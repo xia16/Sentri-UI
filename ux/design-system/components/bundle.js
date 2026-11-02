@@ -1267,17 +1267,20 @@
      format(n) → the word for one value (also each handle's aria-valuetext), summary(from,to) → the chosen span at the title's end,
      ends:[left, middle, right] }). The track is two native range inputs, so the keyboard and screen readers come free; the whole
      48px rail takes the touch (the nearest handle moves), so a glove never has to hit the 28px handle. Open (the whole track) shows
-     no span and a quiet rail; narrowed, the span fills and the title row names it. A tick marks each step (up to 20). A change moves the fill,
+     no span and a quiet rail; narrowed, the span fills and the title row names it. A tick marks each step (up to 20). `counts` (one
+     number per step) draws how many items sit on each step as short bars over the rail, the ones inside the span green, so a scale
+     with few values in use shows where they are instead of shrinking to them. A change moves the fill,
      the value line and the aria text, then fires `sentri-range-change` { key, values:{from,to} } for the host to read. */
   const rangeFormats=new Map(),rangeClamp=(n,lo,hi)=>Math.max(lo,Math.min(hi,n));
   const rangeLine=(f,a,b,open)=>open?'':f.summary?f.summary(a,b):(a===b?f.format(a):f.format(a)+' – '+f.format(b));   // open: the end labels say it
   const rangeVars=(a,b,min,max)=>`--from:${(a-min)/(max-min)*100}%;--to:${(b-min)/(max-min)*100}%`;
-  function rangeSlider({min=0,max=10,step=1,value=[min,max],title='',icon='',key='range',names=['from','to'],labels=['Lowest','Highest'],format=String,summary=null,ends=[],className=''}={}){
+  function rangeSlider({min=0,max=10,step=1,value=[min,max],title='',icon='',key='range',names=['from','to'],labels=['Lowest','Highest'],format=String,summary=null,ends=[],counts=null,className=''}={}){
     if(!(max>min&&step>0))throw new RangeError('RangeSlider requires max > min and step > 0');
     const v=value.map(x=>rangeClamp(min+Math.round((Number(x)-min)/step)*step,min,max)).sort((a,b)=>a-b),f={format,summary};
     rangeFormats.set(key,f);
     const open=v[0]===min&&v[1]===max,steps=Math.round((max-min)/step),ticks=steps<=20?`<div class="st-range-ticks" aria-hidden="true">${'<i></i>'.repeat(steps+1)}</div>`:'';
-    return `<div class="st-range${className?' '+esc(className):''}" data-ds="RangeSlider" data-key="${esc(key)}" data-names="${esc(names.join(','))}"${open?' data-open':''}><div class="st-range-head">${title?heading({title,icon,kind:'section',level:4,className:'st-range-title'}):''}<output class="st-range-value">${esc(rangeLine(f,v[0],v[1],open))}</output></div><div class="st-range-rail" style="${rangeVars(v[0],v[1],min,max)}"><div class="st-range-track"></div>${ticks}${v.map((x,i)=>`<input type="range" min="${min}" max="${max}" step="${step}" value="${x}" data-range="${esc(names[i])}" aria-label="${esc(labels[i])}" aria-valuetext="${esc(format(x))}">`).join('')}</div>${ends.length?`<div class="st-range-ends">${ends.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}</div>`;
+    const top=counts&&counts.length===steps+1&&steps<=20?Math.max(...counts):0,hist=top?`<div class="st-range-hist" aria-hidden="true">${counts.map((n,i)=>{const x=min+i*step;return `<i style="left:${i/steps*100}%;height:${n?Math.max(10,Math.round(n/top*100)):0}%"${!open&&x>=v[0]&&x<=v[1]?' data-on':''}></i>`;}).join('')}</div>`:'';
+    return `<div class="st-range${className?' '+esc(className):''}" data-ds="RangeSlider" data-key="${esc(key)}" data-names="${esc(names.join(','))}"${open?' data-open':''}><div class="st-range-head">${title?heading({title,icon,kind:'section',level:4,className:'st-range-title'}):''}<output class="st-range-value">${esc(rangeLine(f,v[0],v[1],open))}</output></div>${hist}<div class="st-range-rail" style="${rangeVars(v[0],v[1],min,max)}"><div class="st-range-track"></div>${ticks}${v.map((x,i)=>`<input type="range" min="${min}" max="${max}" step="${step}" value="${x}" data-range="${esc(names[i])}" aria-label="${esc(labels[i])}" aria-valuetext="${esc(format(x))}">`).join('')}</div>${ends.length?`<div class="st-range-ends">${ends.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}</div>`;
   }
   function rangeSet(root,input,n){
     const ins=[...root.querySelectorAll('input[type="range"]')],i=ins.indexOf(input),min=+input.min,max=+input.max,step=+input.step,f=rangeFormats.get(root.dataset.key)||{format:String};
@@ -1287,6 +1290,7 @@
     root.querySelector('.st-range-rail').style.cssText=rangeVars(a,b,min,max);
     ins.forEach(x=>x.setAttribute('aria-valuetext',f.format(+x.value)));
     const open=a===min&&b===max;root.toggleAttribute('data-open',open);
+    root.querySelectorAll('.st-range-hist i').forEach((bar,k)=>{const x=min+k*step;bar.toggleAttribute('data-on',!open&&x>=a&&x<=b);});
     root.querySelector('.st-range-value').textContent=rangeLine(f,a,b,open);
     const names=root.dataset.names.split(',');
     root.dispatchEvent(new CustomEvent('sentri-range-change',{bubbles:true,detail:{key:root.dataset.key,values:{[names[0]]:a,[names[1]]:b}}}));
