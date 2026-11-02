@@ -112,4 +112,42 @@ async function corner(p, label) {
   await p.close();
 }
 
+// Variant C (owner, 2026-11-02: "maybe we just have a last action by who when. users can click into that to undo"): under the keys,
+// one row names the last action, when and who; tapping it asks to undo it. The card's quiet "Saved" time goes (the row says it).
+// The row hides while a visit is unsaved: the chips are the visit then, and Clear empties it.
+async function lastAction(p, what, when) {
+  await p.evaluate(({ what, when }) => {
+    const U = window.SentriUI, sheet = document.querySelector('.sheet[data-view="count"]');
+    sheet.querySelector('.alive-quiet')?.remove();
+    sheet.querySelector('.count-keys').insertAdjacentHTML('afterend',
+      U.rowGroup(U.row({ title: what, description: `Last action · ${when}`, action: 'lastAction', trail: 'chevron' }), { className: 'mock-last' }));
+    const st = document.createElement('style'); st.textContent = '.mock-last{margin-top:12px}'; document.head.append(st);
+  }, { what, when });
+}
+{
+  const p = await open('farrowing.count');
+  await lastAction(p, '+4 born alive', 'Aug 26 08:41 · G.H');
+  await shot(p, 'undo-c0-idle.png');
+  await p.close();
+}
+{
+  const p = await open('farrowing.count');
+  await tap(p, PLUS, 3);
+  await tap(p, SAVE);
+  await lastAction(p, '+3 born alive', '09:41 · G.H');
+  await shot(p, 'undo-c1-saved.png');
+  await p.evaluate(() => {
+    const U = window.SentriUI, sheet = document.querySelector('.sheet[data-view="count"]');
+    const body = '<div class="mock-undo-what"><strong>+3 born alive</strong><small>09:41 · G.H</small></div><p class="mock-undo-hint">It comes back as not saved, so you can fix it and save again.</p>';
+    sheet.insertAdjacentHTML('afterend', U.sheet({ variant: 'dialog', title: 'Undo the last action?', body,
+      footer: '<div class="sheet-footer" data-ds="Sheet"><button type="button" class="button secondary" data-ds="Button" data-register="secondary">Back</button><button type="button" class="button primary" data-ds="Button" data-register="primary">Undo</button></div>' }));
+    sheet.setAttribute('inert', '');
+    const st = document.createElement('style');
+    st.textContent = '.mock-undo-what{display:flex;flex-direction:column;gap:2px;margin-top:12px}.mock-undo-what strong{font-size:17px;font-weight:600;color:var(--ink,#1d221e)}.mock-undo-what small{font-size:13px;color:var(--muted,#6b736d)}.mock-undo-hint{margin:12px 0 0;font-size:14px;color:var(--ink-2,#4a524c)}';
+    document.head.append(st);
+  });
+  await shot(p, 'undo-c2-ask.png');
+  await p.close();
+}
+
 await b.close(); server.kill();

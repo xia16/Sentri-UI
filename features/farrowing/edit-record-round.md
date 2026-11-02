@@ -8,23 +8,28 @@ The owner's words (2026-11-02): *"edit record right now is way too confusing …
 
 *"lets just agree that there is no more edit record for farrowing what you fill is in what you fill in. but we need a way something simpler if users fat finger a death or a born. and need to redo it after pressing save."* Count is a global feature, and its spec is a round of its own (`features/count/`, branch `claude/frosty-chatelet-85b362`). The rest of this file is the round as it was put to the owner. Where it differs from this ruling, the ruling stands.
 
-**The redo: Undo the last save, named, in Litter details.** After Save, the Alive card's saved line says what was saved, `✓ Saved · +3 born`. That is how a fat finger gets noticed. The card is already the door to Litter details. There, under the figures, **Last save** shows that one line (`+3 born alive · Saved 09:41 · G.H`) with an **Undo** button. Undo brings the visit back to the drawer as unsaved, exactly as it was: the born chip, the deaths with their causes, the photos. The record drops back to what it was before it. The worker fixes it with the keys they already use (− takes a born back; Death changes a death) and presses Save. The log keeps one line for the visit, marked **Corrected**, with what it was.
+**The redo: the last action, by who and when; tap it to undo.** Under the keys, one row names the sow's last action: `+3 born alive` over `Last action · 09:41 · G.H`. Tapping it asks **Undo the last action?**, naming the line again with Back · Undo. Undo brings the visit back to the drawer as unsaved, exactly as it was: the born chip, the deaths with their causes, the photos. The record drops back to what it was before it. The worker fixes it with the keys they already use (− takes a born back; Death changes a death) and presses Save. The log keeps one line for the visit, marked **Corrected**, with what it was. The Alive card's quiet `Saved 08:20` goes, because the row says it. The row hides while a visit is unsaved (the chips are the visit then, and Clear empties it).
 
-Why not a bare `Undo` in the drawer's top-right corner (drawn first, [undo-2-saved.png](edit-record-round/undo-2-saved.png))? The owner's objection holds. It doesn't say what it undoes, it is a small text target for a glove, and the same corner would mean Clear, Undo or nothing. Why not undo *any* line in the log? That is Edit record again under another name. Only the last save is fresh enough to fix honestly.
+Drawn first and dropped:
+- A bare `Undo` in the header corner ([undo-2-saved.png](edit-record-round/undo-2-saved.png)). It doesn't say what it undoes, it's a small target for a glove, and the corner already holds Clear.
+- `Saved · +3 born` on the card plus Undo in Litter details ([undo-b1-saved.png](edit-record-round/undo-b1-saved.png), [undo-b2-details.png](edit-record-round/undo-b2-details.png)). Named, but one hop away, and the owner preferred the row (2026-11-02).
+- Undo on any log line. That is Edit record again.
 
 | | | |
 |---|---|---|
-| ![Fat finger](edit-record-round/undo-1-fat-finger.png) | ![Saved, named](edit-record-round/undo-b1-saved.png) | ![Details, Last save](edit-record-round/undo-b2-details.png) |
-| **1. The fat finger.** Three taps for two piglets: `+3 born`. Save. | **2. Saved.** Alive 12, `✓ Saved · +3 born`: the card says what went in. Tap it. | **3. Litter details.** Total born 17. **Last save** `+3 born alive · Saved 09:41 · G.H` with **Undo**; then the Farrowing log. Edit record is gone. |
-| ![Undone](edit-record-round/undo-3-reopened.png) | ![Fixed](edit-record-round/undo-4-fixed.png) | ![Log](edit-record-round/undo-5-log.png) |
-| **4. Undo.** Back in the drawer: `Alive · Not saved yet`, 12 with `+3 born`. The record reads 9 until Save. | **5. Fixed.** − once: 11 with `+2 born`. Save. | **6. The log.** One line: `Corrected · +2 born alive · Was +3 born alive · 09:43 · G.H` (the Log's own corrected form). |
+| ![Idle](edit-record-round/undo-c0-idle.png) | ![Fat finger](edit-record-round/undo-1-fat-finger.png) | ![Saved, last action](edit-record-round/undo-c1-saved.png) |
+| **0. Opening her drawer.** Under the keys: `+4 born alive · Last action · Aug 26 08:41 · G.H`. | **1. The fat finger.** Three taps for two piglets: `+3 born`. The row hides while the visit is unsaved. Save. | **2. Saved.** Alive 12; the row now says `+3 born alive · Last action · 09:41 · G.H`. Tap it. |
+| ![Ask](edit-record-round/undo-c2-ask.png) | ![Undone](edit-record-round/undo-3-reopened.png) | ![Fixed](edit-record-round/undo-4-fixed.png) |
+| **3. Undo the last action?** `+3 born alive · 09:41 · G.H`, *It comes back as not saved, so you can fix it and save again.* Back · Undo. | **4. Undone.** `Alive · Not saved yet`, 12 with `+3 born`. The record reads 9 until Save. | **5. Fixed.** − once: 11 with `+2 born`. Save. |
+| ![Log](edit-record-round/undo-5-log.png) | ![Litter details](edit-record-round/undo-6-litter.png) | |
+| **6. The log.** One line: `Corrected · +2 born alive · Was +3 born alive · 09:43 · G.H`. | **7. Litter details.** Edit record is gone; figures and log stay. | |
 
 Rules (proposed):
-- **Only the last save** on this sow, and only for the worker who saved it. It goes once anything else is saved on her, by anyone, or she is finished. Someone on the next shift never sees Undo for a visit they didn't make, which is the owner's point about recall.
+- **Only the last action** on this sow, and only for the worker who saved it. It goes once anything else is saved on her, by anyone, or she is finished. Everyone sees the row (who touched her last is useful at handover). For anyone else it is a plain line with no chevron and nothing to tap, which is the owner's point about recall.
 - **A death is the same.** A saved `1 crushed` that was scours: Undo, open Death, change it, Save.
 - **Clear after Undo** withdraws the visit: the log keeps it as `Withdrawn · +3 born alive`, so nothing silently disappears.
 - **Finish is never undone.** After Finish the only saves are Record dead's, and the same Undo applies to the last one (Q R3).
-- **Gone:** Edit record (Litter details), Edit on the finished record's toolbar, Edit litter record in Actions, Correct born, Edit finish details. Screens `farrowing.edit`, `farrowing.edit-finished`, `farrowing.born` and `farrowing.leave-edit` retire; `farrowing.litter` gains Last save, and `farrowing.count` gains the named saved line.
+- **Gone:** Edit record (Litter details), Edit on the finished record's toolbar, Edit litter record in Actions, Correct born, Edit finish details. Screens `farrowing.edit`, `farrowing.edit-finished`, `farrowing.born` and `farrowing.leave-edit` retire; `farrowing.count` gains the last-action row and a held-frame screen for the Undo question, and the card's quiet saved line goes (a change to the 2026-10-23 card).
 
 Questions for the owner:
 - **R1.** Undo only for the worker who saved it? *Recommend yes.*
