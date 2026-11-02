@@ -23,6 +23,9 @@ Reviewed on the Claude Design canvas ([canvas.md](canvas.md)). Ruled and redrawn
 - **The balancing sheet** (owner, 2026-11-02) is Round 9's batch-level "N unaccounted" made explicit: open gains and losses per batch, balanced by later events, closed into an unaccounted loss when the batch ends (Q, batch end = weaning, transfer out or sale).
 - Withdrawn with the room count: owner questions 2 (as worded), 5 and the room scenarios 17 to 19; scenario 18 (a pig from another pen) now happens inside a pen count.
 
+- **A whole room is counted only inside Transfer's receiving side** (owner question, 2026-11-02). The old transfer task, as the web tracked it and as the Home file's AI-drawn cards sketched it, sends a batch to barns or rooms, never to pens ("200 unpositioned"); choosing pens ahead would be a logistics nightmare. *Receive pigs* is the room count: received against sent on top (the old 已转入 / 已转出), then each pen of the room with how many pigs were put in it (scanning any with ear tags), which positions them; *Finish receiving* puts the difference on the batch's balancing sheet. Everywhere else counting is one pen at a time.
+- **Ticked rows take colour** (owner: "so grey and black"): three options against the status colour convention on its own canvas. A as now (grey wash, black box), **B a green box on white (recommended)**, C a green box on a green wash.
+
 ---
 
 ## 1. The old system, and what is complex about it

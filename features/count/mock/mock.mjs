@@ -110,7 +110,14 @@ if (want('1-')) {
 //    search-and-scan field (farms without a reader type them); each added pig appears below it, a tag added twice counts once, and a
 //    pig the record places in another pen says so quietly ("Currently in …"). Pigs without ear tags are worked out, never typed.
 //    Pen D4 on record: 000801, 000802, 000803 with ear tags + 13 without = 16.
-for (const [name, fewer] of [['mock-3-count-pen.png', true], ['mock-3b-count-pen-match.png', false]]) {
+// The ticked rows in three colourings (owner, 2026-11-02: "it looks so grey and black"), against the status colour convention
+// (done green, in progress blue, late yellow): A as now (well tint, ink box), B green box on white, C green box on green-wash.
+const TICK = {
+  A: '',
+  B: '.st-choice-trail input[type="checkbox"]{accent-color:#276640!important}.inspect-pig.selected,.roster-pig.selected{background:var(--paper,#fff)!important}',
+  C: '.st-choice-trail input[type="checkbox"]{accent-color:#276640!important}.inspect-pig.selected,.roster-pig.selected{background:#eaf2e5!important}',
+};
+for (const [name, fewer, tick] of [['mock-3-count-pen.png', true, 'B'], ['mock-3b-count-pen-match.png', false, 'B'], ['mock-3v-tick-a-now.png', true, 'A'], ['mock-3v-tick-b-green-box.png', true, 'B'], ['mock-3v-tick-c-green-wash.png', true, 'C']]) {
   if (!want(name.slice(5, 7))) continue;
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
@@ -141,6 +148,7 @@ for (const [name, fewer] of [['mock-3-count-pen.png', true], ['mock-3b-count-pen
     const left = '<div class="m-left"><strong>' + untagged + ' without ear tags</strong><small>' + (diff === 0 ? 'Matches the record' : Math.abs(diff) + ' not accounted for') + '</small></div>';
     page('Count pigs', 'Pen D4 · Unit 7', count + tags + `<section class="feature-section">${evidence}</section>`, footer(left, primary('Review count')));
   }, { fewer });
+  if (TICK[tick]) await p.addStyleTag({ content: TICK[tick] });
   await shoot(p, name);
 }
 
@@ -216,6 +224,37 @@ if (want('7-')) {
     document.head.append(st);
   });
   await shoot(p, 'mock-7-noid-conditions.png');
+}
+
+// 8. Receive pigs (the movement feature's receiving side): the one place a whole room is counted. A batch is sent to a room, not to
+//    pens (choosing pens ahead would be a logistics nightmare); as pigs are put in, the worker types how many went into each pen,
+//    scanning any with ear tags. The header keeps received against sent, the old web task's 已转入 / 已转出.
+if (want('8-')) {
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate(() => {
+    const { U, ic, page, footer, primary } = window.M;
+    const field = (value, idle) => { const t = document.createElement('div'); t.innerHTML = U.rowSelectDoor({ code: 'x', value: 'x', action: '', checked: false, count: { value, idle, attrs: { 'data-m-total': '' } } }); return t.querySelector('[data-m-total]')?.outerHTML || ''; };
+    const pen = (code, n, idle) => '<div class="m-recv-pen' + (idle ? ' m-idle' : '') + '"><span class="m-recv-code">' + code + '</span><span class="m-recv-what">' + (idle ? 'Empty' : '') + '</span><span class="m-total-field">' + field(n, idle) + '</span></div>';
+    const bar = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>112</strong><span>of 120 received</span></div><div class="m-recv-track"><i style="width:93%"></i></div><small>Sent from Farrowing room 3 · 08:10 · G.H</small></div>';
+    const pens = U.heading({ title: 'Pigs put in each pen', icon: ic('grid'), kind: 'section', level: 3 })
+      + '<div class="m-recv-list">' + pen('N1', 15) + pen('N2', 15) + pen('N3', 14) + pen('N4', 16) + pen('N5', 15) + pen('N6', 15) + pen('N7', 12) + pen('N8', 10) + pen('N9', 0, true) + pen('N10', 0, true) + '</div>';
+    const left = '<div class="m-left"><strong>8 still to come</strong><small>Batch 25 · 120 sent</small></div>';
+    page('Receive pigs', 'Batch 25 · into Unit 9', bar + pens, footer(left, primary('Finish receiving')));
+    const st = document.createElement('style');
+    st.textContent = `.m-recv-bar{background:var(--paper,#fff);border:1px solid var(--line,#dfe4d8);border-radius:18px;padding:14px 16px;margin:4px 0 20px}
+      .m-recv-figs{display:flex;align-items:baseline;gap:8px}.m-recv-figs strong{font:600 32px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}.m-recv-figs span{font-size:14px;color:var(--ink,#20291f)}
+      .m-recv-track{height:8px;border-radius:4px;background:#eef1e7;margin:12px 0 10px;overflow:hidden}.m-recv-track i{display:block;height:100%;background:#466888;border-radius:4px}
+      .m-recv-bar small{font-size:12px;color:var(--muted,#657060)}
+      .m-recv-list{background:var(--paper,#fff);border:1px solid var(--line,#dfe4d8);border-radius:18px;overflow:hidden}
+      .m-recv-pen{display:flex;align-items:center;gap:12px;min-height:60px;padding:0 14px;border-top:1px solid var(--rule,#e8eddf)}.m-recv-pen:first-child{border-top:0}
+      .m-recv-code{font:600 15px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f);width:44px}
+      .m-recv-what{flex:1;font-size:13px;color:var(--muted,#657060)}
+      .m-recv-pen .m-total-field{margin-left:auto}
+      .m-idle .m-recv-code{color:var(--muted,#657060)}`;
+    document.head.append(st);
+  });
+  await shoot(p, 'mock-8-receive.png');
 }
 
 await b.close(); server.kill();

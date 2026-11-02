@@ -251,3 +251,15 @@ blocked · `224:1486` submittable
 10. **Planned transfer progress** (`已转入 / 已转出 n / N` per batch) on the web.
 11. **Litter counts:** reported vs system with a stated reason, and fostering moving both litters'
     numbers. The old auto-remove and auto-add are the part to replace, not keep.
+
+---
+
+## Added 2026-11-02: the transfer task and receiving (owner asked)
+
+- **Web 转舍 task** (WB `3421:7768`): one row per pig type and batch, progress `已转入 / 已转出` (received / sent out), e.g. `100 / 200`; tiles 未开始 · 进行中 · 已完成. The web tracks; the phone was meant to move.
+- **Mobile transfer cards, Home file** (`UuyZbUklgF674X57hm3PHF`, frame `11060:1864` named **AI出图**, AI-drawn explorations, not a designed flow): `PigTransferMobileCard 11022:3820`, `PigTransferTaskCard 11032:2999`, `PigTransferCard 11022:2551`. *Transfer: Weaner · Line 1 · Batch 25*: **Transfer out** from source barns (Zone 1 Farrowing, Barns 1–3), `0 / 200 Heads`, *Start Selection*; **Transfer in** to target barns (Zone 2 Nursery, Barns 1, 2, 3 +2), *Execute Transfer In* / *Confirm Arrival*, `Moving 100 Heads`, **`200 Unpositioned`**. The destination is barns, never pens: pigs arrive unpositioned.
+- **End nursery check, old UI** (TASK `4120:4013`, sheet `4098:4781` named 转入): rooms with `已检查：200 头` or 需检查, `本批次留种：60 头`, 添加单元. A room-level count inside a task.
+- **Pig count anomaly, prototype** (TASK page 原型图, section `2444:15408` 猪只数量异常): "当前系统记录A1栏位AA0002母猪有10头仔猪，请在下方填写实际数量"; more → add pigs and a reason; fewer → with tagged pigs here, list them to pick which is missing, else just subtract; a reason either way.
+- No mobile Transfer or Receiving screen exists beyond these cards.
+
+Screens saved here: `home-transfer-mobile-card-11022-3820.png`, `home-transfer-task-card-11032-2999.png`, `home-transfer-card-11022-2551.png`, `task-end-nursery-transfer-in-4098-4781.png`.
