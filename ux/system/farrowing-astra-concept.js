@@ -148,7 +148,6 @@ function act(s,a,v){
  // returns to the defaults (her unit, any time, any parity), Back drops it.
  if(a==='allocFilter'){s.fosterDraft.filtering=true;s.fosterDraft.filterDraft=clone(s.fosterDraft.filter);}
  if(a==='allocUnit')s.fosterDraft.filterDraft.unit=v;
- if(a==='allocParity')s.fosterDraft.filterDraft.parity=v;
  if(a==='allocFilterReset')s.fosterDraft.filterDraft=allocFilterDefault(s);
  if(a==='allocFilterApply'){s.fosterDraft.filter=s.fosterDraft.filterDraft;s.fosterDraft.filtering=false;}
  if(a==='allocFilterBack')s.fosterDraft.filtering=false;
@@ -314,13 +313,17 @@ function finishFacts(s){
 const roomContexts=[];
 const penHighlightTimers=[];
 const roomLenses=['Awaiting','Active','Done','All'];
-const defaultRoomFilter=()=>({from:-7,to:7,parity:'Any'});
-const parityChoices=['Any','0','1','2–5','6+'];
+const defaultRoomFilter=()=>({from:-7,to:7,pmin:0,pmax:6});
+// Parity is a range like the due days (owner, 2026-11-02): 0 to 6+, the top end open.
+const parityDay=n=>n===6?'6+':String(n);
+const paritySlider=(d,key)=>SentriUI.rangeSlider({min:0,max:6,value:[d.pmin,d.pmax],title:'Parity',icon:icon('profile'),key,names:['pmin','pmax'],labels:['Lowest parity','Highest parity'],format:parityDay,summary:(a,b)=>parityRangeLabel({pmin:a,pmax:b}),ends:['0','3','6+']});
+const dueSlider=(d,key)=>SentriUI.rangeSlider({min:-7,max:7,value:[d.from,d.to],title:'Expected farrowing',icon:icon('calendar'),key,labels:['Earliest expected farrowing','Latest expected farrowing'],format:dueDay,summary:(from,to)=>dueRangeLabel({from,to}),ends:['7+ days ago','Today','In 7+ days']});
 const dueDay=n=>n===-7?'7+ days ago':n===7?'In 7+ days':n===0?'Today':n===-1?'Yesterday':n===1?'Tomorrow':n<0?(-n)+' days ago':'In '+n+' days';
-function dueRangeLabel(f){return f.from===-7&&f.to===7?'Any time':f.from===f.to?dueDay(f.from):dueDay(f.from)+' – '+dueDay(f.to);}
-function roomFilterCount(f){return Number(f.from!==-7||f.to!==7)+Number(f.parity!=='Any');}
-function roomFilterLabel(f){return [f.from!==-7||f.to!==7?'Due: '+dueRangeLabel(f):'',f.parity!=='Any'?'Parity '+f.parity:''].filter(Boolean).join(' · ');}
-function matchesRoomFilter(r,f){return dueMatches(r,f)&&(f.parity==='Any'||f.parity==='6+'&&r.parity>=6||f.parity==='2–5'&&r.parity>=2&&r.parity<=5||String(r.parity)===f.parity);}
+function dueRangeLabel(f){return f.from===-7&&f.to===7?'':f.from===f.to?dueDay(f.from):dueDay(f.from)+' – '+dueDay(f.to);}
+function parityRangeLabel(f){return f.pmin===0&&f.pmax===6?'':f.pmin===f.pmax?parityDay(f.pmin):f.pmax===6?f.pmin+' or more':f.pmin+'–'+f.pmax;}
+function roomFilterCount(f){return Number(f.from!==-7||f.to!==7)+Number(f.pmin!==0||f.pmax!==6);}
+function roomFilterLabel(f){return [f.from!==-7||f.to!==7?'Due: '+dueRangeLabel(f):'',f.pmin!==0||f.pmax!==6?'Parity '+parityRangeLabel(f):''].filter(Boolean).join(' · ');}
+function matchesRoomFilter(r,f){return dueMatches(r,f)&&r.parity>=f.pmin&&(f.pmax===6||r.parity<=f.pmax);}
 function visibleRoomRecords(c,f=c.filter){return c.listed.filter(r=>matchesRoomFilter(r,f)&&(c.lens==='All'||roomState(r)===c.lens));}
 const roomIcon=k=>SentriIcons.icon(k);
 const roomState=r=>r.productionOutcome||r.locked?'Done':born(r)>0?'Active':'Awaiting';
@@ -719,7 +722,7 @@ function taskEndSheet(s,c){
  const closureLabel=r.awaiting.length||r.blocked?'End task early':'End task';
  return sheet(closureLabel,`${taskPerformance(r.performance)}${taskOutcomeSummary({total:r.rows.length,finished:r.finished.length,active:r.active.length,awaiting:r.awaiting.length,removed:r.removed.length,ended:r.ended.length,abortions:r.abortions.length,notInPig:r.notInPig.length})}`,pageFooter(hold('room-end-confirm',closureLabel,r.blocked,closureLabel==='End task early').replace('button primary hold','button primary hold '+(closureLabel==='End task'?'task-complete':'task-end-confirm'))),'task-end-expanded');
 }
-function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls='',surface='',line=null)=>roomSheet(title,body,actions,cls,surface,line);if(s.view==='roomFilter'){const f=c.filterDraft,n=visibleRoomRecords(c,f).length;return SentriUI.filterSheet({title:'Filter sows',sections:[{content:SentriUI.rangeSlider({min:-7,max:7,value:[f.from,f.to],title:'Expected farrowing',icon:icon('calendar'),key:'due',labels:['Earliest expected farrowing','Latest expected farrowing'],format:dueDay,summary:(from,to)=>dueRangeLabel({from,to}),ends:['7+ days ago','Today','In 7+ days']})},{title:'Parity',icon:icon('profile'),content:SentriUI.segment({variant:'facet',options:parityChoices.map(v=>[v,v]),active:f.parity,action:'room-parity',ariaLabel:'Parity'})}],apply:{label:`Show ${n} ${n===1?'sow':'sows'}`,action:'room-apply-filter'},reset:roomFilterCount(f)?{label:'Reset',action:'room-reset-filter'}:false,backAction:'room-back',className:'room-utility room-filter-sheet'});}
+function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls='',surface='',line=null)=>roomSheet(title,body,actions,cls,surface,line);if(s.view==='roomFilter'){const f=c.filterDraft,n=visibleRoomRecords(c,f).length;return SentriUI.filterSheet({title:'Filter sows',sections:[{content:dueSlider(f,'due')},{content:paritySlider(f,'parity')}],apply:{label:`Show ${n} ${n===1?'sow':'sows'}`,action:'room-apply-filter'},reset:roomFilterCount(f)?{label:'Reset',action:'room-reset-filter'}:false,backAction:'room-back',className:'room-utility room-filter-sheet'});}
  if(s.view==='roomPicker'&&c.picker)return roomSheet(c.picker.label,SentriUI.pickerOptions({options:c.picker.options,selected:c.picker.selected}),footer(SentriUI.backButton({action:'room-back'})),'picker-sheet');
  if(['roomEndTask','roomTaskSows','roomTaskReceipt'].includes(s.view))return taskEndSheet(s,c);
  const penPage=penSubpage(s,c);if(penPage!==null)return penPage;
@@ -749,7 +752,6 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
  if(a==='room-home')s.view='roomHome';
  if(a==='room-lens'){c.lens=v;c.scroll=nextScroll;c.tailSpace=0;s.view='room';}
  if(a==='room-filter'){c.filterDraft=clone(c.filterKeep||c.filter);s.view='roomFilter';}
- if(a==='room-parity')c.filterDraft.parity=v;
  if(a==='room-reset-filter')c.filterDraft=defaultRoomFilter();
  if(a==='room-apply-filter'){c.filterKeep=null;c.filter=clone(c.filterDraft);c.scroll=nextScroll;c.tailSpace=0;s.view='room';}
  if(a==='room-clear-filter'){c.filterKeep=null;c.filter=defaultRoomFilter();c.scroll=nextScroll;c.tailSpace=0;}
@@ -844,13 +846,13 @@ function moreSowActions(s){return btn('sowActions',`Actions ${icon('chevron')}`,
 function recordActions(s){const pending=sum(s.deathDraft);return `<div class="record-inline-actions" aria-label="Record actions"><div class="record-action-group" role="group" aria-label="Quick actions">${s.events.length||born(s)?btn('edit',`${icon('edit')}<span>Edit</span>`,'record-toolbar-action'):''}${btn('death',`${icon('alert')}<span>Record dead</span>${pending?`<small>${pending} unsaved</small>`:''}`,'record-toolbar-action')}${btn('sowActions',`${icon('more')}<span>Actions</span>`,'record-toolbar-action record-toolbar-more').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)}</div></div>`;}
 function recordNavigation(primary=''){return footer(SentriUI.backButton({action:'close'}),primary,'execution-completion');}
 // Right after the hold records her death (or from her row while piglets wait): where do her piglets go? A page of choice tiles
-// (owner, 2026-11-02), each with its one-line meaning. A tile only chooses; its section opens under the tiles. Foster is the sow
+// (owner, 2026-11-02): the labels alone, they are self-evident. A tile only chooses; its section opens under the tiles. Foster is the sow
 // picker in place (search, pen cards, scan): a sow opens the count drawer and Send stays here while piglets are left. Hand-rear and the
 // rearing pen show what will be recorded and commit from the footer. The header's Back leaves with nothing recorded (later).
 // Header line (owner, 2026-11-02: information budget): her tag and the piglets left. Pen and time of death are on her row.
 function allocate(s){
  const n=s.alive,pigs=`${n} piglet${n===1?'':'s'}`,c=s.allocChoice||'',f=s.fosterDraft;
- const options=[{value:'move',label:'Foster',meta:'Other sows',icon:'transfer'},{value:'hand',label:'Hand-rear',meta:'By bottle',icon:'drop'},...(farmConfig.rearingPen?[{value:'rear',label:'Rearing pen',meta:'Rescue deck',icon:'barn'}]:[])].map(o=>({...o,pressed:c===o.value}));
+ const options=[{value:'move',label:'Foster',icon:'transfer'},{value:'hand',label:'Hand-rear',icon:'drop'},...(farmConfig.rearingPen?[{value:'rear',label:'Rearing pen',icon:'barn'}]:[])].map(o=>({...o,pressed:c===o.value}));
  const tiles=SentriTask.choice({label:'Where her piglets go',action:'allocChoose',options});
  let section='',commit=btn('',`Allocate ${pigs}`,'button primary','',true);
  if(c==='move'){
@@ -1063,15 +1065,14 @@ function allocFosterList(s){
  const row=x=>{const p={code:x.r.tag,place:rowText.pen(x.r.pen),right:right(x),action:'fosterPick',value:x.r.tag};return (q?SentriUI.findRow({...p,query:q}):SentriUI.row({variant:'animal',code:p.code,description:p.place,right:p.right||{kind:'state',figure:'',word:'',level:'settled'},action:p.action,value:p.value})).replace('<button ',`<button data-scan-tag="${x.r.tag}" `);};
  return SentriUI.lookupGroups(units.map(u=>({title:u.name,rows:items.filter(x=>x.unit.id===u.id).sort((a,b)=>a.r.pen.localeCompare(b.r.pen,undefined,{numeric:true})||a.r.tag.localeCompare(b.r.tag)).map(row)})),{variant:'find'});
 }
-// The filter is the room's Filter sows (expected farrowing, parity) with the unit added first, as chips (FilterChips: there can be ten
+// The filter is the room's Filter sows (expected farrowing and parity, two ranges) with the unit added first, as chips (FilterChips: there can be ten
 // units). All first, then each unit of the batch with a sow that can take piglets, with that count.
 function allocFilterSheet(s){
  const f=s.fosterDraft,d=f.filterDraft,list=fosterCandidates(s),units=[...new Map(list.map(x=>[x.unit.id,x.unit])).values()].sort((a,b)=>String(a.id).localeCompare(String(b.id),undefined,{numeric:true}));
  const n=allocShown(s,d);
  const chips=SentriUI.filterChips({items:[{value:'all',label:'All',checked:d.unit==='all'},...units.map(u=>({value:u.id,label:u.name,count:list.filter(x=>x.unit===u).length,checked:d.unit===u.id}))],action:'allocUnit',key:'allocUnit',label:'Unit'});
  const sections=[{title:'Unit',icon:icon('grid'),content:chips},
-  {content:SentriUI.rangeSlider({min:-7,max:7,value:[d.from,d.to],title:'Expected farrowing',icon:icon('calendar'),key:'allocDue',labels:['Earliest expected farrowing','Latest expected farrowing'],format:dueDay,summary:(from,to)=>dueRangeLabel({from,to}),ends:['7+ days ago','Today','In 7+ days']})},
-  {title:'Parity',icon:icon('profile'),content:SentriUI.segment({variant:'facet',options:parityChoices.map(v=>[v,v]),active:d.parity,action:'allocParity',ariaLabel:'Parity'})}];
+  {content:dueSlider(d,'allocDue')},{content:paritySlider(d,'allocParity')}];
  return SentriUI.filterSheet({title:'Filter sows',sections,apply:{label:`Show ${n} ${n===1?'sow':'sows'}`,action:'allocFilterApply'},reset:allocFilterCount(s,d)?{label:'Reset',action:'allocFilterReset'}:false,backAction:'allocFilterBack',className:'room-utility room-filter-sheet alloc-filter-sheet'});
 }
 const allocActive=g=>Number(g.unit!=='all')+roomFilterCount(g);   // the badge: filters narrowing the list (her unit counts)
@@ -1112,7 +1113,7 @@ document.addEventListener('pointerdown',()=>document.documentElement.dataset.inp
 document.addEventListener('keydown',()=>delete document.documentElement.dataset.inputMode,true);
 const gallery=document.getElementById('gallery');gallery.innerHTML=cards.map((c,i)=>`<article class="spec" data-card="${i}"><div class="spec-head"><div class="spec-title"><span>0${i+1}</span>${c.title}</div><button type="button" class="demo-scan" data-demo-scan hidden>Simulate scan</button><select class="scenario" aria-label="Example for ${c.title}">${presets.map(([v,l])=>`<option value="${v}"${v===c.initial?' selected':''}>${l}</option>`).join('')}</select></div><div class="phone farrowing-phone"></div><p class="caption">${c.caption}</p></article>`).join('');states.forEach((_,i)=>render(i));
 // The range slider reports each change; keep the draft and the live count in step.
-gallery.addEventListener('sentri-range-change',e=>{const root=e.target.closest('[data-card]'),c=roomContext(states[+root.dataset.card]);if(e.detail.key==='allocDue'){const s=states[+root.dataset.card];Object.assign(s.fosterDraft.filterDraft,e.detail.values);const n=allocShown(s,s.fosterDraft.filterDraft);e.target.closest('.sheet').querySelector('[data-action="allocFilterApply"]').textContent='Show '+n+' '+(n===1?'sow':'sows');return;}Object.assign(c.filterDraft,e.detail.values);const n=visibleRoomRecords(c,c.filterDraft).length;e.target.closest('.sheet').querySelector('[data-action="room-apply-filter"]').textContent='Show '+n+' '+(n===1?'sow':'sows');});
+gallery.addEventListener('sentri-range-change',e=>{const root=e.target.closest('[data-card]'),c=roomContext(states[+root.dataset.card]);if(/^alloc/.test(e.detail.key)){const s=states[+root.dataset.card];Object.assign(s.fosterDraft.filterDraft,e.detail.values);const n=allocShown(s,s.fosterDraft.filterDraft);e.target.closest('.sheet').querySelector('[data-action="allocFilterApply"]').textContent='Show '+n+' '+(n===1?'sow':'sows');return;}Object.assign(c.filterDraft,e.detail.values);const n=visibleRoomRecords(c,c.filterDraft).length;e.target.closest('.sheet').querySelector('[data-action="room-apply-filter"]').textContent='Show '+n+' '+(n===1?'sow':'sows');});
 // Choose pigs: typing narrows the list where it is, so the field keeps focus; Clear shows only while something is typed.
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-foster-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,s=states[i],page=e.target.closest('.foster-pick');s.fosterDraft.q=e.target.value;page.querySelector('.foster-list').innerHTML=(s.view==='allocate'?allocFosterList:fosterList)(s);page.querySelector('[data-action="fosterClear"]')?.toggleAttribute('hidden',!s.fosterDraft.q);if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(s,roomContext(s)));});
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-batch-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,c=roomContext(states[i]),page=e.target.closest('.batch-pick');c.batch.q=e.target.value;page.querySelector('.batch-list').innerHTML=batchRows(c);page.querySelector('[data-action="room-batch-clear"]')?.toggleAttribute('hidden',!c.batch.q);});

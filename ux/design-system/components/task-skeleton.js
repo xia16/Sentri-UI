@@ -126,9 +126,9 @@
   }
 
   /* ---- TaskChoice: farrowing's choice tiles (Foster piglets: Send / Receive): two (or three) big outlined tiles, an icon
-     over the label (and an optional one-line meaning under it, `meta`); the chosen one ringed in ink. options: [{ value, label, meta, icon, pressed }]; one action for all. ---- */
+     over the label; the chosen one ringed in ink. options: [{ value, label, icon, pressed }]; one action for all. ---- */
   function choice({ options = [], action = 'choose', label } = {}) {
-    const b = options.map(o => `<button type="button" class="tk-choice-tile" aria-pressed="${o.pressed ? 'true' : 'false'}"${A(action, o.value)}${L(o.aria)}>${o.icon ? glyph(o.icon) : ''}<span>${T(o.label)}${o.meta ? `<small class="tk-choice-meta">${T(o.meta)}</small>` : ''}</span></button>`).join('');
+    const b = options.map(o => `<button type="button" class="tk-choice-tile" aria-pressed="${o.pressed ? 'true' : 'false'}"${A(action, o.value)}${L(o.aria)}>${o.icon ? glyph(o.icon) : ''}<span>${T(o.label)}</span></button>`).join('');
     return `<div class="tk-choice" data-ds="TaskChoice" role="group" data-count="${options.length}"${L(label)}>${b}</div>`;
   }
 
