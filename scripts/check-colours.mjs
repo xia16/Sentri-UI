@@ -6,11 +6,11 @@
 //   --compare   with --changed: the base server. A changed screen fails only on a stray colour or a role defect the same screen at the base
 //               doesn't have; a new screen only on a stray colour no stylesheet under ux/ on origin/main holds (--base-ref picks another ref).
 // Writes review/colours.json. The convention: the owner, 2026-11-02 (one hue per status, size picks the shade); the tokens:
-// ux/design-system/tokens.json. Three checks, the first two here, the third in tests/status-palette.test.mjs:
+// ux/design-system/tokens.json and ux/design-system/README.md › Colour. Three checks, the first two here, the third in tests/status-palette.test.mjs:
 //   1. token colours only: a colour more than ΔE 2 (OKLab x100) from every token is a stray colour
 //   2. role rules: red only where it means act now, one red signal per row, no green button fill but the counting "+ Born alive" key,
 //      and the status parts (bars, Schedule cells, count discs, legend dots) drawn in the status set
-//   3. the status palette itself: colour-blind separation of the marks, and each fill with its ink
+//   3. the status palette itself: each fill with its own ink, and white on the green key (colour blindness is out of scope: owner, 2026-11-02)
 import { playwright } from './playwright-path.mjs';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -21,14 +21,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.mjs': 'text/javascript', '.cjs': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.otf': 'font/otf', '.md': 'text/plain' };
 
-/* ---------- colour math (OKLab, WCAG contrast, CVD simulation) ---------- */
-// Ported from the dataviz skill's validate_palette.js. Its CVD model is Machado, Oliveira & Fernandes (2009) at severity 1.0: the
-// ΔE 8 separation target is calibrated to that model, so it is kept rather than swapped for Brettel/Viénot.
-const MACHADO = {
-  protan: [[0.152286, 1.052583, -0.204868], [0.114503, 0.786281, 0.099216], [-0.003882, -0.048116, 1.051998]],
-  deutan: [[0.367322, 0.860646, -0.227968], [0.280085, 0.672501, 0.047413], [-0.011820, 0.042940, 0.968881]],
-  tritan: [[1.255528, -0.076749, -0.178779], [-0.078411, 0.930809, 0.147602], [0.004733, 0.691367, 0.303900]],
-};
+/* ---------- colour math (OKLab, WCAG contrast), ported from the dataviz skill's validate_palette.js ---------- */
 const s2lin = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
 // '#rgb', '#rgba', '#rrggbb', '#rrggbbaa' -> [r, g, b, a]: rgb 0..255, alpha 0..1
 export const parseHex = (h) => {
@@ -46,21 +39,16 @@ function oklabFromLin([r, g, b]) {
   return [0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s, 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s];
 }
 export const oklab = (c) => oklabFromLin(linOf(c));
-export const simulate = (c, kind) => { const x = linOf(c), M = MACHADO[kind]; return M.map((row) => Math.max(0, Math.min(1, row[0] * x[0] + row[1] * x[1] + row[2] * x[2]))); };
-// Euclidean distance in OKLab, x100; `kind` (protan, deutan, tritan) compares the two as that reader sees them
-export const deltaE = (c1, c2, kind) => {
-  const a = oklabFromLin(kind ? simulate(c1, kind) : linOf(c1)), b = oklabFromLin(kind ? simulate(c2, kind) : linOf(c2));
-  return 100 * Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
-};
+// Euclidean distance in OKLab, x100
+export const deltaE = (c1, c2) => { const a = oklab(c1), b = oklab(c2); return 100 * Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]); };
 const relLum = (c) => { const [r, g, b] = linOf(c); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
 export const contrast = (a, b) => { const [hi, lo] = [relLum(a), relLum(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
 const over = (top, under) => [0, 1, 2].map((i) => top[i] * top[3] + under[i] * (1 - top[3]));
 
 /* ---------- the palette ---------- */
-// The status convention (owner, 2026-11-02). Each status keeps one hue; size picks the shade: words dark, anything holding a number a
-// light fill with the number in the same hue's dark ink, bars, day segments and dots a clean mid tone. The values the convention adds
-// are listed here under the names of ux/design-system/README.md › Colour until tokens.json carries them; a token with the same value
-// replaces the name given here, and the rules below go by value, so a rename never loosens one.
+// The status convention (owner, 2026-11-02; ux/design-system/README.md › Colour). Each status keeps one hue; size picks the shade:
+// words dark, anything holding a number a light fill with the number in the same hue's dark ink, bars, day segments and dots a clean
+// mid tone. The rules below go by these values, so renaming a token never loosens one.
 export const STATUS = {
   done: { fill: '#d5e8cc', ink: '#1d4d2e', mark: '#5fae6e' },
   progress: { fill: '#c1ddfd', ink: '#1f4470', mark: '#6f9fdc' },  // progress-fill, progress-fill-ink
@@ -70,21 +58,16 @@ export const STATUS = {
   actNow: { word: '#98362b', ink: '#85291f', fill: '#fff1ee' },    // red, red-ink, red-wash
   button: { fill: '#258048', label: '#ffffff' },                   // count-key: the one green button, the counting "+ Born alive" key
 };
-const CONVENTION = [
-  ['done-fill', STATUS.done.fill], ['done-fill-ink', STATUS.done.ink], ['done-mark', STATUS.done.mark],
-  ['progress-mark', STATUS.progress.mark], ['late-mark', STATUS.late.mark], ['neutral-mark', STATUS.neutral.mark], ['count-key', STATUS.button.fill],
-];
 const NEUTRAL = ['paper', 'app-background', 'ground', 'surface', 'inset', 'ink', 'muted', 'line', 'rule', 'control-border', 'button-border', 'handle'];
 const GREEN = ['green', 'green-wash', 'count-key', 'chip-green-border', 'count-surface', 'count-ink'];
 
-// tokens.json's colours and shadow colours, plus the convention's: [{ name, hex, c: [r,g,b,a], lab }]
+// tokens.json's colours and shadow colours: [{ name, hex, c: [r,g,b,a], lab }]
 export function loadPalette(tokensJson) {
   const t = typeof tokensJson === 'string' ? JSON.parse(tokensJson) : tokensJson;
   const out = [], seen = new Set();
   const add = (name, hex) => { const c = parseHex(hex), key = toHex(c); if (seen.has(name)) return; seen.add(name); out.push({ name, hex: key, c, lab: oklab(c) }); };
   for (const x of t.color?.tokens || []) if (/^#[0-9a-f]{3,8}$/i.test(x.value)) add(x.name, x.value);
   for (const x of t.shadow?.tokens || []) for (const [i, m] of [...String(x.value).matchAll(/#[0-9a-f]{3,8}\b/gi)].entries()) add(x.name + (i ? '-' + i : ''), m[0]);
-  for (const [name, hex] of CONVENTION) if (!out.some((p) => p.hex === toHex(parseHex(hex)))) add(name, hex);
   return out;
 }
 const defaultPalette = () => loadPalette(fs.readFileSync(path.join(root, 'ux/design-system/tokens.json'), 'utf8'));

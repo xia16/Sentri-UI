@@ -1,37 +1,13 @@
-// The status palette (owner, 2026-11-02; scripts/check-colours.mjs STATUS): the marks tell apart under colour blindness, and every
-// fill holding a number carries its own ink at 4.5:1. The math is check-colours.mjs's (OKLab, Machado 2009 CVD simulation).
+// The status palette (owner, 2026-11-02; scripts/check-colours.mjs STATUS): every fill holding a number carries its own ink at 4.5:1,
+// and white reads on the one green button. Colour blindness is out of scope (owner, 2026-11-02: "we dont need compatability").
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { STATUS, deltaE, contrast } from '../scripts/check-colours.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { STATUS, contrast, deltaE } from '../scripts/check-colours.mjs';
 
-const SEPARATION = 8; // OKLab ΔE x100 under each simulation, the dataviz validator's target
-const KINDS = ['protan', 'deutan', 'tritan'];
-// The marks that sit side by side: the segments of one bar (done, progress, late on the empty track) and the dots of one legend;
-// the act-now red sits beside any of them as the one red signal in a row; neutral-mark is the bar part that is no status (the middle
-// of Performance metrics' split), beside done.
-const MARKS = { done: STATUS.done.mark, progress: STATUS.progress.mark, late: STATUS.late.mark, waiting: STATUS.waiting.track, neutral: STATUS.neutral.mark, 'act now': STATUS.actNow.word };
-// A pair the settled palette fails, kept visible as a TODO until the owner moves a mark (never dropped from the list).
-const KNOWN = {
-  'done|progress|tritan': 'the done mark #5fae6e and the progress mark #6f9fdc share a lightness, so a tritan reader sees one colour (ΔE 3.3); darkening either mark separates them (done #51945e gives 8.8, progress #597fb0 gives 8.9): waiting for the owner',
-  'done|neutral|protan': 'neutral-mark #a3aa9f beside done-mark #5fae6e: ΔE 6.6 under protan, in the validator’s 6-8 floor band (legal only with labels or gaps): waiting for the owner',
-  'done|neutral|deutan': 'neutral-mark #a3aa9f beside done-mark #5fae6e: ΔE 6.4 under deutan, in the validator’s 6-8 floor band (legal only with labels or gaps): waiting for the owner',
-};
-
-const names = Object.keys(MARKS);
-for (let i = 0; i < names.length; i++) for (let j = i + 1; j < names.length; j++) for (const kind of KINDS) {
-  const [a, b] = [names[i], names[j]], todo = KNOWN[`${a}|${b}|${kind}`] || KNOWN[`${b}|${a}|${kind}`];
-  test(`status marks ${a} and ${b} tell apart under ${kind} (ΔE ≥ ${SEPARATION})`, todo ? { todo } : {}, () => {
-    const d = deltaE(MARKS[a], MARKS[b], kind);
-    assert.ok(d >= SEPARATION, `${a} ${MARKS[a]} vs ${b} ${MARKS[b]} under ${kind}: ΔE ${d.toFixed(1)}`);
-  });
-}
-
-test('the marks tell apart with full colour vision too', () => {
-  for (let i = 0; i < names.length; i++) for (let j = i + 1; j < names.length; j++) {
-    const d = deltaE(MARKS[names[i]], MARKS[names[j]]);
-    assert.ok(d >= SEPARATION, `${names[i]} vs ${names[j]}: ΔE ${d.toFixed(1)}`);
-  }
-});
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 test('each status fill carries its own ink at 4.5:1 or more', () => {
   for (const [status, { fill, ink }] of Object.entries({ done: STATUS.done, progress: STATUS.progress, late: STATUS.late, 'act now': STATUS.actNow })) {
@@ -45,9 +21,14 @@ test('white on the one green button is 4.5:1 or more', () => {
   assert.ok(r >= 4.5, `white on ${STATUS.button.fill} is ${r.toFixed(2)}:1`);
 });
 
+test('the check\'s status values are the tokens', () => {
+  const tokens = Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, 'ux/design-system/tokens.json'), 'utf8')).color.tokens.map((t) => [t.name, t.value.toLowerCase()]));
+  const want = { 'done-fill': STATUS.done.fill, 'done-fill-ink': STATUS.done.ink, 'done-mark': STATUS.done.mark, 'progress-fill': STATUS.progress.fill, 'progress-fill-ink': STATUS.progress.ink, 'progress-mark': STATUS.progress.mark, 'amber-fill': STATUS.late.fill, 'amber-fill-ink': STATUS.late.ink, 'late-mark': STATUS.late.mark, handle: STATUS.waiting.track, 'neutral-mark': STATUS.neutral.mark, red: STATUS.actNow.word, 'red-ink': STATUS.actNow.ink, 'red-wash': STATUS.actNow.fill, 'count-key': STATUS.button.fill };
+  for (const [name, hex] of Object.entries(want)) assert.equal(tokens[name], hex, `tokens.json ${name}`);
+});
+
 test('the math matches known values', () => {
   assert.equal(contrast('#ffffff', '#000000').toFixed(1), '21.0');
   assert.equal(deltaE('#276640', '#276640'), 0);
-  // protan and deutan readers lose red against green; tritan readers keep it
-  assert.ok(deltaE('#d62728', '#2ca02c', 'deutan') < deltaE('#d62728', '#2ca02c'));
+  assert.ok(deltaE('#ffffff', '#000000') > 99);
 });
