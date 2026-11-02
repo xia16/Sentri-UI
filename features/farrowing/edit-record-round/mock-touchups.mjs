@@ -33,20 +33,6 @@ const RUN_CSS = `.mock-run{display:flex;align-items:center;justify-content:space
   .farrowing-phone .mock-run .mock-undo{flex:none;display:inline-flex;align-items:center;gap:5px;height:44px;min-height:44px;margin-right:-8px;padding:0 8px;border:0;background:none;font:600 13px/16px var(--font-sans);color:var(--ink)}
   .farrowing-phone .mock-run .mock-undo svg{width:16px;height:16px;stroke-width:2}`;
 
-// 1. Record dead after Finish: the same rows as Report death (died after birth only, counted from 0 for this record).
-//    Born dead goes: after Finish a stillborn would be a birth, and Total born is locked.
-{
-  const p = await open('farrowing.death');
-  await p.evaluate(() => {
-    const U = window.SentriUI, sheet = document.querySelector('.sheet[data-view="death"]');
-    sheet.querySelector('.tk-choice').outerHTML = U.segment({ variant: 'view-switch', options: [['piglets', 'Piglets'], ['sow', 'The sow']], active: 'piglets', action: 'mode', ariaLabel: 'Record death for' });
-    sheet.querySelector('.sheet-title').textContent = 'Record dead';
-    sheet.querySelector('[data-action="clearVisit"], .st-sheet-corner')?.remove();
-    const primary = sheet.querySelector('.sheet-footer .button.primary'); primary.textContent = 'Save';
-  });
-  await shot(p, 'touch-1-record-dead-after-finish.png');
-}
-
 // 2. The finished record after a Record dead: Edit leaves the toolbar; the last save sits under the litter's figures, with Undo.
 {
   const p = await open('farrowing.locked');

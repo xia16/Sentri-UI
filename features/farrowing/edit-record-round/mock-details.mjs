@@ -1,6 +1,6 @@
-// The finished record as an overview, Litter details as the place for depth, Report death as one list (owner, 2026-11-02:
+// The finished record as an overview, Litter details as the place for depth (owner, 2026-11-02:
 // "this page does not look clean … the one outside is an overview, if they go into the details they should see more
-// information, maybe even past performances … this part seems really clunky too").
+// information, maybe even past performances").
 // Real prototype screens at 390; the bodies are rebuilt with the design system's own parts (SentriUI.*) and the Alive card.
 // Usage (from the repo root): node features/farrowing/edit-record-round/mock-details.mjs <out dir>
 import { spawn } from 'node:child_process';
@@ -111,27 +111,6 @@ const style = async (p) => p.addStyleTag({ content: CSS });
   await shot(p, 'details-2-page-top.png');
   await p.evaluate(() => { const b = document.querySelector('.mock-details .sheet-body'); b.scrollTop = b.scrollHeight; });
   await shot(p, 'details-3-page-bottom.png');
-  await p.close();
-}
-
-// 4. Report death: one list in two groups, no choice first. Born dead (Stillborn, Mummified) and Died after birth (Crushed,
-//    Scours, Starve-out, Other), each a stepper from 0; photos; the sow's own death a door at the end.
-{
-  const p = await open('farrowing.death');
-  await style(p);
-  await p.evaluate(() => {
-    const U = window.SentriUI, ic = (k) => window.SentriIcons.icon(k);
-    const sheet = document.querySelector('.sheet[data-view="death"]');
-    const st = (label, value) => U.stepper({ label, value, min: 0, max: 30, action: 'deadStep', variant: 'row', reserveHint: false });
-    sheet.querySelector('.tk-choice').remove();
-    sheet.querySelector('.death-causes').outerHTML = `<div class="death-causes">${U.heading({ title: 'Died after birth', kind: 'group' })}${st('Crushed', 1)}${st('Scours', 0)}${st('Starve-out', 0)}${st('Other', 0)}</div>
-      <div class="death-causes mock-section-tight">${U.heading({ title: 'Born dead', kind: 'group' })}${st('Stillborn', 0)}${st('Mummified', 0)}</div>`;
-    sheet.querySelector('.photo-field').insertAdjacentHTML('afterend', U.rowGroup(U.row({ title: 'The sow died', description: 'Record her death', icon: ic('alert'), action: 'sowDeath', trail: 'chevron' }), { className: 'mock-sow-door' }));
-    const s2 = document.createElement('style'); s2.textContent = '.mock-section-tight{margin-top:16px}.mock-sow-door{margin-top:16px}'; document.head.append(s2);
-  });
-  await shot(p, 'details-4-report-death.png');
-  await p.evaluate(() => { const b = document.querySelector('.sheet[data-view="death"] .sheet-body'); b.scrollTop = b.scrollHeight; });
-  await shot(p, 'details-5-report-death-end.png');
   await p.close();
 }
 
