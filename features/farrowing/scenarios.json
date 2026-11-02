@@ -3060,6 +3060,134 @@
     },
     {
      "type": "state",
+     "id": "task.blocked",
+     "label": "End task review with sows still farrowing",
+     "reset": {
+      "screen": "farrowing.task-blocked",
+      "preset": "task-blocked"
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "task.blocked.hold",
+       "label": "hold End task early while sows are farrowing",
+       "taps": [
+        {
+         "tap": "[data-action='room-end-confirm']",
+         "hold": 1100
+        }
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-k9-blocked-hold-waits",
+         "tree": "K-9",
+         "label": "While a sow is farrowing the page says so first and the hold waits, saying why",
+         "gwt": {
+          "given": "The End task review is open and two sows are still farrowing.",
+          "when": "The worker holds End task early.",
+          "then": "The task does not end. The page reads Before you can end, and the hold says FINISH 2 SOWS FIRST."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions 2026-11-02 · End task",
+           "says": "While a sow is farrowing the hold's caption reads FINISH N SOWS FIRST"
+          },
+          {
+           "src": "PRD",
+           "at": "Decisions",
+           "says": "Task end: manual, hold-to-commit with receipt, blocked while farrowing is open"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.task-blocked",
+           "hard": "dead-end"
+          },
+          {
+           "text": "Before you can end",
+           "in": "sheet"
+          },
+          {
+           "text": "FINISH 2 SOWS FIRST",
+           "in": "sheet",
+           "says": "the waiting hold names its reason",
+           "hard": "wrong-fact"
+          },
+          {
+           "el": "[data-action='room-end-confirm']",
+           "in": "sheet",
+           "is": "disabled",
+           "says": "the hold waits",
+           "hard": "broken-ruling"
+          }
+         ],
+         "record": [
+          {
+           "expr": "!c.completion && F.taskClosureReview(c).blocked",
+           "says": "nothing ended; the review is blocked",
+           "hard": "broken-ruling"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "task.blocked.open",
+       "label": "tap Still farrowing",
+       "taps": [
+        "[data-action='room-task-list'][data-value='active']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-k10-blocked-opens-sows",
+         "tree": "K-10",
+         "label": "Still farrowing opens the sows to finish, under the same words",
+         "gwt": {
+          "given": "The End task review is open and two sows are still farrowing.",
+          "when": "The worker taps Still farrowing.",
+          "then": "A list titled Still farrowing opens with those two sows, each one a door to her record."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions 2026-11-02 · End task",
+           "says": "Still farrowing (opens those sows) … The sow lists take the row's words as their title"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.task-sows",
+           "hard": "dead-end"
+          },
+          {
+           "text": "Still farrowing",
+           "in": "sheet"
+          },
+          {
+           "el": "[data-action='room-task-sow']",
+           "in": "sheet",
+           "says": "each sow opens her record",
+           "hard": "dead-end"
+          }
+         ],
+         "record": [
+          {
+           "expr": "c.taskReviewGroup === 'active' && F.taskClosureReview(c).active.length === 2",
+           "says": "the list is the two farrowing sows",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
      "id": "task.complete",
      "label": "End task review, every sow finished",
      "tree": "K",

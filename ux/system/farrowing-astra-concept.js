@@ -177,7 +177,9 @@ function taskClosureReview(c){
  const finished=regular.filter(x=>x.record.locked&&!x.record.ended),ended=regular.filter(x=>x.record.ended),drafts=rows.filter(x=>hasDraft(x.record));
  const completedLitters=regular.filter(x=>x.record.locked&&(!x.record.ended||x.record.deathStage==='after'));
  const totals={born:sum(completedLitters.map(x=>born(x.record))),alive:sum(completedLitters.map(x=>x.record.alive)),dead:sum(completedLitters.map(x=>sum(x.record.dead))),stillborn:sum(completedLitters.map(x=>x.record.dead[0])),mummified:sum(completedLitters.map(x=>x.record.dead[1]))};
- const performance={...totals,litters:completedLitters.length,bornAlivePerLitter:completedLitters.length?(totals.born-totals.stillborn-totals.mummified)/completedLitters.length:null,stillbornRate:totals.born?100*totals.stillborn/totals.born:null,target:c.bornAliveTarget??null};
+ // Where the piglets born went, and two per-litter facts: deaths after birth by cause, assisted litters, the mean of recorded litter weights.
+ const cause=i=>sum(completedLitters.map(x=>x.record.dead[i])),weights=completedLitters.map(x=>Number(x.record.weight)).filter(w=>w>0);
+ const performance={...totals,litters:completedLitters.length,bornAlivePerLitter:completedLitters.length?(totals.born-totals.stillborn-totals.mummified)/completedLitters.length:null,stillbornRate:totals.born?100*totals.stillborn/totals.born:null,target:c.bornAliveTarget??null,causes:{crushed:cause(2),scours:cause(3),starveOut:cause(4),other:cause(5)},assisted:completedLitters.filter(x=>x.record.assisted===true).length,weight:weights.length?sum(weights)/weights.length:null};
  return {rows,active,awaiting,finished,ended,abortions,left,notInPig,removed,performance,drafts,blocked:!!active.length};
 }
 function closeTask(c,at=new Date().toISOString()){
@@ -279,8 +281,9 @@ const pageFooter=(right,className='')=>right?footer('',right,className):false;
 // What a header no longer carries and the worker still needs (a status, a stamp, a count) opens the body as its quiet group label:
 // 13px muted, over the card it belongs to (the Heading's group kind), never a louder line than the subtitle it replaced.
 const bodyLead=text=>SentriUI.heading({title:text,kind:'group',level:4,className:'body-lead'});
-function hold(action,label,off=false,danger=false){
- return SentriUI.holdButton({action,label,tone:danger?'danger':'primary',waiting:off,className:action==='room-end-confirm'&&danger?'task-end-confirm':'',caption:'HOLD TO '+(action==='lock'?'FINISH':action==='room-end-confirm'?(label==='End task'?'END':'END EARLY'):'RECORD')});
+// reason: a waiting hold's caption says what it waits for (FINISH 2 SOWS FIRST); the bar above stays bare (no reason line over a waiting button).
+function hold(action,label,off=false,danger=false,reason=''){
+ return SentriUI.holdButton({action,label,tone:danger?'danger':'primary',waiting:off,className:action==='room-end-confirm'&&danger?'task-end-confirm':'',caption:off&&reason?reason:'HOLD TO '+(action==='lock'?'FINISH':action==='room-end-confirm'?(label==='End task'?'END':'END EARLY'):'RECORD')});
 }
 /* The finished litter, read-only: Facts, three across. The death breakdown is one link below, not a button in a fact. */
 function finishFacts(s){
@@ -661,13 +664,33 @@ function penLog(c){
  const body=SentriUI.log(groups,{empty:'No activity recorded for this pen.'});
  return roomSheet('Pen log',body,false,'pen-log-sheet');
 }
+// Performance metrics (owner round, 2026-11-02), one renderer for the overview, End task and the receipt: the two measures large (the
+// target as a verdict), then where every piglet born went (one neutral bar, a row per part, causes under the losses), then per-litter facts.
 function taskPerformance(p){
- const number=n=>n==null?'—':n.toFixed(1);
- return `<section class="task-performance">${SentriUI.heading({title:'Performance metrics',icon:icon('chart'),meta:`${p.litters} finished ${p.litters===1?'litter':'litters'}`,kind:'section',level:4})}<div class="task-performance-surface st-panel"><div class="task-kpi-pair"><div><span>Born alive / litter</span><strong>${number(p.bornAlivePerLitter)}</strong><small class="${p.target!=null&&p.bornAlivePerLitter!=null&&p.bornAlivePerLitter<p.target?'kpi-below':''}">${p.target!=null?'Target '+p.target:'No target set'}</small></div><div><span>Stillborn rate</span><strong>${number(p.stillbornRate)}${p.stillbornRate==null?'':'<small>%</small>'}</strong><small>${p.stillborn} stillborn / ${p.born} born</small></div></div><dl class="task-performance-totals">${[['Born',p.born],['Alive now',p.alive],['Piglet deaths',p.dead]].map(([label,value])=>`<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl></div></section>`;
+ const one=n=>n==null?'—':n.toFixed(1),share=n=>p.born?Math.round(100*n/p.born)+'%':'';
+ const below=p.target!=null&&p.bornAlivePerLitter!=null&&p.bornAlivePerLitter<p.target;
+ const verdict=p.target==null?'<small>No target set</small>':p.bornAlivePerLitter==null?`<small>Target ${p.target}</small>`:`<small class="task-perf-verdict"${below?' data-below=""':''}>${below?'! Below target '+p.target:icon('check')+'On target · '+p.target}</small>`;
+ const causes=p.causes||{},afterBirth=sum(Object.values(causes)),bornDead=p.stillborn+p.mummified;
+ const said=[['crushed',causes.crushed],['scours',causes.scours],['starve-out',causes.starveOut],['other',causes.other]].filter(([,n])=>n).sort((a,b)=>b[1]-a[1]).map(([k,n])=>n+' '+k).join(' · ');
+ const part=(name,n,why='')=>`<li><i aria-hidden="true"></i><span class="task-perf-name">${name}</span><span class="task-perf-n">${n}</span><span class="task-perf-share">${share(n)}</span>${why?`<span class="task-perf-why">${why}</span>`:''}</li>`;
+ const split=p.litters?`<div class="task-perf-split"><div class="task-perf-split-head"><span><b>${p.born}</b>piglets born</span><span><b>${one(p.born/p.litters)}</b>/ litter</span></div><div class="task-perf-bar" role="img" aria-label="${p.alive} alive now, ${afterBirth} died after birth, ${bornDead} born dead"><i style="flex:${p.alive}"></i><i style="flex:${afterBirth}"></i><i style="flex:${bornDead}"></i></div><ul class="task-perf-parts">${part('Alive now',p.alive)}${part('Died after birth',afterBirth,said)}${part('Born dead',bornDead,`${p.stillborn} stillborn · ${p.mummified} mummified`)}</ul></div><dl class="task-perf-facts"><div><dt>Alive / litter</dt><dd>${one(p.alive/p.litters)}</dd></div><div><dt>Assisted</dt><dd>${p.assisted??0}<small>of ${p.litters}</small></dd></div><div><dt>Weight / litter</dt><dd>${p.weight==null?'—':one(p.weight)+'<small>kg</small>'}</dd></div></dl>`:'';
+ return `<section class="task-performance">${SentriUI.heading({title:'Performance metrics',icon:icon('chart'),meta:`${p.litters} finished ${p.litters===1?'litter':'litters'}`,kind:'section',level:4})}<div class="task-perf-card st-panel"><div class="task-perf-kpis"><div><span>Born alive / litter</span><strong>${one(p.bornAlivePerLitter)}</strong>${verdict}</div><div><span>Stillborn rate</span><strong>${one(p.stillbornRate)}${p.stillbornRate==null?'':'<small>%</small>'}</strong><small>${p.born?'Mummified '+one(100*p.mummified/p.born)+'%':'No litters finished'}</small></div></div>${split}</div></section>`;
 }
-function taskOutcomeSummary(o,closed=false){
- const door=(key,note)=>closed?null:{key,note};const rows=[['Finished farrowing',o.finished],...(o.active?[['Still farrowing',o.active,door('active','Finish before ending')]]:[]),[closed?'Removed · not farrowed':'Awaiting farrowing',o.awaiting,o.awaiting?door('awaiting','Leave the batch when the task ends'):null],...(o.removed?[['Removed earlier',o.removed]]:[]),...(o.abortions?[['Aborted',o.abortions]]:[]),...(o.notInPig?[['Not in pig',o.notInPig]]:[]),...(o.ended?[['Sow deaths',o.ended]]:[])];
- return `<section class="task-outcome-section">${SentriUI.heading({title:'Task outcomes',icon:icon('record'),meta:`${o.total} sows`,kind:'section',level:4})}<dl class="task-outcomes-list st-panel">${rows.map(([label,n,d])=>d?`<div class="task-outcome-warn"><dt><button type="button" class="task-outcome-door" data-action="room-task-list" data-value="${d.key}"><span><strong>${label}</strong><small>${d.note}</small></span></button></dt><dd>${n}${icon('chevron')}</dd></div>`:`<div><dt>${label}</dt><dd>${n}</dd></div>`).join('')}</dl></section>`;
+// End task (owner pick, 2026-11-02): can the batch close, and what must happen first. The heading answers; the task's sows as one bar, and
+// under it a row per part, its count in that part's colour (the pen map's: farrowing blue, needs-you yellow, done green). Blockers open their sows.
+function taskClosure(r){
+ const done=r.rows.length-r.active.length-r.awaiting.length;
+ const others=[[r.ended.length,n=>n===1?'1 sow died':n+' sows died'],[r.abortions.length,n=>n+' aborted'],[r.notInPig.length,n=>n+' not in pig'],[r.removed.length,n=>n+' removed earlier']].filter(([n])=>n).map(([n,say])=>say(n));
+ const doneLine=!others.length?'All finished':!r.finished.length?others.join(' · '):others.join(' · ')+(others.length>1?' · rest finished':' · the rest finished');
+ const row=(part,n,title,description,door='')=>SentriUI.row({title,description,icon:`<span class="task-closure-count">${n}</span>`,action:door?'room-task-list':'',value:door,trail:door?'chevron':'none',className:'task-closure-row',attrs:{'data-part':part}});
+ const rows=(r.active.length?row('active',r.active.length,'Still farrowing',`Finish ${r.active.length===1?'her litter':'their litters'} to end the task`,'active'):'')+(r.awaiting.length?row('awaiting',r.awaiting.length,'Leave the batch','Not farrowed · removed at the end','awaiting'):'')+row('done',done,'Done',doneLine);
+ const title=r.blocked?'Before you can end':r.awaiting.length?'Ready to end early':'Ready to end';
+ return `<section class="task-closure">${SentriUI.heading({title,meta:`${r.rows.length} sows`,kind:'section',level:4})}<div class="task-closure-surface st-panel">${AstraTaskOverview.statusProgress({farrowed:done,active:r.active.length,awaiting:r.awaiting.length},false,['done','active','awaiting'])}<div class="st-row-group">${rows}</div></div></section>`;
+}
+// The receipt's account of every sow at closure.
+function taskOutcomeSummary(o){
+ const rows=[['Finished farrowing',o.finished],['Removed · not farrowed',o.awaiting],...(o.removed?[['Removed earlier',o.removed]]:[]),...(o.abortions?[['Aborted',o.abortions]]:[]),...(o.notInPig?[['Not in pig',o.notInPig]]:[]),...(o.ended?[['Sow deaths',o.ended]]:[])];
+ return `<section class="task-outcome-section">${SentriUI.heading({title:'Task outcomes',icon:icon('record'),meta:`${o.total} sows`,kind:'section',level:4})}<dl class="task-outcomes-list st-panel">${rows.map(([label,n])=>`<div><dt>${label}</dt><dd>${n}</dd></div>`).join('')}</dl></section>`;
 }
 function taskOtherOutcomes(r){
  const row=(key,label,n)=>SentriUI.row({title:label,variant:'summary-count',trailing:{text:String(n)},action:n?'room-task-list':'',value:key});
@@ -688,16 +711,16 @@ function taskEndSheet(s,c){
   const end=c.completion;if(!end)return '';
   const at=new Date(end.at),when=at.toLocaleString('en-US',{month:'short'})+' '+at.getDate()+' · '+at.toLocaleString('en-GB',{hour:'2-digit',minute:'2-digit'});
   // Who closed the task and when is the receipt's own fact: the first line of its body (never the header).
-  return sheet(end.early?'Task ended early':'Task ended',`${bodyLead(`Farrowing · ${when} · ${initials(end.who)}`)}${taskPerformance(end.performance)}${taskOutcomeSummary({...end,awaiting:end.removed},true)}`,false,'task-end-expanded task-receipt-sheet');
+  return sheet(end.early?'Task ended early':'Task ended',`${bodyLead(`Farrowing · ${when} · ${initials(end.who)}`)}${taskPerformance(end.performance)}${taskOutcomeSummary({...end,awaiting:end.removed})}`,false,'task-end-expanded task-receipt-sheet');
  }
  const r=taskClosureReview(c);
  if(s.view==='roomTaskSows'){
   const key=['active','awaiting','ended','abortions','left','notInPig','removed'].includes(c.taskReviewGroup)?c.taskReviewGroup:'active';
-  const title={active:'Active farrowing',awaiting:'Awaiting farrowing',ended:'Sow deaths',abortions:'Aborted',left:'Left the task',notInPig:'Not in pig',removed:'Removed from batch'}[key];
+  const title={active:'Still farrowing',awaiting:'Leave the batch',ended:'Sow deaths',abortions:'Aborted',left:'Left the task',notInPig:'Not in pig',removed:'Removed from batch'}[key];
   return sheet(title,`<div class="${key==='awaiting'?'task-removal-notice':'task-list-hint'}">${key==='awaiting'?`${icon('alert')}<div><strong>${r.awaiting.length} ${r.awaiting.length===1?'sow will':'sows will'} be removed from this batch</strong><p>These sows have not farrowed. Ending the task removes them from the batch.</p></div>`:key==='drafts'?'Open a sow to save or clear its changes.':['ended','abortions','left','notInPig','removed'].includes(key)?'Recorded outcomes across all units. Open a sow to view the record.':'Open a sow to review and finish the record.'}</div><div class="task-review-sows${key==='ended'?'':' st-panel st-row-group'}">${r[key].map(({record,unit,unitId})=>key==='ended'?taskDeathReview({record,unit,unitId}):sowRow(record,{where:unit+' · '+record.pen,action:'room-task-sow',value:unitId+':'+record.tag})).join('')||'<p>No sows to review.</p>'}</div>`,false,'task-sows-sheet');
  }
- const closureLabel=r.awaiting.length||r.blocked?'End task early':'End task';
- return sheet(closureLabel,`${taskPerformance(r.performance)}${taskOutcomeSummary({total:r.rows.length,finished:r.finished.length,active:r.active.length,awaiting:r.awaiting.length,removed:r.removed.length,ended:r.ended.length,abortions:r.abortions.length,notInPig:r.notInPig.length})}`,pageFooter(hold('room-end-confirm',closureLabel,r.blocked,closureLabel==='End task early').replace('button primary hold','button primary hold '+(closureLabel==='End task'?'task-complete':'task-end-confirm'))),'task-end-expanded');
+ const closureLabel=r.awaiting.length||r.blocked?'End task early':'End task',n=r.active.length;
+ return sheet('End task',`${taskClosure(r)}${taskPerformance(r.performance)}`,pageFooter(hold('room-end-confirm',closureLabel,r.blocked,closureLabel==='End task early',`FINISH ${n} ${n===1?'SOW':'SOWS'} FIRST`)),'task-end-expanded');
 }
 function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls='',surface='',line=null)=>roomSheet(title,body,actions,cls,surface,line);if(s.view==='roomFilter'){const f=c.filterDraft,n=visibleRoomRecords(c,f).length;return SentriUI.filterSheet({title:'Filter sows',sections:[{content:SentriUI.rangeSlider({min:-7,max:7,value:[f.from,f.to],title:'Expected farrowing',icon:icon('calendar'),key:'due',labels:['Earliest expected farrowing','Latest expected farrowing'],format:dueDay,summary:(from,to)=>dueRangeLabel({from,to}),ends:['7+ days ago','Today','In 7+ days']})},{title:'Parity',icon:icon('profile'),content:SentriUI.segment({variant:'facet',options:parityChoices.map(v=>[v,v]),active:f.parity,action:'room-parity',ariaLabel:'Parity'})}],apply:{label:`Show ${n} ${n===1?'sow':'sows'}`,action:'room-apply-filter'},reset:roomFilterCount(f)?{label:'Reset',action:'room-reset-filter'}:false,backAction:'room-back',className:'room-utility room-filter-sheet'});}
  if(s.view==='roomPicker'&&c.picker)return roomSheet(c.picker.label,SentriUI.pickerOptions({options:c.picker.options,selected:c.picker.selected}),footer(SentriUI.backButton({action:'room-back'})),'picker-sheet');

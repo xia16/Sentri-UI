@@ -23,5 +23,4 @@
 
 .task-overview-details{padding-top:4px}
 .task-overview-details .task-other-outcomes{margin-top:20px}
-.task-overview-details .task-performance-surface{padding:0}
 @media(max-width:370px){.unit-routing-columns,.unit-route{column-gap:5px;grid-template-columns:minmax(65px,1.35fr) repeat(3,minmax(0,1fr)) 16px;padding-left:12px;padding-right:12px}.unit-route-name strong{font-size:13px}.unit-routing-columns{font-size:13px}}
