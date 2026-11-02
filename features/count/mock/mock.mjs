@@ -56,6 +56,10 @@ const CSS = `
   .m-receipt .st-row-group{margin-bottom:8px}
   .m-receipt .m-hint{margin-top:12px}
   .m-count .inspect-pen-head{display:flex;align-items:center}
+  .m-count .m-inline-bar{margin:0 0 10px}
+  .m-count .m-total-field{margin-left:10px;display:flex}
+  .m-count .m-total-field>*{box-sizing:border-box;width:56px;height:44px;border:1px solid #bdc7b6;border-radius:12px;background:#fff;text-align:center;font:600 16px/42px 'IBM Plex Mono',monospace;color:#20291f;padding:0}
+  .m-count .m-total-field>[data-idle],.m-count .m-total-field>.is-idle{color:#657060}
   .m-count .m-trail{margin-left:auto;font-size:13px;color:var(--ink-2,#5b625d);font-variant-numeric:tabular-nums}
   .m-count .m-trail.m-short{color:var(--ink,#1d221e);font-weight:600}
   .m-count .sheet-body>*{flex-shrink:0}
@@ -98,52 +102,61 @@ if (want('1-')) {
 
 // 2. (Dropped, owner 2026-11-02: no "Last counted" row on Home; a recount is asked for inside the task that needs it.)
 
-// 3. Count one pen, by number (and the two with ear tags by scan): Pen D4.
-for (const [name, counted] of [['mock-3-count-pen.png', 12], ['mock-3b-count-pen-match.png', 14]]) {
+// 3. Count one pen (owner, 2026-11-02): first count every pig in the pen, then scan (or type) the ear tags; repeat reads count once.
+//    Pigs without ear tags are worked out, never counted: all pigs − tagged pigs. Pen D4: 2 with ear tags, 14 without on record.
+for (const [name, all] of [['mock-3-count-pen.png', 14], ['mock-3b-count-pen-match.png', 16]]) {
   if (!want(name.slice(5, 7))) continue;
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
-  await p.evaluate(({ counted }) => {
-    const { U, ic, card, page, footer, primary } = window.M;
-    const expected = 14, diff = counted - expected;
+  await p.evaluate(({ all }) => {
+    const { U, ic, page, footer, primary } = window.M;
+    const tagged = 2, untagged = all - tagged, expected = 14, diff = untagged - expected;
+    const pig = (id) => U.rowSelectDoor({ code: id, description: 'Grower · 63d', contextWidth: '112px', checked: true, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig selected', label: id, right: { kind: 'tags', tags: [] } });
+    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs in D4', value: all, min: tagged, max: 80, action: 'x', reserveHint: false }) + '</section>';
     const scan = U.scanBar({ state: 'scanning', device: 'Reader 1', stop: { action: 'x' } });
-    const tagged = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'With ear tags · 2 of 2 seen', icon: ic('tag'), kind: 'section', level: 3 }) + U.rowGroup(
-      U.rowSelectDoor({ code: '000801', description: 'Grower · 63d', contextWidth: '112px', checked: true, value: '000801', action: '', openAction: 'pig', openValue: '000801', className: 'inspect-pig roster-pig selected', label: '000801', right: { kind: 'tags', tags: [] } })
-      + U.rowSelectDoor({ code: '000802', description: 'Grower · 63d', contextWidth: '112px', checked: true, value: '000802', action: '', openAction: 'pig', openValue: '000802', className: 'inspect-pig roster-pig selected', label: '000802', right: { kind: 'tags', tags: [] } })) + '</section>';
-    const stepper = U.stepper({ variant: 'well', label: 'Pigs without ear tags', value: counted, min: 0, max: 60, action: 'x', reserveHint: false });
-    const result = diff === 0 ? '<p class="m-diff">Matches the record.</p>'
-      : `<p class="m-diff"><strong>${Math.abs(diff)} ${diff < 0 ? 'fewer' : 'more'} than the record.</strong> <span>Saved as ${Math.abs(diff)} unaccounted in batch 25.</span></p>`;
+    const typeRow = U.row({ variant: 'navigation', icon: ic('plus'), title: 'Type an ear tag', trail: 'chevron', action: 'x' });
+    const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Scan the ear tags · ' + tagged + ' of 2', icon: ic('tag'), kind: 'section', level: 3 })
+      + '<div class="m-inline-bar">' + scan + '</div>'
+      + U.rowGroup(pig('000801') + pig('000802') + typeRow)
+      + (all === 14 ? '<p class="m-hint">000802 read twice · counted once.</p>' : '') + '</section>';
+    const result = '<section class="feature-section">' + U.rowGroup(U.row({ title: 'Without ear tags', description: all + ' counted − ' + tagged + ' with ear tags', trailing: String(untagged), className: 'm-total' }), { className: 'm-evidence' })
+      + (diff === 0 ? '<p class="m-diff">Matches the record.</p>' : `<p class="m-diff"><strong>${Math.abs(diff)} ${diff < 0 ? 'fewer' : 'more'} than the record.</strong> <span>Saved as ${Math.abs(diff)} unaccounted in batch 25.</span></p>`) + '</section>';
     const line = (title, description, figure, strong) => U.row({ title, description, trailing: figure, className: strong ? 'm-total' : '' });
     const evidence = U.heading({ title: 'Since the last count', icon: ic('record'), kind: 'section', level: 3 })
-      + U.rowGroup(line('Counted', 'Oct 28 · 08:10 · G.H', '18')
+      + U.rowGroup(line('Counted', 'Oct 28 · 08:10 · G.H', '20')
         + line('Moved to D6', 'Oct 30 · 14:20 · M.L', '−3')
         + line('Died', 'Yesterday · 07:05 · G.H', '−1')
-        + line('Should be here now', '', String(expected), true), { className: 'm-evidence' });
-    const body = `<section class="feature-section">${stepper}${result}</section>${tagged}<section class="feature-section">${evidence}</section>`;
-    page('Count pigs', 'Pen D4 · Unit 7', body, footer(U.backButton({ action: 'x' }), primary('Save count')), `<div class="m-bar">${scan}</div>`);
-  }, { counted });
+        + line('Should be here now', '2 with ear tags · 14 without', '16', true), { className: 'm-evidence' })
+      + '<p class="m-hint">Without ear tags is worked out: all pigs − ear tags read. A difference is saved as unaccounted in batch 25; nothing else changes.</p>';
+    // The tally rides in the footer, as on the room count: what the pen is left with and how it differs from the record.
+    const left = '<div class="m-left"><strong>' + untagged + ' without ear tags</strong><small>' + (diff === 0 ? 'Matches the record' : Math.abs(diff) + ' unaccounted') + '</small></div>';
+    const body = count + tags + `<section class="feature-section">${evidence}</section>`;
+    page('Count pigs', 'Pen D4 · Unit 7', body, footer(left, primary('Save count')));
+  }, { all });
   await shoot(p, name);
 }
 
-// 4. Count a room by scan: Unit 7. Every read ticks the pig in her pen; a pig recorded elsewhere joins the pen scanned just before;
-//    the group rows take a number. The footer keeps the tally.
+// 4. Count a room: Unit 7, pen by pen as the worker walks. Each pen card takes the count of every pig in it (its field), then the
+//    ear tags are scanned; a pig recorded elsewhere joins the pen scanned just before; pigs without ear tags are worked out.
 if (want('4-')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
   await p.evaluate(() => {
-    const { U, card, page, footer, primary } = window.M;
+    const { U, ic, page, footer, primary } = window.M;
     const pig = (id, ctx, on, extra = {}) => U.rowSelectDoor({ code: id, description: ctx, contextWidth: '112px', right: extra.right || { kind: 'tags', tags: [] }, checked: on, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig' + (on ? ' selected' : '') + (extra.cls || ''), label: id });
+    // The pen's count field: the group row's own 44px number field, lifted onto the pen header.
+    const field = (value, idle) => { const t = document.createElement('div'); t.innerHTML = U.rowSelectDoor({ code: 'x', value: 'x', action: '', checked: false, count: { value, idle, attrs: { 'data-m-total': '' } } }); return t.querySelector('[data-m-total]')?.outerHTML || ''; };
+    const card = (pen, small, rows, total, idle, trail) => '<section class="inspect-pen m-card" data-pen="' + pen + '"><header class="inspect-pen-head"><span class="pen-name"><strong>' + pen + '</strong><small>· ' + small + '</small></span><span class="m-trail' + (/here|seen/.test(trail) ? ' m-short' : '') + '">' + trail + '</span><span class="m-total-field">' + field(total, idle) + '</span></header>' + rows + '</section>';
+    const without = (n, how) => U.row({ icon: ic('tag-off'), title: 'Without ear tags', description: how, trailing: String(n), className: 'm-total' });
     const scan = U.scanBar({ state: 'scanning', device: 'Reader 1', stop: { action: 'x' } });
-    const hint = '<p class="m-hint"><b>Count</b> · scan every pig, type how many have no ear tag. Pens you skip stay as they are.</p>';
-    const c1 = card('C1', '3 pigs', pig('000254', 'Gestation · 40d', true) + pig('000267', 'Gestation · 42d', true) + pig('000281', 'Gestation · 46d', false), '2 of 3');
-    const c2 = card('C2', '3 pigs', pig('000306', 'Gestation', true) + pig('000312', 'Gestation · 35d', true) + pig('000512', 'Was Unit 9 · C3', true, { cls: ' m-found', right: { kind: 'state', word: 'Moves here', level: 'live' } }), '3 of 2');
-    const group = U.rowSelectDoor({ code: '14 pigs', lead: 'tag-off', contextWidth: '112px', right: { kind: 'tags', tags: [] }, className: 'inspect-pig roster-pig selected', label: '14 without ear tags, pen D4', action: '', checked: true, value: 'notags-D4', openAction: 'x', openValue: 'D4', count: { value: 12, idle: false } });
-    const d4 = card('D4', '16 pigs', pig('000801', 'Grower · 63d', true) + pig('000802', 'Grower · 63d', true) + group, '14 of 16');
-    const d5 = card('D5', '38 pigs', U.rowSelectDoor({ code: '38 pigs', lead: 'tag-off', contextWidth: '112px', right: { kind: 'tags', tags: [] }, className: 'inspect-pig roster-pig', label: '38 without ear tags, pen D5', action: '', checked: false, value: 'notags-D5', openAction: 'x', openValue: 'D5', count: { value: 38, idle: true } }), 'Not counted');
+    const hint = '<p class="m-hint"><b>Count</b> · type how many pigs are in each pen, then scan the ear tags. Pens you skip stay as they are.</p>';
+    const c1 = card('C1', '3 pigs', pig('000254', 'Gestation · 40d', true) + pig('000267', 'Gestation · 42d', true) + pig('000281', 'Gestation · 46d', false), 3, false, '1 not seen');
+    const c2 = card('C2', '2 pigs', pig('000306', 'Gestation', true) + pig('000312', 'Gestation · 35d', true) + pig('000512', 'Was Unit 9 · C3', true, { cls: ' m-found', right: { kind: 'state', word: 'Moves here', level: 'live' } }), 3, false, '+1 here');
+    const d4 = card('D4', '16 pigs', pig('000801', 'Grower · 63d', true) + pig('000802', 'Grower · 63d', true) + without(12, '14 counted − 2 with ear tags'), 14, false, '');
+    const d5 = card('D5', '38 pigs', without(38, 'Not counted'), 38, true, '');
     const body = '<div class="inspect-list m-list">' + hint + c1 + c2 + d4 + d5 + '</div>';
     const left = '<div class="m-left"><strong>3 of 4 pens</strong><small>1 not seen yet</small></div>';
     page('Count pigs', 'Unit 7', body, footer(left, primary('Save count')), `<div class="m-bar">${scan}</div>`);
-    for (const t of document.querySelectorAll('.m-trail')) if (/3 of 2/.test(t.textContent)) { t.textContent = '+1 here'; t.classList.add('m-short'); }
   });
   await p.waitForTimeout(400); await p.screenshot({ path: path.join(out, 'mock-4-count-room.png') });
   await p.evaluate(() => { const s = document.querySelector('.phone .sheet-body'); if (s) s.scrollTop = 330; });
