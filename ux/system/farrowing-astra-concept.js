@@ -143,8 +143,13 @@ function act(s,a,v){
  // (search, pen cards, scan; a sow opens the count drawer); Send saves and the page stays while piglets are left, so 3 can go to one
  // sow and 3 to another. Hand-rear and the rearing pen take what is left, from the footer.
  if(a==='allocChoose'){if(v==='move'&&s.allocChoice!=='move'){s.featureReturn='allocate';s.fosterDraft={...fosterDraft(s.alive),unit:homeUnit(s).id};}s.allocChoice=v;}
- // Allocate's sow picker opens on her own unit; the unit chips reach the batch's other units, All is no filter (owner, 2026-11-02).
- if(a==='allocUnit')s.fosterDraft.unit=v;
+ // Allocate's sow picker opens filtered to her own unit; the filter's unit chips reach the batch's other units, All is no filter
+ // (owner, 2026-11-02). The sheet works on a draft: Show N sows applies it, Reset returns to her unit, Back drops it.
+ if(a==='allocFilter'){s.fosterDraft.filtering=true;s.fosterDraft.unitDraft=s.fosterDraft.unit;}
+ if(a==='allocUnit')s.fosterDraft.unitDraft=v;
+ if(a==='allocFilterReset')s.fosterDraft.unitDraft=homeUnit(s).id;
+ if(a==='allocFilterApply'){s.fosterDraft.unit=s.fosterDraft.unitDraft;s.fosterDraft.filtering=false;}
+ if(a==='allocFilterBack')s.fosterDraft.filtering=false;
  if(a==='allocMove'){s.view='allocate';act(s,'allocChoose','move');}
  if(a==='allocHand'){const n=s.alive;s.handReared={at:'09:41',who:'G.H'};event(s,`${n} piglet${n===1?'':'s'} hand-reared in her crate`,'milestone');s.allocChoice=null;s.view='room';}
  if(a==='allocRear'&&farmConfig.rearingPen){const n=s.alive;s.alive=0;s.moved=(s.moved||0)+n;s.unidentified=0;s.anchor=born(s);event(s,`${n} piglet${n===1?'':'s'} moved to the rearing pen`,'milestone');s.allocChoice=null;s.view='room';}
@@ -849,12 +854,13 @@ function allocate(s){
  if(c==='move'){
   const bar=f.scanning?SentriUI.scanBar({state:f.scanning==='waiting'?'waiting':'scanning',device:'Reader 1',text:f.scanning==='waiting'?'':'Scan the other sow',stop:{action:'fosterScanStop'}})
    :SentriUI.choiceSearch({label:'Search ear tag or pen',placeholder:'Ear tag or pen',value:f.q,attrs:{'data-foster-search':''},clear:{action:'fosterClear'},scan:{action:'fosterScan',label:'Scan ear tag'}});
-  section=`<div class="foster-pick allocate-foster">${bar}${allocUnitChips(s)}<div class="foster-list">${allocFosterList(s)}</div></div>`;commit=false;
+  const filter=f.scanning?'':SentriUI.iconButton({action:'allocFilter',icon:icon('filter'),label:'Filter sows'+(f.unit!=='all'?', 1 applied':''),badge:f.unit!=='all'?1:'',className:'allocate-filter'});
+  section=`<div class="foster-pick allocate-foster"><div class="allocate-bar">${bar}${filter}</div><div class="foster-list">${allocFosterList(s)}</div></div>`;commit=false;
  }
  if(c==='hand'){section=SentriUI.facts([{label:'Piglets',value:String(n)},{label:'Stay in',value:`Crate ${s.pen}`}]);commit=btn('allocHand',`Hand-rear ${pigs}`,'button primary');}
  if(c==='rear'){section=SentriUI.facts([{label:'Piglets',value:String(n)},{label:'Leave',value:`Crate ${s.pen}`}]);commit=btn('allocRear',`Move ${n} to the rearing pen`,'button primary');}
  const html=SentriUI.sheet({variant:'page',title:'Allocate piglets',line:`${pigs} · ${s.tag}`,back:{action:'close'},body:tiles+section,bodyClass:'allocate-body',footer:commit?pageFooter(commit):false,className:'feature-page allocate-page',label:'Allocate piglets',bar:status()});
- const other=c==='move'&&fosterSow(s,f.target),layer=other?fosterCount(s,other,true):'';
+ const other=c==='move'&&fosterSow(s,f.target),layer=other?fosterCount(s,other,true):c==='move'&&f.filtering?allocFilterSheet(s):'';
  return layer?'<div class="page-background" inert aria-hidden="true">'+html+'</div>'+layer:html;
 }
 function locked(s){
@@ -1052,10 +1058,13 @@ function allocFosterList(s){
  const row=x=>{const p={code:x.r.tag,place:rowText.pen(x.r.pen),right:right(x),action:'fosterPick',value:x.r.tag};return (q?SentriUI.findRow({...p,query:q}):SentriUI.row({variant:'animal',code:p.code,description:p.place,right:p.right||{kind:'state',figure:'',word:'',level:'settled'},action:p.action,value:p.value})).replace('<button ',`<button data-scan-tag="${x.r.tag}" `);};
  return SentriUI.lookupGroups(units.map(u=>({title:u.name,rows:items.filter(x=>x.unit.id===u.id).sort((a,b)=>a.r.pen.localeCompare(b.r.pen,undefined,{numeric:true})||a.r.tag.localeCompare(b.r.tag)).map(row)})),{variant:'find'});
 }
-// Unit chips (FilterChips): All first, then each unit of the batch with a sow that can take piglets, with that count.
-function allocUnitChips(s){
- const f=s.fosterDraft,list=fosterCandidates(s),units=[...new Map(list.map(x=>[x.unit.id,x.unit])).values()].sort((a,b)=>String(a.id).localeCompare(String(b.id),undefined,{numeric:true}));
- return SentriUI.filterChips({items:[{value:'all',label:'All',checked:f.unit==='all'},...units.map(u=>({value:u.id,label:u.name,count:list.filter(x=>x.unit===u).length,checked:f.unit===u.id}))],action:'allocUnit',key:'allocUnit',label:'Unit'});
+// The filter, as Choose pigs' (a FilterSheet): one section, the unit, as chips (FilterChips: there can be ten units). All first, then
+// each unit of the batch with a sow that can take piglets, with that count. Her unit is the default, so Reset returns to it.
+function allocFilterSheet(s){
+ const f=s.fosterDraft,home=homeUnit(s).id,list=fosterCandidates(s),units=[...new Map(list.map(x=>[x.unit.id,x.unit])).values()].sort((a,b)=>String(a.id).localeCompare(String(b.id),undefined,{numeric:true}));
+ const n=list.filter(({unit})=>f.unitDraft==='all'||unit.id===f.unitDraft).length;
+ const chips=SentriUI.filterChips({items:[{value:'all',label:'All',checked:f.unitDraft==='all'},...units.map(u=>({value:u.id,label:u.name,count:list.filter(x=>x.unit===u).length,checked:f.unitDraft===u.id}))],action:'allocUnit',key:'allocUnit',label:'Unit'});
+ return SentriUI.filterSheet({title:'Filter sows',sections:[{title:'Unit',icon:icon('grid'),content:chips}],apply:{label:`Show ${n} ${n===1?'sow':'sows'}`,action:'allocFilterApply'},reset:f.unitDraft!==home?{label:'Reset',action:'allocFilterReset'}:false,backAction:'allocFilterBack',className:'batch-filter-sheet alloc-filter-sheet',size:'medium'});
 }
 function fosterCount(s,other,dead){
  const f=s.fosterDraft,out=f.direction==='out',max=fosterMax(s),word=out?'Send':'Receive',n=f.count;
