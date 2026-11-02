@@ -3231,6 +3231,9 @@
            "farrowing.leave-edit",
            "farrowing.edit",
            "farrowing.foster",
+           "farrowing.foster-search",
+           "farrowing.foster-scanning",
+           "farrowing.foster-count",
            "farrowing.reconcile",
            "farrowing.piglet-care",
            "farrowing.piglet-identity",
@@ -3254,7 +3257,9 @@
           "name": "Died",
           "screens": [
            "farrowing.ended",
-           "farrowing.allocate"
+           "farrowing.allocate",
+           "farrowing.foster-dead",
+           "farrowing.foster-move"
           ]
          }
         ],
@@ -5719,32 +5724,335 @@
          "preset": "foster",
          "figma": "",
          "notes": {
-          "purpose": "Send or receive piglets between this litter and another, counted on one Well stepper. From a dead sow's allocation sheet it opens sending out, with all her piglets selected.",
+          "purpose": "From her Actions: find the other sow (search by pen or ear tag, or scan) in a list that scrolls, then send or receive piglets with her.",
           "states": [],
           "elements": [
            {
-            "name": "Piglet count",
-            "shows": "Large - and + keys around the number of piglets moved.",
+            "name": "Other sow",
+            "at": "Tap the other sow, or scan.",
+            "shows": "Choose pigs' bar (the search field \"Ear tag or pen\" with the scan icon at its end), pinned over the list. The list scrolls: every sow with a litter on the task, under a plain unit heading (this unit first), one pen card per pen (\"A3 · 2 sows\"), each row her room row (tag over when, litter figure over state word) with a chevron.",
             "states": [
              {
-              "state": "Default",
-              "when": "Value equals what the system holds",
-              "shows": "Number in ink"
+              "state": "Typed",
+              "when": "The worker types part of a pen or an ear tag",
+              "shows": "The list narrows where it is; the matching part of the tag or the pen code is bold. Nothing matching: \"No sow with a litter matching “…”.\""
              },
              {
-              "state": "Changed",
-              "when": "Value differs from the system count",
-              "shows": "Number in amber with the difference written out"
+              "state": "Scanning",
+              "when": "The scan icon, with the reader on",
+              "shows": "The field becomes the scan bar \"Scanning · Scan the other sow\" with Stop; the list stays. A read opens the count for the sow read, as a tap does."
+             },
+             {
+              "state": "Waiting",
+              "when": "The scan icon, with no reader connected",
+              "shows": "The scan bar \"Waiting for reader · Make sure Reader 1 is on\"; it starts scanning when the reader connects."
              }
             ],
-            "source": "farrowing-astra-concept.js",
-            "at": "Piglet count"
+            "logic": "Search = type, tap one, act (the owner's search/scan ruling); Farrowing is a single-action task, so a read opens, it does not tick. Offered: every sow on the task's lists, in any unit, with a litter (not one that died, not a production outcome, not herself).",
+            "source": "farrowing-astra-concept.js fosterPage(), fosterList(), fosterCount()"
            }
           ],
-          "controls": [],
-          "copy": [],
+          "controls": [
+           {
+            "control": "A sow",
+            "does": "opens the count, sending to her",
+            "goesTo": "farrowing.foster-count"
+           },
+           {
+            "control": "Scan icon",
+            "does": "turns the field into the scan bar",
+            "goesTo": "farrowing.foster-scanning"
+           },
+           {
+            "control": "Back",
+            "does": "leaves; nothing changes",
+            "goesTo": "farrowing.sow-actions"
+           }
+          ],
+          "copy": [
+           "Foster piglets",
+           "Ear tag or pen",
+           "Tap the other sow, or scan.",
+           "<pen> · N sows"
+          ],
+          "edge": [
+           "Only one other sow with a litter: the list is one card. None: \"No other sow has a litter yet.\""
+          ],
+          "issues": [
+           "A read of a sow who cannot take piglets (no litter yet, died, not on the task) is not designed yet: the prototype's simulated reads are sows on the list."
+          ],
+          "rules": [
+           "Owner, 2026-11-02: the other sow is a list to search by pen or ear tag, or scan, grouped pen then pig, scrolling under the field; no Receive for a dead sow; the same search and rows for the general Foster action."
+          ]
+         }
+        },
+        {
+         "id": "farrowing.foster-search",
+         "name": "Foster piglets · typed",
+         "zh": "寄养",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "foster-search",
+         "figma": "",
+         "notes": {
+          "purpose": "The worker typed A3: only pen A3 is left, its code bold.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Other sow",
+            "at": "Tap the other sow, or scan.",
+            "shows": "Choose pigs' bar (the search field \"Ear tag or pen\" with the scan icon at its end), pinned over the list. The list scrolls: every sow with a litter on the task, under a plain unit heading (this unit first), one pen card per pen (\"A3 · 2 sows\"), each row her room row (tag over when, litter figure over state word) with a chevron.",
+            "states": [
+             {
+              "state": "Typed",
+              "when": "The worker types part of a pen or an ear tag",
+              "shows": "The list narrows where it is; the matching part of the tag or the pen code is bold. Nothing matching: \"No sow with a litter matching “…”.\""
+             },
+             {
+              "state": "Scanning",
+              "when": "The scan icon, with the reader on",
+              "shows": "The field becomes the scan bar \"Scanning · Scan the other sow\" with Stop; the list stays. A read opens the count for the sow read, as a tap does."
+             },
+             {
+              "state": "Waiting",
+              "when": "The scan icon, with no reader connected",
+              "shows": "The scan bar \"Waiting for reader · Make sure Reader 1 is on\"; it starts scanning when the reader connects."
+             }
+            ],
+            "logic": "Search = type, tap one, act (the owner's search/scan ruling); Farrowing is a single-action task, so a read opens, it does not tick. Offered: every sow on the task's lists, in any unit, with a litter (not one that died, not a production outcome, not herself).",
+            "source": "farrowing-astra-concept.js fosterPage(), fosterList(), fosterCount()"
+           }
+          ],
+          "controls": [
+           {
+            "control": "Clear",
+            "does": "empties the field; the whole list returns",
+            "goesTo": "farrowing.foster"
+           }
+          ],
+          "copy": [
+           "No sow with a litter matching “<text>”."
+          ],
           "edge": [],
-          "issues": []
+          "issues": [],
+          "rules": [
+           "Owner, 2026-11-02: the other sow is a list to search by pen or ear tag, or scan, grouped pen then pig, scrolling under the field; no Receive for a dead sow; the same search and rows for the general Foster action."
+          ]
+         }
+        },
+        {
+         "id": "farrowing.foster-scanning",
+         "name": "Foster piglets · scanning",
+         "zh": "寄养",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "foster-scanning",
+         "figma": "",
+         "notes": {
+          "purpose": "The reader is on: the scan bar in the field's place, the list under it. A read opens the count for her.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Other sow",
+            "at": "Tap the other sow, or scan.",
+            "shows": "Choose pigs' bar (the search field \"Ear tag or pen\" with the scan icon at its end), pinned over the list. The list scrolls: every sow with a litter on the task, under a plain unit heading (this unit first), one pen card per pen (\"A3 · 2 sows\"), each row her room row (tag over when, litter figure over state word) with a chevron.",
+            "states": [
+             {
+              "state": "Typed",
+              "when": "The worker types part of a pen or an ear tag",
+              "shows": "The list narrows where it is; the matching part of the tag or the pen code is bold. Nothing matching: \"No sow with a litter matching “…”.\""
+             },
+             {
+              "state": "Scanning",
+              "when": "The scan icon, with the reader on",
+              "shows": "The field becomes the scan bar \"Scanning · Scan the other sow\" with Stop; the list stays. A read opens the count for the sow read, as a tap does."
+             },
+             {
+              "state": "Waiting",
+              "when": "The scan icon, with no reader connected",
+              "shows": "The scan bar \"Waiting for reader · Make sure Reader 1 is on\"; it starts scanning when the reader connects."
+             }
+            ],
+            "logic": "Search = type, tap one, act (the owner's search/scan ruling); Farrowing is a single-action task, so a read opens, it does not tick. Offered: every sow on the task's lists, in any unit, with a litter (not one that died, not a production outcome, not herself).",
+            "source": "farrowing-astra-concept.js fosterPage(), fosterList(), fosterCount()"
+           }
+          ],
+          "controls": [
+           {
+            "control": "Stop",
+            "does": "the search field returns",
+            "goesTo": "farrowing.foster"
+           },
+           {
+            "control": "A read",
+            "does": "opens the count for the sow read",
+            "goesTo": "farrowing.foster-count"
+           }
+          ],
+          "copy": [
+           "Scanning · Scan the other sow · Stop"
+          ],
+          "edge": [],
+          "issues": [],
+          "rules": [
+           "Owner, 2026-11-02: the other sow is a list to search by pen or ear tag, or scan, grouped pen then pig, scrolling under the field; no Receive for a dead sow; the same search and rows for the general Foster action."
+          ]
+         }
+        },
+        {
+         "id": "farrowing.foster-count",
+         "name": "Foster piglets · send or receive",
+         "zh": "寄养",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "foster-count",
+         "figma": "",
+         "notes": {
+          "purpose": "The count for 000605, over the list: Send piglets or Receive piglets, how many, and save.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Count",
+            "at": "Number of piglets",
+            "shows": "A drawer over the list: title Send piglets (or Receive piglets), the line \"To <ID> · Pen <pen> · N alive\" (From … when receiving), the Well stepper \"Number of piglets\", one hint line, footer Back and \"Send N piglets\".",
+            "logic": "Send takes at most this litter's alive, Receive at most hers. Saving changes both litters: the sender's alive falls (piglets without identity move first), the receiver's rises (they arrive without identity); each record logs \"N piglets fostered to/from <ID>\". Back closes the drawer; the list keeps its place.",
+            "source": "farrowing-astra-concept.js fosterPage(), fosterList(), fosterCount()"
+           },
+           {
+            "name": "Direction",
+            "at": "Send piglets",
+            "shows": "The segment Send piglets / Receive piglets, first in the drawer (the general Foster action only).",
+            "logic": "Switching sets the count back to 1; the title, line and button follow.",
+            "source": "farrowing-astra-concept.js fosterPage(), fosterList(), fosterCount()"
+           }
+          ],
+          "controls": [
+           {
+            "control": "Send N piglets",
+            "does": "saves both litters and returns to her Actions",
+            "goesTo": "farrowing.sow-actions"
+           },
+           {
+            "control": "Back",
+            "does": "closes the drawer; the list stays",
+            "goesTo": "farrowing.foster"
+           }
+          ],
+          "copy": [
+           "Send piglets · Receive piglets",
+           "To <ID> · Pen <pen> · N alive",
+           "Piglets without identity move first.",
+           "They join without identity until it is recorded.",
+           "Send N piglets · Receive N piglets"
+          ],
+          "edge": [],
+          "issues": [],
+          "rules": [
+           "Owner, 2026-11-02: the other sow is a list to search by pen or ear tag, or scan, grouped pen then pig, scrolling under the field; no Receive for a dead sow; the same search and rows for the general Foster action."
+          ]
+         }
+        },
+        {
+         "id": "farrowing.foster-dead",
+         "name": "Sow died · move to other sows",
+         "zh": "寄养",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "foster-dead",
+         "figma": "",
+         "notes": {
+          "purpose": "From a dead sow's Allocate piglets → Move to other sows: the same list, and the line says how many piglets are to move. Piglets only go out.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Other sow",
+            "at": "Tap the other sow, or scan.",
+            "shows": "Choose pigs' bar (the search field \"Ear tag or pen\" with the scan icon at its end), pinned over the list. The list scrolls: every sow with a litter on the task, under a plain unit heading (this unit first), one pen card per pen (\"A3 · 2 sows\"), each row her room row (tag over when, litter figure over state word) with a chevron.",
+            "states": [
+             {
+              "state": "Typed",
+              "when": "The worker types part of a pen or an ear tag",
+              "shows": "The list narrows where it is; the matching part of the tag or the pen code is bold. Nothing matching: \"No sow with a litter matching “…”.\""
+             },
+             {
+              "state": "Scanning",
+              "when": "The scan icon, with the reader on",
+              "shows": "The field becomes the scan bar \"Scanning · Scan the other sow\" with Stop; the list stays. A read opens the count for the sow read, as a tap does."
+             },
+             {
+              "state": "Waiting",
+              "when": "The scan icon, with no reader connected",
+              "shows": "The scan bar \"Waiting for reader · Make sure Reader 1 is on\"; it starts scanning when the reader connects."
+             }
+            ],
+            "logic": "Search = type, tap one, act (the owner's search/scan ruling); Farrowing is a single-action task, so a read opens, it does not tick. Offered: every sow on the task's lists, in any unit, with a litter (not one that died, not a production outcome, not herself).",
+            "source": "farrowing-astra-concept.js fosterPage(), fosterList(), fosterCount()"
+           }
+          ],
+          "controls": [
+           {
+            "control": "A sow",
+            "does": "opens the count with all her piglets",
+            "goesTo": "farrowing.foster-move"
+           },
+           {
+            "control": "Back",
+            "does": "returns to Allocate piglets; nothing changes",
+            "goesTo": "farrowing.allocate"
+           }
+          ],
+          "copy": [
+           "<b>N piglets</b> · tap the sow that takes them, or scan."
+          ],
+          "edge": [],
+          "issues": [],
+          "rules": [
+           "Owner, 2026-11-02: the other sow is a list to search by pen or ear tag, or scan, grouped pen then pig, scrolling under the field; no Receive for a dead sow; the same search and rows for the general Foster action."
+          ]
+         }
+        },
+        {
+         "id": "farrowing.foster-move",
+         "name": "Sow died · send to a sow",
+         "zh": "寄养",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "foster-move",
+         "figma": "",
+         "notes": {
+          "purpose": "The dead sow's piglets to 000418: no Send/Receive, all of them counted, lowered to split them between sows.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Count",
+            "at": "Number of piglets",
+            "shows": "A drawer over the list: title Send piglets (or Receive piglets), the line \"To <ID> · Pen <pen> · N alive\" (From … when receiving), the Well stepper \"Number of piglets\", one hint line, footer Back and \"Send N piglets\".",
+            "logic": "Send takes at most this litter's alive, Receive at most hers. Saving changes both litters: the sender's alive falls (piglets without identity move first), the receiver's rises (they arrive without identity); each record logs \"N piglets fostered to/from <ID>\". Back closes the drawer; the list keeps its place.",
+            "source": "farrowing-astra-concept.js fosterPage(), fosterList(), fosterCount()"
+           }
+          ],
+          "controls": [
+           {
+            "control": "Send N piglets",
+            "does": "saves; Allocate piglets returns with the rest, or the room when none is left",
+            "goesTo": "farrowing.allocate"
+           },
+           {
+            "control": "Back",
+            "does": "closes the drawer; the list stays",
+            "goesTo": "farrowing.foster-dead"
+           }
+          ],
+          "copy": [
+           "Send piglets",
+           "To <ID> · Pen <pen> · N alive",
+           "Send N piglets"
+          ],
+          "edge": [],
+          "issues": [],
+          "rules": [
+           "Owner, 2026-11-02: the other sow is a list to search by pen or ear tag, or scan, grouped pen then pig, scrolling under the field; no Receive for a dead sow; the same search and rows for the general Foster action."
+          ]
          }
         },
         {
