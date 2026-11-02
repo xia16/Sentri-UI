@@ -30,6 +30,8 @@ The test for menu or content: *is each row a thing with live state (content), or
 
 Screens choose a context and never paint a panel colour. The context sets `--st-panel-bg` (a card's colour) and `--st-press` (a press); components read them. `.st-panel.st-panel.st-panel` beats any page rule on purpose, so a screen that sets `background` on a panel loses and looks "almost right by accident".
 
+**Status colours (owner, 2026-11-02).** A status takes one hue on every base: a light fill with same-hue ink when the shape holds a number, the mid-tone mark for a bar segment or dot, the dark ink for a word; waiting is the empty track or an outline. The table and its rules are in [README.md](README.md) › Colour.
+
 ## Colour on each base
 
 | Part | Page and menu drawer (tint base) | Content or input drawer (white base) |

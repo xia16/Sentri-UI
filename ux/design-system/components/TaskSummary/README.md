@@ -12,7 +12,7 @@ The one card under the last-record line: **left, this unit's figure; right, the 
   - **Description:** 2px below, 11px/500 `ink-2`.
   - **Support:** 6px below, `meta` 10px/1.6 `muted` (`amber` with `supportTone: 'amber'`, e.g. under target).
 - **The task half** is a button (the whole half). A 1px `line` divider on its left, inset 14px top and bottom. The heading ends in a chevron. The value adds `/ n` in `figure-denominator` (15px mono `muted`); the description adds a `muted` 10px scope (`· all units`).
-- **Progress bar:** 5px, 10px under the description, 1px gaps, 6px radius, on `line`. Segments: `done` in `current-marker`, `active` in `progress-active`, `rest` in `handle`. Its support line sits 7px under it.
+- **Progress bar:** 5px, 10px under the description, 1px gaps, 6px radius, on `line`. Segments: `done` in `done-mark`, `active` in `progress-mark`, `rest` in `handle` (status convention, 2026-11-02). Its support line sits 7px under it.
 
 - **No clip:** the card does not clip its halves (a clip read as hiding the task half's last pixel on a room too short to scroll); the task half keeps the card's right corners with its own `radius-panel`, so its pressed wash stays inside.
 

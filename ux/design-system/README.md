@@ -28,6 +28,22 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
 - Status words are coloured text with a 4px dot, never filled badges: `amber` due now / waiting to upload, `progress` in progress, `green` done, `muted` waiting. A pending block may sit on `pending-surface` with a `pending-border`.
 - **Fills colour a status that covers a whole area; washes stay text backgrounds; a fill is never a card's resting colour (owner, 2026-10-14).** A pen tile on the map takes `amber-fill` (needs you) or `progress-fill` (farrowing), with `amber-fill-ink` or `progress-fill-ink` for its text and no border. The washes (`amber-wash`, `progress-wash`) are for text backgrounds and read grey at tile size.
 - `red` is for destructive and ending acts only — "Delete photo", "End task" (filled, white label) and "End early" (`red-wash` fill, `red` border and label). Destructive controls never inherit the green treatment.
+- **One status colour convention for every task (owner, 2026-11-02).** Each settled status keeps one hue; the size of the shape picks the shade. Anything that holds a number (a Schedule cell, an End task count) is a light fill with the number in the same hue's dark ink; a thin mark with no text (a progress-bar segment, a tile's day segment, a key dot) is the clean mid tone; words are the dark ink; a pen tile keeps its area fill.
+
+  | Status | Words | Holds a number | Bars · day segments · dots | Pen tiles |
+  |---|---|---|---|---|
+  | Done (finished, recorded, on target) | `green` | `done-fill` · `done-fill-ink` | `done-mark` | — |
+  | Today · in progress (farrowing, active) | `progress` | `progress-fill` · `progress-fill-ink` | `progress-mark` | `progress-fill` |
+  | Late · needs you (past its plan, due now, below target) | `amber` | `amber-fill` · `amber-fill-ink` | `late-mark` | `amber-fill` |
+  | Waiting (not started, awaiting, still to come) | `muted` | an outline (`control-border`) | the empty `handle` track; an open ring where a key needs a dot | plain |
+  | Act now (overdue animal, died, danger) | `red-ink`, with its "!" | never a red number | — | — |
+
+  - **One red signal per row:** the state word with its "!" is red; the figure beside it stays `ink`. Red is for overdue animals, deaths, danger and the destructive hold only.
+  - **A task past its plan is late** (`late-mark`, "1 day late" in `amber`); an animal past its date is overdue (red).
+  - **Waiting has no colour:** the empty part of a bar, or an outline.
+  - A bar part that is not a status (the middle of Performance metrics' split of piglets born) is `neutral-mark`, so it never reads as done.
+  - **The one green button** is Farrowing's "+ Born alive" key (`count-key`, white label): it records a birth. Every other commit is `ink`; the destructive hold is `red`.
+  - Adjacent marks pass the colour-blind check (done/progress ΔE 18, done/late ΔE 9); every number on a fill is 7:1 or better.
 - Borders: `line` between surfaces, `rule` between rows inside a panel (never above the first row), `control-border` on fields and secondary buttons, `back-border` on Back.
 - No gradients, textures, photography or illustration. The only translucency is `scrim` (with a 1.4px blur) behind a drawer and `dialog-backdrop` behind a dialog.
 

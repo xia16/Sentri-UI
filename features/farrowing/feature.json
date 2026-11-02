@@ -1821,8 +1821,8 @@
         "elements": [
           {
             "name": "Closure card",
-            "shows": "Heading \"Before you can end\" · N sows; the task's sows as one bar; under it a row per part, its count in that part's colour: Still farrowing (blue, opens the sows), Leave the batch (yellow, opens the sows), Done (green, with what else happened: sow deaths, aborted, not in pig, removed earlier).",
-            "logic": "Shown while any sow is still farrowing; that row comes first and opens the sows to finish. Counts: Still farrowing = active, Leave the batch = awaiting, Done = every other sow in the task. Colours are the pen map's fills (progress-fill, amber-fill) and the done green, so the rows key the bar; red stays for deaths and the destructive hold.",
+            "shows": "Heading \"Before you can end\" · N sows; the task's sows as one bar; under it a row per part in the bar's order: Done (light green count, with what else happened: sow deaths, aborted, not in pig, removed earlier), Still farrowing (light blue count, opens the sows), Leave the batch (an outlined count and the amber \"!\" after its title, opens the sows).",
+            "logic": "Shown while any sow is still farrowing; its row opens the sows to finish, and the heading and the waiting hold say it blocks. Counts: Still farrowing = active, Leave the batch = awaiting, Done = every other sow in the task. Status convention (owner, 2026-11-02): the bar is done-mark · progress-mark · the empty track; a count holds a number, so it is its status's light fill with same-hue ink (done-fill, progress-fill), and waiting is an outline; the \"!\" says ending removes those sows. Red stays for deaths and the destructive hold.",
             "source": "farrowing-astra-concept.js taskClosure()",
             "at": "Before you can end"
           },
@@ -1925,8 +1925,8 @@
         "elements": [
           {
             "name": "Closure card",
-            "shows": "Heading \"Ready to end early\" · N sows; the task's sows as one bar; under it a row per part, its count in that part's colour: Still farrowing (blue, opens the sows), Leave the batch (yellow, opens the sows), Done (green, with what else happened: sow deaths, aborted, not in pig, removed earlier).",
-            "logic": "Shown when sows are awaiting and none is farrowing; Leave the batch is the cost of ending early, where those sows go is not said. Counts: Still farrowing = active, Leave the batch = awaiting, Done = every other sow in the task. Colours are the pen map's fills (progress-fill, amber-fill) and the done green, so the rows key the bar; red stays for deaths and the destructive hold.",
+            "shows": "Heading \"Ready to end early\" · N sows; the task's sows as one bar; under it a row per part in the bar's order: Done (light green count, with what else happened: sow deaths, aborted, not in pig, removed earlier), Still farrowing (light blue count, opens the sows), Leave the batch (an outlined count and the amber \"!\" after its title, opens the sows).",
+            "logic": "Shown when sows are awaiting and none is farrowing; Leave the batch is the cost of ending early, where those sows go is not said. Counts: Still farrowing = active, Leave the batch = awaiting, Done = every other sow in the task. Status convention (owner, 2026-11-02): the bar is done-mark · progress-mark · the empty track; a count holds a number, so it is its status's light fill with same-hue ink (done-fill, progress-fill), and waiting is an outline; the \"!\" says ending removes those sows. Red stays for deaths and the destructive hold.",
             "source": "farrowing-astra-concept.js taskClosure()",
             "at": "Ready to end early"
           },
@@ -2022,8 +2022,8 @@
         "elements": [
           {
             "name": "Closure card",
-            "shows": "Heading \"Ready to end\" · N sows; the task's sows as one bar; under it a row per part, its count in that part's colour: Still farrowing (blue, opens the sows), Leave the batch (yellow, opens the sows), Done (green, with what else happened: sow deaths, aborted, not in pig, removed earlier).",
-            "logic": "Shown when no sow is awaiting or farrowing: the bar is all green and Done is the one row. Counts: Still farrowing = active, Leave the batch = awaiting, Done = every other sow in the task. Colours are the pen map's fills (progress-fill, amber-fill) and the done green, so the rows key the bar; red stays for deaths and the destructive hold.",
+            "shows": "Heading \"Ready to end\" · N sows; the task's sows as one bar; under it a row per part in the bar's order: Done (light green count, with what else happened: sow deaths, aborted, not in pig, removed earlier), Still farrowing (light blue count, opens the sows), Leave the batch (an outlined count and the amber \"!\" after its title, opens the sows).",
+            "logic": "Shown when no sow is awaiting or farrowing: the bar is all green and Done is the one row. Counts: Still farrowing = active, Leave the batch = awaiting, Done = every other sow in the task. Status convention (owner, 2026-11-02): the bar is done-mark · progress-mark · the empty track; a count holds a number, so it is its status's light fill with same-hue ink (done-fill, progress-fill), and waiting is an outline; the \"!\" says ending removes those sows. Red stays for deaths and the destructive hold.",
             "source": "farrowing-astra-concept.js taskClosure()",
             "at": "Ready to end"
           },
@@ -2114,8 +2114,8 @@
         "elements": [
           {
             "name": "Closure card",
-            "shows": "Heading \"Ready to end early\" · N sows; the task's sows as one bar; under it a row per part, its count in that part's colour: Still farrowing (blue, opens the sows), Leave the batch (yellow, opens the sows), Done (green, with what else happened: sow deaths, aborted, not in pig, removed earlier).",
-            "logic": "Aborted, not in pig and removed-earlier sows count as Done and are named in its line (\"1 sow died · 1 aborted · rest finished\"). Counts: Still farrowing = active, Leave the batch = awaiting, Done = every other sow in the task. Colours are the pen map's fills (progress-fill, amber-fill) and the done green, so the rows key the bar; red stays for deaths and the destructive hold.",
+            "shows": "Heading \"Ready to end early\" · N sows; the task's sows as one bar; under it a row per part in the bar's order: Done (light green count, with what else happened: sow deaths, aborted, not in pig, removed earlier), Still farrowing (light blue count, opens the sows), Leave the batch (an outlined count and the amber \"!\" after its title, opens the sows).",
+            "logic": "Aborted, not in pig and removed-earlier sows count as Done and are named in its line (\"1 sow died · 1 aborted · rest finished\"). Counts: Still farrowing = active, Leave the batch = awaiting, Done = every other sow in the task. Status convention (owner, 2026-11-02): the bar is done-mark · progress-mark · the empty track; a count holds a number, so it is its status's light fill with same-hue ink (done-fill, progress-fill), and waiting is an outline; the \"!\" says ending removes those sows. Red stays for deaths and the destructive hold.",
             "source": "farrowing-astra-concept.js taskClosure()",
             "at": "Ready to end early"
           },

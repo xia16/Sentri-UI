@@ -879,3 +879,25 @@ The unsaved visit's chips, in the quiet tone once saved; Piglet processing's rec
 
 - **Better because** the fix sits where the mistake shows (the card names what was saved, and by whom), it takes one question and the keys the worker already uses, and nothing old can be rewritten.
 - Undo is the weight of Details ›: a small act looks like one (owner).
+
+# Status colours in Farrowing (2026-11-02), critique
+
+Scope: the room card and Task overview bars, End task's closure card, act-now sow rows, the "+ Born alive" key, Performance metrics' split. Baselined on `origin/main` at `7479ac8` at 390; the owner agreed the canvas.
+
+## Problems
+
+- **major** · The bars used olive, sage and pale grey while End task used green, light blue and yellow: the same sows wore different colours.
+- **major** · Act-now rows set both the figure and the word in bold red: harsh, and two red signals for one fact.
+- **minor** · End task's rows did not follow the bar; the awaiting sows read as a yellow status though they are only waiting.
+
+## Attention budget
+
+The heading answers; the bar reads left to right and the rows follow it; the one "!" marks what ending costs; on rows, one red word.
+
+## House pattern
+
+The animal row ruling's one "!" icon; the pen map's fills; the convention table in README › Colour.
+
+## Self-crit
+
+- **Better because** the bars, counts and rows share one palette with Home, a row carries one red signal, and the + Born alive key is the only green button, on purpose.
