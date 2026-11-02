@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Undo the last save</title>
+<style>
+:root{--bg:#f4f4ef;--card:#fff;--ink:#1d221e;--ink2:#4a524c;--muted:#6b736d;--line:#dfe2da}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161a17;--card:#1f2420;--ink:#eef0ea;--ink2:#c9cec6;--muted:#9aa29b;--line:#333a34}}
+:root[data-theme="dark"]{--bg:#161a17;--card:#1f2420;--ink:#eef0ea;--ink2:#c9cec6;--muted:#9aa29b;--line:#333a34}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Plus Jakarta Sans",system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:28px 16px 48px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+h1{font-size:26px;line-height:1.2;margin:6px 0 10px}
+h2{font-size:17px;margin:26px 0 10px}
+p{margin:0 0 10px;color:var(--ink2)} .lead{font-size:16px;color:var(--ink)}
+.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.shots figure{margin:0} .shots img{width:100%;border-radius:12px;border:1px solid var(--line);display:block}
+.shots figcaption{font-size:13px;color:var(--ink2);margin-top:6px;line-height:1.45}
+.shots b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+ul,ol{margin:0;padding-left:20px;color:var(--ink2)} li{margin:5px 0} li small{display:block;color:var(--muted);font-size:13px}
+@media (max-width:720px){.shots{grid-template-columns:repeat(2,1fr)}}
+</style></head>
+<body><main>
+<p class="eyebrow">Farrowing · no Edit record · the redo for a fat finger</p>
+<h1>Undo the last save</h1>
+<p class="lead">Under a divider, the Alive card shows the <b>last save</b> as a run: the header is when and who (“Saved 09:41 · G.H”), with all of that run's results on one line below (+3 born, −1 died, 1 born dead). For the worker who saved it, a quiet <b>Undo</b> sits on the right: a small return icon and the word, no box, the same weight as the card's “Details ›”. Undo asks “Undo the 09:41 save?”, Back · Undo. The visit comes back unsaved, exactly as it was. You fix it with the same keys and press Save.</p>
+
+<div class="shots">
+<figure><img src="undo-e0-not-mine.png" alt="Card with someone else's last save, no Undo"><figcaption><b>0. Someone else's.</b> “Saved Aug 26 08:41 · L.M” over +4 born: no Undo.</figcaption></figure>
+<figure><img src="undo-1-fat-finger.png" alt="Three born alive taps, not saved yet"><figcaption><b>1. The fat finger.</b> Three taps for two piglets. The run hides while unsaved. Save.</figcaption></figure>
+<figure><img src="undo-e1-saved.png" alt="Saved, the run with Undo in the card"><figcaption><b>2. Saved.</b> Alive 11. Under the divider: “Saved 09:41 · G.H”, +3 born · −1 died · 1 born dead on one line, and a quiet <b>Undo</b> on the right.</figcaption></figure>
+<figure><img src="undo-e2-ask.png" alt="Undo the 09:41 save? Back, Undo"><figcaption><b>3. Undo the 09:41 save?</b> Back · Undo.</figcaption></figure>
+<figure><img src="undo-3-reopened.png" alt="The visit reopened as not saved yet"><figcaption><b>4. Undone.</b> “Not saved yet”, +3 born. The record reads 9 until you save again.</figcaption></figure>
+<figure><img src="undo-4-fixed.png" alt="Fixed to plus two"><figcaption><b>5. Fixed.</b> − once: 11, +2 born. Save. The log keeps one Corrected line: “+2 born alive · Was +3 born alive”.</figcaption></figure>
+</div>
+
+<h2>How the card stays simple</h2>
+<div class="card"><ul>
+<li>One surface, two targets side by side: the figure area opens Details as before; Undo is its own button, never inside the door.</li>
+<li>The run replaces the card's quiet “Saved 08:20”, so the time is said once, and the saved chips are the same parts the unsaved visit used.</li>
+<li>Only the last action can be undone; undoing any line of the log would be Edit record again.</li>
+</ul></div>
+
+<h2>The rules</h2>
+<div class="card"><ul>
+<li><b>Only the last action</b> on this sow, and only for the worker who saved it. It goes once anything else is saved on her or she is finished. Everyone sees the line; for anyone else it has no Undo.</li>
+<li><b>A death works the same way.</b> “1 crushed” that was scours: Undo, open Death, change it, Save.</li>
+<li><b>Clear after Undo</b> withdraws the visit, and the log keeps it as “Withdrawn”. Nothing disappears silently.</li>
+<li><b>Finish is never undone.</b> Edit record, Edit on the finished record, Edit litter record in Actions, Correct born and Edit finish details all go.</li>
+</ul></div>
+
+<h2>The other pages it touches</h2>
+<div class="shots">
+<figure><img src="touch-2-locked.png" alt="Finished record with last save"><figcaption><b>Finished record.</b> Edit is gone. After a Record dead, the last save sits under the figures with Undo; the drawer opens a little taller so Record dead · Actions stay in view.</figcaption></figure>
+<figure><img src="touch-3-sow-died.png" alt="Sow died record"><figcaption><b>Sow died record.</b> Edit is gone: Record dead · Actions.</figcaption></figure>
+<figure><img src="touch-4-log.png" alt="Farrowing log with Withdrawn and Corrected"><figcaption><b>Log.</b> A redone visit: one “Corrected” line. Undone and cleared: “Withdrawn”, struck through.</figcaption></figure>
+<figure><img src="touch-5-actions.png" alt="Actions without Edit litter record"><figcaption><b>Actions.</b> Edit litter record is gone. (Reconcile piglet count is the Count spec's to retire.)</figcaption></figure>
+<figure><img src="undo-6-litter.png" alt="Litter details"><figcaption><b>Litter details.</b> Only the Edit record row goes; Farrowing log stays.</figcaption></figure>
+</div>
+<p style="margin-top:10px">No change needed: Report death, the unsaved visit, Finish farrowing, Death causes.</p>
+
+<h2>Your calls</h2>
+<div class="card"><ol>
+<li>Undo only for the worker who saved it? <small>Recommend yes.</small></li>
+<li>Until the next save on her, or also a time limit (e.g. 30 minutes)? <small>Recommend no clock: the next save closes it.</small></li>
+<li>The same Undo for the last Record dead after Finish? <small>Recommend yes (drawn above).</small></li>
+</ol></div>
+</main></body></html>

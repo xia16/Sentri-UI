@@ -382,66 +382,6 @@
   "source": "notes"
  },
  {
-  "id": "tasks-built-32",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.edit"
-  },
-  "kind": "design",
-  "severity": "low",
-  "title": "Edit Save dimmed and Clear in header, against ruling",
-  "detail": "Ruling: Save absent before a change, never greyed; Clear on the change-summary row. Built: Save dimmed from entry, Clear in the header.",
-  "source": "notes"
- },
- {
-  "id": "tasks-built-33",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.edit"
-  },
-  "kind": "unclear",
-  "severity": "medium",
-  "title": "Edit lets Alive drop below the floor; Born effect unexplained",
-  "detail": "Alive can go below the counting floor, which changes derived Born, and nothing on screen explains it. Needs a rule on how a pre-lock Alive correction restates Born in the log.",
-  "source": "notes"
- },
- {
-  "id": "tasks-built-34",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.born"
-  },
-  "kind": "design",
-  "severity": "low",
-  "title": "Died option shows the full cause list inline in the popup",
-  "detail": "More born > Died opens six causes inside a popup, long on a small phone. The Edit screen behind the popup is not shown on its own anywhere.",
-  "source": "notes"
- },
- {
-  "id": "tasks-built-35",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.born"
-  },
-  "kind": "broken",
-  "severity": "low",
-  "title": "Selected radio shows a blue browser focus ring",
-  "detail": "The first radio in the Correct born popup draws a default blue box, off-palette against the 2px ink ring ruled for radios.",
-  "source": "sweep"
- },
- {
-  "id": "tasks-built-36",
-  "target": {
-   "kind": "screen",
-   "id": "farrowing.edit-finished"
-  },
-  "kind": "design",
-  "severity": "low",
-  "title": "Finish details opens a page; ruling expands the row in place",
-  "detail": "Prototype pushes a separate \"Edit finish details\" page, the ruling expands the row. PRD also calls it \"At finish\", the screen \"Finish details\".",
-  "source": "notes"
- },
- {
   "id": "tasks-built-38",
   "target": {
    "kind": "screen",

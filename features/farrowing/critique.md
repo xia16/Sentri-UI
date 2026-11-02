@@ -841,3 +841,41 @@ Task overview's status bar and its counts; the pen map's fills for status areas 
 - **Better because** the first line answers the question, the one thing to do opens from the first row, the hold says why it waits, and each figure is said once.
 - The page scrolls for the performance card (up to ~260px blocked); the closure card and the hold never need a scroll.
 - The Task overview bar keeps its soft greens; only End task uses the status fills. One look for both is a follow-up for the owner.
+
+# No Edit record; Undo the last save (2026-11-02), critique
+
+Scope: the counting drawer (`farrowing.count`, new `farrowing.count-saved` and `farrowing.undo`), the finished and sow-died records (Edit off the toolbar, the last save under the figures), Litter details (Edit record row), Actions (Edit litter record), the log (Corrected, Withdrawn). Retired: `farrowing.edit`, `farrowing.edit-finished`, `farrowing.born`, `farrowing.leave-edit`. Baselined on `origin/main` at `1c83077` at 390. The owner agreed the drawn screens in the round ([edit-record-round.md](edit-record-round.md)) and said to build the drawer; Report death, Record dead's own screen and Litter details' redesign are other sessions'.
+
+## Keep
+
+- The Alive card: the figure, Details ›, the chips of an unsaved visit, one height while counting; the keys and the bar unchanged.
+- The finished record's facts and Death causes door (Litter details' redesign is another session's).
+
+## Problems
+
+- **major** · Edit record let a worker change a death's cause or Total born days later, which nobody can honestly know (owner, 2026-11-02); the same tap meant three things (lowering crushed lowered Born before Finish, raised Alive after).
+- **major** · Nothing let a worker take back a fat-fingered save except that Edit screen.
+- **minor** · The card's quiet `Saved Aug 26 08:20` said when, not what or who.
+
+## Attention budget
+
+1 alive now (the figure) · 2 the keys · 3 the last save (when · who, then what) · 4 Undo, quiet, only for whoever saved it. On the finished record the last save sits under the figures and is said once.
+
+## House pattern
+
+The unsaved visit's chips, in the quiet tone once saved; Piglet processing's receipt line with its text Undo; the shared dialog for the one question; the Log's own Corrected form.
+
+## Parts
+
+| Part | Drawn by | Keep / fix / cut |
+|---|---|---|
+| Last save run | `lastRun()`, `.alive-run*` in bundle.css (Alive card section) | **new** |
+| Undo | SentriUI.button, text register, `return` glyph | **new** |
+| Undo question | SentriUI.sheet dialog | **new** |
+| Card surface | `.alive-surface` carries the border and fill; the door keeps its geometry | **fix** |
+| Edit record, Edit finish details, Correct born, Save correction? | `edit()`, `editFinish()`, `bornPanel()`, leaveEdit dialog | **cut** |
+
+## Self-crit
+
+- **Better because** the fix sits where the mistake shows (the card names what was saved, and by whom), it takes one question and the keys the worker already uses, and nothing old can be rewritten.
+- Undo is the weight of Details ›: a small act looks like one (owner).
