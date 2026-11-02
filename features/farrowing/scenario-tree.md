@@ -69,10 +69,10 @@ States: C0 Farrowing, nothing entered (000418: alive 9, dead 1·1·2·0·0·1).
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
 | C-1 | C0 | open | → the Alive card says when the record was last saved (`Saved Aug 26 08:20`) | S — owner decisions 2026-10-23 (Counting) | `fa-c1-receipt-says-saved` |
-| C-2 | C0 | read the death tool | → it reads **Report death** | S — owner decisions 2026-10-23 (Counting) | `fa-c2-tool-reads-record-dead` |
+| C-2 | C0 | read the death key | → it reads **Death** (the down arrow) and opens Report death | S — owner decisions 2026-10-23 (Counting), keys 2026-11-02 | `fa-c2-tool-reads-record-dead` |
 | C-3 | C0 | + then − on Born alive | → Born alive − greys at 0; Alive 9 and born 14 unchanged (a saved count is corrected in Edit record) | S — owner decisions 2026-10-23 (Counting) | `fa-c3-minus-clamps-at-floor` |
 | C-4 | C0 | idle 90 min | → the visit folds into one log line | S — RUL Surfaces (visit ends after ~90 min idle); contract C3 (draft) | pending `fa-c4-idle-fold` |
-| C-5 | C0 | Report death | → the Report death level (§4) | S — owner decisions 2026-10-23 (Counting) | via D-* |
+| C-5 | C0 | Death | → the Report death level (§4) | S — owner decisions 2026-10-23 (Counting) | via D-* |
 | C-6 | C0 | the Alive card › Edit record | → Litter details, then the one correction screen (§6) | S — owner decisions 2026-10-23 (Counting) | via X-* |
 | C-7 | C0 | More actions › Foster piglets | ? Q1 | S (conflict) — RUL After the lock (parked) vs feature.json foster screen | blocker `fa-z1-fostering-scope` |
 

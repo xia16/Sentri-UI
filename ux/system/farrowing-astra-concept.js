@@ -813,7 +813,10 @@ function aliveCard(s){
 }
 function count(s){
  const dr=visitDraft(s),back=SentriUI.backButton({action:'close'});
- const body=`${aliveCard(s)}${farmStepper({variant:'count',label:'Born alive',value:s.bornDraft||0,min:0,action:'bornAlive',reserveHint:false})}${btn('death',`${icon('alert')}<span>Report death</span>`,'report-death')}`;
+ // One row of keys under the card (owner, 2026-11-02): − takes back a + not yet saved, + Born alive, Death opens Report death.
+ const n=s.bornDraft||0;
+ const keys=`<div class="count-keys" role="group" aria-label="Count this visit"><button type="button" class="count-key" data-action="bornAlive" data-value="-1" aria-label="Take back one born alive"${n?'':' aria-disabled="true"'}>${icon('minus')}</button><button type="button" class="count-key" data-tone="plus" data-action="bornAlive" data-value="1">${icon('plus')}<span>Born alive</span></button><button type="button" class="count-key" data-tone="death" data-action="death" aria-label="Report death">${icon('trend-down')}<span>Death</span></button></div>`;
+ const body=aliveCard(s)+keys;
  return {cls:'count-body',body,corner:dr?cornerClear('clearVisit'):null,footer:dr?footer(back,SentriUI.button({label:'Save',register:'primary',action:'saveVisit'}),'execution-completion'):footer(back,SentriUI.button({label:'Finish farrowing',register:'primary',action:'finish',disabled:!born(s)})+SentriUI.iconButton({action:'sowActions',icon:icon('more'),label:'Actions for sow '+s.tag}),'execution-completion count-footer')};
 }
 function finish(s){
@@ -987,7 +990,7 @@ function capabilitySurface(s){return s.view==='marker'?markerPage(s):s.view==='p
 
 function farrowingRecordSurface(s){const surface=({count,finish,locked,death,edit,editFinish,allocate})[s.view];if(!surface)return '';const v=surface(s),h=identity(s),page=AstraSurfaces.isPage('farrowing',s.view);
  const label={allocate:'Allocate piglets',count:'Count alive',finish:'Finish farrowing',locked:'Locked litter',death:'Record dead',editFinish:'Edit finish details',edit:'Edit record'}[s.view];
- return SentriUI.sheet(Object.assign({variant:page?'page':'drawer',body:v.body,bodyClass:v.cls,corner:v.corner||null,footer:v.footer,size:['death','edit','editFinish','finish'].includes(s.view)?'long':'medium',sizing:['count','death','edit'].includes(s.view)?'full':'content',view:s.view,label,scrim:{action:'dismiss',label:'Dismiss sheet'},bar:page?status():''},h));}
+ return SentriUI.sheet(Object.assign({variant:page?'page':'drawer',body:v.body,bodyClass:v.cls,corner:v.corner||null,footer:v.footer,size:['death','edit','editFinish','finish'].includes(s.view)?'long':'medium',sizing:['death','edit'].includes(s.view)?'full':'content',view:s.view,label,scrim:{action:'dismiss',label:'Dismiss sheet'},bar:page?status():''},h));}
 function farrowingBackground(s){
  if(s.view==='roomPicker'){const c=roomContext(s),back=c.picker?.returnView||'';const behind=['roomPenReadNote','roomPenNote','roomPenFault','roomPenFaultRecord'].includes(back)?penSubpage({...s,view:back},c):['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile'].includes(back)?capabilitySurface({...s,view:back}):'';return behind?'<div class="page-background" inert aria-hidden="true">'+behind+'</div>':'';}
  if(['roomPenReadNote','roomPenNote','roomPenFault','roomPenFaultRecord'].includes(s.view))return '<div class="page-background" inert aria-hidden="true">'+penDetails(roomContext(s))+'</div>';
