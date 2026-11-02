@@ -139,3 +139,11 @@ Out:
 
 - The pen page and everything on it (Note, Feed, Fault, the pen log) live in **Inspection**, where pens are walked and looked after. Farrowing keeps the room, Pen map and the pen header's `›` that opens the pen page; its map no longer lists the pen screens.
 - **Find a sow and Scan ear tags** stay in Farrowing's scope and are their own band on its map ("Find and scan"), apart from the room.
+
+### Owner decisions, 2026-11-02 · End task
+
+- **The page answers whether the batch can close.** Its heading is the answer: `Before you can end` while a sow is still farrowing, `Ready to end early` while sows are awaiting, `Ready to end` when every sow has an outcome. The page title is plain `End task`; the hold says early or not.
+- **One bar, a row per part.** The task's sows as one bar; under it Still farrowing (opens those sows), Leave the batch (opens those sows) and Done (with what else happened: deaths, aborted, not in pig, removed earlier). Each row's count sits in its part's colour, the pen map's fills: farrowing blue, needs-you yellow, done green. Red stays for deaths and the destructive hold.
+- **The waiting hold says why.** While a sow is farrowing the hold's caption reads `FINISH N SOWS FIRST`. Ending early (sows removed) is the red hold; a plain end is the ink hold. Hold buttons are never green: green means done or recorded.
+- **Performance metrics are the full card**, the same on the Task overview, End task and the receipt: Born alive / litter (target as a verdict, on or below) and Stillborn rate (mummified rate under it); where every piglet born went (Alive now · Died after birth with causes · Born dead, each with its share); Alive / litter · Assisted · Weight / litter. The page may scroll for it; the closure card and the hold stay on the first screen.
+- The sow lists take the row's words as their title: Still farrowing, Leave the batch.
