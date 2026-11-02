@@ -25,7 +25,7 @@
   ],
   "classification": "component",
   "variants": [
-    { "name": "row", "usedBy": ["farrowing.death", "farrowing.edit", "piglet-processing.counts", "piglet-processing.record-death", "piglet-processing.adjust-count"], "status": "agent-checked",
+    { "name": "row", "usedBy": ["farrowing.death", "piglet-processing.counts", "piglet-processing.record-death", "piglet-processing.adjust-count"], "status": "agent-checked",
       "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
       "findings": ["Focus cell still rings both keys"] },
     { "name": "count", "usedBy": ["farrowing.count", "piglet-processing.set-count"], "status": "agent-checked",

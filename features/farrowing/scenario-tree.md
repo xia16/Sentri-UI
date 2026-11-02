@@ -69,11 +69,11 @@ States: C0 Farrowing, nothing entered (000418: alive 9, dead 1·1·2·0·0·1).
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
 | C-1 | C0 | open | → the Alive card says when the record was last saved (`Saved Aug 26 08:20`) | S — owner decisions 2026-10-23 (Counting) | `fa-c1-receipt-says-saved` |
-| C-2 | C0 | read the death tool | → it reads **Report death** | S — owner decisions 2026-10-23 (Counting) | `fa-c2-tool-reads-record-dead` |
-| C-3 | C0 | + then − on Born alive | → Born alive − greys at 0; Alive 9 and born 14 unchanged (a saved count is corrected in Edit record) | S — owner decisions 2026-10-23 (Counting) | `fa-c3-minus-clamps-at-floor` |
+| C-2 | C0 | read the death key | → it reads **Death** (the down arrow) and opens Report death | S — owner decisions 2026-10-23 (Counting), keys 2026-11-02 | `fa-c2-tool-reads-record-dead` |
+| C-3 | C0 | + then − on Born alive | → Born alive − greys at 0; Alive 9 and born 14 unchanged (a saved visit is fixed by undoing it, §6) | S — owner decisions 2026-10-23 (Counting); owner decision 2026-11-02 | `fa-c3-minus-clamps-at-floor` |
 | C-4 | C0 | idle 90 min | → the visit folds into one log line | S — RUL Surfaces (visit ends after ~90 min idle); contract C3 (draft) | pending `fa-c4-idle-fold` |
-| C-5 | C0 | Report death | → the Report death level (§4) | S — owner decisions 2026-10-23 (Counting) | via D-* |
-| C-6 | C0 | the Alive card › Edit record | → Litter details, then the one correction screen (§6) | S — owner decisions 2026-10-23 (Counting) | via X-* |
+| C-5 | C0 | Death | → the Report death level (§4) | S — owner decisions 2026-10-23 (Counting) | via D-* |
+| C-6 | C0 | the Alive card › Details | → Litter details: the totals and the Farrowing log (Edit record is gone, owner 2026-11-02) | S — owner decisions 2026-10-23 (Counting); owner decision 2026-11-02 | — |
 | C-7 | C0 | More actions › Foster piglets | ? Q1 | S (conflict) — RUL After the lock (parked) vs feature.json foster screen | blocker `fa-z1-fostering-scope` |
 
 ## 4 · The dead drawer draft (D)
@@ -95,7 +95,7 @@ States: D0 Report death open over C0 with 1 crushed entered · D1 C0 after Done,
 
 ## 5 · Finish and the lock (F)
 
-States: F0 the record with a visit waiting (from D1) · F1 *retired* (Finish with an Edit draft: an unsaved correction cannot reach Finish, see X-10) · F2 Finish, nothing waiting.
+States: F0 the record with a visit waiting (from D1) · F1 *retired* (Finish with an Edit draft: an unsaved correction cannot reach Finish, see X-10) · F2 Finish, nothing waiting · F3 a finished sow's record · F4 Details for a first litter.
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
@@ -106,30 +106,38 @@ States: F0 the record with a visit waiting (from D1) · F1 *retired* (Finish wit
 | F-5 | F1 | *retired* | an unsaved correction cannot reach Finish (X-10); leaf `fa-f5-finish-blocked-by-edit-draft` retired | owner decision 2026-10-10 | — |
 | F-6 | F1 | *retired* | replaced by X-12; leaf `fa-f6-saved-correction-returns-to-finish` retired | owner decision 2026-10-10 | — |
 | F-7 | F2 | tap (no hold) | → nothing locks | S — RUL Surfaces (hold-to-lock is the second guard) | `fa-f7-tap-does-not-lock` |
-| F-8 | F2 | hold | → locked record: Born 14, Edit · Record dead, no Finish | S — RUL After the lock | `fa-f8-locked-record-face` |
+| F-8 | F2 | hold | → locked record: Born 14, Record dead · Actions, no Edit, no Finish | S — RUL After the lock; owner decision 2026-11-02 | `fa-f8-locked-record-face` |
 | F-9 | F2 | weak / deformed steppers | → commit per tap; healthy derived; capped at alive | S — RUL Model (classification at Finish) | — |
 | F-10 | F2 | litter weight outside 0.8–2.5 kg × alive | → soft words warning, never a gate | S — contract C5 (draft); review tasks-built-28 | — |
 | F-11 | F2 | tap Yes on Assisted | → No was chosen before (required No / Yes, no Clear); Yes is chosen and recorded | S — owner decision 2026-10-15 | `fa-f11-assisted-no-preselected` |
 | F-12 | F2 | type 12,6 in the Litter weight field (the system decimal keyboard) | → the weight reads 12.6 kg (the comma became a point); no Numpad; the sheet stays open | S — owner decision 2026-10-16 | `fa-f12-weight-on-the-keyboard` |
+| F-13 | F3 | open a finished sow | → one card: alive now, where the litter went, Born alive 12 / 14, head band Finished · Details ›; Back · Actions · Record dead in the bar | S — owner decision 2026-11-02 | `fa-f13-finished-at-a-glance` |
+| F-14 | F3 | tap the litter card | → Details (a page): This litter with causes, Against her batch, Against herself, Farrowing log | S — owner decision 2026-11-02 | `fa-f14-details-compares` |
+| F-15 | F4 | open Details for a first litter | → Against herself reads First litter; the batch comparison still shows | S — owner decision 2026-11-02 | `fa-f15-first-litter-placeholder` |
 
-## 6 · Edit and Correct born (X)
+## 6 · Undo the last save (X)
 
-States: X0 Edit open while counting · X1 Edit open on a locked record.
+No Edit record (owner, 2026-11-02): what is saved is in. A fat finger is fixed by undoing the last save: only the last one on her, only for
+the worker who saved it; it comes back as the unsaved visit. Edit record, Edit finish details and Correct born are gone, and so are their rows' old
+meanings: the row ids below are kept with the leaves that now check the Undo.
+
+States: X0 counting, three Born alive taps just saved by G.H (a fat finger for two) · X1 a locked record (born 14) with one crushed death just
+recorded by G.H.
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
 | X-1 | X0 | first change | *retired*: the amber banner and change summary are gone; see X-9. Leaf `fa-x1-change-shows-banner-and-summary` retired | owner decision 2026-10-10 | — |
-| X-2 | X0 + change | Save | → one stamped correction; Born heals from its inputs (13) | S — RUL Surfaces | `fa-x2-save-correction` |
+| X-2 | X0 › Undo › Undo | Save unchanged | → the line as it was (+3 born alive), not marked Corrected; alive 12, born 17 | owner decision 2026-11-02 | `fa-x2-save-correction` |
 | X-3 | X0 + change | Back | *retired*: Back with unsaved changes now asks (X-10) instead of silently keeping the draft. Leaf `fa-x3-edit-back-keeps-draft` retired | owner decision 2026-10-10 | — |
-| X-4 | X0 + change | Clear | → change discarded | S — RUL Surfaces | `fa-x4-edit-clear-discards` |
-| X-5 | X1 | Correct born ✎ › More born 1 › Apply › Save | → Born 14 → 15, stamped; original kept in the log | S — RUL After the lock (anyone may amend) | `fa-x5-correct-born-after-lock` |
-| X-6 | X1 after X-5 | View log | → the Farrowing record shows the correction and the finish | S — RUL After the lock (one ledger surface) | `fa-x6-log-shows-correction` |
+| X-4 | X0 › Undo › Undo | Clear | → the save is withdrawn: alive 9, nothing waiting; the log keeps +3 born alive marked Withdrawn | owner decision 2026-11-02 | `fa-x4-edit-clear-discards` |
+| X-5 | X1 | Undo › Undo | → Record dead opens with the crushed death as its unsaved count; born stays 14; the finish line is kept | owner decision 2026-11-02 | `fa-x5-correct-born-after-lock` |
+| X-6 | X1 after X-5 | Crushed −, Scours +, Record, Details, Farrowing log | → the log shows +1 scours marked Corrected (Was +1 crushed) above Farrowing finished | owner decision 2026-11-02; RUL After the lock (one ledger surface) | `fa-x6-log-shows-correction` |
 | X-7 | X1 | a piglet dies after the lock | ? Q4 — which door owns post-lock deaths | S (open) — RUL After the lock vs review tasks-built-24 | blocker `fa-x7-post-lock-death-door` |
-| X-8 | X0 | lower Alive below the counting floor | ? Q7 — how a pre-lock Alive correction restates Born | S (open) — review tasks-built-33 | — |
-| X-9 | X0 | first change | → the changed row shows its new value in ink with a muted `was N` beside the label; no banner, no Corrected tag; Save correction live | owner decision 2026-10-10 | `fa-x9-changed-row-shows-was` |
-| X-10 | X0 + change | Back | → the shared dialog asks `Save correction?` (Save / Discard); the screen stays on Edit until answered; nothing posted | owner decision 2026-10-10 | `fa-x10-back-with-change-asks-save` |
-| X-11 | X-10 | Discard | → the change is dropped, back on Litter details, nothing posted | owner decision 2026-10-10; owner decisions 2026-10-23 (Counting) | `fa-x11-ask-discard-drops-change` |
-| X-12 | X-10 | Save | → one stamped correction (who and old → new go to the log), back on the record | owner decision 2026-10-10 | `fa-x12-ask-save-posts-correction` |
+| X-8 | — | *retired*: there is no Alive correction any more (owner, 2026-11-02); Q7 is answered | owner decision 2026-11-02 | — |
+| X-9 | X0 | look | → the Alive card names the last save under a divider (Saved 09:41 · G.H, +3 born) with a quiet Undo; no banner, no Corrected tag | owner decision 2026-11-02 | `fa-x9-changed-row-shows-was` |
+| X-10 | X0 | Undo | → the shared dialog asks `Undo the 09:41 save?` (Back / Undo); nothing changes until it is answered | owner decision 2026-11-02 | `fa-x10-back-with-change-asks-save` |
+| X-11 | X-10 | Undo | → the save comes back as the unsaved visit (+3 born); the record reads 9 alive again and the log its four earlier lines | owner decision 2026-11-02 | `fa-x11-ask-discard-drops-change` |
+| X-12 | X-11 | − once, Save | → one log line marked Corrected: +2 born alive, Was +3 born alive; 11 alive, and the new save can be undone | owner decision 2026-11-02 | `fa-x12-ask-save-posts-correction` |
 
 ## 7 · Sow death (M)
 
@@ -160,7 +168,7 @@ States: M0 Report death on The sow over C0 · M1 Ended (sow died).
 
 ## 8 · The task: overview → End → receipt (K)
 
-States: K0 room with sows still farrowing · K1 End review, all finished · K2 End review, awaiting remainder, none active · K3 task ended.
+States: K0 room with sows still farrowing · K1 End review, all finished · K2 End review, awaiting remainder, none active · K3 task ended · K4 End review, sows still farrowing.
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
@@ -172,6 +180,8 @@ States: K0 room with sows still farrowing · K1 End review, all finished · K2 E
 | K-6 | K2 | hold End task early | → early receipt | S — PRD Decisions | `fa-k6-end-early-receipt` |
 | K-7 | K2 | the awaiting sows at End | ? Q6 — where they go | S (open) — contract C9 vs review tasks-built-44 | blocker `fa-k7-awaiting-at-early-end` |
 | K-8 | K3 | a later correction to a sow | ? Q8 — does the receipt change | S (open) — review tasks-built-50 | — |
+| K-9 | K4 | hold End task early | → nothing ends; the heading reads Before you can end and the hold says FINISH 2 SOWS FIRST | S — PRD Decisions (blocked while farrowing is open; 2026-11-02 End task) | `fa-k9-blocked-hold-waits` |
+| K-10 | K4 | tap Still farrowing | → the Still farrowing list: those sows, each a door to her record | S — PRD Decisions 2026-11-02 End task | `fa-k10-blocked-opens-sows` |
 
 ## 8b · Find a sow and Scan ear tags (S)
 
@@ -271,7 +281,7 @@ task with laggards and an unsaved draft somewhere (K, Q2) · **s7** interrupted:
 4. **Q4 · After the lock, which door records a piglet death?** *(X-7)*
 5. **Q5 · May piglet deaths be recorded after the sow died?** *Answered 2026-10-10: through Record dead; the count drops. (M-4, now a leaf)*
 6. **Q6 · Where do awaiting sows go when the task ends early?** *(K-7)*
-7. **Q7 · How does a pre-lock Alive correction below the floor restate Born?** *(X-8)*
+7. **Q7 · How does a pre-lock Alive correction below the floor restate Born?** *Answered 2026-11-02: there is no Alive correction; Edit record is gone (X-8 retired).*
 8. **Q8 · Does a correction after End change the receipt?** *(K-8)*
 
 Also standing as a recommendation, not a ruling: review tasks-built-21 proposes reversing D-1 (discard with a confirm).

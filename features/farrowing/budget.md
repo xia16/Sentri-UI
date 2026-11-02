@@ -248,3 +248,14 @@ Scope: the room's pen page (`farrowing.pen`, `roomPenDetail`), moved onto the la
 | Pen log (`All recorded activity`) | door | What has happened here? | kept as one row at the end |
 
 Cut: the notices' kind chips (`Equipment`, `Note`); the verb rows' second lines (`View feeding information`, `Name the device and what is wrong`, `Leave information for the next person`, `Update the note for this pen`); the fault notice's `Equipment` chip and its stamp line on the pen page (the fault row is the door to both). No `Observe` or `Tick all` tile: Farrowing has neither verb, and none is invented.
+
+## The last save (2026-11-02)
+
+| Fact | Level | Question | Rule |
+|---|---|---|---|
+| `Saved 09:41 · G.H` (the day too when not today) | Settled | Who touched her last, and when? | replaces the card's `Saved Aug 26 08:20`; the run's header |
+| `+3 born · −1 died · 1 born dead` | Settled | What went in? | that save's results, quiet chips, one line; a kind with nothing is left out |
+| Undo | action (quiet) | Can I take that back? | only the last save, only for whoever saved it, until anything else is saved or she is finished |
+| `Undo the 09:41 save?` | ask | Am I sure? | the one question; Back · Undo |
+
+Cut: Edit record, Edit finish details, Correct born and Save correction? with everything they drew; Edit in the record toolbar and in Actions.

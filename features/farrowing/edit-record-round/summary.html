@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Edit record round</title>
+<style>
+:root{--bg:#f4f4ef;--card:#fff;--ink:#1d221e;--ink2:#4a524c;--muted:#6b736d;--line:#dfe2da;--accent:#2f5d3a;--amber:#8a5a00}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161a17;--card:#1f2420;--ink:#eef0ea;--ink2:#c9cec6;--muted:#9aa29b;--line:#333a34;--accent:#8fc39c;--amber:#e0b25c}}
+:root[data-theme="dark"]{--bg:#161a17;--card:#1f2420;--ink:#eef0ea;--ink2:#c9cec6;--muted:#9aa29b;--line:#333a34;--accent:#8fc39c;--amber:#e0b25c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Plus Jakarta Sans",system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:28px 16px 48px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+h1{font-size:26px;line-height:1.2;margin:6px 0 10px}
+h2{font-size:17px;margin:28px 0 10px}
+p{margin:0 0 10px;color:var(--ink2)}
+.lead{font-size:16px;color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.shots{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.shots figure{margin:0}
+.shots img{width:100%;border-radius:12px;border:1px solid var(--line);display:block}
+.shots figcaption{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+ul{margin:0;padding-left:18px;color:var(--ink2)} li{margin:3px 0}
+ol.q{margin:0;padding-left:20px} ol.q li{margin:8px 0;color:var(--ink)}
+ol.q small{display:block;color:var(--muted);font-size:13px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted);margin-right:6px}
+strong{color:var(--ink)}
+@media (max-width:720px){.shots{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}}
+</style></head>
+<body><main>
+<p class="eyebrow">Farrowing · Edit record · product round · 2 Nov</p>
+<h1>Fix while she farrows. Count after she finishes.</h1>
+<p class="lead">Edit record stays only while she is farrowing, where a worker can honestly remember a wrong tap. Finish farrowing locks the record. After that, a new generic <strong>Count</strong> in Actions takes the place of every post-Finish correction. It shows what should be there and why, and saves any difference as <em>unaccounted</em>. Total born and the death causes never move.</p>
+
+<h2>The recommended option, at 390 in the real prototype parts</h2>
+<div class="shots">
+<figure><img src="new-1-locked.png" alt="Finished record, toolbar Record dead and Actions"><figcaption><strong>Finished record.</strong> Edit is gone: Record dead · Actions.</figcaption></figure>
+<figure><img src="new-2-actions.png" alt="Actions with a Count tile"><figcaption><strong>Actions.</strong> Count joins the shared verb tiles. Reconcile and Edit litter record leave.</figcaption></figure>
+<figure><img src="new-3-count-fewer.png" alt="Count piglets page, one fewer"><figcaption><strong>Count piglets.</strong> Counted 6, should be 7: 1 unaccounted. Found the body? Record dead.</figcaption></figure>
+<figure><img src="new-4-log.png" alt="Farrowing log with the count line"><figcaption><strong>Log.</strong> “Counted 6 · 1 unaccounted”. Born 14 untouched.</figcaption></figure>
+</div>
+
+<h2>Why</h2>
+<div class="cols">
+<div class="card"><p><span class="tag">Today</span>8 kinds of correction across 4 doors. The same tap means different things: lowering crushed before Finish lowers Total born, after Finish it raises Alive. Two doors (More born, Reconcile) can raise a Total born that Finish froze.</p></div>
+<div class="card"><p><span class="tag">At the crate</span>Before Finish a worker can know a wrong tap or cause. A day later nobody can tell crushed from starved, or prove more or fewer born. A count proves what is there now, not what was born.</p></div>
+</div>
+<p style="margin-top:10px">A blind pass by another model family (OpenAI), given only the requirements, reached the same split: corrections are one thing, a count that never touches Total born is another. From it: no reason on a count, a rule for a body found after a count, and fosters must be recordable. It would also allow a <em>proven</em> mistake to be fixed after Finish (Q2).</p>
+
+<h2>What it retires</h2>
+<ul>
+<li>Edit record after Finish, Correct born (More born / Count was wrong), Edit finish details.</li>
+<li>“Anyone may amend born post-lock”, and the post-lock half of “What Edit adjusts”.</li>
+<li>Reconcile piglet count becomes Count. It no longer raises Total born or needs a typed reason.</li>
+</ul>
+
+<h2>Your calls</h2>
+<div class="card"><ol class="q">
+<li>Lock Total born, the causes and the finish details at Finish, on the phone? <small>Recommend yes: your direction.</small></li>
+<li>A proven mistake found after Finish (a line saved twice): leave it, or let a supervisor correct it later on desktop? <small>Recommend leaving it on the phone and parking a supervisor correction. The other model would allow it on that log line, original kept.</small></li>
+<li>Open Foster piglets for every litter (not only when the sow died)? Without it, every foster shows up as “unaccounted”. <small>Recommend yes.</small></li>
+<li>A body found after a count already took it as unaccounted: should Record dead ask “One of the 1 unaccounted?” (Yes / No, only then)? <small>Recommend yes, or the piglet is taken twice.</small></li>
+<li>Assisted and litter weight after Finish: locked too? <small>Recommend locked: the Finish form is the check.</small></li>
+<li>A reason on a count difference: none, or required (as Reconcile asks today)? <small>Recommend none (as Piglet processing, Round 9).</small></li>
+</ol></div>
+<p style="margin-top:12px;font-size:13px;color:var(--muted)">Full round, with the current-state shots, scenarios and the three options: features/farrowing/edit-record-round.md</p>
+</main></body></html>

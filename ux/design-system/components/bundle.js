@@ -1448,7 +1448,7 @@
   function taskTile({id='',title='',sub='',todo={},days={},late=false,saved=0,action='',entry=''}={}){
     const n=Math.max(1,days.total||1),d=Math.max(0,Math.min(n,days.day||0)),over=Math.max(0,days.over||0);
     const act=t=>t==='act'||t==='red';
-    // One coloured signal at most (owner, 2026-10-19): red only on the overdue part or the days over; "Ready to close" is a quiet tick.
+    // One coloured signal at most (owner, 2026-10-19): red only on the overdue part; days past the plan are late, amber (status convention, 2026-11-02); "Ready to close" is a quiet tick.
     const also=todo.also?`<span class="st-tile-also"${act(todo.also.tone)?' data-tone="act"':''}>· ${esc(todo.also.text)}</span>`:'';
     const todoHtml=todo.done?`<span class="st-tile-todo" data-done="">${glyph('check')}<b>${esc(todo.done)}</b></span>`
       :todo.next?`<span class="st-tile-todo" data-next=""><b>${esc(todo.next.value)}</b><span>${esc(todo.next.label)}</span></span>`
@@ -1456,7 +1456,7 @@
       :`<span class="st-tile-todo"${act(todo.tone)?' data-tone="act"':''}><b>${esc(todo.value)}</b><span>${esc(todo.label)}</span>${also}</span>`;
     const todoText=todo.done||todo.none||(todo.next?`${todo.next.value} ${todo.next.label}`:[`${todo.value} ${todo.label}`,todo.also&&todo.also.text].filter(Boolean).join(', '));
     const segs=Array.from({length:n},(_,i)=>`<i${i<d?' data-on=""':''}></i>`).join('')+Array.from({length:over},()=>'<i data-over=""></i>').join('');
-    const dayText=days.text||(over?`${over} ${over===1?'day':'days'} overdue`:`Day ${d} of ${n}`);
+    const dayText=days.text||(over?`${over} ${over===1?'day':'days'} late`:`Day ${d} of ${n}`);
     const savedText=saved>0?`${saved} ${saved===1?'record':'records'} waiting to upload`:'';
     const name=[title,sub,todoText,dayText,savedText].filter(Boolean).join(', ');
     return `<button type="button" class="st-tile" data-ds="TaskTile"${late?' data-late=""':''}${id?` data-card="${esc(id)}"`:''}${action?` data-action="${esc(action)}" data-value="${esc(id)}"`:''}${entry?` data-entry="${esc(entry)}"`:''} aria-label="Open ${esc(name)}">`+
@@ -1599,7 +1599,7 @@
       const h=before.get('H'+scanKey(e)),hn=e.getBoundingClientRect().height;if(h!==undefined&&Math.abs(h-hn)>.5)e.animate([{height:h+'px',overflow:'hidden'},{height:hn+'px',overflow:'hidden'}],ease);
     }
   }
-  const api=Object.freeze({taskDock,lookupGroups,findPage,findResults,findRow,findMark,scanPage,scanBar,scanArrive,scanPlaces,scanGlide,taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({taskDock,lookupGroups,findPage,findResults,findRow,findMark,scanPage,scanBar,scanArrive,scanPlaces,scanGlide,taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,alertDot:()=>ALERT_DOT,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

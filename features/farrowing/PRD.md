@@ -32,7 +32,7 @@ From RULINGS.md, quoted short:
 - **Model**: "The overdue signal ends at the first record"; rows speak in days from due (due = service + 114), never gestation day; "Overdue · 3 days" colours only the number.
 - **Model**: "The hero owns the total; the receipt owns the change". Since 2026-10-23 the change is the visit's chips beside Alive, until Save.
 - **Surfaces & entrances**: "ONE dead drawer product-wide". While she farrows it is Report death, a level of her drawer whose counts join the visit (2026-10-23); after Finish it is Record dead: Save commits, Back keeps the draft, Clear discards.
-- **Surfaces & entrances**: "ONE correction door: Edit … ONE SCREEN"; "What Edit adjusts: the observations, never the derivation"; a missed fact is a recording, never an Edit.
+- **Surfaces & entrances**: "ONE correction door: Edit … ONE SCREEN"; "What Edit adjusts: the observations, never the derivation"; a missed fact is a recording, never an Edit. Superseded on 2026-11-02: there is no Edit record (see Decisions). A fat finger is fixed by undoing the last save.
 - **Surfaces & entrances**: "Type-to-set is retired on count figures"; one stepper shape, − n +, everywhere.
 - **Surfaces & entrances**: "Identity is sheet-first … the room row offers no sow-page target."
 - **Surfaces & entrances**: "`Finish` is `Finish farrowing`"; the hold-to-lock is "the second guard".
@@ -40,10 +40,10 @@ From RULINGS.md, quoted short:
 - **Starting and ending a session**: the sow's death lives in the drawer (`Piglets · The sow`), "hold-to-commit"; "She stays in the room".
 - **Starting and ending a session**: "A non-empty ledger is never unreachable"; a draft never crosses the lock.
 - **After the lock**: "The record face IS the record"; "One ledger surface, the Farrowing record page"; "History is the chevron on the fact line"; "The correction mark is the amber value".
-- **After the lock**: Born is amended through the Edit ceremony, which opens in place under the Born row (`More born` / `Count was wrong`; never a drawer on a drawer); "Anyone may amend born post-lock — open ✎, stamped, no role gate." Fostering is **parked**.
+- **After the lock**: Born is amended through the Edit ceremony, which opens in place under the Born row (`More born` / `Count was wrong`; never a drawer on a drawer); "Anyone may amend born post-lock — open ✎, stamped, no role gate." Superseded on 2026-11-02: Born never moves after Finish. Fostering is **parked**.
 - **Names and glyphs**: "words carry actions, icons carry objects"; dates speak relative within the week.
 - **Piglet processing, Round 5**: all tasks look the same (farrowing's skeleton); "The exit word is always **Back**."
-- **Owner calls for this atlas**: *Edit record* is editing while she is still farrowing; *Correct born* exists only after farrowing has finished. Home's Farrowing card and Choose unit both land on the room list.
+- **Owner calls for this atlas**: Home's Farrowing card and Choose unit both land on the room list. (*Edit record* and *Correct born* are gone, 2026-11-02.)
 
 ## Scope
 
@@ -52,9 +52,9 @@ In:
 - Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Pen map, Scan ear tag, Search.
 - Find a sow (a full page that searches every unit) and Scan ear tags (a full page, always listening, that collects scanned sows). A sow in any unit opens her farrowing drawer.
 - The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.
-- Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born correction (in place), the Farrowing log.
+- Death entry (piglets and the sow), Undo of the last save (during and after Finish), the Farrowing log.
 - Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.
-- Farrowing's rows on the pig's Actions sheet (Edit litter record, Record abortion, Mark not in pig).
+- Farrowing's rows on the pig's Actions sheet (Record abortion, Mark not in pig).
 - When a sow dies: the allocation sheet (move her piglets to other sows, hand-rear them in her crate, or move them to a rearing pen), the Move page it opens (`farrowing.foster`), and her row's life on the list until every piglet has a place.
 
 Out:
@@ -76,9 +76,9 @@ Out:
 - Overdue signal stops at the first record — RULINGS *Model*.
 - Days from due on rows, gestation day on the sheet header only — RULINGS *Model*.
 - Receipt `Saved · +4 this visit`; hero numeral plain, no typing — RULINGS *Model*.
-- Edit folds weak, deformed, weight and assisted into one `At finish` row — RULINGS *Model*.
+- ~~Edit folds weak, deformed, weight and assisted into one `At finish` row — RULINGS *Model*.~~ Superseded 2026-11-02: no Edit.
 - Dead drawer is the only dead entrance, staged (Back/Clear/Save) — RULINGS *Surfaces & entrances*.
-- Edit is the only correction door and one screen — RULINGS *Surfaces & entrances*.
+- ~~Edit is the only correction door and one screen — RULINGS *Surfaces & entrances*.~~ Superseded 2026-11-02: Undo the last save.
 - Count figures are stepper-only — RULINGS *Surfaces & entrances*.
 - Sheet-first identity: only the sheet header opens the sow page — RULINGS *Surfaces & entrances*.
 - Exit grammar: bars hold exits only; Finish farrowing is a hold — RULINGS *Surfaces & entrances*.
@@ -87,12 +87,12 @@ Out:
 - Merge contract: signed deltas, flag instead of silently applying a breach — RULINGS *Starting and ending a session*.
 - Fostering parked — RULINGS *After the lock*.
 - The locked record is designed as a record, with one ledger page — RULINGS *After the lock*.
-- Anyone may amend Born after the lock — RULINGS *After the lock*.
+- ~~Anyone may amend Born after the lock — RULINGS *After the lock*.~~ Superseded 2026-11-02: Born never moves after Finish.
 - Words for actions, icons for objects — RULINGS *Names and glyphs*.
 - Relative dates inside a week — RULINGS *Names and glyphs*.
 - Farrowing's skeleton is the model for all tasks; exit word Back — RULINGS *Piglet processing, Round 5*.
 - Task end: manual, hold-to-commit with receipt, blocked while farrowing is open — RULINGS *Piglet processing, Q5*; closure details in `ux/research/farrowing/ASTRA-TASK-CLOSURE.md`.
-- Edit record vs Correct born split by status; Home entries land on the room list — owner calls for this atlas.
+- Home entries land on the room list — owner calls for this atlas. (Edit record vs Correct born: gone, 2026-11-02.)
 
 ### Owner decisions, 2026-10-10
 
@@ -131,10 +131,47 @@ Out:
 - **Two kinds of piglet death.** Born dead (stillborn, mummified) never lowers Alive. Died after birth (crushed, scours, starve-out, other) lowers Alive on Save. Total born stays Alive + Dead: the stored record is unchanged, only what the actions mean.
 - **Report death is a level of the drawer, not a page.** What died is one choice: Born dead, Died after birth, or the sow. Its bar is Back · Done: Done takes the counts to the visit, Back leaves without them.
 - **The bar.** With a draft: Back · Save. Without: Back · Finish farrowing · ··· (the sow's actions).
-- **Edit record moves into Litter details**, with the log: the back door for re-tallies and mistakes.
+- **Edit record moves into Litter details**, with the log: the back door for re-tallies and mistakes. Superseded on 2026-11-02: Edit record is gone; Litter details keeps the log.
+- **The keys are one row under the Alive card** (owner, 2026-11-02): a narrow −, a wide + Born alive and a compact Death key (the down arrow) that opens Report death. The card only reads and opens Litter details; the drawer is sized to its content, one height with or without a visit.
 - Next, each in its own PR: before farrowing (due card, Start farrowing), the full Litter details ledger (spreadsheet edit logged as an override, Missing), production-only actions and Assisted farrowing. The approved reference is the v17 prototype.
+
+### Owner decision, 2026-11-02 · No Edit record; Undo the last save
+
+From the Edit record product round ([edit-record-round.md](edit-record-round.md)); the owner agreed the drawn screens and said to build them.
+
+- **No Edit record, before or after Finish.** "What you fill in is in." Edit record, Edit finish details and Correct born (More born / Count was wrong) are gone, with Edit on the finished and sow-died records, Edit record in Litter details and Edit litter record in Actions. A day later nobody can honestly re-cause a death or know Born was wrong.
+- **A fat finger is fixed by undoing the last save.** The Alive card names the last save under a divider: when and who as its header (`Saved 09:41 · G.H`), that save's results on one line as quiet chips (`+3 born`, `−1 died`, `1 born dead`), and a quiet **Undo** at the right (a text action, the return glyph, the weight of Details ›). It hides while a visit is unsaved.
+- **Who and how long.** Only the last save on her, only for the worker who saved it; it goes once anything else is saved on her, by anyone, or she is finished. No time limit. For anyone else the line shows with no Undo.
+- **Undo asks once, short:** `Undo the 09:41 save?` with Back · Undo. Undo takes the save off the record and brings it back as the unsaved visit, exactly as it was (the born chip, the deaths with their causes, the photos). Saved again after a change: one log line marked **Corrected**, with `Was +3 born alive`. Saved again unchanged: the line as it was. Clear: the log keeps it as **Withdrawn**.
+- **After Finish** the same Undo applies to the last Record dead: it reopens Record dead with that death as its unsaved count. Total born never moves after Finish. Born dead after Finish and the Record dead and Report death screens themselves are another session's.
+- **Recounts are not corrections.** Counting a group again belongs to the global Count feature (its own product round), not to Farrowing.
 
 ### Owner decision, 2026-10-22 · The pen tools are Inspection's
 
 - The pen page and everything on it (Note, Feed, Fault, the pen log) live in **Inspection**, where pens are walked and looked after. Farrowing keeps the room, Pen map and the pen header's `›` that opens the pen page; its map no longer lists the pen screens.
 - **Find a sow and Scan ear tags** stay in Farrowing's scope and are their own band on its map ("Find and scan"), apart from the room.
+
+### Owner decisions, 2026-11-02 · End task
+
+- **The page answers whether the batch can close.** Its heading is the answer: `Before you can end` while a sow is still farrowing, `Ready to end early` while sows are awaiting, `Ready to end` when every sow has an outcome. The page title is plain `End task`; the hold says early or not.
+- **One bar, a row per part.** The task's sows as one bar; under it Still farrowing (opens those sows), Leave the batch (opens those sows) and Done (with what else happened: deaths, aborted, not in pig, removed earlier). Each row's count sits in its part's colour, the pen map's fills: farrowing blue, needs-you yellow, done green. Red stays for deaths and the destructive hold.
+- **The waiting hold says why.** While a sow is farrowing the hold's caption reads `FINISH N SOWS FIRST`. Ending early (sows removed) is the red hold; a plain end is the ink hold. Hold buttons are never green: green means done or recorded.
+- **Performance metrics are the full card**, the same on the Task overview, End task and the receipt: Born alive / litter (target as a verdict, on or below) and Stillborn rate (mummified rate under it); where every piglet born went (Alive now · Died after birth with causes · Born dead, each with its share); Alive / litter · Assisted · Weight / litter. The page may scroll for it; the closure card and the hold stay on the first screen.
+- The sow lists take the row's words as their title: Still farrowing, Leave the batch.
+
+### Owner decisions, 2026-11-02 · Status colours
+
+- The status colour convention (owner, 2026-11-02; canvas https://claude.ai/artifact/BTzQ8Y3zBiv41WL3wshJyq): one hue per status, the shape's size picks the shade (README › Colour).
+- **The task status bar** (room card, Task overview, End task): done `done-mark`, farrowing `progress-mark`, awaiting the empty track (an open ring in the key).
+- **End task's rows go in the bar's order:** Done · Still farrowing · Leave the batch. A count holds a number, so Done is `done-fill`, Still farrowing `progress-fill`; Leave the batch is waiting, an outline, with the amber "!" after its title because ending removes those sows.
+- **One red signal per row:** an act-now sow row ("7 to allocate · ! Sow died", "3 days · ! Overdue") keeps the figure in `ink`; only the word with its "!" is red.
+- **The "+ Born alive" key** is the one green button (`count-key` #258048, white label; canvas pick D): it records a birth.
+- Performance metrics' split of piglets born: the middle part (died after birth) is `neutral-mark`, so it never reads as done.
+
+### Owner decisions, 2026-11-02 · The finished sow
+
+- **Her drawer says what happened this time, nothing more.** One card: a ring of where the litter went (alive now at its centre; died after birth; born dead), the three counts beside it and Born alive 12 / 14. A tappable card in a white drawer, so a white body with a tinted head band: `Finished Aug 27 at 08:12 by G.H` · `Details ›` (SURFACES rule 6). The last save and its Undo stay under the card.
+- **No stacking.** Back · Actions · Record dead are one row in the bar; the body holds the card alone.
+- **Details is a page** (the tint, white cards; no header line, one Back from the drawer): This litter (the bar, Alive now · Died after birth with causes · Born dead, then Weak · Deformed · Assisted · Weight); Against her batch (born alive, born dead, died after birth, each on the batch's range with her dot and the batch average line above it); Against herself (born alive and weaned per litter, the target line); Farrowing log at its foot. A first litter keeps Against herself's place with a placeholder.
+- **Comparisons keep signal only.** Weak, deformed, litter weight, dates and sow weights stay out of the comparisons; no written analysis. Labels read in ink-2, not muted, and the charts carry the colour.
+- Applies to a sow that finished normally; a died or aborted sow keeps the earlier record face. Earlier litters are sample data here; the sow profile's production records hold the real ones.

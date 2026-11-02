@@ -49,7 +49,7 @@
     "id": "radio",
     "name": "Radio rows",
     "usedBy": [
-      "farrowing.born"
+      "farrowing.death"
     ],
     "use": "Use for two to four recorded outcomes with visible rings.",
     "notUse": "Not for PickerField for five or more outcomes.",
@@ -94,8 +94,7 @@
     "id": "inline-key",
     "name": "Inline Choice · keys",
     "usedBy": [
-      "farrowing.finish",
-      "farrowing.edit-finished"
+      "farrowing.finish"
     ],
     "use": "Use for a required two or three short outcomes in a form of Stepper rows and Measures, where the answer sits in the same right column (Assisted: No / Yes).",
     "notUse": "Not for long labels (radio rows) or an optional answer (an optional row).",

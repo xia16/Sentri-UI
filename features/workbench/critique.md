@@ -119,3 +119,25 @@ Keep: the header's section trigger and Assistant door, their order and alignment
 | Saved-work control | page-drawn pill (data-sync-shell.css) | IconButton · bordered (upload; alert in red when signed out) | **fix** |
 | Task tile's records | none | TaskTile `saved` ("↑ N" on the run line) | **new** |
 | Island variant, state classes | page | none | **cut** |
+
+# Status colours on Home (2026-11-02), critique
+
+Scope: Home tiles (the run of days), the Schedule and its key, Home's progress bars. Baselined on `origin/main` at `7479ac8` at 390; the owner agreed the canvas (tonal cells, clean marks).
+
+## Problems
+
+- **major** · Done was six different greens across the files, active sage on some screens and slate blue on others; the page read grey and muddy.
+- **minor** · The run of days drew done days and today in one dark grey, and days past the plan in red: a late task looked like an emergency.
+- **minor** · The Schedule's today was a dark ink cell and a late day a red rim, unlike every other status shape.
+
+## Attention budget
+
+Today first (blue), then anything late (yellow), then what is done (green); the rest stays empty.
+
+## House pattern
+
+The pen map's fills for status areas; status chips (wash + same-hue ink); the convention table in README › Colour.
+
+## Self-crit
+
+- **Better because** each status is one hue everywhere, the cells read clean (light fill, dark same-hue number, 7:1+), and red is left for overdue animals, deaths and danger.
