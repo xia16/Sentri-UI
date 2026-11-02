@@ -1634,27 +1634,25 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .finished-first strong{display:block;color:var(--ink);font-weight:600}
 /* Farrowing · Foster piglets (owner, 2026-11-02): the count drawer over the list of sows; its parts stack 18px apart, as a feature page's, and the hint keeps the section space above the footer. */
 .farrowing-phone .sheet.foster-count>.sheet-body{display:flex;flex-direction:column;gap:var(--space-18);padding-bottom:var(--space-24)}
-.farrowing-phone .allocate-body .tk-choice+*{margin-top:var(--space-18)}
-/* The sow picker (Foster piglets, Allocate's Foster). In Allocate the bar (field and filter) and the results stack under the tiles, 12px apart. */
-.farrowing-phone .allocate-foster{display:flex;flex-direction:column;gap:12px}
-.farrowing-phone .allocate-foster .st-choice-search{margin:0}
-.farrowing-phone .allocate-foster .foster-bar{display:flex;align-items:center;gap:var(--space-8)}
-.farrowing-phone .allocate-foster .foster-bar .st-choice-search{flex:1;min-width:0}
-.farrowing-phone .allocate-foster .foster-filter{width:var(--tap-min);height:var(--tap-min);flex:none}
 .farrowing-phone .foster-list .st-find-list{--st-panel-bg:var(--paper)}   /* a page is tinted, so its cards are white (Surfaces); Lookup's card is tinted for Find's white page */
 /* FilterChips in a FilterSheet section: the chip track pads itself to the gutter and scrolls to the sheet edge, so the section lets it bleed
    (first chip under the section title, Allocate piglets' Unit filter). */
 .st-filter-section .st-filter-chips{margin-inline:calc(-1 * var(--space-gutter))}
 /* Foster piglets · With ID (owner, 2026-11-02): a label as Without ID's (its ticked count at the end), the search or scan bar, then one
-   box of tick rows that scrolls past about 2½ rows, so the count and Send stay on screen. No card inside the box. */
+   box of tick rows that scrolls past about 2½ rows, so the count and Send stay on screen. No card inside the box. Foster off is a
+   page (the tint), so the box is white (Surfaces rule 1). */
 .farrowing-phone .foster-ids{display:flex;flex-direction:column;gap:var(--space-8)}
 .farrowing-phone .foster-ids-head{display:flex;align-items:baseline;justify-content:space-between;margin:0;font:500 var(--type-entry-label-size)/1.5 var(--font-sans);color:var(--ink)}
 .farrowing-phone .foster-ids-count{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
 .farrowing-phone .foster-ids .st-choice-search{margin:0}
-.farrowing-phone .foster-id-box{border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--app-background);overflow:clip}
+.farrowing-phone .foster-id-box{border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--paper);overflow:clip}
 .farrowing-phone .foster-id-scroll{max-height:calc(2.5 * var(--animal-row-min));overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
 .farrowing-phone .foster-id-scroll::-webkit-scrollbar{display:none}
 .farrowing-phone .foster-id-scroll>.st-row+.st-row{border-top:var(--border-width) solid var(--line)}
 .farrowing-phone .foster-id-none{margin:0;padding:var(--space-16)}
 /* Foster piglets: Send or Receive heads the page, over the search bar. */
 .farrowing-phone .foster-pick .foster-direction{padding:0 var(--space-gutter) var(--space-12)}
+/* Allocate piglets (owner, 2026-11-02): a menu drawer of three verb tiles, then what has been fostered off so far; the same list heads
+   Foster piglets when it is opened from Allocate. */
+.farrowing-phone .allocate-sent{margin-top:var(--space-18)}
+.farrowing-phone .foster-pick .allocate-sent{margin:0 0 var(--space-18)}

@@ -103,7 +103,7 @@ function act(s,a,v){
  if(a==='back'&&s.view==='death'&&s.deathFrom){s.deathDraft=[...s.deathFrom];s.deathFrom=null;}   // Back leaves the level without what it entered; Done keeps it
  if(a==='doneDeath'){s.deathFrom=null;s.saved=false;s.view='count';}
  if(a==='deathGroup'){if(v==='sow')s.mode='sow';else{s.mode='piglets';s.group=v;}}
- if(a==='close'){if(s.view==='count')fold(s);if(s.view==='allocate')s.allocChoice=null;s.view=s.view==='roomEndTask'?'roomOverview':s.view==='roomTaskSows'?'roomEndTask':s.view==='roomTaskReceipt'?'roomHome':penParent(s.view);}
+ if(a==='close'){if(s.view==='count')fold(s);s.view=s.view==='roomEndTask'?'roomOverview':s.view==='roomTaskSows'?'roomEndTask':s.view==='roomTaskReceipt'?'roomHome':penParent(s.view);}
  if(a==='open')s.view=s.locked?'locked':'count';
  if(a==='back'){s.popup=null;s.view=s.view==='litter'?s.litterBack||'count':['history','profile','deathBreakdown'].includes(s.view)?s.pageBack||s.back||'count':s.back||'count';}
  if(a==='finish'){s.pointers=false;s.view='finish';}
@@ -137,10 +137,12 @@ function act(s,a,v){
  if(a==='addPiglet'||a==='scanPiglet'||a==='notchPiglet'){s.pigletEditIndex=-1;s.pigletDraft={tag:a==='scanPiglet'?String(418001+s.piglets.length):'',notch:a==='notchPiglet'?'Choose notch':'',sex:'',weight:'',state:'Alive'};s.view='pigletEdit';}
  if(a==='savePiglet'){const p=s.pigletDraft;if(!p||![p.tag,p.notch,p.sex,p.weight].some(x=>String(x||'').trim()))return;const clean={tag:String(p.tag||'').trim(),notch:p.notch==='Choose notch'?'':String(p.notch||'').trim(),sex:p.sex||'',weight:String(p.weight||'').trim(),state:p.state||'Alive'};if(s.pigletEditIndex<0){s.piglets.push(clean);s.unidentified=Math.max(0,s.unidentified-1);}else s.piglets[s.pigletEditIndex]=clean;event(s,`${s.pigletEditIndex<0?'Piglet identity added':'Piglet identity updated'} · ${clean.tag||clean.notch||'identity pending'}`);s.pigletTab='records';s.view='pigletCare';}
  if(a==='foster'){s.featureReturn=s.view==='pigletCare'?'pigletCare':'profile';s.fosterDraft=fosterStart(s,1);s.view='foster';}
- // Allocate piglets (owner, 2026-11-02): a tile only chooses; its section opens under the tiles. Foster is the sow picker in place
- // (search, pen cards, scan; a sow opens the count drawer); Send saves and the page stays while piglets are left, so 3 can go to one
- // sow and 3 to another. Hand-rear and the rearing pen take what is left, from the footer.
- if(a==='allocChoose'){if(v==='move'&&s.allocChoice!=='move'){s.featureReturn='allocate';s.fosterDraft=fosterStart(s,s.alive);}s.allocChoice=v;}
+ // Allocate piglets (owner, 2026-11-02): a menu drawer of three verbs; each pushes its own page and Back returns to the drawer. Foster
+ // is the Foster piglets page itself, foster off only (Foster on is there, disabled); each save comes back to it while piglets are left,
+ // so 3 can go to one sow and 3 to another. Hand-rear and the rearing pen take what is left, from their pages.
+ if(a==='allocFoster'){s.featureReturn='allocate';s.fosterDraft=fosterStart(s,s.alive);s.view='foster';}
+ if(a==='allocHandPage')s.view='allocHand';
+ if(a==='allocRearPage'&&farmConfig.rearingPen)s.view='allocRear';
  // Allocate's sow picker opens filtered to her own unit. The filter is the room's (expected farrowing, parity) plus the unit, whose chips
  // reach the batch's other units; All is no unit filter (owner, 2026-11-02). The sheet works on a draft: Show N sows applies it, Reset
  // returns to the defaults (her unit, any time, any parity), Back drops it.
@@ -149,11 +151,11 @@ function act(s,a,v){
  if(a==='fosterFilterReset')s.fosterDraft.filterDraft=fosterFilterDefault(s);
  if(a==='fosterFilterApply'){s.fosterDraft.filter=s.fosterDraft.filterDraft;s.fosterDraft.filtering=false;}
  if(a==='fosterFilterBack')s.fosterDraft.filtering=false;
- if(a==='allocMove'){s.view='allocate';act(s,'allocChoose','move');}
- if(a==='allocHand'){const n=s.alive;s.handReared={at:'09:41',who:'G.H'};event(s,`${n} piglet${n===1?'':'s'} hand-reared in her crate`,'milestone');s.allocChoice=null;s.view='room';}
- if(a==='allocRear'&&farmConfig.rearingPen){const n=s.alive;s.alive=0;s.moved=(s.moved||0)+n;s.unidentified=0;s.anchor=born(s);event(s,`${n} piglet${n===1?'':'s'} moved to the rearing pen`,'milestone');s.allocChoice=null;s.view='room';}
+ if(a==='allocMove')act(s,'allocFoster');
+ if(a==='allocHand'){const n=s.alive;s.handReared={at:'09:41',who:'G.H'};event(s,`${n} piglet${n===1?'':'s'} hand-reared in her crate`,'milestone');s.view='room';}
+ if(a==='allocRear'&&farmConfig.rearingPen){const n=s.alive;s.alive=0;s.moved=(s.moved||0)+n;s.unidentified=0;s.anchor=born(s);event(s,`${n} piglet${n===1?'':'s'} moved to the rearing pen`,'milestone');s.view='room';}
  if(a==='fosterDirection'){s.fosterDraft.direction=v;s.fosterDraft.start=1;s.fosterDraft.target='';}   // the page's first choice: send to, or receive from, the sow tapped next
- if(a==='fosterPick'){const f=s.fosterDraft;f.target=v;f.start=Math.min(f.start,s.alive);fosterOpen(s);}   // a tap or a read opens the count over the list
+ if(a==='fosterPick'){const f=s.fosterDraft;f.target=v;f.start=Math.min(f.start,s.alive);fosterOpen(s);s.view='fosterSend';}   // a tap or a read pushes Foster off (or on): who, and how many
  if(a==='fosterId'){const f=s.fosterDraft,k=f.ids.indexOf(v);if(k<0)f.ids.push(v);else f.ids.splice(k,1);}
  // The ID list searches by piglet ID, or scans: each read ticks that piglet (a multi-select place, owner 2026-10-22), never unticks.
  if(a==='fosterIdScan'){s.fosterDraft.idScan=roomContext(s).scan.connected?true:'waiting';s.fosterDraft.idQ='';}
@@ -170,14 +172,15 @@ function act(s,a,v){
   from.alive-=n;from.moved=(from.moved||0)+n;to.alive+=n;to.moved=(to.moved||0)-n;from.unidentified=fosterNoId(from);to.unidentified=fosterNoId(to);[from,to].forEach(r=>{if(!r.locked)r.anchor=born(r);});
   event(s,`${word} ${out?'to':'from'} ${other.tag}${idText}`,'milestone');event(other,`${word} ${out?'from':'to'} ${s.tag}${idText}`,'milestone');f.target='';f.ids=[];
   if(s.featureReturn==='allocate')(s.allocSent||=[]).push({tag:other.tag,pen:other.pen,n,ids});   // Allocate lists what has gone where
-  if(s.featureReturn==='allocate'){s.view=toAllocate(s)?'allocate':'room';}else if(s.featureReturn==='pigletCare'){s.pigletTab='records';s.view='pigletCare';}else{s.actionsEntry=true;s.view='profile';}}
+  if(s.featureReturn==='allocate'){s.view=toAllocate(s)?'foster':'room';}else if(s.featureReturn==='pigletCare'){s.pigletTab='records';s.view='pigletCare';}else{s.actionsEntry=true;s.view='profile';}}
  if(a==='openMortality'){if(!s.pigletSelected.length&&!s.unidentified)return;s.mortalityDraft={cause:'',unidentified:0,photos:[]};s.view='pigletDeath';}
  if(a==='mortalityCount'){const max=Math.min(s.unidentified,s.alive-s.pigletSelected.length);s.mortalityDraft.unidentified=Math.max(0,Math.min(max,s.mortalityDraft.unidentified+Number(v)));}
  if(a==='savePigletMortality'){const f=s.mortalityDraft,total=s.pigletSelected.length+f.unidentified;if(!f.cause||!total)return;const selected=new Set(s.pigletSelected);s.piglets.forEach(p=>{if(selected.has(p.tag))p.state='Dead';});s.unidentified=Math.max(0,s.unidentified-f.unidentified);s.alive=Math.max(0,s.alive-total);const typeIndex={Stillborn:0,Mummified:1,Crushed:2,Scours:3,'Starve-out':4,Other:5,'Cause unknown':5}[f.cause]??5;s.dead[typeIndex]+=total;s.frozen=Math.max(s.frozen,born(s));event(s,`${total} piglet${total===1?'':'s'} died · ${f.cause.toLowerCase()}`,'danger',f.photos);s.pigletSelected=[];s.pigletTab='records';s.view='pigletCare';}
  if(a==='countReconcile'){s.countDraft=s.alive;s.countReason='';s.view='countReconcile';}
  if(a==='countReconcileStep'){const identified=s.piglets.filter(p=>p.state==='Alive').length;s.countDraft=Math.max(identified,Math.min(30,s.countDraft+Number(v)));}
  if(a==='saveCountReconcile'){if(s.countDraft===s.alive||!s.countReason.trim())return;const before=s.alive,diff=s.countDraft-before;s.alive=s.countDraft;s.unidentified=Math.max(0,s.unidentified+diff);s.anchor=born(s);if(s.locked)s.frozen=Math.max(s.frozen,born(s));event(s,`Piglet count corrected · ${before} → ${s.alive} · ${s.countReason.trim()}`,'correction');s.actionsEntry=true;s.view='profile';}
- if(a==='featureBack'&&s.view==='foster'&&s.fosterDraft.target){s.fosterDraft.target='';return;}   // the count drawer closes first; the list stays
+ if(a==='featureBack'&&s.view==='fosterSend'){s.fosterDraft.target='';s.view='foster';return;}   // back to the sows
+ if(a==='featureBack'&&['allocHand','allocRear'].includes(s.view)){s.view='allocate';return;}   // back to the drawer's three verbs
  if(a==='featureBack'){if(s.view==='foster'&&s.featureReturn==='allocate'){s.view='allocate';}else if(['pigletEdit','pigletDeath'].includes(s.view)||s.view==='foster'&&s.featureReturn==='pigletCare'){s.pigletTab='records';s.view='pigletCare';}else if(s.scanReturn){s.scanReturn=false;s.actionsEntry=false;s.view=s.pageBack||'roomScan';}else{s.actionsEntry=true;s.view='profile';}}   // opened from Scan's Actions: Back returns to the scan list
 }
 // Merge every saved event in the pen, independent of the current list filters.
@@ -230,8 +233,11 @@ function atlasScreen(s,c){
  if(v==='finish')return 'farrowing.finish';
  if(v==='locked')return s.ended?'farrowing.ended':'farrowing.locked';
  if(v==='history')return 'farrowing.history';
- if(v==='foster'){const f=s.fosterDraft;return f.target?'farrowing.foster-count':f.filtering?'farrowing.foster-filter':f.scanning?'farrowing.foster-scanning':f.q.trim()?'farrowing.foster-search':'farrowing.foster';}
- if(v==='allocate'){const c=s.allocChoice,f=s.fosterDraft;return c==='move'?(f.target?'farrowing.allocate-send':f.filtering?'farrowing.allocate-filter':'farrowing.allocate-foster'):c==='hand'?'farrowing.allocate-hand':c==='rear'?'farrowing.allocate-rear':'farrowing.allocate';}
+ if(v==='foster'){const f=s.fosterDraft;if(s.featureReturn==='allocate')return f.filtering?'farrowing.allocate-filter':'farrowing.allocate-foster';return f.filtering?'farrowing.foster-filter':f.scanning?'farrowing.foster-scanning':f.q.trim()?'farrowing.foster-search':'farrowing.foster';}
+ if(v==='fosterSend')return s.featureReturn==='allocate'?'farrowing.allocate-send':'farrowing.foster-send';
+ if(v==='allocHand')return 'farrowing.allocate-hand';
+ if(v==='allocRear')return 'farrowing.allocate-rear';
+ if(v==='allocate')return 'farrowing.allocate';
  if(v==='countReconcile')return 'farrowing.reconcile';
  if(v==='roomOverview')return 'farrowing.overview';
  if(v==='roomTaskReceipt')return 'farrowing.task-receipt';
@@ -248,7 +254,7 @@ function atlasScreen(s,c){
  if(v==='profile'&&s.actionsEntry)return 'farrowing.sow-actions';
  return null;
 }
-const presets=[['room','Room list'],['count','Counting'],['visit','Counting · not saved yet'],['saved','Counting · just saved'],['undo','Undo the last save'],['litter','Litter details'],['details','Details · a finished sow'],['details-first','Details · first litter'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['locked','Locked record'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · allocate piglets'],['allocate-foster','Allocate · foster'],['allocate-send','Allocate · send to a sow'],['allocate-filter','Allocate · filter sows'],['allocate-hand','Allocate · hand-rear'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['foster-search','Foster · search a pen'],['foster-scanning','Foster · scanning'],['foster-count','Foster · send or receive'],['foster-filter','Foster · filter sows'],['foster-receive','Foster · receive piglets'],['reconcile','Reconcile piglet count'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · listening'],['scan-read','Scan · her drawer opened'],['scan-pig','Scan · a pig not in Farrowing'],['scan-dead','Scan · a pig that died'],['scan-unknown','Scan · a tag with no pig'],['scan-stopped','Scan · stopped'],['batch-sheet','Actions · pigs in this unit'],['batch-none','Choose pigs · none yet'],['batch-pick','Choose pigs · 3 chosen'],['batch-search','Choose pigs · search'],['batch-filter','Choose pigs · filter'],['batch-scanning','Choose pigs · scanning'],['batch-waiting','Choose pigs · waiting for the reader'],['batch-missed','Choose pigs · reads that cannot join'],['batch-form','Actions · the form'],['batch-saved','Actions · saved']];
+const presets=[['room','Room list'],['count','Counting'],['visit','Counting · not saved yet'],['saved','Counting · just saved'],['undo','Undo the last save'],['litter','Litter details'],['details','Details · a finished sow'],['details-first','Details · first litter'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['locked','Locked record'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · allocate piglets'],['allocate-foster','Allocate · foster'],['allocate-send','Allocate · foster off to a sow'],['allocate-filter','Allocate · filter sows'],['allocate-hand','Allocate · hand-rear'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['foster-search','Foster · search a pen'],['foster-scanning','Foster · scanning'],['foster-send','Foster · foster off to a sow'],['foster-filter','Foster · filter sows'],['foster-receive','Foster · foster on'],['reconcile','Reconcile piglet count'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · listening'],['scan-read','Scan · her drawer opened'],['scan-pig','Scan · a pig not in Farrowing'],['scan-dead','Scan · a pig that died'],['scan-unknown','Scan · a tag with no pig'],['scan-stopped','Scan · stopped'],['batch-sheet','Actions · pigs in this unit'],['batch-none','Choose pigs · none yet'],['batch-pick','Choose pigs · 3 chosen'],['batch-search','Choose pigs · search'],['batch-filter','Choose pigs · filter'],['batch-scanning','Choose pigs · scanning'],['batch-waiting','Choose pigs · waiting for the reader'],['batch-missed','Choose pigs · reads that cannot join'],['batch-form','Actions · the form'],['batch-saved','Actions · saved']];
 const cards=[{title:'Find the next sow',caption:'<strong>The room, in context.</strong> Filter by state, jump to a pen, and open each sow’s live record.',initial:'room'},{title:'Finish with confidence',caption:'<strong>Two observations, then the lock.</strong> Clear rows, optional details and a deliberate final action.',initial:'finish'},{title:'Read the whole litter',caption:'<strong>Current facts, with their context.</strong> Finish details stay readable; the history opens on its own page.',initial:'locked'}];
 const states=cards.map(c=>{const r=seed(c.initial);restoreDraft(r);return r;});
 // Scenario gate hook (scripts/run-scenarios.mjs): read-only access to the live records for record assertions. Draws nothing.
@@ -280,6 +286,7 @@ function identity(s){
  // Headers (owner, 2026-10-13; features/farrowing/budget.md ## Headers): the sow's record drawer is the hub and carries the route line, her
  // chip and the two facts that tell her apart at farrowing (her pen, her parity). Actions launched from it carry no line: it is one Back away.
  const route=(facts)=>({chip:{id:s.tag,action:'profile',label:'View sow '+s.tag+' details'},facts});
+ if(s.view==='allocate')return {surface:'menu',title:'Allocate piglets',close:false,label:'Allocate piglets',line:{text:[{text:`${s.alive} piglet${s.alive===1?'':'s'}`},{text:' · '+s.tag}]}};
  if(s.view==='finish')return {title:'Finish farrowing',close:{action:'dismiss',label:'Close finish drawer'}};
  if(s.view==='death')return {title:s.locked||s.ended?'Record dead':'Report death',close:false};
  return {title:'Farrowing record',line:route([sowPlace(s),'Parity '+s.parity]),close:{action:'dismiss',label:'Close sow drawer'},label:'Sow '+s.tag};
@@ -823,7 +830,7 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
  return true;
 }
 function pageAfterRender(i,s,c,root){
- const demo=root.querySelector('[data-demo-scan]');if(demo){demo.hidden=fosterPicking(s)?(s.fosterDraft.target?!s.fosterDraft.idScan:!s.fosterDraft.scanning):s.view==='roomBatchPick'?!c.batch?.scanning:s.view!=='roomScan'||!c.scan.connected;demo.disabled=s.view==='roomScan'&&!c.scan.listening;demo.textContent=s.view==='roomBatchPick'&&c.batch?.scanning==='waiting'||fosterPicking(s)&&(s.fosterDraft.target?s.fosterDraft.idScan:s.fosterDraft.scanning)==='waiting'?'Simulate reader on':'Simulate scan';}
+ const demo=root.querySelector('[data-demo-scan]');if(demo){demo.hidden=s.view==='fosterSend'?!s.fosterDraft.idScan:fosterPicking(s)?!s.fosterDraft.scanning:s.view==='roomBatchPick'?!c.batch?.scanning:s.view!=='roomScan'||!c.scan.connected;demo.disabled=s.view==='roomScan'&&!c.scan.listening;demo.textContent=s.view==='roomBatchPick'&&c.batch?.scanning==='waiting'||(s.view==='fosterSend'?s.fosterDraft.idScan:fosterPicking(s)&&s.fosterDraft.scanning)==='waiting'?'Simulate reader on':'Simulate scan';}
  if(s.view==='roomPig')connectPig(root,c);
  if(s.view==='roomBatchForm')connectBatchForm(root,c);
  // The pig just read is brought into view where she is, and her row keeps Row's Just scanned state for a moment.
@@ -892,26 +899,23 @@ function finish(s){
 function moreSowActions(s){return btn('sowActions',`Actions ${icon('chevron')}`,'more-sow-actions').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`);}
 function recordActions(s){const pending=sum(s.deathDraft);return `<div class="record-inline-actions" aria-label="Record actions"><div class="record-action-group" role="group" aria-label="Quick actions">${btn('death',`${icon('alert')}<span>Record dead</span>${pending?`<small>${pending} unsaved</small>`:''}`,'record-toolbar-action')}${btn('sowActions',`${icon('more')}<span>Actions</span>`,'record-toolbar-action record-toolbar-more').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)}</div></div>`;}
 function recordNavigation(primary=''){return footer(SentriUI.backButton({action:'close'}),primary,'execution-completion');}
-// Right after the hold records her death (or from her row while piglets wait): where do her piglets go? A page of choice tiles
-// (owner, 2026-11-02): the labels alone, they are self-evident. A tile only chooses; its section opens under the tiles. Foster is the sow
-// picker in place (search, pen cards, scan): a sow opens the count drawer and Send stays here while piglets are left. Hand-rear and the
-// rearing pen show what will be recorded and commit from the footer. The header's Back leaves with nothing recorded (later).
-// Header line (owner, 2026-11-02: information budget): her tag and the piglets left. Pen and time of death are on her row.
+// Right after the hold records her death (or from her row while piglets wait): where do her piglets go? A menu drawer (owner,
+// 2026-11-02) of three verbs as Row tiles, each pushing its page; Back here means later. What has already gone where sits under them.
+// Header line (information budget): the piglets left and her tag. Pen and time of death are on her row.
 function allocate(s){
- const n=s.alive,pigs=`${n} piglet${n===1?'':'s'}`,c=s.allocChoice||'',f=s.fosterDraft;
- const options=[{value:'move',label:'Foster',icon:'transfer'},{value:'hand',label:'Hand-rear',icon:'drop'},...(farmConfig.rearingPen?[{value:'rear',label:'Rearing pen',icon:'barn'}]:[])].map(o=>({...o,pressed:c===o.value}));
- const tiles=SentriTask.choice({label:'Where her piglets go',action:'allocChoose',options});
- let section='',commit=btn('',`Allocate ${pigs}`,'button primary','',true);
- if(c==='move'){
-  section=`<div class="foster-pick allocate-foster">${fosterBar(s)}<div class="foster-list">${fosterPickList(s)}</div></div>`;commit=false;
- }
- if(c==='hand'){section=SentriUI.facts([{label:'Piglets',value:String(n)},{label:'Stay in',value:`Crate ${s.pen}`}]);commit=btn('allocHand',`Hand-rear ${pigs}`,'button primary');}
- if(c==='rear'){section=SentriUI.facts([{label:'Piglets',value:String(n)},{label:'Leave',value:`Crate ${s.pen}`}]);commit=btn('allocRear',`Move ${n} to the rearing pen`,'button primary');}
- // What has gone where so far (owner, 2026-11-02): one row per send, between the tiles and what comes next, so a split stays in view.
- const sent=(s.allocSent||[]).length?`<section class="allocate-sent">${SentriUI.heading({title:'Sent',kind:'group',level:4})}${SentriUI.panel(s.allocSent.map(x=>SentriUI.row({variant:'animal',code:x.tag,description:[rowText.pen(x.pen),x.ids.length?'ID '+x.ids.join(', '):''].filter(Boolean).join(' · '),right:{kind:'state',figure:`${x.n} piglet${x.n===1?'':'s'}`,word:'',level:'settled'}})).join(''),{className:'st-row-group allocate-sent-rows'})}</section>`:'';
- const html=SentriUI.sheet({variant:'page',title:'Allocate piglets',line:`${pigs} · ${s.tag}`,back:{action:'close'},body:tiles+sent+section,bodyClass:'allocate-body',footer:commit?pageFooter(commit):false,className:'feature-page allocate-page',label:'Allocate piglets',bar:status()});
- const layer=c==='move'?fosterLayer(s,true):'';
- return layer?'<div class="page-background" inert aria-hidden="true">'+html+'</div>'+layer:html;
+ const verbs=[{label:'Foster',title:'Foster off to other sows',icon:icon('transfer'),action:'allocFoster'},{label:'Hand-rear',title:'Hand-rear in her crate',icon:icon('drop'),action:'allocHandPage'},...(farmConfig.rearingPen?[{label:'Rearing pen',title:'Move to the rearing pen',icon:icon('barn'),action:'allocRearPage'}]:[])];
+ return {cls:'allocate-body',body:SentriUI.rowGrid(verbs,{label:'Where her piglets go'})+allocSentList(s),footer:footer(SentriUI.backButton({action:'close'}))};
+}
+// What has gone where so far (owner, 2026-11-02): one row per foster-off save, the sow, her pen, the IDs that went and how many.
+function allocSentList(s){
+ if(!(s.allocSent||[]).length)return '';
+ return `<section class="allocate-sent">${SentriUI.heading({title:'Fostered off',kind:'group',level:4})}${SentriUI.panel(s.allocSent.map(x=>SentriUI.row({variant:'animal',code:x.tag,description:[rowText.pen(x.pen),x.ids.length?'ID '+x.ids.join(', '):''].filter(Boolean).join(' · '),right:{kind:'state',figure:`${x.n} piglet${x.n===1?'':'s'}`,word:'',level:'settled'}})).join(''),{className:'st-row-group allocate-sent-rows'})}</section>`;
+}
+// Hand-rear and the rearing pen: a page each, what will be recorded and the one commit; Back returns to the drawer.
+function allocDonePage(s,rear){
+ const n=s.alive,pigs=`${n} piglet${n===1?'':'s'}`;
+ const body=SentriUI.facts([{label:'Piglets',value:String(n)},rear?{label:'Move to',value:'Rescue deck'}:{label:'Stay in',value:`Crate ${s.pen}`}]);
+ return featurePage(s,rear?'Rearing pen':'Hand-rear',body,rear?btn('allocRear',`Move ${n} to the rearing pen`,'button primary'):btn('allocHand',`Hand-rear ${pigs}`,'button primary'),'alloc-done-page',{text:[{text:pigs},{text:' · '+s.tag}]});
 }
 // The finished sow (owner, 2026-11-02): her drawer says only what happened this time, one ring of where the litter went in a card that
 // opens Details (a tappable card in a white drawer: white body, tinted head band); her actions sit in the bar, nothing stacked in the body.
@@ -1075,7 +1079,7 @@ function pigletEditPage(s){
    Farrowing's single-action Scan does. Tapping or reading her opens the count over the list. Every sow with a litter on the task is offered.
    From a dead sow (Allocate piglets → Move to other sows) the piglets can only go out: no Send/Receive there. The general Foster action keeps
    both, on the count, with the same search and rows. */
-const fosterPicking=s=>s.view==='foster'||s.view==='allocate'&&s.allocChoice==='move';   // the sow picker is on screen (Foster piglets, or Allocate's Foster)
+const fosterPicking=s=>s.view==='foster';   // the sow picker is on screen
 const fosterStart=(s,count)=>({...fosterDraft(count),filter:fosterFilterDefault(s)});   // her unit, any time, any parity
 const fosterDraft=count=>({direction:'out',target:'',count,ids:[],idQ:'',idScan:false,idRead:'',start:count,q:'',scanning:false,seq:0});
 // A litter's piglets with an ID (alive) and how many have none: the count is what the record says is alive, so no ID = alive - IDs.
@@ -1088,13 +1092,14 @@ function fosterPreset(i,p){
  const s=states[i];act(s,'foster');
  if(p==='foster-search')s.fosterDraft.q='B3';
  if(p==='foster-scanning')s.fosterDraft.scanning=true;
- if(p==='foster-count')act(s,'fosterPick','000406');
+ if(p==='foster-send')act(s,'fosterPick','000406');
  if(p==='foster-filter')act(s,'fosterFilter');
  if(p==='foster-receive')act(s,'fosterDirection','in');
 }
-// Allocate's states over the allocate preset (000399, 7 piglets): Foster chosen, a sow tapped, the filter open, Hand-rear chosen.
+// Allocate's states over the allocate preset (000399, 7 piglets): its Foster page, Foster off for a sow, the filter, the Hand-rear page.
 function allocPreset(i,p){
- const s=states[i]=seed('allocate');s.preset=p;act(s,'allocChoose',p==='allocate-hand'?'hand':'move');
+ const s=states[i]=seed('allocate');s.preset=p;
+ if(p==='allocate-hand')act(s,'allocHandPage');else act(s,'allocFoster');
  if(p==='allocate-send')act(s,'fosterPick','000418');
  if(p==='allocate-filter')act(s,'fosterFilter');
 }
@@ -1117,12 +1122,16 @@ function fosterBar(s,cls=''){
  return `<div class="${cls?cls+' ':''}foster-bar">${bar}${filter}</div>`;
 }
 // Over a picker: the count drawer once a sow is tapped, or Filter sows while it is open.
-const fosterLayer=(s,dead)=>{const f=s.fosterDraft,other=fosterSow(s,f.target);return other?fosterCount(s,other,dead):f.filtering?fosterFilterSheet(s):'';};
-// Foster piglets (a sow's Actions): Send or Receive first (owner, 2026-11-02: the page asks which way before a sow is chosen), then
-// the sow picker Allocate uses (the same search and rows for both doors), pinned over the list. A sow tapped (or read) opens the count.
+const fosterLayer=s=>s.fosterDraft.filtering?fosterFilterSheet(s):'';   // Filter sows over the list
+// Foster piglets, from a sow's Actions or from Allocate: foster off or on first (owner, 2026-11-02: the page asks which way before a
+// sow is chosen), then the sow picker (search, filter, scan), pinned over the list. A sow tapped (or read) pushes Foster off (or on).
 function fosterPage(s){
- const page=SentriUI.sheet({variant:'page',title:'Foster piglets',back:{action:'featureBack'},above:`<div class="foster-direction">${SentriUI.segment({variant:'view-switch',options:[['out','Send piglets'],['in','Receive piglets']],active:s.fosterDraft.direction,action:'fosterDirection',ariaLabel:'Direction'})}</div>${fosterBar(s,'batch-bar')}`,body:`<div class="foster-list">${fosterPickList(s)}</div>`,footer:false,className:'room-utility batch-pick foster-pick',label:'Foster piglets',bar:status()});
- const layer=fosterLayer(s,false);
+ const dead=s.featureReturn==='allocate',dir=SentriUI.segment({variant:'view-switch',options:[['out','Foster off'],['in','Foster on']],active:s.fosterDraft.direction,action:'fosterDirection',ariaLabel:'Direction'});
+ // A dead sow only fosters off: Foster on stays in its place, disabled (owner, 2026-11-02), so the page reads the same from both doors.
+ const seg=dead?dir.replace(/(<button[^>]*data-value="in")/,'$1 disabled'):dir;
+ const line=dead?{text:[{text:`${s.alive} piglet${s.alive===1?'':'s'}`},{text:' · '+s.tag}]}:null;
+ const page=SentriUI.sheet({variant:'page',title:'Foster piglets',line,back:{action:'featureBack'},above:`<div class="foster-direction">${seg}</div>${fosterBar(s,'batch-bar')}`,body:`${dead?allocSentList(s):''}<div class="foster-list">${fosterPickList(s)}</div>`,footer:false,className:'room-utility batch-pick foster-pick',label:'Foster piglets',bar:status()});
+ const layer=fosterLayer(s);
  return layer?'<div class="page-background" inert aria-hidden="true">'+page+'</div>'+layer:page;
 }
 // The count, over the list: who the piglets go to (or come from), how many, and what happens to the ones without identity.
@@ -1167,11 +1176,14 @@ function fosterIdList(list,f){
   :SentriUI.choiceSearch({label:'Search piglet ID',placeholder:'Piglet ID',value:f.idQ,attrs:{'data-foster-id-search':''},clear:{action:'fosterIdClear'},scan:{action:'fosterIdScan',label:'Scan piglet tags'}});
  return `<section class="foster-ids" aria-label="With ID"><p class="foster-ids-head"><span>With ID</span><span class="foster-ids-count">${f.ids.length} of ${list.length}</span></p>${bar}<div class="foster-id-box"><div class="foster-id-scroll">${fosterIdRows(list,f)}</div></div></section>`;
 }
-function fosterCount(s,other,dead){
- const f=s.fosterDraft,out=f.direction==='out',max=fosterMax(s),word=out?'Send':'Receive',src=out?s:other,withId=fosterIds(src),n=f.count+f.ids.length;
+// Foster off (or on): a page pushed from the sow tapped (owner, 2026-11-02: too much for a drawer). Who the piglets go to (or come
+// from) is its line; the piglets with an ID are ticked by ID, the rest counted; the one commit names how many.
+function fosterSendPage(s){
+ const f=s.fosterDraft,other=fosterSow(s,f.target);if(!other)return '';
+ const out=f.direction==='out',max=fosterMax(s),src=out?s:other,withId=fosterIds(src),n=f.count+f.ids.length,word=out?'Foster off':'Foster on';
  const line={text:[{text:out?'To ':'From '},{text:other.tag,strong:true},{text:` · ${rowText.pen(other.pen)} · ${other.farm?other.stage:rowText.alive(other.alive)}`}]};
  const body=`${fosterIdList(withId,f)}${max||!withId.length?`<section class="feature-section">${farmStepper({variant:'well',label:withId.length?'Without ID':'Number of piglets',value:f.count,min:withId.length?0:1,max,action:'fosterCount',reserveHint:false})}</section>`:''}`;
- return SentriUI.sheet({variant:'drawer',title:out?'Send piglets':'Receive piglets',line,body,footer:footer(SentriUI.backButton({action:'fosterClose'}),btn('saveFoster',`${word} ${n} piglet${n===1?'':'s'}`,'button primary','',n<1||f.count>max)),className:'foster-count',size:withId.length?'long':'medium',sizing:'content',label:out?'Send piglets':'Receive piglets',scrim:{action:'fosterClose',label:'Close'}});
+ return featurePage(s,word,body,btn('saveFoster',`${word} ${n} piglet${n===1?'':'s'}`,'button primary','',n<1||f.count>max),'foster-send-page',line);
 }
 function pigletDeathPage(s){
  const f=s.mortalityDraft,total=s.pigletSelected.length+f.unidentified;
@@ -1183,10 +1195,10 @@ function countReconcilePage(s){
  const body=`<section class="count-compare"><div><span>System count</span><strong>${s.alive}</strong></div></section><section class="feature-section">${farmStepper({variant:'well',label:'Count the piglets in this litter',value:s.countDraft,min:identified,max:30,action:'countReconcileStep',reserveHint:false})}<p class="feature-hint">The count cannot be lower than the ${identified} identified piglets still recorded alive.</p></section>${changed?`<div class="feature-warning">${icon('alert')}<span><strong>Your count will replace ${s.alive}</strong><small>${s.countDraft>s.alive?s.countDraft-s.alive+' piglets will be added without identity.':s.alive-s.countDraft+' piglets without identity will be removed.'}</small></span></div>`:''}${SentriUI.field({label:'Reason for mismatch',control:`<textarea rows="3" data-count-reason placeholder="What explains the difference?">${esc(s.countReason)}</textarea>`,className:'feature-field'})}`;
  return featurePage(s,'Correct piglet count',body,btn('saveCountReconcile','Save corrected count','button primary','',!changed||!s.countReason.trim()),'count-reconcile-page');
 }
-function capabilitySurface(s){return s.view==='allocate'?allocate(s):s.view==='marker'?markerPage(s):s.view==='pigletCare'?pigletCarePage(s):s.view==='pigletEdit'?pigletEditPage(s):s.view==='foster'?fosterPage(s):s.view==='pigletDeath'?pigletDeathPage(s):s.view==='countReconcile'?countReconcilePage(s):'';}
+function capabilitySurface(s){return s.view==='fosterSend'?fosterSendPage(s):s.view==='allocHand'?allocDonePage(s,false):s.view==='allocRear'?allocDonePage(s,true):s.view==='marker'?markerPage(s):s.view==='pigletCare'?pigletCarePage(s):s.view==='pigletEdit'?pigletEditPage(s):s.view==='foster'?fosterPage(s):s.view==='pigletDeath'?pigletDeathPage(s):s.view==='countReconcile'?countReconcilePage(s):'';}
 
-function farrowingRecordSurface(s){const surface=({count,finish,locked,death})[s.view];if(!surface)return '';const v=surface(s),h=identity(s),page=AstraSurfaces.isPage('farrowing',s.view);
- const label={count:'Count alive',finish:'Finish farrowing',locked:'Locked litter',death:'Record dead'}[s.view];
+function farrowingRecordSurface(s){const surface=({count,finish,locked,death,allocate})[s.view];if(!surface)return '';const v=surface(s),h=identity(s),page=AstraSurfaces.isPage('farrowing',s.view);
+ const label={allocate:'Allocate piglets',count:'Count alive',finish:'Finish farrowing',locked:'Locked litter',death:'Record dead'}[s.view];
  return SentriUI.sheet(Object.assign({variant:page?'page':'drawer',body:v.body,bodyClass:v.cls,corner:v.corner||null,footer:v.footer,size:['death','finish'].includes(s.view)||s.view==='locked'&&lastSave(s)?.afterLock?'long':'medium',sizing:['death'].includes(s.view)?'full':'content',view:s.view,label,scrim:{action:'dismiss',label:'Dismiss sheet'},bar:page?status():''},h));}
 function farrowingBackground(s){
  if(s.view==='roomPicker'){const c=roomContext(s),back=c.picker?.returnView||'';const behind=['roomPenReadNote','roomPenNote','roomPenFault','roomPenFaultRecord'].includes(back)?penSubpage({...s,view:back},c):['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile'].includes(back)?capabilitySurface({...s,view:back}):'';return behind?'<div class="page-background" inert aria-hidden="true">'+behind+'</div>':'';}
@@ -1212,7 +1224,7 @@ gallery.addEventListener('input',e=>{if(!e.target.matches('[data-room-search]'))
 // The demo's own control, outside the phone: the reader reads the next sample sow.
 document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const i=+b.closest('[data-card]').dataset.card,s=states[i],c=roomContext(s);
  // Foster, scanning: a read opens the count for the sow read (single-action), as tapping her does; the reader connecting starts it.
- if(fosterPicking(s)&&s.fosterDraft.target&&s.fosterDraft.idScan){const f=s.fosterDraft;if(f.idScan==='waiting'){c.scan.connected=true;f.idScan=true;render(i);return;}const next=fosterIds(fosterFrom(s)).find(p=>!f.ids.includes(p.tag));if(next){f.ids.push(next.tag);f.idRead=next.tag;}render(i);return;}   // a read ticks that piglet
+ if(s.view==='fosterSend'&&s.fosterDraft.idScan){const f=s.fosterDraft;if(f.idScan==='waiting'){c.scan.connected=true;f.idScan=true;render(i);return;}const next=fosterIds(fosterFrom(s)).find(p=>!f.ids.includes(p.tag));if(next){f.ids.push(next.tag);f.idRead=next.tag;}render(i);return;}   // a read ticks that piglet
  if(fosterPicking(s)&&s.fosterDraft.scanning&&!s.fosterDraft.target){const f=s.fosterDraft;if(f.scanning==='waiting'){c.scan.connected=true;f.scanning=true;render(i);return;}const list=fosterCandidates(s),x=list[f.seq++%list.length];if(x)act(s,'fosterPick',x.r.tag);render(i);return;}
  // Choosing pigs, scanning: a read ticks her and marks her row (a repeat read keeps her ticked); a pig from another unit isn't added (a toast says where she is).
  if(s.view==='roomBatchPick'&&c.batch.scanning){const b=c.batch,tag=b.scanning==='waiting'?'':batchScans[b.seq++%batchScans.length],p=unitPigs(c).find(x=>x.tag===tag);if(b.scanning==='waiting'){c.scan.connected=true;b.scanning=true;render(i);return;}   // the reader connects: scanning starts
