@@ -1749,7 +1749,7 @@
     {
      "type": "state",
      "id": "finish.done-first",
-     "label": "Details for a sow's first litter",
+     "label": "Details for a sow with no earlier litter on record",
      "tree": "F",
      "reset": {
       "screen": "farrowing.details-first",
@@ -1760,11 +1760,11 @@
        "type": "outcome",
        "id": "fa-f15-first-litter-placeholder",
        "tree": "F-15",
-       "label": "A first litter keeps her history's place with a placeholder; the batch comparison still shows",
+       "label": "With no earlier litter on record, her history keeps its place with one placeholder; the batch comparison still shows",
        "gwt": {
         "given": "A parity 1 sow finished her first litter.",
         "when": "The worker opens Details.",
-        "then": "Against her batch shows as for any sow; Against herself reads First litter, her earlier litters showing from her second farrowing."
+        "then": "Against her batch shows as for any sow; Against herself reads No earlier litters on record, the same message whether this is her first litter or her earlier ones were never recorded."
        },
        "authority": [
         {
@@ -1779,7 +1779,7 @@
          "hard": "dead-end"
         },
         {
-         "text": "First litter",
+         "text": "No earlier litters on record",
          "in": "phone"
         },
         {

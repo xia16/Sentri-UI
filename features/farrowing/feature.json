@@ -1624,14 +1624,14 @@
     },
     {
       "id": "farrowing.details-first",
-      "name": "Details · first litter",
+      "name": "Details · no earlier litters",
       "zh": "",
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "details-first",
       "figma": "",
       "notes": {
-        "purpose": "Details for a sow's first litter: the full litter and her batch; her own history starts from her second farrowing.",
+        "purpose": "Details for a sow with no earlier litter on record (her first litter, or a farm that has just joined): the full litter and her batch; her own history shows once litters are recorded.",
         "states": [],
         "elements": [
           {
@@ -1650,8 +1650,8 @@
           },
           {
             "name": "Against herself",
-            "at": "First litter",
-            "shows": "A dashed placeholder: \"First litter · Her earlier litters show here from her second farrowing.\"",
+            "at": "No earlier litters on record",
+            "shows": "A dashed placeholder: \"No earlier litters on record · Her past litters show here once they're recorded.\" One message for every reason: a first litter, or a sow whose earlier litters were never recorded here.",
             "logic": "No earlier litter on record.",
             "source": "farrowing-astra-concept.js finishedDetails(), pastLitters()"
           },
@@ -1669,7 +1669,7 @@
           "(raw) This litter · Against her batch · Against herself",
           "(raw) This sow · Batch average · Batch range",
           "(raw) Born alive · Weaned · this litter: alive now · Target 12",
-          "(raw) First litter · Her earlier litters show here from her second farrowing."
+          "(raw) No earlier litters on record · Her past litters show here once they're recorded."
         ],
         "edge": [],
         "rules": [

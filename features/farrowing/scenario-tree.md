@@ -95,7 +95,7 @@ States: D0 Report death open over C0 with 1 crushed entered · D1 C0 after Done,
 
 ## 5 · Finish and the lock (F)
 
-States: F0 the record with a visit waiting (from D1) · F1 *retired* (Finish with an Edit draft: an unsaved correction cannot reach Finish, see X-10) · F2 Finish, nothing waiting · F3 a finished sow's record · F4 Details for a first litter.
+States: F0 the record with a visit waiting (from D1) · F1 *retired* (Finish with an Edit draft: an unsaved correction cannot reach Finish, see X-10) · F2 Finish, nothing waiting · F3 a finished sow's record · F4 Details with no earlier litter on record.
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
@@ -113,7 +113,7 @@ States: F0 the record with a visit waiting (from D1) · F1 *retired* (Finish wit
 | F-12 | F2 | type 12,6 in the Litter weight field (the system decimal keyboard) | → the weight reads 12.6 kg (the comma became a point); no Numpad; the sheet stays open | S — owner decision 2026-10-16 | `fa-f12-weight-on-the-keyboard` |
 | F-13 | F3 | open a finished sow | → one card: alive now, where the litter went, Born alive 12 / 14, head band Finished · Details ›; Back · Actions · Record dead in the bar | S — owner decision 2026-11-02 | `fa-f13-finished-at-a-glance` |
 | F-14 | F3 | tap the litter card | → Details (a page): This litter with causes, Against her batch, Against herself, Farrowing log | S — owner decision 2026-11-02 | `fa-f14-details-compares` |
-| F-15 | F4 | open Details for a first litter | → Against herself reads First litter; the batch comparison still shows | S — owner decision 2026-11-02 | `fa-f15-first-litter-placeholder` |
+| F-15 | F4 | open Details with no earlier litter on record | → Against herself reads No earlier litters on record (first litter or never recorded); the batch comparison still shows | S — owner decision 2026-11-02 | `fa-f15-first-litter-placeholder` |
 
 ## 6 · Undo the last save (X)
 
