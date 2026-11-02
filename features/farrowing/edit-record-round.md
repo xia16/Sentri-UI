@@ -35,10 +35,28 @@ Rules (proposed):
 - **Finish is never undone.** After Finish the only saves are Record dead's, and the same Undo applies to the last one (Q R3).
 - **Gone:** Edit record (Litter details), Edit on the finished record's toolbar, Edit litter record in Actions, Correct born, Edit finish details. Screens `farrowing.edit`, `farrowing.edit-finished`, `farrowing.born` and `farrowing.leave-edit` retire; `farrowing.count` gains the last-action line in the card and a held-frame screen for the Undo question, and the card's quiet saved line goes (a change to the 2026-10-23 card).
 
+### The pages it touches (walked at 390, 2026-11-02)
+
+| | | |
+|---|---|---|
+| ![Record dead after Finish](edit-record-round/touch-1-record-dead-after-finish.png) | ![Finished record](edit-record-round/touch-2-locked.png) | ![Sow died record](edit-record-round/touch-3-sow-died.png) |
+| **Record dead after Finish: touch-up.** Today it lists all six causes with the litter's totals and only a `+` (− grey at the posted figure). Now it matches Report death: died after birth only (Crushed, Scours, Starve-out, Other), counted from 0 for this record. A slip is fixed with − before Save and with Undo after. Born dead goes after Finish: a stillborn would be a birth, and Total born is locked (R4). The bar is Back · **Save**, the drawer's own word. | **Finished record: touch-up.** Edit leaves the toolbar (Record dead · Actions). After a Record dead, the last save sits under the litter's figures as in the Alive card: `Saved 14:02 · G.H`, `−1 died`, quiet Undo. With a run to show, the drawer opens at the long height (85%, as Finish and Record dead do), so the toolbar stays in view. | **Sow died record: touch-up.** Edit leaves the toolbar: Record dead · Actions. |
+| ![Log](edit-record-round/touch-4-log.png) | ![Actions](edit-record-round/touch-5-actions.png) | ![Litter details](edit-record-round/undo-6-litter.png) |
+| **Farrowing log: touch-up.** A redone visit is one `Corrected` line with `Was …`; a visit undone and then cleared stays as `Withdrawn`, struck through. The old `Crushed 3 → 2 · Correction` lines are no longer written. | **Actions: touch-up.** *Edit litter record* leaves Production. *Reconcile piglet count* is the Count spec's to retire (`features/count/`, PR #293/#295), not this round's. | **Litter details: removal only.** The Edit record row goes; Farrowing log stays as a one-row door, the same shape as the finished record's Death causes. |
+
+No change needed:
+- **Report death** (`farrowing.death`): a fat-fingered cause is fixed with − before Done. After Save, Undo brings the counts back, and Death reopens on them.
+- **The unsaved visit** (`farrowing.count-draft`): Clear and the chips work as they do; the last-save line hides.
+- **Finish farrowing**: Born · Alive · Dead stay the last check before the hold.
+- **Death causes**: still the read of the causes.
+
+For the build: `receipt()` in the prototype is dead code that still says "Use Edit for corrections" (delete it). The presets *Edit counts*, *Correct born* and *Leave edit with changes*, the label map entries, and the strings `tk.demo.edit` and `tk.demo.born.wrong` go with the screens they belong to.
+
 Questions for the owner:
 - **R1.** Undo only for the worker who saved it? *Recommend yes.*
 - **R2.** Until the next save on her, or also a time limit (e.g. 30 minutes)? *Recommend until the next save, with no clock: simpler, and the next save closes it anyway.*
-- **R3.** The same Undo for the last Record dead after Finish? *Recommend yes.*
+- **R3.** The same Undo for the last Record dead after Finish? *Recommend yes (drawn above).*
+- **R4.** No born dead after Finish (no stillborn or mummified in Record dead once she is finished)? *Recommend yes: it would be a birth, and Total born is locked.*
 
 ## Recommendation in one paragraph (as put to the owner, before the ruling)
 
