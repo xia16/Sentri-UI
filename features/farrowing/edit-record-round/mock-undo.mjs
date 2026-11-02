@@ -150,4 +150,50 @@ async function lastAction(p, what, when) {
   await p.close();
 }
 
+// Variant D (owner, 2026-11-02, on C: "should be up here with a divider, with undo as a button … the popup is too wordy"):
+// the last action sits inside the Alive card under a divider, with its own Undo button. The card stays one surface with two
+// sibling targets: the figure area opens Details as before; the Undo button is beside the line, never nested in the door.
+// Undo shows only for the worker who saved it, while it is the last action; for anyone else the line is plain text.
+async function cardLast(p, what, when, mine) {
+  await p.evaluate(({ what, when, mine }) => {
+    const sheet = document.querySelector('.sheet[data-view="count"]'), card = sheet.querySelector('.alive-card');
+    card.querySelector('.alive-quiet')?.remove();
+    const wrap = document.createElement('div'); wrap.className = 'mock-alive';
+    card.replaceWith(wrap); wrap.append(card);
+    const undo = mine ? `<button type="button" class="button secondary mock-undo" data-ds="Button" data-register="secondary" data-action="undoLast" aria-label="Undo ${what}">${window.SentriIcons.icon('return')}<span>Undo</span></button>` : '';
+    wrap.insertAdjacentHTML('beforeend', `<div class="mock-last-line"><span class="mock-last-copy"><strong>${what}</strong><small>${when}</small></span>${undo}</div>`);
+    const st = document.createElement('style');
+    st.textContent = `.farrowing-phone .mock-alive{margin:0 0 16px;border:1px solid var(--line);border-radius:20px;background:#f6f7f1;overflow:hidden}
+      .farrowing-phone .mock-alive .alive-card{margin:0;border:0;border-radius:0;background:transparent}
+      .mock-last-line{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:68px;margin:0 16px;padding:12px 0;border-top:1px solid var(--line);box-sizing:border-box}
+      .mock-last-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+      .mock-last-copy strong{font:600 15px/20px var(--font-sans);color:var(--ink)}
+      .mock-last-copy small{font:400 13px/18px var(--font-sans);color:var(--muted)}
+      .farrowing-phone .mock-undo{flex:none;display:inline-flex;align-items:center;gap:6px;width:auto;min-width:0;height:44px;min-height:44px;padding:0 16px}
+      .farrowing-phone .mock-undo svg{width:18px;height:18px}`;
+    document.head.append(st);
+  }, { what, when, mine });
+}
+{
+  const p = await open('farrowing.count');
+  await cardLast(p, '+4 born alive', 'Aug 26 08:41 · L.M', false);
+  await shot(p, 'undo-d0-not-mine.png');
+  await p.close();
+}
+{
+  const p = await open('farrowing.count');
+  await tap(p, PLUS, 3);
+  await tap(p, SAVE);
+  await cardLast(p, '+3 born alive', '09:41 · G.H', true);
+  await shot(p, 'undo-d1-saved.png');
+  await p.evaluate(() => {
+    const U = window.SentriUI, sheet = document.querySelector('.sheet[data-view="count"]');
+    sheet.insertAdjacentHTML('afterend', U.sheet({ variant: 'dialog', title: 'Undo +3 born alive?', body: '',
+      footer: '<div class="sheet-footer" data-ds="Sheet"><button type="button" class="button secondary" data-ds="Button" data-register="secondary">Back</button><button type="button" class="button primary" data-ds="Button" data-register="primary">Undo</button></div>' }));
+    sheet.setAttribute('inert', '');
+  });
+  await shot(p, 'undo-d2-ask.png');
+  await p.close();
+}
+
 await b.close(); server.kill();
