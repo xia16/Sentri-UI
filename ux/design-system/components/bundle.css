@@ -1464,3 +1464,12 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 /* FilterChips in a FilterSheet section: the chip track pads itself to the gutter and scrolls to the sheet edge, so the section lets it bleed
    (first chip under the section title, Allocate piglets' Unit filter). */
 .st-filter-section .st-filter-chips{margin-inline:calc(-1 * var(--space-gutter))}
+/* Foster piglets · With ID (owner, 2026-11-02): one box holds the picker, the title outside: the search (or scan bar) on top, then the
+   tick rows, which scroll inside the box past about 2½ rows, so the count and Send stay on screen. The box is the drawer's tinted card; ticked rows take the well, as Row · Select. */
+.farrowing-phone .foster-id-box{border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--app-background);overflow:clip}
+.farrowing-phone .foster-id-bar{padding:var(--space-8);border-bottom:var(--border-width) solid var(--line)}
+.farrowing-phone .foster-id-bar .st-choice-search{margin:0}
+.farrowing-phone .foster-id-scroll{max-height:calc(2.5 * var(--animal-row-min));overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.farrowing-phone .foster-id-scroll::-webkit-scrollbar{display:none}
+.farrowing-phone .foster-id-scroll>.st-row+.st-row{border-top:var(--border-width) solid var(--line)}
+.farrowing-phone .foster-id-none{margin:0;padding:var(--space-16)}
