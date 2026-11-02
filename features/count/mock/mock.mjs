@@ -96,24 +96,7 @@ if (want('1-')) {
   await shoot(p, 'mock-1-pen-entry.png');
 }
 
-// 2. Entry, a room: the unit's card on Home gains Count pigs under Inspect unit, with when the unit was last counted.
-if (want('2-')) {
-  const p = await b.newPage({ viewport: { width: 390, height: 844 } });
-  await p.goto(`http://localhost:${port}/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7&screen=workbench.unit`);
-  await p.waitForSelector('html.atlas-ready', { timeout: 15000 });
-  await p.evaluate((TALLY) => {
-    const env = document.querySelector('.unit-hub-environment');
-    const row = env.cloneNode(true);
-    row.classList.add('unit-hub-count'); row.setAttribute('aria-label', 'Count pigs in Unit 7');
-    const arrow = [...env.querySelectorAll('.unit-environment-bottom svg')].pop()?.outerHTML || '';
-    row.innerHTML = `<span class="unit-environment-label">Count pigs</span><span class="unit-environment-bottom"><span class="unit-device-count">Last counted Oct 21 · G.H</span>${arrow}</span>`;
-    env.before(row);
-    const st = document.createElement('style');
-    st.textContent = '.unit-hub-count svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}';
-    document.head.append(st);
-  }, TALLY);
-  await shoot(p, 'mock-2-unit-entry.png');
-}
+// 2. (Dropped, owner 2026-11-02: no "Last counted" row on Home; a recount is asked for inside the task that needs it.)
 
 // 3. Count one pen, by number (and the two with ear tags by scan): Pen D4.
 for (const [name, counted] of [['mock-3-count-pen.png', 12], ['mock-3b-count-pen-match.png', 14]]) {
@@ -184,27 +167,37 @@ if (want('4b')) {
   await shoot(p, 'mock-4b-count-unknown-tag.png');
 }
 
-// 5. Saved: a receipt drawer over the room with only what changed or needs eyes.
+// 5. Saved: a receipt you read at a glance. One tile per pen counted: ✓ matches, +n / −n differs (amber), – not counted.
+//    Under it only what needs a person: the tagged pigs not seen. No sentences.
 if (want('5-')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
   await p.evaluate(() => {
     const { U, ic } = window.M;
-    const r = (title, description, trail, icon) => U.row({ title, description, ...(trail === 'chevron' ? { trail: 'chevron', action: 'x', variant: 'navigation' } : { trailing: trail }), ...(icon ? { icon: ic(icon) } : {}) });
-    const body =
-      U.heading({ title: 'Different from the record', kind: 'section', level: 3 })
-      + U.rowGroup(r('D4 · 12 counted', 'Should be 14 · 2 unaccounted in batch 25', '−2')
-        + r('000512 moved to C2', 'Was Unit 9 · C3', '+1'), { className: 'm-evidence' })
-      + U.heading({ title: 'Not seen', kind: 'section', level: 3 })
-      + U.rowGroup(r('000281', 'Stays recorded in C1 · open her to report missing', 'chevron'))
-      + '<p class="m-hint">C1 and C2 match the record otherwise. D5 was not counted.</p>';
-    const sheet = U.sheet({ variant: 'drawer', title: 'Count saved', line: 'Unit 7 · 3 of 4 pens · 09:30', body, footer: '<div class="sheet-footer" data-ds="Sheet">' + U.button({ label: 'Done', register: 'primary', action: 'x' }) + '</div>', className: 'm-count m-receipt', label: 'Count saved' });
+    const check = window.SentriIcons.icon('check');
+    const head = `<div class="tk-receipt m-head" role="status"><span class="tk-receipt-mark">${check}</span><div><p class="tk-receipt-title">Unit 7 counted</p><p class="tk-receipt-meta">09:30 · L.M</p></div></div>`;
+    const tile = (code, mark, kind, n) => `<div class="m-tile" data-kind="${kind}"><strong>${code}</strong><span class="m-mark">${mark}</span><small>${n}</small></div>`;
+    const tiles = '<div class="m-tiles">' + tile('C1', '!', 'diff', '1 not seen') + tile('C2', '+1', 'diff', '3 pigs') + tile('D4', '−2', 'diff', '14 pigs') + tile('D5', '–', 'skip', 'Skipped') + '</div>';
+    const notSeen = U.heading({ title: 'Not seen', icon: ic('alert'), kind: 'section', level: 3 })
+      + U.rowGroup(U.row({ variant: 'navigation', code: '000281', title: 'Pen C1', trail: 'chevron', action: 'x' }));
+    const body = tiles + notSeen;
+    const sheet = U.sheet({ variant: 'drawer', title: 'Count saved', line: 'Unit 7 · 3 of 4 pens · 09:30 · L.M', body, footer: '<div class="sheet-footer" data-ds="Sheet">' + U.button({ label: 'Done', register: 'primary', action: 'x' }) + '</div>', className: 'm-count m-receipt', label: 'Count saved' });
     const phone = document.querySelector('.phone');
-    const main = phone.querySelector('.inspect-main') || phone.firstElementChild;
-    main.setAttribute('inert', '');
+    (phone.querySelector('.inspect-main') || phone.firstElementChild).setAttribute('inert', '');
     phone.insertAdjacentHTML('beforeend', '<div class="m-scrim"></div>' + sheet);
     const st = document.createElement('style');
-    st.textContent = '.m-scrim{position:absolute;inset:0;background:rgba(20,24,21,.38);z-index:5}.phone>.sheet.m-receipt{position:absolute;left:0;right:0;bottom:0;z-index:6}';
+    st.textContent = `.m-scrim{position:absolute;inset:0;background:rgba(20,24,21,.38);z-index:5}.phone>.sheet.m-receipt{position:absolute;left:0;right:0;bottom:0;z-index:6}
+      .m-receipt .m-tiles{margin-top:4px}
+      .m-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
+      .m-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:96px;border-radius:12px;background:var(--paper,#fff);border:1px solid var(--line,#dfe2da)}
+      .m-tile strong{font:600 15px/1.2 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#1d221e)}
+      .m-tile .m-mark{font:700 22px/1.2 var(--font-sans);color:var(--ink,#1d221e);font-variant-numeric:tabular-nums;height:28px;display:flex;align-items:center}
+      .m-tile .m-mark svg{width:24px;height:24px;fill:none;stroke:var(--green,#2f6b3d);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+      .m-tile small{font-size:12px;color:var(--muted,#6b736d)}
+      .m-tile[data-kind="diff"]{background:var(--amber-fill,#fede82);border-color:transparent}
+      .m-tile[data-kind="diff"] strong,.m-tile[data-kind="diff"] .m-mark,.m-tile[data-kind="diff"] small{color:var(--amber-fill-ink,#5c3f00)}
+      .m-tile[data-kind="skip"]{background:var(--well,#eceee8);border-color:transparent}
+      .m-tile[data-kind="skip"] strong,.m-tile[data-kind="skip"] .m-mark{color:var(--muted,#6b736d)}`;
     document.head.append(st);
   });
   await shoot(p, 'mock-5-result.png');

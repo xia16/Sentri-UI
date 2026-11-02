@@ -6,7 +6,7 @@ The owner's words (2026-11-02): *"count is not only for piglets but we do counts
 
 ## Recommendation in one paragraph
 
-**Count is a place's action, one page for every place.** It sits on the pen page (beside Note, Feed, Observe, Fault, Tick all) and on the unit's card on Home (`Count pigs · Last counted Oct 21`), never in a pig's Actions: you count a place, not a pig. The page is the Inspection list you already know, in counting mode: the reader is always listening; every ear tag read ticks that pig; a pig the record places somewhere else is ticked here with *Moves here*; each group of pigs without ear tags takes the number counted in its 44px field (a one-pen count shows a big stepper). **Save count** writes one observation: what was seen, what the record expected, who and when. Scanned pigs from elsewhere move here. Pigs with ear tags that were not seen **stay where they are recorded**: the receipt lists them, and opening one is the way to Report missing. A difference in pigs without ear tags is saved as **unaccounted** on their batch (Round 9), never as a pen status, never a birth or a death. No reason is asked. The few pigs you just moved in are not a count: **Transfer records the arrivals** (scan them at the new pen, or type how many), so nobody rescans 30 pigs for 3. And conditions on pigs without ear tags **follow the pigs you pick**: picking 5 of 14 asks, for each condition the group has, how many of the 5 have it.
+**Count is a place's action, one page for every place.** It sits on the pen page (beside Note, Feed, Observe, Fault, Tick all), never in a pig's Actions: you count a place, not a pig. Home never reminds anyone to count (owner, 2026-11-02): a recount of a room is asked for **inside the task whose number disagrees**, as in the old app (receiving pigs in Transfer: 28 arrived where 30 were sent). The page is the Inspection list you already know, in counting mode: the reader is always listening; every ear tag read ticks that pig; a pig the record places somewhere else is ticked here with *Moves here*; each group of pigs without ear tags takes the number counted in its 44px field (a one-pen count shows a big stepper). **Save count** writes one observation: what was seen, what the record expected, who and when. Scanned pigs from elsewhere move here. Pigs with ear tags that were not seen **stay where they are recorded**: the receipt lists them, and opening one is the way to Report missing. A difference in pigs without ear tags is saved as **unaccounted** on their batch (Round 9), never as a pen status, never a birth or a death. No reason is asked. The few pigs you just moved in are not a count: **Transfer records the arrivals** (scan them at the new pen, or type how many), so nobody rescans 30 pigs for 3. And conditions on pigs without ear tags **follow the pigs you pick**: picking 5 of 14 asks, for each condition the group has, how many of the 5 have it.
 
 ---
 
@@ -57,7 +57,7 @@ The archived Set count (`inspection.set-count-batches`, [now/](now/inspection.se
 | 14 | **Sows in group housing** | Each sow by tag | Count the pen (scan every sow) or the room. |
 | 15 | **Piglets and growers without ear tags** | A number per pen | The group row's number (room) or the stepper (one pen). |
 | 16 | **A mixed pen** (2 tagged + 14 untagged) | Both | One page: the tagged by scan, the 14 by number. |
-| 17 | **A whole room** | Pen by pen as they walk | Count the unit: pen cards in walking order; pens they skip stay as they are (`3 of 4 pens`). |
+| 17 | **A whole room** | Pen by pen as they walk | Opened from the task that asks for it (Q2). Count the unit: pen cards in walking order; pens they skip stay as they are (`3 of 4 pens`). |
 | 18 | **A room scan finds a pig from another room** | She is in this room | She joins the pen scanned just before her, shown on her row (*Moves to C2 ›*, changeable), and on the receipt. |
 | 19 | **A pig in the wrong pen of the same room** | Only if they count that pen | A room count proves the room, not the pen; a pen count proves the pen (Q5). |
 | 20 | **Death** | A body, often its cause | Report death (its own record). It lowers what the next count expects. |
@@ -131,14 +131,14 @@ The archived Set count (`inspection.set-count-batches`, [now/](now/inspection.se
 
 | | |
 |---|---|
-| ![Pen page with Count](mock/mock-1-pen-entry.png) | ![Unit card with Count pigs](mock/mock-2-unit-entry.png) |
-| **Entry, one pen.** Count joins the pen's tiles (six: 3 + 3, the row grid rule). | **Entry, a room.** *Count pigs · Last counted Oct 21 · G.H* joins the unit's card on Home, between Inspect unit and Environment & devices. |
+| ![Pen page with Count](mock/mock-1-pen-entry.png) | ![Old app: count anomaly inside the task](old-system/task-piglet-count-confirm-under-971-15991.png) |
+| **Entry, one pen.** Count joins the pen's tiles (six: 3 + 3, the row grid rule). | **A recount, in the old app** (TASK `971:15991`, reached from the piglet task's More actions › 数量异常 `1567:20878`): the task's own number (18) against the record (20), inside the task. No reminder anywhere. The proposal keeps that: a room recount opens from the task whose number disagrees. (The Home *Last counted* row of the first draft is dropped, owner 2026-11-02.) |
 | ![Count one pen](mock/mock-3-count-pen.png) | ![Count one pen, matches](mock/mock-3b-count-pen-match.png) |
 | **Count by number, one pen (D4).** The reader listens; the stepper starts at what should be there (14), the worker sets 12: *2 fewer than the record. Saved as 2 unaccounted in batch 25.* The two tagged pigs tick as they are read. *Since the last count* explains the 14. Back · Save count. | **Matches.** *Matches the record.* Saving still writes the count, so the next one starts from it. |
 | ![Count a room](mock/mock-4-count-room.png) | ![Count a room, scrolled](mock/mock-4c-count-room-scrolled.png) |
 | **Count by scan, a room (Unit 7).** Pen cards in walking order, each read ticks the pig where she is; the card says `2 of 3`. Footer: `3 of 4 pens · 1 not seen yet` · Save count. | **The same, scrolled.** 000512, recorded in Unit 9 · C3, was read among C2's sows: *Moves here*, `+1 here` on C2. D4's untagged group took 12 in its field; D5 untouched reads *Not counted*. |
 | ![Unknown tag](mock/mock-4b-count-unknown-tag.png) | ![Count saved](mock/mock-5-result.png) |
-| **An unknown tag.** The shared scan toast; the count goes on. | **Count saved.** Only what differs: *D4 · 12 counted · Should be 14 · 2 unaccounted in batch 25* (−2), *000512 moved to C2 · Was Unit 9 · C3* (+1); *Not seen · 000281 · Stays recorded in C1 · open her to report missing*; one quiet line for the rest. Done. |
+| **An unknown tag.** The shared scan toast; the count goes on. | **Count saved, at a glance** (redrawn after owner review: "I don't even want to read it"). One tile per pen: ✓ matches, amber differs (*+1* a pig moved in, *−2* unaccounted, *!* a tagged pig not seen), grey skipped. Under the tiles only the tagged pig not seen, which opens her (Report missing). Done. |
 | ![Pen log](mock/mock-6-log.png) | ![Conditions follow the pick](mock/mock-7-noid-conditions.png) |
 | **The pen log.** `Counted 14 · 2 unaccounted / Should have been 16 · both tagged pigs seen`; the move and death since are their own lines. | **Conditions follow the pick** (any action on some untagged pigs): *How many in all? 5 of 14* and *With Coughing · of the 3 in D4 · 2*. |
 
@@ -159,7 +159,7 @@ Mock notes: these are drawn by swapping content into the real pages (`mock.mjs`)
 ## 8. Questions only the owner can answer
 
 1. **The name.** *Count* (盘点) for the tile, the page and the log. *Recommend: Count.*
-2. **Where it lives.** The pen page (one pen, crate or group) and the unit's card on Home (a room); not a pig's Actions. *Recommend: yes.*
+2. **Where it lives.** The pen page (one pen, crate or group); a whole room only from the task that asks for a recount (receiving pigs). Do you also want a whole-room count outside tasks, and where? *Recommend: no; the pen's own Count covers the rest.*
 3. **Tagged pigs not seen.** They stay recorded where they were; the receipt lists them and opening one is the way to Report missing. Or should a count report them missing itself? *Recommend: stay recorded; missing is always a person's call.*
 4. **Scan here moves here.** A tagged pig read in a count that the record places elsewhere moves here when the count is saved (shown on her row and the receipt). *Recommend: yes.*
 5. **A room count proves the room, not the pen.** Pigs read in the room tick in the pen the record has them in; a pen in the wrong place inside the room is fixed by counting that pen. A pig from another room joins the pen scanned just before her (changeable). *Recommend: yes; the alternative, one pen at a time, loses the room scan you asked for.*
@@ -169,10 +169,10 @@ Mock notes: these are drawn by swapping content into the real pages (`mock.mjs`)
 9. **The number starts at the record.** The stepper and group fields start at what should be there (fast when it matches; a worker could save without counting). Or start empty? *Recommend: start at the record; the matching count is the common case.*
 10. **Unknown tags.** Left out with the scan toast. Should the receipt offer *Give this tag to one of the 14 pigs without ear tags* (Assign identity)? *Recommend: later, with Assign identity.*
 11. **A sow found in another crate in farrowing.** Does her litter move with her? *Recommend: yes, the litter is hers until weaning; the crate's count checks the number.*
-12. **Scheduled counts.** v1 shows *Last counted* on the unit card and nothing more; no count task, no reminder. *Recommend: yes; a stocktake task on Home later if farms ask.*
+12. **Scheduled counts.** None in v1: no reminder, no *Last counted* (owner, 2026-11-02). A recount is asked for only by a task whose number disagrees. *Recommend: yes.*
 
 ## 9. Next steps after a ruling
 
 1. Transfer's product round, using this page as its arrivals tally (scenarios 1–4).
-2. Build Count on the pen page and the unit card in the prototypes; retire Set count and Reconcile piglet count.
+2. Build Count on the pen page in the prototypes; retire Set count and Reconcile piglet count.
 3. Exits (sold, off farm) as their own record, so *Since the last count* is complete.

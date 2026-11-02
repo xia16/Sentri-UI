@@ -28,15 +28,15 @@ strong{color:var(--ink)}
 <body><main>
 <p class="eyebrow">Count · 盘点 · product round · 2 Nov · proposal, nothing built</p>
 <h1>Count is a place's action. One page for every pen and room.</h1>
-<p class="lead">Count sits on the pen page and on the unit's card, not in a pig's Actions: you count a place. It is the Inspection list in counting mode. The reader listens and every tag read ticks that pig. A pig recorded somewhere else is ticked here and <strong>moves here</strong> when you save. Pigs without ear tags get the number you counted. <strong>Save count</strong> records what you saw, what the record expected, who and when. Tagged pigs that weren't read <strong>stay where they are recorded</strong>, and the receipt lists them. A difference in untagged pigs is saved as <strong>unaccounted</strong> on their batch. It is never a pen status, a birth or a death, and no reason is asked. The 3 pigs you just moved in are not a count: <strong>Transfer records the arrivals</strong>, so nobody rescans 30 pigs for 3.</p>
+<p class="lead">Count sits on the pen page, not in a pig's Actions: you count a place. A room recount is asked for inside the task that needs it. It is the Inspection list in counting mode. The reader listens and every tag read ticks that pig. A pig recorded somewhere else is ticked here and <strong>moves here</strong> when you save. Pigs without ear tags get the number you counted. <strong>Save count</strong> records what you saw, what the record expected, who and when. Tagged pigs that weren't read <strong>stay where they are recorded</strong>, and the receipt lists them. A difference in untagged pigs is saved as <strong>unaccounted</strong> on their batch. It is never a pen status, a birth or a death, and no reason is asked. The 3 pigs you just moved in are not a count: <strong>Transfer records the arrivals</strong>, so nobody rescans 30 pigs for 3.</p>
 
 <h2>The recommended flow, at 390 in the real prototype parts</h2>
 <div class="shots">
 <figure><img src="mock/mock-1-pen-entry.png" alt="Pen page with a Count tile"><figcaption><strong>One pen.</strong> Count joins the pen's tiles (3 + 3).</figcaption></figure>
-<figure><img src="mock/mock-2-unit-entry.png" alt="Unit card with Count pigs"><figcaption><strong>A room.</strong> <em>Count pigs · Last counted Oct 21</em> on the unit's card.</figcaption></figure>
+<figure><img src="old-system/task-piglet-count-confirm-under-971-15991.png" alt="Old app count check inside the task"><figcaption><strong>A room recount</strong> is asked for inside the task whose number disagrees, as in the old app. Home never reminds.</figcaption></figure>
 <figure><img src="mock/mock-3-count-pen.png" alt="Count one pen by number"><figcaption><strong>Count by number.</strong> Starts at 14, counted 12: <em>2 unaccounted in batch 25.</em> The tagged two tick as they are read.</figcaption></figure>
 <figure><img src="mock/mock-4c-count-room-scrolled.png" alt="Count a room by scan"><figcaption><strong>Count by scan, a room.</strong> 000512 from Unit 9 <em>moves here</em>. D4's untagged group took 12. D5 is skipped.</figcaption></figure>
-<figure><img src="mock/mock-5-result.png" alt="Count saved receipt"><figcaption><strong>Saved.</strong> Only what differs, plus <em>Not seen · 000281</em>. Opening her is the way to report her missing.</figcaption></figure>
+<figure><img src="mock/mock-5-result.png" alt="Count saved receipt"><figcaption><strong>Saved, at a glance.</strong> One tile per pen: ✓ matches, amber differs, grey skipped. Below, only the pig not seen.</figcaption></figure>
 <figure><img src="mock/mock-6-log.png" alt="Pen log with count lines"><figcaption><strong>Log.</strong> <em>Counted 14 · 2 unaccounted / Should have been 16.</em> History is never rewritten.</figcaption></figure>
 <figure><img src="mock/mock-7-noid-conditions.png" alt="Conditions follow the pick"><figcaption><strong>Conditions on untagged pigs follow the pick.</strong> 5 of 14, of them 2 with Coughing.</figcaption></figure>
 <figure><img src="mock/mock-4b-count-unknown-tag.png" alt="Unknown tag toast"><figcaption><strong>An unknown tag.</strong> The shared toast. It is left out and the count goes on.</figcaption></figure>
@@ -51,7 +51,7 @@ strong{color:var(--ink)}
 <h2>Questions only you can answer</h2>
 <div class="card"><ol class="q">
 <li><strong>Name it Count (盘点)?</strong><small>Recommend: yes.</small></li>
-<li><strong>On the pen page and the unit card, not in a pig's Actions?</strong><small>Recommend: yes. A count is about a place. (The Edit record round had put it in the sow's Actions.)</small></li>
+<li><strong>On the pen page; a whole room only from the task that asks for a recount?</strong><small>Recommend: yes. A count is about a place. (The Edit record round had put it in the sow's Actions.)</small></li>
 <li><strong>Tagged pigs not seen stay recorded and are listed on the receipt. Should a count report them missing on its own?</strong><small>Recommend: no. Missing is always a person's call.</small></li>
 <li><strong>A pig read here that the record places elsewhere moves here on Save?</strong><small>Recommend: yes. Her row and the receipt both show it.</small></li>
 <li><strong>A room count proves the room, not the pen?</strong><small>Recommend: yes. A pig in the wrong pen inside the room is fixed by counting that pen. A pig from another room joins the pen scanned just before her, and you can change it.</small></li>
@@ -61,7 +61,7 @@ strong{color:var(--ink)}
 <li><strong>Does the number start at the record, not empty?</strong><small>Recommend: start at the record. A count that matches is the common case.</small></li>
 <li><strong>Unknown tags are left out. Offer "give this tag to one of the untagged pigs" later?</strong><small>Recommend: later, with Assign identity.</small></li>
 <li><strong>A sow found in another farrowing crate: does her litter move with her?</strong><small>Recommend: yes. The crate's count checks the number.</small></li>
-<li><strong>No scheduled count task in v1, only <em>Last counted</em> on the unit card?</strong><small>Recommend: yes.</small></li>
+<li><strong>No scheduled counts and no reminders in v1?</strong><small>Recommend: yes.</small></li>
 </ol></div>
 <p style="margin-top:16px">Full proposal: <code>features/count/PRD.md</code>. It has 26 scenarios, the model, three options and the rulings it changes. Old-system screens are in <code>features/count/old-system/</code> and the blind pass is in <code>features/count/codex-blind-pass.md</code>.</p>
 </main></body></html>
