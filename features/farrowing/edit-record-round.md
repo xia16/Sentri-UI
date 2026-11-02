@@ -4,7 +4,32 @@
 
 The owner's words (2026-11-02): *"edit record right now is way too confusing … once farrow has finished we dont allow for changes here, users wouldnt be able to recall or right that pig was not crushed it was starved … for example born how would users know there are more or less born? … maybe this feature should just be removed, and let users adjust count [inside actions a generic one … with supporting evidence here like when pigs were moved in if fostering has happened]."*
 
-## Recommendation in one paragraph
+## Owner ruling, 2026-11-02, and the redo it asks for
+
+*"lets just agree that there is no more edit record for farrowing what you fill is in what you fill in. but we need a way something simpler if users fat finger a death or a born. and need to redo it after pressing save."* Count is a global feature, and its spec is a round of its own (`features/count/`, branch `claude/frosty-chatelet-85b362`). The rest of this file is the round as it was put to the owner. Where it differs from this ruling, the ruling stands.
+
+**The redo: Undo the last save.** After Save, the drawer's header corner, where *Clear* sits while a visit is unsaved, says **Undo**. Undo brings that visit back as the unsaved visit, exactly as it was: the born chip, the deaths with their causes, the photos. The record drops back to what it was before it. The worker fixes it with the keys they already use (− takes a born back; Death changes a death) and presses Save. The log keeps one line for the visit, marked **Corrected**, with what it was. No Edit screen, no stepper per cause, nothing new to learn: it is the visit they just saved, opened again.
+
+| | | |
+|---|---|---|
+| ![Fat finger](edit-record-round/undo-1-fat-finger.png) | ![Saved, Undo](edit-record-round/undo-2-saved.png) | ![Undone](edit-record-round/undo-3-reopened.png) |
+| **1. The fat finger.** Three taps for two piglets: `+3 born`. Save. | **2. Saved.** Alive 12, `✓ Saved`. The empty corner says **Undo**. | **3. Undo.** The visit is back: `Alive · Not saved yet`, 12 with `+3 born`, the corner is Clear again, the record reads 9 until Save. |
+| ![Fixed](edit-record-round/undo-4-fixed.png) | ![Log](edit-record-round/undo-5-log.png) | ![Litter details](edit-record-round/undo-6-litter.png) |
+| **4. Fixed.** − once: 11 with `+2 born`. Save. | **5. The log.** One line: `Corrected · +2 born alive · Was +3 born alive · 09:43 · G.H` (the Log's own corrected form). | **6. Litter details.** Edit record is gone; the figures and the log stay. |
+
+Rules (proposed):
+- **Only the last save** on this sow, and only for the worker who saved it. It goes once anything else is saved on her, by anyone, or she is finished. Someone on the next shift never sees Undo for a visit they didn't make, which is the owner's point about recall.
+- **A death is the same.** A saved `1 crushed` that was scours: Undo, open Death, change it, Save.
+- **Clear after Undo** withdraws the visit: the log keeps it as `Withdrawn · +3 born alive`, so nothing silently disappears.
+- **Finish is never undone.** After Finish the only saves are Record dead's, and the same Undo applies to the last one (Q R3).
+- **Gone:** Edit record (Litter details), Edit on the finished record's toolbar, Edit litter record in Actions, Correct born, Edit finish details. Screens `farrowing.edit`, `farrowing.edit-finished`, `farrowing.born` and `farrowing.leave-edit` retire, and a held-frame screen for "Saved · Undo" is added.
+
+Questions for the owner:
+- **R1.** Undo only for the worker who saved it? *Recommend yes.*
+- **R2.** Until the next save on her, or also a time limit (e.g. 30 minutes)? *Recommend until the next save, with no clock: simpler, and the next save closes it anyway.*
+- **R3.** The same Undo for the last Record dead after Finish? *Recommend yes.*
+
+## Recommendation in one paragraph (as put to the owner, before the ruling)
 
 **Fix while she farrows, count after she finishes.** Edit record stays only while she is farrowing, as the one correction screen it is today (Alive and the six causes). The worker is at the crate, the events are hours old, and a mistyped cause can honestly be fixed. Finish farrowing locks the record: Total born, the born-dead and died-after-birth causes, and the finish details. After Finish there is no Edit, no Correct born and no Edit finish details on the phone. A new generic action, **Count**, is added to the shared verb tiles in Actions. It works for any group of pigs: a litter after Finish, a pen, a group. The worker enters the number they counted, and the page shows what should be there and why: the last count, then the deaths and fosterings since. A difference is saved as **unaccounted**. It never changes Total born or a cause, and no reason is asked. When the count is lower, the page offers Record dead, so a body that is found gets its cause instead of an unaccounted loss. The existing *Reconcile piglet count* action becomes Count. Today it can raise the frozen Total born, which an existing ruling forbids.
 

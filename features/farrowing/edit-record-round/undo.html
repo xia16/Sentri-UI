@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Undo the last save</title>
+<style>
+:root{--bg:#f4f4ef;--card:#fff;--ink:#1d221e;--ink2:#4a524c;--muted:#6b736d;--line:#dfe2da}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161a17;--card:#1f2420;--ink:#eef0ea;--ink2:#c9cec6;--muted:#9aa29b;--line:#333a34}}
+:root[data-theme="dark"]{--bg:#161a17;--card:#1f2420;--ink:#eef0ea;--ink2:#c9cec6;--muted:#9aa29b;--line:#333a34}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Plus Jakarta Sans",system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:28px 16px 48px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+h1{font-size:26px;line-height:1.2;margin:6px 0 10px}
+h2{font-size:17px;margin:26px 0 10px}
+p{margin:0 0 10px;color:var(--ink2)} .lead{font-size:16px;color:var(--ink)}
+.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.shots figure{margin:0} .shots img{width:100%;border-radius:12px;border:1px solid var(--line);display:block}
+.shots figcaption{font-size:13px;color:var(--ink2);margin-top:6px;line-height:1.45}
+.shots b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+ul,ol{margin:0;padding-left:20px;color:var(--ink2)} li{margin:5px 0} li small{display:block;color:var(--muted);font-size:13px}
+@media (max-width:720px){.shots{grid-template-columns:repeat(2,1fr)}}
+</style></head>
+<body><main>
+<p class="eyebrow">Farrowing · no Edit record · the redo for a fat finger</p>
+<h1>Undo the last save</h1>
+<p class="lead">After Save, the drawer's top-right corner, where <b>Clear</b> sits while a visit is unsaved, says <b>Undo</b>. Undo opens the visit you just saved again, exactly as it was. You fix it with the same keys (− takes a born back, Death changes a death) and press Save. No Edit screen.</p>
+
+<div class="shots">
+<figure><img src="undo-1-fat-finger.png" alt="Three born alive taps, not saved yet"><figcaption><b>1. The fat finger.</b> Three taps for two piglets: +3 born. Save.</figcaption></figure>
+<figure><img src="undo-2-saved.png" alt="Saved, Undo in the corner"><figcaption><b>2. Saved.</b> Alive 12, ✓ Saved. The corner says <b>Undo</b>.</figcaption></figure>
+<figure><img src="undo-3-reopened.png" alt="The visit reopened as not saved yet"><figcaption><b>3. Undo.</b> The visit is back as “Not saved yet”, +3 born. The record reads 9 until you save again.</figcaption></figure>
+<figure><img src="undo-4-fixed.png" alt="Fixed to plus two"><figcaption><b>4. Fixed.</b> − once: 11, +2 born. Save.</figcaption></figure>
+<figure><img src="undo-5-log.png" alt="Log with a corrected line"><figcaption><b>5. The log.</b> One line, marked Corrected: “+2 born alive · Was +3 born alive”.</figcaption></figure>
+<figure><img src="undo-6-litter.png" alt="Litter details without Edit record"><figcaption><b>6. Litter details.</b> Edit record is gone; the figures and the log stay.</figcaption></figure>
+</div>
+
+<h2>The rules</h2>
+<div class="card"><ul>
+<li><b>Only the last save</b> on this sow, and only for the worker who saved it. It goes once anything else is saved on her or she is finished, so the next shift never undoes a visit they didn't make.</li>
+<li><b>A death works the same way.</b> “1 crushed” that was scours: Undo, open Death, change it, Save.</li>
+<li><b>Clear after Undo</b> withdraws the visit, and the log keeps it as “Withdrawn”. Nothing disappears silently.</li>
+<li><b>Finish is never undone.</b> Edit record, Edit on the finished record, Edit litter record in Actions, Correct born and Edit finish details all go.</li>
+</ul></div>
+
+<h2>Your calls</h2>
+<div class="card"><ol>
+<li>Undo only for the worker who saved it? <small>Recommend yes.</small></li>
+<li>Until the next save on her, or also a time limit (e.g. 30 minutes)? <small>Recommend no clock: the next save closes it.</small></li>
+<li>The same Undo for the last Record dead after Finish? <small>Recommend yes.</small></li>
+</ol></div>
+</main></body></html>
