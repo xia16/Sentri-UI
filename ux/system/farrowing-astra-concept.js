@@ -677,7 +677,9 @@ function taskClosure(r){
  const others=[[r.ended.length,n=>n===1?'1 sow died':n+' sows died'],[r.abortions.length,n=>n+' aborted'],[r.notInPig.length,n=>n+' not in pig'],[r.removed.length,n=>n+' removed earlier']].filter(([n])=>n).map(([n,say])=>say(n));
  const doneLine=!others.length?'All finished':!r.finished.length?others.join(' · '):others.join(' · ')+(others.length>1?' · rest finished':' · the rest finished');
  const row=(part,n,title,description,door='')=>SentriUI.row({title,description,icon:`<span class="task-closure-count">${n}</span>`,action:door?'room-task-list':'',value:door,trail:door?'chevron':'none',className:'task-closure-row',attrs:{'data-part':part}});
- const rows=(r.active.length?row('active',r.active.length,'Still farrowing',`Finish ${r.active.length===1?'her litter':'their litters'} to end the task`,'active'):'')+(r.awaiting.length?row('awaiting',r.awaiting.length,'Leave the batch','Not farrowed · removed at the end','awaiting'):'')+row('done',done,'Done',doneLine);
+ // Rows in the bar's order (owner, 2026-11-02). Leave the batch is waiting (an outline), but ending removes those sows: the amber "!" after its title.
+ const leave=r.awaiting.length?row('awaiting',r.awaiting.length,'Leave the batch','Not farrowed · removed at the end','awaiting').replace('</strong>',SentriUI.alertDot()+'</strong>'):'';
+ const rows=row('done',done,'Done',doneLine)+(r.active.length?row('active',r.active.length,'Still farrowing',`Finish ${r.active.length===1?'her litter':'their litters'} to end the task`,'active'):'')+leave;
  const title=r.blocked?'Before you can end':r.awaiting.length?'Ready to end early':'Ready to end';
  return `<section class="task-closure">${SentriUI.heading({title,meta:`${r.rows.length} sows`,kind:'section',level:4})}<div class="task-closure-surface st-panel">${AstraTaskOverview.statusProgress({farrowed:done,active:r.active.length,awaiting:r.awaiting.length},false,['done','active','awaiting'])}<div class="st-row-group">${rows}</div></div></section>`;
 }
