@@ -123,14 +123,14 @@ for (const [name, fewer] of [['mock-3-count-pen.png', true], ['mock-3b-count-pen
     const notAdded = fewer ? ['000803'] : [];
     // Every pig added is a ticked row; untick one read by mistake (a pig in the next pen through the bars) and it leaves the count.
     const kept = added.filter((a) => !a[3]);
-    const tagged = kept.length + notAdded.length, untagged = all - tagged, expected = 13, diff = untagged - expected;
+    const tagged = kept.length, untagged = all - tagged, expected = 16 + (fewer ? 2 : 0), diff = all - expected;
     const row = ([id, ctx, away, off]) => U.rowSelectDoor({ code: id, description: ctx, contextWidth: '240px', right: { kind: 'tags', tags: [] }, checked: !off, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig' + (off ? '' : ' selected') + (away ? ' m-away' : ''), label: id });
     const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs in D4', value: all, min: kept.length, max: 80, action: 'x', reserveHint: false }) + '</section>';
     const search = U.choiceSearch({ label: 'Search ear tag', placeholder: 'Ear tag', value: '', clear: { action: 'x' }, scan: { action: 'x', label: 'Scan ear tags' } });
     const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Ear tags · ' + kept.length, icon: ic('tag'), kind: 'section', level: 3 })
       + '<div class="m-inline-bar">' + search + '</div>'
       + U.rowGroup(added.map(row).join(''))
-      + (notAdded.length ? '<p class="m-hint">Recorded here, not added yet: <b>' + notAdded.join(', ') + '</b></p>' : '')
+      + (notAdded.length ? '<p class="m-hint">Recorded here, not scanned yet: <b>' + notAdded.join(', ') + '</b></p>' : '')
       + (fewer ? '<p class="m-hint">000802 added twice · counted once.</p>' : '') + '</section>';
     const line = (title, description, figure, strong) => U.row({ title, description, trailing: figure, className: strong ? 'm-total' : '' });
     const evidence = U.heading({ title: 'Since the last count', icon: ic('record'), kind: 'section', level: 3 })
@@ -138,61 +138,43 @@ for (const [name, fewer] of [['mock-3-count-pen.png', true], ['mock-3b-count-pen
         + line('Moved to D6', 'Oct 30 · 14:20 · M.L', '−3')
         + line('Died', 'Yesterday · 07:05 · G.H', '−1')
         + line('Should be here now', '3 with ear tags · 13 without', '16', true), { className: 'm-evidence' });
-    const left = '<div class="m-left"><strong>' + untagged + ' without ear tags</strong><small>' + (diff === 0 ? 'Matches the record' : Math.abs(diff) + ' unaccounted') + '</small></div>';
-    page('Count pigs', 'Pen D4 · Unit 7', count + tags + `<section class="feature-section">${evidence}</section>`, footer(left, primary('Save count')));
+    const left = '<div class="m-left"><strong>' + untagged + ' without ear tags</strong><small>' + (diff === 0 ? 'Matches the record' : Math.abs(diff) + ' not accounted for') + '</small></div>';
+    page('Count pigs', 'Pen D4 · Unit 7', count + tags + `<section class="feature-section">${evidence}</section>`, footer(left, primary('Review count')));
   }, { fewer });
   await shoot(p, name);
 }
 
-// 5a. Save count with a tagged pig recorded here but not added: a short drawer settles her on the spot, before anything is saved.
-if (want('5a')) {
-  const p = await open(INSPECT, 'inspection.walk');
-  await prep(p);
-  await p.evaluate(() => {
-    const { U, ic, page, footer, primary } = window.M;
-    // The count page behind it, as the worker left it.
-    page('Count pigs', 'Pen D4 · Unit 7', '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs in D4', value: 16, min: 4, max: 80, action: 'x', reserveHint: false }) + '</section>'
-      + '<section class="feature-section">' + U.heading({ title: 'Ear tags · 4', icon: ic('tag'), kind: 'section', level: 3 }) + '</section>',
-      footer('<div class="m-left"><strong>11 without ear tags</strong><small>2 unaccounted</small></div>', primary('Save count')));
-    const pig = U.rowGroup(U.row({ code: '000803', description: 'Grower · 63d' }));
-    const choice = U.choiceRadios({ label: 'Where is she?', labelHidden: true, action: 'x', selected: 'here', options: [
-      { value: 'here', label: 'Here · add her' },
-      { value: 'missing', label: 'Not here · report her missing' },
-      { value: 'later', label: 'Not sure · leave her in D4' }] });
-    const sheet = U.sheet({ variant: 'drawer', title: '1 pig not added', line: 'Recorded in D4, not scanned or typed', body: pig + choice, footer: '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save count', register: 'primary', action: 'x' }) + '</div>', className: 'm-count m-receipt', label: '1 pig not added' });
-    const phone = document.querySelector('.phone');
-    phone.firstElementChild.setAttribute('inert', '');
-    phone.insertAdjacentHTML('beforeend', '<div class="m-scrim"></div>' + sheet.replace('m-count m-receipt', 'm-receipt'));
-    const st = document.createElement('style');
-    st.textContent = `.m-scrim{position:absolute;inset:0;background:rgba(20,24,21,.38);z-index:10}.phone>.sheet.m-receipt{position:absolute;left:0;right:0;bottom:0;top:auto;z-index:20!important;filter:none!important;opacity:1!important}
-      .m-receipt .st-row-group{margin-bottom:16px}`;
-    document.head.append(st);
-  });
-  await shoot(p, 'mock-5a-not-added.png');
-}
-
-// 5. Count saved: a full page that says plainly what the count did. What is in the pen now; the pigs moved here, by name, from where;
-//    the pigs unaccounted for and what happens to them (the batch's balancing sheet). Nothing left to decide: that was done before saving.
+// 5. Review count (owner, 2026-11-02): a full page before saving that says plainly what the count will do. No popup: a tagged pig
+//    recorded here and not scanned is simply not accounted for, beside the untagged ones. Both go on the batch's balancing sheet, where
+//    a count of the pen they went to (or a death, or a move) balances them: the usual reason is pigs already moved and not yet updated,
+//    or piglets moved around between pens. Record: 000801, 000802, 000803 + 13 without = 16; 000512 and 000733 scanned here; 16 counted.
 if (want('5-')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
   await p.evaluate(() => {
-    const { U, ic, page, footer, primary } = window.M;
-    const now = '<section class="feature-section">' + U.heading({ title: 'In D4 now', icon: ic('details'), kind: 'section', level: 3 })
-      + U.facts([{ label: 'Pigs', value: '16' }, { label: 'With ear tags', value: '5' }, { label: 'Without', value: '11' }], { columns: 3 }) + '</section>';
+    const { U, ic, page } = window.M;
+    const now = '<section class="feature-section">' + U.heading({ title: 'In D4 after this count', icon: ic('details'), kind: 'section', level: 3 })
+      + U.facts([{ label: 'Pigs', value: '16' }, { label: 'With ear tags', value: '4' }, { label: 'Without', value: '12' }], { columns: 3 }) + '</section>';
     const moved = '<section class="feature-section">' + U.heading({ title: '2 pigs moved here', icon: ic('transfer'), kind: 'section', level: 3 })
       + U.rowGroup(U.row({ code: '000512', description: 'From Unit 9 · C3', trailing: 'C3 → D4', className: 'm-line' })
         + U.row({ code: '000733', description: 'From D2', trailing: 'D2 → D4', className: 'm-line' })) + '</section>';
-    const lost = '<section class="feature-section">' + U.heading({ title: '2 pigs unaccounted for', icon: ic('alert'), kind: 'section', level: 3 })
-      + U.rowGroup(U.row({ icon: ic('tag-off'), title: 'Without ear tags', description: 'Should be 13, now 11', trailing: '13 → 11', className: 'm-line' }))
-      + '<p class="m-hint m-explain">They go on batch 25\'s balancing sheet. A later count, a death or a move can balance them. Still open when batch 25 ends, they are recorded as an unaccounted loss.</p></section>';
-    page('D4 counted', 'Pen D4 · 09:30 · L.M', now + moved + lost, '<div class="sheet-footer" data-ds="Sheet">' + primary('Done') + '</div>');
+    const lost = '<section class="feature-section">' + U.heading({ title: '2 pigs not accounted for', icon: ic('alert'), kind: 'section', level: 3 })
+      + U.rowGroup(U.row({ code: '000803', description: 'Recorded in D4, not scanned', trailing: '−1', className: 'm-line' })
+        + U.row({ icon: ic('tag-off'), title: 'Without ear tags', description: 'Should be 13, now 12', trailing: '−1', className: 'm-line' }))
+      + '<p class="m-hint m-explain">They go on batch 25\'s balancing sheet. Counting the pen they went to balances them, as does a death or a move. Still open when batch 25 ends, they are an unaccounted loss.</p></section>';
+    const sheet = '<section class="feature-section">' + U.heading({ title: 'Batch 25 balancing sheet', icon: ic('record'), kind: 'section', level: 3 })
+      + U.rowGroup(U.row({ code: 'D5', description: 'Counted today · 09:10', trailing: '+1', className: 'm-line' })
+        + U.row({ code: 'D4', description: 'This count', trailing: '−2', className: 'm-line' })
+        + U.row({ title: 'Open', description: '1 pig not accounted for', trailing: '−1', className: 'm-line m-total' })) + '</section>';
+    page('Review count', 'Pen D4 · 16 pigs counted', now + moved + lost + sheet, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save count', register: 'primary', action: 'x' }) + '</div>');
     const st = document.createElement('style');
     st.textContent = `.m-count .m-line .st-row-trailing{font:600 17px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f);white-space:nowrap}
       .m-count .m-explain{font-size:13px;line-height:1.5;margin-top:10px;color:var(--ink,#20291f)}`;
     document.head.append(st);
   });
-  await shoot(p, 'mock-5-result.png');
+  await p.waitForTimeout(400); await p.screenshot({ path: path.join(out, 'mock-5-result.png') });
+  await p.evaluate(() => { const s = document.querySelector('.phone .sheet-body'); if (s) s.scrollTop = 600; });
+  await shoot(p, 'mock-5b-result-scrolled.png');
 }
 
 // 6. The pen log: one line per count, the figures it saw; history is never rewritten.
