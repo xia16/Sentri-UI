@@ -1445,7 +1445,8 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .litter-doors{margin-top:16px}
 /* Farrowing End task (owner pick, 2026-11-02): the closure card. The task's sows as one bar, a row per part under it; each row's count sits in
    its part's colour, the pen map's fills (farrowing = progress-fill, needs you = amber-fill, done = current-marker), so the rows key the bar. */
-.farrowing-phone .task-end-sheet .sheet-body{gap:var(--space-24)}
+.farrowing-phone .task-end-sheet:not(.task-receipt-sheet) .sheet-body{gap:var(--space-24)}
+.farrowing-phone .task-end-sheet .sheet-body>*{flex-shrink:0}
 .farrowing-phone .task-closure-surface.st-panel{padding:0;overflow:hidden}
 .farrowing-phone .task-closure-surface>.task-status-bar{width:auto;height:10px;margin:var(--space-16) 15px 10px}
 .farrowing-phone .task-closure-surface>.st-row-group{border-top:1px solid var(--line)}
@@ -1455,7 +1456,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .task-closure-row.st-row .st-row-icon{background:var(--current-marker);color:var(--paper)}
 .farrowing-phone .task-closure-row.st-row[data-part="active"] .st-row-icon{background:var(--progress-fill);color:var(--progress-fill-ink)}
 .farrowing-phone .task-closure-row.st-row[data-part="awaiting"] .st-row-icon{background:var(--amber-fill);color:var(--amber-fill-ink)}
-.farrowing-phone .task-closure-count{font:600 16px/1 var(--font-mono)}
+.farrowing-phone .task-closure-count{font:600 15px/1 var(--font-mono)}
 /* Performance metrics (overview, End task, receipt): two measures, where the piglets born went, per-litter facts. The split bar is neutral
    (ink-2 · log-dot · handle) so it never reads as the status bar; each part is named in its row, never by colour alone. */
 .farrowing-phone .task-perf-card.st-panel{padding:22px 18px}
