@@ -317,7 +317,11 @@ const defaultRoomFilter=()=>({from:-7,to:7,pmin:0,pmax:6});
 // Parity is a range like the due days (owner, 2026-11-02): 0 to 6+, the top end open.
 const parityDay=n=>n===6?'6+':String(n);
 const paritySlider=(d,key,counts)=>SentriUI.rangeSlider({counts,min:0,max:6,value:[d.pmin,d.pmax],title:'Parity',icon:icon('profile'),key,names:['pmin','pmax'],labels:['Lowest parity','Highest parity'],format:parityDay,summary:(a,b)=>parityRangeLabel({pmin:a,pmax:b}),ends:['0','3','6+']});
-const dueSlider=(d,key,counts)=>SentriUI.rangeSlider({counts,min:-7,max:7,value:[d.from,d.to],title:'Expected farrowing',icon:icon('calendar'),key,labels:['Earliest expected farrowing','Latest expected farrowing'],format:dueDay,summary:(from,to)=>dueRangeLabel({from,to}),ends:['7+ days ago','Today','In 7+ days']});
+// The chosen span on the title row, short (owner, 2026-11-02: too much text): days from today as numbers against the rail's words.
+// "−2 to +1 days", "+3 days", "Today"; an open end keeps its +: "−7+ to −3 days".
+const dueNum=n=>n===0?"0":(n>0?"+":"−")+Math.abs(n)+(Math.abs(n)===7?"+":"");
+const dueSpan=(a,b)=>a===b?(a===0?"Today":dueNum(a)+(Math.abs(a)===1?" day":" days")):dueNum(a)+" to "+dueNum(b)+" days";
+const dueSlider=(d,key,counts)=>SentriUI.rangeSlider({counts,min:-7,max:7,value:[d.from,d.to],title:'Expected farrowing',icon:icon('calendar'),key,labels:['Earliest expected farrowing','Latest expected farrowing'],format:dueDay,summary:dueSpan,ends:['7+ days ago','Today','In 7+ days']});
 const dueDay=n=>n===-7?'7+ days ago':n===7?'In 7+ days':n===0?'Today':n===-1?'Yesterday':n===1?'Tomorrow':n<0?(-n)+' days ago':'In '+n+' days';
 function dueRangeLabel(f){return f.from===-7&&f.to===7?'Any time':f.from===f.to?dueDay(f.from):dueDay(f.from)+' – '+dueDay(f.to);}
 // The two ranges of Filter sows, over the sows the sheet narrows (owner, 2026-11-02): the scale never shrinks to the data (0 to 6+,
