@@ -140,45 +140,29 @@ for (const [name, fewer] of [['mock-3-count-pen.png', true], ['mock-3b-count-pen
   await shoot(p, name);
 }
 
-// 5. Count saved (one pen whose count touched others): this pen first, as one figure and what made it; then every other pen the
-//    count changed, as tiles, each with the pigs that left it; then only the pigs that need a person. Read at a glance, no sentences.
+// 5. Count saved: one list, one line per thing that changed, each read as before → after, the way it would go on paper.
+//    Pigs that moved show where from and to; the pigs without ear tags show their figure; what needs a person comes last, apart.
 if (want('5-')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
   await p.evaluate(() => {
     const { U, ic } = window.M;
-    const hero = '<div class="m-hero"><div class="m-hero-pen"><strong>D4</strong><span class="m-hero-n">16</span><small>pigs</small></div>'
-      + '<div class="m-hero-parts"><span><b>5</b> with ear tags</span><span><b>11</b> without</span></div></div>';
-    const chip = (mark, word, kind) => `<div class="m-chip" data-kind="${kind}"><span class="m-mark">${mark}</span><small>${word}</small></div>`;
-    const here = '<div class="m-chips">' + chip('+2', 'moved in', 'info') + chip('−2', 'unaccounted', 'info') + '</div>';
-    const tile = (code, mark, pigs) => `<div class="m-tile" data-kind="info"><strong>${code}</strong><span class="m-mark">${mark}</span><small>${pigs}</small></div>`;
-    const others = U.heading({ title: 'Other pens', icon: ic('transfer'), kind: 'section', level: 3 })
-      + '<div class="m-tiles">' + tile('Unit 9 · C3', '−1', '000512') + tile('D2', '−1', '000733') + '</div>';
-    const notSeen = U.heading({ title: 'Not seen', icon: ic('alert'), kind: 'section', level: 3 })
-      + U.rowGroup(U.row({ variant: 'navigation', code: '000803', title: 'Stays in D4', trail: 'chevron', action: 'x' }));
-    const sheet = U.sheet({ variant: 'drawer', title: 'Count saved', line: 'Pen D4 · 09:30 · L.M', body: hero + here + others + notSeen, footer: '<div class="sheet-footer" data-ds="Sheet">' + U.button({ label: 'Done', register: 'primary', action: 'x' }) + '</div>', className: 'm-count m-receipt', label: 'Count saved' });
+    const moved = (id, from) => U.row({ code: id, description: 'Moved here', trailing: from + ' → D4', className: 'm-line' });
+    const changed = U.rowGroup(
+      moved('000512', 'C3')
+      + moved('000733', 'D2')
+      + U.row({ icon: ic('tag-off'), title: 'Without ear tags', description: '2 unaccounted', trailing: '13 → 11', className: 'm-line' }));
+    const check = U.heading({ title: 'To check', icon: ic('alert'), kind: 'section', level: 3 })
+      + U.rowGroup(U.row({ variant: 'navigation', code: '000803', description: 'Not seen · still recorded in D4', trail: 'chevron', action: 'x', className: 'm-check' }));
+    const sheet = U.sheet({ variant: 'drawer', title: 'D4 counted · 16 pigs', line: '09:30 · L.M', body: changed + check, footer: '<div class="sheet-footer" data-ds="Sheet">' + U.button({ label: 'Done', register: 'primary', action: 'x' }) + '</div>', className: 'm-count m-receipt', label: 'Count saved' });
     const phone = document.querySelector('.phone');
     (phone.querySelector('.inspect-main') || phone.firstElementChild).setAttribute('inert', '');
     phone.insertAdjacentHTML('beforeend', '<div class="m-scrim"></div>' + sheet);
     const st = document.createElement('style');
     st.textContent = `.m-scrim{position:absolute;inset:0;background:rgba(20,24,21,.38);z-index:5}.phone>.sheet.m-receipt{position:absolute;left:0;right:0;bottom:0;z-index:6}
-      .m-hero{display:flex;align-items:center;gap:16px;padding:14px 16px;border:1px solid var(--line,#dfe4d8);border-radius:18px;background:var(--paper,#fff);margin:4px 0 8px}
-      .m-hero-pen{display:flex;align-items:baseline;gap:8px}
-      .m-hero-pen strong{font:600 15px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}
-      .m-hero-n{font:600 40px/1 var(--font-mono,'IBM Plex Mono',monospace);letter-spacing:-1px;color:var(--ink,#20291f)}
-      .m-hero-pen small{font-size:13px;color:var(--muted,#657060)}
-      .m-hero-parts{margin-left:auto;display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--muted,#657060);text-align:right}
-      .m-hero-parts b{font:600 15px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}
-      .m-chips{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:6px}
-      .m-chip,.m-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:72px;border-radius:12px;background:var(--amber-fill,#fede82);color:var(--amber-fill-ink,#5c3f00)}
-      .m-chip .m-mark,.m-tile .m-mark{font:700 22px/1.2 var(--font-mono,'IBM Plex Mono',monospace)}
-      .m-chip small,.m-tile small{font-size:13px}
-      .m-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:6px}
-      .m-tile{min-height:88px}
-      .m-chip[data-kind=info],.m-tile[data-kind=info]{background:var(--paper,#fff);border:1px solid var(--line,#dfe4d8);color:var(--ink,#20291f)}
-      .m-tile[data-kind=info] small,.m-chip[data-kind=info] small{color:var(--muted,#657060)}
-      .m-tile strong{font:600 14px/1.2 var(--font-mono,'IBM Plex Mono',monospace)}
-      .m-tile small{font-family:var(--font-mono,'IBM Plex Mono',monospace)}`;
+      .m-receipt .st-row-group{margin-bottom:8px}
+      .m-receipt .m-line .st-row-trailing{font:600 17px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f);white-space:nowrap}
+      .m-receipt .m-check .st-row-copy small{color:var(--amber,#896017)}`;
     document.head.append(st);
   });
   await shoot(p, 'mock-5-result.png');
