@@ -1327,14 +1327,61 @@
   const PEN_LEVELS=['act','live','plain','hidden'],PEN_HOLD_MS=350,PEN_SLOP=12,PEN_GAP=8,penPeeks=new Map();
   let penHold=null,penSwallow=false;
   const penLabels=o=>Object.assign({map:'Pens',act:'needs you',live:'farrowing',plain:'has sows',empty:'empty',hidden:'no sows match',pen:c=>'Pen '+c},o);
-  function penMap({lanes=['A','B','C','D'],depth=6,pens={},current='',action='pen',key='pen-map',rangeSize=20,entrance='Entrance',labels={},peek=null,className=''}={}){
-    const L=penLabels(labels),rows=Array.from({length:Math.max(1,depth|0)},(_,i)=>i+1);
+  function penMap({lanes=['A','B','C','D'],depth=6,across=[],apart=[],aSide='left',entranceAt='middle',backDoor=null,pens={},current='',action='pen',key='pen-map',rangeSize=20,entrance='Entrance',labels={},peek=null,className=''}={}){
+    const L=penLabels(labels);
     if(typeof peek==='function')penPeeks.set(key,peek);else penPeeks.delete(key);
     const level=c=>PEN_LEVELS.includes(pens[c])?pens[c]:'empty';
-    const tile=c=>{const l=level(c),off=l==='empty'||l==='hidden';
-      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc(L.pen(c)+', '+L[l])}">${esc(c)}</button>`;};
-    const grid=`<div class="st-pen-grid" style="--pm-lanes:${lanes.length}"><span class="st-pen-col st-pen-row" aria-hidden="true"></span>${lanes.map(c=>`<span class="st-pen-col" aria-hidden="true">${esc(c)}</span>`).join('')}${rows.map(n=>`<span class="st-pen-row" data-row="${n}" aria-hidden="true">${n}</span>${lanes.map(c=>tile(c+n)).join('')}`).join('')}</div>`;
-    return `<div class="st-pen-map${className?' '+esc(className):''}" data-ds="PenMap" data-key="${esc(key)}"${current?` data-current="${esc(current)}"`:''}${rows.length>99?' data-wide':''}><div class="st-pen-entrance">${sGlyph('arrow-down')}<span>${esc(entrance)}</span></div><div class="st-pen-field"><div class="st-pen-scroll" role="group" aria-label="${esc(L.map)}">${grid}</div><div class="st-pen-peek" hidden></div></div></div>`;
+    const tile=(c,at='')=>{const l=level(c),off=l==='empty'||l==='hidden';
+      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${at}${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc(L.pen(c)+', '+L[l])}">${esc(c)}</button>`;};
+    const band=(cls,text,at,extra='')=>`<div class="${cls}"${at==='left'||at==='right'?` data-at="${at}"`:''}${extra}>${sGlyph('arrow-down')}<span>${esc(text)}</span></div>`;
+    let grid,tall;
+    if(lanes.every(l=>typeof l==='string')&&!across.length&&!apart.length&&aSide!=='right'&&!backDoor){
+      const rows=Array.from({length:Math.max(1,depth|0)},(_,i)=>i+1);tall=rows.length>99;
+      grid=`<div class="st-pen-grid" style="--pm-lanes:${lanes.length}"><span class="st-pen-col st-pen-row" aria-hidden="true"></span>${lanes.map(c=>`<span class="st-pen-col" aria-hidden="true">${esc(c)}</span>`).join('')}${rows.map(n=>`<span class="st-pen-row" data-row="${n}" aria-hidden="true">${n}</span>${lanes.map(c=>tile(c+n)).join('')}`).join('')}</div>`;
+    }else({tall,html:grid}=penPlaced({lanes,depth,across,apart,aSide,backDoor,tile,band}));
+    return `<div class="st-pen-map${className?' '+esc(className):''}" data-ds="PenMap" data-key="${esc(key)}"${current?` data-current="${esc(current)}"`:''}${tall?' data-wide':''}>${band('st-pen-entrance',entrance,entranceAt)}<div class="st-pen-field"><div class="st-pen-scroll" role="group" aria-label="${esc(L.map)}">${grid}</div><div class="st-pen-peek" hidden></div></div></div>`;
+  }
+  /* A room as the farm layout describes it (2026-11-02): lanes of different lengths, lanes made of runs of different pen
+     types, pens across several lanes at the far end, pens on their own, lane A on the right, a back door. Rows stay pen
+     numbers, so lane A's pen 11 and lane B's pen 11 share a row; sizes are never drawn to scale and a drawn shape is a tile.
+     A lane stops where its pens stop. Where the pen type changes along a lane, its column names the new type in one quiet
+     line over the run (and over every first run, when the room has more than one type); neighbours with the same name share
+     the line. A pen across lanes takes the row after the longer of its lanes; a pen on its own takes a column of its own
+     beyond the last lane, at its row (or at the end). */
+  function penPlaced({lanes,depth,across,apart,aSide,backDoor,tile,band}){
+    const letterOf=i=>String.fromCharCode(65+i),laneOf=code=>String(code).replace(/\d+$/,'');
+    const ls=lanes.map((l,i)=>typeof l==='string'?{letter:l,runs:[{n:depth}]}:{letter:l.letter||letterOf(i),runs:l.runs&&l.runs.length?l.runs:[{n:l.n||depth}]});
+    const cells={},put=(c,n,v)=>{(cells[c]||(cells[c]={}))[n]=v;},top=()=>Math.max(0,...Object.values(cells).flatMap(o=>Object.keys(o).map(Number)));
+    for(const l of ls){let n=0;for(const r of l.runs)for(let j=0;j<(r.n|0);j++){n++;put(l.letter,n,{code:l.letter+n,type:r.type||''});}l.len=n;}
+    const order=[...ls.map(l=>l.letter),...apart.map(p=>laneOf(p.code))];
+    if(aSide==='right')order.reverse();
+    const col=c=>order.indexOf(c)+2,depthN=Math.max(0,...ls.map(l=>l.len));
+    for(const p of across){
+      const cs=(p.lanes||[]).filter(c=>ls.some(l=>l.letter===c)).sort((a,b)=>col(a)-col(b));if(!cs.length)continue;
+      const n=Math.max(...cs.map(c=>ls.find(l=>l.letter===c).len))+1;
+      cs.forEach((c,i)=>put(c,n,i?{under:true}:{code:p.code,type:p.type||'',span:col(cs[cs.length-1])-col(c)+1}));
+    }
+    const end=top();
+    for(const p of apart)put(laneOf(p.code),p.row>0?p.row|0:end>depthN?end:depthN+1,{code:p.code,apart:true});
+    const rowsN=Math.max(1,top()),laneCols=order.filter(c=>ls.some(l=>l.letter===c));
+    const named=new Set(laneCols.flatMap(c=>Object.values(cells[c]).filter(v=>!v.under).map(v=>v.type))).size>1;
+    const at=(row,c,span)=>` style="grid-area:${row}/${c}${span>1?`/span 1/span ${span}`:''}"`;
+    let r=1,out=`<span class="st-pen-col st-pen-row" aria-hidden="true"></span>${order.map(c=>`<span class="st-pen-col" style="grid-area:1/${col(c)}" aria-hidden="true">${esc(c)}</span>`).join('')}`;
+    for(let n=1;n<=rowsN;n++){
+      /* a run starts here in a column: it is named, unless the column only carries on */
+      const heads=named?laneCols.map(c=>{const v=cells[c][n],u=cells[c][n-1];return v&&!v.under&&v.type&&(!u||u.under||u.type!==v.type)?{c,type:v.type,span:v.span||1}:null;}).filter(Boolean):[];
+      if(heads.length){
+        r++;out+=`<span class="st-pen-row" style="grid-row:${r}" data-before="${n}" aria-hidden="true"></span>`;
+        for(let i=0;i<heads.length;i++){const h=heads[i];let span=h.span;
+          while(heads[i+1]&&heads[i+1].type===h.type&&col(heads[i+1].c)===col(h.c)+span){span+=heads[i+1].span;i++;}
+          out+=`<span class="st-pen-run"${at(r,col(h.c),span)}>${esc(h.type)}</span>`;}
+      }
+      r++;const numbered=ls.some(l=>l.len>=n);
+      out+=`<span class="st-pen-row" style="grid-row:${r}"${numbered?` data-row="${n}"`:''} aria-hidden="true">${numbered?n:''}</span>`;
+      for(const c of order){const v=cells[c]&&cells[c][n];if(v&&v.code)out+=tile(v.code,at(r,col(c),v.span||1));}
+    }
+    if(backDoor){const b=typeof backDoor==='string'?{label:backDoor}:backDoor;r++;out+=band('st-pen-exit',b.label||'Back door',b.at,` style="grid-area:${r}/1/span 1/span ${order.length+1}"`);}
+    return {tall:depthN>99,html:`<div class="st-pen-grid" data-placed style="--pm-lanes:${order.length}">${out}</div>`};
   }
   /* penMapKey({ pens, words:{ act, live } }): the items of the sheet's key line: sheet({ line:{ key: penMapKey(...) } }). */
   function penMapKey({pens={},words={}}={}){
@@ -1405,7 +1452,8 @@
     document.addEventListener('click',e=>{
       const b=e.target.closest&&e.target.closest('.st-pen-ranges button');
       if(b){
-        const map=penSheet(b).querySelector('.st-pen-scroll'),l=map&&map.querySelector(`.st-pen-row[data-row="${b.dataset.from}"]`);
+        /* a range that starts a run lands on the run's name */
+        const map=penSheet(b).querySelector('.st-pen-scroll'),l=map&&(map.querySelector(`.st-pen-row[data-before="${b.dataset.from}"]`)||map.querySelector(`.st-pen-row[data-row="${b.dataset.from}"]`));
         if(l)map.scrollTop+=l.getBoundingClientRect().top-penHead(map).getBoundingClientRect().bottom-PEN_GAP;
         return;
       }

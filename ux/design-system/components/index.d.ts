@@ -805,11 +805,23 @@ export interface SentriUI { rangeSlider(props?:RangeSliderProps):string; filterS
 /** A pen's status on the map. act: needs the worker. live: farrowing. plain: has sows the list shows. hidden: has sows the current tab or filter hides. A pen missing from pens is empty. */
 export type PenLevel = 'act' | 'live' | 'plain' | 'hidden';
 export interface PenMapLabels { map?: string; act?: string; live?: string; plain?: string; empty?: string; hidden?: string; pen?: (code: string) => string }
+/** A lane of the room as the farm layout describes it: runs of one pen type each, in order from the main door. */
+export interface PenMapLane { letter?: string; n?: number; runs?: Array<{ n: number; type?: string }> }
 export interface PenMapProps {
-  /** Column letters, in order. */
-  lanes?: string[];
-  /** Rows (pens per lane). Pen codes are the lane then the row: B3, A120. */
+  /** Column letters, in order (every lane `depth` pens), or the lanes with their runs (lanes of any length, runs of pen types). */
+  lanes?: Array<string | PenMapLane>;
+  /** Rows (pens per lane) for letter lanes. Pen codes are the lane then the row: B3, A120. */
   depth?: number;
+  /** Pens across several lanes, in the row after the longer of those lanes (an end pen across A and B: C1). */
+  across?: Array<{ code: string; lanes: string[]; type?: string }>;
+  /** Pens on their own (drawn, any shape): a column each beyond the last lane, at `row` or at the end. */
+  apart?: Array<{ code: string; row?: number }>;
+  /** Which side lane A is on as you walk in at the main door (default left). */
+  aSide?: 'left' | 'right';
+  /** Where the main door is across the top of the room (default middle). */
+  entranceAt?: 'left' | 'middle' | 'right';
+  /** A door at the far end of the lanes: the band that ends the map. */
+  backDoor?: string | { label?: string; at?: 'left' | 'middle' | 'right' } | null;
   pens?: Record<string, PenLevel>;
   /** The pen the map opens centred on. */
   current?: string;

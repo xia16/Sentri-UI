@@ -1112,6 +1112,13 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-pen-map[data-wide]{--pm-label:calc(var(--size-24) + var(--space-6))}
 .st-pen-entrance{flex:none;display:flex;align-items:center;justify-content:center;gap:var(--space-8);min-height:calc(var(--size-34) + var(--size-2));margin:0 0 var(--space-10);border-radius:var(--radius-segment);background:var(--well);color:var(--ink);font:var(--type-weight-semibold) var(--type-meta-size) var(--font-sans)}
 .st-pen-entrance svg{width:var(--size-16);height:var(--size-16);stroke-width:var(--icon-pad-stroke)}
+/* the main door's place across the top of the room when it is not in the middle; a back door ends the map */
+.st-pen-entrance[data-at=left],.st-pen-exit[data-at=left]{justify-content:flex-start;padding-left:var(--space-16)}
+.st-pen-entrance[data-at=right],.st-pen-exit[data-at=right]{justify-content:flex-end;padding-right:var(--space-16)}
+.st-pen-exit{display:flex;align-items:center;justify-content:center;gap:var(--space-8);min-height:calc(var(--size-34) + var(--size-2));border-radius:var(--radius-segment);background:var(--well);color:var(--ink);font:var(--type-weight-semibold) var(--type-meta-size) var(--font-sans)}
+.st-pen-exit svg{width:var(--size-16);height:var(--size-16);stroke-width:var(--icon-pad-stroke);transform:rotate(180deg)}
+/* a run of another pen type along a lane: its name, one quiet line over its first pen */
+.st-pen-run{display:flex;align-items:flex-end;min-width:0;padding:var(--space-8) 0 0;color:var(--muted);font:var(--type-weight-semibold) var(--type-meta-size)/1.25 var(--font-sans);overflow-wrap:anywhere}
 .st-pen-field{position:relative;display:flex;flex:0 1 auto;min-height:0}
 .st-pen-scroll{scroll-snap-type:both proximity;scroll-padding:calc(var(--pm-head) + var(--pm-gap)) 0 0 calc(var(--pm-label) + var(--pm-gap));position:relative;flex:1 1 auto;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:none;border-radius:var(--radius-control);-webkit-overflow-scrolling:touch}
 .st-pen-scroll::-webkit-scrollbar{display:none;width:0;height:0}

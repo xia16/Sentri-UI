@@ -14,6 +14,14 @@
 <div class="ph" data-state="Long row · 2 × 100, the wider number column" data-demo="b100"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Long row · 2 × 160, eight ranges" data-demo="b160"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Sideways scroll · 8 × 20, opens on E3" data-demo="b8"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Lanes of different lengths · A 6, B 6, C 4, D 2" data-demo="lengths"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Mixed lane · 10 group pens, then 12 stalls" data-demo="mixed"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Mixed lanes · 3 gilt pens, a stall, a gilt pen" data-demo="mixed2"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Across lanes · C1 across A and B at the far end" data-demo="across"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Drawn pens · the sketch room" data-demo="sketch"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Doors · the main door on the left, a back door" data-demo="doors"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Lane A on the right as you walk in" data-demo="mirror"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Long lane · 2 × 50 stalls" data-demo="stalls50"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Chinese · Unit 7" data-demo="zh7"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Chinese · 2 × 100" data-demo="zh100"><div class="bg"></div><div class="over"></div></div>
 <script>
@@ -28,7 +36,16 @@ const BARNS={
  b60:{lanes:L(2),depth:60,pens:{A2:'live',B3:'act',B4:'plain',B5:'plain',A5:'plain',B6:'act',A22:'plain',B45:'act'},current:'B4'},
  b100:{lanes:L(2),depth:100,pens:{A3:'plain',A4:'plain',B4:'plain',B5:'live',A6:'act',A37:'plain',B82:'act'},current:'A4'},
  b160:{lanes:L(2),depth:160,pens:{A2:'plain',B2:'plain',A5:'act',B5:'live',B9:'plain',A90:'act',B133:'act',B159:'live'},current:'A5'},
- b8:{lanes:L(8),depth:20,pens:{B4:'live',G3:'act',C3:'plain',D3:'plain',H2:'plain',F9:'plain',G11:'live'},current:'E3'}
+ b8:{lanes:L(8),depth:20,pens:{B4:'live',G3:'act',C3:'plain',D3:'plain',H2:'plain',F9:'plain',G11:'live'},current:'E3'},
+ /* rooms the farm layout describes (2026-11-02): runs of pen types, pens across lanes, drawn pens, doors, lane A on the right */
+ lengths:{lanes:[{n:6},{n:6},{n:4},{n:2}],depth:6,pens:{A2:'plain',A5:'live',B1:'act',B6:'plain',C3:'plain',C4:'act',D1:'plain'},current:'B3'},
+ mixed:{lanes:[{runs:[{n:10,type:'Group pen'},{n:12,type:'Gestation stall'}]},{runs:[{n:10,type:'Group pen'},{n:12,type:'Gestation stall'}]}],depth:22,pens:{A7:'plain',A8:'plain',A9:'act',A10:'plain',B8:'plain',B9:'plain',B10:'plain',A11:'plain',A12:'act',A13:'plain',A14:'plain',B11:'plain',B13:'plain',B14:'act'},words:{act:'need you'},current:'A10'},
+ mixed2:{lanes:[{runs:[{n:3,type:'Gilt pen'},{n:1,type:'Stall'},{n:1,type:'Gilt pen'}]},{runs:[{n:5,type:'Gilt pen'}]}],depth:5,pens:{A1:'plain',A2:'act',A4:'plain',A5:'plain',B1:'plain',B3:'plain',B4:'act'},words:{act:'need you'},current:'A1'},
+ across:{lanes:[{n:6},{n:6}],depth:6,across:[{code:'C1',lanes:['A','B']}],pens:{A2:'plain',A4:'live',A6:'plain',B3:'act',B5:'plain',C1:'act'},current:'A4'},
+ sketch:{lanes:[{runs:[{n:2,type:'Sick pen'}]},{runs:[{n:2,type:'Sick pen'}]}],depth:2,across:[{code:'C1',lanes:['A','B'],type:'Group pen'}],apart:[{code:'D1',row:2},{code:'E1'}],pens:{A1:'act',B2:'plain',C1:'plain',D1:'plain',E1:'act'},words:{act:'need you'},current:'A1'},
+ doors:{lanes:[{n:4},{n:4}],depth:4,entranceAt:'left',backDoor:'Back door',pens:{A1:'plain',A3:'act',B2:'plain',B4:'plain'},words:{act:'need you'},current:'A1'},
+ mirror:{lanes:[{n:4},{n:4}],depth:4,aSide:'right',pens:{A1:'plain',A3:'act',B2:'plain',B4:'plain'},words:{act:'need you'},current:'A1'},
+ stalls50:{lanes:[{runs:[{n:50,type:'Gestation stall'}]},{runs:[{n:50,type:'Gestation stall'}]}],depth:50,pens:{A3:'plain',A4:'plain',A5:'act',B4:'plain',B6:'plain',A31:'act',B47:'plain'},words:{act:'need you'},current:'A4'}
 };
 const bg=()=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+UI.heading({title:'Farrowing',kind:'page',description:'Last record 08:41 · G.H'})+UI.panel(UI.row({title:'Unit 7',description:'Task overview'}),{className:'st-row-group'});
 const peekRows=[{code:'000418',right:{kind:'state',figure:'2 days',word:'Overdue',level:'act'}},{code:'000431',right:{kind:'state',figure:'Tomorrow',word:'Due',level:'soon'}}];
@@ -38,7 +55,7 @@ const open=(name,lang,o)=>{
  const b=BARNS[name],t=lang==='zh'?ZH:EN;
  const peek=code=>UI.penPeek({title:code,meta:lang==='zh'?'2头母猪':'2 sows',rows:peekRows});
  const body=UI.penMap(Object.assign({},b,{action:'pick',key:'pm-'+name+lang,entrance:t.entrance,labels:t.labels,peek},o||{}));
- return UI.sheet({surface:'menu',size:'long',title:lang==='zh'?'栏位图':'Pen map',label:'Pen map',line:{key:UI.penMapKey({pens:b.pens,words:t.legend})},body,footer:UI.penMapFooter({back:{action:'back',label:lang==='zh'?'返回':'Back'},depth:b.depth,label:lang==='zh'?'跳转栏位':'Jump to pens'})});
+ return UI.sheet({surface:'menu',size:'long',title:lang==='zh'?'栏位图':'Pen map',label:'Pen map',line:{key:UI.penMapKey({pens:b.pens,words:lang==='zh'?t.legend:b.words||t.legend})},body,footer:UI.penMapFooter({back:{action:'back',label:lang==='zh'?'返回':'Back'},depth:b.depth,label:lang==='zh'?'跳转栏位':'Jump to pens'})});
 };
 const R={
  unit7:()=>open('unit7','en'),
@@ -48,6 +65,7 @@ const R={
  filtered:()=>open('filtered','en'),
  empty:()=>open('empty','en'),
  b60:()=>open('b60','en'),b100:()=>open('b100','en'),b160:()=>open('b160','en'),b8:()=>open('b8','en'),
+ lengths:()=>open('lengths','en'), mixed:()=>open('mixed','en'), mixed2:()=>open('mixed2','en'), across:()=>open('across','en'), sketch:()=>open('sketch','en'), doors:()=>open('doors','en'), mirror:()=>open('mirror','en'), stalls50:()=>open('stalls50','en'),
  zh7:()=>open('unit7','zh'),zh100:()=>open('b100','zh')
 };
 document.querySelectorAll('[data-state]').forEach(el=>{
