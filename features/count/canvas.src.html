@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Count canvas</title>
+<style>
+:root{--bg:#e9eae4;--ink:#1d221e;--ink2:#4a524c;--muted:#6b736d;--line:#d4d7cf;--card:#fff;--amber:#fede82;--amber-ink:#5c3f00}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121512;--ink:#eef0ea;--ink2:#c9cec6;--muted:#9aa29b;--line:#333a34;--card:#1f2420}}
+:root[data-theme="dark"]{--bg:#121512;--ink:#eef0ea;--ink2:#c9cec6;--muted:#9aa29b;--line:#333a34;--card:#1f2420}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font:15px/1.45 "Plus Jakarta Sans",system-ui,sans-serif}
+#view{position:fixed;inset:0;cursor:grab;touch-action:none}
+#view.drag{cursor:grabbing}
+#board{position:absolute;left:0;top:0;transform-origin:0 0;padding:56px;display:flex;gap:72px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:20px}
+.col>h2{margin:0;font-size:22px;line-height:1.2}
+.col>p.sub{margin:-12px 0 4px;color:var(--muted);font-size:14px;max-width:420px}
+.row{display:flex;gap:28px;align-items:flex-start}
+figure{margin:0;width:330px}
+.phone{width:330px;height:714px;border-radius:52px;background:#111;padding:11px;box-shadow:0 18px 40px rgba(0,0,0,.18)}
+.phone img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:42px;display:block;background:#fff}
+figcaption{margin-top:12px;font-size:14px;color:var(--ink2);line-height:1.45}
+figcaption b{color:var(--ink)}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--amber);color:var(--amber-ink);margin-bottom:6px}
+.tag.old{background:#d9dcd5;color:#3b423d}
+.note{width:420px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px}
+.note h3{margin:0 0 8px;font-size:17px}
+.note p,.note li{color:var(--ink2);margin:0 0 8px}
+.note ul,.note ol{margin:0;padding-left:20px}
+.note li{margin:6px 0}
+.note b{color:var(--ink)}
+.hint{position:fixed;left:16px;bottom:16px;font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 14px}
+.hint button{font:inherit;border:0;background:none;color:var(--ink);font-weight:600;cursor:pointer;padding:0 0 0 8px}
+</style></head>
+<body>
+<div id="view"><div id="board">
+
+<section class="col">
+  <h2>Count · 盘点</h2>
+  <p class="sub">Proposal, 2 Nov. Nothing built. Drag to move, scroll or pinch to zoom.</p>
+  <div class="note">
+    <h3>The idea in four lines</h3>
+    <ul>
+      <li><b>Count belongs to a place.</b> It sits on the pen page, not in a pig's Actions.</li>
+      <li><b>Tagged pigs by scan, untagged by number.</b> A pig read here that the record places elsewhere moves here.</li>
+      <li><b>Nothing disappears because it wasn't read.</b> A pig not seen stays where she is recorded.</li>
+      <li><b>A difference in untagged pigs is unaccounted on the batch.</b> No reason is asked, and births and deaths are never rewritten.</li>
+    </ul>
+  </div>
+  <div class="note">
+    <h3>Changed after your review</h3>
+    <ul>
+      <li><b>No "Last counted" on Home.</b> A reminder of the last count is not work, so it is gone.</li>
+      <li><b>A recount is asked for inside the task that needs it.</b> In the old app it lived inside the task too (see the next column). Count is never a standing reminder.</li>
+      <li><b>Count saved is a glance:</b> one tile per pen. ✓ means it matches, amber means look at it, and grey means it wasn't counted. Below the tiles is only the pig not seen.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="col">
+  <h2>How the old app did it</h2>
+  <p class="sub">Recount lived inside the task, not on Home.</p>
+  <div class="row">
+    <figure><div class="phone"><img src="old-system/task-quantity-anomaly-1567-20878.png" alt=""></div>
+      <figcaption><span class="tag old">Old · piglet task</span><br><b>更多操作 › 数量异常</b> (count anomaly). Inside the task's More actions, beside Foster and Report death. The worker opens it when the number looks wrong.</figcaption></figure>
+    <figure><div class="phone"><img src="old-system/task-piglet-count-confirm-under-971-15991.png" alt=""></div>
+      <figcaption><span class="tag old">Old · piglet task</span><br><b>仔猪数量确认.</b> When the piglets entered (18) differ from the record (20): "will remove 2 piglets automatically". It asks for a reason and a "confirm, continue" checkbox before Submit.</figcaption></figure>
+    <figure><div class="phone"><img src="old-system/insp-calibration-step2-blocked-1797-1721.png" alt=""></div>
+      <figcaption><span class="tag old">Old · inspection</span><br><b>猪只数量校准.</b> The pen recount, behind a hidden pencil icon. A two-step wizard where every untagged pig must be split into batch rows before Submit unlocks.</figcaption></figure>
+  </div>
+  <div class="note">
+    <h3>So a "recount needed" is a task's own number disagreeing</h3>
+    <p>The old app had no reminder. It checked the task's number against the record (piglets processed against piglets alive). On the web, the transfer task 转舍 tracked <b>已转出 / 已转入</b> (sent out / received) per batch. The receiving step on the phone was never drawn.</p>
+    <p>Proposed: when receiving pigs in Transfer (not designed yet) finds 28 where 30 were sent, the task itself asks for a count of that pen. The same is true of any task whose number disagrees. Home stays quiet.</p>
+  </div>
+</section>
+
+<section class="col">
+  <h2>Start a count</h2>
+  <p class="sub">From the pen, any time. From a task, when its number is off.</p>
+  <div class="row">
+    <figure><div class="phone"><img src="mock/mock-1-pen-entry.png" alt=""></div>
+      <figcaption><span class="tag">New</span><br><b>Pen page.</b> Count joins Note, Feed, Observe, Fault and Tick all (3 + 3). Nothing about counting shows anywhere else until it is needed.</figcaption></figure>
+  </div>
+</section>
+
+<section class="col">
+  <h2>Count one pen</h2>
+  <p class="sub">Pen D4: 2 sows with ear tags and 14 pigs without.</p>
+  <div class="row">
+    <figure><div class="phone"><img src="mock/mock-3-count-pen.png" alt=""></div>
+      <figcaption><span class="tag">New</span><br><b>Fewer.</b> The stepper starts at what should be there (14). The worker sets 12: 2 unaccounted in batch 25. The two tagged pigs tick as they are read. <i>Since the last count</i> (below) explains the 14.</figcaption></figure>
+    <figure><div class="phone"><img src="mock/mock-3b-count-pen-match.png" alt=""></div>
+      <figcaption><span class="tag">New</span><br><b>Matches.</b> Saving still writes the count, so the next one starts from it.</figcaption></figure>
+  </div>
+</section>
+
+<section class="col">
+  <h2>Count a room by scan</h2>
+  <p class="sub">The reader is always listening. Pens in walking order. Pens you skip stay as they are.</p>
+  <div class="row">
+    <figure><div class="phone"><img src="mock/mock-4-count-room.png" alt=""></div>
+      <figcaption><span class="tag">New</span><br><b>Unit 7.</b> Each read ticks the pig where she is; the card says <i>2 of 3</i>. The footer keeps the tally.</figcaption></figure>
+    <figure><div class="phone"><img src="mock/mock-4c-count-room-scrolled.png" alt=""></div>
+      <figcaption><span class="tag">New</span><br><b>A pig from elsewhere.</b> 000512, recorded in Unit 9 · C3, is read among C2's sows and <i>moves here</i>. D4's untagged group took 12 in its field.</figcaption></figure>
+    <figure><div class="phone"><img src="mock/mock-4b-count-unknown-tag.png" alt=""></div>
+      <figcaption><span class="tag">New</span><br><b>An unknown tag.</b> The shared scan toast. The tag is left out and the count goes on.</figcaption></figure>
+  </div>
+</section>
+
+<section class="col">
+  <h2>Count saved</h2>
+  <p class="sub">Redrawn: a glance, not a read.</p>
+  <div class="row">
+    <figure><div class="phone"><img src="mock/mock-5-result.png" alt=""></div>
+      <figcaption><span class="tag">New</span><br><b>One tile per pen,</b> the same pens as the room count. A pen that matches gets a ✓ (none does here). Amber is different: <i>+1</i> a pig moved in, <i>−2</i> unaccounted, <i>!</i> a tagged pig not seen. Grey was not counted. The only row is the pig not seen; opening her is the way to report her missing.</figcaption></figure>
+    <figure><div class="phone"><img src="mock/mock-6-log.png" alt=""></div>
+      <figcaption><span class="tag">New</span><br><b>The pen log.</b> <i>Counted 14 · 2 unaccounted</i>. The move and the death since then are their own lines. History is never rewritten.</figcaption></figure>
+  </div>
+</section>
+
+<section class="col">
+  <h2>Untagged pigs carry their conditions</h2>
+  <p class="sub">For any action on some of a group: Transfer, Report death, selling.</p>
+  <div class="row">
+    <figure><div class="phone"><img src="mock/mock-7-noid-conditions.png" alt=""></div>
+      <figcaption><span class="tag">New</span><br><b>Pick 5 of 14, of them 2 with Coughing.</b> D4 keeps <i>Coughing · 1</i> and the new pen gets <i>Coughing · 2</i>. Nothing is copied. Taking the whole group takes every condition, with no question.</figcaption></figure>
+  </div>
+</section>
+
+<section class="col">
+  <h2>Your questions</h2>
+  <p class="sub">Each has my recommendation.</p>
+  <div class="note">
+    <ol>
+      <li><b>A whole-room count outside a task:</b> do you still want one, and if so where? <i>Recommend: only from the task that asks for it (receiving pigs). A pen's own count covers everything else.</i></li>
+      <li><b>Tagged pigs not seen</b> stay recorded where they were. Missing is always a person's call. <i>Recommend: yes.</i></li>
+      <li><b>A pig read here moves here</b> when the count is saved. <i>Recommend: yes.</i></li>
+      <li><b>A room count proves the room, not the pen.</b> A pig in the wrong pen inside the room is fixed by counting that pen. <i>Recommend: yes.</i></li>
+      <li><b>One batch per pen for untagged pigs:</b> pigs moved in join the pen's batch. <i>Recommend: yes. It removes the old batch split.</i></li>
+      <li><b>Conditions follow the pick</b> (default 0; the whole group takes all). <i>Recommend: yes.</i></li>
+      <li><b>A body found after a count</b> asks no question. The next count finds one more than expected, so the batch evens out. <i>Recommend: yes (Round 9).</i></li>
+      <li><b>The number starts at the record,</b> not empty. <i>Recommend: yes.</i></li>
+      <li><b>A sow found in another crate</b> brings her litter with her. <i>Recommend: yes.</i></li>
+    </ol>
+  </div>
+</section>
+
+</div></div>
+<div class="hint">Drag to move · scroll to zoom <button id="fit" type="button">Fit</button></div>
+<script>
+(() => {
+  const view = document.getElementById('view'), board = document.getElementById('board');
+  let s = 1, x = 0, y = 0;
+  const apply = () => { board.style.transform = `translate(${x}px,${y}px) scale(${s})`; };
+  const fit = () => { s = Math.min(1, (innerHeight - 40) / board.scrollHeight); x = 0; y = 0; apply(); };
+  const zoomAt = (cx, cy, f) => { const ns = Math.min(2.5, Math.max(0.12, s * f)); x = cx - (cx - x) * ns / s; y = cy - (cy - y) * ns / s; s = ns; apply(); };
+  view.addEventListener('wheel', (e) => { e.preventDefault(); if (e.ctrlKey || e.metaKey || Math.abs(e.deltaY) > Math.abs(e.deltaX) && !e.shiftKey) zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0015)); else { x -= e.deltaX; y -= e.deltaY; apply(); } }, { passive: false });
+  const pts = new Map(); let last = null, pinch = null;
+  view.addEventListener('pointerdown', (e) => { view.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); view.classList.add('drag'); last = [e.clientX, e.clientY]; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a[0] - b[0], a[1] - b[1]); } });
+  view.addEventListener('pointermove', (e) => {
+    if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]); zoomAt((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, d / pinch); pinch = d; return; }
+    x += e.clientX - last[0]; y += e.clientY - last[1]; last = [e.clientX, e.clientY]; apply();
+  });
+  const up = (e) => { pts.delete(e.pointerId); pinch = null; if (!pts.size) view.classList.remove('drag'); else last = [...pts.values()][0]; };
+  view.addEventListener('pointerup', up); view.addEventListener('pointercancel', up);
+  document.getElementById('fit').addEventListener('click', fit);
+  addEventListener('load', fit); fit();
+})();
+</script>
+</body></html>
