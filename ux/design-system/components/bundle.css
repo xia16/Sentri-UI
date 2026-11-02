@@ -827,18 +827,26 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-filter-help{margin:var(--space-10) 0 0;font-size:var(--type-description-size);line-height:1.7;color:var(--muted)}
 
 /* RangeSlider: two native range inputs laid over one track. The rail is 48px tall and takes the whole touch (the nearest handle moves),
-   so the 32px handle is never the target. */
-.st-range-head{display:flex;flex-direction:column;gap:var(--space-7);margin-bottom:var(--space-14)}
-.st-range-value{font-size:var(--type-choice-meta-size);line-height:1.6;color:var(--muted);min-height:var(--size-20);font-variant-numeric:tabular-nums}
-.st-range-rail{position:relative;height:var(--tap-min);margin:var(--space-16) var(--space-16) 0;touch-action:none;cursor:ew-resize}
+   so the 28px handle is never the target. Open, the rail is quiet and the title row shows nothing; narrowed, the span between the
+   handles fills green and its words sit at the end of the title row. A short tick under the rail marks each step (owner, 2026-11-02:
+   the first version read abrupt: a solid bar for "any", big rings, a gap under the title). */
+.st-range{--range-knob:var(--space-28)}
+.st-range-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-8)}
+.st-range-value{font-size:var(--type-choice-meta-size);line-height:1.6;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.st-range-rail{position:relative;height:var(--tap-min);margin:0 var(--size-14);touch-action:none;cursor:ew-resize}
 .st-range-track{position:absolute;left:0;right:0;top:var(--size-22);height:var(--size-4);border-radius:var(--radius-4);background:linear-gradient(to right,var(--line) 0 var(--from),var(--range-fill) var(--from) var(--to),var(--line) var(--to) 100%)}
-.st-range-rail input[type=range]{position:absolute;inset:0;width:calc(100% + var(--space-32));left:calc(-1 * var(--space-16));height:var(--tap-min);padding:0;margin:0;appearance:none;-webkit-appearance:none;pointer-events:none;background:transparent;accent-color:var(--range-fill)}
+.st-range[data-open] .st-range-track{background:var(--line)}
+.st-range-ticks{position:absolute;left:0;right:0;top:calc(var(--size-22) + var(--size-4) + var(--space-12));display:flex;justify-content:space-between;pointer-events:none}
+.st-range-ticks i{width:var(--border-width);height:var(--space-4);background:var(--control-border)}
+.st-range-rail input[type=range]{position:absolute;inset:0;width:calc(100% + var(--range-knob));left:calc(-1 * var(--size-14));height:var(--tap-min);padding:0;margin:0;appearance:none;-webkit-appearance:none;pointer-events:none;background:transparent;accent-color:var(--range-fill)}
 .st-range-rail input[type=range]:focus-visible{outline:none}
 .st-range-rail input[type=range]::-webkit-slider-runnable-track{height:var(--size-4);background:transparent}
-.st-range-rail input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:var(--space-32);height:var(--space-32);margin-top:calc(-1 * var(--size-14));background:var(--paper);border:calc(1.5 * var(--border-width)) solid var(--range-handle);border-radius:50%;box-shadow:var(--shadow-handle);pointer-events:auto;cursor:ew-resize}
+.st-range-rail input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:var(--range-knob);height:var(--range-knob);margin-top:calc(var(--size-4) / 2 - var(--size-14));background:var(--paper);border:calc(1.5 * var(--border-width)) solid var(--range-handle);border-radius:50%;box-shadow:var(--shadow-handle);pointer-events:auto;cursor:ew-resize}
 .st-range-rail input[type=range]::-moz-range-track{height:var(--size-4);background:transparent}
-.st-range-rail input[type=range]::-moz-range-thumb{width:var(--space-32);height:var(--space-32);background:var(--paper);border:calc(1.5 * var(--border-width)) solid var(--range-handle);border-radius:50%;pointer-events:auto;cursor:ew-resize}
-.st-range-ends{display:flex;justify-content:space-between;font-size:var(--type-range-end-size);color:var(--muted);margin:0 0 var(--space-17)}
+.st-range-rail input[type=range]::-moz-range-thumb{width:var(--range-knob);height:var(--range-knob);background:var(--paper);border:calc(1.5 * var(--border-width)) solid var(--range-handle);border-radius:50%;box-shadow:var(--shadow-handle);pointer-events:auto;cursor:ew-resize}
+.st-range-ends{display:grid;grid-template-columns:1fr auto 1fr;font-size:var(--type-range-end-size);color:var(--muted);margin:0 0 var(--space-17)}
+.st-range-ends>:first-child{justify-self:start}
+.st-range-ends>:last-child{justify-self:end}
 
 /* 7 · The approved look (main at 6e6c940). Components reproduce the approved Farrowing screens; see scripts/compare-screens.mjs. */
 /* IconButton, the task header's Back */
@@ -1451,7 +1459,3 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 /* FilterChips in a FilterSheet section: the chip track pads itself to the gutter and scrolls to the sheet edge, so the section lets it bleed
    (first chip under the section title, Allocate piglets' Unit filter). */
 .st-filter-section .st-filter-chips{margin-inline:calc(-1 * var(--space-gutter))}
-/* Farrowing's Filter sows (room and Allocate): a range's chosen span sits at the end of its title row, and only once narrowed; the
-   rail's end labels say the open range (owner, 2026-11-02: no "Any time" line). */
-.room-filter-sheet .st-range-head{flex-direction:row;align-items:baseline;justify-content:space-between;gap:var(--space-8)}
-.room-filter-sheet .st-range-value{min-height:0}

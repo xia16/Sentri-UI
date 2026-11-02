@@ -1,6 +1,6 @@
 # RangeSlider
 
-Pick a from–to range of whole steps with two round handles on one track: Farrowing's expected-farrowing range (7+ days ago to in 7+ days). It sits in a [FilterSheet](../FilterSheet/README.md) section and does not record a farm fact.
+Pick a from–to range of whole steps with two round handles on one track: Farrowing's expected-farrowing range (7+ days ago to in 7+ days) and its parity range (0 to 6+). It sits in a [FilterSheet](../FilterSheet/README.md) section and does not record a farm fact.
 
 `SentriUI.rangeSlider({ min, max, step, value: [from, to], title, icon, key, names, labels, format, summary, ends })`
 
@@ -11,10 +11,10 @@ Pick a from–to range of whole steps with two round handles on one track: Farro
 
 ## Anatomy
 
-1. **Title** (optional): a section Heading with its icon.
-2. **Value line**: the current range in words. The whole track reads "Any time".
-3. **Track**: two round handles centred on a 4px rail; the span between them is filled green.
-4. **End labels**: left, middle and right ("7+ days ago · Today · In 7+ days").
+1. **Title row**: a section Heading with its icon, and at its end the chosen span in words (muted), only once the range is narrowed.
+2. **Track**: two 28px round handles centred on a 4px rail. Open (the whole track), the rail is quiet (`line`); narrowed, the span between the handles fills green.
+3. **Ticks**: a 4px tick under the rail at each step (up to 20 steps), so the stops show.
+4. **End labels**: left, middle and right ("7+ days ago · Today · In 7+ days"; "0 · 3 · 6+"), the middle one centred.
 
 ## Variants
 
@@ -24,20 +24,20 @@ Pick a from–to range of whole steps with two round handles on one track: Farro
 
 | State | Appearance and behaviour |
 |---|---|
-| Default | Handles at both ends; the value line says the open phrase. |
-| Narrowed | Handles moved in; the fill sits between them and the value line names both ends. |
-| Same value | Both handles on one step; the value line names it once. |
-| Long / Chinese | The value line wraps; the track keeps its size. |
+| Open (default) | Handles at both ends, a quiet rail, nothing at the title's end: the end labels say the range. |
+| Narrowed | Handles moved in; the fill sits between them and the title row names both ends. |
+| Same value | Both handles on one step; the title row names it once. |
+| Long / Chinese | The span wraps under the title; the track keeps its size. |
 
 There is no designed pressed state: the handle follows the finger. Handles never cross; a handle pushed past the other carries it along.
 
 ## Behaviour
 
-A touch anywhere on the 48px-tall rail moves the nearest handle, and a drag keeps hold of it, so the 32px handle is never the target. When both handles share a step, the next touch picks the side it lands on. Each change updates the fill, the value line and the handle's spoken value, then fires `sentri-range-change` with `{ key, values: { from, to } }`; the host reads that and re-counts its list.
+A touch anywhere on the 48px-tall rail moves the nearest handle, and a drag keeps hold of it, so the 28px handle is never the target. When both handles share a step, the next touch picks the side it lands on. Each change updates the fill, the span at the title's end and the handle's spoken value, then fires `sentri-range-change` with `{ key, values: { from, to } }`; the host reads that and re-counts its list.
 
 ## Content rules
 
-The value line is the range in plain words, never raw numbers alone. End labels are short nouns or phrases; the middle label names the neutral point. `format(n)` supplies one value's words (also each handle's spoken value); `summary(from, to)` supplies the whole line.
+The span is the range in plain words, never raw numbers alone, and nothing while the range is open. End labels are short nouns or phrases; the middle label names the neutral point. `format(n)` supplies one value's words (also each handle's spoken value); `summary(from, to)` supplies the narrowed span.
 
 ## Accessibility
 
@@ -58,3 +58,4 @@ Component: generic, used across sections.
 ## Changelog
 
 2026-10-10: distilled from the Farrowing room filter; the look is unchanged, the colours are tokens, and the gesture moved from the screen into the bundle.
+2026-11-02: refined with the owner (the first version read abrupt: a solid green bar for "any", 32px rings, a gap under the title). Open is a quiet rail with nothing named; the span sits at the end of the title row; 28px handles; a tick per step; the middle end label centred. Parity became a second range in Farrowing's Filter sows.

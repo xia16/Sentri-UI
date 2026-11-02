@@ -319,8 +319,8 @@ const parityDay=n=>n===6?'6+':String(n);
 const paritySlider=(d,key)=>SentriUI.rangeSlider({min:0,max:6,value:[d.pmin,d.pmax],title:'Parity',icon:icon('profile'),key,names:['pmin','pmax'],labels:['Lowest parity','Highest parity'],format:parityDay,summary:(a,b)=>parityRangeLabel({pmin:a,pmax:b}),ends:['0','3','6+']});
 const dueSlider=(d,key)=>SentriUI.rangeSlider({min:-7,max:7,value:[d.from,d.to],title:'Expected farrowing',icon:icon('calendar'),key,labels:['Earliest expected farrowing','Latest expected farrowing'],format:dueDay,summary:(from,to)=>dueRangeLabel({from,to}),ends:['7+ days ago','Today','In 7+ days']});
 const dueDay=n=>n===-7?'7+ days ago':n===7?'In 7+ days':n===0?'Today':n===-1?'Yesterday':n===1?'Tomorrow':n<0?(-n)+' days ago':'In '+n+' days';
-function dueRangeLabel(f){return f.from===-7&&f.to===7?'':f.from===f.to?dueDay(f.from):dueDay(f.from)+' – '+dueDay(f.to);}
-function parityRangeLabel(f){return f.pmin===0&&f.pmax===6?'':f.pmin===f.pmax?parityDay(f.pmin):f.pmax===6?f.pmin+' or more':f.pmin+'–'+f.pmax;}
+function dueRangeLabel(f){return f.from===-7&&f.to===7?'Any time':f.from===f.to?dueDay(f.from):dueDay(f.from)+' – '+dueDay(f.to);}
+function parityRangeLabel(f){return f.pmin===0&&f.pmax===6?'Any parity':f.pmin===f.pmax?parityDay(f.pmin):f.pmax===6?f.pmin+' or more':f.pmin+'–'+f.pmax;}
 function roomFilterCount(f){return Number(f.from!==-7||f.to!==7)+Number(f.pmin!==0||f.pmax!==6);}
 function roomFilterLabel(f){return [f.from!==-7||f.to!==7?'Due: '+dueRangeLabel(f):'',f.pmin!==0||f.pmax!==6?'Parity '+parityRangeLabel(f):''].filter(Boolean).join(' · ');}
 function matchesRoomFilter(r,f){return dueMatches(r,f)&&r.parity>=f.pmin&&(f.pmax===6||r.parity<=f.pmax);}
