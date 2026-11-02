@@ -1473,6 +1473,19 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .task-status-dot.task-status-awaiting{background:var(--paper);box-shadow:inset 0 0 0 1.5px var(--control-border)}
 .tc-progress:not(.tc-progress-time){background:var(--handle)}
 .tc-progress:not(.tc-progress-time) i{background:var(--done-mark)}
+/* Home's task progress (unit cards' track, the task preview's whole-task bar): the same marks; in progress `progress-mark`, complete `done-mark`. */
+.progress-track{background:var(--handle)}
+.progress-track span{background:var(--progress-mark)}
+.progress-track.complete span{background:var(--done-mark)}
+.whole-progress-bar{background:var(--handle)}
+.whole-progress-bar .done,.whole-progress-facts .done{background-color:var(--done-mark)}
+.whole-progress-bar .active,.whole-progress-facts .active{background:var(--progress-mark)}
+.whole-progress-bar .waiting{background:transparent}
+.whole-progress-facts .waiting{background:var(--paper);box-shadow:inset 0 0 0 1.5px var(--control-border)}
+.hc-track{background:var(--handle)}
+.hc-track>span{background:var(--done-mark)}
+.hc-track>span.active{background:var(--progress-mark)}
+.hc-track>span.waiting{background:transparent}
 /* Farrowing End task (owner pick, 2026-11-02): the closure card. The task's sows as one bar, a row per part under it in the bar's order
    (Done · Still farrowing · Leave the batch); a count holds a number, so it takes its status's light fill and dark ink; waiting is an outline. */
 .farrowing-phone .task-end-sheet:not(.task-receipt-sheet) .sheet-body{gap:var(--space-24)}
