@@ -198,7 +198,7 @@ async function cardLast(p, what, when, mine) {
 
 // Variant E (owner, 2026-11-02: "header should be the time and who, with all the results of that run below it"): the stamp is the
 // line's header, and the run's results sit under it as the same chips the unsaved visit wears (+3 born, −1 died, 1 born dead),
-// so a saved run looks as it did before Save, in the quiet tone (saved: colour no longer means "not yet"). Undo stays one button on the right.
+// on one line under the header (at most three kinds: born, died, born dead), so a saved run looks as it did before Save, in the quiet tone (saved: colour no longer means "not yet"). Undo sits on the header row, beside the stamp.
 async function cardRun(p, stamp, chips, figure, mine) {
   await p.evaluate(({ stamp, chips, figure, mine }) => {
     const ic = (k) => window.SentriIcons.icon(k);
@@ -207,17 +207,17 @@ async function cardRun(p, stamp, chips, figure, mine) {
     if (figure) card.querySelector('.alive-figure').textContent = figure;
     const wrap = document.createElement('div'); wrap.className = 'mock-alive';
     card.replaceWith(wrap); wrap.append(card);
-    const chip = ([tone, glyph, n, word]) => `<span class="alive-chip" data-tone="${tone}">${ic(glyph)}<b>${n}</b>${word}</span>`;
+    const chip = ([tone, glyph, n, word]) => `<span class="alive-chip" data-tone="${tone}"><b>${n}</b>${word}</span>`; // no glyph: the word says it, and three always fit one line
     const undo = mine ? `<button type="button" class="button secondary mock-undo" data-ds="Button" data-register="secondary">${ic('return')}<span>Undo</span></button>` : '';
-    wrap.insertAdjacentHTML('beforeend', `<div class="mock-run"><div class="mock-run-copy"><small>${stamp}</small><span class="mock-run-chips">${chips.map(chip).join('')}</span></div>${undo}</div>`);
+    wrap.insertAdjacentHTML('beforeend', `<div class="mock-run"><div class="mock-run-head"><small>${stamp}</small>${undo}</div><span class="mock-run-chips">${chips.map(chip).join('')}</span></div>`);
     const st = document.createElement('style');
     st.textContent = `.farrowing-phone .mock-alive{margin:0 0 16px;border:1px solid var(--line);border-radius:20px;background:#f6f7f1;overflow:hidden}
       .farrowing-phone .mock-alive .alive-card{margin:0;border:0;border-radius:0;background:transparent}
-      .mock-run{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 16px;padding:12px 0 14px;border-top:1px solid var(--line)}
-      .mock-run-copy{display:flex;flex-direction:column;gap:8px;min-width:0}
-      .mock-run-copy small{font:400 13px/18px var(--font-sans);color:var(--muted)}
-      .mock-run-chips{display:flex;flex-wrap:wrap;gap:6px}
-      .mock-run .alive-chip{display:inline-flex;align-items:center;gap:5px;height:24px;box-sizing:border-box;padding:0 10px;border-radius:999px;font:500 13px/1 var(--font-sans);background:#eceee7;color:#4b5547}
+      .mock-run{display:flex;flex-direction:column;gap:8px;margin:0 16px;padding:10px 0 14px;border-top:1px solid var(--line)}
+      .mock-run-head{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}
+      .mock-run-head small{font:400 13px/18px var(--font-sans);color:var(--muted)}
+      .mock-run-chips{display:flex;flex-wrap:nowrap;gap:6px;min-width:0}
+      .mock-run .alive-chip{display:inline-flex;align-items:center;gap:5px;height:24px;box-sizing:border-box;padding:0 9px;border-radius:999px;font:500 13px/1 var(--font-sans);background:#eceee7;color:#4b5547;white-space:nowrap}
       .mock-run .alive-chip b{flex:none;font:600 14px/1 var(--font-mono)}
       .mock-run .alive-chip svg{display:block;flex:none;width:15px;height:15px;stroke-width:2}
       .farrowing-phone .mock-undo{flex:none;display:inline-flex;align-items:center;gap:6px;width:auto;min-width:0;height:44px;min-height:44px;padding:0 16px}
