@@ -901,3 +901,27 @@ The animal row ruling's one "!" icon; the pen map's fills; the convention table 
 ## Self-crit
 
 - **Better because** the bars, counts and rows share one palette with Home, a row carries one red signal, and the + Born alive key is the only green button, on purpose.
+
+# The finished sow: what happened, then Details (2026-11-02), critique
+
+Scope: the finished sow's record (farrowing.locked) and the new Details page (farrowing.details, farrowing.details-first). Baselined on `origin/main` at `6dbd20d`; the owner shaped it on the canvas https://claude.ai/artifact/FJiEYMkwPquPoY8VpXhkWk (ring, head band, actions in the bar, page Details, no analysis copy).
+
+## Problems
+
+- **major** · The record listed seven figures at one weight (born, alive now, dead, weak, deformed, assisted, weight) and compared her with nothing.
+- **major** · Litter details was nine figures in a grid with no order.
+- **minor** · Record dead · Actions stacked in the body under the card.
+
+## Attention budget
+
+1 how this litter turned out (alive now, born alive of born) · 2 the losses at a glance (the ring) · 3 the door to Details · then on Details: the full litter, against her batch, against herself, the log.
+
+## House pattern
+
+End task's Performance metrics (two measures, the neutral split, small facts); the sow profile's Production stats (averages, a row per litter); SURFACES rules 1 and 6; the Headers law (no line one Back away).
+
+## Self-crit
+
+- **Better because** one look says how the litter went, and the comparisons a manager needs sit one tap away, drawn, not written.
+- Earlier litters are sample data; the batch range collapses when every litter has the same figure (her dot sits on the average).
+- The Death breakdown page is no longer opened from a finished sow; its causes are on Details.
