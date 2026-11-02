@@ -144,29 +144,52 @@ for (const [name, fewer] of [['mock-3-count-pen.png', true], ['mock-3b-count-pen
   await shoot(p, name);
 }
 
-// 5. Count saved: one list, one line per thing that changed, each read as before → after, the way it would go on paper.
-//    Pigs that moved show where from and to; the pigs without ear tags show their figure; what needs a person comes last, apart.
+// 5a. Save count with a tagged pig recorded here but not added: a short drawer settles her on the spot, before anything is saved.
+if (want('5a')) {
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate(() => {
+    const { U, ic, page, footer, primary } = window.M;
+    // The count page behind it, as the worker left it.
+    page('Count pigs', 'Pen D4 · Unit 7', '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs in D4', value: 16, min: 4, max: 80, action: 'x', reserveHint: false }) + '</section>'
+      + '<section class="feature-section">' + U.heading({ title: 'Ear tags · 4', icon: ic('tag'), kind: 'section', level: 3 }) + '</section>',
+      footer('<div class="m-left"><strong>11 without ear tags</strong><small>2 unaccounted</small></div>', primary('Save count')));
+    const pig = U.rowGroup(U.row({ code: '000803', description: 'Grower · 63d' }));
+    const choice = U.choiceRadios({ label: 'Where is she?', labelHidden: true, action: 'x', selected: 'here', options: [
+      { value: 'here', label: 'Here · add her' },
+      { value: 'missing', label: 'Not here · report her missing' },
+      { value: 'later', label: 'Not sure · leave her in D4' }] });
+    const sheet = U.sheet({ variant: 'drawer', title: '1 pig not added', line: 'Recorded in D4, not scanned or typed', body: pig + choice, footer: '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save count', register: 'primary', action: 'x' }) + '</div>', className: 'm-count m-receipt', label: '1 pig not added' });
+    const phone = document.querySelector('.phone');
+    phone.firstElementChild.setAttribute('inert', '');
+    phone.insertAdjacentHTML('beforeend', '<div class="m-scrim"></div>' + sheet.replace('m-count m-receipt', 'm-receipt'));
+    const st = document.createElement('style');
+    st.textContent = `.m-scrim{position:absolute;inset:0;background:rgba(20,24,21,.38);z-index:10}.phone>.sheet.m-receipt{position:absolute;left:0;right:0;bottom:0;top:auto;z-index:20!important;filter:none!important;opacity:1!important}
+      .m-receipt .st-row-group{margin-bottom:16px}`;
+    document.head.append(st);
+  });
+  await shoot(p, 'mock-5a-not-added.png');
+}
+
+// 5. Count saved: a full page that says plainly what the count did. What is in the pen now; the pigs moved here, by name, from where;
+//    the pigs unaccounted for and what happens to them (the batch's balancing sheet). Nothing left to decide: that was done before saving.
 if (want('5-')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
   await p.evaluate(() => {
-    const { U, ic } = window.M;
-    const moved = (id, from) => U.row({ code: id, description: 'Moved here', trailing: from + ' → D4', className: 'm-line' });
-    const changed = U.rowGroup(
-      moved('000512', 'C3')
-      + moved('000733', 'D2')
-      + U.row({ icon: ic('tag-off'), title: 'Without ear tags', description: '2 unaccounted', trailing: '13 → 11', className: 'm-line' }));
-    const check = U.heading({ title: 'To check', icon: ic('alert'), kind: 'section', level: 3 })
-      + U.rowGroup(U.row({ variant: 'navigation', code: '000803', description: 'Not seen · still recorded in D4', trail: 'chevron', action: 'x', className: 'm-check' }));
-    const sheet = U.sheet({ variant: 'drawer', title: 'D4 counted · 16 pigs', line: '09:30 · L.M', body: changed + check, footer: '<div class="sheet-footer" data-ds="Sheet">' + U.button({ label: 'Done', register: 'primary', action: 'x' }) + '</div>', className: 'm-count m-receipt', label: 'Count saved' });
-    const phone = document.querySelector('.phone');
-    (phone.querySelector('.inspect-main') || phone.firstElementChild).setAttribute('inert', '');
-    phone.insertAdjacentHTML('beforeend', '<div class="m-scrim"></div>' + sheet);
+    const { U, ic, page, footer, primary } = window.M;
+    const now = '<section class="feature-section">' + U.heading({ title: 'In D4 now', icon: ic('details'), kind: 'section', level: 3 })
+      + U.facts([{ label: 'Pigs', value: '16' }, { label: 'With ear tags', value: '5' }, { label: 'Without', value: '11' }], { columns: 3 }) + '</section>';
+    const moved = '<section class="feature-section">' + U.heading({ title: '2 pigs moved here', icon: ic('transfer'), kind: 'section', level: 3 })
+      + U.rowGroup(U.row({ code: '000512', description: 'From Unit 9 · C3', trailing: 'C3 → D4', className: 'm-line' })
+        + U.row({ code: '000733', description: 'From D2', trailing: 'D2 → D4', className: 'm-line' })) + '</section>';
+    const lost = '<section class="feature-section">' + U.heading({ title: '2 pigs unaccounted for', icon: ic('alert'), kind: 'section', level: 3 })
+      + U.rowGroup(U.row({ icon: ic('tag-off'), title: 'Without ear tags', description: 'Should be 13, now 11', trailing: '13 → 11', className: 'm-line' }))
+      + '<p class="m-hint m-explain">They go on batch 25\'s balancing sheet. A later count, a death or a move can balance them. Still open when batch 25 ends, they are recorded as an unaccounted loss.</p></section>';
+    page('D4 counted', 'Pen D4 · 09:30 · L.M', now + moved + lost, '<div class="sheet-footer" data-ds="Sheet">' + primary('Done') + '</div>');
     const st = document.createElement('style');
-    st.textContent = `.m-scrim{position:absolute;inset:0;background:rgba(20,24,21,.38);z-index:5}.phone>.sheet.m-receipt{position:absolute;left:0;right:0;bottom:0;z-index:6}
-      .m-receipt .st-row-group{margin-bottom:8px}
-      .m-receipt .m-line .st-row-trailing{font:600 17px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f);white-space:nowrap}
-      .m-receipt .m-check .st-row-copy small{color:var(--amber,#896017)}`;
+    st.textContent = `.m-count .m-line .st-row-trailing{font:600 17px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f);white-space:nowrap}
+      .m-count .m-explain{font-size:13px;line-height:1.5;margin-top:10px;color:var(--ink,#20291f)}`;
     document.head.append(st);
   });
   await shoot(p, 'mock-5-result.png');
