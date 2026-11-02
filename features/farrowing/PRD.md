@@ -158,3 +158,12 @@ From the Edit record product round ([edit-record-round.md](edit-record-round.md)
 - **The waiting hold says why.** While a sow is farrowing the hold's caption reads `FINISH N SOWS FIRST`. Ending early (sows removed) is the red hold; a plain end is the ink hold. Hold buttons are never green: green means done or recorded.
 - **Performance metrics are the full card**, the same on the Task overview, End task and the receipt: Born alive / litter (target as a verdict, on or below) and Stillborn rate (mummified rate under it); where every piglet born went (Alive now · Died after birth with causes · Born dead, each with its share); Alive / litter · Assisted · Weight / litter. The page may scroll for it; the closure card and the hold stay on the first screen.
 - The sow lists take the row's words as their title: Still farrowing, Leave the batch.
+
+### Owner decisions, 2026-11-02 · Status colours
+
+- The status colour convention (owner, 2026-11-02; canvas https://claude.ai/artifact/BTzQ8Y3zBiv41WL3wshJyq): one hue per status, the shape's size picks the shade (README › Colour).
+- **The task status bar** (room card, Task overview, End task): done `done-mark`, farrowing `progress-mark`, awaiting the empty track (an open ring in the key).
+- **End task's rows go in the bar's order:** Done · Still farrowing · Leave the batch. A count holds a number, so Done is `done-fill`, Still farrowing `progress-fill`; Leave the batch is waiting, an outline, with the amber "!" after its title because ending removes those sows.
+- **One red signal per row:** an act-now sow row ("7 to allocate · ! Sow died", "3 days · ! Overdue") keeps the figure in `ink`; only the word with its "!" is red.
+- **The "+ Born alive" key** is the one green button (`count-key` #258048, white label; canvas pick D): it records a birth.
+- Performance metrics' split of piglets born: the middle part (died after birth) is `neutral-mark`, so it never reads as done.

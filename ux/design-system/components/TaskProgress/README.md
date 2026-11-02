@@ -7,7 +7,7 @@ The task's progress as one card: a head (`Whole-task progress` · `19 sows`), th
 **Anatomy** (`section.st-panel.tk-progress-card`, `data-ds="TaskProgress"`)
 - The Panel (`paper` on a page, 1px `line`, `radius-panel`), padded `space-row-x space-panel` (14 × 16).
 - **Head** (`.tk-progress-head`): the title in `panel-title` 12px/500 `ink`; the meta right, `meta` 10px `muted`; `space-heading` under it.
-- **Bar** (`.tk-progress`, `role=progressbar`): 8px tall, `radius` 6px, 2px between segments; segments `done` `current-marker`, `active` `progress-active`, `rest` `handle`, on a `line` track.
+- **Bar** (`.tk-progress`, `role=progressbar`): 8px tall, `radius` 6px, 2px between segments; segments `done` `done-mark`, `active` `progress-mark`, `rest` `handle` (status convention, 2026-11-02), on a `line` track.
 - **Counts** (`.tk-progress-counts`): one column per count, 10px apart, `space-heading` under the bar. The figure in `figure-total` 23px/500 mono, −1px; under it (6px) the label in `meta` 10px `muted` after a 6px dot in its segment's colour.
 
 **States**
