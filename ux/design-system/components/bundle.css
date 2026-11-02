@@ -1646,13 +1646,18 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .foster-ids-count{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
 .farrowing-phone .foster-ids .st-choice-search{margin:0}
 .farrowing-phone .foster-id-box{border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--paper);overflow:clip}
-.farrowing-phone .foster-id-scroll{max-height:calc(2.5 * var(--animal-row-min));overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.farrowing-phone .foster-id-scroll{max-height:calc(2.5 * var(--animal-row-min));overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;scroll-snap-type:y mandatory}
+.farrowing-phone .foster-id-scroll>.st-row{scroll-snap-align:start}   /* a whole row at the top of the box, never a half one */
+.farrowing-phone .piglet-sex{display:inline-flex;margin-left:var(--space-6);vertical-align:-2px;color:var(--muted)}
+.farrowing-phone .piglet-sex svg{width:var(--size-14);height:var(--size-14);stroke-width:2}
 .farrowing-phone .foster-id-scroll::-webkit-scrollbar{display:none}
 .farrowing-phone .foster-id-scroll>.st-row+.st-row{border-top:var(--border-width) solid var(--line)}
 .farrowing-phone .foster-id-none{margin:0;padding:var(--space-16)}
 /* Foster piglets: Send or Receive heads the page, over the search bar. */
 .farrowing-phone .foster-pick .foster-direction{padding:0 var(--space-gutter) var(--space-12)}
-/* Allocate piglets (owner, 2026-11-02): a menu drawer of three verb tiles, then what has been fostered off so far; the same list heads
-   Foster piglets when it is opened from Allocate. */
+/* Allocate piglets (owner, 2026-11-02): a menu drawer, the question and its three choices, then what has been sent so far; the same
+   list heads Foster piglets when it is opened from Allocate. */
 .farrowing-phone .allocate-sent{margin-top:var(--space-18)}
 .farrowing-phone .foster-pick .allocate-sent{margin:0 0 var(--space-18)}
+/* Hand-rear and Rearing pen: a short content drawer; the card keeps the section space above the footer. */
+.farrowing-phone .alloc-done-body{padding-bottom:var(--space-24)}
