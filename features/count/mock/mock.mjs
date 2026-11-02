@@ -60,6 +60,8 @@ const CSS = `
   .m-count .m-total-field{margin-left:10px;display:flex}
   .m-count .m-total-field>*{box-sizing:border-box;width:56px;height:44px;border:1px solid #bdc7b6;border-radius:12px;background:#fff;text-align:center;font:600 16px/42px 'IBM Plex Mono',monospace;color:#20291f;padding:0}
   .m-count .m-total-field>[data-idle],.m-count .m-total-field>.is-idle{color:#657060}
+  .m-count .m-away .st-row-copy small{color:var(--amber,#896017)}
+  .m-count .m-hint b{font-family:var(--font-mono,'IBM Plex Mono',monospace)}
   .m-count .m-trail{margin-left:auto;font-size:13px;color:var(--ink-2,#5b625d);font-variant-numeric:tabular-nums}
   .m-count .m-trail.m-short{color:var(--ink,#1d221e);font-weight:600}
   .m-count .sheet-body>*{flex-shrink:0}
@@ -102,115 +104,81 @@ if (want('1-')) {
 
 // 2. (Dropped, owner 2026-11-02: no "Last counted" row on Home; a recount is asked for inside the task that needs it.)
 
-// 3. Count one pen (owner, 2026-11-02): first count every pig in the pen, then scan (or type) the ear tags; repeat reads count once.
-//    Pigs without ear tags are worked out, never counted: all pigs − tagged pigs. Pen D4: 2 with ear tags, 14 without on record.
-for (const [name, all] of [['mock-3-count-pen.png', 14], ['mock-3b-count-pen-match.png', 16]]) {
+// 3. Count one pen (owner, 2026-11-02): one pen at a time. First count every pig in the pen, then add the ear tags with the shared
+//    search-and-scan field (farms without a reader type them); each added pig appears below it, a tag added twice counts once, and a
+//    pig the record places in another pen says so quietly ("Currently in …"). Pigs without ear tags are worked out, never typed.
+//    Pen D4 on record: 000801, 000802, 000803 with ear tags + 13 without = 16.
+for (const [name, fewer] of [['mock-3-count-pen.png', true], ['mock-3b-count-pen-match.png', false]]) {
   if (!want(name.slice(5, 7))) continue;
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
-  await p.evaluate(({ all }) => {
+  await p.evaluate(({ fewer }) => {
     const { U, ic, page, footer, primary } = window.M;
-    const tagged = 2, untagged = all - tagged, expected = 14, diff = untagged - expected;
-    const pig = (id) => U.rowSelectDoor({ code: id, description: 'Grower · 63d', contextWidth: '112px', checked: true, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig selected', label: id, right: { kind: 'tags', tags: [] } });
-    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs in D4', value: all, min: tagged, max: 80, action: 'x', reserveHint: false }) + '</section>';
-    const scan = U.scanBar({ state: 'scanning', device: 'Reader 1', stop: { action: 'x' } });
-    const typeRow = U.row({ variant: 'navigation', icon: ic('plus'), title: 'Type an ear tag', trail: 'chevron', action: 'x' });
-    const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Scan the ear tags · ' + tagged + ' of 2', icon: ic('tag'), kind: 'section', level: 3 })
-      + '<div class="m-inline-bar">' + scan + '</div>'
-      + U.rowGroup(pig('000801') + pig('000802') + typeRow)
-      + (all === 14 ? '<p class="m-hint">000802 read twice · counted once.</p>' : '') + '</section>';
-    const result = '<section class="feature-section">' + U.rowGroup(U.row({ title: 'Without ear tags', description: all + ' counted − ' + tagged + ' with ear tags', trailing: String(untagged), className: 'm-total' }), { className: 'm-evidence' })
-      + (diff === 0 ? '<p class="m-diff">Matches the record.</p>' : `<p class="m-diff"><strong>${Math.abs(diff)} ${diff < 0 ? 'fewer' : 'more'} than the record.</strong> <span>Saved as ${Math.abs(diff)} unaccounted in batch 25.</span></p>`) + '</section>';
+    const all = 16;
+    const added = fewer
+      ? [['000801', 'Grower · 63d'], ['000802', 'Grower · 63d'], ['000512', 'Currently in Unit 9 · C3', true], ['000733', 'Currently in D2', true]]
+      : [['000801', 'Grower · 63d'], ['000802', 'Grower · 63d'], ['000803', 'Grower · 63d']];
+    const notAdded = fewer ? ['000803'] : [];
+    const tagged = added.length + notAdded.length, untagged = all - tagged, expected = 13, diff = untagged - expected;
+    const row = ([id, ctx, away]) => U.row({ code: id, description: ctx, trail: 'chevron', action: 'x', className: 'm-added' + (away ? ' m-away' : '') });
+    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs in D4', value: all, min: added.length, max: 80, action: 'x', reserveHint: false }) + '</section>';
+    const search = U.choiceSearch({ label: 'Search ear tag', placeholder: 'Ear tag', value: '', clear: { action: 'x' }, scan: { action: 'x', label: 'Scan ear tags' } });
+    const tags = '<section class="feature-section">' + U.heading({ title: 'Ear tags · ' + added.length + ' added', icon: ic('tag'), kind: 'section', level: 3 })
+      + '<div class="m-inline-bar">' + search + '</div>'
+      + U.rowGroup(added.map(row).join(''))
+      + (notAdded.length ? '<p class="m-hint">Recorded here, not added yet: <b>' + notAdded.join(', ') + '</b></p>' : '')
+      + (fewer ? '<p class="m-hint">000802 added twice · counted once.</p>' : '') + '</section>';
     const line = (title, description, figure, strong) => U.row({ title, description, trailing: figure, className: strong ? 'm-total' : '' });
     const evidence = U.heading({ title: 'Since the last count', icon: ic('record'), kind: 'section', level: 3 })
       + U.rowGroup(line('Counted', 'Oct 28 · 08:10 · G.H', '20')
         + line('Moved to D6', 'Oct 30 · 14:20 · M.L', '−3')
         + line('Died', 'Yesterday · 07:05 · G.H', '−1')
-        + line('Should be here now', '2 with ear tags · 14 without', '16', true), { className: 'm-evidence' })
-      + '<p class="m-hint">Without ear tags is worked out: all pigs − ear tags read. A difference is saved as unaccounted in batch 25; nothing else changes.</p>';
-    // The tally rides in the footer, as on the room count: what the pen is left with and how it differs from the record.
+        + line('Should be here now', '3 with ear tags · 13 without', '16', true), { className: 'm-evidence' });
     const left = '<div class="m-left"><strong>' + untagged + ' without ear tags</strong><small>' + (diff === 0 ? 'Matches the record' : Math.abs(diff) + ' unaccounted') + '</small></div>';
-    const body = count + tags + `<section class="feature-section">${evidence}</section>`;
-    page('Count pigs', 'Pen D4 · Unit 7', body, footer(left, primary('Save count')));
-  }, { all });
+    page('Count pigs', 'Pen D4 · Unit 7', count + tags + `<section class="feature-section">${evidence}</section>`, footer(left, primary('Save count')));
+  }, { fewer });
   await shoot(p, name);
 }
 
-// 4. Count a room: Unit 7, pen by pen as the worker walks. Each pen card takes the count of every pig in it (its field), then the
-//    ear tags are scanned; a pig recorded elsewhere joins the pen scanned just before; pigs without ear tags are worked out.
-if (want('4-')) {
-  const p = await open(INSPECT, 'inspection.walk');
-  await prep(p);
-  await p.evaluate(() => {
-    const { U, ic, page, footer, primary } = window.M;
-    const pig = (id, ctx, on, extra = {}) => U.rowSelectDoor({ code: id, description: ctx, contextWidth: '112px', right: extra.right || { kind: 'tags', tags: [] }, checked: on, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig' + (on ? ' selected' : '') + (extra.cls || ''), label: id });
-    // The pen's count field: the group row's own 44px number field, lifted onto the pen header.
-    const field = (value, idle) => { const t = document.createElement('div'); t.innerHTML = U.rowSelectDoor({ code: 'x', value: 'x', action: '', checked: false, count: { value, idle, attrs: { 'data-m-total': '' } } }); return t.querySelector('[data-m-total]')?.outerHTML || ''; };
-    const card = (pen, small, rows, total, idle, trail) => '<section class="inspect-pen m-card" data-pen="' + pen + '"><header class="inspect-pen-head"><span class="pen-name"><strong>' + pen + '</strong><small>· ' + small + '</small></span><span class="m-trail' + (/here|seen/.test(trail) ? ' m-short' : '') + '">' + trail + '</span><span class="m-total-field">' + field(total, idle) + '</span></header>' + rows + '</section>';
-    const without = (n, how) => U.row({ icon: ic('tag-off'), title: 'Without ear tags', description: how, trailing: String(n), className: 'm-total' });
-    const scan = U.scanBar({ state: 'scanning', device: 'Reader 1', stop: { action: 'x' } });
-    const hint = '<p class="m-hint"><b>Count</b> · type how many pigs are in each pen, then scan the ear tags. Pens you skip stay as they are.</p>';
-    const c1 = card('C1', '3 pigs', pig('000254', 'Gestation · 40d', true) + pig('000267', 'Gestation · 42d', true) + pig('000281', 'Gestation · 46d', false), 3, false, '1 not seen');
-    const c2 = card('C2', '2 pigs', pig('000306', 'Gestation', true) + pig('000312', 'Gestation · 35d', true) + pig('000512', 'Was Unit 9 · C3', true, { cls: ' m-found', right: { kind: 'state', word: 'Moves here', level: 'live' } }), 3, false, '+1 here');
-    const d4 = card('D4', '16 pigs', pig('000801', 'Grower · 63d', true) + pig('000802', 'Grower · 63d', true) + without(12, '14 counted − 2 with ear tags'), 14, false, '');
-    const d5 = card('D5', '38 pigs', without(38, 'Not counted'), 38, true, '');
-    const body = '<div class="inspect-list m-list">' + hint + c1 + c2 + d4 + d5 + '</div>';
-    const left = '<div class="m-left"><strong>3 of 4 pens</strong><small>1 not seen yet</small></div>';
-    page('Count pigs', 'Unit 7', body, footer(left, primary('Save count')), `<div class="m-bar">${scan}</div>`);
-  });
-  await p.waitForTimeout(400); await p.screenshot({ path: path.join(out, 'mock-4-count-room.png') });
-  await p.evaluate(() => { const s = document.querySelector('.phone .sheet-body'); if (s) s.scrollTop = 330; });
-  await shoot(p, 'mock-4c-count-room-scrolled.png');
-}
-
-// 4b. An unknown tag read during the count: the shared scan toast, the count goes on.
-if (want('4b')) {
-  const p = await open(INSPECT, 'inspection.walk');
-  await prep(p);
-  await p.evaluate(() => {
-    const { U, card, page, footer, primary } = window.M;
-    const pig = (id, ctx, on) => U.rowSelectDoor({ code: id, description: ctx, contextWidth: '112px', right: { kind: 'tags', tags: [] }, checked: on, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig' + (on ? ' selected' : ''), label: id });
-    const scan = U.scanBar({ state: 'scanning', device: 'Reader 1', stop: { action: 'x' } });
-    const c1 = '<div class="inspect-list m-list">' + card('C1', '3 pigs', pig('000254', 'Gestation · 40d', true) + pig('000267', 'Gestation · 42d', true) + pig('000281', 'Gestation · 46d', false), '2 of 3') + '</div>';
-    const toast = U.toast('No pig with this tag', { detail: '000999 · Left out of the count', dismiss: { action: 'x' }, door: { action: 'x', label: 'Open' } });
-    page('Count pigs', 'Unit 7', '<p class="m-hint"><b>Count</b> · scan every pig, type how many have no ear tag. Pens you skip stay as they are.</p>' + c1 + `<div class="m-toast-host">${toast}</div>`, footer('<div class="m-left"><strong>1 of 4 pens</strong><small>1 not seen yet</small></div>', primary('Save count')), `<div class="m-bar">${scan}</div>`);
-    const st = document.createElement('style'); st.textContent = '.m-toast-host{position:absolute;left:16px;right:16px;bottom:104px}.m-toast-host>*{position:static!important;transform:none!important;opacity:1!important}';
-    document.head.append(st);
-  });
-  await shoot(p, 'mock-4b-count-unknown-tag.png');
-}
-
-// 5. Saved: a receipt you read at a glance. One tile per pen counted: ✓ matches, +n / −n differs (amber), – not counted.
-//    Under it only what needs a person: the tagged pigs not seen. No sentences.
+// 5. Count saved (one pen whose count touched others): this pen first, as one figure and what made it; then every other pen the
+//    count changed, as tiles, each with the pigs that left it; then only the pigs that need a person. Read at a glance, no sentences.
 if (want('5-')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
   await p.evaluate(() => {
     const { U, ic } = window.M;
-    const check = window.SentriIcons.icon('check');
-    const head = `<div class="tk-receipt m-head" role="status"><span class="tk-receipt-mark">${check}</span><div><p class="tk-receipt-title">Unit 7 counted</p><p class="tk-receipt-meta">09:30 · L.M</p></div></div>`;
-    const tile = (code, mark, kind, n) => `<div class="m-tile" data-kind="${kind}"><strong>${code}</strong><span class="m-mark">${mark}</span><small>${n}</small></div>`;
-    const tiles = '<div class="m-tiles">' + tile('C1', '!', 'diff', '1 not seen') + tile('C2', '+1', 'diff', '3 pigs') + tile('D4', '−2', 'diff', '14 pigs') + tile('D5', '–', 'skip', 'Skipped') + '</div>';
+    const hero = '<div class="m-hero"><div class="m-hero-pen"><strong>D4</strong><span class="m-hero-n">16</span><small>pigs</small></div>'
+      + '<div class="m-hero-parts"><span><b>5</b> with ear tags</span><span><b>11</b> without</span></div></div>';
+    const chip = (mark, word, kind) => `<div class="m-chip" data-kind="${kind}"><span class="m-mark">${mark}</span><small>${word}</small></div>`;
+    const here = '<div class="m-chips">' + chip('+2', 'moved in', 'info') + chip('−2', 'unaccounted', 'info') + '</div>';
+    const tile = (code, mark, pigs) => `<div class="m-tile" data-kind="info"><strong>${code}</strong><span class="m-mark">${mark}</span><small>${pigs}</small></div>`;
+    const others = U.heading({ title: 'Other pens', icon: ic('transfer'), kind: 'section', level: 3 })
+      + '<div class="m-tiles">' + tile('Unit 9 · C3', '−1', '000512') + tile('D2', '−1', '000733') + '</div>';
     const notSeen = U.heading({ title: 'Not seen', icon: ic('alert'), kind: 'section', level: 3 })
-      + U.rowGroup(U.row({ variant: 'navigation', code: '000281', title: 'Pen C1', trail: 'chevron', action: 'x' }));
-    const body = tiles + notSeen;
-    const sheet = U.sheet({ variant: 'drawer', title: 'Count saved', line: 'Unit 7 · 3 of 4 pens · 09:30 · L.M', body, footer: '<div class="sheet-footer" data-ds="Sheet">' + U.button({ label: 'Done', register: 'primary', action: 'x' }) + '</div>', className: 'm-count m-receipt', label: 'Count saved' });
+      + U.rowGroup(U.row({ variant: 'navigation', code: '000803', title: 'Stays in D4', trail: 'chevron', action: 'x' }));
+    const sheet = U.sheet({ variant: 'drawer', title: 'Count saved', line: 'Pen D4 · 09:30 · L.M', body: hero + here + others + notSeen, footer: '<div class="sheet-footer" data-ds="Sheet">' + U.button({ label: 'Done', register: 'primary', action: 'x' }) + '</div>', className: 'm-count m-receipt', label: 'Count saved' });
     const phone = document.querySelector('.phone');
     (phone.querySelector('.inspect-main') || phone.firstElementChild).setAttribute('inert', '');
     phone.insertAdjacentHTML('beforeend', '<div class="m-scrim"></div>' + sheet);
     const st = document.createElement('style');
     st.textContent = `.m-scrim{position:absolute;inset:0;background:rgba(20,24,21,.38);z-index:5}.phone>.sheet.m-receipt{position:absolute;left:0;right:0;bottom:0;z-index:6}
-      .m-receipt .m-tiles{margin-top:4px}
-      .m-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
-      .m-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:96px;border-radius:12px;background:var(--paper,#fff);border:1px solid var(--line,#dfe2da)}
-      .m-tile strong{font:600 15px/1.2 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#1d221e)}
-      .m-tile .m-mark{font:700 22px/1.2 var(--font-sans);color:var(--ink,#1d221e);font-variant-numeric:tabular-nums;height:28px;display:flex;align-items:center}
-      .m-tile .m-mark svg{width:24px;height:24px;fill:none;stroke:var(--green,#2f6b3d);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-      .m-tile small{font-size:12px;color:var(--muted,#6b736d)}
-      .m-tile[data-kind="diff"]{background:var(--amber-fill,#fede82);border-color:transparent}
-      .m-tile[data-kind="diff"] strong,.m-tile[data-kind="diff"] .m-mark,.m-tile[data-kind="diff"] small{color:var(--amber-fill-ink,#5c3f00)}
-      .m-tile[data-kind="skip"]{background:var(--well,#eceee8);border-color:transparent}
-      .m-tile[data-kind="skip"] strong,.m-tile[data-kind="skip"] .m-mark{color:var(--muted,#6b736d)}`;
+      .m-hero{display:flex;align-items:center;gap:16px;padding:14px 16px;border:1px solid var(--line,#dfe4d8);border-radius:18px;background:var(--paper,#fff);margin:4px 0 8px}
+      .m-hero-pen{display:flex;align-items:baseline;gap:8px}
+      .m-hero-pen strong{font:600 15px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}
+      .m-hero-n{font:600 40px/1 var(--font-mono,'IBM Plex Mono',monospace);letter-spacing:-1px;color:var(--ink,#20291f)}
+      .m-hero-pen small{font-size:13px;color:var(--muted,#657060)}
+      .m-hero-parts{margin-left:auto;display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--muted,#657060);text-align:right}
+      .m-hero-parts b{font:600 15px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}
+      .m-chips{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:6px}
+      .m-chip,.m-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:72px;border-radius:12px;background:var(--amber-fill,#fede82);color:var(--amber-fill-ink,#5c3f00)}
+      .m-chip .m-mark,.m-tile .m-mark{font:700 22px/1.2 var(--font-mono,'IBM Plex Mono',monospace)}
+      .m-chip small,.m-tile small{font-size:13px}
+      .m-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:6px}
+      .m-tile{min-height:88px}
+      .m-chip[data-kind=info],.m-tile[data-kind=info]{background:var(--paper,#fff);border:1px solid var(--line,#dfe4d8);color:var(--ink,#20291f)}
+      .m-tile[data-kind=info] small,.m-chip[data-kind=info] small{color:var(--muted,#657060)}
+      .m-tile strong{font:600 14px/1.2 var(--font-mono,'IBM Plex Mono',monospace)}
+      .m-tile small{font-family:var(--font-mono,'IBM Plex Mono',monospace)}`;
     document.head.append(st);
   });
   await shoot(p, 'mock-5-result.png');

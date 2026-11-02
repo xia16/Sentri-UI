@@ -8,6 +8,19 @@ The owner's words (2026-11-02): *"count is not only for piglets but we do counts
 
 **Count is a place's action, one page for every place.** It sits on the pen page (beside Note, Feed, Observe, Fault, Tick all), never in a pig's Actions: you count a place, not a pig. Home never reminds anyone to count (owner, 2026-11-02): a recount of a room is asked for **inside the task whose number disagrees**, as in the old app (receiving pigs in Transfer: 28 arrived where 30 were sent). The page is the Inspection list you already know, in counting mode, and the order is the barn's (owner, 2026-11-02): **first count every pig in the pen**, one number, which is easy; **then scan the ear tags** (or type one), the reader always listening, a pig read twice counted once because pigs move about. Pigs without ear tags are never counted on their own, which is hard: they are worked out, all pigs − pigs with ear tags. A pig the record places somewhere else is ticked here with *Moves here*. **Save count** writes one observation: what was seen, what the record expected, who and when. Scanned pigs from elsewhere move here. Pigs with ear tags that were not seen **stay where they are recorded**: the receipt lists them, and opening one is the way to Report missing. A difference in pigs without ear tags is saved as **unaccounted** on their batch (Round 9), never as a pen status, never a birth or a death. No reason is asked. The few pigs you just moved in are not a count: **Transfer records the arrivals** (scan them at the new pen, or type how many), so nobody rescans 30 pigs for 3. And conditions on pigs without ear tags **follow the pigs you pick**: picking 5 of 14 asks, for each condition the group has, how many of the 5 have it.
 
+
+## Owner review, 2026-11-02 (supersedes the room count and the first Count saved below)
+
+Reviewed on the Claude Design canvas ([canvas.md](canvas.md)). Ruled and redrawn:
+
+- **One pen at a time.** There is no room count: a farm never counts a whole room in one go. A task that asks for a recount names its pens, and each pen is counted on its own page. The room screens and the per-room questions below are withdrawn.
+- **Count every pig first, then add the ear tags.** The pen's number is one count of all pigs, which is easy; pigs without ear tags are worked out (all − ear tags), never counted alone, which is hard.
+- **The ear tags go in through the shared search-and-scan field** (the same control as search elsewhere), because some farms have no reader: type a tag, or tap scan. Each added pig appears in the list below it. A tag added twice counts once (pigs move about while you scan).
+- **A pig recorded in another pen says so quietly** on its second line: *Currently in Unit 9 · C3* in amber text, no chip. Saving moves it here.
+- **Pigs recorded here and not added** are named under the list (*Recorded here, not added yet: 000803*). They stay recorded here and are counted as tagged when working out the pigs without ear tags.
+- **Count saved handles a count that touched several pens:** this pen first as one figure (*D4 · 16 pigs · 5 with ear tags · 11 without*) and what made it (*+2 moved in*, *−2 unaccounted*); then a tile for every other pen it changed, with the pigs that left it (*Unit 9 · C3 −1 · 000512*, *D2 −1 · 000733*); then only the pigs that need a person (*Not seen · 000803*, which opens her). Colour is kept for what needs someone; the rest is white.
+- Withdrawn with the room count: owner questions 2 (as worded), 5 and the room scenarios 17 to 19; scenario 18 (a pig from another pen) now happens inside a pen count.
+
 ---
 
 ## 1. The old system, and what is complex about it
