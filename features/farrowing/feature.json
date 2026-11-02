@@ -1589,7 +1589,7 @@
           {
             "name": "Against herself",
             "at": "Against herself",
-            "shows": "Born alive (filled) and weaned (outlined) per litter, this litter last in the deeper green with alive now as its outlined bar; the target line dashed.",
+            "shows": "Born alive (filled) and weaned (outlined) per litter, this litter last (P3 · now) in the deeper green with alive now as its outlined bar; the target line dashed. The legend is one line: Born alive · Weaned · Target.",
             "logic": "Earlier litters come from her production records (sample data here). Target = the batch's born-alive target (12).",
             "source": "farrowing-astra-concept.js finishedDetails(), pastLitters()"
           },
@@ -1606,8 +1606,8 @@
           "(raw) Details",
           "(raw) This litter · Against her batch · Against herself",
           "(raw) This sow · Batch average · Batch range",
-          "(raw) Born alive · Weaned · this litter: alive now · Target 12",
-          "(raw) P1 · P2 · P3 · this"
+          "(raw) Born alive · Weaned · Target 12",
+          "(raw) P1 · P2 · P3 · now"
         ],
         "edge": [],
         "rules": [
@@ -1668,7 +1668,7 @@
           "(raw) Details",
           "(raw) This litter · Against her batch · Against herself",
           "(raw) This sow · Batch average · Batch range",
-          "(raw) Born alive · Weaned · this litter: alive now · Target 12",
+          "(raw) Born alive · Weaned · Target 12",
           "(raw) No earlier litters on record · Her past litters show here once they're recorded."
         ],
         "edge": [],
