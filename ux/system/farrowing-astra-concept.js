@@ -142,13 +142,15 @@ function act(s,a,v){
  // Allocate piglets (owner, 2026-11-02): a tile only chooses; its section opens under the tiles. Foster is the sow picker in place
  // (search, pen cards, scan; a sow opens the count drawer); Send saves and the page stays while piglets are left, so 3 can go to one
  // sow and 3 to another. Hand-rear and the rearing pen take what is left, from the footer.
- if(a==='allocChoose'){if(v==='move'&&s.allocChoice!=='move'){s.featureReturn='allocate';s.fosterDraft={...fosterDraft(s.alive),unit:homeUnit(s).id};}s.allocChoice=v;}
- // Allocate's sow picker opens filtered to her own unit; the filter's unit chips reach the batch's other units, All is no filter
- // (owner, 2026-11-02). The sheet works on a draft: Show N sows applies it, Reset returns to her unit, Back drops it.
- if(a==='allocFilter'){s.fosterDraft.filtering=true;s.fosterDraft.unitDraft=s.fosterDraft.unit;}
- if(a==='allocUnit')s.fosterDraft.unitDraft=v;
- if(a==='allocFilterReset')s.fosterDraft.unitDraft=homeUnit(s).id;
- if(a==='allocFilterApply'){s.fosterDraft.unit=s.fosterDraft.unitDraft;s.fosterDraft.filtering=false;}
+ if(a==='allocChoose'){if(v==='move'&&s.allocChoice!=='move'){s.featureReturn='allocate';s.fosterDraft={...fosterDraft(s.alive),filter:allocFilterDefault(s)};}s.allocChoice=v;}
+ // Allocate's sow picker opens filtered to her own unit. The filter is the room's (expected farrowing, parity) plus the unit, whose chips
+ // reach the batch's other units; All is no unit filter (owner, 2026-11-02). The sheet works on a draft: Show N sows applies it, Reset
+ // returns to the defaults (her unit, any time, any parity), Back drops it.
+ if(a==='allocFilter'){s.fosterDraft.filtering=true;s.fosterDraft.filterDraft=clone(s.fosterDraft.filter);}
+ if(a==='allocUnit')s.fosterDraft.filterDraft.unit=v;
+ if(a==='allocParity')s.fosterDraft.filterDraft.parity=v;
+ if(a==='allocFilterReset')s.fosterDraft.filterDraft=allocFilterDefault(s);
+ if(a==='allocFilterApply'){s.fosterDraft.filter=s.fosterDraft.filterDraft;s.fosterDraft.filtering=false;}
  if(a==='allocFilterBack')s.fosterDraft.filtering=false;
  if(a==='allocMove'){s.view='allocate';act(s,'allocChoose','move');}
  if(a==='allocHand'){const n=s.alive;s.handReared={at:'09:41',who:'G.H'};event(s,`${n} piglet${n===1?'':'s'} hand-reared in her crate`,'milestone');s.allocChoice=null;s.view='room';}
@@ -854,7 +856,7 @@ function allocate(s){
  if(c==='move'){
   const bar=f.scanning?SentriUI.scanBar({state:f.scanning==='waiting'?'waiting':'scanning',device:'Reader 1',text:f.scanning==='waiting'?'':'Scan the other sow',stop:{action:'fosterScanStop'}})
    :SentriUI.choiceSearch({label:'Search ear tag or pen',placeholder:'Ear tag or pen',value:f.q,attrs:{'data-foster-search':''},clear:{action:'fosterClear'},scan:{action:'fosterScan',label:'Scan ear tag'}});
-  const filter=f.scanning?'':SentriUI.iconButton({action:'allocFilter',icon:icon('filter'),label:'Filter sows'+(f.unit!=='all'?', 1 applied':''),badge:f.unit!=='all'?1:'',className:'allocate-filter'});
+  const filter=f.scanning?'':SentriUI.iconButton({action:'allocFilter',icon:icon('filter'),label:'Filter sows'+(allocActive(f.filter)?`, ${allocActive(f.filter)} applied`:''),badge:allocActive(f.filter)||'',className:'allocate-filter'});
   section=`<div class="foster-pick allocate-foster"><div class="allocate-bar">${bar}${filter}</div><div class="foster-list">${allocFosterList(s)}</div></div>`;commit=false;
  }
  if(c==='hand'){section=SentriUI.facts([{label:'Piglets',value:String(n)},{label:'Stay in',value:`Crate ${s.pen}`}]);commit=btn('allocHand',`Hand-rear ${pigs}`,'button primary');}
@@ -1019,6 +1021,9 @@ const fosterSow=(s,tag)=>fosterCandidates(s).find(x=>x.r.tag===tag)?.r||(p=>p&&f
 // A pig outside Farrowing found by search (a weaned sow taken as nurse sow): a light record of her own, kept with the room, so a send lands.
 const fosterFarmSow=(c,p)=>(c.fosterFarm||={})[p.tag]||=({tag:p.tag,pen:p.pen,stage:p.stage,unit:p.unit,farm:true,locked:true,alive:0,moved:0,unidentified:0,dead:[0,0,0,0,0,0],events:[]});
 const homeUnit=s=>{const c=roomContext(s);return c.units.find(u=>u.records.includes(s))||c.unit;};
+const allocFilterDefault=s=>({unit:homeUnit(s).id,...defaultRoomFilter()});
+const allocFilterCount=(s,g)=>Number(g.unit!==homeUnit(s).id)+roomFilterCount(g);   // what differs from the defaults (Reset shows)
+const allocMatch=(g,r,u)=>(g.unit==='all'||u.id===g.unit)&&(!r.farm&&matchesRoomFilter(r,g)||r.farm&&roomFilterCount(g)===0);
 const fosterMax=s=>{const f=s.fosterDraft;return f.direction==='out'?s.alive:fosterSow(s,f.target)?.alive||0;};   // receiving takes no more than she has
 function fosterRow(r,q){
  const f=sowFacts(r),context=f.context.split(' · ').filter(t=>!/^[A-Z]\.[A-Z]$/.test(t)).join(' · ');   // her room row, without the hand
@@ -1047,25 +1052,30 @@ function fosterPage(s){
 // right). The unit chips filter it, her unit chosen on entry. Typing an ear tag reaches every pig on the farm, in or out of this batch;
 // a pen is searched only in the chosen unit (owner, 2026-11-02). Her unit first, then the batch's units, then the rest of the farm.
 function allocFosterList(s){
- const f=s.fosterDraft,c=roomContext(s),q=f.q.trim().toLowerCase(),home=homeUnit(s),inUnit=u=>f.unit==='all'||u.id===f.unit;
- const hit=(r,u)=>q?r.tag.includes(q)||inUnit(u)&&r.pen.toLowerCase().includes(q):inUnit(u);
- const items=[...fosterCandidates(s).filter(({r,unit})=>hit(r,unit)),...(q?farmPigs.filter(p=>!p.gone).map(p=>({p,unit:farmUnit(c,p.unit)})).filter(({p,unit})=>hit(p,unit)).map(({p,unit})=>({r:fosterFarmSow(c,p),p,unit})):[])];
- const where=f.unit==='all'?'':` in ${farmUnit(c,f.unit).name}`;
- if(!items.length)return `<p class="st-find-hint">${q?`No pig matching “${esc(f.q.trim())}”${/^d+$/.test(q)?'':where}.`:`No other sow has a litter${where}.`}</p>`;
+ const f=s.fosterDraft,g=f.filter,c=roomContext(s),q=f.q.trim().toLowerCase(),home=homeUnit(s),inFilter=(r,u)=>allocMatch(g,r,u);
+ const hit=(r,u)=>q?r.tag.includes(q)||inFilter(r,u)&&r.pen.toLowerCase().includes(q):inFilter(r,u);
+ const items=[...fosterCandidates(s).filter(({r,unit})=>hit(r,unit)),...(q?farmPigs.filter(p=>!p.gone).map(p=>({p,unit:farmUnit(c,p.unit),r:fosterFarmSow(c,p)})).filter(({r,unit})=>hit(r,unit)):[])];
+ const where=g.unit==='all'?'':` in ${farmUnit(c,g.unit).name}`;
+ if(!items.length)return `<p class="st-find-hint">${q?`No pig matching “${esc(f.q.trim())}”${/^d+$/.test(q)?'':where}.`:`No other sow${allocFilterCount(s,{...g,unit:home.id})?' matches the filter':' has a litter'}${where}.`}</p>`;
  const inBatch=u=>c.units.some(x=>x.id===u.id),units=[...new Map(items.map(x=>[x.unit.id,x.unit])).values()].sort((a,b)=>(b.id===home.id)-(a.id===home.id)||inBatch(b)-inBatch(a)||String(a.id).localeCompare(String(b.id),undefined,{numeric:true}));
  const right=x=>{if(x.p)return x.p.cond?{kind:'tags',tags:[{name:x.p.cond,level:'ongoing'}]}:null;const sf=sowFacts(x.r);return {kind:'state',figure:sf.figure,word:sf.word,level:sf.level};};
  // Nothing typed: the plain Row · Animal, the tag in ink; typed: Lookup's find row, the typed part marked and the rest muted.
  const row=x=>{const p={code:x.r.tag,place:rowText.pen(x.r.pen),right:right(x),action:'fosterPick',value:x.r.tag};return (q?SentriUI.findRow({...p,query:q}):SentriUI.row({variant:'animal',code:p.code,description:p.place,right:p.right||{kind:'state',figure:'',word:'',level:'settled'},action:p.action,value:p.value})).replace('<button ',`<button data-scan-tag="${x.r.tag}" `);};
  return SentriUI.lookupGroups(units.map(u=>({title:u.name,rows:items.filter(x=>x.unit.id===u.id).sort((a,b)=>a.r.pen.localeCompare(b.r.pen,undefined,{numeric:true})||a.r.tag.localeCompare(b.r.tag)).map(row)})),{variant:'find'});
 }
-// The filter, as Choose pigs' (a FilterSheet): one section, the unit, as chips (FilterChips: there can be ten units). All first, then
-// each unit of the batch with a sow that can take piglets, with that count. Her unit is the default, so Reset returns to it.
+// The filter is the room's Filter sows (expected farrowing, parity) with the unit added first, as chips (FilterChips: there can be ten
+// units). All first, then each unit of the batch with a sow that can take piglets, with that count.
 function allocFilterSheet(s){
- const f=s.fosterDraft,home=homeUnit(s).id,list=fosterCandidates(s),units=[...new Map(list.map(x=>[x.unit.id,x.unit])).values()].sort((a,b)=>String(a.id).localeCompare(String(b.id),undefined,{numeric:true}));
- const n=list.filter(({unit})=>f.unitDraft==='all'||unit.id===f.unitDraft).length;
- const chips=SentriUI.filterChips({items:[{value:'all',label:'All',checked:f.unitDraft==='all'},...units.map(u=>({value:u.id,label:u.name,count:list.filter(x=>x.unit===u).length,checked:f.unitDraft===u.id}))],action:'allocUnit',key:'allocUnit',label:'Unit'});
- return SentriUI.filterSheet({title:'Filter sows',sections:[{title:'Unit',icon:icon('grid'),content:chips}],apply:{label:`Show ${n} ${n===1?'sow':'sows'}`,action:'allocFilterApply'},reset:f.unitDraft!==home?{label:'Reset',action:'allocFilterReset'}:false,backAction:'allocFilterBack',className:'batch-filter-sheet alloc-filter-sheet',size:'medium'});
+ const f=s.fosterDraft,d=f.filterDraft,list=fosterCandidates(s),units=[...new Map(list.map(x=>[x.unit.id,x.unit])).values()].sort((a,b)=>String(a.id).localeCompare(String(b.id),undefined,{numeric:true}));
+ const n=allocShown(s,d);
+ const chips=SentriUI.filterChips({items:[{value:'all',label:'All',checked:d.unit==='all'},...units.map(u=>({value:u.id,label:u.name,count:list.filter(x=>x.unit===u).length,checked:d.unit===u.id}))],action:'allocUnit',key:'allocUnit',label:'Unit'});
+ const sections=[{title:'Unit',icon:icon('grid'),content:chips},
+  {content:SentriUI.rangeSlider({min:-7,max:7,value:[d.from,d.to],title:'Expected farrowing',icon:icon('calendar'),key:'allocDue',labels:['Earliest expected farrowing','Latest expected farrowing'],format:dueDay,summary:(from,to)=>dueRangeLabel({from,to}),ends:['7+ days ago','Today','In 7+ days']})},
+  {title:'Parity',icon:icon('profile'),content:SentriUI.segment({variant:'facet',options:parityChoices.map(v=>[v,v]),active:d.parity,action:'allocParity',ariaLabel:'Parity'})}];
+ return SentriUI.filterSheet({title:'Filter sows',sections,apply:{label:`Show ${n} ${n===1?'sow':'sows'}`,action:'allocFilterApply'},reset:allocFilterCount(s,d)?{label:'Reset',action:'allocFilterReset'}:false,backAction:'allocFilterBack',className:'room-utility room-filter-sheet alloc-filter-sheet'});
 }
+const allocActive=g=>Number(g.unit!=='all')+roomFilterCount(g);   // the badge: filters narrowing the list (her unit counts)
+const allocShown=(s,g)=>fosterCandidates(s).filter(({r,unit})=>allocMatch(g,r,unit)).length;
 function fosterCount(s,other,dead){
  const f=s.fosterDraft,out=f.direction==='out',max=fosterMax(s),word=out?'Send':'Receive',n=f.count;
  const line={text:[{text:out?'To ':'From '},{text:other.tag,strong:true},{text:` · ${rowText.pen(other.pen)} · ${other.farm?other.stage:rowText.alive(other.alive)}`}]};
@@ -1102,7 +1112,7 @@ document.addEventListener('pointerdown',()=>document.documentElement.dataset.inp
 document.addEventListener('keydown',()=>delete document.documentElement.dataset.inputMode,true);
 const gallery=document.getElementById('gallery');gallery.innerHTML=cards.map((c,i)=>`<article class="spec" data-card="${i}"><div class="spec-head"><div class="spec-title"><span>0${i+1}</span>${c.title}</div><button type="button" class="demo-scan" data-demo-scan hidden>Simulate scan</button><select class="scenario" aria-label="Example for ${c.title}">${presets.map(([v,l])=>`<option value="${v}"${v===c.initial?' selected':''}>${l}</option>`).join('')}</select></div><div class="phone farrowing-phone"></div><p class="caption">${c.caption}</p></article>`).join('');states.forEach((_,i)=>render(i));
 // The range slider reports each change; keep the draft and the live count in step.
-gallery.addEventListener('sentri-range-change',e=>{const root=e.target.closest('[data-card]'),c=roomContext(states[+root.dataset.card]);Object.assign(c.filterDraft,e.detail.values);const n=visibleRoomRecords(c,c.filterDraft).length;e.target.closest('.sheet').querySelector('[data-action="room-apply-filter"]').textContent='Show '+n+' '+(n===1?'sow':'sows');});
+gallery.addEventListener('sentri-range-change',e=>{const root=e.target.closest('[data-card]'),c=roomContext(states[+root.dataset.card]);if(e.detail.key==='allocDue'){const s=states[+root.dataset.card];Object.assign(s.fosterDraft.filterDraft,e.detail.values);const n=allocShown(s,s.fosterDraft.filterDraft);e.target.closest('.sheet').querySelector('[data-action="allocFilterApply"]').textContent='Show '+n+' '+(n===1?'sow':'sows');return;}Object.assign(c.filterDraft,e.detail.values);const n=visibleRoomRecords(c,c.filterDraft).length;e.target.closest('.sheet').querySelector('[data-action="room-apply-filter"]').textContent='Show '+n+' '+(n===1?'sow':'sows');});
 // Choose pigs: typing narrows the list where it is, so the field keeps focus; Clear shows only while something is typed.
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-foster-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,s=states[i],page=e.target.closest('.foster-pick');s.fosterDraft.q=e.target.value;page.querySelector('.foster-list').innerHTML=(s.view==='allocate'?allocFosterList:fosterList)(s);page.querySelector('[data-action="fosterClear"]')?.toggleAttribute('hidden',!s.fosterDraft.q);if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(s,roomContext(s)));});
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-batch-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,c=roomContext(states[i]),page=e.target.closest('.batch-pick');c.batch.q=e.target.value;page.querySelector('.batch-list').innerHTML=batchRows(c);page.querySelector('[data-action="room-batch-clear"]')?.toggleAttribute('hidden',!c.batch.q);});
