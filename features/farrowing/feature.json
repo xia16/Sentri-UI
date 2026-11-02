@@ -1042,7 +1042,7 @@
       "preset": "count",
       "figma": "",
       "notes": {
-        "purpose": "Count her litter while she farrows: alive now as one figure, Born alive taps and deaths held as this visit's draft until Save (owner, 2026-10-23).",
+        "purpose": "Count her litter while she farrows: alive now as one figure, and one row of keys under it (−, + Born alive, Death), all held as this visit's draft until Save (owner, 2026-10-23; keys 2026-11-02).",
         "states": [
           "Nothing entered: the card's right side is the quiet last-save line (\"Saved Aug 26 08:20\", or \"✓ Saved\" right after a Save); the bar is Back · Finish farrowing · ···",
           "A visit entered: see Counting · not saved yet (farrowing.count-draft)"
@@ -1056,18 +1056,11 @@
             "source": "farrowing-astra-concept.js aliveCard()"
           },
           {
-            "name": "Born alive",
+            "name": "Keys",
             "at": "Born alive",
-            "shows": "The count Stepper: − n + for the piglets born alive this visit, from 0.",
-            "logic": "Each tap changes the draft only; nothing is saved until Save. − stops at 0.",
-            "source": "farrowing-astra-concept.js act(\"bornAlive\")"
-          },
-          {
-            "name": "Report death",
-            "at": "Report death",
-            "shows": "One outlined tool button under the stepper.",
-            "logic": "Opens Report death, a level of this drawer (farrowing.death).",
-            "source": "farrowing-astra-concept.js count()"
+            "shows": "One row under the card: a narrow −, a wide green + Born alive, and a compact Death key (the down arrow over the word).",
+            "logic": "+ adds one born alive to the draft; − takes back a + not yet saved and greys at 0 (a saved count is corrected in Edit record); Death opens Report death. The drawer is sized to its content and is one height with or without a visit.",
+            "source": "farrowing-astra-concept.js count(), act(\"bornAlive\")"
           },
           {
             "name": "Bar",
@@ -1079,15 +1072,18 @@
         ],
         "controls": [
           {
-            "control": "Born alive − / +",
+            "control": "− / + Born alive",
             "does": "change this visit's draft; Save commits it"
+          },
+          {
+            "control": "Death",
+            "does": "opens Report death"
           }
         ],
         "copy": [
           "(raw) Alive · Details",
           "(raw) Saved Aug 26 08:20",
-          "(raw) Born alive",
-          "(raw) Report death",
+          "(raw) − · Born alive · Death",
           "(raw) Back · Finish farrowing"
         ],
         "edge": [

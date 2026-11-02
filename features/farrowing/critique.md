@@ -785,3 +785,24 @@ Foster piglets' TaskChoice (two or three big tiles that change the form below) f
 
 - **Better because** nothing is saved by accident, Alive always means alive now, and a death never inflates Born.
 - Before first count still shows Alive 0; the due card and Start farrowing are the next PR.
+
+# Counting: one row of keys under the Alive card (2026-11-02), critique
+
+Scope: the counting face. Baselined on `origin/main` at `59bed92` (PR 291) at 390 and 360; the owner picked the layout from v18–v22 (keys outside the card, one row, the down arrow on Death).
+
+## Problems
+
+- **major** · Two big boxes said the same thing: the Alive card and a full Born alive stepper card (its own 0) under it, so the eye had two figures to read.
+- **minor** · Report death was a full-width row of its own, so the drawer ran full height with empty space above the bar.
+
+## Attention budget
+
+1 alive now (the figure) · 2 the visit's chips · 3 + Born alive (the widest key) · 4 Death · 5 the card as a door to Litter details. Born alive's own figure is cut: its count is the +N born chip.
+
+## House pattern
+
+The count Stepper's key faces (green +, outlined −, dashed when greyed) on one row; the chips' down arrow on Death, so the key and the change it makes look alike.
+
+## Self-crit
+
+- **Better because** there is one figure to read and every act is one row under it; the drawer drops from full height to its content, the same height with or without a visit.

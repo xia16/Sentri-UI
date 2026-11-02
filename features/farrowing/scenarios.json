@@ -767,23 +767,28 @@
        "type": "outcome",
        "id": "fa-c2-tool-reads-record-dead",
        "tree": "C-2",
-       "label": "The death tool reads Report death",
+       "label": "The death key reads Death, with the down arrow",
        "gwt": {
         "given": "Sow 000418 is Farrowing and her counting sheet is open.",
         "when": "The worker looks for the tool that records deaths.",
-        "then": "It is called Report death."
+        "then": "The key under the card reads Death; it opens Report death."
        },
        "authority": [
         {
          "src": "PRD",
          "at": "Decisions · owner decisions 2026-10-23 (Counting)",
          "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
+        },
+        {
+         "src": "PRD",
+         "at": "Decisions · owner decisions 2026-10-23 (Counting), keys 2026-11-02",
+         "says": "a compact Death key (the down arrow) that opens Report death"
         }
        ],
        "visible": [
         {
-         "text": "Report death",
-         "in": "sheet",
+         "text": "Death",
+         "in": ".count-keys",
          "hard": "broken-ruling"
         }
        ]
