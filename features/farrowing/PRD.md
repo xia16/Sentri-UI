@@ -132,6 +132,7 @@ Out:
 - **Report death is a level of the drawer, not a page.** What died is one choice: Born dead, Died after birth, or the sow. Its bar is Back · Done: Done takes the counts to the visit, Back leaves without them.
 - **The bar.** With a draft: Back · Save. Without: Back · Finish farrowing · ··· (the sow's actions).
 - **Edit record moves into Litter details**, with the log: the back door for re-tallies and mistakes.
+- **The keys are one row under the Alive card** (owner, 2026-11-02): a narrow −, a wide + Born alive and a compact Death key (the down arrow) that opens Report death. The card only reads and opens Litter details; the drawer is sized to its content, one height with or without a visit.
 - Next, each in its own PR: before farrowing (due card, Start farrowing), the full Litter details ledger (spreadsheet edit logged as an override, Missing), production-only actions and Assisted farrowing. The approved reference is the v17 prototype.
 
 ### Owner decision, 2026-10-22 · The pen tools are Inspection's
