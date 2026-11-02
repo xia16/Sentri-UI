@@ -108,14 +108,6 @@
 .task-end-sheet h4,.task-end-sheet p{margin:0}
 .task-outcome-section{flex-shrink:0}
 .task-performance{flex-shrink:0}
-.task-performance-surface{background:var(--st-panel-bg);border-radius:12px;padding:14px 15px}
-.task-kpi-pair{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.task-kpi-pair>div{display:flex;flex-direction:column;gap:4px}
-.task-kpi-pair>div>span{font-size:13px;color:var(--muted);line-height:1.5}
-.task-kpi-pair strong{font:500 28px/1.2 var(--font-mono);letter-spacing:-1px}
-.task-kpi-pair strong>small{font-size:15px;margin-left:2px}
-.task-kpi-pair>div>small{font-size:13px;line-height:1.5;color:var(--muted)}
-.task-kpi-pair>div>small.kpi-below{color:#8b5800}
 .task-performance-totals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 0;padding-top:11px;border-top:1px solid #e3e6dc}
 .task-performance-totals dt{font-size:13px;color:var(--muted);line-height:1.5}
 .task-performance-totals dd{font:500 17px/1.5 var(--font-mono);margin:2px 0 0}
@@ -150,20 +142,15 @@
 .task-overview-content{display:flex;flex-direction:column;gap:24px;min-width:0}
 .task-overview-content h4{margin:0}
 .task-overview-sheet .task-overview-content .task-progress{padding:16px;border-radius:12px}
-.task-overview-sheet .task-overview-content .task-performance-surface{padding:16px}
 .task-overview-sheet .task-overview-content .task-performance-totals{margin-top:16px;padding-top:14px}
 .task-other-surface{padding:6px 16px;background:var(--st-panel-bg);border-radius:12px}@media(max-width:420px){
  .task-warning-card{padding:9px 10px;gap:8px;min-height:76px}
  .farrowing-phone .task-end-sheet.task-end-expanded[data-presentation="page"]{height:100%;max-height:100%;bottom:0}
  .farrowing-phone .task-end-sheet[data-size="medium"]{height:var(--drawer-long)}
- .task-end-sheet .task-performance-surface{padding:10px 12px}
- .task-end-sheet .task-kpi-pair{gap:12px}
- .task-end-sheet .task-kpi-pair strong{font-size:24px}
  .task-end-sheet .task-performance-totals{padding-top:8px;margin-top:8px}
  .task-end-sheet .task-outcomes-list{padding:7px 12px}
  .task-end-sheet .task-outcomes-list>div{min-height:24px}
- .task-overview-sheet .task-metrics strong{font-size:23px}
- .task-overview-sheet .task-kpi-pair strong{font-size:24px}}
+ .task-overview-sheet .task-metrics strong{font-size:23px}}
 
 /* One scrollable overview, with fixed title and footer. */
 .task-overview-content{flex-shrink:0}
@@ -171,7 +158,7 @@
 .task-overview-sheet .task-metrics span{font-size:13px;white-space:nowrap}
 
 /* Reading cards and their unit breakdown share the same outer and inner edges. */
-.task-overview-sheet :is(.task-progress,.task-performance-surface,.task-other-surface){width:100%;box-sizing:border-box}
+.task-overview-sheet :is(.task-progress,.task-other-surface){width:100%;box-sizing:border-box}
 
 /* A stable return position, with secondary sow actions below the main row. */
 .farrowing-phone .sheet-footer.record-action-footer{display:flex;flex-direction:column;gap:2px;padding-bottom:18px}
@@ -199,21 +186,10 @@
 .farrowing-phone .key svg{width:17px;height:17px;stroke-width:2.2}
 .farrowing-phone .key:active:not(:disabled){background:var(--ink);color:#fff}
 .farrowing-phone .entry-was{margin-left:6px;font:400 13px var(--font-sans);color:var(--muted)}
-/* The task outcome rows that carry a warning are the door: an amber word, what happens, a chevron */
-.farrowing-phone .task-outcome-door{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:48px;padding:0;background:transparent;text-align:left;color:inherit}
-.farrowing-phone .task-outcome-door strong{display:block;font-weight:600;color:var(--amber)}
-.farrowing-phone .task-outcome-door small{display:block;font-size:13px;line-height:1.5;color:var(--muted)}
-.farrowing-phone .task-outcome-door svg{width:14px;height:14px;color:var(--muted)}
-.farrowing-phone .task-outcome-warn dt{flex:1}
 
 /* Correct born opens in place under the Born row: one surface, rows separated by a rule. */
 .farrowing-phone .born-correction{display:flex;flex-direction:column;gap:12px;flex:none;padding:12px 0 16px;border-bottom:1px solid var(--rule)}
 .farrowing-phone .born-correction .st-stepper{flex:none}
-/* The outcome rows that open a list: the count, then the chevron; the whole row is the door. */
-.farrowing-phone .task-outcome-warn{position:relative}
-.farrowing-phone .task-outcome-door::after{content:"";position:absolute;inset:0}
-.farrowing-phone .task-outcomes-list>.task-outcome-warn dd{display:flex;align-items:center;gap:8px}
-.farrowing-phone .task-outcomes-list>.task-outcome-warn dd svg{width:14px;height:14px;color:var(--muted)}
 .farrowing-phone .edit-counts.born-open{flex:none;min-height:0}
 
 /* Litter summary on the count drawer: Born and Dead sit on the panel's own edge, no second box inside it. */

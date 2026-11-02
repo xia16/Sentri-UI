@@ -160,7 +160,7 @@ States: M0 Report death on The sow over C0 · M1 Ended (sow died).
 
 ## 8 · The task: overview → End → receipt (K)
 
-States: K0 room with sows still farrowing · K1 End review, all finished · K2 End review, awaiting remainder, none active · K3 task ended.
+States: K0 room with sows still farrowing · K1 End review, all finished · K2 End review, awaiting remainder, none active · K3 task ended · K4 End review, sows still farrowing.
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
@@ -172,6 +172,8 @@ States: K0 room with sows still farrowing · K1 End review, all finished · K2 E
 | K-6 | K2 | hold End task early | → early receipt | S — PRD Decisions | `fa-k6-end-early-receipt` |
 | K-7 | K2 | the awaiting sows at End | ? Q6 — where they go | S (open) — contract C9 vs review tasks-built-44 | blocker `fa-k7-awaiting-at-early-end` |
 | K-8 | K3 | a later correction to a sow | ? Q8 — does the receipt change | S (open) — review tasks-built-50 | — |
+| K-9 | K4 | hold End task early | → nothing ends; the heading reads Before you can end and the hold says FINISH 2 SOWS FIRST | S — PRD Decisions (blocked while farrowing is open; 2026-11-02 End task) | `fa-k9-blocked-hold-waits` |
+| K-10 | K4 | tap Still farrowing | → the Still farrowing list: those sows, each a door to her record | S — PRD Decisions 2026-11-02 End task | `fa-k10-blocked-opens-sows` |
 
 ## 8b · Find a sow and Scan ear tags (S)
 

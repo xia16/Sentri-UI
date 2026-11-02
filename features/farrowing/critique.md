@@ -806,3 +806,38 @@ The count Stepper's key faces (green +, outlined −, dashed when greyed) on one
 ## Self-crit
 
 - **Better because** there is one figure to read and every act is one row under it; the drawer drops from full height to its content, the same height with or without a visit.
+
+# End task: can the batch close (2026-11-02), critique
+
+Scope: End task (task-blocked, task-ready, task-complete, task-outcomes), its sow lists and the shared performance card (Task overview, receipt). Baselined on `origin/main` at `98485ac` (PR 292) at 390 and 360; the owner picked from directions A–G (A's checklist wording on B's bar, then house colours and a fuller card).
+
+## Problems
+
+- **major** · Nothing read first: two figure cards of equal weight, and no line said whether the batch could close.
+- **major** · The blockers (Still farrowing, Awaiting farrowing) were ordinary outcome rows in amber text.
+- **major** · The waiting hold gave no reason; a reason line above a waiting bar is hidden by house rule, so nothing said why.
+- **minor** · Repeats: `7 finished litters` = `Finished farrowing 7`; the title, hold label and caption all said End task early; `Awaiting 0` printed when nothing awaited.
+- **minor** · The Still farrowing row opened a page titled Active farrowing.
+
+## Attention budget
+
+1 can it close (the heading) · 2 what blocks it and the way in (Still farrowing ›) · 3 what ending costs (Leave the batch ›) · 4 the hold, with its reason when waiting · 5 Done, accounting for every other sow · 6 performance, below, scrolled to.
+
+## House pattern
+
+Task overview's status bar and its counts; the pen map's fills for status areas (progress-fill farrowing, amber-fill needs you); Row with an icon tile for each part; Inspection's End walk (one answer, one consequence, the commit). Colours checked: red↔green failed the colour-blind check (ΔE 3.9), the house fills pass (worst adjacent ΔE 16.7) and every part is named in its row.
+
+## Parts
+
+| Part | Drawn by | Keep / fix / cut |
+|---|---|---|
+| Closure card | `taskClosure()`: Heading, AstraTaskOverview.statusProgress, SentriUI.row | **new** |
+| Performance card | `taskPerformance()`, `.task-perf-*` in bundle.css | **fix** (fuller: split of piglets born, causes, per-litter facts) |
+| Hold | SentriUI.holdButton, caption carries the waiting reason | **fix** |
+| Task outcomes on End task | `taskOutcomeSummary()` | **cut** (kept on the receipt) |
+
+## Self-crit
+
+- **Better because** the first line answers the question, the one thing to do opens from the first row, the hold says why it waits, and each figure is said once.
+- The page scrolls for the performance card (up to ~260px blocked); the closure card and the hold never need a scroll.
+- The Task overview bar keeps its soft greens; only End task uses the status fills. One look for both is a follow-up for the owner.
