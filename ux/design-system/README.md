@@ -43,7 +43,7 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
   - **Waiting has no colour:** the empty part of a bar, or an outline.
   - A bar part that is not a status (the middle of Performance metrics' split of piglets born) is `neutral-mark`, so it never reads as done.
   - **The one green button** is Farrowing's "+ Born alive" key (`count-key`, white label): it records a birth. Every other commit is `ink`; the destructive hold is `red`.
-  - Colour-blind check (OKLab ΔE, Machado 2009): done/progress and done/late pass for protan and deutan; under tritan done/progress is only ΔE 3.3 (same lightness), and `neutral-mark`/`done-mark` sits at 6.4–6.6 for protan/deutan. So a status is never colour alone: bar segments keep their 2px gaps and every part is named in its row, key or label. Every number on a fill is 7:1 or better. Open (owner): darken `done-mark` to #51945e or `progress-mark` to #597fb0 to clear tritan (ΔE ≈ 9).
+  - Colour-blind compatibility is not a requirement (owner, 2026-11-02); a status is still never colour alone: bar segments keep their 2px gaps and every part is named in its row, key or label. Every number on a fill is 7:1 or better.
 - Borders: `line` between surfaces, `rule` between rows inside a panel (never above the first row), `control-border` on fields and secondary buttons, `back-border` on Back.
 - No gradients, textures, photography or illustration. The only translucency is `scrim` (with a 1.4px blur) behind a drawer and `dialog-backdrop` behind a dialog.
 
