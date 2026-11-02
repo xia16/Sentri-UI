@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Count round</title>
+<style>
+:root{--bg:#f4f4ef;--card:#fff;--ink:#1d221e;--ink2:#4a524c;--muted:#6b736d;--line:#dfe2da;--accent:#2f5d3a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161a17;--card:#1f2420;--ink:#eef0ea;--ink2:#c9cec6;--muted:#9aa29b;--line:#333a34;--accent:#8fc39c}}
+:root[data-theme="dark"]{--bg:#161a17;--card:#1f2420;--ink:#eef0ea;--ink2:#c9cec6;--muted:#9aa29b;--line:#333a34;--accent:#8fc39c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Plus Jakarta Sans",system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:28px 16px 48px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+h1{font-size:26px;line-height:1.2;margin:6px 0 10px}
+h2{font-size:17px;margin:28px 0 10px}
+p{margin:0 0 10px;color:var(--ink2)}
+.lead{font-size:16px;color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.shots{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.shots figure{margin:0}
+.shots img{width:100%;border-radius:12px;border:1px solid var(--line);display:block}
+.shots figcaption{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+ul{margin:0;padding-left:18px;color:var(--ink2)} li{margin:3px 0}
+ol.q{margin:0;padding-left:20px} ol.q li{margin:8px 0;color:var(--ink)}
+ol.q small{display:block;color:var(--muted);font-size:13px}
+strong{color:var(--ink)}
+@media (max-width:720px){.shots{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}}
+</style></head>
+<body><main>
+<p class="eyebrow">Count · 盘点 · product round · 2 Nov · proposal, nothing built</p>
+<h1>Count is a place's action. One page for every pen and room.</h1>
+<p class="lead">Count sits on the pen page and on the unit's card, not in a pig's Actions: you count a place. It is the Inspection list in counting mode. The reader listens and every tag read ticks that pig. A pig recorded somewhere else is ticked here and <strong>moves here</strong> when you save. Pigs without ear tags get the number you counted. <strong>Save count</strong> records what you saw, what the record expected, who and when. Tagged pigs that weren't read <strong>stay where they are recorded</strong>, and the receipt lists them. A difference in untagged pigs is saved as <strong>unaccounted</strong> on their batch. It is never a pen status, a birth or a death, and no reason is asked. The 3 pigs you just moved in are not a count: <strong>Transfer records the arrivals</strong>, so nobody rescans 30 pigs for 3.</p>
+
+<h2>The recommended flow, at 390 in the real prototype parts</h2>
+<div class="shots">
+<figure><img src="mock/mock-1-pen-entry.png" alt="Pen page with a Count tile"><figcaption><strong>One pen.</strong> Count joins the pen's tiles (3 + 3).</figcaption></figure>
+<figure><img src="mock/mock-2-unit-entry.png" alt="Unit card with Count pigs"><figcaption><strong>A room.</strong> <em>Count pigs · Last counted Oct 21</em> on the unit's card.</figcaption></figure>
+<figure><img src="mock/mock-3-count-pen.png" alt="Count one pen by number"><figcaption><strong>Count by number.</strong> Starts at 14, counted 12: <em>2 unaccounted in batch 25.</em> The tagged two tick as they are read.</figcaption></figure>
+<figure><img src="mock/mock-4c-count-room-scrolled.png" alt="Count a room by scan"><figcaption><strong>Count by scan, a room.</strong> 000512 from Unit 9 <em>moves here</em>. D4's untagged group took 12. D5 is skipped.</figcaption></figure>
+<figure><img src="mock/mock-5-result.png" alt="Count saved receipt"><figcaption><strong>Saved.</strong> Only what differs, plus <em>Not seen · 000281</em>. Opening her is the way to report her missing.</figcaption></figure>
+<figure><img src="mock/mock-6-log.png" alt="Pen log with count lines"><figcaption><strong>Log.</strong> <em>Counted 14 · 2 unaccounted / Should have been 16.</em> History is never rewritten.</figcaption></figure>
+<figure><img src="mock/mock-7-noid-conditions.png" alt="Conditions follow the pick"><figcaption><strong>Conditions on untagged pigs follow the pick.</strong> 5 of 14, of them 2 with Coughing.</figcaption></figure>
+<figure><img src="mock/mock-4b-count-unknown-tag.png" alt="Unknown tag toast"><figcaption><strong>An unknown tag.</strong> The shared toast. It is left out and the count goes on.</figcaption></figure>
+</div>
+
+<h2>Why this beats the old system</h2>
+<div class="cols">
+<div class="card"><p><strong>Old: about 14 frames for one number.</strong> The only way in is a hidden pencil glyph. Then a two-step wizard: confirm the identified pigs, then a total that every untagged pig must be split into (line, batch) rows until they add up exactly, or Submit stays blocked. Then a confirm dialog, then a toast. It asks no reason, stamps nothing and shows no expected figure. Transfer asks stay / move / copy for every pen health record, and copy doubles cases. Missing is a dialog into a list that was never designed.</p></div>
+<div class="card"><p><strong>New: one page and one Save.</strong> One batch per pen removes the allocation step. Scanning moves strays here; nothing disappears just because it wasn't read. The page shows <em>Since the last count</em> down to <em>Should be here now</em>, so the worker sees why. Conditions on untagged pigs are counts that split with the pigs picked, never copied. The other model's blind pass reached the same core on its own. The three places it differed are Q5, Q7 and Q8.</p></div>
+</div>
+
+<h2>Questions only you can answer</h2>
+<div class="card"><ol class="q">
+<li><strong>Name it Count (盘点)?</strong><small>Recommend: yes.</small></li>
+<li><strong>On the pen page and the unit card, not in a pig's Actions?</strong><small>Recommend: yes. A count is about a place. (The Edit record round had put it in the sow's Actions.)</small></li>
+<li><strong>Tagged pigs not seen stay recorded and are listed on the receipt. Should a count report them missing on its own?</strong><small>Recommend: no. Missing is always a person's call.</small></li>
+<li><strong>A pig read here that the record places elsewhere moves here on Save?</strong><small>Recommend: yes. Her row and the receipt both show it.</small></li>
+<li><strong>A room count proves the room, not the pen?</strong><small>Recommend: yes. A pig in the wrong pen inside the room is fixed by counting that pen. A pig from another room joins the pen scanned just before her, and you can change it.</small></li>
+<li><strong>One batch per pen for untagged pigs: arrivals join the pen's batch?</strong><small>Recommend: yes. This removes the old batch allocation.</small></li>
+<li><strong>Conditions follow the pick: "of these 5, how many have Coughing", default 0?</strong><small>Recommend: yes. Taking the whole group takes every condition. A count below a condition's figure caps it. The other model wanted a "Cannot tell" answer.</small></li>
+<li><strong>A body found after a count already booked it: no question?</strong><small>Recommend: no question (Round 9). The next count finds one more than expected, so the batch nets to zero unaccounted and one death.</small></li>
+<li><strong>Does the number start at the record, not empty?</strong><small>Recommend: start at the record. A count that matches is the common case.</small></li>
+<li><strong>Unknown tags are left out. Offer "give this tag to one of the untagged pigs" later?</strong><small>Recommend: later, with Assign identity.</small></li>
+<li><strong>A sow found in another farrowing crate: does her litter move with her?</strong><small>Recommend: yes. The crate's count checks the number.</small></li>
+<li><strong>No scheduled count task in v1, only <em>Last counted</em> on the unit card?</strong><small>Recommend: yes.</small></li>
+</ol></div>
+<p style="margin-top:16px">Full proposal: <code>features/count/PRD.md</code>. It has 26 scenarios, the model, three options and the rulings it changes. Old-system screens are in <code>features/count/old-system/</code> and the blind pass is in <code>features/count/codex-blind-pass.md</code>.</p>
+</main></body></html>
