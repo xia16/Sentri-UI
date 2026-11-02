@@ -196,4 +196,56 @@ async function cardLast(p, what, when, mine) {
   await p.close();
 }
 
+// Variant E (owner, 2026-11-02: "header should be the time and who, with all the results of that run below it"): the stamp is the
+// line's header, and the run's results sit under it as the same chips the unsaved visit wears (+3 born, −1 died, 1 born dead),
+// so a saved run looks as it did before Save, in the quiet tone (saved: colour no longer means "not yet"). Undo stays one button on the right.
+async function cardRun(p, stamp, chips, figure, mine) {
+  await p.evaluate(({ stamp, chips, figure, mine }) => {
+    const ic = (k) => window.SentriIcons.icon(k);
+    const sheet = document.querySelector('.sheet[data-view="count"]'), card = sheet.querySelector('.alive-card');
+    card.querySelector('.alive-quiet')?.remove();
+    if (figure) card.querySelector('.alive-figure').textContent = figure;
+    const wrap = document.createElement('div'); wrap.className = 'mock-alive';
+    card.replaceWith(wrap); wrap.append(card);
+    const chip = ([tone, glyph, n, word]) => `<span class="alive-chip" data-tone="${tone}">${ic(glyph)}<b>${n}</b>${word}</span>`;
+    const undo = mine ? `<button type="button" class="button secondary mock-undo" data-ds="Button" data-register="secondary">${ic('return')}<span>Undo</span></button>` : '';
+    wrap.insertAdjacentHTML('beforeend', `<div class="mock-run"><div class="mock-run-copy"><small>${stamp}</small><span class="mock-run-chips">${chips.map(chip).join('')}</span></div>${undo}</div>`);
+    const st = document.createElement('style');
+    st.textContent = `.farrowing-phone .mock-alive{margin:0 0 16px;border:1px solid var(--line);border-radius:20px;background:#f6f7f1;overflow:hidden}
+      .farrowing-phone .mock-alive .alive-card{margin:0;border:0;border-radius:0;background:transparent}
+      .mock-run{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 16px;padding:12px 0 14px;border-top:1px solid var(--line)}
+      .mock-run-copy{display:flex;flex-direction:column;gap:8px;min-width:0}
+      .mock-run-copy small{font:400 13px/18px var(--font-sans);color:var(--muted)}
+      .mock-run-chips{display:flex;flex-wrap:wrap;gap:6px}
+      .mock-run .alive-chip{display:inline-flex;align-items:center;gap:5px;height:24px;box-sizing:border-box;padding:0 10px;border-radius:999px;font:500 13px/1 var(--font-sans);background:#eceee7;color:#4b5547}
+      .mock-run .alive-chip b{flex:none;font:600 14px/1 var(--font-mono)}
+      .mock-run .alive-chip svg{display:block;flex:none;width:15px;height:15px;stroke-width:2}
+      .farrowing-phone .mock-undo{flex:none;display:inline-flex;align-items:center;gap:6px;width:auto;min-width:0;height:44px;min-height:44px;padding:0 16px}
+      .farrowing-phone .mock-undo svg{width:18px;height:18px}`;
+    document.head.append(st);
+  }, { stamp, chips, figure, mine });
+}
+const RUN = [['add', 'farrow', '+3', 'born'], ['sub', 'trend-down', '−1', 'died'], ['quiet', 'minus', '1', 'born dead']];
+{
+  const p = await open('farrowing.count');
+  await tap(p, PLUS, 3);
+  await tap(p, SAVE);
+  await cardRun(p, 'Saved 09:41 · G.H', RUN, '11', true);
+  await shot(p, 'undo-e1-saved.png');
+  await p.evaluate(() => {
+    const U = window.SentriUI, sheet = document.querySelector('.sheet[data-view="count"]');
+    sheet.insertAdjacentHTML('afterend', U.sheet({ variant: 'dialog', title: 'Undo the 09:41 save?', body: '',
+      footer: '<div class="sheet-footer" data-ds="Sheet"><button type="button" class="button secondary" data-ds="Button" data-register="secondary">Back</button><button type="button" class="button primary" data-ds="Button" data-register="primary">Undo</button></div>' }));
+    sheet.setAttribute('inert', '');
+  });
+  await shot(p, 'undo-e2-ask.png');
+  await p.close();
+}
+{
+  const p = await open('farrowing.count');
+  await cardRun(p, 'Saved Aug 26 08:41 · L.M', [['add', 'farrow', '+4', 'born']], '', false);
+  await shot(p, 'undo-e0-not-mine.png');
+  await p.close();
+}
+
 await b.close(); server.kill();

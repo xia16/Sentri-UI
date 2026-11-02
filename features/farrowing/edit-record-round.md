@@ -8,7 +8,7 @@ The owner's words (2026-11-02): *"edit record right now is way too confusing …
 
 *"lets just agree that there is no more edit record for farrowing what you fill is in what you fill in. but we need a way something simpler if users fat finger a death or a born. and need to redo it after pressing save."* Count is a global feature, and its spec is a round of its own (`features/count/`, branch `claude/frosty-chatelet-85b362`). The rest of this file is the round as it was put to the owner. Where it differs from this ruling, the ruling stands.
 
-**The redo: the last action in the Alive card, with Undo.** Under the figure, behind a divider, the card names the sow's last action: `+3 born alive` over `09:41 · G.H`. For the worker who saved it, an **Undo** button (the `return` glyph, secondary) sits beside it. Undo asks only **Undo +3 born alive?** with Back · Undo. Then the visit comes back to the drawer as unsaved, exactly as it was: the born chip, the deaths with their causes, the photos. The record drops back to what it was before it. The worker fixes it with the keys they already use (− takes a born back; Death changes a death) and presses Save. The log keeps one line for the visit, marked **Corrected**, with what it was.
+**The redo: the last save in the Alive card, with Undo.** Under the figure, behind a divider, the card shows the sow's last save as a run. The header is when and who (`Saved 09:41 · G.H`). Under it are all of that run's results, as the same chips the unsaved visit wore (`+3 born`, `−1 died`, `1 born dead`), in the quiet tone because they are saved. For the worker who saved it, an **Undo** button (the `return` glyph, secondary) sits beside them. Undo asks only **Undo the 09:41 save?** with Back · Undo. Then the visit comes back to the drawer as unsaved, exactly as it was: the born chip, the deaths with their causes, the photos. The record drops back to what it was before it. The worker fixes it with the keys they already use (− takes a born back; Death changes a death) and presses Save. The log keeps one line for the visit, marked **Corrected**, with what it was.
 
 The card stays one surface with two sibling targets. The figure area opens Details as before; Undo is its own button beside the line, never nested inside the door. The card's quiet `Saved 08:20` goes, because the line says it. While a visit is unsaved the line hides: the chips are the visit then, and Clear empties it.
 
@@ -16,14 +16,15 @@ Drawn first and dropped:
 - A bare `Undo` in the header corner ([undo-2-saved.png](edit-record-round/undo-2-saved.png)). It doesn't say what it undoes.
 - `Saved · +3 born` on the card plus Undo in Litter details ([undo-b2-details.png](edit-record-round/undo-b2-details.png)). One hop away.
 - A row under the keys with a chevron ([undo-c1-saved.png](edit-record-round/undo-c1-saved.png)) and a wordy question ([undo-c2-ask.png](edit-record-round/undo-c2-ask.png)). The owner wants it in the card, as a button, and the question short (2026-11-02).
+- One result as the title with the stamp under it ([undo-d1-saved.png](edit-record-round/undo-d1-saved.png)). A visit can hold several results, so the owner made the stamp the header and the run's results go below (2026-11-02).
 - Undo on any log line. That is Edit record again.
 
 | | | |
 |---|---|---|
-| ![Not mine](edit-record-round/undo-d0-not-mine.png) | ![Fat finger](edit-record-round/undo-1-fat-finger.png) | ![Saved, Undo](edit-record-round/undo-d1-saved.png) |
-| **0. Someone else's last action.** `+4 born alive · Aug 26 08:41 · L.M`, plain: no Undo. | **1. The fat finger.** Three taps for two piglets: `+3 born`. The line hides while unsaved. Save. | **2. Saved.** Alive 12; under the divider `+3 born alive · 09:41 · G.H` and **Undo**. |
-| ![Ask](edit-record-round/undo-d2-ask.png) | ![Undone](edit-record-round/undo-3-reopened.png) | ![Fixed](edit-record-round/undo-4-fixed.png) |
-| **3. Undo +3 born alive?** Back · Undo. Nothing else. | **4. Undone.** `Alive · Not saved yet`, 12 with `+3 born`. The record reads 9 until Save. | **5. Fixed.** − once: 11 with `+2 born`. Save. |
+| ![Not mine](edit-record-round/undo-e0-not-mine.png) | ![Fat finger](edit-record-round/undo-1-fat-finger.png) | ![Saved, Undo](edit-record-round/undo-e1-saved.png) |
+| **0. Someone else's last save.** `Saved Aug 26 08:41 · L.M` over `+4 born`: no Undo. | **1. The fat finger.** Three taps for two piglets, plus a death and a stillborn in the same visit. The run hides while unsaved. Save. | **2. Saved.** Alive 11; under the divider `Saved 09:41 · G.H` over `+3 born` `−1 died` `1 born dead`, and **Undo**. |
+| ![Ask](edit-record-round/undo-e2-ask.png) | ![Undone](edit-record-round/undo-3-reopened.png) | ![Fixed](edit-record-round/undo-4-fixed.png) |
+| **3. Undo the 09:41 save?** Back · Undo. Nothing else. | **4. Undone.** `Alive · Not saved yet`, 12 with `+3 born`. The record reads 9 until Save. | **5. Fixed.** − once: 11 with `+2 born`. Save. |
 | ![Log](edit-record-round/undo-5-log.png) | ![Litter details](edit-record-round/undo-6-litter.png) | |
 | **6. The log.** One line: `Corrected · +2 born alive · Was +3 born alive · 09:43 · G.H`. | **7. Litter details.** Edit record is gone; figures and log stay. | |
 
