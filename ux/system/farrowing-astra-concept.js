@@ -139,8 +139,9 @@ function act(s,a,v){
  if(a==='addPiglet'||a==='scanPiglet'||a==='notchPiglet'){s.pigletEditIndex=-1;s.pigletDraft={tag:a==='scanPiglet'?String(418001+s.piglets.length):'',notch:a==='notchPiglet'?'Choose notch':'',sex:'',weight:'',state:'Alive'};s.view='pigletEdit';}
  if(a==='savePiglet'){const p=s.pigletDraft;if(!p||![p.tag,p.notch,p.sex,p.weight].some(x=>String(x||'').trim()))return;const clean={tag:String(p.tag||'').trim(),notch:p.notch==='Choose notch'?'':String(p.notch||'').trim(),sex:p.sex||'',weight:String(p.weight||'').trim(),state:p.state||'Alive'};if(s.pigletEditIndex<0){s.piglets.push(clean);s.unidentified=Math.max(0,s.unidentified-1);}else s.piglets[s.pigletEditIndex]=clean;event(s,`${s.pigletEditIndex<0?'Piglet identity added':'Piglet identity updated'} · ${clean.tag||clean.notch||'identity pending'}`);s.pigletTab='records';s.view='pigletCare';}
  if(a==='foster'){s.featureReturn=s.view==='pigletCare'?'pigletCare':'profile';const candidate=roomContext(s).units.flatMap(u=>u.records).find(r=>r!==s&&!r.ended&&!r.productionOutcome&&born(r)>0);s.fosterDraft={direction:'out',target:candidate?.tag||'',count:1};s.view='foster';}
- if(a==='allocChoose')s.allocChoice=v;   // a tile only chooses; the footer commits (owner, 2026-11-02: Hand-rear jumped straight back to the list)
- if(a==='allocMove'){const candidate=fosterCandidates(s)[0];s.featureReturn='allocate';s.fosterDraft={direction:'out',target:candidate?.tag||'',count:s.alive};s.view='foster';}
+ // A tile only chooses; its section opens under the tiles and the footer commits (owner, 2026-11-02: Hand-rear jumped straight back to the list).
+ // Other sows is the foster form itself, sending out of this litter: Send saves and stays here while piglets are left (saveFoster).
+ if(a==='allocChoose'){s.allocChoice=v;if(v==='move'&&(s.featureReturn!=='allocate'||s.fosterDraft?.direction!=='out')){s.featureReturn='allocate';s.fosterDraft={direction:'out',target:fosterCandidates(s)[0]?.tag||'',count:s.alive};}}
  if(a==='allocHand'){const n=s.alive;s.handReared={at:'09:41',who:'G.H'};event(s,`${n} piglet${n===1?'':'s'} hand-reared in her crate`,'milestone');s.allocChoice=null;s.view='room';}
  if(a==='allocRear'&&farmConfig.rearingPen){const n=s.alive;s.alive=0;s.moved=(s.moved||0)+n;s.unidentified=0;s.anchor=born(s);event(s,`${n} piglet${n===1?'':'s'} moved to the rearing pen`,'milestone');s.allocChoice=null;s.view='room';}
  if(a==='fosterDirection'){s.fosterDraft.direction=v;s.fosterDraft.count=1;}
@@ -824,19 +825,24 @@ function moreSowActions(s){return btn('sowActions',`Actions ${icon('chevron')}`,
 function recordActions(s){const pending=sum(s.deathDraft);return `<div class="record-inline-actions" aria-label="Record actions"><div class="record-action-group" role="group" aria-label="Quick actions">${s.events.length||born(s)?btn('edit',`${icon('edit')}<span>Edit</span>`,'record-toolbar-action'):''}${btn('death',`${icon('alert')}<span>Record dead</span>${pending?`<small>${pending} unsaved</small>`:''}`,'record-toolbar-action')}${btn('sowActions',`${icon('more')}<span>Actions</span>`,'record-toolbar-action record-toolbar-more').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)}</div></div>`;}
 function recordNavigation(primary=''){return footer(SentriUI.backButton({action:'close'}),primary,'execution-completion');}
 // Right after the hold records her death (or from her row while piglets wait): where do her piglets go? A page of choice tiles
-// (owner, 2026-11-02). A tile only chooses: the line under the tiles says what will happen, and the footer commits. Other sows
-// opens Foster piglets; Hand-rear and the rearing pen record here. The header's Back leaves with nothing recorded (later).
+// (owner, 2026-11-02). A tile only chooses; what it means opens under the tiles and the footer commits. Other sows is the foster
+// form in place (a sow, how many); Hand-rear and the rearing pen show what will be recorded. The header's Back leaves with nothing
+// recorded (later). Her death is the header line (owner, 2026-11-02: no floating line in the body). The count opens it: after a partial send it is what is left.
 function allocate(s){
  const n=s.alive,pigs=`${n} piglet${n===1?'':'s'}`,c=s.allocChoice||'';
  const options=[{value:'move',label:'Other sows',icon:'transfer'},{value:'hand',label:'Hand-rear',icon:'drop'},...(farmConfig.rearingPen?[{value:'rear',label:'Rearing pen',icon:'barn'}]:[])].map(o=>({...o,pressed:c===o.value}));
- // Her death is status, so it is the body's first line, with her tag and pen (she is on screen; no header line repeats her).
- // The count left the title (owner, 2026-10-14: no counts in a title; the title is the job, `Allocate piglets`) and opens this line.
  const e=s.events.find(e=>e.text.startsWith('Sow died'));
- const died=bodyLead(`${pigs} · ${s.tag} · ${s.pen} · sow died ${[e?.day&&e.day!=='Today'?e.day:'',e?.time].filter(Boolean).join(' ')}`.trim());
- const hint={move:'Foster or nurse sow. Choose each sow and how many on the next page; any left come back here.',hand:`Bottle or milk replacer in her crate. The ${pigs} stay in her litter.`,rear:`Rescue deck. The ${pigs} leave her litter.`}[c];
- const commit={move:['allocMove',`Choose sows ${icon('chevron')}`],hand:['allocHand',`Hand-rear ${pigs}`],rear:['allocRear',`Move ${n} to the rearing pen`]}[c]||['',`Allocate ${pigs}`];
- const body=died+SentriTask.choice({label:'Where her piglets go',action:'allocChoose',options})+(hint?`<p class="feature-hint">${hint}</p>`:'');
- return SentriUI.sheet({variant:'page',title:'Allocate piglets',back:{action:'close'},body,bodyClass:'allocate-body',footer:pageFooter(btn(commit[0],commit[1],'button primary','',!c)),className:'feature-page allocate-page',label:'Allocate piglets',bar:status()});
+ const line=`${pigs} · ${s.tag} · ${s.pen} · died ${[e?.day&&e.day!=='Today'?e.day:'',e?.time].filter(Boolean).join(' ')}`.trim();
+ const tiles=SentriTask.choice({label:'Where her piglets go',action:'allocChoose',options});
+ let section='',commit=btn('',`Allocate ${pigs}`,'button primary','',true);
+ if(c==='move'){
+  const f=s.fosterDraft,context=roomContext(s);f.count=Math.max(1,Math.min(f.count,n));
+  section=SentriUI.choiceGroup(fosterCandidates(s).map(r=>SentriUI.choiceRow({label:r.tag,mono:true,meta:`${context.units.find(u=>u.records.includes(r))?.name||''} · ${r.pen} · ${r.alive} alive`,action:'fosterTarget',value:r.tag,selected:f.target===r.tag})),{title:'Other sow',className:'foster-choice'})+`<section class="feature-section">${farmStepper({variant:'well',label:'Number of piglets',value:f.count,min:1,max:n,action:'fosterCount',reserveHint:false})}</section>`;
+  commit=btn('saveFoster',`Send ${f.count} piglet${f.count===1?'':'s'}`,'button primary','',!f.target);
+ }
+ if(c==='hand'){section=SentriUI.facts([{label:'Piglets',value:String(n)},{label:'Stay in',value:`Crate ${s.pen}`}]);commit=btn('allocHand',`Hand-rear ${pigs}`,'button primary');}
+ if(c==='rear'){section=SentriUI.facts([{label:'Piglets',value:String(n)},{label:'Move to',value:'Rescue deck'}]);commit=btn('allocRear',`Move ${n} to the rearing pen`,'button primary');}
+ return SentriUI.sheet({variant:'page',title:'Allocate piglets',line,back:{action:'close'},body:tiles+section,bodyClass:'allocate-body',footer:pageFooter(commit),className:'feature-page allocate-page',label:'Allocate piglets',bar:status()});
 }
 function locked(s){
  const e=s.events[0];
