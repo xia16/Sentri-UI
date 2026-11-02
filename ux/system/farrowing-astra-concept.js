@@ -47,7 +47,7 @@ function seed(preset='count'){
  if(preset==='litter'){s.view='litter';s.litterBack='count';}
  if(preset==='leave'){s.edit=snap(s);s.edit.dead[2]+=1;s.back='count';s.view='edit';s.popup={kind:'leaveEdit'};}
  if(['locked','history','ended','allocate','born'].includes(preset)){Object.assign(s,{locked:true,view:'locked',alive:8,dead:[1,1,3,0,0,1],pending:0,weight:'12.6',assisted:true});s.events.unshift({text:'+4 alive',day:'Aug 26',time:'08:41',who:'G. Hansen'},{text:'Farrowing finished · born 14',day:'Aug 27',time:'08:12',who:'G. Hansen',kind:'milestone'});s.events=s.events.slice(0,2).reverse().concat(s.events.slice(2));s.events.unshift({text:'+1 crushed',day:'Aug 28',time:'14:02',who:'L. Madsen'});}
- if(preset==='ended'||preset==='allocate'){s.ended=true;s.deathStage='during';s.frozen=10;s.alive=7;s.dead=[2,0,1,0,0,0];s.sowCause='Prolapse';s.events=[{text:'Sow died · prolapse',day:'Aug 25',time:'06:20',who:'L. Madsen',kind:'danger'},{text:'7 alive · 3 dead',day:'Aug 25',time:'06:18',who:'L. Madsen'}];if(preset==='allocate')Object.assign(s,{tag:'000399',pen:'B3',parity:4,view:'allocate',back:'locked'});}
+ if(preset==='ended'||preset==='allocate'){s.ended=true;s.deathStage='during';s.frozen=10;s.alive=7;s.dead=[2,0,1,0,0,0];s.sowCause='Prolapse';s.events=[{text:'Sow died · prolapse',day:'Aug 25',time:'06:20',who:'L. Madsen',kind:'danger'},{text:'7 alive · 3 dead',day:'Aug 25',time:'06:18',who:'L. Madsen'}];if(preset==='allocate'){Object.assign(s,{tag:'000399',pen:'B3',parity:4,view:'allocate',back:'locked'});s.piglets=s.piglets.map((p,i)=>({...p,tag:'3990'+String(i+1).padStart(2,'0')}));s.unidentified=s.alive-s.piglets.length;}}
  if(preset==='history'){s.view='history';s.back='locked';}
  if(preset==='edit'||preset==='born'){enterEdit(s);if(preset==='born')s.popup={kind:'born',mode:'more',n:1,split:'alive',cause:5};}
  return s;
@@ -154,16 +154,20 @@ function act(s,a,v){
  if(a==='allocMove'){s.view='allocate';act(s,'allocChoose','move');}
  if(a==='allocHand'){const n=s.alive;s.handReared={at:'09:41',who:'G.H'};event(s,`${n} piglet${n===1?'':'s'} hand-reared in her crate`,'milestone');s.allocChoice=null;s.view='room';}
  if(a==='allocRear'&&farmConfig.rearingPen){const n=s.alive;s.alive=0;s.moved=(s.moved||0)+n;s.unidentified=0;s.anchor=born(s);event(s,`${n} piglet${n===1?'':'s'} moved to the rearing pen`,'milestone');s.allocChoice=null;s.view='room';}
- if(a==='fosterDirection'){s.fosterDraft.direction=v;s.fosterDraft.count=1;}
- if(a==='fosterPick'){const f=s.fosterDraft;f.target=v;f.direction='out';f.count=Math.min(f.start,s.alive);}   // a tap or a read opens the count over the list
+ if(a==='fosterDirection'){s.fosterDraft.direction=v;s.fosterDraft.start=1;fosterOpen(s);}
+ if(a==='fosterPick'){const f=s.fosterDraft;f.target=v;f.direction='out';f.start=Math.min(f.start,s.alive);fosterOpen(s);}   // a tap or a read opens the count over the list
+ if(a==='fosterId'){const f=s.fosterDraft,k=f.ids.indexOf(v);if(k<0)f.ids.push(v);else f.ids.splice(k,1);}
  if(a==='fosterClose')s.fosterDraft.target='';
  if(a==='fosterScan'){s.fosterDraft.scanning=roomContext(s).scan.connected?true:'waiting';s.fosterDraft.q='';}
  if(a==='fosterScanStop')s.fosterDraft.scanning=false;
  if(a==='fosterClear')s.fosterDraft.q='';
- if(a==='fosterCount'){const f=s.fosterDraft;f.count=Math.max(1,Math.min(fosterMax(s),f.count+Number(v)));}
- if(a==='saveFoster'){const f=s.fosterDraft,other=fosterSow(s,f.target);if(!other||f.count<1||f.count>fosterMax(s))return;const n=f.count,out=f.direction==='out',to=out?other:s,from=out?s:other,word=`${n} piglet${n===1?'':'s'} fostered`;
-  from.alive-=n;from.moved=(from.moved||0)+n;from.unidentified=Math.max(0,(from.unidentified||0)-n);to.alive+=n;to.moved=(to.moved||0)-n;to.unidentified=(to.unidentified||0)+n;[from,to].forEach(r=>{if(!r.locked)r.anchor=born(r);});   // piglets without identity move first; they arrive without identity
-  event(s,`${word} ${out?'to':'from'} ${other.tag}`,'milestone');event(other,`${word} ${out?'from':'to'} ${s.tag}`,'milestone');f.target='';
+ if(a==='fosterCount'){const f=s.fosterDraft;f.count=Math.max(0,Math.min(fosterMax(s),f.count+Number(v)));}
+ if(a==='saveFoster'){const f=s.fosterDraft,other=fosterSow(s,f.target);if(!other||f.count<0||f.count>fosterMax(s)||f.count+f.ids.length<1)return;const out=f.direction==='out',to=out?other:s,from=out?s:other,ids=f.ids.slice(),k=f.count,n=k+ids.length,word=`${n} piglet${n===1?'':'s'} fostered`,idText=ids.length?` · ID ${ids.join(', ')}`:'';
+  // the ticked piglets go with their records (ID, notch, sex, weight); the others go as a count and arrive without identity
+  ids.forEach(tag=>{const i=(from.piglets||[]).findIndex(p=>p.tag===tag);if(i>=0)(to.piglets||=[]).push(from.piglets.splice(i,1)[0]);});
+  from.alive-=n;from.moved=(from.moved||0)+n;to.alive+=n;to.moved=(to.moved||0)-n;from.unidentified=fosterNoId(from);to.unidentified=fosterNoId(to);[from,to].forEach(r=>{if(!r.locked)r.anchor=born(r);});
+  event(s,`${word} ${out?'to':'from'} ${other.tag}${idText}`,'milestone');event(other,`${word} ${out?'from':'to'} ${s.tag}${idText}`,'milestone');f.target='';f.ids=[];
+  if(s.featureReturn==='allocate')(s.allocSent||=[]).push({tag:other.tag,pen:other.pen,n,ids});   // Allocate lists what has gone where
   if(s.featureReturn==='allocate'){s.view=toAllocate(s)?'allocate':'room';}else if(s.featureReturn==='pigletCare'){s.pigletTab='records';s.view='pigletCare';}else{s.actionsEntry=true;s.view='profile';}}
  if(a==='openMortality'){if(!s.pigletSelected.length&&!s.unidentified)return;s.mortalityDraft={cause:'',unidentified:0,photos:[]};s.view='pigletDeath';}
  if(a==='mortalityCount'){const max=Math.min(s.unidentified,s.alive-s.pigletSelected.length);s.mortalityDraft.unidentified=Math.max(0,Math.min(max,s.mortalityDraft.unidentified+Number(v)));}
@@ -873,7 +877,9 @@ function allocate(s){
  }
  if(c==='hand'){section=SentriUI.facts([{label:'Piglets',value:String(n)},{label:'Stay in',value:`Crate ${s.pen}`}]);commit=btn('allocHand',`Hand-rear ${pigs}`,'button primary');}
  if(c==='rear'){section=SentriUI.facts([{label:'Piglets',value:String(n)},{label:'Leave',value:`Crate ${s.pen}`}]);commit=btn('allocRear',`Move ${n} to the rearing pen`,'button primary');}
- const html=SentriUI.sheet({variant:'page',title:'Allocate piglets',line:`${pigs} · ${s.tag}`,back:{action:'close'},body:tiles+section,bodyClass:'allocate-body',footer:commit?pageFooter(commit):false,className:'feature-page allocate-page',label:'Allocate piglets',bar:status()});
+ // What has gone where so far (owner, 2026-11-02): one row per send, between the tiles and what comes next, so a split stays in view.
+ const sent=(s.allocSent||[]).length?`<section class="allocate-sent">${SentriUI.heading({title:'Sent',kind:'group',level:4})}${SentriUI.panel(s.allocSent.map(x=>SentriUI.row({variant:'animal',code:x.tag,description:[rowText.pen(x.pen),x.ids.length?'ID '+x.ids.join(', '):''].filter(Boolean).join(' · '),right:{kind:'state',figure:`${x.n} piglet${x.n===1?'':'s'}`,word:'',level:'settled'}})).join(''),{className:'st-row-group allocate-sent-rows'})}</section>`:'';
+ const html=SentriUI.sheet({variant:'page',title:'Allocate piglets',line:`${pigs} · ${s.tag}`,back:{action:'close'},body:tiles+sent+section,bodyClass:'allocate-body',footer:commit?pageFooter(commit):false,className:'feature-page allocate-page',label:'Allocate piglets',bar:status()});
  const layer=c==='move'?fosterLayer(s,true):'';
  return layer?'<div class="page-background" inert aria-hidden="true">'+html+'</div>'+layer:html;
 }
@@ -1021,7 +1027,13 @@ function pigletEditPage(s){
    both, on the count, with the same search and rows. */
 const fosterPicking=s=>s.view==='foster'||s.view==='allocate'&&s.allocChoice==='move';   // the sow picker is on screen (Foster piglets, or Allocate's Foster)
 const fosterStart=(s,count)=>({...fosterDraft(count),filter:fosterFilterDefault(s)});   // her unit, any time, any parity
-const fosterDraft=count=>({direction:'out',target:'',count,start:count,q:'',scanning:false,seq:0});
+const fosterDraft=count=>({direction:'out',target:'',count,ids:[],start:count,q:'',scanning:false,seq:0});
+// A litter's piglets with an ID (alive) and how many have none: the count is what the record says is alive, so no ID = alive - IDs.
+const fosterIds=r=>(r.piglets||[]).filter(p=>p.state==='Alive');
+const fosterNoId=r=>Math.max(0,(r.alive||0)-fosterIds(r).length);
+const fosterFrom=s=>s.fosterDraft.direction==='out'?s:fosterSow(s,s.fosterDraft.target);   // the litter the piglets leave
+// The start of a count: all of them when Allocate moves the whole litter (start covers it), else one piglet without ID (or none, if all have one).
+const fosterOpen=(s)=>{const f=s.fosterDraft,src=fosterFrom(s);if(!src)return;const all=f.start>=src.alive;f.ids=all?fosterIds(src).map(p=>p.tag):[];f.count=all?fosterNoId(src):Math.min(1,fosterNoId(src));};
 function fosterPreset(i,p){
  const s=states[i];act(s,'foster');
  if(p==='foster-search')s.fosterDraft.q='B3';
@@ -1043,7 +1055,7 @@ const homeUnit=s=>{const c=roomContext(s);return c.units.find(u=>u.records.inclu
 const fosterFilterDefault=s=>({unit:homeUnit(s).id,...defaultRoomFilter()});
 const fosterFilterCount=(s,g)=>Number(g.unit!==homeUnit(s).id)+roomFilterCount(g);   // what differs from the defaults (Reset shows)
 const fosterMatch=(g,r,u)=>(g.unit==='all'||u.id===g.unit)&&(!r.farm&&matchesRoomFilter(r,g)||r.farm&&roomFilterCount(g)===0);
-const fosterMax=s=>{const f=s.fosterDraft;return f.direction==='out'?s.alive:fosterSow(s,f.target)?.alive||0;};   // receiving takes no more than she has
+const fosterMax=s=>{const src=fosterFrom(s);return src?fosterNoId(src):0;};   // the piglets without ID the litter they leave has
 // The search bar, both doors: the search field (or the scan bar while the reader listens) and Filter sows, its count of filters narrowing
 // the list on the button (her unit counts: the list opens on it).
 function fosterBar(s,cls=''){
@@ -1090,11 +1102,17 @@ function fosterFilterSheet(s){
 }
 const fosterActive=g=>Number(g.unit!=='all')+roomFilterCount(g);   // the badge: filters narrowing the list (her unit counts)
 const fosterShown=(s,g)=>fosterCandidates(s).filter(({r,unit})=>fosterMatch(g,r,unit)).length;
+// The litter's piglets with an ID, one tick row each (Row · Select with an animal's right side): the ID over its notch, weight over sex. Ticked ones move with their records.
+function fosterIdList(list,ids){
+ if(!list.length)return '';
+ const rows=list.map(p=>SentriUI.rowSelect({code:p.tag,description:p.notch?'Notch '+p.notch:'',right:{kind:'state',figure:p.weight?p.weight+' kg':'',word:p.sex||'',level:'settled'},checked:ids.includes(p.tag),action:'fosterId',value:p.tag,inputAttrs:{'data-value':p.tag,'aria-label':'Move '+p.tag}})).join('');
+ return `<section class="foster-ids">${SentriUI.heading({title:`With ID · ${ids.length} of ${list.length}`,kind:'group',level:4})}${SentriUI.panel(rows,{className:'st-row-group foster-id-rows'})}</section>`;
+}
 function fosterCount(s,other,dead){
- const f=s.fosterDraft,out=f.direction==='out',max=fosterMax(s),word=out?'Send':'Receive',n=f.count;
+ const f=s.fosterDraft,out=f.direction==='out',max=fosterMax(s),word=out?'Send':'Receive',src=out?s:other,withId=fosterIds(src),n=f.count+f.ids.length;
  const line={text:[{text:out?'To ':'From '},{text:other.tag,strong:true},{text:` · ${rowText.pen(other.pen)} · ${other.farm?other.stage:rowText.alive(other.alive)}`}]};
- const body=`${dead?'':SentriUI.segment({variant:'view-switch',options:[['out','Send piglets'],['in','Receive piglets']],active:f.direction,action:'fosterDirection',ariaLabel:'Direction'})}<section class="feature-section">${farmStepper({variant:'well',label:'Number of piglets',value:n,min:1,max,action:'fosterCount',reserveHint:false})}<p class="feature-hint">${out?'Piglets without identity move first.':'They join without identity until it is recorded.'}</p></section>`;
- return SentriUI.sheet({variant:'drawer',title:out?'Send piglets':'Receive piglets',line,body,footer:footer(SentriUI.backButton({action:'fosterClose'}),btn('saveFoster',`${word} ${n} piglet${n===1?'':'s'}`,'button primary','',n<1||n>max)),className:'foster-count',size:'medium',sizing:'content',label:out?'Send piglets':'Receive piglets',scrim:{action:'fosterClose',label:'Close'}});
+ const body=`${dead?'':SentriUI.segment({variant:'view-switch',options:[['out','Send piglets'],['in','Receive piglets']],active:f.direction,action:'fosterDirection',ariaLabel:'Direction'})}${fosterIdList(withId,f.ids)}${max||!withId.length?`<section class="feature-section">${farmStepper({variant:'well',label:withId.length?'Without ID':'Number of piglets',value:f.count,min:withId.length?0:1,max,action:'fosterCount',reserveHint:false})}</section>`:''}`;
+ return SentriUI.sheet({variant:'drawer',title:out?'Send piglets':'Receive piglets',line,body,footer:footer(SentriUI.backButton({action:'fosterClose'}),btn('saveFoster',`${word} ${n} piglet${n===1?'':'s'}`,'button primary','',n<1||f.count>max)),className:'foster-count',size:withId.length?'long':'medium',sizing:'content',label:out?'Send piglets':'Receive piglets',scrim:{action:'fosterClose',label:'Close'}});
 }
 function pigletDeathPage(s){
  const f=s.mortalityDraft,total=s.pigletSelected.length+f.unidentified;
