@@ -89,4 +89,27 @@ async function corner(p, label) {
   await p.close();
 }
 
+// Variant B (owner, 2026-11-02: "should it be inside details and then undo a certain action?"): the card's saved line names what
+// was saved, and the undo sits on that one named line in Litter details, the door the card already is. Only the last save has it.
+{
+  const p = await open('farrowing.count');
+  await tap(p, PLUS, 3);
+  await tap(p, SAVE);
+  await p.evaluate(() => {
+    const q = document.querySelector('.sheet[data-view="count"] .alive-quiet');
+    q.innerHTML = q.innerHTML.replace('Saved', 'Saved <b class="mock-what">· +3 born</b>');
+    const st = document.createElement('style'); st.textContent = '.alive-quiet .mock-what{font-weight:600;color:var(--ink,#1d221e)}'; document.head.append(st);
+  });
+  await shot(p, 'undo-b1-saved.png');
+  await tap(p, '.alive-card');
+  await p.evaluate(() => {
+    const U = window.SentriUI;
+    const doors = document.querySelector('.litter-doors');
+    const last = U.rowGroup(U.rowAction({ title: '+3 born alive', description: 'Saved 09:41 · G.H', action: 'history', act: { label: 'Undo', action: 'undoVisit' } }), { title: 'Last save' });
+    doors.outerHTML = last + U.rowGroup(U.row({ title: 'Farrowing log', action: 'history', trail: 'chevron' }), { className: 'litter-doors' });
+  });
+  await shot(p, 'undo-b2-details.png');
+  await p.close();
+}
+
 await b.close(); server.kill();
