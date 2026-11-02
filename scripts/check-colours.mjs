@@ -59,18 +59,20 @@ const over = (top, under) => [0, 1, 2].map((i) => top[i] * top[3] + under[i] * (
 /* ---------- the palette ---------- */
 // The status convention (owner, 2026-11-02). Each status keeps one hue; size picks the shade: words dark, anything holding a number a
 // light fill with the number in the same hue's dark ink, bars, day segments and dots a clean mid tone. The values the convention adds
-// are listed here until tokens.json carries them; a token with the same value replaces the name given here.
+// are listed here under the names of ux/design-system/README.md › Colour until tokens.json carries them; a token with the same value
+// replaces the name given here, and the rules below go by value, so a rename never loosens one.
 export const STATUS = {
   done: { fill: '#d5e8cc', ink: '#1d4d2e', mark: '#5fae6e' },
   progress: { fill: '#c1ddfd', ink: '#1f4470', mark: '#6f9fdc' },  // progress-fill, progress-fill-ink
   late: { fill: '#fede82', ink: '#5c3f00', mark: '#e8b33c' },      // amber-fill, amber-fill-ink
   waiting: { track: '#dce0d4' },                                   // handle: the empty track, or an outline
+  neutral: { mark: '#a3aa9f' },                                    // neutral-mark: a bar part that is no status
   actNow: { word: '#98362b', ink: '#85291f', fill: '#fff1ee' },    // red, red-ink, red-wash
-  button: { fill: '#258048', label: '#ffffff' },                   // the one green button: the counting "+ Born alive" key
+  button: { fill: '#258048', label: '#ffffff' },                   // count-key: the one green button, the counting "+ Born alive" key
 };
 const CONVENTION = [
-  ['done-fill', STATUS.done.fill], ['done-ink', STATUS.done.ink], ['done-mark', STATUS.done.mark],
-  ['progress-mark', STATUS.progress.mark], ['amber-mark', STATUS.late.mark], ['done-button', STATUS.button.fill],
+  ['done-fill', STATUS.done.fill], ['done-fill-ink', STATUS.done.ink], ['done-mark', STATUS.done.mark],
+  ['progress-mark', STATUS.progress.mark], ['late-mark', STATUS.late.mark], ['neutral-mark', STATUS.neutral.mark], ['count-key', STATUS.button.fill],
 ];
 const NEUTRAL = ['paper', 'app-background', 'ground', 'surface', 'inset', 'ink', 'muted', 'line', 'rule', 'control-border', 'button-border', 'handle'];
 const GREEN = ['green', 'green-wash', 'count-key', 'chip-green-border', 'count-surface', 'count-ink'];
@@ -94,7 +96,7 @@ function rolesOf(palette) {
   const red = new Set([...val(['red', 'red-ink']), ...hexes([STATUS.actNow.word, STATUS.actNow.ink])]);
   const done = hexes([STATUS.done.fill, STATUS.done.ink, STATUS.done.mark, STATUS.button.fill]);
   const green = new Set([...val(GREEN), ...done]);
-  const statusSet = new Set([...hexes([STATUS.done.fill, STATUS.done.ink, STATUS.done.mark, STATUS.progress.fill, STATUS.progress.ink, STATUS.progress.mark, STATUS.late.fill, STATUS.late.ink, STATUS.late.mark, STATUS.waiting.track, STATUS.actNow.word, STATUS.actNow.ink, STATUS.actNow.fill]), ...val(NEUTRAL)]);
+  const statusSet = new Set([...hexes([STATUS.done.fill, STATUS.done.ink, STATUS.done.mark, STATUS.progress.fill, STATUS.progress.ink, STATUS.progress.mark, STATUS.late.fill, STATUS.late.ink, STATUS.late.mark, STATUS.waiting.track, STATUS.neutral.mark, STATUS.actNow.word, STATUS.actNow.ink, STATUS.actNow.fill]), ...val(NEUTRAL)]);
   return { red, green, statusSet };
 }
 

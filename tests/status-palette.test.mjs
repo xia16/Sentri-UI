@@ -7,11 +7,14 @@ import { STATUS, deltaE, contrast } from '../scripts/check-colours.mjs';
 const SEPARATION = 8; // OKLab ΔE x100 under each simulation, the dataviz validator's target
 const KINDS = ['protan', 'deutan', 'tritan'];
 // The marks that sit side by side: the segments of one bar (done, progress, late on the empty track) and the dots of one legend;
-// the act-now red sits beside any of them as the one red signal in a row.
-const MARKS = { done: STATUS.done.mark, progress: STATUS.progress.mark, late: STATUS.late.mark, waiting: STATUS.waiting.track, 'act now': STATUS.actNow.word };
+// the act-now red sits beside any of them as the one red signal in a row; neutral-mark is the bar part that is no status (the middle
+// of Performance metrics' split), beside done.
+const MARKS = { done: STATUS.done.mark, progress: STATUS.progress.mark, late: STATUS.late.mark, waiting: STATUS.waiting.track, neutral: STATUS.neutral.mark, 'act now': STATUS.actNow.word };
 // A pair the settled palette fails, kept visible as a TODO until the owner moves a mark (never dropped from the list).
 const KNOWN = {
   'done|progress|tritan': 'the done mark #5fae6e and the progress mark #6f9fdc share a lightness, so a tritan reader sees one colour (ΔE 3.3); darkening either mark separates them (done #51945e gives 8.8, progress #597fb0 gives 8.9): waiting for the owner',
+  'done|neutral|protan': 'neutral-mark #a3aa9f beside done-mark #5fae6e: ΔE 6.6 under protan, in the validator’s 6-8 floor band (legal only with labels or gaps): waiting for the owner',
+  'done|neutral|deutan': 'neutral-mark #a3aa9f beside done-mark #5fae6e: ΔE 6.4 under deutan, in the validator’s 6-8 floor band (legal only with labels or gaps): waiting for the owner',
 };
 
 const names = Object.keys(MARKS);
