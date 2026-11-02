@@ -1415,8 +1415,22 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 
 /* Farrowing · counting (owner, 2026-10-23): the Alive card is alive now, the visit's unsaved changes as chips at its right; one height in
    every state, so the drawer never jumps. Below it Born alive (Stepper count) and Report death; Report death is a level of the drawer. */
-.farrowing-phone .alive-card{position:relative;display:block;width:100%;box-sizing:border-box;margin:0 0 16px;padding:16px;border:1px solid var(--line);border-radius:20px;background:#f6f7f1;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+/* The card is one surface (owner, 2026-11-02): the figure is the door to Litter details; under a divider the last save, with a quiet Undo
+   beside it, never inside the door. The surface carries the border and fill so the door and the run share one box. */
+.farrowing-phone .alive-surface{margin:0 0 16px;border:1px solid var(--line);border-radius:20px;background:#f6f7f1;overflow:hidden}
+.farrowing-phone .alive-card{position:relative;display:block;width:100%;box-sizing:border-box;margin:0;padding:16px;border:0;border-radius:0;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
 .farrowing-phone .alive-card:active{background:#eef1e7}
+/* The last save as a run: "Saved 09:41 · G.H", its results on one line as quiet chips (no glyph: the word says it), Undo centred at the right. */
+.alive-run{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0 14px;border-top:1px solid var(--line)}
+.alive-surface .alive-run{margin:0 16px}
+.facts-surface .alive-run{margin-top:14px;padding-bottom:0}
+.alive-run-copy{display:flex;flex-direction:column;gap:8px;min-width:0}
+.alive-run-copy small{font:400 13px/18px var(--font-sans);color:var(--muted)}
+.alive-run-chips{display:flex;flex-wrap:wrap;gap:5px}
+.alive-run .alive-chip{display:inline-flex;align-items:center;gap:5px;height:24px;box-sizing:border-box;padding:0 7px;border-radius:999px;font:500 13px/1 var(--font-sans);background:#eceee7;color:#4b5547;white-space:nowrap}
+.alive-run .alive-chip b{flex:none;font:600 14px/1 var(--font-mono)}
+.farrowing-phone .alive-run .alive-undo{flex:none;min-height:48px;margin-right:-8px;padding:0 8px;gap:5px;font:600 13px/16px var(--font-sans);color:var(--ink)}
+.farrowing-phone .alive-run .alive-undo svg{width:16px;height:16px;stroke-width:2}
 .alive-card .alive-label{display:block;font:400 14px/20px var(--font-sans);color:var(--muted)}
 .alive-card .alive-draft{color:#8a5a1d;font-weight:600}
 .alive-card .alive-go{position:absolute;top:16px;right:16px;display:flex;align-items:center;gap:4px;font:600 13px/20px var(--font-sans);color:var(--ink)}

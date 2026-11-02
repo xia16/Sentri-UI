@@ -19,7 +19,6 @@
     ],
     "usedBy": [
       "farrowing.death",
-      "farrowing.edit",
       "piglet-processing.counts",
       "piglet-processing.record-death",
       "piglet-processing.adjust-count"
