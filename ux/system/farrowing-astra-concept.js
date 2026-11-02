@@ -93,7 +93,7 @@ function act(s,a,v){
  if(a==='back'&&s.view==='death'&&s.deathFrom){s.deathDraft=[...s.deathFrom];s.deathFrom=null;}   // Back leaves the level without what it entered; Done keeps it
  if(a==='doneDeath'){s.deathFrom=null;s.saved=false;s.view='count';}
  if(a==='deathGroup'){if(v==='sow')s.mode='sow';else{s.mode='piglets';s.group=v;}}
- if(a==='close'){if(s.view==='count')fold(s);s.view=s.view==='roomEndTask'?'roomOverview':s.view==='roomTaskSows'?'roomEndTask':s.view==='roomTaskReceipt'?'roomHome':penParent(s.view);}
+ if(a==='close'){if(s.view==='count')fold(s);if(s.view==='allocate')s.allocChoice=null;s.view=s.view==='roomEndTask'?'roomOverview':s.view==='roomTaskSows'?'roomEndTask':s.view==='roomTaskReceipt'?'roomHome':penParent(s.view);}
  if(a==='open')s.view=s.locked?'locked':'count';
  if(a==='back'){s.popup=null;s.view=s.view==='editFinish'?'edit':s.view==='litter'?s.litterBack||'count':['history','profile','deathBreakdown'].includes(s.view)?s.pageBack||s.back||'count':s.back||'count';}
  if(a==='finish'){s.pointers=false;s.view='finish';}
@@ -139,9 +139,10 @@ function act(s,a,v){
  if(a==='addPiglet'||a==='scanPiglet'||a==='notchPiglet'){s.pigletEditIndex=-1;s.pigletDraft={tag:a==='scanPiglet'?String(418001+s.piglets.length):'',notch:a==='notchPiglet'?'Choose notch':'',sex:'',weight:'',state:'Alive'};s.view='pigletEdit';}
  if(a==='savePiglet'){const p=s.pigletDraft;if(!p||![p.tag,p.notch,p.sex,p.weight].some(x=>String(x||'').trim()))return;const clean={tag:String(p.tag||'').trim(),notch:p.notch==='Choose notch'?'':String(p.notch||'').trim(),sex:p.sex||'',weight:String(p.weight||'').trim(),state:p.state||'Alive'};if(s.pigletEditIndex<0){s.piglets.push(clean);s.unidentified=Math.max(0,s.unidentified-1);}else s.piglets[s.pigletEditIndex]=clean;event(s,`${s.pigletEditIndex<0?'Piglet identity added':'Piglet identity updated'} · ${clean.tag||clean.notch||'identity pending'}`);s.pigletTab='records';s.view='pigletCare';}
  if(a==='foster'){s.featureReturn=s.view==='pigletCare'?'pigletCare':'profile';const candidate=roomContext(s).units.flatMap(u=>u.records).find(r=>r!==s&&!r.ended&&!r.productionOutcome&&born(r)>0);s.fosterDraft={direction:'out',target:candidate?.tag||'',count:1};s.view='foster';}
+ if(a==='allocChoose')s.allocChoice=v;   // a tile only chooses; the footer commits (owner, 2026-11-02: Hand-rear jumped straight back to the list)
  if(a==='allocMove'){const candidate=fosterCandidates(s)[0];s.featureReturn='allocate';s.fosterDraft={direction:'out',target:candidate?.tag||'',count:s.alive};s.view='foster';}
- if(a==='allocHand'){const n=s.alive;s.handReared={at:'09:41',who:'G.H'};event(s,`${n} piglet${n===1?'':'s'} hand-reared in her crate`,'milestone');s.view='room';}
- if(a==='allocRear'&&farmConfig.rearingPen){const n=s.alive;s.alive=0;s.moved=(s.moved||0)+n;s.unidentified=0;s.anchor=born(s);event(s,`${n} piglet${n===1?'':'s'} moved to the rearing pen`,'milestone');s.view='room';}
+ if(a==='allocHand'){const n=s.alive;s.handReared={at:'09:41',who:'G.H'};event(s,`${n} piglet${n===1?'':'s'} hand-reared in her crate`,'milestone');s.allocChoice=null;s.view='room';}
+ if(a==='allocRear'&&farmConfig.rearingPen){const n=s.alive;s.alive=0;s.moved=(s.moved||0)+n;s.unidentified=0;s.anchor=born(s);event(s,`${n} piglet${n===1?'':'s'} moved to the rearing pen`,'milestone');s.allocChoice=null;s.view='room';}
  if(a==='fosterDirection'){s.fosterDraft.direction=v;s.fosterDraft.count=1;}
  if(a==='fosterTarget')s.fosterDraft.target=v;
  if(a==='fosterCount'){const max=s.fosterDraft.direction==='out'?s.alive:20;s.fosterDraft.count=Math.max(1,Math.min(max,s.fosterDraft.count+Number(v)));}
@@ -252,7 +253,6 @@ function identity(s){
  // Headers (owner, 2026-10-13; features/farrowing/budget.md ## Headers): the sow's record drawer is the hub and carries the route line, her
  // chip and the two facts that tell her apart at farrowing (her pen, her parity). Actions launched from it carry no line: it is one Back away.
  const route=(facts)=>({chip:{id:s.tag,action:'profile',label:'View sow '+s.tag+' details'},facts});
- if(s.view==='allocate')return {surface:'menu',title:'Allocate piglets',close:false,label:'Allocate piglets'};
  if(s.view==='finish')return {title:'Finish farrowing',close:{action:'dismiss',label:'Close finish drawer'}};
  if(s.view==='death')return {title:s.locked||s.ended?'Record dead':'Report death',close:false};
  if(['edit','editFinish'].includes(s.view))return {title:s.view==='editFinish'?'Edit finish details':'Edit record',close:false};
@@ -823,14 +823,20 @@ function finish(s){
 function moreSowActions(s){return btn('sowActions',`Actions ${icon('chevron')}`,'more-sow-actions').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`);}
 function recordActions(s){const pending=sum(s.deathDraft);return `<div class="record-inline-actions" aria-label="Record actions"><div class="record-action-group" role="group" aria-label="Quick actions">${s.events.length||born(s)?btn('edit',`${icon('edit')}<span>Edit</span>`,'record-toolbar-action'):''}${btn('death',`${icon('alert')}<span>Record dead</span>${pending?`<small>${pending} unsaved</small>`:''}`,'record-toolbar-action')}${btn('sowActions',`${icon('more')}<span>Actions</span>`,'record-toolbar-action record-toolbar-more').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)}</div></div>`;}
 function recordNavigation(primary=''){return footer(SentriUI.backButton({action:'close'}),primary,'execution-completion');}
-// Right after the hold records her death (or from her row while piglets wait): where do her piglets go? Back = later.
+// Right after the hold records her death (or from her row while piglets wait): where do her piglets go? A page of choice tiles
+// (owner, 2026-11-02). A tile only chooses: the line under the tiles says what will happen, and the footer commits. Other sows
+// opens Foster piglets; Hand-rear and the rearing pen record here. The header's Back leaves with nothing recorded (later).
 function allocate(s){
- const rows=[SentriUI.choiceRow({mode:'navigate',label:'Move to other sows',meta:'Foster or nurse sow',action:'allocMove'}),SentriUI.choiceRow({mode:'navigate',label:'Hand-rear here',meta:'Bottle or milk replacer in her crate',action:'allocHand'}),...(farmConfig.rearingPen?[SentriUI.choiceRow({mode:'navigate',label:'Move to a rearing pen',meta:'Rescue deck',action:'allocRear'})]:[])];
+ const n=s.alive,pigs=`${n} piglet${n===1?'':'s'}`,c=s.allocChoice||'';
+ const options=[{value:'move',label:'Other sows',icon:'transfer'},{value:'hand',label:'Hand-rear',icon:'drop'},...(farmConfig.rearingPen?[{value:'rear',label:'Rearing pen',icon:'barn'}]:[])].map(o=>({...o,pressed:c===o.value}));
  // Her death is status, so it is the body's first line, with her tag and pen (she is on screen; no header line repeats her).
  // The count left the title (owner, 2026-10-14: no counts in a title; the title is the job, `Allocate piglets`) and opens this line.
  const e=s.events.find(e=>e.text.startsWith('Sow died'));
- const died=bodyLead(`${s.alive} piglet${s.alive===1?'':'s'} · ${s.tag} · ${s.pen} · sow died ${[e?.day&&e.day!=='Today'?e.day:'',e?.time].filter(Boolean).join(' ')}`.trim());
- return {cls:'allocate-body',body:died+SentriUI.choiceGroup(rows),footer:footer(SentriUI.backButton({action:'close'}))};
+ const died=bodyLead(`${pigs} · ${s.tag} · ${s.pen} · sow died ${[e?.day&&e.day!=='Today'?e.day:'',e?.time].filter(Boolean).join(' ')}`.trim());
+ const hint={move:'Foster or nurse sow. Choose each sow and how many on the next page; any left come back here.',hand:`Bottle or milk replacer in her crate. The ${pigs} stay in her litter.`,rear:`Rescue deck. The ${pigs} leave her litter.`}[c];
+ const commit={move:['allocMove',`Choose sows ${icon('chevron')}`],hand:['allocHand',`Hand-rear ${pigs}`],rear:['allocRear',`Move ${n} to the rearing pen`]}[c]||['',`Allocate ${pigs}`];
+ const body=died+SentriTask.choice({label:'Where her piglets go',action:'allocChoose',options})+(hint?`<p class="feature-hint">${hint}</p>`:'');
+ return SentriUI.sheet({variant:'page',title:'Allocate piglets',back:{action:'close'},body,bodyClass:'allocate-body',footer:pageFooter(btn(commit[0],commit[1],'button primary','',!c)),className:'feature-page allocate-page',label:'Allocate piglets',bar:status()});
 }
 function locked(s){
  const e=s.events[0];
@@ -983,10 +989,10 @@ function countReconcilePage(s){
  const body=`<section class="count-compare"><div><span>System count</span><strong>${s.alive}</strong></div></section><section class="feature-section">${farmStepper({variant:'well',label:'Count the piglets in this litter',value:s.countDraft,min:identified,max:30,action:'countReconcileStep',reserveHint:false})}<p class="feature-hint">The count cannot be lower than the ${identified} identified piglets still recorded alive.</p></section>${changed?`<div class="feature-warning">${icon('alert')}<span><strong>Your count will replace ${s.alive}</strong><small>${s.countDraft>s.alive?s.countDraft-s.alive+' piglets will be added without identity.':s.alive-s.countDraft+' piglets without identity will be removed.'}</small></span></div>`:''}${SentriUI.field({label:'Reason for mismatch',control:`<textarea rows="3" data-count-reason placeholder="What explains the difference?">${esc(s.countReason)}</textarea>`,className:'feature-field'})}`;
  return featurePage(s,'Correct piglet count',body,btn('saveCountReconcile','Save corrected count','button primary','',!changed||!s.countReason.trim()),'count-reconcile-page');
 }
-function capabilitySurface(s){return s.view==='marker'?markerPage(s):s.view==='pigletCare'?pigletCarePage(s):s.view==='pigletEdit'?pigletEditPage(s):s.view==='foster'?fosterPage(s):s.view==='pigletDeath'?pigletDeathPage(s):s.view==='countReconcile'?countReconcilePage(s):'';}
+function capabilitySurface(s){return s.view==='allocate'?allocate(s):s.view==='marker'?markerPage(s):s.view==='pigletCare'?pigletCarePage(s):s.view==='pigletEdit'?pigletEditPage(s):s.view==='foster'?fosterPage(s):s.view==='pigletDeath'?pigletDeathPage(s):s.view==='countReconcile'?countReconcilePage(s):'';}
 
-function farrowingRecordSurface(s){const surface=({count,finish,locked,death,edit,editFinish,allocate})[s.view];if(!surface)return '';const v=surface(s),h=identity(s),page=AstraSurfaces.isPage('farrowing',s.view);
- const label={allocate:'Allocate piglets',count:'Count alive',finish:'Finish farrowing',locked:'Locked litter',death:'Record dead',editFinish:'Edit finish details',edit:'Edit record'}[s.view];
+function farrowingRecordSurface(s){const surface=({count,finish,locked,death,edit,editFinish})[s.view];if(!surface)return '';const v=surface(s),h=identity(s),page=AstraSurfaces.isPage('farrowing',s.view);
+ const label={count:'Count alive',finish:'Finish farrowing',locked:'Locked litter',death:'Record dead',editFinish:'Edit finish details',edit:'Edit record'}[s.view];
  return SentriUI.sheet(Object.assign({variant:page?'page':'drawer',body:v.body,bodyClass:v.cls,corner:v.corner||null,footer:v.footer,size:['death','edit','editFinish','finish'].includes(s.view)?'long':'medium',sizing:['count','death','edit'].includes(s.view)?'full':'content',view:s.view,label,scrim:{action:'dismiss',label:'Dismiss sheet'},bar:page?status():''},h));}
 function farrowingBackground(s){
  if(s.view==='roomPicker'){const c=roomContext(s),back=c.picker?.returnView||'';const behind=['roomPenReadNote','roomPenNote','roomPenFault','roomPenFaultRecord'].includes(back)?penSubpage({...s,view:back},c):['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile'].includes(back)?capabilitySurface({...s,view:back}):'';return behind?'<div class="page-background" inert aria-hidden="true">'+behind+'</div>':'';}
