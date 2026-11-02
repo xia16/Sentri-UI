@@ -35,10 +35,10 @@ An agent score is never shown as approval. The approved version of a screen stay
 
 Owner ruling (2026-11-02): all prototype work is shown on a **canvas** first, and reaches the atlas only when the owner agrees. This covers new screens, changed screens, explorations, product rounds and polish-loop changes.
 
-- **The canvas.** One self-contained page in the feature's folder, `features/<id>/canvas.html`. It is built from `canvas.src.html` by `node scripts/canvas.mjs`, which writes the pictures into the file, so the canvas opens wherever the owner looks with no blank frames. Every screen sits in a phone frame at 390. The flow reads left to right, and each frame is labelled *old*, *now* or *new* with a one-line caption. Open questions come last, each with a recommendation. The screens are real: they are drawn with the prototype's own parts (tokens, `bundle.css`, `SentriUI.*`), rendered from the live page and swapped in by a script in the feature folder (as `features/count/mock/mock.mjs`). A picture drawn freehand is not a canvas screen.
+- **The canvas** is a **Claude Design canvas** on claude.ai (owner, 2026-11-02): the Artifact tool's *Design* type, one canvas per feature round, with the Sentri design system installed. Its link goes in `features/<id>/canvas.md` with one line on what it holds. Every screen is an artboard at 390 × 844. The flow reads left to right, one row per step. Each artboard is titled *old*, *now* or *new*, and a one-line caption sits under it. Open questions sit beside the rows as one note, each with a recommendation. The screens are real: they are drawn with the prototype's own parts (tokens, `bundle.css`, `SentriUI.*`), rendered from the live page by a script in the feature folder (as `features/count/mock/mock.mjs`), uploaded to the canvas and placed on artboards. A picture drawn freehand is not a canvas screen. Where claude.ai can't be used, `node scripts/canvas.mjs` makes the same set into one offline file, `features/<id>/canvas.html`, with the pictures inside it.
 - **Nothing reaches the atlas before the owner agrees.** Until then, no change goes to a prototype under `ux/`, to `atlas/atlas.json` or to a feature's `feature.json` screens, and nothing merges. The canvas and its sources are committed on the work's own branch and pushed, and nothing merges.
 - **The owner's agreement starts the build.** When the owner agrees on the canvas, the agreed screens are built into the prototypes and the atlas, gated, and merged behind the machine gate as before. The owner's agreement on the canvas is the design approval (it replaces "PR it" as the moment of approval). A screen built differently from its agreed canvas goes back to the canvas.
-- **Show it, then wait.** Send the canvas to the owner and stop. The owner's reaction goes onto the same canvas, until they agree.
+- **Show it, then wait.** Give the owner the canvas link and stop. The owner's reaction (comments on the canvas, or in the session) changes the same canvas, until they agree.
 
 ## Owner rules (binding on every brief)
 
@@ -100,7 +100,7 @@ One entry point drives them all: `/design <feature>` ([.claude/skills/design/](.
 
 1. **Class it**: copy, presentation, behaviour or shared component (table below).
 2. **References**: find what exists for the job and capture the baselines before building ([build.md §1](briefs/build.md#1-start-from-what-exists-p1)).
-3. **Canvas**: draw the change on the feature's canvas and show it to the owner ([Canvas first](#canvas-first)). Wait for the owner to agree.
+3. **Canvas**: put the change on the feature's Claude Design canvas and give the owner its link ([Canvas first](#canvas-first)). Wait for the owner to agree.
 4. **Build** what the owner agreed, on a branch in a worktree off `origin/main` ([build.md](briefs/build.md)).
 5. **Gate** it on the exact merge candidate. A different agent from the builder runs [gate.md](briefs/gate.md).
 6. **Merge** it automatically once the gates pass. Merge main forward with `node scripts/merge-main.mjs` (it regenerates `atlas/atlas.json` and `tokens.css`); never rebase or force-push. Rerun the checks on the merged result.
@@ -138,7 +138,7 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | `node scripts/feature-state.mjs <feature>` | Where a feature stands and what `/design` drives next: chart, plan, scenarios, build, polish, review or freeze |
 | `node scripts/component-jobs.mjs [word]` | One line per design-system component saying what job it does, so a builder names the existing component before building a new one |
 | `node scripts/shoot-screens.mjs <out>` | Screenshots atlas screens bare at any widths and languages, and says where Chinese doesn't render; `--components` adds the design system's variant pages |
-| `node scripts/canvas.mjs <canvas.src.html>` | Writes the owner's canvas (`canvas.html` beside it) with every picture inside the file, so it opens anywhere; a missing picture fails the run ([Canvas first](#canvas-first)) |
+| `node scripts/canvas.mjs <canvas.src.html>` | The offline copy of a canvas: writes `canvas.html` beside the source with every picture inside the file; a missing picture fails the run. The canvas itself is a Claude Design canvas ([Canvas first](#canvas-first)) |
 
 ## Briefs
 

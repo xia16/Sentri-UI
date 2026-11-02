@@ -39,7 +39,7 @@ This mode is done only when the ledger says **settled**. On capped or stuck, com
 
 A product question becomes a grilling ticket on the feature's map. For a feature with no map, open a small one, with the question as its first ticket.
 
-**build.** Canvas first: draw the screens on `features/<id>/canvas.html` (`node scripts/canvas.mjs`), send it to the owner and stop until they agree ([Canvas first](../../../docs/design-workflow/README.md#canvas-first)). Then build what was agreed: screens first, components from the feature. One builder per change with [build.md](../../../docs/design-workflow/briefs/build.md), gated by `scripts/gate.mjs`, merged behind the merge guard.
+**build.** Canvas first: put the screens on the round's Claude Design canvas (link in `features/<id>/canvas.md`), give the owner the link and stop until they agree ([Canvas first](../../../docs/design-workflow/README.md#canvas-first)). Then build what was agreed: screens first, components from the feature. One builder per change with [build.md](../../../docs/design-workflow/briefs/build.md), gated by `scripts/gate.mjs`, merged behind the merge guard.
 
 **polish.** Follow [.claude/skills/polish-loop/SKILL.md](../polish-loop/SKILL.md) to its stop.
 
