@@ -52,10 +52,29 @@ No change needed:
 
 For the build: `receipt()` in the prototype is dead code that still says "Use Edit for corrections" (delete it). The presets *Edit counts*, *Correct born* and *Leave edit with changes*, the label map entries, and the strings `tk.demo.edit` and `tk.demo.born.wrong` go with the screens they belong to.
 
+### Overview and depth (owner, 2026-11-02: "the one outside is an overview, if they go into the details they should see more")
+
+Board: [edit-record-round/details.html](edit-record-round/details.html).
+
+| | | |
+|---|---|---|
+| ![Overview](edit-record-round/details-1-overview.png) | ![Details top](edit-record-round/details-2-page-top.png) | ![Details bottom](edit-record-round/details-3-page-bottom.png) |
+| **The finished record is the farrowing drawer.** The Alive card shows 7 alive now, `14 born · 7 dead` at its right and `· Finished Aug 27` on the label. The last save sits under its divider with Undo. The bar is Back · **Record dead** · ···. The facts wall, Litter summary, View log, Death causes and the tool row move to Details. | **Litter details becomes a page.** *This litter*: Total born · Born alive · Alive now, and one bar of the 14 born (7 alive now, 5 died after birth, 2 born dead). The colours pass the colour-blind check and each part is labelled. *Losses* by cause in two groups replace the Death causes drawer. | *At finish*: weak, deformed, assisted, litter weight. *Her litters*: born alive per parity with what each weaned, from her production history. Then Farrowing log and Production stats. |
+
+| | |
+|---|---|
+| ![Report death](edit-record-round/details-4-report-death.png) | ![Report death, end](edit-record-round/details-5-report-death-end.png) |
+| **Report death as one list.** No choice first: *Died after birth* (Crushed, Scours, Starve-out, Other) and *Born dead* (Stillborn, Mummified), each a stepper from 0. | Photos, then **The sow died ›**, a door of its own (her death stays a hold-to-commit). This changes the 2026-10-23 ruling "What died is one choice" (D2). |
+
+Screens: `farrowing.locked` and `farrowing.ended` take the drawer shape; `farrowing.litter` becomes a page; `farrowing.death-breakdown` retires into Losses; `farrowing.death` loses its tiles.
+
 Questions for the owner:
 - **R1.** Undo only for the worker who saved it? *Recommend yes.*
 - **R2.** Until the next save on her, or also a time limit (e.g. 30 minutes)? *Recommend until the next save, with no clock: simpler, and the next save closes it anyway.*
 - **R3.** The same Undo for the last Record dead after Finish? *Recommend yes (drawn above).*
+- **D1.** The finished record's main button is Record dead? *Recommend yes.*
+- **D2.** Report death as one list, with the sow behind a door, replacing the three tiles? *Recommend yes.*
+- **D3.** Her litters in Litter details (born alive and weaned per parity)? *Recommend yes.*
 - **R4.** No born dead after Finish (no stillborn or mummified in Record dead once she is finished)? *Recommend yes: it would be a birth, and Total born is locked.*
 
 ## Recommendation in one paragraph (as put to the owner, before the ruling)
