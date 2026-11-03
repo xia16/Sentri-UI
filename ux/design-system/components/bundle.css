@@ -266,6 +266,8 @@ body{background:var(--ground);color:var(--ink)}
 .st-note-foot svg{width:16px;height:16px}
 .st-panel.st-note-days{margin-top:var(--space-18);padding:var(--space-8) var(--space-16)}
 .st-note-days .st-stepper{margin:0}
+.attention-list+.st-note-row{margin-top:var(--space-12)}   /* a pig's note under its health cards (pig page) */
+.field textarea.st-note-input{min-height:144px;font-size:var(--type-input-size);line-height:1.5}   /* five lines, then it grows with the text (a note composer, as iOS Notes and Reminders) */
 .st-panel.st-panel--empty{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 16px}
 .st-panel--empty>span{display:flex;color:var(--muted)}
 .st-panel--empty svg{width:20px;height:20px;flex:none}

@@ -16012,7 +16012,7 @@
            },
            {
             "name": "Last record",
-            "shows": "\"Last record 06:40 · G.H\" above the list, with Log beside it (no End walk, no check-in: owner, 2026-11-03)",
+            "shows": "In the header line: \"Unit 7 · last record 06:40 · G.H\"; the history button at the top right opens This walk (no End walk, no check-in: owner, 2026-11-03)",
             "states": [
              {
               "state": "Nothing recorded yet",
@@ -17048,7 +17048,6 @@
            "No updates yet (raw)"
           ],
           "issues": [
-           "The button is called Log, the aria-label \"Updates this walk\" and the sheet \"This walk\": three names.",
            "The same events appear again in each pig's Log and the pen log."
           ]
          }
