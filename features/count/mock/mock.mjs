@@ -378,7 +378,7 @@ async function taskMap(name, o) {
     document.querySelector('.room-context-strip').innerHTML = window.AstraTaskOverview.render({ headingIcons: true, unit: o.unit, task: o.task });
     document.querySelector('.room-controls')?.remove();
     const pens = {}; for (const c of Object.keys(o.tiles)) pens[c] = 'plain';
-    const host = document.createElement('div'); host.innerHTML = U.penMap({ lanes: o.lanes, depth: o.depth, pens, entrance: 'Entrance', key: 'recv' });
+    const host = document.createElement('div'); host.innerHTML = U.penMap({ lanes: o.lanes, depth: o.depth, rows: o.rows, pens, entrance: 'Entrance', key: 'recv' });
     host.querySelectorAll('.st-pen-tile').forEach((t) => {
       const c = t.dataset.pen, v = o.tiles[c];
       const [n, cap] = v ? v[0].split('/').map(Number) : [0, 1];
@@ -395,11 +395,11 @@ async function taskMap(name, o) {
       const foot = document.createElement('div'); foot.className = 'sheet-footer m-scanfoot'; foot.dataset.ds = 'Sheet';
       foot.innerHTML = left + (read.length ? U.button({ label: 'Clear', register: 'secondary', action: 'x' }) : '');
       dock.replaceWith(foot);
-      if (o.scan.toast) { const t = document.createElement('div'); t.className = 'm-toast'; t.innerHTML = U.toast(o.scan.toast, { tone: 'done' }); document.querySelector('.room-scroll').parentElement.append(t); }
+      if (o.scan.toast) { const t = document.createElement('div'); t.className = 'm-toast'; t.innerHTML = U.toast(o.scan.toast, { tone: 'done' }); foot.append(t); }
     }
     const walk = document.createTreeWalker(document.querySelector('.st-task-dock, [data-ds="TaskDock"]') || document.body, NodeFilter.SHOW_TEXT);
     while (walk.nextNode()) if (walk.currentNode.nodeValue.trim() === 'Pen map') walk.currentNode.nodeValue = 'Pen list';
-    const st = document.createElement('style'); st.textContent = PLAN_CSS + '.m-count .m-scanbar{margin:0 0 14px}.m-scanfoot{display:flex;align-items:center;justify-content:space-between;gap:12px}.m-scanfoot .m-left strong{display:block;font-size:15px}.m-scanfoot .m-left small{display:block;font-size:13px;color:var(--muted,#657060)}.m-toast{position:absolute;left:16px;right:16px;bottom:112px;z-index:5}'
+    const st = document.createElement('style'); st.textContent = PLAN_CSS + '.m-count .m-scanbar{margin:0 0 14px}.m-scanfoot{display:flex;align-items:center;justify-content:space-between;gap:12px}.m-scanfoot .m-left strong{display:block;font-size:15px}.m-scanfoot .m-left small{display:block;font-size:13px;color:var(--muted,#657060)}.m-scanfoot{position:relative}.m-toast{position:absolute;left:0;right:0;bottom:calc(100% + 12px);z-index:5;--toast-bottom:0px}'
       + '.room-list.m-count{padding-bottom:24px}.m-count .m-map .st-pen-tile{position:relative;overflow:hidden}' // the fill line only where room matters: pens not counted
       + '.m-count .m-fill{position:absolute;left:12px;right:12px;bottom:8px;height:4px;border-radius:2px;background:var(--handle,#dce0d4)}'
       + '.m-count .m-fill i{display:block;height:100%;border-radius:2px;background:var(--muted,#657060)}'
@@ -410,13 +410,18 @@ async function taskMap(name, o) {
   await p.close();
 }
 const keyOf = (counted) => '<p class="m-plankey">' + (counted ? '<span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span>' : '')
-  + '<span><i class="m-k-plan"></i>Planned</span><span>Pens hold <b>15</b></span></p>';
+  + '<span><i class="m-k-plan"></i>Planned</span><span>Pens hold <b>15</b> · sick <b>4</b></span></p>';
 const unit9 = (over) => {
   const t = { A1: ['0/15', 'm-plan'], A2: ['0/15', 'm-plan'], A3: ['0/15', 'm-plan'], A4: ['0/15', 'm-plan'], B1: ['0/15', 'm-plan'], B2: ['0/15', 'm-plan'],
-    B3: ['0/15', 'm-free'], B4: ['0/15', 'm-free'], C1: ['15/15', 'm-free'], C2: ['9/15', 'm-free'], C3: ['0/15', 'm-free'], C4: ['0/15', 'm-free'] };
+    B3: ['0/15', 'm-free'], B4: ['0/15', 'm-free'], C1: ['15/15', 'm-free'], C2: ['9/15', 'm-free'], C3: ['0/15', 'm-free'], C4: ['0/15', 'm-free'],
+    D1: ['2/4', 'm-free'], D2: ['0/4', 'm-free'], D3: ['0/4', 'm-free'] };
   return { ...t, ...over };
 };
-const RECV = { title: 'Receive pigs', line: 'Batch 25 · from Farrowing room 3', lanes: ['A', 'B', 'C'], depth: 4 };
+// Unit 9 drawn from its Farm layout on the merged PenMap (PR 307): three lanes of four weaner pens and a row of three sick pens by
+// the door, met first; a sick pen is shorter than a weaner pen, so its tile is (56px against 94px).
+const WEANER = { runs: [{ n: 4, type: 'Weaner pen', size: 545 }] };
+const RECV = { title: 'Receive pigs', line: 'Batch 25 · from Farrowing room 3', lanes: [WEANER, WEANER, WEANER], depth: 4,
+  rows: [{ letter: 'D', at: 'door', runs: [{ n: 3, type: 'Sick pen', size: 250 }] }] };
 if (want('13-')) {
   await taskMap('mock-13-receive-plan.png', { ...RECV, tiles: unit9({}), key: keyOf(false),
     unit: { name: 'Unit 9', value: '0', metric: 'Received', target: '6 pens planned' },
