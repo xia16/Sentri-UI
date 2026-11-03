@@ -610,7 +610,7 @@
          ],
          "visible": [
           {
-           "screen": "farrowing.count",
+           "screen": "farrowing.count-saved",
            "hard": "wrong-fact"
           }
          ],
@@ -702,7 +702,7 @@
          ],
          "visible": [
           {
-           "screen": "farrowing.count",
+           "screen": "farrowing.count-saved",
            "hard": "wrong-fact"
           }
          ],
@@ -767,23 +767,28 @@
        "type": "outcome",
        "id": "fa-c2-tool-reads-record-dead",
        "tree": "C-2",
-       "label": "The death tool reads Report death",
+       "label": "The death key reads Death, with the down arrow",
        "gwt": {
         "given": "Sow 000418 is Farrowing and her counting sheet is open.",
         "when": "The worker looks for the tool that records deaths.",
-        "then": "It is called Report death."
+        "then": "The key under the card reads Death; it opens Report death."
        },
        "authority": [
         {
          "src": "PRD",
          "at": "Decisions · owner decisions 2026-10-23 (Counting)",
          "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
+        },
+        {
+         "src": "PRD",
+         "at": "Decisions · owner decisions 2026-10-23 (Counting), keys 2026-11-02",
+         "says": "a compact Death key (the down arrow) that opens Report death"
         }
        ],
        "visible": [
         {
-         "text": "Report death",
-         "in": "sheet",
+         "text": "Death",
+         "in": ".count-keys",
          "hard": "broken-ruling"
         }
        ]
@@ -801,7 +806,7 @@
          "type": "outcome",
          "id": "fa-c3-minus-clamps-at-floor",
          "tree": "C-3",
-         "label": "Born alive − stops at 0; a saved count is corrected only in Edit record",
+         "label": "Born alive − stops at 0; a saved visit is fixed by undoing it",
          "gwt": {
           "given": "Sow 000418 is Farrowing with 9 alive and 5 dead, nothing entered this visit.",
           "when": "The worker taps + on Born alive, then −.",
@@ -1079,7 +1084,7 @@
                ],
                "visible": [
                 {
-                 "screen": "farrowing.count"
+                 "screen": "farrowing.count-saved"
                 },
                 {
                  "text": "Not saved yet",
@@ -1563,17 +1568,17 @@
          "type": "outcome",
          "id": "fa-f8-locked-record-face",
          "tree": "F-8",
-         "label": "The locked record: Born 14 frozen, Edit and Record dead, no Finish",
+         "label": "The locked record: Born 14 frozen, Record dead and no Edit, no Finish",
          "gwt": {
           "given": "The Finish sheet is open for a sow whose born count is 14, with nothing waiting.",
           "when": "The worker holds Finish farrowing until it commits.",
-          "then": "The locked record opens with born frozen at 14. Edit and Record dead are offered and Finish is gone."
+          "then": "The locked record opens with born frozen at 14. Record dead is offered; there is no Edit and Finish is gone."
          },
          "authority": [
           {
-           "src": "RUL",
-           "at": "After the lock",
-           "says": "Bar Edit · Record dead."
+           "src": "owner",
+           "at": "decision 2026-11-02",
+           "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
           },
           {
            "src": "RUL",
@@ -1588,7 +1593,10 @@
           },
           {
            "el": "[data-action='edit']",
-           "in": "sheet"
+           "in": "sheet",
+           "is": "absent",
+           "says": "no Edit on the record",
+           "hard": "broken-ruling"
           },
           {
            "el": "[data-action='death']",
@@ -1610,250 +1618,383 @@
        ]
       }
      ]
+    },
+    {
+     "type": "state",
+     "id": "finish.done",
+     "label": "A finished sow's record (born 14, 8 alive)",
+     "tree": "F",
+     "reset": {
+      "screen": "farrowing.locked",
+      "preset": "locked"
+     },
+     "children": [
+      {
+       "type": "outcome",
+       "id": "fa-f13-finished-at-a-glance",
+       "tree": "F-13",
+       "label": "The finished record shows what happened this time; the actions sit in the bar",
+       "gwt": {
+        "given": "A sow finished farrowing with 14 born, 8 alive now.",
+        "when": "The worker opens her record.",
+        "then": "One card shows 8 alive now with where the litter went and Born alive 12 / 14, under a head band that reads Finished and Details. Back, Actions and Record dead sit in the bar; nothing else is stacked in the body."
+       },
+       "authority": [
+        {
+         "src": "owner",
+         "at": "decision 2026-11-02",
+         "says": "The finished sow's drawer gives a high-level view of what happened this time; users click into Details for the full litter and the comparisons across her batch and against herself; no stacking: Back · Actions · Record dead in the bar"
+        }
+       ],
+       "visible": [
+        {
+         "screen": "farrowing.locked",
+         "hard": "dead-end"
+        },
+        {
+         "text": "alive now",
+         "in": "sheet"
+        },
+        {
+         "el": ".finished-footer [data-action='sowActions']",
+         "in": "sheet",
+         "says": "Actions in the bar",
+         "hard": "unreachable-control"
+        },
+        {
+         "el": ".finished-footer [data-action='death']",
+         "in": "sheet",
+         "says": "Record dead in the bar",
+         "hard": "unreachable-control"
+        },
+        {
+         "el": ".record-inline-actions",
+         "in": "sheet",
+         "is": "absent",
+         "says": "no stacked actions in the body",
+         "hard": "broken-ruling"
+        }
+       ],
+       "record": [
+        {
+         "expr": "s.locked && !s.ended && s.alive === 8",
+         "says": "the finished litter, 8 alive",
+         "hard": "wrong-fact"
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "finish.done.details",
+       "label": "tap the litter card",
+       "taps": [
+        "[data-action='litter']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-f14-details-compares",
+         "tree": "F-14",
+         "label": "The card opens Details: the full litter, against her batch, against herself",
+         "gwt": {
+          "given": "A finished sow's record is open; she has two earlier litters.",
+          "when": "The worker taps the litter card.",
+          "then": "Details opens as a page: This litter with the causes, Against her batch with her dot on the batch's range and the batch average, and Against herself with her litters and the target. Farrowing log is at its foot."
+         },
+         "authority": [
+          {
+           "src": "owner",
+           "at": "decision 2026-11-02",
+           "says": "The finished sow's drawer gives a high-level view of what happened this time; users click into Details for the full litter and the comparisons across her batch and against herself; no stacking: Back · Actions · Record dead in the bar"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.details",
+           "hard": "dead-end"
+          },
+          {
+           "text": "Against her batch",
+           "in": "phone"
+          },
+          {
+           "text": "Against herself",
+           "in": "phone"
+          },
+          {
+           "text": "3 crushed · 1 other",
+           "in": "phone",
+           "says": "the causes of the deaths after birth",
+           "hard": "wrong-fact"
+          },
+          {
+           "text": "Farrowing log",
+           "in": "phone",
+           "says": "the log opens from here",
+           "hard": "dead-end"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.view === 'litter' && s.litterBack === 'locked'",
+           "says": "Details, one Back from the record",
+           "hard": "dead-end"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "finish.done-first",
+     "label": "Details for a sow's first litter",
+     "tree": "F",
+     "reset": {
+      "screen": "farrowing.details-first",
+      "preset": "details-first"
+     },
+     "children": [
+      {
+       "type": "outcome",
+       "id": "fa-f15-first-litter-placeholder",
+       "tree": "F-15",
+       "label": "A first litter keeps her history's place with a placeholder; the batch comparison still shows",
+       "gwt": {
+        "given": "A parity 1 sow finished her first litter.",
+        "when": "The worker opens Details.",
+        "then": "Against her batch shows as for any sow; Against herself reads First litter, her earlier litters showing from her second farrowing."
+       },
+       "authority": [
+        {
+         "src": "owner",
+         "at": "decision 2026-11-02",
+         "says": "The finished sow's drawer gives a high-level view of what happened this time; users click into Details for the full litter and the comparisons across her batch and against herself; no stacking: Back · Actions · Record dead in the bar"
+        }
+       ],
+       "visible": [
+        {
+         "screen": "farrowing.details-first",
+         "hard": "dead-end"
+        },
+        {
+         "text": "First litter",
+         "in": "phone"
+        },
+        {
+         "text": "Against her batch",
+         "in": "phone"
+        }
+       ],
+       "record": [
+        {
+         "expr": "s.parity === 1",
+         "says": "her first litter",
+         "hard": "wrong-fact"
+        }
+       ]
+      }
+     ]
     }
    ]
   },
   {
    "type": "entry",
    "id": "edit",
-   "label": "Edit / correct born → history",
+   "label": "Undo the last save → log",
    "children": [
     {
      "type": "state",
      "id": "edit.during",
-     "label": "Counting, Litter details, Edit record open",
+     "label": "Counting: three Born alive taps saved (a fat finger for two)",
      "tree": "X",
      "reset": {
       "screen": "farrowing.count",
       "preset": "count",
       "taps": [
-       "[data-action='litter']",
-       "[data-action='edit']"
+       "[data-action='bornAlive'][data-value='1']",
+       "[data-action='bornAlive'][data-value='1']",
+       "[data-action='bornAlive'][data-value='1']",
+       "[data-action='saveVisit']"
       ]
      },
      "children": [
       {
+       "type": "outcome",
+       "id": "fa-x9-changed-row-shows-was",
+       "tree": "X-9",
+       "label": "After Save the Alive card names the last save, when and who, with Undo; no banner",
+       "gwt": {
+        "given": "Sow 000418 is Farrowing with 9 alive; the worker G.H tapped + Born alive three times and saved.",
+        "when": "The worker looks at the drawer.",
+        "then": "Under a divider the Alive card says Saved 09:41 · G.H with +3 born, and a quiet Undo beside it. There is no banner and no Corrected tag."
+       },
+       "authority": [
+        {
+         "src": "owner",
+         "at": "decision 2026-11-02",
+         "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
+        }
+       ],
+       "visible": [
+        {
+         "text": "Saved 09:41 · G.H",
+         "in": "sheet",
+         "says": "the last save, when and who",
+         "hard": "broken-ruling"
+        },
+        {
+         "text": "Correcting a past record",
+         "in": "sheet",
+         "absent": true,
+         "says": "no banner",
+         "hard": "broken-ruling"
+        },
+        {
+         "text": "Corrected",
+         "in": "sheet",
+         "absent": true,
+         "says": "no Corrected tag"
+        },
+        {
+         "el": "[data-action='undoAsk']",
+         "is": "enabled",
+         "says": "Undo is offered to the worker who saved it"
+        }
+       ]
+      },
+      {
        "type": "action",
-       "id": "edit.during.crushed-down",
-       "label": "Crushed − once",
+       "id": "edit.during.undo-ask",
+       "label": "Undo",
        "taps": [
-        "[data-action='editStep'][data-value='dead,2,-1']"
+        "[data-action='undoAsk']"
        ],
        "children": [
         {
          "type": "outcome",
-         "id": "fa-x9-changed-row-shows-was",
-         "tree": "X-9",
-         "label": "A changed row shows its new value in ink with a muted \"was N\"; no banner",
+         "id": "fa-x10-back-with-change-asks-save",
+         "tree": "X-10",
+         "label": "Undo asks \"Undo the 09:41 save?\" and changes nothing until answered",
          "gwt": {
-          "given": "Sow 000418 is Farrowing and Edit is open, with 2 crushed deaths.",
-          "when": "The worker lowers Crushed by one.",
-          "then": "The changed row shows its new value in normal ink with a small muted note of what it was (was 2). There is no banner and no Corrected tag. Save correction is live."
+          "given": "The drawer shows the last save, +3 born at 09:41 by G.H.",
+          "when": "The worker taps Undo.",
+          "then": "A short question opens, Undo the 09:41 save?, with Back and Undo. Nothing changes until it is answered: Alive is still 12 and the log still has five lines."
          },
          "authority": [
           {
            "src": "owner",
-           "at": "decision 2026-10-10",
-           "says": "A changed row shows its new value in normal ink with a small muted \"was 2\" beside the label; no banner, no Corrected tag; one Save correction in the footer."
+           "at": "decision 2026-11-02",
+           "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
           }
          ],
          "visible": [
           {
-           "text": "was 2",
+           "text": "Undo the 09:41 save?",
            "in": "sheet",
-           "says": "the row says what it was",
+           "says": "the question is open",
            "hard": "broken-ruling"
           },
           {
-           "text": "Correcting a past record",
-           "in": "sheet",
-           "absent": true,
-           "says": "no banner",
-           "hard": "broken-ruling"
-          },
-          {
-           "text": "Corrected",
-           "in": "sheet",
-           "absent": true,
-           "says": "no Corrected tag"
-          },
-          {
-           "el": "[data-action='saveEdit']",
+           "el": "[data-action='undoLast']",
            "is": "enabled",
-           "says": "Save correction is live"
+           "hard": "dead-end"
+          },
+          {
+           "el": "[data-action='cancelPopup']",
+           "is": "enabled",
+           "hard": "dead-end"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.popup?.kind === 'undo' && s.alive === 12 && s.events.length === 5",
+           "says": "asked, nothing changed yet",
+           "hard": "lost-draft"
           }
          ]
         },
         {
          "type": "action",
-         "id": "edit.during.crushed-down.save",
-         "label": "Save correction",
+         "id": "edit.during.undo",
+         "label": "Undo (in the question)",
          "taps": [
-          "[data-action='saveEdit']"
+          "[data-action='undoLast']"
          ],
          "children": [
           {
            "type": "outcome",
-           "id": "fa-x2-save-correction",
-           "tree": "X-2",
-           "label": "Save writes one stamped correction; Born heals from its inputs",
+           "id": "fa-x11-ask-discard-drops-change",
+           "tree": "X-11",
+           "label": "Undo brings the save back as the unsaved visit; the record drops back",
            "gwt": {
-            "given": "Edit is open on Sow 000418 and Crushed has been lowered from 2 to 1.",
-            "when": "The worker taps Save correction.",
-            "then": "One stamped correction is posted and Counting is shown. Crushed is 1 and born heals to 13."
-           },
-           "authority": [
-            {
-             "src": "RUL",
-             "at": "Surfaces & entrances",
-             "says": "Save commits everything as one stamped correction event"
-            },
-            {
-             "src": "RUL",
-             "at": "Surfaces & entrances",
-             "says": "Born has no door pre-lock (it heals when its inputs heal)"
-            }
-           ],
-           "visible": [
-            {
-             "screen": "farrowing.count"
-            }
-           ],
-           "record": [
-            {
-             "expr": "s.dead[2] === 1 && s.events[0].kind === 'correction' && F.born(s) === 13",
-             "says": "crushed 1, correction event, born 13",
-             "hard": "wrong-fact"
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "type": "action",
-         "id": "edit.during.crushed-down.clear",
-         "label": "Clear",
-         "taps": [
-          "[data-action='clearEdit']"
-         ],
-         "children": [
-          {
-           "type": "outcome",
-           "id": "fa-x4-edit-clear-discards",
-           "tree": "X-4",
-           "label": "Clear discards the correction draft",
-           "gwt": {
-            "given": "Edit is open on Sow 000418 and Crushed has been lowered from 2 to 1.",
-            "when": "The worker taps Clear.",
-            "then": "The correction draft is discarded. No change is waiting and crushed is still 2."
-           },
-           "authority": [
-            {
-             "src": "RUL",
-             "at": "Surfaces & entrances",
-             "says": "Clear (text action on the summary row) discards it"
-            }
-           ],
-           "record": [
-            {
-             "expr": "F.changes(s).length === 0 && s.dead[2] === 2",
-             "hard": "wrong-fact"
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "type": "action",
-         "id": "edit.during.crushed-down.back",
-         "label": "Back with the change unsaved",
-         "taps": [
-          "[data-action='back']"
-         ],
-         "children": [
-          {
-           "type": "outcome",
-           "id": "fa-x10-back-with-change-asks-save",
-           "tree": "X-10",
-           "label": "Back with unsaved changes asks \"Save correction?\" and stays on Edit until answered",
-           "gwt": {
-            "given": "Edit is open on Sow 000418 with one change not yet saved.",
-            "when": "The worker taps Back.",
-            "then": "A Save correction? question opens with Save and Discard both available. Edit stays open until it is answered, the change is still waiting, and posted crushed deaths are still 2."
+            "given": "The Undo the 09:41 save? question is open over the drawer.",
+            "when": "The worker taps Undo.",
+            "then": "The visit is back as it was, not saved yet: +3 born. The record reads 9 alive again and the log has its four earlier lines."
            },
            "authority": [
             {
              "src": "owner",
-             "at": "decision 2026-10-10",
-             "says": "Leaving Edit with unsaved changes asks \"Save correction?\" (Save / Discard) in the shared dialog, so an unsaved correction can never reach Finish."
+             "at": "decision 2026-11-02",
+             "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
             }
            ],
            "visible": [
             {
-             "text": "Save correction?",
-             "in": "sheet",
-             "says": "the ask is open",
-             "hard": "broken-ruling"
-            },
-            {
-             "el": "[data-action='leaveSave']",
-             "is": "enabled",
-             "hard": "dead-end"
-            },
-            {
-             "el": "[data-action='leaveDiscard']",
-             "is": "enabled",
+             "screen": "farrowing.count-draft",
              "hard": "dead-end"
             }
            ],
            "record": [
             {
-             "expr": "s.view === 'edit' && F.changes(s).length === 1 && s.dead[2] === 2",
-             "says": "still on Edit, one change waiting, posted crushed still 2",
-             "hard": "lost-draft"
+             "expr": "s.bornDraft === 3 && s.alive === 9 && !s.popup",
+             "says": "the save is the draft again; alive back to 9",
+             "hard": "wrong-fact"
+            },
+            {
+             "expr": "s.events.length === 4",
+             "says": "the undone save left the log (the four lines it had)",
+             "hard": "wrong-fact"
             }
            ]
           },
           {
            "type": "action",
-           "id": "edit.during.crushed-down.back.discard",
-           "label": "Discard",
+           "id": "edit.during.undo.fix",
+           "label": "− once, Save",
            "taps": [
-            "[data-action='leaveDiscard']"
+            "[data-action='bornAlive'][data-value='-1']",
+            "[data-action='saveVisit']"
            ],
            "children": [
             {
              "type": "outcome",
-             "id": "fa-x11-ask-discard-drops-change",
-             "tree": "X-11",
-             "label": "Discard drops the change and returns; nothing is posted",
+             "id": "fa-x12-ask-save-posts-correction",
+             "tree": "X-12",
+             "label": "Fixed and saved: one log line marked Corrected, with what it was",
              "gwt": {
-              "given": "The Save correction? question is open over Edit, with one unsaved change.",
-              "when": "The worker taps Discard.",
-              "then": "Litter details is shown again. The change is dropped, nothing is posted, and the log still has the same four lines."
+              "given": "The 09:41 save (+3 born) was undone and is the unsaved visit.",
+              "when": "The worker takes one back with − and saves.",
+              "then": "The drawer shows 11 alive and the new last save, which G.H can still undo. The newest log line is +2 born alive, marked Corrected, with Was +3 born alive."
              },
              "authority": [
               {
                "src": "owner",
-               "at": "decision 2026-10-10",
-               "says": "Discard in the Save correction? ask drops the unsaved change."
+               "at": "decision 2026-11-02",
+               "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
               }
              ],
              "visible": [
               {
-               "screen": "farrowing.litter",
+               "screen": "farrowing.count-saved",
                "hard": "dead-end"
               }
              ],
              "record": [
               {
-               "expr": "s.edit === null && s.dead[2] === 2 && !s.popup",
-               "says": "no draft left, posted crushed still 2",
-               "hard": "wrong-fact"
-              },
-              {
-               "expr": "s.events.length === 4",
-               "says": "nothing posted (the four log lines it had)",
+               "expr": "s.alive === 11 && s.events.length === 5 && s.events[0].kind === 'corrected' && s.events[0].text === '+2 born alive' && s.events[0].was === 'Was +3 born alive'",
+               "says": "one Corrected line, +2 born alive, was +3",
                "hard": "wrong-fact"
               }
              ]
@@ -1862,39 +2003,73 @@
           },
           {
            "type": "action",
-           "id": "edit.during.crushed-down.back.save",
-           "label": "Save",
+           "id": "edit.during.undo.save",
+           "label": "Save unchanged",
            "taps": [
-            "[data-action='leaveSave']"
+            "[data-action='saveVisit']"
            ],
            "children": [
             {
              "type": "outcome",
-             "id": "fa-x12-ask-save-posts-correction",
-             "tree": "X-12",
-             "label": "Save in the ask posts one stamped correction and returns",
+             "id": "fa-x2-save-correction",
+             "tree": "X-2",
+             "label": "Saved again unchanged: the line as it was, not marked Corrected",
              "gwt": {
-              "given": "The Save correction? question is open over Edit, with one unsaved change lowering Crushed from 2 to 1.",
-              "when": "The worker taps Save.",
-              "then": "One stamped correction is posted and Counting is shown. Crushed is 1, and the newest log line is the correction saying Crushed 2 to 1."
+              "given": "The 09:41 save (+3 born) was undone and is the unsaved visit.",
+              "when": "The worker saves it again without changing it.",
+              "then": "Counting is shown with 12 alive and born 17. The newest log line is +3 born alive, not marked Corrected."
              },
              "authority": [
               {
                "src": "owner",
-               "at": "decision 2026-10-10",
-               "says": "Save in the Save correction? ask commits the correction (who, old → new in the log) and returns."
+               "at": "decision 2026-11-02",
+               "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
               }
              ],
              "visible": [
               {
-               "screen": "farrowing.count",
-               "hard": "dead-end"
+               "screen": "farrowing.count-saved"
               }
              ],
              "record": [
               {
-               "expr": "s.dead[2] === 1 && s.events.length === 5 && s.events[0].kind === 'correction' && s.events[0].text.includes('Crushed 2 → 1')",
-               "says": "crushed 1, one correction line (Crushed 2 → 1)",
+               "expr": "s.alive === 12 && F.born(s) === 17 && s.events[0].text === '+3 born alive' && s.events[0].kind !== 'corrected'",
+               "says": "the line as it was",
+               "hard": "wrong-fact"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "edit.during.undo.clear",
+           "label": "Clear",
+           "taps": [
+            "[data-action='clearVisit']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "fa-x4-edit-clear-discards",
+             "tree": "X-4",
+             "label": "Clear after Undo withdraws the save; the log keeps it as Withdrawn",
+             "gwt": {
+              "given": "The 09:41 save (+3 born) was undone and is the unsaved visit.",
+              "when": "The worker taps Clear.",
+              "then": "Nothing is waiting, alive is 9, and the newest log line is +3 born alive marked Withdrawn."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "decision 2026-11-02",
+               "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
+              }
+             ],
+             "record": [
+              {
+               "expr": "s.alive === 9 && !s.bornDraft && s.events[0].kind === 'withdrawn' && s.events[0].text === '+3 born alive'",
+               "says": "withdrawn, kept in the log",
                "hard": "wrong-fact"
               }
              ]
@@ -1910,52 +2085,53 @@
     {
      "type": "state",
      "id": "edit.locked",
-     "label": "Locked record (born 14), Edit open",
+     "label": "Locked record (born 14), one crushed recorded with Record dead",
      "tree": "X",
      "reset": {
       "screen": "farrowing.locked",
       "preset": "locked",
       "taps": [
-       "[data-action='edit']"
+       ".finished-footer [data-action='death']",
+       "[data-action='deadStep'][data-value='2,1']",
+       "[data-action='saveDeath']"
       ]
      },
      "children": [
       {
        "type": "action",
-       "id": "edit.locked.more-born",
-       "label": "Correct born ✎, More born 1 (alive), Apply, Save correction",
+       "id": "edit.locked.undo",
+       "label": "Undo, Undo",
        "taps": [
-        "[data-action='bornPopup']",
-        "[data-action='applyBorn']",
-        "[data-action='saveEdit']"
+        "[data-action='undoAsk']",
+        "[data-action='undoLast']"
        ],
        "children": [
         {
          "type": "outcome",
          "id": "fa-x5-correct-born-after-lock",
          "tree": "X-5",
-         "label": "Anyone corrects Born after the lock: 14 → 15, stamped, original kept in the log",
+         "label": "After Finish the last Record dead can be undone; Born stays 14",
          "gwt": {
-          "given": "A sow's record is locked with born 14 and Edit is open.",
-          "when": "The worker opens the born correction, adds 1 more born, applies it and saves the correction.",
-          "then": "Born is now 15, recorded as a stamped correction. The original finish line is kept in the log. No role is needed to do this."
+          "given": "A sow's record is locked with born 14, and G.H has just recorded one crushed death.",
+          "when": "G.H undoes that save.",
+          "then": "Record dead opens again with the crushed death as its unsaved count. Born is still 14 and the original finish line is kept in the log."
          },
          "authority": [
           {
-           "src": "RUL",
-           "at": "After the lock",
-           "says": "Anyone may amend born post-lock — open ✎, stamped, no role gate."
+           "src": "owner",
+           "at": "decision 2026-11-02",
+           "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
           }
          ],
          "visible": [
           {
-           "screen": "farrowing.locked"
+           "screen": "farrowing.death"
           }
          ],
          "record": [
           {
-           "expr": "s.frozen === 15 && s.events[0].kind === 'correction'",
-           "says": "born 15, a correction event",
+           "expr": "s.frozen === 14 && s.deathDraft[2] === 1 && s.dead[2] === 3 && s.alive === 8",
+           "says": "born 14; the death is a draft again",
            "hard": "wrong-fact"
           },
           {
@@ -1967,9 +2143,13 @@
         },
         {
          "type": "action",
-         "id": "edit.locked.more-born.log",
-         "label": "View log",
+         "id": "edit.locked.undo.scours",
+         "label": "Crushed − , Scours +, Record, Details, Farrowing log",
          "taps": [
+          "[data-action='deadStep'][data-value='2,-1']",
+          "[data-action='deadStep'][data-value='3,1']",
+          "[data-action='saveDeath']",
+          "[data-action='litter']",
           "[data-action='history']"
          ],
          "children": [
@@ -1977,22 +2157,22 @@
            "type": "outcome",
            "id": "fa-x6-log-shows-correction",
            "tree": "X-6",
-           "label": "The Farrowing record shows the correction above the finish",
+           "label": "The log shows the corrected death above the finish",
            "gwt": {
-            "given": "A locked record's born count has just been corrected from 14 to 15.",
-            "when": "The worker opens the log from the record.",
-            "then": "The Farrowing record page shows the correction above the Farrowing finished line."
+            "given": "A crushed death recorded after Finish was undone and changed to scours.",
+            "when": "The worker records it and opens the log.",
+            "then": "The Farrowing log shows +1 scours marked Corrected, with Was +1 crushed, above the Farrowing finished line."
            },
            "authority": [
             {
-             "src": "RUL",
-             "at": "After the lock",
-             "says": "One ledger surface, the Farrowing record page"
+             "src": "owner",
+             "at": "decision 2026-11-02",
+             "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
             },
             {
              "src": "RUL",
              "at": "After the lock",
-             "says": "corrections amber with ✎"
+             "says": "One ledger surface, the Farrowing record page"
             }
            ],
            "visible": [
@@ -2003,6 +2183,11 @@
             {
              "text": "Farrowing finished",
              "in": "sheet"
+            },
+            {
+             "text": "Was +1 crushed",
+             "in": "sheet",
+             "says": "what it was"
             }
            ]
           }
@@ -3046,6 +3231,134 @@
              "says": "End is allowed with review items open (piglet processing)"
             }
            ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "task.blocked",
+     "label": "End task review with sows still farrowing",
+     "reset": {
+      "screen": "farrowing.task-blocked",
+      "preset": "task-blocked"
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "task.blocked.hold",
+       "label": "hold End task early while sows are farrowing",
+       "taps": [
+        {
+         "tap": "[data-action='room-end-confirm']",
+         "hold": 1100
+        }
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-k9-blocked-hold-waits",
+         "tree": "K-9",
+         "label": "While a sow is farrowing the page says so first and the hold waits, saying why",
+         "gwt": {
+          "given": "The End task review is open and two sows are still farrowing.",
+          "when": "The worker holds End task early.",
+          "then": "The task does not end. The page reads Before you can end, and the hold says FINISH 2 SOWS FIRST."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions 2026-11-02 · End task",
+           "says": "While a sow is farrowing the hold's caption reads FINISH N SOWS FIRST"
+          },
+          {
+           "src": "PRD",
+           "at": "Decisions",
+           "says": "Task end: manual, hold-to-commit with receipt, blocked while farrowing is open"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.task-blocked",
+           "hard": "dead-end"
+          },
+          {
+           "text": "Before you can end",
+           "in": "sheet"
+          },
+          {
+           "text": "FINISH 2 SOWS FIRST",
+           "in": "sheet",
+           "says": "the waiting hold names its reason",
+           "hard": "wrong-fact"
+          },
+          {
+           "el": "[data-action='room-end-confirm']",
+           "in": "sheet",
+           "is": "disabled",
+           "says": "the hold waits",
+           "hard": "broken-ruling"
+          }
+         ],
+         "record": [
+          {
+           "expr": "!c.completion && F.taskClosureReview(c).blocked",
+           "says": "nothing ended; the review is blocked",
+           "hard": "broken-ruling"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "task.blocked.open",
+       "label": "tap Still farrowing",
+       "taps": [
+        "[data-action='room-task-list'][data-value='active']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-k10-blocked-opens-sows",
+         "tree": "K-10",
+         "label": "Still farrowing opens the sows to finish, under the same words",
+         "gwt": {
+          "given": "The End task review is open and two sows are still farrowing.",
+          "when": "The worker taps Still farrowing.",
+          "then": "A list titled Still farrowing opens with those two sows, each one a door to her record."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions 2026-11-02 · End task",
+           "says": "Still farrowing (opens those sows) … The sow lists take the row's words as their title"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.task-sows",
+           "hard": "dead-end"
+          },
+          {
+           "text": "Still farrowing",
+           "in": "sheet"
+          },
+          {
+           "el": "[data-action='room-task-sow']",
+           "in": "sheet",
+           "says": "each sow opens her record",
+           "hard": "dead-end"
+          }
+         ],
+         "record": [
+          {
+           "expr": "c.taskReviewGroup === 'active' && F.taskClosureReview(c).active.length === 2",
+           "says": "the list is the two farrowing sows",
+           "hard": "wrong-fact"
           }
          ]
         }

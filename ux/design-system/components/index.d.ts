@@ -586,7 +586,7 @@ export interface RowCopyProps {
   strs?: Strs<'title' | 'description' | 'code'>;
   args?: StrArgs<'title' | 'description' | 'code'>;
 }
-export interface RowSelectProps extends RowCopyProps { inputAttrs?: SafeAttrs; checked?: boolean; /** Default 'select'. */ action?: string; value: string; /** false: the tick doesn't tint the cell (a box beside its own door). */ fill?: boolean; /** With code: an animal's right side, as Row · Animal (a list that only chooses animals). */ right?: AnimalRight | null; contextWidth?: string }
+export interface RowSelectProps extends RowCopyProps { inputAttrs?: SafeAttrs; checked?: boolean; /** Default 'select'. */ action?: string; value: string; /** With code: an animal's right side, as Row · Animal (a list that only chooses animals). */ right?: AnimalRight | null; contextWidth?: string }
 export interface RowActionProps extends RowCopyProps {
   /** The door (the copy, with an inline ›). */
   action: string;

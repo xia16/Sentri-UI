@@ -785,3 +785,143 @@ Foster piglets' TaskChoice (two or three big tiles that change the form below) f
 
 - **Better because** nothing is saved by accident, Alive always means alive now, and a death never inflates Born.
 - Before first count still shows Alive 0; the due card and Start farrowing are the next PR.
+
+# Counting: one row of keys under the Alive card (2026-11-02), critique
+
+Scope: the counting face. Baselined on `origin/main` at `59bed92` (PR 291) at 390 and 360; the owner picked the layout from v18–v22 (keys outside the card, one row, the down arrow on Death).
+
+## Problems
+
+- **major** · Two big boxes said the same thing: the Alive card and a full Born alive stepper card (its own 0) under it, so the eye had two figures to read.
+- **minor** · Report death was a full-width row of its own, so the drawer ran full height with empty space above the bar.
+
+## Attention budget
+
+1 alive now (the figure) · 2 the visit's chips · 3 + Born alive (the widest key) · 4 Death · 5 the card as a door to Litter details. Born alive's own figure is cut: its count is the +N born chip.
+
+## House pattern
+
+The count Stepper's key faces (green +, outlined −, dashed when greyed) on one row; the chips' down arrow on Death, so the key and the change it makes look alike.
+
+## Self-crit
+
+- **Better because** there is one figure to read and every act is one row under it; the drawer drops from full height to its content, the same height with or without a visit.
+
+# End task: can the batch close (2026-11-02), critique
+
+Scope: End task (task-blocked, task-ready, task-complete, task-outcomes), its sow lists and the shared performance card (Task overview, receipt). Baselined on `origin/main` at `98485ac` (PR 292) at 390 and 360; the owner picked from directions A–G (A's checklist wording on B's bar, then house colours and a fuller card).
+
+## Problems
+
+- **major** · Nothing read first: two figure cards of equal weight, and no line said whether the batch could close.
+- **major** · The blockers (Still farrowing, Awaiting farrowing) were ordinary outcome rows in amber text.
+- **major** · The waiting hold gave no reason; a reason line above a waiting bar is hidden by house rule, so nothing said why.
+- **minor** · Repeats: `7 finished litters` = `Finished farrowing 7`; the title, hold label and caption all said End task early; `Awaiting 0` printed when nothing awaited.
+- **minor** · The Still farrowing row opened a page titled Active farrowing.
+
+## Attention budget
+
+1 can it close (the heading) · 2 what blocks it and the way in (Still farrowing ›) · 3 what ending costs (Leave the batch ›) · 4 the hold, with its reason when waiting · 5 Done, accounting for every other sow · 6 performance, below, scrolled to.
+
+## House pattern
+
+Task overview's status bar and its counts; the pen map's fills for status areas (progress-fill farrowing, amber-fill needs you); Row with an icon tile for each part; Inspection's End walk (one answer, one consequence, the commit). Colours checked: red↔green failed the colour-blind check (ΔE 3.9), the house fills pass (worst adjacent ΔE 16.7) and every part is named in its row.
+
+## Parts
+
+| Part | Drawn by | Keep / fix / cut |
+|---|---|---|
+| Closure card | `taskClosure()`: Heading, AstraTaskOverview.statusProgress, SentriUI.row | **new** |
+| Performance card | `taskPerformance()`, `.task-perf-*` in bundle.css | **fix** (fuller: split of piglets born, causes, per-litter facts) |
+| Hold | SentriUI.holdButton, caption carries the waiting reason | **fix** |
+| Task outcomes on End task | `taskOutcomeSummary()` | **cut** (kept on the receipt) |
+
+## Self-crit
+
+- **Better because** the first line answers the question, the one thing to do opens from the first row, the hold says why it waits, and each figure is said once.
+- The page scrolls for the performance card (up to ~260px blocked); the closure card and the hold never need a scroll.
+- The Task overview bar keeps its soft greens; only End task uses the status fills. One look for both is a follow-up for the owner.
+
+# No Edit record; Undo the last save (2026-11-02), critique
+
+Scope: the counting drawer (`farrowing.count`, new `farrowing.count-saved` and `farrowing.undo`), the finished and sow-died records (Edit off the toolbar, the last save under the figures), Litter details (Edit record row), Actions (Edit litter record), the log (Corrected, Withdrawn). Retired: `farrowing.edit`, `farrowing.edit-finished`, `farrowing.born`, `farrowing.leave-edit`. Baselined on `origin/main` at `1c83077` at 390. The owner agreed the drawn screens in the round ([edit-record-round.md](edit-record-round.md)) and said to build the drawer; Report death, Record dead's own screen and Litter details' redesign are other sessions'.
+
+## Keep
+
+- The Alive card: the figure, Details ›, the chips of an unsaved visit, one height while counting; the keys and the bar unchanged.
+- The finished record's facts and Death causes door (Litter details' redesign is another session's).
+
+## Problems
+
+- **major** · Edit record let a worker change a death's cause or Total born days later, which nobody can honestly know (owner, 2026-11-02); the same tap meant three things (lowering crushed lowered Born before Finish, raised Alive after).
+- **major** · Nothing let a worker take back a fat-fingered save except that Edit screen.
+- **minor** · The card's quiet `Saved Aug 26 08:20` said when, not what or who.
+
+## Attention budget
+
+1 alive now (the figure) · 2 the keys · 3 the last save (when · who, then what) · 4 Undo, quiet, only for whoever saved it. On the finished record the last save sits under the figures and is said once.
+
+## House pattern
+
+The unsaved visit's chips, in the quiet tone once saved; Piglet processing's receipt line with its text Undo; the shared dialog for the one question; the Log's own Corrected form.
+
+## Parts
+
+| Part | Drawn by | Keep / fix / cut |
+|---|---|---|
+| Last save run | `lastRun()`, `.alive-run*` in bundle.css (Alive card section) | **new** |
+| Undo | SentriUI.button, text register, `return` glyph | **new** |
+| Undo question | SentriUI.sheet dialog | **new** |
+| Card surface | `.alive-surface` carries the border and fill; the door keeps its geometry | **fix** |
+| Edit record, Edit finish details, Correct born, Save correction? | `edit()`, `editFinish()`, `bornPanel()`, leaveEdit dialog | **cut** |
+
+## Self-crit
+
+- **Better because** the fix sits where the mistake shows (the card names what was saved, and by whom), it takes one question and the keys the worker already uses, and nothing old can be rewritten.
+- Undo is the weight of Details ›: a small act looks like one (owner).
+
+# Status colours in Farrowing (2026-11-02), critique
+
+Scope: the room card and Task overview bars, End task's closure card, act-now sow rows, the "+ Born alive" key, Performance metrics' split. Baselined on `origin/main` at `7479ac8` at 390; the owner agreed the canvas.
+
+## Problems
+
+- **major** · The bars used olive, sage and pale grey while End task used green, light blue and yellow: the same sows wore different colours.
+- **major** · Act-now rows set both the figure and the word in bold red: harsh, and two red signals for one fact.
+- **minor** · End task's rows did not follow the bar; the awaiting sows read as a yellow status though they are only waiting.
+
+## Attention budget
+
+The heading answers; the bar reads left to right and the rows follow it; the one "!" marks what ending costs; on rows, one red word.
+
+## House pattern
+
+The animal row ruling's one "!" icon; the pen map's fills; the convention table in README › Colour.
+
+## Self-crit
+
+- **Better because** the bars, counts and rows share one palette with Home, a row carries one red signal, and the + Born alive key is the only green button, on purpose.
+
+# The finished sow: what happened, then Details (2026-11-02), critique
+
+Scope: the finished sow's record (farrowing.locked) and the new Details page (farrowing.details, farrowing.details-first). Baselined on `origin/main` at `6dbd20d`; the owner shaped it on the canvas https://claude.ai/artifact/FJiEYMkwPquPoY8VpXhkWk (ring, head band, actions in the bar, page Details, no analysis copy).
+
+## Problems
+
+- **major** · The record listed seven figures at one weight (born, alive now, dead, weak, deformed, assisted, weight) and compared her with nothing.
+- **major** · Litter details was nine figures in a grid with no order.
+- **minor** · Record dead · Actions stacked in the body under the card.
+
+## Attention budget
+
+1 how this litter turned out (alive now, born alive of born) · 2 the losses at a glance (the ring) · 3 the door to Details · then on Details: the full litter, against her batch, against herself, the log.
+
+## House pattern
+
+End task's Performance metrics (two measures, the neutral split, small facts); the sow profile's Production stats (averages, a row per litter); SURFACES rules 1 and 6; the Headers law (no line one Back away).
+
+## Self-crit
+
+- **Better because** one look says how the litter went, and the comparisons a manager needs sit one tap away, drawn, not written.
+- Earlier litters are sample data; the batch range collapses when every litter has the same figure (her dot sits on the average).
+- The Death breakdown page is no longer opened from a finished sow; its causes are on Details.

@@ -1,0 +1,6 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Icon round pairs</title>
+<style>body{margin:0;padding:8px;font:13px sans-serif;display:flex;gap:8px;flex-wrap:wrap}figure{margin:0}img{width:390px;display:block;border:1px solid #ccc}</style>
+<body><script>
+const names=new URLSearchParams(location.search).get('n').split(',');
+document.body.innerHTML=names.flatMap(n=>['now','new'].map(m=>`<figure><figcaption>${m} · ${n}</figcaption><img src="shots/${m}-${n}.png"></figure>`)).join('');
+</script></body></html>

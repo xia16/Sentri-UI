@@ -207,7 +207,7 @@ test('batch membership is one production entrance for add, move and remove', () 
 test('farrowing operations stay together inside Production', () => {
   const s = farrowing.seed('count');
   const actions = farrowing.sowActionCatalogue(s);
-  for (const id of ['miscarriage', 'edit']) {
+  for (const id of ['miscarriage', 'not-in-pig']) {
     const entry = actions.find(action => action.id === id);
     assert.equal(entry.group, 'production', id);
     assert.equal(entry.scope, 'farrowing', id);
@@ -229,7 +229,8 @@ test('farrowing operations stay together inside Production', () => {
   assert.match(html, /aria-label="Farrowing actions">[\s\S]*?<h5[^>]*><span>Farrowing<\/span><\/h5>/);
   assert.match(html, /aria-label="Piglet processing actions">[\s\S]*?<h5[^>]*><span>Piglet processing<\/span><\/h5>/);
   assert.doesNotMatch(html, /Current task ·/);
-  assert.match(html, /Edit litter record/);
+  assert.match(html, /Record abortion/);
+  assert.doesNotMatch(html, /Edit litter record/, 'no Edit record (owner, 2026-11-02)');
   assert.ok(html.indexOf('aria-label="Farrowing actions"') < html.indexOf('aria-label="Piglet processing actions"'));
   assert.ok(html.indexOf('aria-label="Piglet processing actions"') < html.indexOf('aria-label="Shared actions"'));
   assert.doesNotMatch(html, /Other production actions|aria-label="Other actions"/);
@@ -251,7 +252,8 @@ test('Farrowing actions use one note, one measurements entrance and no Feed cate
   const catalogue = model.actionCatalogue(c);
   assert.deepEqual(catalogue.groups.map(group => group.id), ['health', 'routine', 'production']);
   const production = catalogue.groups.find(group => group.id === 'production').items;
-  assert.equal(production.find(item => item.value === 'edit').section, 'farrowing');
+  assert.equal(production.find(item => item.value === 'miscarriage').section, 'farrowing');
+  assert.equal(production.some(item => item.value === 'edit'), false, 'no Edit litter record (owner, 2026-11-02)');
   const general = catalogue.groups.find(group => group.id === 'routine').items;
   assert.equal(general.filter(item => item.title === 'Edit note').length, 1);
   assert.equal(general.some(item => item.title === 'Add a note'), false);

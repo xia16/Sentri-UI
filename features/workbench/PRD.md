@@ -61,3 +61,10 @@ The Assistant, Scan and Toolbox controls are visible prototype navigation to sep
 - Open: where language and log out live; what the real "Not designed yet" page shows per task; how the real queue feeds the app-header badge; what "Day N of N" means for tasks with no batch window.
 - Open (data): the Home card uses Piglet processing Batch 27 (8 pens, 2 units), while its linked piglet-processing prototype uses Batch 40 (12 pens). These are independent design fixtures; the click-through demonstrates the intended destination, not continuity of one task instance. Align the fixtures before using this flow for connected-data acceptance.
 - Open (date): `Sample · Thu, 8 Jul` is a fixed prototype date, not the device clock or a real work schedule. The connected Home date source and formatting still need definition.
+
+### Owner decisions, 2026-11-02 · Status colours
+
+- The status colour convention (owner, 2026-11-02; canvas https://claude.ai/artifact/BTzQ8Y3zBiv41WL3wshJyq): one hue per status, the shape's size picks the shade (README › Colour).
+- **A tile's run of days:** days done `done-mark`, today `progress-mark`, days past the plan `late-mark`, days to come the empty well. A task past its plan is late, not overdue: the line reads "1 day late" in `amber`. Red stays for the overdue part (animals) only.
+- **The Schedule's cells hold a number**, so each takes its status's light fill with the number in the same hue's dark ink: done `done-fill`, today `progress-fill` (today's date ringed in `progress`), past its plan `amber-fill`. Planned, estimate and waiting keep their outlines; the key matches.
+- Home's progress bars use the same marks: in progress `progress-mark`, complete `done-mark`, on the `handle` track.

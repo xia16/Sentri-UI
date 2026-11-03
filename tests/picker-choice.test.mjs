@@ -163,7 +163,7 @@ test("flat multi keeps section headings without navigating levels", () => {
 require("../ux/system/astra-surfaces.js");
 require("../ux/system/farrowing-astra-concept.js");
 require("../ux/system/inspection-astra-concept.js");
-test("assisted is a required No / Yes on the finish and edit forms: No preselected, no Clear (owner, 2026-10-15)", () => {
+test("assisted is a required No / Yes on the finish form: No preselected, no Clear (owner, 2026-10-15)", () => {
   const F = globalThis.FarrowingStudy,
     s = F.seed("before");
   assert.equal(s.assisted, false, "a new finish starts on No");
@@ -173,31 +173,20 @@ test("assisted is a required No / Yes on the finish and edit forms: No preselect
   assert.equal(s.assisted, false);
   F.act(s, "assistance-clear", "assistance");
   assert.equal(s.assisted, false, "there is no Clear: nothing returns it to unanswered");
-  s.edit = { ...s };
+  // no Edit finish details any more (owner, 2026-11-02): nothing else writes it after Finish
   F.act(s, "editAssistance", "true");
-  assert.equal(s.edit.assisted, true);
-  assert.equal(s.assisted, false, "the edit draft does not write the record");
-  F.act(s, "editAssistance-clear", "editAssistance");
-  assert.equal(s.edit.assisted, true);
-  // an old record that never had it keeps null until the worker answers; the form shows neither key chosen
-  const old = F.seed("locked");
-  old.assisted = null;
-  old.edit = { ...old };
-  assert.equal(old.edit.assisted, null);
-  F.act(old, "editAssistance", "false");
-  assert.equal(old.edit.assisted, false);
-  assert.equal(old.assisted, null);
+  assert.equal(s.assisted, false, "there is no edit form to answer it");
 });
 test("the litter weight is typed on the system decimal keyboard: cleaned while typing, normalised on save, blank or 0 is not recorded", () => {
   const F = globalThis.FarrowingStudy;
   for (const [typed, kept] of [["12,6", "12.6"], ["12.67", "12.6"], ["123", "12"], ["a1b2", "12"], [".5", "0.5"], ["1..2", "1.2"], ["", ""]])
     assert.equal(F.cleanWeight(typed), kept, typed);
   for (const [typed, saved] of [["12.6", "12.6"], ["12.", "12"], ["0", ""], ["0.0", ""], ["", ""]]) assert.equal(F.normWeight(typed), saved, typed);
-  const s = F.seed("locked");
-  s.view = "editFinish";
-  s.edit = { ...s, weight: "12." };
-  F.act(s, "saveEdit");
-  assert.equal(s.weight, "12", "saving drops a trailing point");
+  const s = F.seed("finish");
+  s.weight = "12.";
+  F.act(s, "lock");
+  assert.equal(s.locked, true);
+  assert.equal(s.weight, "12", "finishing drops a trailing point");
   const UI = globalThis.SentriUI;
   assert.doesNotMatch(UI.numpad({ decimals: 1, intLength: 2, value: "12.6", replace: true }), /data-replace/, "the Numpad has no replace option");
 });

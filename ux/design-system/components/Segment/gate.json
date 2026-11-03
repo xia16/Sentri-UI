@@ -131,7 +131,6 @@
       "name": "view switch",
       "usedBy": [
         "farrowing.death",
-        "farrowing.born",
         "health-record.condition-picker",
         "health-record.record-health",
         "feed-plan.bulk",
