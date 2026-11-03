@@ -2027,7 +2027,8 @@ function sheet(c,title,scope,body,actions,surface='',line=null,corner=null){
  const above=(c.view==='pig-log'?logFilterBar(c,pigLogEntries(c),'pig'):c.view==='pen-log'?logFilterBar(c,penLogEntries(c,c.penId),'pen'):'');
  let foot=nav||(wantBack&&!page?SentriUI.sheetFooter({back:{action:'back'}}):false);
  if(page&&foot){foot=foot.replace(back(),'');if(!/<button/.test(foot))foot=false;}
- return SentriUI.sheet({variant:page?'page':'drawer',surface,title,line,corner,cross,back:{action:'back'},above,body,footer:foot,className:c.view==='actions'?'actions-sheet':'',size:drawerSize(c.view,c),sizing:['search','scan','grid'].includes(c.view)||c.view==='record-optional'&&c.form.optionalKey==='target'?'full':holdRows?'hold':'content',holdRows,label:title,scrim:{action:'dismiss',label:'Dismiss '+title},bar:page?status():''});
+ /* A picker is the tint with white cards, as every drawer will be (owner, 2026-11-03: one surface convention; Medicines is the reference). */
+ return SentriUI.sheet({variant:page?'page':'drawer',surface:surface||(picker?'menu':''),title,line,corner,cross,back:{action:'back'},above,body,footer:foot,className:c.view==='actions'?'actions-sheet':'',size:drawerSize(c.view,c),sizing:['search','scan','grid'].includes(c.view)||c.view==='record-optional'&&c.form.optionalKey==='target'?'full':holdRows?'hold':'content',holdRows,label:title,scrim:{action:'dismiss',label:'Dismiss '+title},bar:page?status():''});
 }
 function back(){return SentriUI.backButton({action:'back'});}
 /* Header lines (features/pig-profile/budget.md ## Headers): a surface that writes to or is about one pig shows that pig on screen
