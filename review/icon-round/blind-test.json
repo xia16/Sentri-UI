@@ -1,0 +1,199 @@
+{
+ "kept": [
+  {
+   "name": "pig",
+   "read": "\"Plain pig\", medium; \"pig, side view\", high in the second test"
+  },
+  {
+   "name": "piglet",
+   "read": "\"Small pig\", medium"
+  },
+  {
+   "name": "pigs",
+   "read": "\"Two pigs\", medium, then \"two overlapping pigs\", high"
+  },
+  {
+   "name": "missing",
+   "read": "\"Pig with a question mark\", medium, then high"
+  },
+  {
+   "name": "breeder",
+   "read": "\"Pig with a flag / bookmark\", medium"
+  },
+  {
+   "name": "service",
+   "read": "\"Male and female symbols\", high"
+  },
+  {
+   "name": "return-heat",
+   "read": "\"Flame inside a circular arrow\", medium"
+  },
+  {
+   "name": "farrow",
+   "read": "Borderline: \"big pig with a small pig under it\", then \"sow with a piglet\", matched to farrowing in the second test"
+  },
+  {
+   "name": "death",
+   "read": "\"Gravestone\", medium"
+  },
+  {
+   "name": "move",
+   "read": "\"Arrow going into a fence or gate\", medium (the fence version, second test)"
+  },
+  {
+   "name": "truck",
+   "read": "\"Truck\", high"
+  },
+  {
+   "name": "sample",
+   "read": "\"Test tube\", high"
+  },
+  {
+   "name": "count",
+   "read": "\"Tally marks\", high"
+  },
+  {
+   "name": "history",
+   "read": "\"Clock with counter-clockwise arrow\", high"
+  },
+  {
+   "name": "tasks",
+   "read": "\"Checklist\", high"
+  },
+  {
+   "name": "undo",
+   "read": "\"Back / undo arrow\", high"
+  },
+  {
+   "name": "pen",
+   "read": "\"Picket fence\", medium"
+  },
+  {
+   "name": "note",
+   "read": "\"Note / sticky note\", high"
+  },
+  {
+   "name": "record",
+   "read": "\"Clipboard with lines\", medium"
+  },
+  {
+   "name": "chart",
+   "read": "\"Line chart\", high"
+  },
+  {
+   "name": "humidity",
+   "read": "\"Water drop over waves\", medium"
+  },
+  {
+   "name": "fan",
+   "read": "\"Three-blade propeller\", medium"
+  }
+ ],
+ "cut": [
+  {
+   "name": "sow",
+   "read": "Same blob as pig at 16 px; the teats vanish",
+   "instead": "pig"
+  },
+  {
+   "name": "boar",
+   "read": "Same blob as pig; the tusk reads as a hook only at 28 px",
+   "instead": "pig"
+  },
+  {
+   "name": "gilt",
+   "read": "\"New pig\" at best; the spark is tiny",
+   "instead": "pig"
+  },
+  {
+   "name": "litter",
+   "read": "A duplicate of the two-pig group",
+   "instead": "piglet"
+  },
+  {
+   "name": "foster",
+   "read": "A refresh arrow over a blob",
+   "instead": "piglet"
+  },
+  {
+   "name": "wean",
+   "read": "\"Arrow pointing into a pig\"",
+   "instead": "no screen yet"
+  },
+  {
+   "name": "notch",
+   "read": "A cone or shark fin",
+   "instead": "tag"
+  },
+  {
+   "name": "pain",
+   "read": "\"Power / electric\"",
+   "instead": "pill"
+  },
+  {
+   "name": "room",
+   "read": "A notched square or doorway; failed twice",
+   "instead": "grid (unchanged)"
+  },
+  {
+   "name": "production",
+   "read": "Snout in circular arrows reads as refresh or undo",
+   "instead": "production (current bars; chart no longer shares them)"
+  },
+  {
+   "name": "pregnancy",
+   "read": "Ring in the belly reads as an eye",
+   "instead": "pregnancy (current glyph; farrow no longer shares it)"
+  },
+  {
+   "name": "pregnancy-belly",
+   "read": "A round belly reads as just \"pig\" (second test)",
+   "instead": "pregnancy (current)"
+  },
+  {
+   "name": "pregnancy-heart",
+   "read": "A heart reads as \"favourite pig\" or health (second test)",
+   "instead": "pregnancy (current)"
+  },
+  {
+   "name": "not-pregnant",
+   "read": "\"Eye-slash / hidden\"",
+   "instead": "pregnancy (current)"
+  },
+  {
+   "name": "ear-tag",
+   "read": "A clipboard or battery; the existing tag is far clearer",
+   "instead": "tag (current)"
+  },
+  {
+   "name": "pig-face",
+   "read": "Reads as \"pig\", which we already have",
+   "instead": "pig"
+  },
+  {
+   "name": "backfat",
+   "read": "A bell, lamp or protractor",
+   "instead": "no icon"
+  },
+  {
+   "name": "body-condition",
+   "read": "\"Move pigs\" (a pig over a double arrow)",
+   "instead": "no icon"
+  },
+  {
+   "name": "service-ai",
+   "read": "A key or lollipop at 16 px",
+   "instead": "service (♀♂)"
+  },
+  {
+   "name": "ultrasound",
+   "read": "A pen with wireless waves",
+   "instead": "pregnancy (current)"
+  },
+  {
+   "name": "move-pens",
+   "read": "An abstract bracket-arrow-bracket (second test)",
+   "instead": "move (arrow into a fence)"
+  }
+ ]
+}

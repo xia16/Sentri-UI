@@ -32,6 +32,9 @@ const out = {
   litter: pig({ x: 3, y: 12.5, w: 10, h: 6, legs: 2, tail: false }) + 'M9.4 10.9A3 3 0 0 1 12 9H16.5A3 3 0 0 1 16.5 15H14.6M19.5 10.9h1a.4.4 0 0 1 .4.4v1.4a.4.4 0 0 1-.4.4H19.5M14.7 9.1L15.4 7.3L16.3 9.2M16.5 15v2',
   farrow: pig({ x: 3, y: 5, w: 16, h: 9, legs: 0 }) + pig({ x: 7, y: 16.5, w: 8, h: 4.5, legs: 0, tail: false, ear: false }),
   foster: pig({ x: 6, y: 13, w: 11, h: 7, legs: 0, tail: false }) + 'M4 10a8 6 0 0 1 15.5-2.5M20 3.5v4.3h-4.3',
+  missing: pig({ x: 2.5, y: 8, w: 12.5, h: 8, legs: 2.5 }) + 'M17 6.5a2.5 2.5 0 1 1 3.4 2.3c-.8.3-1 .9-1 1.6v.6M19.4 14.2h.01',
+  breeder: pig({ x: 3, y: 9, w: 14.5, h: 9, legs: 2.5 }) + 'M16.5 2.5h4.5v6.5l-2.25-1.6L16.5 9z',
+  'body-condition': pig({ x: 3, y: 4, w: 16, h: 9.5, legs: 0 }) + 'M4 18.5h16M6.5 16 4 18.5 6.5 21M17.5 16l2.5 2.5-2.5 2.5',
   wean: pig({ x: 10, y: 9.5, w: 10.5, h: 6.5, legs: 2.5 }) + 'M2.5 12.75h4M4.8 10.75l2 2-2 2',
 };
 const file = new URL('./icons.js', import.meta.url);

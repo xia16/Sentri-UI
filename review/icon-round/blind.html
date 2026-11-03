@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Icon blind test</title>
+<link rel="stylesheet" href="../../ux/design-system/tokens.css">
+<style>
+body{margin:0;padding:20px;font-family:var(--font-sans);color:var(--ink);background:var(--app-background)}
+.g{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.t{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;align-items:center;gap:14px}
+.t b{font:600 15px/1 var(--font-mono);width:26px;color:var(--muted)}
+.tile{width:34px;height:34px;border-radius:10px;background:var(--row-icon-bg,#eef2e7);color:var(--row-icon-ink,#53674a);display:grid;place-items:center}
+svg{fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round;display:block}
+.s18{width:18px;height:18px}.s16{width:16px;height:16px}.s28{width:28px;height:28px}
+</style>
+<body><div class="g" id="g"></div>
+<script src="../../ux/design-system/components/bundle.js"></script>
+<script src="icons.js"></script>
+<script>
+// Test icons are given by name in ?names=, shown shuffled with a fixed seed and numbered; the key is printed to the console.
+const names=new URLSearchParams(location.search).get('names').split(',');
+const P=Object.assign({},SentriIcons.paths,SentriIconsNext.paths);
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const order=names.map(n=>[rnd(),n]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+const svg=(d,c)=>`<svg viewBox="0 0 24 24" class="${c}"><path d="${d}"/></svg>`;
+document.getElementById('g').innerHTML=order.map((n,i)=>`<div class="t"><b>${i+1}</b><span class="tile">${svg(P[n],'s18')}</span>${svg(P[n],'s16')}${svg(P[n],'s28')}</div>`).join('');
+console.warn('KEY '+JSON.stringify(order));
+</script></body></html>

@@ -29,6 +29,7 @@ const screens = [
   ['farrowing.filter', 'filter'],
   ['workbench.gestation', 'home-overview'],
   ['farrowing.sow-actions', 'unit-actions'],
+  ['environment.page', 'fan'],
 ];
 const patched = new Set(swaps.map((s) => s.file));
 const b = await chromium.launch();
