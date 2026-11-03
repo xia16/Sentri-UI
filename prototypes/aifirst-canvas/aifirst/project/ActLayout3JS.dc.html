@@ -49,41 +49,12 @@
       </button>
     </sc-if>
 
-    <!-- View, inside a room: the header (what is here, what needs a look, the cameras) and the pig profile on the right -->
-    <sc-if value="{{showHead}}" hint-placeholder-val="{{false}}">
-      <div style="{{head.style}}">
-        <sc-if value="{{head.hasNeed}}" hint-placeholder-val="{{true}}">
-          <button type="button" onClick="{{head.prev}}" aria-label="Previous pen that needs a look" style="{{head.navStyle}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevL}}"></path></svg></button>
-        </sc-if>
-        <button type="button" onClick="{{head.pill}}" aria-label="{{head.aria}}" style="{{head.pillStyle}}">
-          <span>{{head.text}}</span>
-          <sc-if value="{{head.hasNeed}}" hint-placeholder-val="{{true}}">
-            <span style="color: #A3AAA5">·</span>
-            <span style="{{head.markStyle}}">! {{head.need}}</span>
-          </sc-if>
-        </button>
-        <sc-if value="{{head.hasNeed}}" hint-placeholder-val="{{true}}">
-          <button type="button" onClick="{{head.next}}" aria-label="Next pen that needs a look" style="{{head.navStyle}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg></button>
-        </sc-if>
-        <sc-if value="{{head.hasCams}}" hint-placeholder-val="{{true}}">
-          <button type="button" onClick="{{head.cams}}" aria-pressed="{{head.camsOn}}" style="{{head.camsStyle}}">
-            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.cam}}"></path></svg>
-            {{head.camsText}}
-          </button>
-        </sc-if>
-        <sc-if value="{{head.hasBatch}}" hint-placeholder-val="{{false}}">
-          <button type="button" onClick="{{head.openBatch}}" aria-label="{{head.batchAria}}" style="{{head.batchStyle}}">
-            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.layers}}"></path></svg>
-            {{head.batch}}
-          </button>
-        </sc-if>
-      </div>
-    </sc-if>
-
+    <!-- A pig met through a batch remains a sub-page on the right. -->
     <sc-if value="{{showProf}}" hint-placeholder-val="{{false}}">
       <section aria-label="{{prof.aria}}" style="{{prof.style}}">
         <div style="flex: none; display: flex; align-items: flex-start; gap: 4px; padding: 16px 8px 12px 16px">
           <div style="flex: 1 1 auto; min-width: 0">
+            <sc-if value="{{prof.hasBack}}"><button type="button" onClick="{{prof.back}}" style="height: 44px; padding: 0; border: 0; background: transparent; color: #626C66; font: inherit; font-size: 14px; cursor: pointer">‹ {{prof.backLabel}}</button></sc-if>
             <div style="display: flex; align-items: center; gap: 10px; min-width: 0">
               <span style="{{prof.titleStyle}}">{{prof.title}}</span>
               <sc-if value="{{prof.hasChip}}" hint-placeholder-val="{{false}}"><span style="{{prof.chipStyle}}">{{prof.chip}}</span></sc-if>
@@ -456,7 +427,7 @@
       </div>
     </sc-if>
 
-    <!-- THE DETAILS CARD: read only. Where you are, what it is, what is inside. -->
+    <!-- THE LOCATION CARD in View; the existing layout card in Edit. -->
     <sc-if value="{{showCard}}" hint-placeholder-val="{{true}}">
       <section aria-label="{{P.aria}}" style="{{cardStyle}}">
         <div style="flex: none; padding: 8px 8px 12px 16px; {{P.fade}}">
@@ -500,13 +471,208 @@
               </button>
             </sc-if>
             <sc-if value="{{P.hasToggle}}" hint-placeholder-val="{{true}}">
-            <button type="button" onClick="{{P.toggle}}" aria-label="{{P.toggleAria}}" aria-expanded="{{P.cardOpen}}" style="flex: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 9px; background: transparent; color: #4A544E; cursor: pointer">
+            <button type="button" onClick="{{P.toggle}}" aria-label="{{P.toggleAria}}" aria-expanded="{{P.cardOpen}}" style="{{P.toggleStyle}}">
               <svg viewBox="0 0 24 24" aria-hidden="true" style="{{P.chevStyle}}"><path d="{{ic.chevD}}"></path></svg>
             </button>
             </sc-if>
           </div>
         </div>
 
+        <sc-if value="{{loc.open}}">
+          <div ref="{{setLocBody}}" style="flex: 0 1 auto; min-height: 0; overflow-y: auto; font-size: 14px">
+            <sc-if value="{{loc.hasPigBack}}"><button type="button" onClick="{{loc.pigBack}}" style="{{loc.backStyle}}">{{loc.pigBackLabel}}</button></sc-if>
+            <sc-if value="{{loc.hasPigs}}">
+              <div style="padding: 10px 16px 8px; border-top: 1px solid #EEF0EC">
+                <div style="{{loc.headStyle}}">Pigs here</div>
+                <div aria-hidden="true" style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin: 12px 0 4px"><sc-for list="{{loc.stages}}" as="g"><span style="{{g.segment}}"></span></sc-for></div>
+                <sc-for list="{{loc.stages}}" as="g">
+                  <button type="button" onClick="{{g.pick}}" aria-pressed="{{g.on}}" style="{{g.style}}"><span style="{{g.dot}}"></span><span style="flex: 1; text-align: left">{{g.label}}</span><span>{{g.count}}</span></button>
+                </sc-for>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap"><sc-for list="{{loc.flags}}" as="g"><button type="button" onClick="{{g.pick}}" aria-pressed="{{g.on}}" style="{{g.style}}">{{g.label}}</button></sc-for><sc-if value="{{loc.filtered}}"><button type="button" onClick="{{loc.clearFilter}}" style="{{loc.plainStyle}}">Show all</button></sc-if></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{loc.hasUnit}}">
+              <div style="padding: 0 16px 8px; border-top: 1px solid #EEF0EC">
+                <button type="button" onClick="{{loc.unitToggle}}" aria-expanded="{{loc.unitOpen}}" style="{{loc.unitStyle}}"><span>Unit details</span><span>{{loc.unitChevron}}</span></button>
+                <sc-if value="{{loc.unitOpen}}"><sc-for list="{{loc.unitRows}}" as="r"><div style="display: flex; justify-content: space-between; gap: 12px; padding: 5px 0"><span style="color: #626C66">{{r.label}}</span><span style="text-align: right">{{r.value}}</span></div></sc-for></sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{loc.hasReadings}}">
+              <div style="padding: 10px 16px 8px; border-top: 1px solid #EEF0EC">
+                <div style="{{loc.headStyle}}">Readings</div>
+                <sc-for list="{{loc.readings}}" as="r"><button type="button" onClick="{{r.open}}" style="{{loc.readStyle}}"><span style="flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 8px"><span style="color: #626C66">{{r.name}}</span><span>{{r.value}}</span><span style="margin-left: auto; font-size: 12.5px; color: #626C66">{{r.age}}</span></span><span style="color: #626C66">›</span></button></sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{loc.hasGroup}}">
+              <div style="padding: 10px 16px; border-top: 1px solid #EEF0EC">
+                <div style="{{loc.headStyle}}">Pigs here · {{loc.groupCount}}</div>
+                <sc-for list="{{loc.pigs}}" as="g"><button type="button" onClick="{{g.open}}" aria-label="{{g.aria}}" style="{{loc.readStyle}}"><span style="flex: 1; min-width: 0; text-align: left"><span style="display: block">{{g.label}}</span><span style="display: block; font-size: 12.5px; color: #626C66">{{g.status}}</span></span><sc-if value="{{g.flagged}}"><span aria-label="Flagged" style="width: 7px; height: 7px; border-radius: 50%; background: #C28A33"></span></sc-if><span style="color: #626C66">›</span></button></sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{loc.hasProfile}}"><div style="padding: 0 16px 12px; font-size: 14px">
+  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span style="font-size: 16px; font-weight: 600">{{prof.title}}</span><sc-if value="{{prof.hasChip}}"><span style="{{prof.chipStyle}}">{{prof.chip}}</span></sc-if></div>
+  <div style="font-size: 12.5px; color: #626C66; margin-top: 4px">{{prof.sub}}</div>
+  <div style="margin-top: 6px">{{prof.stage}}</div>
+  <sc-if value="{{prof.hasBatch}}"><button type="button" onClick="{{prof.openBatch}}" aria-label="{{prof.batchAria}}" style="height: 44px; padding: 0; border: 0; background: transparent; color: #4A544E; font: inherit; cursor: pointer">{{prof.batch}} ›</button></sc-if>
+  <sc-if value="{{prof.hasChip}}"><div style="{{prof.whyStyle}}">{{prof.why}}</div></sc-if>
+</div>        <div style="min-height: 0; border-top: 1px solid #EEF0EC">
+          <sc-if value="{{prof.feedOn}}" hint-placeholder-val="{{false}}">
+            <div style="position: relative; margin: 12px 16px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px; background: #0E1411">
+              <canvas ref="{{setCamCv}}" width="640" height="360" role="img" aria-label="{{camAria}}" style="display: block; width: 100%; height: 100%; background: #0E1411"></canvas>
+              <div style="position: absolute; left: 8px; top: 8px; max-width: calc(100% - 64px); height: 28px; box-sizing: border-box; padding: 0 10px; border-radius: 8px; background: rgba(8, 12, 10, 0.55); color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; line-height: 28px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{camName}}</div>
+              <button type="button" onClick="{{closeCam}}" aria-label="Close the camera view" style="position: absolute; right: 4px; top: 4px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; background: rgba(8, 12, 10, 0.55); color: #FFFFFF; cursor: pointer">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.x}}"></path></svg>
+              </button>
+              <div style="position: absolute; left: 8px; bottom: 8px; height: 28px; box-sizing: border-box; padding: 0 10px; border-radius: 8px; background: rgba(8, 12, 10, 0.55); display: flex; align-items: center; gap: 7px; color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; line-height: 16px">
+                <span style="width: 8px; height: 8px; border-radius: 4px; background: #E5483A"></span>
+                <span ref="{{setCamClock}}">{{camClock}}</span>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{prof.canWatchBtn}}" hint-placeholder-val="{{false}}">
+            <div style="padding: 12px 16px">
+              <button type="button" onClick="{{prof.watch}}" style="width: 100%; min-height: 44px; display: flex; align-items: center; gap: 8px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 14px; color: #4A544E; cursor: pointer">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.cam}}"></path></svg>
+                Watch this pen
+              </button>
+            </div>
+          </sc-if>
+          <sc-if value="{{prof.empty}}" hint-placeholder-val="{{false}}">
+            <div style="padding: 16px; font-size: 14px; line-height: 21px; color: #4A544E">{{prof.emptyNote}}</div>
+          </sc-if>
+          <sc-for list="{{prof.sections}}" as="s" hint-placeholder-count="6">
+            <div style="border-top: 1px solid #EEF0EC; margin-top: -1px">
+              <button type="button" onClick="{{s.toggle}}" aria-expanded="{{s.open}}" style="width: 100%; min-height: 52px; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 0 16px; border: 0; background: transparent; font: inherit; color: #121815; text-align: left; cursor: pointer">
+                <span style="flex: none; font-size: 12.5px; font-weight: 500; color: #626C66">{{s.title}}</span>
+                <span style="flex: 1 1 auto; min-width: 0; text-align: right; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{s.sum}}</span>
+                <sc-if value="{{s.hasSpark}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="flex: none; display: inline-flex; align-items: flex-end; gap: 2px; height: 12px"><sc-for list="{{s.spark}}" as="b" hint-placeholder-count="5"><span style="{{b}}"></span></sc-for></span></sc-if>
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="{{s.chevStyle}}"><path d="{{ic.chevD}}"></path></svg>
+              </button>
+              <sc-if value="{{s.open}}" hint-placeholder-val="{{false}}">
+                <div style="padding: 0 16px 16px">
+                  <sc-if value="{{s.isWait}}" hint-placeholder-val="{{false}}">
+                    <sc-for list="{{s.waits}}" as="w" hint-placeholder-count="2">
+                      <div style="display: flex; align-items: baseline; gap: 12px; min-height: 28px; font-size: 14px; line-height: 20px">
+                        <span style="flex: none; min-width: 52px; color: #626C66; white-space: nowrap">{{w.w}}</span>
+                        <span style="min-width: 0">{{w.t}}</span>
+                      </div>
+                    </sc-for>
+                    <sc-if value="{{s.hasDec}}" hint-placeholder-val="{{false}}">
+                      <button type="button" onClick="{{s.openDec}}" style="width: 100%; min-height: 44px; margin-top: 6px; box-sizing: border-box; display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 14px; color: #121815; text-align: left; cursor: pointer">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M9 11l3 3L22 4 M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                        <span style="flex: 1 1 auto; min-width: 0"><span style="color: #626C66">In a decision:</span> {{s.dec}}</span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg>
+                      </button>
+                    </sc-if>
+                  </sc-if>
+                  <sc-if value="{{s.isRows}}" hint-placeholder-val="{{false}}">
+                    <sc-for list="{{s.rows}}" as="r" hint-placeholder-count="3">
+                      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; min-height: 28px; font-size: 14px; line-height: 20px">
+                        <span style="color: #626C66; flex: none">{{r.k}}</span>
+                        <span style="font-weight: 500; text-align: right; min-width: 0">{{r.v}}</span>
+                      </div>
+                    </sc-for>
+                  </sc-if>
+                  <sc-if value="{{s.isPigs}}" hint-placeholder-val="{{false}}">
+                    <sc-for list="{{s.pigs}}" as="g" hint-placeholder-count="6">
+                      <button type="button" onClick="{{g.toggle}}" aria-label="{{g.aria}}" style="{{g.style}}">
+                        <sc-if value="{{g.tick}}" hint-placeholder-val="{{false}}">
+                          <span style="{{g.boxStyle}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg></span>
+                        </sc-if>
+                        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 600">{{g.tag}}</span>
+                        <span style="flex: 1 1 auto; min-width: 0; font-size: 12.5px; color: #8A5A12; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{g.note}}</span>
+                        <span style="flex: none; font-size: 14px; color: #4A544E">{{g.w}}</span>
+                      </button>
+                    </sc-for>
+                  </sc-if>
+                  <sc-if value="{{s.isLit}}" hint-placeholder-val="{{false}}">
+                    <div style="display: flex; align-items: flex-end; gap: 16px; padding-top: 6px; overflow-x: auto">
+                      <sc-for list="{{s.bars}}" as="b" hint-placeholder-count="4">
+                        <div style="flex: none; display: flex; flex-direction: column; align-items: center; gap: 5px">
+                          <div style="display: flex; align-items: flex-end; gap: 3px; height: 62px">
+                            <div style="{{b.s1}}"></div>
+                            <div style="{{b.s2}}"></div>
+                          </div>
+                          <span style="font-size: 11.5px; color: #626C66">{{b.label}}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 14px; margin-top: 8px; font-size: 12px; color: #4A544E">
+                      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #2E3832"></span>Born alive</span>
+                      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #A9B3AB"></span>Weaned</span>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{s.isHealth}}" hint-placeholder-val="{{false}}">
+                    <svg viewBox="0 0 388 32" aria-hidden="true" style="display: block; width: 100%; height: auto; overflow: visible">
+                      <path d="{{s.d1}}" style="fill: none; stroke: #D3D8D0; stroke-width: 2; stroke-linecap: round"></path>
+                      <path d="{{s.d2}}" style="fill: #2E3832; stroke: none"></path>
+                      <path d="{{s.d3}}" style="fill: #B3261E; stroke: none"></path>
+                    </svg>
+                    <div style="display: flex; justify-content: space-between; margin-top: 2px; font-size: 11.5px; color: #7C857F"><span>{{s.axisL}}</span><span>{{s.axisR}}</span></div>
+                    <div style="margin-top: 8px">
+                      <sc-for list="{{s.events}}" as="e" hint-placeholder-count="3">
+                        <div style="display: flex; align-items: baseline; gap: 12px; min-height: 28px; font-size: 14px; line-height: 20px">
+                          <span style="flex: none; width: 52px; color: #626C66">{{e.w}}</span>
+                          <span style="{{e.style}}">{{e.t}}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{s.isWeight}}" hint-placeholder-val="{{false}}">
+                    <svg viewBox="0 0 388 76" aria-hidden="true" style="display: block; width: 100%; height: auto; overflow: visible">
+                      <path d="{{s.d2}}" style="fill: none; stroke: #A9B3AB; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"></path>
+                      <path d="{{s.d1}}" style="fill: none; stroke: #121815; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path>
+                      <path d="{{s.d3}}" style="fill: #121815; stroke: none"></path>
+                    </svg>
+                    <div style="display: flex; justify-content: space-between; margin-top: 2px; font-size: 11.5px; color: #7C857F"><span>{{s.axisL}}</span><span>{{s.axisR}}</span></div>
+                    <div style="display: flex; align-items: center; gap: 14px; margin-top: 8px; font-size: 12.5px; color: #2E3832">
+                      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 14px; height: 2px; background: #121815"></span>{{s.lg1}}</span>
+                      <sc-if value="{{s.hasLg2}}" hint-placeholder-val="{{false}}"><span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 14px; height: 2px; background: #A9B3AB"></span>{{s.lg2}}</span></sc-if>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{s.isFeed}}" hint-placeholder-val="{{false}}">
+                    <svg viewBox="0 0 388 56" aria-hidden="true" style="display: block; width: 100%; height: auto; overflow: visible">
+                      <path d="{{s.d2}}" style="fill: #EEF0EC; stroke: none"></path>
+                      <path d="{{s.d1}}" style="fill: none; stroke: #121815; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path>
+                      <path d="{{s.d3}}" style="{{s.dotStyle}}"></path>
+                    </svg>
+                    <div style="display: flex; justify-content: space-between; margin-top: 2px; font-size: 11.5px; color: #7C857F"><span>{{s.axisL}}</span><span>{{s.axisR}}</span></div>
+                    <div style="display: flex; align-items: center; gap: 14px; margin-top: 8px; font-size: 12.5px; color: #2E3832">
+                      <span>{{s.lg1}}</span>
+                      <sc-if value="{{s.hasLg2}}" hint-placeholder-val="{{false}}"><span style="color: #A33A2B; font-weight: 500">{{s.lg2}}</span></sc-if>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{s.isNotes}}" hint-placeholder-val="{{false}}">
+                    <sc-for list="{{s.notes}}" as="n" hint-placeholder-count="2">
+                      <div style="display: flex; align-items: baseline; gap: 12px; padding: 4px 0; font-size: 14px; line-height: 19px">
+                        <span style="flex: none; width: 52px; color: #626C66">{{n.w}}</span>
+                        <span style="{{n.style}}">{{n.t}}</span>
+                      </div>
+                    </sc-for>
+                    <sc-if value="{{s.hasEmpty}}" hint-placeholder-val="{{false}}"><div style="font-size: 14px; line-height: 19px; color: #626C66">{{s.empty}}</div></sc-if>
+                  </sc-if>
+                  <sc-if value="{{s.isMoves}}" hint-placeholder-val="{{false}}">
+                    <sc-for list="{{s.moves}}" as="mv" hint-placeholder-count="2">
+                      <div style="display: flex; align-items: baseline; gap: 12px; min-height: 28px; font-size: 14px; line-height: 20px">
+                        <span style="flex: none; width: 52px; color: #626C66">{{mv.w}}</span>
+                        <span>{{mv.t}}</span>
+                      </div>
+                    </sc-for>
+                  </sc-if>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+</sc-if>
+            <sc-if value="{{loc.hasEquipment}}">
+              <div ref="{{setLocEquipment}}" style="padding: 10px 16px 12px; border-top: 1px solid #EEF0EC">
+                <div style="{{loc.headStyle}}">Equipment</div>
+                <sc-for list="{{loc.equipment}}" as="d"><div style="min-height: 56px; display: flex; align-items: center; gap: 10px; padding: 4px 0"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex: none; fill: none; stroke: #626C66; stroke-width: 1.8"><path d="{{d.icon}}"></path></svg><span style="flex: 1; min-width: 0"><span style="display: block">{{d.name}}</span><span style="display: block; font-size: 12.5px; color: #626C66">{{d.state}}</span></span><span style="font-size: 12.5px; color: #626C66">Preview</span></div></sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
         <sc-if value="{{P.cardOpen}}" hint-placeholder-val="{{true}}">
           <sc-if value="{{P.hasRows}}" hint-placeholder-val="{{true}}">
             <div style="flex: 0 1 auto; min-height: 0; overflow-y: auto; padding: 0 16px 8px; {{P.fade}}">
@@ -1234,7 +1400,7 @@
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["saved","view","batchlist","viewbatch","viewbatchtask","actionsmenu","pigwaiting","devicesetup","devicefeeder","devicepens","addpens","typepicker","newtypeinline","ungroupsel","viewroom","picked","addmenu","typemanager","device","devicenew","viewpen","viewcam","editfromview","doneask","endrow","sickview","doors","movezone","night","intronight","introroom","introgest","introlist","introcam","intropen","zone","section","room","lane","pentype","place","select","newsection","confirm","draw","drawn","drawing","roomsize","roomedit","repeat","shape","fit","removed","intro","start","draft","pens","ready","sickroom","grouped","dup","plan","edit","mixed","grouptype","farm-acres","farm-groupgest","farm-weaner","farm-sketch"],"default":"saved"},"$preview":{"width":1360,"height":830}}'>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["locroom","locpen","locgroup","locfilter","saved","view","batchlist","viewbatch","viewbatchtask","actionsmenu","pigwaiting","devicesetup","devicefeeder","devicepens","addpens","typepicker","newtypeinline","ungroupsel","viewroom","picked","addmenu","typemanager","device","devicenew","viewpen","viewcam","editfromview","doneask","endrow","sickview","doors","movezone","night","intronight","introroom","introgest","introlist","introcam","intropen","zone","section","room","lane","pentype","place","select","newsection","confirm","draw","drawn","drawing","roomsize","roomedit","repeat","shape","fit","removed","intro","start","draft","pens","ready","sickroom","grouped","dup","plan","edit","mixed","grouptype","farm-acres","farm-groupgest","farm-weaner","farm-sketch"],"default":"saved"},"$preview":{"width":1360,"height":830}}'>
 // <inlined>
 const LAYOUT_ENGINE = (function () {
 // Layout engine: the farm as a plain document (JSON, centimetres) and every rule that turns it into geometry.
@@ -3413,7 +3579,7 @@ class Component extends DCLogic {
   snapshot() { const m = this.M(); return { zones: this.clone(m.zones), sections: this.clone(m.sections), rooms: this.clone(m.rooms), types: this.clone(m.types) }; }
   // ---------- states ----------
   eff(start) {
-    const alias = { addmenu: 'room', typemanager: 'room', device: 'room', devicenew: 'room', devicefeeder: 'room', devicepens: 'room', devicesetup: 'room', picked: 'saved', view: 'saved', viewroom: 'saved', viewpen: 'saved', viewcam: 'saved', editfromview: 'saved', doneask: 'saved', viewbatch: 'saved', viewbatchtask: 'saved', batchlist: 'saved', actionsmenu: 'saved', pigwaiting: 'saved', addpens: 'lane', typepicker: 'lane', newtypeinline: 'lane', ungroupsel: 'saved', draw: 'sickview', drawn: 'sickview', drawing: 'sickview', intronight: 'intro', introroom: 'intro', introgest: 'intro', introlist: 'intro', introcam: 'intro', intropen: 'intro', night: 'saved', farm: 'saved', record: 'saved', empty: 'intro', structure: 'draft', filling: 'draft', pentypes: 'pens', complete: 'ready', sick: 'sickroom', roomnew: 'pentype', paint: 'pentype', canvas: 'section', top: 'plan', mixed: 'lane', grouptype: 'pentype' };
+    const alias = { locroom: 'saved', locpen: 'saved', locgroup: 'saved', locfilter: 'saved', addmenu: 'room', typemanager: 'room', device: 'room', devicenew: 'room', devicefeeder: 'room', devicepens: 'room', devicesetup: 'room', picked: 'saved', view: 'saved', viewroom: 'saved', viewpen: 'saved', viewcam: 'saved', editfromview: 'saved', doneask: 'saved', viewbatch: 'saved', viewbatchtask: 'saved', batchlist: 'saved', actionsmenu: 'saved', pigwaiting: 'saved', addpens: 'lane', typepicker: 'lane', newtypeinline: 'lane', ungroupsel: 'saved', draw: 'sickview', drawn: 'sickview', drawing: 'sickview', intronight: 'intro', introroom: 'intro', introgest: 'intro', introlist: 'intro', introcam: 'intro', intropen: 'intro', night: 'saved', farm: 'saved', record: 'saved', empty: 'intro', structure: 'draft', filling: 'draft', pentypes: 'pens', complete: 'ready', sick: 'sickroom', roomnew: 'pentype', paint: 'pentype', canvas: 'section', top: 'plan', mixed: 'lane', grouptype: 'pentype' };
     const ok = ['doors', 'movezone', 'saved', 'zone', 'section', 'room', 'lane', 'pentype', 'place', 'select', 'newsection', 'confirm', 'sickview', 'endrow', 'shape', 'fit', 'removed', 'roomsize', 'roomedit', 'repeat', 'intro', 'start', 'draft', 'pens', 'ready', 'sickroom', 'grouped', 'dup', 'plan', 'edit'];
     return ok.indexOf(start) >= 0 ? start : (alias[start] || 'saved');
   }
@@ -3427,7 +3593,7 @@ class Component extends DCLogic {
       nn: null, cf: null, dupT: null, mvT: false, chT: false, ptList: false, devT: null, ed: null, arT: null, fresh: null, hv: null, moreOpen: false,
       ah: '', lens: false, sz: null, hn: 0, cc: false, bh: 0, sw: 0, fold: '', night: false, reshape: false, cm: null, addDoor: false,
       ip: '', rec: false, lh: '', icam: null, lst: true,
-      vm: 'edit', psel: [], gsel: [], sm: false, vt: null, dn: false, dp: '', dvE: null, bv: null, bfold: {}, bl: false, bdone: false, bfig: '', nl: -1, ask: false, askIn: '', pfold: {}
+      vf: null, locPig: null, locUnit: false, vm: 'edit', psel: [], gsel: [], sm: false, vt: null, dn: false, dp: '', dvE: null, bv: null, bfold: {}, bl: false, bdone: false, bfig: '', nl: -1, ask: false, askIn: '', pfold: {}
     };
     const o = {
       intro: { mode: 'intro' }, start: { mode: 'start' }, draft: { mode: 'draft' },
@@ -3455,7 +3621,7 @@ class Component extends DCLogic {
     // the finished farm, opened inside a room: pigs, the list, a pen card, a camera
     const ir = { introroom: { view: 'room', roomId: 'fr2', hl: '' }, introgest: { view: 'room', roomId: 'g2', hl: '' }, introlist: { view: 'room', roomId: 'g2', hl: '', ip: 'B14', psel: ['B14'], nl: 0 }, introcam: { view: 'room', roomId: 'fr2', hl: '', icam: { kind: 'room', i: 0 } }, intropen: { view: 'room', roomId: 'fr2', hl: '', ip: 'A3', psel: ['A3'] } }[start] || {};
     // the farm view: a saved farm opens in View; the editor is the other mode
-    const vw = { viewroom: { view: 'room', roomId: 'g2' }, viewpen: { view: 'room', roomId: 'fr2', ip: 'A3', psel: ['A3'] }, viewcam: { view: 'room', roomId: 'fr2', icam: { kind: 'room', i: 0 } }, doneask: { view: 'room', roomId: 'g2' }, viewbatch: { view: 'room', roomId: 'fr2', bv: { id: '32', task: '' } }, viewbatchtask: { view: 'room', roomId: 'g1', bv: { id: '34', task: 'breed' } }, batchlist: { bl: true }, actionsmenu: { view: 'room', roomId: 'g2', psel: ['B15', 'B20', 'D40'], moreOpen: 'act' }, pigwaiting: { view: 'room', roomId: 'fr2', ip: 'A3', psel: ['A3'] } }[start] || {};
+    const vw = { locroom: { view: 'room', roomId: 'g2' }, locpen: { view: 'room', roomId: 'fr2', ip: 'A3', psel: ['A3'] }, locgroup: { view: 'room', roomId: 'n1', ip: 'B7', psel: ['B7'] }, locfilter: { view: 'room', roomId: 'g2', vf: { kind: 'flag', id: 'urgent' } }, viewroom: { view: 'room', roomId: 'g2' }, viewpen: { view: 'room', roomId: 'fr2', ip: 'A3', psel: ['A3'] }, viewcam: { view: 'room', roomId: 'fr2', icam: { kind: 'room', i: 0 } }, doneask: { view: 'room', roomId: 'g2' }, viewbatch: { view: 'room', roomId: 'fr2', bv: { id: '32', task: '' } }, viewbatchtask: { view: 'room', roomId: 'g1', bv: { id: '34', task: 'breed' } }, batchlist: { bl: true }, actionsmenu: { view: 'room', roomId: 'g2', psel: ['B15', 'B20', 'D40'], moreOpen: 'act' }, pigwaiting: { view: 'room', roomId: 'fr2', ip: 'A3', psel: ['A3'] } }[start] || {};
     // the side displays: the bar's Add menu, the pen type manager, a device, the pens picked
     const sd = { addmenu: { moreOpen: 'add' }, ungroupsel: { zoneId: 'z1', secId: 's-far', selKind: 'room', selIds: ['fr1', 'fr2', 'fr3', 'fr4'] }, typemanager: { ptList: true }, device: { sel: { kind: 'device', id: 'g2-nh3' } }, devicefeeder: { sel: { kind: 'device', id: 'g2-feed' } }, devicepens: { sel: { kind: 'device', id: 'g2-cam' }, dp: 'g2-cam' }, devicesetup: { sel: { kind: 'device', id: 'g2-clim' }, dvE: { id: 'g2-clim', isNew: true, code: '', model: '' } }, devicenew: { devT: { kind: 'nh3' } }, picked: { view: 'room', roomId: 'g2', psel: ['B15', 'B20', 'D40'], moreOpen: 'sel' } }[start] || {};
     const vm = e === 'saved' && start !== 'editfromview' && start !== 'doneask' && start !== 'ungroupsel' ? 'view' : 'edit';
@@ -3538,6 +3704,7 @@ class Component extends DCLogic {
     this.alive = false;
     this.ctxSync('');
     clearTimeout(this.toastT);
+    clearTimeout(this.locScrollT);
     cancelAnimationFrame(this.raf);
     if (this.ro) this.ro.disconnect();
     if (this.onWin) window.removeEventListener('resize', this.onWin);
@@ -4646,6 +4813,7 @@ class Component extends DCLogic {
       const amt = Math.max(rm.dim * 0.86, (rm.fd || 0) * 0.65, vt > 0.5 ? 0 : this.penDim(hl, p), this.hlType && p.t !== this.hlType ? 0.84 : 0);
       if (amt > 0) c.lerp(paper, amt);
       if (vt > 0 && vp) { const cc = (vp.cell[rm.id] || {})[p.code], bvc = this.bvColor(rm.id, p.code, cc); c.lerp(from.set(bvc || (cc && cc.flag ? (cc.flag.lvl === 'urgent' ? '#E7A196' : '#EFCF8C') : (cc && cc.kind ? '#F3D9D2' : '#F2F1EC'))), vt); }
+      if (this.IP && u.vm === 'view' && u.vf && !this.locationMatches((this.IP.cell[rm.id] || {})[p.code], u.vf)) c.set('#F4F3EE');
       rm.im.setColorAt(i, c);
     });
     if (rm.im.instanceColor) rm.im.instanceColor.needsUpdate = true;
@@ -4655,6 +4823,7 @@ class Component extends DCLogic {
       if (sp.out) c.lerp(red, 0.6);
       const sa = Math.max(rm.dim * 0.86, (rm.fd || 0) * 0.65, this.hlType && sp.t !== this.hlType ? 0.84 : 0);
       if (sa > 0) c.lerp(paper, sa);
+      if (this.IP && u.vm === 'view' && u.vf && !this.locationMatches((this.IP.cell[rm.id] || {})[sp.code], u.vf)) c.set('#F4F3EE');
       sp.mat.color.copy(c);
     });
     rm.floorMat.color.set('#FFFFFF').lerp(new T.Color('#EAF2EA'), rm.hov).lerp(paper, (rm.fd || 0) * 0.6);
@@ -5065,16 +5234,107 @@ class Component extends DCLogic {
     if (this.skyG) this.skyG.position.copy(this.camera.position);
     if (this.mat) { this.mat.arrow.opacity = Math.max(0, Math.min(1, (150 - c.dist) / 60)); this.mat.arrow2.opacity = this.mat.arrow.opacity * 0.85; }
   }
-  // the bar owns the bottom of the stage: the model is framed in what is left above it
+  // The location card reads the same pen cells and device bindings as the model.
+  locationDevices(u) {
+    if (u.vm !== 'view' || u.mode !== 'saved' || !this.IP) return [];
+    const D = this.Dv(), one = !u.bv && (u.psel || []).length === 1 ? u.psel[0] : '';
+    if (u.view === 'room') {
+      const d = D.room[u.roomId];
+      return d ? d.devices.filter((x) => one ? x.serves === 'pens' && x.pens.indexOf(one) >= 0 : x.serves === 'room' || x.serves === 'spot') : [];
+    }
+    // No zone or section bindings in this seed; room devices are never rolled up.
+    return [];
+  }
+  locationEquipment() {
+    this.put({ cc: false, moreOpen: false });
+    this.reframe(450);
+    clearTimeout(this.locScrollT);
+    this.locScrollT = setTimeout(() => { if (this.locEquipment && this.locBody) this.locBody.scrollTop = this.locEquipment.offsetTop - this.locBody.offsetTop; }, 100);
+  }
+  locationMatches(cell, vf) { return !!cell && (vf.kind === 'stage' ? cell.kind === vf.id : !!cell.flag && cell.flag.lvl === vf.id); }
+  locationFilter(kind, id) {
+    const old = this.ui().vf;
+    this.put({ vf: old && old.kind === kind && old.id === id ? null : { kind: kind, id: id } });
+    this.repaintBv();
+  }
+  locationView(u, pen, data, member) {
+    const on = u.mode === 'saved' && u.vm === 'view' && !!this.IP;
+    const plain = 'min-height: 44px; padding: 0; border: 0; background: transparent; color: #4A544E; font: inherit; font-size: 14px; cursor: pointer';
+    const row = plain + '; width: 100%; display: flex; align-items: center; gap: 10px; text-align: left';
+    const head = 'font-size: 12.5px; line-height: 20px; font-weight: 500; color: #626C66';
+    const loc = { open: on && !u.cc, hasPigs: false, stages: [], flags: [], filtered: !!u.vf, clearFilter: () => { this.put({ vf: null }); this.repaintBv(); },
+      hasUnit: false, unitOpen: !!u.locUnit, unitToggle: () => this.put({ locUnit: !this.ui().locUnit }), unitChevron: u.locUnit ? '⌃' : '⌄', unitRows: [],
+      hasReadings: false, readings: [], hasEquipment: false, equipment: [], hasGroup: false, groupCount: '', pigs: [], hasProfile: false,
+      hasPigBack: !!member, pigBack: () => { this.put({ locPig: null }); if (this.locBody) this.locBody.scrollTop = 0; }, pigBackLabel: pen ? '‹ Pen ' + pen.code : '', backStyle: plain + '; margin: 0 16px',
+      headStyle: head, unitStyle: row + '; justify-content: space-between; ' + head, readStyle: row + '; min-height: 48px', plainStyle: plain };
+    if (!on) return loc;
+    const defs = [['sow', 'Sows in pig', '#B89C91'], ['litter', 'Sows with litters', '#C7836C'], ['dry', 'Sows due to farrow', '#C6A95D'], ['gilts', 'Gilts', '#A6A38C'], ['boar', 'Boars', '#8F8B9E'], ['weaners', 'Weaners', '#A4B3BE'], ['sick', 'Sick', '#C76D64']];
+    if (!pen) {
+      const rs = u.view === 'room' ? this.M().rooms.filter((r) => r.id === u.roomId) : u.secId ? this.roomsOf(u.secId) : u.zoneId ? this.M().rooms.filter((r) => this.zoneOfRoom(r) === u.zoneId) : this.M().rooms;
+      const counts = {}, flags = { urgent: 0, watch: 0 };
+      rs.forEach((r) => Object.values(this.IP.cell[r.id] || {}).forEach((c) => {
+        if (!c || !c.kind) return;
+        counts[c.kind] = (counts[c.kind] || 0) + (c.kind === 'weaners' || c.kind === 'gilts' ? c.n || 0 : 1);
+        if (c.flag) flags[c.flag.lvl] = (flags[c.flag.lvl] || 0) + 1;
+      }));
+      const total = Object.values(counts).reduce((a, b) => a + b, 0);
+      loc.stages = defs.filter((d) => counts[d[0]]).map((d) => {
+        const selected = !!u.vf && u.vf.kind === 'stage' && u.vf.id === d[0];
+        return { label: d[1], count: this.fmt(counts[d[0]]), on: selected, pick: () => this.locationFilter('stage', d[0]),
+          segment: 'height: 8px; flex: ' + counts[d[0]] / total + ' 1 0; background: ' + d[2], dot: 'width: 8px; height: 8px; flex: none; border-radius: 50%; background: ' + d[2],
+          style: row + '; color: ' + (selected ? '#121815' : '#4A544E') + '; font-weight: ' + (selected ? 600 : 400) };
+      });
+      loc.hasPigs = loc.stages.length > 0;
+      loc.flags = ['urgent', 'watch'].filter((id) => flags[id]).map((id) => {
+        const selected = !!u.vf && u.vf.kind === 'flag' && u.vf.id === id;
+        return { label: (id === 'urgent' ? '! ' : '') + flags[id] + (id === 'urgent' ? ' urgent' : ' to watch'), on: selected, pick: () => this.locationFilter('flag', id),
+          style: plain + '; font-size: 12.5px; color: ' + (id === 'urgent' ? '#9A1F17' : '#8A5A12') + '; font-weight: ' + (selected ? 600 : 400) + '; text-decoration: ' + (selected ? 'underline' : 'none') };
+      });
+      if (u.view === 'room') {
+        const r = this.roomById(u.roomId), d = this.Dv().room[u.roomId];
+        if (r && d) {
+          const size = this.roomSizeOf(r), main = d.doors.find((x) => x.main), f1 = (v) => (Math.round(v * 10) / 10).toFixed(1);
+          loc.hasUnit = true;
+          loc.unitRows = [{ label: 'Size', value: size.rect ? f1(size.w) + ' × ' + f1(size.l) + ' m' : this.fmt(Math.round(size.area)) + ' m²' }, { label: 'Pens', value: this.fmt(d.pens.length + d.drawn.length) }, { label: 'Places', value: this.fmt(d.places) }, { label: 'Main door', value: main ? main.side : 'None' }];
+        }
+        const readings = { g2: ['22.4 °C', '61 %', '8 ppm', '2 min ago'], fr2: ['26.1 °C', '58 %', '6 ppm', '1 min ago'] }[u.roomId];
+        if (readings) loc.readings = ['Temperature', 'Humidity', 'NH₃'].map((name, i) => ({ name: name, value: readings[i], age: readings[3], open: () => { /* TODO T5: open the sensor trend sub-page. */ this.showToast('Trends come with T5'); } }));
+        loc.hasReadings = loc.readings.length > 0;
+      }
+    } else if (data) {
+      loc.hasGroup = data.group && !member;
+      loc.hasProfile = !data.group || !!member;
+      const status = (data.kind === 'weaners' ? 'Nursery day ' : 'Quarantine day ') + data.i.age;
+      loc.groupCount = String(data.pigs.length);
+      loc.pigs = data.pigs.map((g, index) => ({ label: g.tag || 'Batch ' + data.i.batch + ' · ' + status, status: g.tag ? 'Batch ' + data.i.batch + ' · ' + status : '', flagged: !!g.note, aria: 'Open pig ' + (g.tag || index + 1), open: () => { this.put({ locPig: index, pfold: {} }); if (this.locBody) this.locBody.scrollTop = 0; } }));
+    }
+    loc.equipment = this.locationDevices(u).map((d) => ({ name: d.name, icon: this.devPaths()[d.kind] || '', state: d.serves === 'pens' ? 'Serves ' + this.penRanges(d.pens) : d.kind === 'climate' || d.kind === 'fan' ? 'Auto' : d.where || 'Monitoring' }));
+    loc.hasEquipment = loc.equipment.length > 0;
+    return loc;
+  }
+  penRanges(pens) {
+    const spans = [];
+    pens.forEach((code) => { const m = /^([A-Z]+)([0-9]+)$/.exec(code), last = spans[spans.length - 1]; if (m && last && last.letter === m[1] && last.end + 1 === +m[2]) { last.end = +m[2]; last.to = code; } else spans.push({ from: code, to: code, letter: m ? m[1] : '', end: m ? +m[2] : 0 }); });
+    return spans.map((x) => x.from === x.to ? x.from : x.from + '–' + x.to).join(', ');
+  }
+  // The expanded location card and the bar leave a free rectangle for the model.
   insets(u) {
     const n = u.narrow;
-    const prof = (!!this.IP && u.view === 'room' && (u.psel || []).length === 1) || (!!this.IP && (!!u.bv || !!u.bl)), pw = (n ? 380 : 420) + 32;
+    const prof = (!!this.IP && u.mode === 'intro' && u.view === 'room' && (u.psel || []).length === 1) || (!!this.IP && (!!u.bv || !!u.bl)), pw = (n ? 380 : 420) + 32;
     if (u.mode === 'intro') return u.view === 'room' ? { t: n ? 210 : 130, b: 90, l: n ? 28 : 430, r: prof ? pw : 28 } : { t: 158, b: 84, l: 28, r: 28 };
     // the card floats at the left (280 wide, 16 from the edge) and the bar fills the bottom: the model is framed in what is left
     const ins = { t: Math.max(88, u.cc ? (u.view === 'room' || u.secId || u.zoneId || u.selKind ? 126 : 98) : 0), b: (u.bh || 70) + 16 + 16, l: u.cc ? 28 : 16 + 280 + 16, r: 28 };
     // View: the card is only the place's name, top left; the model takes the width, under it
     if (this.IP) { ins.l = 28; ins.t = Math.max(ins.t, 104); ins.r = prof ? pw : 28; }
     if (this.IP && u.view === 'room') ins.t = Math.max(ins.t, 128);
+    if (this.IP && u.mode === 'saved' && u.vm === 'view') {
+      const hasPen = !u.bv && (u.psel || []).length === 1;
+      const rs = u.view === 'room' ? this.M().rooms.filter((r) => r.id === u.roomId) : u.secId ? this.roomsOf(u.secId) : u.zoneId ? this.M().rooms.filter((r) => this.zoneOfRoom(r) === u.zoneId) : this.M().rooms;
+      const hasPigs = rs.some((r) => Object.values(this.IP.cell[r.id] || {}).some((c) => c && c.kind));
+      const expanded = !u.cc && (hasPen || u.view === 'room' || hasPigs || this.locationDevices(u).length);
+      ins.l = expanded ? 392 : 28;
+      ins.t = expanded ? 88 : (u.view === 'room' || u.secId || u.zoneId ? 144 : 104);
+    }
     return ins;
   }
   fitCam(box, yaw, pitch, ins, given) {
@@ -5312,6 +5572,7 @@ class Component extends DCLogic {
   goUp(hard) {
     const u = this.ui();
     if (u.view === 'room') {
+      if (this.IP && u.vm === 'view' && (u.psel || []).length) { if (u.locPig != null) this.put({ locPig: null }); else this.selClear(); return; }
       if (this.IP && !hard) { if (u.icam) { this.closeCam(); return; } if ((u.psel || []).length) { this.selClear(); return; } if (u.sm) { this.setSm(false); return; } }
       if (u.corner != null && !hard) { this.updateSel(this.put({ corner: null })); return; }
       if (u.pen) { this.updateSel(this.put({ pen: '', sel: u.sel && u.sel.kind === 'lane' ? u.sel : null })); return; }
@@ -5330,6 +5591,8 @@ class Component extends DCLogic {
     if (u.cm) { this.put({ cm: null }); return true; }
     if (u.vt) { this.put({ vt: null }); return true; }
     if (u.moreOpen === 'act') { this.put({ moreOpen: false }); return true; }
+    if (u.vm === 'view' && u.locPig != null) { this.put({ locPig: null }); return true; }
+    if (u.vm === 'view' && u.bv && (u.psel || []).length) { this.selClear(); return true; }
     if (u.bv && u.bv.task) { this.closeBatchTask(); return true; }
     if (u.bv) { this.closeBatch(); return true; }
     if (u.bl) { this.put({ bl: false }); return true; }
@@ -6532,7 +6795,8 @@ class Component extends DCLogic {
   }
   // a pen while a batch is shown: one calm colour, or its pig's state in the task opened; flags keep theirs; the rest steps back
   bvColor(roomId, code, cell) {
-    const bv = this.ui().bv;
+    const u = this.ui(), bv = u.bv, vf = u.vm === 'view' ? u.vf : null;
+    if (vf && !this.locationMatches(cell, vf)) return '#F4F3EE';
     if (!bv) return null;
     if (!cell || cell.batch == null || String(cell.batch) !== String(bv.id)) return '#F4F3EE';
     if (cell.flag) return cell.flag.lvl === 'urgent' ? '#E7A196' : '#EFCF8C';
@@ -7068,7 +7332,7 @@ class Component extends DCLogic {
   // View: pigs, status, cameras, read only. Edit layout: the editor, no pigs. The intro preview is View on the example farm.
   vOn(u) { u = u || this.ui(); return u.mode === 'intro' || (u.mode === 'saved' && u.vm === 'view'); }
   cellOf(rm, code) { const P = this.IPfull || this.IP; return P ? (P.cell[rm.id] || {})[code] : undefined; }
-  viewClear() { return { ip: '', psel: [], gsel: [], sm: false, vt: null, dn: false, nl: -1, lh: '', icam: null, rec: false, ask: false, askIn: '' }; }
+  viewClear() { return { vf: null, locPig: null, locUnit: false, ip: '', psel: [], gsel: [], sm: false, vt: null, dn: false, nl: -1, lh: '', icam: null, rec: false, ask: false, askIn: '' }; }
   setVm(to) {
     const u = this.ui();
     if (u.mode !== 'saved' || u.vm === to || !this.rooms) return;
@@ -7111,14 +7375,15 @@ class Component extends DCLogic {
   setSel(codes, o) {
     o = o || {};
     const u = this.ui(), cur = u.icam, ip = codes.length === 1 ? codes[0] : '';
-    if (codes.length && (u.bv || u.bl)) this.leaveBatch();
-    const n = { psel: codes, gsel: [], ip: ip, nl: o.nl != null ? o.nl : -1, vt: null, rec: false, ask: false, lh: '' };
+    if (codes.length && u.bl && !u.bv) this.leaveBatch();
+    const n = { psel: codes, gsel: [], locPig: null, cc: codes.length === 1 && u.vm === 'view' ? false : u.cc, ip: ip, nl: o.nl != null ? o.nl : -1, vt: null, rec: false, ask: false, lh: '' };
     if (cur && cur.kind === 'pen' && cur.code !== ip) n.icam = null;
     this.put(n);
     this.syncHl(); this.syncCamVis(); this.pendSync();
     this.dirty = true;
   }
-  selClear() { this.setSel([]); }
+  selClear() { this.setSel([]); if (this.ui().vm === 'view') this.reframe(500); }
+  locationBack() { if (this.ui().locPig != null) this.put({ locPig: null }); else this.selClear(); }
   viewPick(code, multi) {
     const u = this.ui(), rm = this.rooms.find((x) => x.id === u.roomId);
     if (!rm || !this.penByCode(rm, code)) return;
@@ -7425,8 +7690,15 @@ class Component extends DCLogic {
     return D;
   }
   // the panel's model: header, sections that open and close, charts, the Ask bar
-  profView(rm, p) {
-    const u = this.ui(), D = this.profData(rm, p), i = D.i, key = rm.id + ':' + p.code;
+  profView(rm, p, member) {
+    const u = this.ui(), base = this.profData(rm, p);
+    const D = member ? Object.assign({}, base, { group: false, pigs: [], i: Object.assign({}, base.i, { tag: member.tag || 'Untagged pig', who: member.tag || 'Untagged pig', stage: (base.kind === 'weaners' ? 'Nursery day ' : 'Quarantine day ') + base.i.age, flag: member.note ? base.i.flag : null }) }) : base;
+    if (member) {
+      const ratio = parseFloat(member.w) / D.w[D.w.length - 1];
+      D.w = D.w.map((v) => v * ratio);
+      if (!member.note && base.i.flag) D.health = D.health.filter((e) => e.t !== base.i.flag.why);
+    }
+    const i = D.i, key = rm.id + ':' + p.code;
     const urgent = !!(i.flag && i.flag.lvl === 'urgent');
     const pfold = u.pfold || {};
     const W = 388;
@@ -7465,7 +7737,7 @@ class Component extends DCLogic {
       secs.push(mk('health', 'Health', (() => { if (!D.health.length) return 'Nothing recorded yet'; const n = D.health.filter((e) => /treat|vaccin|dewormed/i.test(e.t)).length; return (n ? n + (n === 1 ? ' treatment' : ' treatments') : D.health.length + (D.health.length === 1 ? ' entry' : ' entries')) + ' · last ' + (D.health[0].d === 0 ? 'today' : D.when(D.health[0].d)) + (i.flag ? ' · ' + i.flag.why : ''); })(), rel, { isHealth: true, d1: 'M6 16 H' + (W - 6), d2: cool.map((q) => dot(q, 4.5)).join(' '), d3: hot.map((q) => dot(q, 5.5)).join(' '), axisL: '90 days ago', axisR: 'Today', events: D.health.map((e) => ({ w: e.d === 0 ? 'Today' : D.when(e.d), t: e.t, style: 'min-width: 0; ' + (e.hot ? 'color: #9A1F17; font-weight: 500' : '') })) })); }
     // weight, and backfat
     { const a = line(D.w, 76, 10, false), b = D.bf.length ? line(D.bf, 76, 10, false) : null;
-      secs.push(mk('weight', D.group ? 'Weight' : 'Weight & backfat', D.w.length ? D.w.length + ' weighings' : 'No weighing yet. Weigh 10 pigs on the phone to see the line', rel, { spark: D.w.length ? spark(D.w) : [], isWeight: true, d1: a.d, d2: b ? b.d : '', d3: dot(a.last, 3.5), hasLegend: true, lg1: D.group ? 'Average ' + (Math.round(D.w[7] * 10) / 10) + ' kg' : 'Weight ' + Math.round(D.w[7]) + ' kg', lg2: b ? 'Backfat ' + Math.round(D.bf[7]) + ' mm' : '', hasLg2: !!b, axisL: '14 weeks ago', axisR: 'Now' })); }
+      secs.push(mk('weight', D.group || member ? 'Weight' : 'Weight & backfat', D.w.length ? D.w.length + ' weighings' : 'No weighing yet. Weigh 10 pigs on the phone to see the line', rel, { spark: D.w.length ? spark(D.w) : [], isWeight: true, d1: a.d, d2: b ? b.d : '', d3: dot(a.last, 3.5), hasLegend: true, lg1: D.group ? 'Average ' + (Math.round(D.w[7] * 10) / 10) + ' kg' : 'Weight ' + Math.round(D.w[7]) + ' kg', lg2: b ? 'Backfat ' + Math.round(D.bf[7]) + ' mm' : '', hasLg2: !!b, axisL: '14 weeks ago', axisR: 'Now' })); }
     // feed intake, 14 days
     { const f = line(D.feed, 56, 8, true);
       secs.push(mk('feed', 'Feed intake', D.sumFeed.replace('Today ', 'today '), rel, { spark: spark(D.feed.slice(-7)), isFeed: true, d1: f.d, d2: f.d + ' L' + (W - 6) + ' 52 L6 52 Z', d3: dot(f.last, 3.5), hasLegend: true, lg1: 'kg a day' + (D.group ? ', per pig' : ''), lg2: D.feedLow ? 'Eating less than usual' : '', hasLg2: D.feedLow, dotStyle: 'fill: ' + (D.feedLow ? '#B3261E' : '#121815') + '; stroke: none', axisL: '14 days ago', axisR: 'Today' })); }
@@ -7477,7 +7749,7 @@ class Component extends DCLogic {
     secs.push(mk('moves', 'Moves', D.sumMoves, rel, { isMoves: true, moves: D.moves.map((m) => ({ w: m[0], t: m[1] })) }));
     }
     const tagTitle = D.group ? i.who : i.tag;
-    const subBits = D.group ? [i.type, 'Pen ' + p.code, rm.r.name] : [({ sow: 'Sow', litter: 'Sow', dry: 'Sow', sick: 'Sow', boar: 'Boar' }[D.kind] || 'Pig') + (D.kind === 'boar' ? '' : ', parity ' + (i.parity || 1)), 'Pen ' + p.code, rm.r.name];
+    const subBits = member ? [base.kind === 'weaners' ? 'Weaner' : 'Gilt', 'Pen ' + p.code, rm.r.name] : D.group ? [i.type, 'Pen ' + p.code, rm.r.name] : [({ sow: 'Sow', litter: 'Sow', dry: 'Sow', sick: 'Sow', boar: 'Boar' }[D.kind] || 'Pig') + (D.kind === 'boar' ? '' : ', parity ' + (i.parity || 1)), 'Pen ' + p.code, rm.r.name];
     const canWatch = !!(rm.cams && rm.cams.some((s) => s.kind === 'pen' && s.code === p.code));
     // the Ask bar at the foot: the same chat, looking at this pig
     const log = ((this.askLog || {})[key]) || [];
@@ -7714,8 +7986,8 @@ class Component extends DCLogic {
         else if (hit && hit.roomId) this.goRoom(hit.roomId);
         else if (u.view === 'room') {
           const rm = this.rooms.find((x) => x.id === u.roomId), g = ground(e);
-          if (hit && hit.wall) { if ((u.psel || []).length) this.selClear(); }
-          else if (rm && g && this.inside(this.fp(rm.r), g.x, g.z)) { if ((u.psel || []).length) this.selClear(); } else this.goUp();
+          if (hit && hit.wall) { if ((u.psel || []).length) this.locationBack(); }
+          else if (rm && g && this.inside(this.fp(rm.r), g.x, g.z)) { if ((u.psel || []).length) this.locationBack(); } else this.goUp();
         }
         return;
       }
@@ -8814,18 +9086,12 @@ class Component extends DCLogic {
       }
     }
 
-    // ----- View: the same card, now about the pigs; the bar has only what View can do -----
+    // ----- View: the location card; the bar has only what View can do -----
     const psel = u.psel || [], gsel = u.gsel || [];
     if (VV) {
-      const VP = this.IP;
-      const vsum = (rs) => { let pigs = 0, urgent = 0, watch = 0; rs.forEach((r) => { const q = r && VP.room[r.id]; if (!q) return; if (!q.arr) pigs += q.pigs || 0; urgent += q.urgent || 0; watch += (q.need || 0) - (q.urgent || 0); }); return { pigs: pigs, urgent: urgent, watch: watch }; };
-      const vline = (s) => (s.pigs || s.urgent || s.watch ? [s.pigs ? this.fmt(s.pigs) + ' pigs' : '', s.urgent ? s.urgent + ' urgent' : '', s.watch ? s.watch + ' watch' : ''].filter(Boolean).join(' · ') : 'No pigs yet');
-      const roomFact = (r) => { const q = VP.room[r.id]; if (!q || !q.short) return 'No pigs yet'; if (q.arr) return q.detail; const w = (q.need || 0) - (q.urgent || 0); return [q.batch, q.detail, q.urgent ? q.urgent + ' urgent' : '', w ? w + ' to watch' : ''].filter(Boolean).join(' · '); };
       P.hasEdit = false;
-      const rsOf = lvl === 'farm' ? m.rooms : lvl === 'zone' ? roomsOfZone(u.zoneId) : lvl === 'section' ? this.roomsOf(u.secId) : (rcur ? [rcur] : []);
-      const devPicked = isRoom && !!u.sel && u.sel.kind === 'device';
-      if (!devPicked) { P.rows = [fact(lvl === 'room' && rcur ? roomFact(rcur) : vline(vsum(rsOf)))]; if (u.lens && lvl === 'room') P.rows.push(row({ isNote: true, noteStyle: 'white-space: normal', text: 'Devices are shown as a preview. Not ready yet: readings and control come with device integration.' })); P.hasRows = true; }
-      if (devPicked) { /* the card keeps the device */ } else { P.hasRows = false; P.rows = []; P.hasInside = false; P.inside = []; P.hasKindLine = false; P.hasToggle = false; }
+      P.hasRows = false; P.rows = []; P.hasInside = false; P.inside = []; P.hasKindLine = false; P.hasToggle = true;
+      if (isRoom && rcur && u.sel && u.sel.kind === 'device') { setTitle(rcur.name); P.bNote = false; P.cNote = false; P.closeLabel = ''; }
       const acts = [];
       if (lvl === 'room' && rcur) {
         P.hasLead = true;
@@ -8833,8 +9099,6 @@ class Component extends DCLogic {
       }
       P.actions = acts;
       P.hasAdd = false;
-      // a device picked in the lens: the card tells what it is; the bar only says where to change it
-      if (isRoom && u.sel && u.sel.kind === 'device') { P.actions = []; P.bNote = true; P.note = 'Devices are a preview. Use Edit layout to add or remove them.'; P.cNote = true; P.closeLabel = 'Close the device'; }
       // the pens that are picked, and what can be done with them: at the right of the bar
       // Actions ▾: the console's Action pages that take what is picked
       const actsOf = (tg) => {
@@ -8848,6 +9112,11 @@ class Component extends DCLogic {
       };
       // Batches: the running batches, on the side
       P.actions = [aRow('batches', 'Batches', ic.layers, () => this.toggleBatches(), { hot: !!(u.bl || u.bv), aria: u.bl || u.bv ? 'Close the batches' : 'Show the running batches' })];
+      if (isRoom && rcur && !(psel.length === 1 && !u.bv)) {
+        const info = this.IP.room[rcur.id];
+        if (info && info.cams) P.actions.push(aRow('cameras', 'Cameras', ic.cam, () => this.openCam('room', '', 0)));
+      }
+      if (this.locationDevices(u).length) P.actions.push(aRow('equipment', 'Equipment', addIcons.device, () => this.locationEquipment()));
       // a batch shown: the chip names it, Clear goes back, Actions ▾ for the batch
       if (u.bv && this.batchData()[u.bv.id]) {
         const b = this.batchData()[u.bv.id];
@@ -8862,7 +9131,7 @@ class Component extends DCLogic {
         const rmv = this.rooms ? this.rooms.find((x) => x.id === rcur.id) : null;
         const chipCol = (lv) => 'display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; flex: none; ' + (lv === 'urgent' ? 'background: #FBE7E4; color: #9A1F17' : 'background: #FBF0D9; color: #7A4A00');
         const rows = multiPens && rmv ? psel.map((code) => { const pp = this.penByCode(rmv, code), ii = pp ? this.pigInfo(rmv, pp) : null; return ii ? { code: code, who: ii.who, stage: ii.stage || (ii.lines[0] || ''), hasChip: !!ii.flag, chip: ii.flag ? (ii.flag.lvl === 'urgent' ? 'Urgent' : 'Watch') : '', chipStyle: ii.flag ? chipCol(ii.flag.lvl) : '', untickAria: 'Take pen ' + code + ' out of the selection', untick: () => this.viewPick(code, true), openAria: 'Open pen ' + code, open: () => { this.put({ moreOpen: false }); this.viewPick(code, false); } } : null; }).filter(Boolean) : [];
-        Object.assign(P, { hasSel: true, selText: nsel ? (multiPens ? psel.length + ' pens picked' : tgt) : 'Tick pens, or Shift-click', selHint: !nsel, selChip: nsel > 0, selList: multiPens, selOpen: multiPens && u.moreOpen === 'sel', selToggle: () => this.put({ moreOpen: this.ui().moreOpen === 'sel' ? false : 'sel' }), selRows: rows, selClearOn: nsel > 0, selClear: () => { this.put({ moreOpen: false }); this.selClear(); }, selActs: [] });
+        Object.assign(P, { hasSel: nsel > 0 || u.sm, selText: nsel ? (multiPens ? psel.length + ' pens picked' : tgt) : 'Tick pens, or Shift-click', selHint: !nsel, selChip: psel.length > 1, selList: multiPens, selOpen: multiPens && u.moreOpen === 'sel', selToggle: () => this.put({ moreOpen: this.ui().moreOpen === 'sel' ? false : 'sel' }), selRows: rows, selClearOn: psel.length > 1, selClear: () => { this.put({ moreOpen: false }); this.selClear(); }, selActs: [] });
         if (nsel) Object.assign(P, actsOf(this.pickTarget()));
       }
     }
@@ -9137,6 +9406,14 @@ class Component extends DCLogic {
         leave: () => this.crumbLater()
       };
     });
+    const locationPen = VV && !u.bv && psel.length === 1 && rmCur ? this.penByCode(rmCur, psel[0]) : null;
+    if (locationPen) {
+      setTitle('Pen ' + locationPen.code);
+      P.aria = 'Location card, pen ' + locationPen.code;
+      P.canBack = true;
+      P.crumbs = [{ label: '‹ ' + rcur.name, sep: false, isLink: true, isText: false, aria: 'Back to ' + rcur.name, open: false, menu: [], pick: () => this.selClear(), enter: () => {}, leave: () => {}, style: 'height: 44px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 12.5px; color: #626C66; cursor: pointer' }];
+    }
+    if (VV) P.crumbs.forEach((c) => { c.style = c.style.replace('height: 28px', 'height: 44px').replace('line-height: 28px', 'line-height: 44px'); });
     const cmCur = cmu && P.crumbs[cmu.i] ? P.crumbs[cmu.i] : null;
     const crumbMenu = cmCur ? {
       aria: cmCur.label === '…' ? 'Levels in between' : 'Siblings of ' + cmCur.label,
@@ -9226,31 +9503,16 @@ class Component extends DCLogic {
 
     // ----- View, inside a room: the header, the pig profile, the camera -----
     const vRoom = this.IP && isRoom && this.rooms ? this.rooms.find((x) => x.id === u.roomId) : null;
-    const vinfo = vRoom && this.IP.room[u.roomId] ? this.IP.room[u.roomId] : null;
-    const lr = vRoom ? this.listRows(vRoom) : { need: [], all: [] };
-    const needN = lr.need.length, urgN = lr.need.filter((x) => x.flag.lvl === 'urgent').length;
     const camOn = !!(vRoom && u.icam);
     const camRoomOn = camOn && u.icam.kind === 'room';
     const roomCams = vRoom && vRoom.cams ? vRoom.cams.filter((s) => s.kind === 'room') : [];
     const camSpot = camOn && vRoom.cams ? vRoom.cams.find((s) => s.kind === u.icam.kind && (u.icam.kind === 'room' ? s.i === (u.icam.i || 0) : s.code === u.icam.code)) : null;
     const camName = camOn ? (camSpot ? camSpot.name : (u.icam.kind === 'room' ? rcur.name + ', end wall' : 'Crate ' + u.icam.code)) : '';
     const lvlChip = (lv) => 'display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; flex: none; ' + (lv === 'urgent' ? 'background: #FBE7E4; color: #9A1F17' : 'background: #FBF0D9; color: #7A4A00');
-    const hdBase = 'height: 40px; box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; border: 1px solid #E3E6E1; border-radius: 10px; background: rgba(255, 255, 255, 0.96); color: #121815; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 8px 24px rgba(18, 24, 21, 0.06); ';
-    const hdr = {
-      text: vinfo && vinfo.short ? vinfo.short : 'No pigs yet', hasNeed: needN > 0, need: String(needN),
-      markStyle: 'display: inline-flex; align-items: center; height: 22px; padding: 0 7px; border-radius: 6px; font-size: 12.5px; font-weight: 700; color: #FFFFFF; background: ' + (urgN ? '#B3261E' : '#A35F00'),
-      aria: needN + (needN === 1 ? ' pen needs' : ' pens need') + ' a look. Go to the ' + (u.nl >= 0 ? 'next' : 'first') + ' one',
-      pill: () => this.nlGo(1), prev: () => this.nlGo(-1), next: () => this.nlGo(1),
-      hasCams: !!(vinfo && vinfo.cams), camsText: 'Cameras (' + (vinfo ? vinfo.cams : 0) + ')', cams: () => (camRoomOn ? this.closeCam() : this.openCam('room', '', 0)), camsOn: camRoomOn,
-      style: 'position: absolute; right: 16px; top: ' + (topY + 58) + 'px; z-index: 3; display: flex; align-items: center; gap: 8px',
-      pillStyle: hdBase + 'padding: 0 10px 0 14px; cursor: ' + (needN ? 'pointer' : 'default'),
-      navStyle: hdBase + 'width: 40px; padding: 0; justify-content: center',
-      camsStyle: hdBase + 'padding: 0 14px 0 12px; ' + (camRoomOn ? 'background: #121815; color: #FFFFFF; border-color: #121815' : ''),
-      hasBatch: !!(vinfo && vinfo.batch && this.batchData()[String(vinfo.batch).replace('Batch ', '')]) && !u.bv, batch: vinfo && vinfo.batch ? vinfo.batch : '', batchAria: 'Show ' + (vinfo && vinfo.batch ? vinfo.batch : 'the batch') + ' across the farm',
-      openBatch: () => { if (vinfo && vinfo.batch) this.openBatch(String(vinfo.batch).replace('Batch ', '')); }, batchStyle: hdBase + 'padding: 0 14px 0 12px'
-    };
     const penSel = vRoom && psel.length === 1 ? this.penByCode(vRoom, psel[0]) : null;
-    const pv = penSel ? this.profView(vRoom, penSel) : null;
+    const pd = penSel ? this.profData(vRoom, penSel) : null;
+    const member = pd && u.locPig != null ? pd.pigs[u.locPig] : null;
+    const pv = penSel ? this.profView(vRoom, penSel, member) : null;
     const wProf = u.narrow ? 380 : 420;
     const sideBottom = intro ? 80 : (u.bh || 70) + 32 + (camRoomOn ? 214 : 0);
     const profStyle = 'position: absolute; right: 16px; top: ' + (topY + 110) + 'px; bottom: ' + sideBottom + 'px; width: ' + wProf + 'px; max-width: calc(100% - 32px); z-index: 3; box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 10px 28px rgba(18, 24, 21, 0.09); animation: sentriRise 0.25s cubic-bezier(0.2, 0.7, 0.2, 1) both';
@@ -9260,7 +9522,7 @@ class Component extends DCLogic {
       titleStyle: (pv.titleMono ? "font-family: 'Geist Mono', ui-monospace, monospace; font-size: 20px; letter-spacing: -0.01em; " : 'font-size: 18px; ') + 'line-height: 26px; font-weight: 600; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis',
       sub: pv.sub, stage: pv.stage, hasStage: !!pv.stage, hasChip: pv.hasChip, chip: pv.chip, chipStyle: lvlChip(pv.urgent ? 'urgent' : 'watch'), why: pv.why,
       whyStyle: 'margin-top: 3px; font-size: 13.5px; line-height: 19px; font-weight: 500; color: ' + (pv.urgent ? '#9A1F17' : '#7A4A00'),
-      close: () => this.selClear(), askChat: () => { try { window.dispatchEvent(new CustomEvent('sentri:ask')); } catch (e) { /* ignore */ } }, canWatchBtn: pv.canWatch && !pv.feedOn, watch: () => this.openCam('pen', pv.code),
+      close: () => this.selClear(), back: () => this.selClear(), backLabel: u.bv ? (this.batchData()[u.bv.id] || { name: 'Batch' }).name : '', hasBack: !!u.bv, askChat: () => { try { window.dispatchEvent(new CustomEvent('sentri:ask')); } catch (e) { /* ignore */ } }, canWatchBtn: pv.canWatch && !pv.feedOn, watch: () => this.openCam('pen', pv.code),
       watchStyle: 'width: 100%; height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #121815; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer',
       feedOn: pv.feedOn, empty: pv.empty, emptyNote: pv.emptyNote, sections: pv.sections, ask: pv.ask,
       hasBatch: !!pv.batchId, batch: pv.batchId ? 'Batch ' + pv.batchId : '', batchAria: 'Show Batch ' + pv.batchId + ' across the farm', openBatch: () => this.openBatch(pv.batchId),
@@ -9333,6 +9595,10 @@ class Component extends DCLogic {
     const multi = { style: profStyle.replace(/ bottom: [0-9]+px;/, ' max-height: calc(100% - ' + (topY + 110 + sideBottom) + 'px);'), aria: psel.length + ' pens picked', title: psel.length + ' pens picked', clear: () => this.selClear(),
       rows: multiOn ? psel.map((code) => { const p = this.penByCode(vRoom, code), i = p ? this.pigInfo(vRoom, p) : null; return i ? { code: code, who: i.who, stage: i.stage || (i.lines[0] || ''), hasChip: !!i.flag, chip: i.flag ? (i.flag.lvl === 'urgent' ? 'Urgent' : 'Watch') : '', chipStyle: i.flag ? lvlChip(i.flag.lvl) : '', aria: 'Open pen ' + code, open: () => this.viewPick(code, false) } : null; }).filter(Boolean) : [] };
 
+    const loc = this.locationView(u, locationPen, pd, member);
+    P.toggleStyle = 'flex: none; width: ' + (VV ? 44 : 32) + 'px; height: ' + (VV ? 44 : 32) + 'px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 9px; background: transparent; color: #4A544E; cursor: pointer';
+    if (VV) P.aria = locationPen ? P.aria : 'Location card, ' + P.title;
+
     const introHl = [['zone', 'Zone'], ['section', 'Section'], ['room', 'Room'], ['lane', 'Lane'], ['pen', 'Pen']];
     const introText = {
       zone: 'A part of your site you keep separate, like the production area or the isolation shed.',
@@ -9358,8 +9624,8 @@ class Component extends DCLogic {
       loading: !ready || !!u.err,
       loadMsg: u.err || 'Loading the 3D model…',
       showCard: ready && !intro && !u.err,
-      showBar: ready && !intro && !u.err && !(VV && lvl !== 'room' && !P.isTask && !P.bNote && !(P.actions && P.actions.length)),
-      cardStyle: 'position: absolute; left: 16px; top: 16px; z-index: 3; width: 280px; box-sizing: border-box; display: flex; flex-direction: column; max-height: calc(100% - ' + ((u.bh || 70) + 48) + 'px); overflow: hidden; background: rgba(255, 255, 255, 0.96); border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 10px 28px rgba(18, 24, 21, 0.09)',
+      showBar: ready && !intro && !u.err,
+      cardStyle: 'position: absolute; left: 16px; top: 16px; z-index: 3; width: ' + (VV ? 360 : 280) + 'px; box-sizing: border-box; display: flex; flex-direction: column; max-height: calc(100% - ' + ((u.bh || 70) + 48) + 'px); overflow: hidden; background: rgba(255, 255, 255, 0.96); border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 10px 28px rgba(18, 24, 21, 0.09)',
       barInnerStyle: 'display: flex; flex-direction: column; min-height: 0; ' + P.fade,
       barStyle: 'position: absolute; left: 16px; right: 16px; bottom: 16px; z-index: 4; box-sizing: border-box; padding: 10px 12px; display: flex; flex-direction: column; max-height: calc(100% - 32px); overflow-y: ' + (P.isTask ? 'auto' : 'visible') + '; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 16px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 10px 28px rgba(18, 24, 21, 0.10)',
       setBarEl: (el) => { this.barEl = el || null; },
@@ -9380,7 +9646,7 @@ class Component extends DCLogic {
       nightLabel: u.night ? 'Day' : 'Night',
       nightIcon: u.night ? ic.sun : ic.moon,
       ready: ready,
-      showHead: !!vRoom, head: hdr, showProf: !!pv && !u.bv && !u.bl, prof: profT, showBatch: bvOn, bp: bpT, showMulti: false, multi: multi,
+      loc: loc, setLocBody: (el) => { this.locBody = el || null; }, setLocEquipment: (el) => { this.locEquipment = el || null; }, showProf: !!pv && (!!u.bv || intro), prof: profT, showBatch: bvOn && !pv, bp: bpT, showMulti: false, multi: multi,
       showLens: VV && isRoom, lensOn: !!u.lens, lensTitle: u.lens ? 'Hide devices' : 'Show devices', toLens: () => this.put({ lens: !this.ui().lens }),
       lensStyle: 'width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; cursor: pointer; background: ' + (u.lens ? '#EEF0EC' : 'transparent') + '; color: ' + (u.lens ? '#121815' : '#4A544E'),
       addBtnStyle: 'height: 44px; box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px 0 14px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer',
