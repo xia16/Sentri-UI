@@ -20,8 +20,6 @@ const urls = {};
 
 // [screen, file name, scroll: a selector to scroll into view before the shot]
 const screens = [
-  ['farrowing.details', 'details-top'],
-  ['farrowing.details', 'details-herself', '.finished-section:last-of-type'],
   ['pig-profile.full', 'pig-profile'],
   ['pig-profile.actions', 'pig-actions'],
   ['farrowing.count', 'count'],

@@ -34,8 +34,8 @@ Five pairs are the same shape under two names:
 
 | Group | Glyph | Meaning | First uses |
 |---|---|---|---|
-| Animals | **pig** (redrawn) | A pig of any kind or age: sow, gilt, boar, piglet (the word says which) | Farrowing Details: *This litter*; Parity; Report death: *The sow*; Piglet processing and Foster actions; + born chip; Pig profile; Home: Piglet processing, Nursery |
-| | **batch** (borderline) | A batch, such as "Batch 27": a stack of cards | *Against her batch*; Move to another farrowing batch; Batch membership; Pig profile: Batches |
+| Animals | **pig** (redrawn) | A pig of any kind or age: sow, gilt, boar, piglet (the word says which) | Parity; Report death: *The sow*; Piglet processing and Foster actions; + born chip; Pig profile; Home: Piglet processing, Nursery |
+| | **batch** (borderline) | A batch, such as "Batch 27": a stack of cards | Move to another farrowing batch; Batch membership; Pig profile: Batches |
 | | **missing** | A missing pig: a dashed circle with a question mark | Drawn for Report missing (no screen yet) |
 | Events | **service** | Service (breeding): ♀♂ | Home: Breeding section and task |
 | | **return-heat** | Return-heat check | Home: Return-heat task (was the Undo arrow) |
@@ -46,7 +46,7 @@ Five pairs are the same shape under two names:
 | | **count** | A count of animals | Reconcile piglet count |
 | Records | **record** (redrawn) | A record: a clipboard | Litter summary, Task outcomes, Pig record |
 | | **note** (redrawn) | A note: a sticky note | Pen and sow notes, Add a note |
-| | **history** | Past records, the log | Home: Records; Farrowing Details: *Against herself* (her past litters); Pig profile: Log |
+| | **history** | Past records, the log | Home: Records; Pig profile: Log |
 | | **tasks** | A list of tasks | Pig profile: Current tasks |
 | | **chart** (redrawn) | Performance over time: a line on axes | Performance metrics, Averages, Base curve |
 | | **undo** | Undo (the old `return` shape) | Farrowing: Undo; `return` becomes its alias |
@@ -68,7 +68,10 @@ Five pairs are the same shape under two names:
 
 ## The usage swaps
 
-49 swaps in five files are listed in [swaps.json](swaps.json), each with its reason. The mock applies them in memory, and `node review/icon-round/swaps.mjs --write` applies them for the build.
+Farrowing Details is the Farrowing session's page. Its section icons (This litter, Against her batch, Against herself) are chosen there, from this set. This round only supplies the icons.
+
+
+46 swaps in five files are listed in [swaps.json](swaps.json), each with its reason. The mock applies them in memory, and `node review/icon-round/swaps.mjs --write` applies them for the build.
 - **Inspection:** icon names only (`'clock'` → `'sow'`, and so on). No logic changes.
 - **Farrowing:** two action entries that had no icon get one (`Record abortion` and `Record sow death`). Everything else is a name change.
 - **Fallbacks for cut icons:**

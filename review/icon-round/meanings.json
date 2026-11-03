@@ -4,12 +4,12 @@
     [
       "Animals",
       [
-        ["pig", "redrawn", "A pig of any kind or age: sow, gilt, boar, piglet. The word says which", "Farrowing Details: This litter; Parity facet; Report death: The sow; actions: Piglet processing, Foster piglets; + born chip; Pig profile: title, General details, Basic information, Sow & cycle; Home: Piglet processing task, Nursery section"],
+        ["pig", "redrawn", "A pig of any kind or age: sow, gilt, boar, piglet. The word says which", "Parity facet; Report death: The sow; actions: Piglet processing, Foster piglets; + born chip; Pig profile: title, General details, Basic information, Sow & cycle; Home: Piglet processing task, Nursery section"],
         [
           "batch",
           "new",
           "A batch: pigs managed together (\"Batch 27\"). Borderline in the blind test: reads as a stack, fine beside the word",
-          "Farrowing Details: Against her batch; Move to another farrowing batch; Pig actions: Batch membership; Pig profile: Batches"
+          "Move to another farrowing batch; Pig actions: Batch membership; Pig profile: Batches"
         ],
         ["missing", "new", "A missing pig (a dashed circle with a question mark, no pig)", "Drawn for Report missing (no screen yet)"]
       ]
@@ -35,7 +35,7 @@
       [
         ["record", "redrawn", "A record or summary of what was done", "Litter summary, Task outcomes, Other outcomes, Pig record, Batches, Task overview"],
         ["note", "redrawn", "A note someone wrote", "Pen note, sow note, Add a note, Details (other cause)"],
-        ["history", "new", "Past records, the log", "Home: Records; Farrowing Details: Against herself; Pig profile: Log"],
+        ["history", "new", "Past records, the log", "Home: Records; Pig profile: Log"],
         ["tasks", "new", "A list of tasks", "Pig profile: Current tasks"],
         ["chart", "redrawn", "Performance over time", "Performance metrics, Averages, Base curve, Production totals & averages, Production stats"],
         ["edit", "kept", "Edit", "Edit conditions, correction banner"],
