@@ -1,0 +1,6041 @@
+{
+ "note": "Rooms as the console engine derives them (layout.engine.js derive(), 2026-11-03), trimmed to the fields ux/model/pen-map-contract.md names. Regenerate when the engine changes.",
+ "types": {
+  "sick": {
+   "name": "Sick pen",
+   "w": 250
+  },
+  "large": {
+   "name": "Sick pen, large",
+   "w": 900
+  },
+  "group": {
+   "name": "Group pen",
+   "w": 483
+  },
+  "stall": {
+   "name": "Gestation stall",
+   "w": 65
+  },
+  "weaner": {
+   "name": "Weaner pen",
+   "w": 545
+  },
+  "crate": {
+   "name": "Farrowing crate",
+   "w": 180
+  }
+ },
+ "rooms": {
+  "sketch": {
+   "code": "Z1-ISO-1",
+   "name": "Sketch room",
+   "geom": {
+    "vflip": false,
+    "dW": 1160,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 120,
+      "x1": 520,
+      "runs": [
+       {
+        "type": "sick",
+        "n": 2
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 640,
+      "x1": 1040,
+      "runs": [
+       {
+        "type": "sick",
+        "n": 2
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "large",
+        "n": 1
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 580
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 315,
+     "type": "sick"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 565,
+     "type": "sick"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 315,
+     "type": "sick"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 565,
+     "type": "sick"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 905,
+     "type": "large",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": false,
+    "dW": 1560,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 170,
+      "x1": 734,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 826,
+      "x1": 1390,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 780
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "weaner": {
+   "code": "Z1-WEA-1",
+   "name": "Weaner 1",
+   "geom": {
+    "vflip": false,
+    "dW": 680,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 0,
+      "x1": 300,
+      "runs": [
+       {
+        "type": "weaner",
+        "n": 4
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 380,
+      "x1": 680,
+      "runs": [
+       {
+        "type": "weaner",
+        "n": 4
+       }
+      ]
+     }
+    ],
+    "ends": [],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 340
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 463,
+     "type": "weaner"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 1008,
+     "type": "weaner"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 1553,
+     "type": "weaner"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 2098,
+     "type": "weaner"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 463,
+     "type": "weaner"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 1008,
+     "type": "weaner"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 1553,
+     "type": "weaner"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 2098,
+     "type": "weaner"
+    }
+   ],
+   "drawn": []
+  },
+  "acres": {
+   "code": "Z1-FAR-1",
+   "name": "Farrowing 1",
+   "geom": {
+    "vflip": false,
+    "dW": 742,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 0,
+      "x1": 260,
+      "runs": [
+       {
+        "type": "crate",
+        "n": 20
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 482,
+      "x1": 742,
+      "runs": [
+       {
+        "type": "crate",
+        "n": 20
+       }
+      ]
+     }
+    ],
+    "ends": [],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 371
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 280,
+     "type": "crate"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 460,
+     "type": "crate"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 640,
+     "type": "crate"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 820,
+     "type": "crate"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 1000,
+     "type": "crate"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 1180,
+     "type": "crate"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 1360,
+     "type": "crate"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 1540,
+     "type": "crate"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 1720,
+     "type": "crate"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 1900,
+     "type": "crate"
+    },
+    {
+     "code": "A11",
+     "lane": 0,
+     "j": 10,
+     "v": 2080,
+     "type": "crate"
+    },
+    {
+     "code": "A12",
+     "lane": 0,
+     "j": 11,
+     "v": 2260,
+     "type": "crate"
+    },
+    {
+     "code": "A13",
+     "lane": 0,
+     "j": 12,
+     "v": 2440,
+     "type": "crate"
+    },
+    {
+     "code": "A14",
+     "lane": 0,
+     "j": 13,
+     "v": 2620,
+     "type": "crate"
+    },
+    {
+     "code": "A15",
+     "lane": 0,
+     "j": 14,
+     "v": 2800,
+     "type": "crate"
+    },
+    {
+     "code": "A16",
+     "lane": 0,
+     "j": 15,
+     "v": 2980,
+     "type": "crate"
+    },
+    {
+     "code": "A17",
+     "lane": 0,
+     "j": 16,
+     "v": 3160,
+     "type": "crate"
+    },
+    {
+     "code": "A18",
+     "lane": 0,
+     "j": 17,
+     "v": 3340,
+     "type": "crate"
+    },
+    {
+     "code": "A19",
+     "lane": 0,
+     "j": 18,
+     "v": 3520,
+     "type": "crate"
+    },
+    {
+     "code": "A20",
+     "lane": 0,
+     "j": 19,
+     "v": 3700,
+     "type": "crate"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 280,
+     "type": "crate"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 460,
+     "type": "crate"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 640,
+     "type": "crate"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 820,
+     "type": "crate"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 1000,
+     "type": "crate"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 1180,
+     "type": "crate"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 1360,
+     "type": "crate"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 1540,
+     "type": "crate"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 1720,
+     "type": "crate"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 1900,
+     "type": "crate"
+    },
+    {
+     "code": "B11",
+     "lane": 1,
+     "j": 10,
+     "v": 2080,
+     "type": "crate"
+    },
+    {
+     "code": "B12",
+     "lane": 1,
+     "j": 11,
+     "v": 2260,
+     "type": "crate"
+    },
+    {
+     "code": "B13",
+     "lane": 1,
+     "j": 12,
+     "v": 2440,
+     "type": "crate"
+    },
+    {
+     "code": "B14",
+     "lane": 1,
+     "j": 13,
+     "v": 2620,
+     "type": "crate"
+    },
+    {
+     "code": "B15",
+     "lane": 1,
+     "j": 14,
+     "v": 2800,
+     "type": "crate"
+    },
+    {
+     "code": "B16",
+     "lane": 1,
+     "j": 15,
+     "v": 2980,
+     "type": "crate"
+    },
+    {
+     "code": "B17",
+     "lane": 1,
+     "j": 16,
+     "v": 3160,
+     "type": "crate"
+    },
+    {
+     "code": "B18",
+     "lane": 1,
+     "j": 17,
+     "v": 3340,
+     "type": "crate"
+    },
+    {
+     "code": "B19",
+     "lane": 1,
+     "j": 18,
+     "v": 3520,
+     "type": "crate"
+    },
+    {
+     "code": "B20",
+     "lane": 1,
+     "j": 19,
+     "v": 3700,
+     "type": "crate"
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest:door+30": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": false,
+    "dW": 1560,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 170,
+      "x1": 734,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 826,
+      "x1": 1390,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 810
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest:door-80": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": false,
+    "dW": 1560,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 170,
+      "x1": 734,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 826,
+      "x1": 1390,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 700
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest:wider-group": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": false,
+    "dW": 1560,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 150,
+      "x1": 734,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 826,
+      "x1": 1410,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 780
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest:aisle+40": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": false,
+    "dW": 1880,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 296,
+      "x1": 860,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 1020,
+      "x1": 1584,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 940
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest:moved-turned": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": false,
+    "dW": 1560,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 170,
+      "x1": 734,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 826,
+      "x1": 1390,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 780
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest:side-door": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": false,
+    "dW": 1560,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 170,
+      "x1": 734,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 826,
+      "x1": 1390,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 780
+     },
+     {
+      "main": false,
+      "side": "left",
+      "u": 0
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest:outline": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": false,
+    "dW": 1560,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 170,
+      "x1": 734,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 826,
+      "x1": 1390,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 780
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest:door-left-aisle": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": false,
+    "dW": 1560,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 170,
+      "x1": 734,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 826,
+      "x1": 1390,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 110
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest:back-door": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": false,
+    "dW": 1560,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 170,
+      "x1": 734,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 826,
+      "x1": 1390,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 780
+     },
+     {
+      "main": false,
+      "side": "back",
+      "u": 1060
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest:a-right": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": false,
+    "dW": 1560,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 826,
+      "x1": 1390,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 170,
+      "x1": 734,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 780
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 432,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 915,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 1398,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 1881,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2364,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 2847,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 3330,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 3813,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 4296,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 4779,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 5140,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest:main-back": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": true,
+    "dW": 1560,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 826,
+      "x1": 1390,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 170,
+      "x1": 734,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "back",
+      "u": 780
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 4904,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 4421,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 3938,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 3455,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2972,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 2489,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 2006,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 1523,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 1040,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 557,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 4904,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 4421,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 3938,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 3455,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2972,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 2489,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 2006,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 1523,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 1040,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 557,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest:main-left-far": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": true,
+    "dW": 1560,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 170,
+      "x1": 734,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 826,
+      "x1": 1390,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "far",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "left",
+      "u": 0
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 4904,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 4421,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 3938,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 3455,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2972,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 2489,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 2006,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 1523,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 1040,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 557,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 4904,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 4421,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 3938,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 3455,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2972,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 2489,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 2006,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 1523,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 1040,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 557,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 195,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "groupgest:row-by-door": {
+   "code": "Z1-GRO-1",
+   "name": "Gestation barn",
+   "geom": {
+    "vflip": false,
+    "dW": 1560,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 170,
+      "x1": 734,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 826,
+      "x1": 1390,
+      "runs": [
+       {
+        "type": "group",
+        "n": 10
+       }
+      ]
+     }
+    ],
+    "ends": [
+     {
+      "i": 2,
+      "at": "door",
+      "runs": [
+       {
+        "type": "stall",
+        "n": 24
+       }
+      ]
+     }
+    ],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 780
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 657,
+     "type": "group"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 1140,
+     "type": "group"
+    },
+    {
+     "code": "A3",
+     "lane": 0,
+     "j": 2,
+     "v": 1623,
+     "type": "group"
+    },
+    {
+     "code": "A4",
+     "lane": 0,
+     "j": 3,
+     "v": 2106,
+     "type": "group"
+    },
+    {
+     "code": "A5",
+     "lane": 0,
+     "j": 4,
+     "v": 2589,
+     "type": "group"
+    },
+    {
+     "code": "A6",
+     "lane": 0,
+     "j": 5,
+     "v": 3072,
+     "type": "group"
+    },
+    {
+     "code": "A7",
+     "lane": 0,
+     "j": 6,
+     "v": 3555,
+     "type": "group"
+    },
+    {
+     "code": "A8",
+     "lane": 0,
+     "j": 7,
+     "v": 4038,
+     "type": "group"
+    },
+    {
+     "code": "A9",
+     "lane": 0,
+     "j": 8,
+     "v": 4521,
+     "type": "group"
+    },
+    {
+     "code": "A10",
+     "lane": 0,
+     "j": 9,
+     "v": 5004,
+     "type": "group"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 657,
+     "type": "group"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 1140,
+     "type": "group"
+    },
+    {
+     "code": "B3",
+     "lane": 1,
+     "j": 2,
+     "v": 1623,
+     "type": "group"
+    },
+    {
+     "code": "B4",
+     "lane": 1,
+     "j": 3,
+     "v": 2106,
+     "type": "group"
+    },
+    {
+     "code": "B5",
+     "lane": 1,
+     "j": 4,
+     "v": 2589,
+     "type": "group"
+    },
+    {
+     "code": "B6",
+     "lane": 1,
+     "j": 5,
+     "v": 3072,
+     "type": "group"
+    },
+    {
+     "code": "B7",
+     "lane": 1,
+     "j": 6,
+     "v": 3555,
+     "type": "group"
+    },
+    {
+     "code": "B8",
+     "lane": 1,
+     "j": 7,
+     "v": 4038,
+     "type": "group"
+    },
+    {
+     "code": "B9",
+     "lane": 1,
+     "j": 8,
+     "v": 4521,
+     "type": "group"
+    },
+    {
+     "code": "B10",
+     "lane": 1,
+     "j": 9,
+     "v": 5004,
+     "type": "group"
+    },
+    {
+     "code": "C1",
+     "lane": 2,
+     "j": 0,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C2",
+     "lane": 2,
+     "j": 1,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C3",
+     "lane": 2,
+     "j": 2,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C4",
+     "lane": 2,
+     "j": 3,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C5",
+     "lane": 2,
+     "j": 4,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C6",
+     "lane": 2,
+     "j": 5,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C7",
+     "lane": 2,
+     "j": 6,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C8",
+     "lane": 2,
+     "j": 7,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C9",
+     "lane": 2,
+     "j": 8,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C10",
+     "lane": 2,
+     "j": 9,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C11",
+     "lane": 2,
+     "j": 10,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C12",
+     "lane": 2,
+     "j": 11,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C13",
+     "lane": 2,
+     "j": 12,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C14",
+     "lane": 2,
+     "j": 13,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C15",
+     "lane": 2,
+     "j": 14,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C16",
+     "lane": 2,
+     "j": 15,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C17",
+     "lane": 2,
+     "j": 16,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C18",
+     "lane": 2,
+     "j": 17,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C19",
+     "lane": 2,
+     "j": 18,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C20",
+     "lane": 2,
+     "j": 19,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C21",
+     "lane": 2,
+     "j": 20,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C22",
+     "lane": 2,
+     "j": 21,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C23",
+     "lane": 2,
+     "j": 22,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    },
+    {
+     "code": "C24",
+     "lane": 2,
+     "j": 23,
+     "v": 295,
+     "type": "stall",
+     "end": 0
+    }
+   ],
+   "drawn": []
+  },
+  "sketch:drawn": {
+   "code": "Z1-ISO-1",
+   "name": "Sketch room",
+   "geom": {
+    "vflip": false,
+    "dW": 1760,
+    "lanes": [
+     {
+      "i": 0,
+      "x0": 120,
+      "x1": 520,
+      "runs": [
+       {
+        "type": "sick",
+        "n": 2
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "x0": 640,
+      "x1": 1040,
+      "runs": [
+       {
+        "type": "sick",
+        "n": 2
+       }
+      ]
+     }
+    ],
+    "ends": [],
+    "doors": [
+     {
+      "main": true,
+      "side": "front",
+      "u": 580
+     }
+    ]
+   },
+   "pens": [
+    {
+     "code": "A1",
+     "lane": 0,
+     "j": 0,
+     "v": 315,
+     "type": "sick"
+    },
+    {
+     "code": "A2",
+     "lane": 0,
+     "j": 1,
+     "v": 565,
+     "type": "sick"
+    },
+    {
+     "code": "B1",
+     "lane": 1,
+     "j": 0,
+     "v": 315,
+     "type": "sick"
+    },
+    {
+     "code": "B2",
+     "lane": 1,
+     "j": 1,
+     "v": 565,
+     "type": "sick"
+    }
+   ],
+   "drawn": [
+    {
+     "code": "A3",
+     "lane": 0,
+     "v": 850,
+     "type": "sick"
+    },
+    {
+     "code": "C1",
+     "lane": null,
+     "v": 500,
+     "type": "large"
+    }
+   ]
+  }
+ }
+}
