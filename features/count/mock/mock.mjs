@@ -14,6 +14,9 @@ fs.mkdirSync(out, { recursive: true });
 const port = 4751;
 const server = spawn(process.execPath, [path.join(root, 'scripts/serve-ux.cjs'), String(port)], { cwd: root, stdio: 'ignore' });
 await new Promise((r) => setTimeout(r, 600));
+// A failed page step must not leave the server holding the process open.
+const fail = (e) => { console.error(e); server.kill(); process.exit(1); };
+process.on('uncaughtException', fail); process.on('unhandledRejection', fail);
 const b = await chromium.launch();
 
 // A tally glyph for Count (a proposed icon-registry addition: nothing in the registry draws a count yet).
@@ -390,14 +393,6 @@ if (want('13-')) {
     key: '', left: '<div class="m-left"><strong>Pigs in?</strong><small>Count each pen</small></div>', cta: 'Count pens',
   });
 }
-if (want('13b')) {
-  const tiles = {}; for (const c of ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7']) tiles[c] = [''];
-  await receiveMap('mock-13b-receive-crates.png', {
-    title: 'Receive sows', line: 'Batch 31 · into Gestation 2', lanes: ['A', 'B', 'C', 'D'], depth: 8, tiles,
-    facts: [['Arriving', '14'], ['Crates', '14']],
-    key: '', left: '<div class="m-left"><strong>One sow a crate</strong><small>Into the white crates</small></div>', cta: 'Check in sows',
-  });
-}
 if (want('14-')) {
   const tiles = { A1: ['15', 'm-done'], A2: ['16', 'm-done'], A3: ['14', 'm-done'], B1: ['15', 'm-done'], A4: ['15', 'm-todo'], B2: ['15', 'm-todo'], B3: ['15', 'm-todo'], B4: ['15', 'm-todo'] };
   await receiveMap('mock-14-receive-count.png', {
@@ -442,31 +437,108 @@ if (want('12')) {
   await shoot(p, 'mock-12-receive-pen.png');
 }
 
-// 9. Pigs to move: a reference list of what moves. A pen sending only some says how many of how many; the pigs that stay fold away
-//    behind one quiet line (owner, 2026-11-03: users don't need them, Expand shows them). 9b: expanded.
-for (const [name, open9] of [['mock-9-transfer-out.png', false], ['mock-9b-transfer-out-expanded.png', true]]) {
+// 9. Pigs to move (owner, 2026-11-03): the source room's pen map. A pen whose pigs all go shows the move glyph; a pen sending some
+//    shows how many of how many (12/13). Tap a partial pen: its pigs, a toggle between those that move and those that stay (9b, 9c).
+//    Farrowing room 3: A1 12 · A2 11 · A3 12 of 13 · A4 10 · B1 13 · B2 11 · B3 12 · B4 9 of 10 · C1–C3 10 each = 120.
+const MOVE = { A1: 'all', A2: 'all', A3: '12/13', A4: 'all', B1: 'all', B2: 'all', B3: 'all', B4: '9/10', C1: 'all', C2: 'all', C3: 'all' };
+if (want('9-')) {
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate(({ UNIT_CSS, PLAN_CSS, MOVE }) => {
+    const { U, ic, page } = window.M;
+    const pens = {}; for (const c of Object.keys(MOVE)) pens[c] = 'plain';
+    const host = document.createElement('div'); host.innerHTML = U.penMap({ lanes: ['A', 'B', 'C'], depth: 4, pens, key: 'move' });
+    host.querySelectorAll('.st-pen-tile').forEach((t) => {
+      const c = t.dataset.pen, v = MOVE[c];
+      t.innerHTML = '<span class="m-pc">' + c + '</span>' + (!v ? '' : v === 'all' ? '<span class="m-pi">' + ic('transfer') + '</span>' : '<span class="m-pn m-part">' + v + '</span>');
+    });
+    const head = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>120</strong><span>pigs to move</span></div><small>From Farrowing room 3 to Unit 9 · today</small></div>';
+    const key = '<p class="m-plankey"><span class="m-ki">' + ic('transfer') + 'All move</span><span><b>12/13</b> Some move · tap to see</span></p>';
+    page('Pigs to move', 'Transfer · batch 25', head + key + '<div class="m-map">' + host.innerHTML + '</div>', '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Receive in Unit 9', register: 'primary', action: 'x' }) + '</div>');
+    const st = document.createElement('style'); st.textContent = UNIT_CSS + PLAN_CSS + `.m-count .m-map .st-pen-tile .m-pi svg{width:22px;height:22px;display:block;color:var(--ink,#20291f)}
+      .m-count .m-map .st-pen-tile .m-pn.m-part{font-size:17px}
+      .m-count .m-plankey .m-ki{display:inline-flex;align-items:center;gap:6px}.m-count .m-plankey .m-ki svg{width:16px;height:16px}`;
+    document.head.append(st);
+  }, { UNIT_CSS, PLAN_CSS, MOVE });
+  await shoot(p, 'mock-9-transfer-out.png');
+}
+for (const [name, view] of [['mock-9b-pen-move.png', 'move'], ['mock-9c-pen-stay.png', 'stay']]) {
   if (!want(name.slice(5, 7))) continue;
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
-  await p.evaluate(({ UNIT_CSS, open9 }) => {
+  await p.evaluate(({ UNIT_CSS, view }) => {
     const { U, ic, page } = window.M;
-    const DOWN = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="' + (open9 ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6') + '"/></svg>';
-    const pen = (code, head, rows) => '<section class="inspect-pen m-card"><header class="inspect-pen-head"><span class="pen-name"><strong>' + code + '</strong><small>· ' + head + '</small></span></header>' + rows + '</section>';
-    const heads = (n) => U.row({ icon: ic('tag-off'), title: n + ' pigs', description: 'Without ear tags' });
-    const tagged = (id, ctx) => U.row({ code: id, description: ctx, trail: 'chevron', action: 'x' });
-    const stays = (n) => '<button type="button" class="m-more">' + (open9 ? 'Hide' : 'Show') + ' ' + n + ' that stays' + DOWN + '</button>';
-    const head = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>120</strong><span>pigs to move</span></div><small>From Farrowing room 3 to Unit 9 · today</small></div>';
-    const list = '<div class="inspect-list m-list">'
-      + pen('B1', 'all 11', heads(11))
-      + pen('B2', '12 of 13', heads(12) + (open9 ? U.row({ code: '000901', description: 'Stays in B2', className: 'm-stays' }) : '') + stays(1))
-      + pen('B3', 'all 10', heads(10))
-      + pen('B4', 'all 13', heads(12) + tagged('000904', 'Gilt')) + '</div>';
-    page('Pigs to move', 'Transfer · batch 25', head + list, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Receive in Unit 9', register: 'primary', action: 'x' }) + '</div>');
-    const st = document.createElement('style'); st.textContent = UNIT_CSS + `.m-stays .st-row-code,.m-stays .st-row-copy small{color:var(--muted,#657060)}
-      .m-more{display:flex;align-items:center;gap:6px;width:100%;min-height:48px;padding:0 16px;border:0;border-top:1px solid var(--rule,#e9ece3);background:none;font:500 13px var(--font-sans,'Plus Jakarta Sans',sans-serif);color:var(--muted,#657060)}`;
-    document.head.append(st);
-  }, { UNIT_CSS, open9 });
+    const toggle = U.segment({ variant: 'view-switch', options: [['move', 'Move · 12'], ['stay', 'Stay · 1']], active: view, action: 'x', ariaLabel: 'Pigs in A3' });
+    const rows = view === 'move'
+      ? U.row({ icon: ic('tag-off'), title: '11 pigs', description: 'Without ear tags' }) + U.row({ code: '000904', description: 'Gilt', trail: 'chevron', action: 'x' })
+      : U.row({ code: '000901', description: 'Gilt', trail: 'chevron', action: 'x' });
+    page('A3', 'Pigs to move · 12 of 13', '<section class="feature-section">' + toggle + '</section><section class="feature-section">' + U.rowGroup(rows) + '</section>', '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + '</div>');
+    const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
+  }, { UNIT_CSS, view });
   await shoot(p, name);
+}
+
+// 16. End the transfer (owner, 2026-11-03: "look at how we do it for the farrowing end task"): Farrowing's End task, its own parts.
+//     The heading answers whether the task can close; one bar over the batch's pigs, then a row per part (Received, Still to count,
+//     Not arrived, which leaves the batch on the balancing sheet with the amber "!"); a count card (sent against counted); what
+//     ending does; the hold. These need Farrowing's End task (PR 294): run from a checkout that has it.
+const FARROW = `http://localhost:${port}/ux/system/farrowing-astra-concept.html?layout=focus`;
+const END = [
+  ['mock-16-end-blocked.png', 'task-blocked', {
+    heading: 'Before you can end', meta: '120 pigs', segs: [['farrowed', 105], ['active', 15]],
+    parts: [['done', 105, 'Received', 'Counted into 7 pens in Unit 9', false], ['active', 15, 'Still to count', 'Count B4 to end the task', true]],
+    sent: 120, counted: 105, countedNote: 'B4 not counted yet', tagged: 2,
+    ends: [['Recorded in Unit 9', '105'], ['Left in Farrowing room 3', '0']], owe: null,
+    hold: ['End task early', 'COUNT B4 FIRST', true],
+  }],
+  ['mock-16b-end-early.png', 'task-ready', {
+    heading: 'Ready to end early', meta: '120 pigs', segs: [['farrowed', 119], ['awaiting', 1]],
+    parts: [['done', 119, 'Received', 'Counted into 8 pens in Unit 9', false], ['awaiting', 1, 'Not arrived', 'Goes on the balancing sheet at the end', true, true]],
+    sent: 120, counted: 119, countedNote: '1 not arrived', tagged: 2,
+    ends: [['Recorded in Unit 9', '119'], ['Left in Farrowing room 3', '0']], owe: ['To the balancing sheet', '1', 'A loss if not found by batch end'],
+    hold: ['End task early', 'HOLD TO END EARLY', false, true],
+  }],
+  ['mock-16c-end-ready.png', 'task-complete', {
+    heading: 'Ready to end', meta: '120 pigs', segs: [['farrowed', 120]],
+    parts: [['done', 120, 'Received', 'Counted into 8 pens in Unit 9', false]],
+    sent: 120, counted: 120, countedNote: 'All arrived', tagged: 2,
+    ends: [['Recorded in Unit 9', '120'], ['Left in Farrowing room 3', '0']], owe: null,
+    hold: ['End task', 'HOLD TO END', false],
+  }],
+];
+for (const [name, screen, d] of END) {
+  if (!want(name.slice(5, 8))) continue;
+  const p = await b.newPage({ viewport: { width: 390, height: 844 } });
+  await p.goto(`${FARROW}&screen=farrowing.${screen}`);
+  await p.waitForSelector('html.atlas-ready', { timeout: 15000 });
+  await p.evaluate((d) => {
+    const U = window.SentriUI, ic = (k) => window.SentriIcons.icon(k);
+    const sheet = document.querySelector('.task-end-sheet');
+    const total = d.segs.reduce((a, s) => a + s[1], 0);
+    const bar = '<span class="task-status-bar" role="progressbar">' + d.segs.map(([k, n]) => '<i class="task-status-' + k + '" style="width:' + (100 * n / total) + '%"></i>').join('') + '</span>';
+    const alert = document.querySelector('.st-alert-dot')?.outerHTML || '';
+    const chev = document.querySelector('.task-closure-row .st-row-chevron')?.outerHTML || '';
+    const part = ([k, n, title, sub, door, warn]) => (door ? '<button class="st-row task-closure-row" data-ds="Row" data-variant="navigation" type="button" data-part="' + k + '">' : '<div class="st-row task-closure-row" data-ds="Row" data-variant="navigation" data-part="' + k + '">')
+      + '<span class="st-row-icon"><span class="task-closure-count">' + n + '</span></span><span class="st-row-copy"><strong>' + title + (warn ? alert : '') + '</strong><small>' + sub + '</small></span>' + (door ? chev + '</button>' : '</div>');
+    const closure = '<section class="task-closure">' + U.heading({ title: d.heading, meta: d.meta, kind: 'section', level: 4 })
+      + '<div class="task-closure-surface st-panel">' + bar + '<div class="st-row-group">' + d.parts.map(part).join('') + '</div></div></section>';
+    const count = '<section class="task-performance">' + U.heading({ title: 'Count', icon: ic('tag'), meta: 'Batch 25', kind: 'section', level: 4 })
+      + '<div class="task-perf-card st-panel"><div class="task-perf-kpis"><div><span>Sent</span><strong>' + d.sent + '</strong><small>From Farrowing room 3</small></div><div><span>Counted</span><strong>' + d.counted + '</strong><small>' + d.countedNote + '</small></div></div>'
+      + '<dl class="task-perf-facts"><div><dt>Pens</dt><dd>' + (d.counted === 105 ? 7 : 8) + '<small>of 8</small></dd></div><div><dt>Per pen</dt><dd>' + (d.counted / (d.counted === 105 ? 7 : 8)).toFixed(1) + '</dd></div><div><dt>Ear tags</dt><dd>' + d.tagged + '</dd></div></dl></div></section>';
+    // What ending does, in the summary rows Farrowing's Other outcomes uses; the one that needs following up is a door.
+    const rows = d.ends.map(([title, n]) => U.row({ title, variant: 'summary-count', trailing: { text: n } })).join('')
+      + (d.owe ? U.row({ title: d.owe[0], description: d.owe[2], variant: 'summary-count', trailing: { text: d.owe[1] }, action: 'x', trail: 'chevron' }) : '');
+    const ends = '<section class="task-other-outcomes">' + U.heading({ title: 'When you end', icon: ic('record'), kind: 'section', level: 4 }) + '<div class="task-other-surface st-panel st-row-group">' + rows + '</div></section>';
+    sheet.querySelector('.sheet-body').innerHTML = closure + ends + count;
+    const [label, caption, waiting, danger] = d.hold;
+    sheet.querySelector('.sheet-footer').innerHTML = U.holdButton({ action: 'x', label, tone: danger || waiting ? 'danger' : 'primary', waiting, caption, className: label === 'End task' ? 'task-complete' : 'task-end-confirm' });
+    sheet.querySelector('.st-page-title').textContent = 'End task';
+    const line = document.createElement('p'); line.className = 'st-header-line'; line.textContent = 'Transfer · batch 25';
+    sheet.querySelector('.st-page-titles').append(line);
+  }, d);
+  await p.waitForTimeout(500);
+  await p.screenshot({ path: path.join(out, name) });
+  await p.close();
 }
 
 await b.close(); server.kill();
