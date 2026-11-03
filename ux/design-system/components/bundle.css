@@ -1680,6 +1680,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .hand-pen-bar .st-choice-search{margin:0}
 /* Her piglets (owner, 2026-11-03): Inspection's pen list for one litter; search with scan inside above it, Tick all beside the heading. */
 .farrowing-phone .litter-list .litter-bar{margin:0 0 8px}
+.farrowing-phone .litter-door{margin:var(--space-12) 0 var(--space-18)}   /* her record's Piglets row: between Sow died (or her card) and what follows */
 .farrowing-phone .litter-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .farrowing-phone .litter-head .st-heading{flex:1;min-width:0;margin:0}
 .farrowing-phone .litter-head{margin-bottom:8px}

@@ -265,7 +265,7 @@ function atlasScreen(s,c){
  if(v==='profile'&&s.actionsEntry)return 'farrowing.sow-actions';
  return null;
 }
-const presets=[['room','Room list'],['count','Counting'],['visit','Counting · not saved yet'],['saved','Counting · just saved'],['undo','Undo the last save'],['litter','Details · while she farrows'],['details','Details · a finished sow'],['details-first','Details · no earlier litters'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['locked','Locked record'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · allocate piglets'],['piglets-dead','Piglets · a dead sow'],['piglets-ticked','Piglets · three ticked'],['piglets-actions','Piglets · Actions'],['piglets-sow','Piglets · foster to a sow'],['piglets-filter','Piglets · filter sows'],['piglets-confirm','Piglets · confirm the sow'],['piglets-after','Piglets · after a send'],['piglets-pen','Piglets · move to a pen'],['piglets-live','Piglets · a finished sow'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['foster-search','Foster · search a pen'],['foster-scanning','Foster · scanning'],['foster-send','Foster · send to a sow'],['foster-filter','Foster · filter sows'],['foster-receive','Foster · receive piglets'],['reconcile','Reconcile piglet count'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · listening'],['scan-read','Scan · her drawer opened'],['scan-pig','Scan · a pig not in Farrowing'],['scan-dead','Scan · a pig that died'],['scan-unknown','Scan · a tag with no pig'],['scan-stopped','Scan · stopped'],['batch-sheet','Actions · pigs in this unit'],['batch-none','Choose pigs · none yet'],['batch-pick','Choose pigs · 3 chosen'],['batch-search','Choose pigs · search'],['batch-filter','Choose pigs · filter'],['batch-scanning','Choose pigs · scanning'],['batch-waiting','Choose pigs · waiting for the reader'],['batch-missed','Choose pigs · reads that cannot join'],['batch-form','Actions · the form'],['batch-saved','Actions · saved']];
+const presets=[['room','Room list'],['count','Counting'],['visit','Counting · not saved yet'],['saved','Counting · just saved'],['undo','Undo the last save'],['litter','Details · while she farrows'],['details','Details · a finished sow'],['details-first','Details · no earlier litters'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['locked','Locked record'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · her piglets'],['piglets-dead','Piglets · a dead sow'],['piglets-ticked','Piglets · three ticked'],['piglets-actions','Piglets · Actions'],['piglets-sow','Piglets · foster to a sow'],['piglets-filter','Piglets · filter sows'],['piglets-confirm','Piglets · confirm the sow'],['piglets-after','Piglets · after a send'],['piglets-pen','Piglets · move to a pen'],['piglets-live','Piglets · a finished sow'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['foster-search','Foster · search a pen'],['foster-scanning','Foster · scanning'],['foster-send','Foster · send to a sow'],['foster-filter','Foster · filter sows'],['foster-receive','Foster · receive piglets'],['reconcile','Reconcile piglet count'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · listening'],['scan-read','Scan · her drawer opened'],['scan-pig','Scan · a pig not in Farrowing'],['scan-dead','Scan · a pig that died'],['scan-unknown','Scan · a tag with no pig'],['scan-stopped','Scan · stopped'],['batch-sheet','Actions · pigs in this unit'],['batch-none','Choose pigs · none yet'],['batch-pick','Choose pigs · 3 chosen'],['batch-search','Choose pigs · search'],['batch-filter','Choose pigs · filter'],['batch-scanning','Choose pigs · scanning'],['batch-waiting','Choose pigs · waiting for the reader'],['batch-missed','Choose pigs · reads that cannot join'],['batch-form','Actions · the form'],['batch-saved','Actions · saved']];
 const cards=[{title:'Find the next sow',caption:'<strong>The room, in context.</strong> Filter by state, jump to a pen, and open each sow’s live record.',initial:'room'},{title:'Finish with confidence',caption:'<strong>Two observations, then the lock.</strong> Clear rows, optional details and a deliberate final action.',initial:'finish'},{title:'Read the whole litter',caption:'<strong>Current facts, with their context.</strong> Finish details stay readable; the history opens on its own page.',initial:'locked'}];
 const states=cards.map(c=>{const r=seed(c.initial);restoreDraft(r);return r;});
 // Scenario gate hook (scripts/run-scenarios.mjs): read-only access to the live records for record assertions. Draws nothing.
@@ -406,7 +406,7 @@ function taskOverview(c){
 // THE sow row (owner approved 2026-10-12): the room list, Find a sow and Scan results all draw it here, and nowhere else. Two lines each side.
 // Left: the ear tag exactly as stored (16px/600 mono, always ink, even for a sow that died) over 13px muted context: Parity on a waiting sow,
 // when · who on a recorded one, "Pen B3 · …" in a flat result. Right, right-aligned: the figure (16px) over the state word (13px).
-// The level sets the weight and colour. Act now (overdue; sow died with piglets to allocate): red figure, red word, the one "!" icon in a row.
+// The level sets the weight and colour. Act now (overdue): red figure, red word, the one "!" icon in a row.
 // Live (farrowing): bold figure. Coming up (due today or tomorrow): ink figure, muted word. Settled (done, due in 2+ days, aborted, hand-reared
 // piglets): muted. Recorded counts only: alive always, dead only above zero, never born. One quiet chevron, no pencil: the row opens the record.
 // Row strings are in the registry (ux/laws/strings.json, fr.*); ?lang=zh draws these rows in Chinese (the rest of the page is English).
@@ -415,7 +415,7 @@ const rowText={
  sowDied:ZH?'母猪死亡':'Sow died',farrowing:ZH?'分娩中':'Farrowing',aborted:ZH?'流产':'Aborted',yesterday:ZH?'昨天':'yesterday',
  dead:n=>ZH?`死亡${n}头`:`${n} dead`,alive:n=>ZH?`存活${n}头`:`${n} alive`,
  parity:n=>ZH?`胎次${n}`:`Parity ${n}`,ago:ZH?'1小时前':'1h ago',justNow:ZH?'刚刚':'just now',
- pen:p=>ZH?`${p}栏`:`Pen ${p}`,allocWord:ZH?'待分配':'to allocate',handWord:ZH?'人工哺育':'hand-reared',
+ pen:p=>ZH?`${p}栏`:`Pen ${p}`,pigletsWord:ZH?'头仔猪':'piglets',
  outcome:o=>ZH?{'not-in-pig':'未怀孕',removed:'已移出批次'}[o]:{'not-in-pig':'Not in pig',removed:'Removed from batch'}[o]
 };
 // Days to due from her due text: negative when late.
@@ -427,8 +427,7 @@ function sowFacts(r){
  const diedAt=r.events.find(e=>e.text.startsWith('Sow died')),abortAt=r.events.find(e=>e.text.startsWith('Abortion'));
  let word,figure,level,context='';
  if(r.ended){word=rowText.sowDied;
-  if(r.handReared){figure=`${r.alive} ${rowText.handWord}`;level='soon';context=at(r.handReared.at,r.handReared.who);}
-  else{figure=`${r.alive} ${rowText.allocWord}`;level='act';context=at(diedAt?.day==='Today'?diedAt.time:rowText.yesterday,initials(diedAt?.who));}}
+  figure=`${r.alive} ${rowText.pigletsWord}`;level='settled';context=at(diedAt?.day==='Today'?diedAt.time:rowText.yesterday,initials(diedAt?.who));}   // her piglets stay with her until someone moves them: nothing to decide
  else if(r.productionOutcome==='abortion'){word=rowText.aborted;figure=counts(r.alive);level='settled';context=at(abortAt?.time,initials(abortAt?.who||'G. Hansen'));}
  else if(r.productionOutcome){word=rowText.outcome(r.productionOutcome);figure='';level='settled';}
  else if(state==='Awaiting'){const n=dueDays(r.due||'Due today');context=rowText.parity(r.parity);
@@ -910,6 +909,12 @@ function recordNavigation(primary=''){return footer(SentriUI.backButton({action:
 function litterDraft(s){if(!s.fosterDraft?.alloc)s.fosterDraft={...fosterStart(s,0),ids:[],count:0,alloc:true};return s.fosterDraft;}
 const litterPicked=s=>s.fosterDraft?.alloc?s.fosterDraft.ids.length+s.fosterDraft.count:0;
 const pigletWord=n=>`${n} piglet${n===1?'':'s'}`;
+// Her record leads to her piglets (owner, 2026-11-03: "we show that sow has died, and then the piglet list"): a dead sow's right under
+// Sow died, a finished sow's under her card. A sow still farrowing keeps her counting drawer; Foster is in her Actions.
+function litterDoor(s){
+ if(!s.alive)return '';
+ return `<div class="litter-door">${SentriUI.rowGroup(SentriUI.row({variant:'navigation',icon:icon('pig'),title:'Piglets',description:'Foster or move',trail:'chevron',action:'pigletList'}))}</div>`;
+}
 function litterRows(s){
  const f=litterDraft(s),noId=fosterNoId(s),q=(f.idQ||'').trim().toLowerCase();
  const shown=fosterIds(s).filter(p=>!q||p.tag.toLowerCase().includes(q));
@@ -1003,8 +1008,8 @@ function finishedDetails(s){
 function locked(s){
  const e=s.events[0];
  const ab=s.productionOutcome==='abortion'?s.events.find(e=>e.text.startsWith('Abortion')):null;
- if(!ab&&!s.ended)return {cls:'completed-record-body finished-record-body',body:finishedCard(s),footer:footer(SentriUI.backButton({action:'close'}),btn('sowActions',`${icon('more')}<span>Actions</span>`,'button primary').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)+btn('death',`${icon('death')}<span>Record dead</span>`,'button secondary'),'execution-completion finished-footer')};
- const body=ab?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Aborted',ab.text.replace(/^Abortion · ?/,''),[ab.day,ab.time].filter(Boolean).join(' '),initials(ab.who)].filter(Boolean).join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:s.ended?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Sow died',s.sowCause.toLowerCase(),...diedStamp(s)].join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:'';
+ if(!ab&&!s.ended)return {cls:'completed-record-body finished-record-body',body:finishedCard(s)+litterDoor(s),footer:footer(SentriUI.backButton({action:'close'}),btn('sowActions',`${icon('more')}<span>Actions</span>`,'button primary').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)+btn('death',`${icon('death')}<span>Record dead</span>`,'button secondary'),'execution-completion finished-footer')};
+ const body=ab?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Aborted',ab.text.replace(/^Abortion · ?/,''),[ab.day,ab.time].filter(Boolean).join(' '),initials(ab.who)].filter(Boolean).join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:s.ended?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Sow died',s.sowCause.toLowerCase(),...diedStamp(s)].join(' · ')})}${litterDoor(s)}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:'';
  return {cls:'completed-record-body',body:`${body}${recordActions(s)}`,footer:recordNavigation()};
 }
 // Report death while she farrows (owner, 2026-10-23): a level of the drawer. What died is one choice (Born dead, Died after birth, or the
