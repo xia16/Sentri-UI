@@ -1333,23 +1333,126 @@
      columns and numbers always the rows, so the map uses the phone's height; it is drawn as seen from the door (the
      Entrance band): pen 1 is nearest it, at the top. A tile is a button that goes to its pen and says nothing but the pen
      code; its colour is its status. When the lanes do not fit at 56px the map scrolls sideways; the tiles never shrink.
-     penMap({ lanes, depth, pens:{ B3:'act'|'live'|'plain'|'hidden' }, current, action, key, rangeSize, entrance,
-     labels, peek }): the Entrance band and the map. A pen missing from `pens` is empty; 'hidden' is a pen with
-     sows the current list does not show. Empty and hidden tiles are disabled. The colour key is the sheet's header line: penMapKey({ pens, words }) gives its items, the count of pens at each
-     coloured level, and a level with none is left out. `peek(code)` returns the HTML of the hold-to-peek card for a pen (see penPeek).
-     penMapFooter({ back, depth, rangeSize, label }): Back, and beside it the range control when a row has more than
-     rangeSize pens. The map opens scrolled so its current pen is in view; the range control follows the map's scroll. */
-  const PEN_LEVELS=['act','live','plain','hidden'],PEN_HOLD_MS=350,PEN_SLOP=12,PEN_GAP=8,penPeeks=new Map();
+     penMap({ lanes, depth, pens:{ B3:'act'|'live'|'plain'|'hidden' }, current, action, key, entrance, labels, peek }):
+     the Entrance band and the map. A pen missing from `pens` is empty; 'hidden' is a pen with sows the current list does
+     not show. Empty and hidden tiles are disabled. The colour key is the sheet's header line: penMapKey({ pens, words })
+     gives its items, the count of pens at each coloured level, and a level with none is left out. `peek(code)` returns the
+     HTML of the hold-to-peek card for a pen (see penPeek). penMapFooter({ back }): Back. The map opens scrolled so its
+     current pen is in view; a map more than two screens tall adds Whole room beside Back (see penWhole). */
+  const PEN_LEVELS=['act','live','plain','hidden'],PEN_HOLD_MS=350,PEN_SLOP=12,PEN_GAP=8,PEN_TILE=56,PEN_CAP=1.68,PEN_STEPS=[2,5,10,25,50],penPeeks=new Map(),penRooms=new Map();
   let penHold=null,penSwallow=false;
-  const penLabels=o=>Object.assign({map:'Pens',act:'needs you',live:'farrowing',plain:'has sows',empty:'empty',hidden:'no sows match',pen:c=>'Pen '+c},o);
-  function penMap({lanes=['A','B','C','D'],depth=6,pens={},current='',action='pen',key='pen-map',rangeSize=20,entrance='Entrance',labels={},peek=null,className=''}={}){
-    const L=penLabels(labels),rows=Array.from({length:Math.max(1,depth|0)},(_,i)=>i+1);
+  const penLabels=o=>Object.assign({map:'Pens',act:'needs you',live:'farrowing',plain:'has sows',empty:'empty',hidden:'no sows match',pen:c=>'Pen '+c,pens:r=>'Pens '+r,whole:'Whole room',byPen:'Pen by pen'},o);
+  /* A pen's size says what it is: a tile is as tall as its pen is long along the lane, against the room's other pens. The
+     room's shortest pen is 56px and nothing is smaller; the longest is at most PEN_CAP times that (94px: on a 390 × 844 phone,
+     four of the biggest pens fit in a lane under the letters). Within that the ratios are true;
+     past it they are compressed together and keep their order (log of the ratio). One size, or none given: every tile 56px. */
+  function penSizes(cms){
+    const s=cms.filter(v=>v>0);if(!s.length)return()=>PEN_TILE;
+    const lo=Math.min(...s),r=Math.max(...s)/lo,p=r>PEN_CAP?Math.log(PEN_CAP)/Math.log(r):1;
+    return v=>v>0?Math.round(PEN_TILE*Math.pow(v/lo,p)):PEN_TILE;
+  }
+  function penMap({lanes=['A','B','C','D'],depth=6,rows=[],apart=[],aSide='left',entranceAt='middle',backDoor=null,pens={},current='',action='pen',key='pen-map',entrance='Entrance',labels={},peek=null,className=''}={}){
+    const L=penLabels(labels);
     if(typeof peek==='function')penPeeks.set(key,peek);else penPeeks.delete(key);
     const level=c=>PEN_LEVELS.includes(pens[c])?pens[c]:'empty';
-    const tile=c=>{const l=level(c),off=l==='empty'||l==='hidden';
-      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc(L.pen(c)+', '+L[l])}">${esc(c)}</button>`;};
-    const grid=`<div class="st-pen-grid" style="--pm-lanes:${lanes.length}"><span class="st-pen-col st-pen-row" aria-hidden="true"></span>${lanes.map(c=>`<span class="st-pen-col" aria-hidden="true">${esc(c)}</span>`).join('')}${rows.map(n=>`<span class="st-pen-row" data-row="${n}" aria-hidden="true">${n}</span>${lanes.map(c=>tile(c+n)).join('')}`).join('')}</div>`;
-    return `<div class="st-pen-map${className?' '+esc(className):''}" data-ds="PenMap" data-key="${esc(key)}"${current?` data-current="${esc(current)}"`:''}${rows.length>99?' data-wide':''}><div class="st-pen-entrance">${sGlyph('arrow-down')}<span>${esc(entrance)}</span></div><div class="st-pen-field"><div class="st-pen-scroll" role="group" aria-label="${esc(L.map)}">${grid}</div><div class="st-pen-peek" hidden></div></div></div>`;
+    const tile=(c,at='')=>{const l=level(c),off=l==='empty'||l==='hidden';
+      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${at}${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc(L.pen(c)+', '+L[l])}">${esc(c)}</button>`;};
+    const band=(cls,text,at,extra='')=>`<div class="${cls}"${at==='left'||at==='right'?` data-at="${at}"`:''}${extra}>${sGlyph('arrow-down')}<span>${esc(text)}</span></div>`;
+    const letterOf=i=>String.fromCharCode(65+i),runsOf=l=>typeof l==='string'?[]:l.runs||[];
+    const sizeOf=penSizes([...lanes.flatMap(l=>runsOf(l).map(r=>r.size)),...rows.flatMap(w=>(w.runs||[]).map(r=>r.size))]);
+    const ls=lanes.map((l,i)=>typeof l==='string'?{letter:l,runs:[{n:Math.max(1,depth|0),h:PEN_TILE}]}:{letter:l.letter||letterOf(i),runs:(runsOf(l).length?runsOf(l):[{n:l.n||depth}]).map(r=>({n:r.n|0,h:sizeOf(r.size)}))});
+    const rs=rows.map((w,i)=>({letter:w.letter||letterOf(ls.length+i),at:w.at==='door'?'door':'far',runs:(w.runs||[]).map(r=>({n:r.n|0,h:sizeOf(r.size)}))}));
+    penRooms.set(key,{ls,rs,apart,aSide,tile,level,L});
+    let grid,tall;
+    if(lanes.every(l=>typeof l==='string')&&!rows.length&&!apart.length&&aSide!=='right'&&!backDoor){
+      const rows=Array.from({length:Math.max(1,depth|0)},(_,i)=>i+1);tall=rows.length>99;
+      grid=`<div class="st-pen-grid" style="--pm-lanes:${lanes.length}"><span class="st-pen-col st-pen-row" aria-hidden="true"></span>${lanes.map(c=>`<span class="st-pen-col" aria-hidden="true">${esc(c)}</span>`).join('')}${rows.map(n=>`<span class="st-pen-row" data-row="${n}" aria-hidden="true">${n}</span>${lanes.map(c=>tile(c+n)).join('')}`).join('')}</div>`;
+    }else({tall,html:grid}=penPlaced({ls,rs,apart,aSide,backDoor,tile,band}));
+    return `<div class="st-pen-map${className?' '+esc(className):''}" data-ds="PenMap" data-key="${esc(key)}"${current?` data-current="${esc(current)}"`:''}${tall?' data-wide':''}>${band('st-pen-entrance',entrance,entranceAt)}<div class="st-pen-field"><div class="st-pen-scroll" role="group" aria-label="${esc(L.map)}">${grid}</div><div class="st-pen-peek" hidden></div></div></div>`;
+  }
+  const penH=h=>h!==PEN_TILE?`min-height:${h}px`:'';
+  const penStyle=(...parts)=>{const s=parts.filter(Boolean).join(';');return s?` style="${s}"`:'';};
+  /* A room as the farm layout describes it (2026-11-02, rows and sizes 2026-11-03): lanes of different lengths, lanes made
+     of runs of different pen types, rows of pens across the room, pens on their own, lane A on the right, a back door.
+     A lane stops where its pens stop. When every lane pen is one size, rows stay pen numbers (lane A's pen 11 and lane B's
+     pen 11 share a row, the number on the left). When the lanes hold pens of different sizes, each lane is a column of its
+     own pens, each as tall as its size (penSizes): the size says the type, so nothing is named, and there are no row numbers
+     (the codes carry them). A row across the room (the layout's end row) stands where you meet it: by the door before the
+     lanes, at the far end after them, laid out under the lanes by the row-grid rule (1-4 on one line, then the fewest even
+     lines, four across at most), counted from lane A's side; one pen is one wide tile. A pen on its own takes a column of
+     its own beyond the last lane. Drawn shapes are tiles. */
+  function penPlaced({ls,rs,apart,aSide,backDoor,tile,band}){
+    const laneOf=code=>String(code).replace(/\d+$/,'');
+    for(const l of ls)l.len=l.runs.reduce((a,r)=>a+r.n,0);
+    const order=[...ls.map(l=>l.letter),...apart.map(p=>laneOf(p.code))];
+    if(aSide==='right')order.reverse();
+    const stacked=new Set(ls.flatMap(l=>l.runs.filter(r=>r.n>0).map(r=>r.h))).size>1,g=stacked?0:1;
+    const col=c=>order.indexOf(c)+1+g,cols=Math.max(1,order.length),depthN=Math.max(0,...ls.map(l=>l.len));
+    let r=1,out=(g?'<span class="st-pen-col st-pen-row" aria-hidden="true"></span>':'')+order.map(c=>`<span class="st-pen-col" style="grid-area:1/${col(c)}" aria-hidden="true">${esc(c)}</span>`).join('');
+    const blank=()=>g?`<span class="st-pen-row" style="grid-row:${r}" aria-hidden="true"></span>`:'';
+    /* a row's pens in lines under the lanes, a run starting a new line; 8px more space keeps it apart from the lanes */
+    const block=(row,edge)=>{let k=0;const lines=[];
+      for(const run of row.runs){const codes=Array.from({length:run.n},()=>row.letter+(++k));if(!codes.length)continue;
+        const n=Math.ceil(codes.length/4),per=Math.ceil(codes.length/n);
+        for(let q=0;q<n;q++)lines.push({per,h:run.h,codes:codes.slice(q*per,q*per+per)});}
+      lines.forEach((ln,i)=>{r++;const mark=edge==='start'&&i===0?' data-start':edge==='end'&&i===lines.length-1?' data-end':'';
+        out+=blank()+`<div class="st-pen-line"${aSide==='right'?' data-rtl':''}${mark} style="grid-area:${r}/${1+g}/span 1/span ${cols};--pm-across:${ln.per}">${ln.codes.map(c=>tile(c,penStyle(penH(ln.h)))).join('')}</div>`;});
+    };
+    rs.forEach(w=>{if(w.at==='door')block(w,'end');});
+    if(stacked){
+      r++;
+      for(const c of order){const l=ls.find(x=>x.letter===c);let j=0;
+        const pens=l?l.runs.flatMap(u=>Array.from({length:u.n},()=>tile(c+(++j),penStyle(penH(u.h))))):apart.filter(p=>laneOf(p.code)===c).map(p=>tile(p.code));
+        out+=`<div class="st-pen-lane" style="grid-area:${r}/${col(c)}">${pens.join('')}</div>`;}
+    }else{
+      const h=penH(ls.find(l=>l.len)?.runs.find(u=>u.n).h||PEN_TILE),cells={};
+      for(const l of ls)for(let n=1;n<=l.len;n++)(cells[l.letter]||(cells[l.letter]={}))[n]=l.letter+n;
+      for(const p of apart)(cells[laneOf(p.code)]||(cells[laneOf(p.code)]={}))[p.row>0?p.row|0:depthN+1]=p.code;
+      const rowsN=Math.max(ls.length?1:0,...Object.values(cells).flatMap(o=>Object.keys(o).map(Number)));
+      for(let n=1;n<=rowsN;n++){
+        r++;const numbered=ls.some(l=>l.len>=n);
+        out+=`<span class="st-pen-row" style="grid-row:${r}"${numbered?` data-row="${n}"`:''} aria-hidden="true">${numbered?n:''}</span>`;
+        for(const c of order){const code=cells[c]&&cells[c][n];if(code)out+=tile(code,penStyle(`grid-area:${r}/${col(c)}`,h));}
+      }
+    }
+    rs.forEach(w=>{if(w.at!=='door')block(w,'start');});
+    if(backDoor){const b=typeof backDoor==='string'?{label:backDoor}:backDoor;r++;out+=band('st-pen-exit',b.label||'Back door',b.at,` style="grid-area:${r}/1/span 1/span ${cols+g}"`);}
+    return {tall:!stacked&&depthN>99,html:`<div class="st-pen-grid" data-placed${stacked?' data-stacked':''} style="--pm-lanes:${cols}">${out}</div>`};
+  }
+  /* Whole room (2026-11-03): a map more than two screens tall gets one more button beside Back, Whole room. It draws the
+     room on one screen with no scrolling down: neighbouring pens of one run share a tile (A11–20), the fewest to a tile that
+     fit (2, 5, 10, 25 or 50). A shared tile shows its range and one mark per pen in that pen's status colour, in order
+     (past ten pens, one mark per status as long as its share); a leftover of less than half a tile joins the tile before
+     it (B14–19, never a lone B19); tiles keep their pen's size. When a range does not fit its column, every lane tile drops
+     the lane letter (11–15: the letter is at the top of the column). A tap on a shared tile goes back to pen by pen with
+     that tile's first pen at the top; the button, now Pen by pen, goes back to where the map was. A pen alone in its tile
+     is a pen tile and opens as one. */
+  function penWhole(room,k,colW){
+    const {ls,rs,apart,aSide,tile,level,L}=room,laneOf=code=>String(code).replace(/\d+$/,'');
+    const order=[...ls.map(l=>l.letter),...apart.map(p=>laneOf(p.code))];if(aSide==='right')order.reverse();
+    const groups=(letter,m)=>{const out=[];for(let a=0;a<m;){let b=Math.min(m,a+k);if(m-b>0&&m-b<Math.ceil(k/2))b=m;
+      out.push(Array.from({length:b-a},(_,q)=>letter+(a+q+1)));a=b;}return out;};
+    const range=g=>g.length>1?g[0]+'–'+g[g.length-1].replace(/^[A-Z]+/,''):g[0];
+    const laneGroups=ls.map(l=>{let j=0;return l.runs.flatMap(u=>{const gs=groups(l.letter,u.n).map(g=>g.map(c=>l.letter+(+c.replace(/^[A-Z]+/,'')+j)));j+=u.n;return gs.map(g=>({g,h:u.h}));});});
+    const lettered=laneGroups.flat().every(({g})=>g.length<2||colW-12>=range(g).length*8);
+    const marks=g=>{const lv=g.map(level);
+      if(lv.length<=10)return lv.map(l=>`<i data-level="${l}"></i>`).join('');
+      return PEN_LEVELS.concat('empty').map(l=>[l,lv.filter(x=>x===l).length]).filter(([,n])=>n).map(([l,n])=>`<i data-level="${l}" style="flex:${n}"></i>`).join('');};
+    const shared=(g,h,lane)=>{if(g.length===1)return tile(g[0],penStyle(penH(h)));const label=range(g);
+      return `<button type="button" class="st-pen-tile st-pen-group" data-level="${g.some(c=>level(c)!=='empty')?'plain':'empty'}" data-from="${esc(g[0])}"${penStyle(penH(h))} aria-label="${esc(L.pens(label))}"><span>${esc(lane&&!lettered?label.replace(/^[A-Z]+/,''):label)}</span><span class="st-pen-marks" aria-hidden="true">${marks(g)}</span></button>`;};
+    let r=1,out=order.map((c,i)=>`<span class="st-pen-col" style="grid-area:1/${i+1}" aria-hidden="true">${esc(c)}</span>`).join('');
+    const block=(row,edge)=>{const lines=[];let j=0;
+      for(const u of row.runs){const gs=groups(row.letter,u.n).map(g=>g.map(c=>row.letter+(+c.replace(/^[A-Z]+/,'')+j)));j+=u.n;if(!gs.length)continue;
+        const n=Math.ceil(gs.length/4),per=Math.ceil(gs.length/n);for(let q=0;q<n;q++)lines.push({per,h:u.h,gs:gs.slice(q*per,q*per+per)});}
+      lines.forEach((ln,i)=>{r++;const mark=edge==='start'&&i===0?' data-start':edge==='end'&&i===lines.length-1?' data-end':'';
+        out+=`<div class="st-pen-line"${aSide==='right'?' data-rtl':''}${mark} style="grid-area:${r}/1/span 1/span ${Math.max(1,order.length)};--pm-across:${ln.per}">${ln.gs.map(g=>shared(g,ln.h,false)).join('')}</div>`;});};
+    rs.forEach(w=>{if(w.at==='door')block(w,'end');});
+    r++;
+    order.forEach((c,i)=>{const at=ls.findIndex(l=>l.letter===c);
+      const tiles=at>=0?laneGroups[at].map(({g,h})=>shared(g,h,true)):apart.filter(p=>laneOf(p.code)===c).map(p=>tile(p.code));
+      out+=`<div class="st-pen-lane" style="grid-area:${r}/${i+1}">${tiles.join('')}</div>`;});
+    rs.forEach(w=>{if(w.at!=='door')block(w,'start');});
+    return `<div class="st-pen-grid st-pen-whole" data-placed data-stacked style="--pm-lanes:${Math.max(1,order.length)}">${out}</div>`;
   }
   /* penMapKey({ pens, words:{ act, live } }): the items of the sheet's key line: sheet({ line:{ key: penMapKey(...) } }). */
   function penMapKey({pens={},words={}}={}){
@@ -1363,50 +1466,51 @@
   function penPeek({title='',meta='',rows=[],more=''}={}){
     return `<div class="st-pen-peek-head"><b>${esc(title)}</b>${meta?`<span>${esc(meta)}</span>`:''}</div>${rows.map(r=>row(Object.assign({variant:'animal',className:'st-pen-peek-row'},r))).join('')}${more?`<p class="st-pen-peek-more">${esc(more)}</p>`:''}`;
   }
-  function penMapFooter({back={action:'back'},depth=0,rangeSize=20,label='Jump to pens'}={}){
-    const size=Math.max(1,rangeSize|0);
-    if(!(depth>size))return sheetFooter({back});
-    const ranges=Array.from({length:Math.ceil(depth/size)},(_,i)=>[i*size+1,Math.min(depth,(i+1)*size)]);
-    return sheetFooter({content:backButton(back)+`<div class="st-pen-ranges" data-ds="PenMap" role="radiogroup" aria-label="${esc(label)}">${ranges.map(([a,b],i)=>`<button type="button" role="radio" data-from="${a}" data-to="${b}" aria-checked="${i===0}">${a}–${b}</button>`).join('')}</div>`});
-  }
+  /* Back. The map adds Whole room beside it when it needs one (`depth`, `rangeSize` and `label` are no longer read: the
+     range control is gone, 2026-11-03). */
+  function penMapFooter({back={action:'back'}}={}){return sheetFooter({back});}
   /* The map's own behaviour. A pen map is found by its markup, so any host that draws one gets it without a call:
-     it opens centred on its current pen; the range control (in the sheet's footer) follows the top visible row, and a tap
-     on a range scrolls its first row to just under the column letters; a hold shows the peek (350ms; a move of more than
-     12px, a scroll or a release hides it), and the tap after a peek only closes it. */
+     it opens centred on its current pen; a map more than two screens tall adds Whole room to the sheet's footer; a hold
+     shows the peek (350ms; a move of more than 12px, a scroll or a release hides it), and the tap after a peek only closes it. */
   const penHead=map=>map.querySelector('.st-pen-col'),penSheet=el=>el.closest('.sheet,.phone')||document.body;
-  function penTopRow(map){
-    const h=penHead(map).getBoundingClientRect().bottom;
-    for(const l of map.querySelectorAll('.st-pen-row[data-row]'))if(l.getBoundingClientRect().bottom>h+4)return +l.dataset.row;
-    return 1;
-  }
-  function penMark(map){
-    const ranges=penSheet(map).querySelector('.st-pen-ranges');if(!ranges)return;
-    const btns=[...ranges.children],atEnd=map.scrollHeight>map.clientHeight+1&&map.scrollTop+map.clientHeight>=map.scrollHeight-1,n=penTopRow(map);
-    const on=atEnd?btns[btns.length-1]:btns.find(b=>n>=+b.dataset.from&&n<=+b.dataset.to);
-    btns.forEach(b=>b.setAttribute('aria-checked',String(b===on)));
-    if(on){const r=on.getBoundingClientRect(),q=ranges.getBoundingClientRect();if(r.left<q.left)ranges.scrollLeft+=r.left-q.left;else if(r.right>q.right)ranges.scrollLeft+=r.right-q.right;}
-    penEdges(ranges);
-  }
-  /* ranges that overflow fade on the side that has more, so a cut range reads as "more this way", never as clipped */
-  function penEdges(r){
-    const s=r.scrollLeft,more=[s>1&&'start',s+r.clientWidth<r.scrollWidth-1&&'end'].filter(Boolean).join(' ');
-    if(more)r.dataset.more=more;else delete r.dataset.more;
-  }
   function penMount(scope){
     const maps=!scope||!scope.querySelectorAll?[]:scope.matches&&scope.matches('.st-pen-map')?[scope]:[...scope.querySelectorAll('.st-pen-map')];
     for(const m of maps){
       if(m.dataset.mounted)continue;m.dataset.mounted='1';
-      const map=m.querySelector('.st-pen-scroll'),cur=m.dataset.current&&[...map.querySelectorAll('.st-pen-tile')].find(t=>t.dataset.pen===m.dataset.current);
+      const map=m.querySelector('.st-pen-scroll');if(!map)continue;
+      const cur=m.dataset.current&&[...map.querySelectorAll('.st-pen-tile')].find(t=>t.dataset.pen===m.dataset.current);
       if(cur){
-        const box=map.getBoundingClientRect(),head=penHead(map).getBoundingClientRect(),side=map.querySelector('.st-pen-row').getBoundingClientRect(),r=cur.getBoundingClientRect();
-        map.scrollTop+=r.top+r.height/2-(head.bottom+box.bottom)/2;map.scrollLeft+=r.left+r.width/2-(side.right+box.right)/2;
+        const box=map.getBoundingClientRect(),head=penHead(map).getBoundingClientRect(),gut=map.querySelector('.st-pen-row'),side=gut?gut.getBoundingClientRect().right:box.left-PEN_GAP,r=cur.getBoundingClientRect();
+        map.scrollTop+=r.top+r.height/2-(head.bottom+box.bottom)/2;map.scrollLeft+=r.left+r.width/2-(side+box.right)/2;
         /* then rest on a whole row and column: the tile edge sits PEN_GAP under the letters and beside the numbers */
         const snap=(d,pitch)=>{d=((d%pitch)+pitch)%pitch;return d>pitch/2?d-pitch:d;},at=cur.getBoundingClientRect();
         map.scrollTop+=snap(at.top-(head.bottom+PEN_GAP),at.height+PEN_GAP);
-        if(map.scrollWidth>map.clientWidth+1)map.scrollLeft+=snap(at.left-(side.right+PEN_GAP),at.width+PEN_GAP);
+        if(map.scrollWidth>map.clientWidth+1)map.scrollLeft+=snap(at.left-(side+PEN_GAP),at.width+PEN_GAP);
       }
-      penMark(map);
+      const room=penRooms.get(m.dataset.key),foot=penSheet(m).querySelector('.sheet-footer');
+      if(room&&foot&&map.clientHeight>0&&map.scrollHeight>2*map.clientHeight&&!foot.querySelector('.st-pen-whole-toggle'))
+        foot.insertAdjacentHTML('beforeend',button({label:room.L.whole,className:'st-pen-whole-toggle',attrs:{'aria-pressed':'false','data-key':m.dataset.key}}));
     }
+  }
+  /* Whole room on, at the fewest pens to a tile that fit the map's height; off, back to the pens where they were */
+  function penWholeSet(m,on,from){
+    const map=m.querySelector('.st-pen-scroll'),pens=map.querySelector('.st-pen-grid:not(.st-pen-whole)'),room=penRooms.get(m.dataset.key);
+    const btn=penSheet(m).querySelector(`.st-pen-whole-toggle[data-key="${CSS.escape(m.dataset.key)}"]`);
+    let whole=map.querySelector('.st-pen-whole');
+    if(on){
+      m.dataset.pensTop=map.scrollTop;penStop();
+      const n=Math.max(1,room.ls.length+room.apart.length),colW=Math.max((map.clientWidth-PEN_GAP*(n-1))/n,PEN_TILE);
+      const most=Math.max(...room.ls.flatMap(l=>l.runs.map(u=>u.n)),...room.rs.flatMap(w=>w.runs.map(u=>u.n)));
+      const steps=PEN_STEPS.filter((s,i)=>i===0||PEN_STEPS[i-1]<most);
+      pens.hidden=true;
+      for(const k of steps){if(whole)whole.remove();map.insertAdjacentHTML('beforeend',penWhole(room,k,colW));whole=map.querySelector('.st-pen-whole');if(map.scrollHeight<=map.clientHeight+1)break;}
+      map.scrollTop=0;
+    }else{
+      if(whole)whole.remove();pens.hidden=false;
+      const t=from&&[...pens.querySelectorAll('.st-pen-tile')].find(x=>x.dataset.pen===from);
+      map.scrollTop=t?t.getBoundingClientRect().top-map.getBoundingClientRect().top+map.scrollTop-penHead(map).getBoundingClientRect().height-PEN_GAP:+(m.dataset.pensTop||0);
+    }
+    if(btn){btn.setAttribute('aria-pressed',String(on));btn.querySelector('.st-button-label').textContent=on?room.L.byPen:room.L.whole;}
   }
   function penStop(){
     const p=penHold;if(!p)return;
@@ -1415,20 +1519,17 @@
   if(typeof document!=='undefined'){
     if(typeof MutationObserver!=='undefined')new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1)penMount(n);}).observe(document,{childList:true,subtree:true});
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>penMount(document));else penMount(document);
-    let frame=0;
-    document.addEventListener('scroll',e=>{const t=e.target;if(t.classList&&t.classList.contains('st-pen-ranges')){penEdges(t);return;}if(!t.classList||!t.classList.contains('st-pen-scroll'))return;penStop();cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>penMark(t));},true);
+    document.addEventListener('scroll',e=>{const t=e.target;if(t.classList&&t.classList.contains('st-pen-scroll'))penStop();},true);
     document.addEventListener('click',e=>{
-      const b=e.target.closest&&e.target.closest('.st-pen-ranges button');
-      if(b){
-        const map=penSheet(b).querySelector('.st-pen-scroll'),l=map&&map.querySelector(`.st-pen-row[data-row="${b.dataset.from}"]`);
-        if(l)map.scrollTop+=l.getBoundingClientRect().top-penHead(map).getBoundingClientRect().bottom-PEN_GAP;
-        return;
-      }
+      const w=e.target.closest&&e.target.closest('.st-pen-whole-toggle');
+      if(w){const m=penSheet(w).querySelector(`.st-pen-map[data-key="${CSS.escape(w.dataset.key)}"]`);if(m)penWholeSet(m,w.getAttribute('aria-pressed')!=='true');return;}
+      const g=e.target.closest&&e.target.closest('.st-pen-group');
+      if(g){penWholeSet(g.closest('.st-pen-map'),false,g.dataset.from);return;}
       if(penSwallow&&e.target.closest&&e.target.closest('.st-pen-tile')){penSwallow=false;e.stopImmediatePropagation();e.preventDefault();}
     },true);
     document.addEventListener('pointerdown',e=>{
       penSwallow=false;penStop();
-      const t=e.target.closest&&e.target.closest('.st-pen-tile:not(:disabled)');if(!t||e.button!==0)return;
+      const t=e.target.closest&&e.target.closest('.st-pen-tile:not(:disabled):not(.st-pen-group)');if(!t||e.button!==0)return;
       const root=t.closest('.st-pen-map'),fn=penPeeks.get(root.dataset.key);if(!fn)return;
       penHold={map:root,x:e.clientX,y:e.clientY,timer:setTimeout(()=>{
         const card=root.querySelector('.st-pen-peek'),code=t.dataset.pen;

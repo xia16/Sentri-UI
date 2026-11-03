@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PenMap · whole room</title><style>
+.ph{position:relative;height:var(--phone-height);max-width:var(--phone-width);margin:0 auto var(--space-16);overflow:hidden;background:var(--app-background);font-family:var(--font-sans);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius-device)}
+.ph .bg{padding:0 var(--space-gutter)}
+.ph .bar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
+</style></head><body>
+<div class="ph" data-state="Whole room · 2 × 50 stalls, ten pens to a tile" data-demo="stalls50" data-whole><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Whole room · the gestation barn, group pens and the stall row" data-demo="gestbarn" data-whole><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Whole room · four lanes, four types" data-demo="mixed4" data-whole><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Whole room · 8 × 20, the lane letters dropped" data-demo="nursery" data-whole><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Pen by pen again · after a tap on B1–10" data-demo="stalls50" data-whole data-back="B1"><div class="bg"></div><div class="over"></div></div>
+<script>
+const UI=window.SentriUI;
+/* rooms with their pens' sizes in cm along the lane, as the farm layout gives them */
+const run=(n,type,size)=>({n,type,size}),lane=(...runs)=>({runs});
+const BARNS={
+ stalls50:{lanes:[lane(run(50,'Gestation stall',65)),lane(run(50,'Gestation stall',65))],pens:{A3:'plain',A4:'plain',A5:'act',B4:'plain',B6:'plain',A12:'live',A31:'act',B33:'plain',B35:'live',B38:'act',B47:'plain',A44:'plain'}},
+ gestbarn:{lanes:[lane(run(10,'Group pen',483)),lane(run(10,'Group pen',483))],rows:[{letter:'C',runs:[run(24,'Gestation stall',65)]}],pens:{A3:'plain',A7:'plain',A9:'act',B6:'plain',B9:'plain',C2:'plain',C3:'act',C11:'act',C18:'plain'}},
+ mixed4:{lanes:[lane(run(2,'Group pen',483),run(14,'Gestation stall',65)),lane(run(13,'Gestation stall',65),run(6,'Farrowing crate',180)),lane(run(12,'Farrowing crate',180)),lane(run(1,'Sick pen',250),run(7,'Group pen',483))],pens:{A1:'plain',A3:'act',B2:'plain',B4:'live',B15:'live',C5:'plain',C9:'act',D2:'act',D6:'plain'}},
+ nursery:{lanes:'ABCDEFGH'.split('').map(()=>lane(run(20,'Nursery pen',150))),pens:{A2:'plain',B7:'act',C3:'live',D11:'plain',E14:'act',F5:'plain',G18:'live',H9:'plain'}}
+};
+const bg=()=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+UI.heading({title:'Farrowing',kind:'page',description:'Last record 08:41 · G.H'})+UI.panel(UI.row({title:'Unit 7',description:'Task overview'}),{className:'st-row-group'});
+document.querySelectorAll('[data-state]').forEach((el,i)=>{
+ const b=BARNS[el.dataset.demo];
+ el.querySelector('.bg').innerHTML=bg();
+ el.querySelector('.over').innerHTML=UI.sheet({surface:'menu',size:'long',title:'Pen map',label:'Pen map',line:{key:UI.penMapKey({pens:b.pens,words:{act:'need you'}})},body:UI.penMap(Object.assign({},b,{action:'pick',key:'pw-'+i})),footer:UI.penMapFooter({back:{action:'back',label:'Back'}})});
+});
+/* the map mounts (and adds Whole room) as it lands; then each state turns Whole room on, and the last taps a shared tile */
+setTimeout(()=>document.querySelectorAll('[data-whole]').forEach(el=>{
+ el.querySelector('.st-pen-whole-toggle')?.click();
+ if(el.dataset.back)el.querySelector(`.st-pen-group[data-from="${el.dataset.back}"]`)?.click();
+}),0);
+</script></body></html>
