@@ -350,7 +350,6 @@ button.st-row:disabled{cursor:default}
 
 /* Shared chooser: catalogue = flat; short ungrouped choices = one muted inset.
    A second text line never changes selection behavior or adds a nested card. */
-.inspection-phone .sheet.picker-step:is(.medicine-picker-step,.health-picker-step)>.sheet-body{background:var(--st-paper)}
 .inspection-phone .sheet.picker-step .st-chooser-list{border:0;border-radius:0;background:transparent;min-width:0;flex:none}
 .inspection-phone .sheet.picker-step .st-chooser-list[data-chooser-tone="inset"]{padding:0}
 .inspection-phone .sheet.picker-step .catalog-path{background:transparent}
@@ -404,7 +403,7 @@ button.st-row:disabled{cursor:default}
 /* In a picker sheet every option row is one height: one line and a wrapped two-line label both fit the 56px row. */
 .st-picker-body .st-choice-row.st-choice-row{padding-block:var(--space-8)}
 /* Search stays at the top of the sheet while the one list scrolls under it (sticky in the sheet body, never a second scroller). */
-.sheet-body>.st-picker-body>.st-choice-search,.sheet-body>*>.st-picker-body>.st-choice-search{position:sticky;top:calc(-1 * var(--space-section));z-index:1;margin:calc(-1 * var(--space-section)) calc(-1 * var(--space-gutter-sheet)) var(--space-12);padding:var(--space-section) var(--space-gutter-sheet) var(--space-8);background:var(--paper)}
+.sheet-body>.st-picker-body>.st-choice-search,.sheet-body>*>.st-picker-body>.st-choice-search{position:sticky;top:calc(-1 * var(--space-section));z-index:1;margin:calc(-1 * var(--space-section)) calc(-1 * var(--space-gutter-sheet)) var(--space-12);padding:var(--space-section) var(--space-gutter-sheet) var(--space-8);background:var(--st-context-bg,var(--paper))}
 /* Toast: what was just saved, on the ink above the page's dock (the Android snackbar). Solid, never see-through: it is read in sun
    and glare. A glyph says how it went (done: a check on the green; offline: no-signal, saved on this phone), the title what was done,
    the second line for whom or where it went. It rises in once and never takes a tap. */
@@ -701,8 +700,18 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-picker-field.error .st-picker-hint{color:var(--red)}
 .st-choice-label,.st-choice-meta{overflow-wrap:anywhere;white-space:normal}
 .st-choice-row[data-mode="single"] .st-choice-trail{color:var(--ink)}
-/* A ticked multi-select box is green with a white tick (select-mark, owner 2026-11-03); its row stays white. */
-.st-choice-trail input[type="checkbox"]{accent-color:var(--select-mark)}
+/* A ticked multi-select box is green with a white tick (select-mark, owner 2026-11-03); its row stays white. The box is drawn here,
+   not left to the browser: a native box with accent-color darkens under the pointer and after a tap, so two ticked boxes showed two
+   greens (owner, 2026-11-03). Every checkbox in the system takes this face; hosts set only its size. */
+input[type="checkbox"]{appearance:none;-webkit-appearance:none;display:inline-flex;align-items:center;justify-content:center;flex:none;box-sizing:border-box;border:1.5px solid var(--muted);border-radius:var(--radius-4);background:var(--paper);cursor:pointer}
+input[type="checkbox"]:checked{border-color:var(--select-mark);background:var(--select-mark)}
+input[type="checkbox"]:checked::before{content:'';width:28%;height:52%;margin-top:-12%;border:solid var(--paper);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+input[type="checkbox"]:disabled{border-color:var(--control-border);background:var(--disabled-fill);cursor:default}
+input[type="checkbox"]:disabled:checked{border-color:var(--control-border);background:var(--control-border)}
+/* The count of ticked items inside a door (Row, ChoiceList navigate; owner 2026-11-03, canvas B3): the box's green, before the chevron. */
+.st-count-badge{flex:none;display:inline-grid;place-items:center;min-width:var(--size-22);height:var(--size-22);padding:0 var(--space-6);margin-left:auto;box-sizing:border-box;border-radius:var(--radius-11);background:var(--select-mark);color:var(--paper);font:600 var(--font-size-13)/1 var(--font-sans);font-variant-numeric:tabular-nums}
+.st-row .st-count-badge{margin-right:var(--space-8)}
+.st-choice-row .st-count-badge{margin-left:var(--space-8)}
 .st-choice-row[data-mode="multi"]:has(:checked) .st-choice-label{font-weight:var(--type-weight-strong)}
 .st-picker-value.is-names{display:flex;align-items:baseline;gap:var(--space-6);white-space:normal;overflow:visible}
 .st-picker-names{min-width:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}

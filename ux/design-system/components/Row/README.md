@@ -16,7 +16,7 @@ One row, five slots, left to right. Each variant below fills them its own way; a
 
 1. **Lead** (optional): an icon tile (navigation only), a tick mark (task item: an empty ring when due, an ink disc when ticked; 24px, the whole row is the target) or a selection box (select + door: a 24px box in a 48px hit area, always on the left).
 2. **Body**: a title over line 2; or, for an animal, the ID over one context line.
-3. **Right** (optional): one thing only. A count (`trailing`), the animal's state (figure over word), one line of condition tags, or one Status chip (`SentriUI.status({variant:'chip',kind,text})`).
+3. **Right** (optional): one thing only. A count (`trailing`), a count of ticked items inside a door (`count`: a green `select-mark` badge before the chevron, the description keeping its own words; owner, 2026-11-03), the animal's state (figure over word), one line of condition tags, or one Status chip (`SentriUI.status({variant:'chip',kind,text})`).
 4. **Trail** (optional, none when disabled): a chevron, Edit (a saved record), or the current ✓.
 5. **Act** (task item only): one sibling button beside the door, never nested in it.
 
@@ -86,3 +86,4 @@ Component, absorbing TaskRow's animal/tick/door/door+act faces as variants. The 
 
 The repository [component standard](../../../../docs/design-workflow/research/component-standard.md) records primary ADM List and TDesign Cell references, with Material 3 and Apple list guidance. This pass unifies the family, adds state specimens and migrates the real callers; human approval remains separate from implementation checks.
 
+2026-11-03 (Conditions, canvas B3): `count` draws the number of ticked items inside a navigation door as a green badge before the chevron (`st-count-badge`, read "N selected"), in place of a muted "N selected" description.
