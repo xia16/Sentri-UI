@@ -15,7 +15,7 @@ svg{fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap
 <script>
 // Test icons are given by name in ?names=, shown shuffled with a fixed seed and numbered; the key is printed to the console.
 const names=new URLSearchParams(location.search).get('names').split(',');
-const P=Object.assign({},SentriIcons.paths,SentriIconsNext.paths);
+const P=Object.assign({},SentriIcons.paths,SentriIconsNext.cut,SentriIconsNext.trial,SentriIconsNext.paths);
 let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
 const order=names.map(n=>[rnd(),n]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
 const svg=(d,c)=>`<svg viewBox="0 0 24 24" class="${c}"><path d="${d}"/></svg>`;

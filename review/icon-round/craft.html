@@ -17,7 +17,7 @@ small{font-size:13px}
 <script src="icons.js"></script>
 <script>
 const q=new URLSearchParams(location.search),only=(q.get('names')||'').split(',').filter(Boolean);
-const P=Object.assign({},SentriIcons.paths,SentriIconsNext.paths);
+const P=Object.assign({},SentriIcons.paths,SentriIconsNext.cut,SentriIconsNext.trial,SentriIconsNext.paths);
 const names=only.length?only:Object.keys(SentriIconsNext.paths);
 const svg=(d,c)=>`<svg viewBox="0 0 24 24" class="${c}"><path d="${d}"/></svg>`;
 document.getElementById('g').innerHTML=names.map(n=>`<div class="cell"><div class="big pad">${svg(P[n],'')}</div><div class="sizes">${['s16','s18','s20','s24'].map(c=>svg(P[n],c)).join('')}</div><small>${n}</small></div>`).join('');

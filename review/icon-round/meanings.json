@@ -4,11 +4,14 @@
     [
       "Animals",
       [
-        ["pig", "redrawn", "A pig, any type: sow, gilt, boar or finisher", "Farrowing Details: Against herself; Parity facet; Report death: The sow; Pig profile: title, General details, Basic information, Sow & cycle; Farrowing filter: Pigs"],
-        ["piglet", "new", "A piglet, or piglets as a subject", "Farrowing actions: Piglet processing, Foster piglets; Details: This litter; Alive card: + born; Home: Piglet processing task, Nursery section"],
-        ["pigs", "new", "A group of pigs: a batch", "Details: Against her batch; Move to another farrowing batch; Pig actions: Batch membership"],
-        ["missing", "new", "A missing pig", "Drawn for Report missing (no screen yet)"],
-        ["breeder", "new", "Marked as a breeder (kept for breeding)", "Drawn for Mark as breeder (no screen yet)"]
+        ["pig", "redrawn", "A pig of any kind or age: sow, gilt, boar, piglet. The word says which", "Farrowing Details: This litter, Against herself; Parity facet; Report death: The sow; actions: Piglet processing, Foster piglets; + born chip; Pig profile: title, General details, Basic information, Sow & cycle; Home: Piglet processing task, Nursery section"],
+        [
+          "batch",
+          "new",
+          "A batch: pigs managed together (\"Batch 27\"). Borderline in the blind test: reads as a stack, fine beside the word",
+          "Farrowing Details: Against her batch; Move to another farrowing batch; Pig actions: Batch membership"
+        ],
+        ["missing", "new", "A missing pig (a dashed circle with a question mark, no pig)", "Drawn for Report missing (no screen yet)"]
       ]
     ],
     [
@@ -18,9 +21,9 @@
         ["heat", "kept", "Heat check", "Home: Heat check tasks"],
         ["return-heat", "new", "Return-heat check", "Home: Return-heat check task"],
         ["pregnancy", "kept", "Pregnancy: the check, abortion, not in pig", "Home: Gestation, Pregnancy check; Actions: Record abortion, Mark not in pig"],
-        ["farrow", "redrawn", "Farrowing", "Home: Farrowing section and task; Pig actions: Open Farrowing"],
+        ["farrow", "redrawn", "Farrowing: a sow lying down, a piglet at her belly. Borderline in the blind test", "Home: Farrowing section and task; Pig actions: Open Farrowing"],
         ["death", "new", "A death", "Farrowing: Death key, Died after birth, − died chip; Actions: Record piglet deaths, Record sow death"],
-        ["move", "new", "Moving pigs into another pen (was transfer)", "Actions: Transfer; Home: Pig transfer tasks; Home: Other"],
+        ["transfer", "kept", "Moving or transferring pigs to another pen or room (generic)", "Actions: Transfer; Home: Pig transfer tasks; Home: Other"],
         ["truck", "new", "Pigs leaving the farm", "Home: Outbound pickups"],
         ["sample", "new", "Sampling", "Home: Sampling tasks"],
         ["count", "new", "A count of animals", "Farrowing actions: Reconcile piglet count"],
@@ -41,7 +44,7 @@
         ["calendar", "kept", "A date", "Expected farrowing; first-litter placeholder"],
         ["clock", "kept", "Time or due", "Header times; Home task timing"],
         ["details", "kept", "More detail fields (sliders)", "Piglet processing end page"],
-        ["bookmark", "kept", "A mark to keep a pig (breeder pick)", "Piglet processing"]
+        ["bookmark", "kept", "Mark a pig: breeder pick, Mark as breeder", "Piglet processing; Mark as breeder"]
       ]
     ],
     [
@@ -84,7 +87,7 @@
         ["weight", "kept", "Weight", "Weight measure"],
         ["measure", "kept", "Measurements", "Measurements & condition"],
         ["temperature", "kept", "Temperature", "Sensors, measure"],
-        ["humidity", "redrawn", "Air humidity", "Sensors"],
+        ["humidity", "kept", "Air humidity", "Sensors"],
         ["air", "kept", "Ventilation reading", "Sensors"],
         ["fan", "new", "A fan (a device)", "Home unit: fan controls"],
         ["wrench", "kept", "A fault, maintenance", "Report fault, Maintenance"],

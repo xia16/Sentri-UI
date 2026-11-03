@@ -27,7 +27,6 @@ const screens = [
   ['farrowing.count', 'count'],
   ['farrowing.death', 'death'],
   ['farrowing.filter', 'filter'],
-  ['workbench.gestation', 'home-overview'],
   ['farrowing.sow-actions', 'unit-actions'],
   ['environment.page', 'fan'],
 ];

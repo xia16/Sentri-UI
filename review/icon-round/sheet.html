@@ -30,11 +30,11 @@ const svg=d=>`<svg viewBox="0 0 24 24" aria-hidden="true">${d===now.more?[5,12,1
 const only=q.get('groups');let html='';
 if(q.get('view')==='cut'){
   const why=Object.fromEntries((await (await fetch('blind-test.json')).json()).cut.map(x=>[x.name,x.read]));
-  html='<h2>Drawn, tested blind, cut</h2><p class="lead">A fresh tester named each icon unlabelled at 16–18 px, then matched it to the labels on the list. These could not be told apart or were read as something else, so they stay out of the registry. Each meaning falls back to an icon that passed.</p><div class="set">'+Object.entries(SentriIconsNext.cut).filter(([n])=>why[n]).map(([n,d])=>`<div class="ic">${svg(d)}<b>${n}</b><span>${why[n]}</span></div>`).join('')+'</div>';
+  html='<h2>Drawn, tested blind, cut</h2><p class="lead">A fresh tester named each icon unlabelled at 16–18 px, then matched it to the labels on the list. These could not be told apart or were read as something else, so they stay out of the registry. Each meaning falls back to an icon that passed.</p><div class="set">'+Object.keys(why).filter(n=>SentriIconsNext.cut[n]).map(n=>[n,SentriIconsNext.cut[n]]).map(([n,d])=>`<div class="ic">${svg(d)}<b>${n}</b><span>${why[n]}</span></div>`).join('')+'</div>';
 }else if(q.get('view')==='pairs'){
-  const pairs=[['chart','production','Both were the same three bars'],['farrow','pregnancy','Both were the same pulse line'],['note','record','Both were the same lined page'],['transfer','return','Become move and undo; the old names stay as aliases'],['pig','profile','A person stood in for a sow'],['humidity','drop','Two identical drops']];
+  const pairs=[['chart','production','Both were the same three bars'],['farrow','pregnancy','Both were the same pulse line'],['note','record','Both were the same lined page'],['return','up','return becomes undo; up was a copy of back-chevron and becomes its alias'],['pig','profile','A person stood in for a sow']];
   html='<h2>Look-alike pairs, before and after</h2><p class="lead">Each pair had one shape doing two jobs. Now each name has its own shape.</p><div class="pairs">'+pairs.map(([a,b,why])=>{
-    const nn=k=>({transfer:'move',return:'undo'})[k]||k;
+    const nn=k=>({return:'undo',up:'back-chevron'})[k]||k;
     return `<div class="pair"><div class="row"><b>Now</b><span class="g">${svg(now[a])}<small>${a}</small></span><span class="g">${svg(now[b])}<small>${b}</small></span></div><div class="row"><b>New</b><span class="g">${svg(next[nn(a)])}<small>${nn(a)}</small></span><span class="g">${svg(next[b==='profile'?'pig':nn(b)])}<small>${b==='profile'?'pig':nn(b)}</small></span></div><div class="row">${why}</div></div>`}).join('')+'</div>';
 }else{
   for(const [g,items] of m.groups){if(only&&!only.split(',').includes(g))continue;
