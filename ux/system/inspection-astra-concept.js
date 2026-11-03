@@ -86,23 +86,23 @@ function penLogEntries(c,id){
 }
 /* Pen note life (proposal, 2026-11-03): a note shows for a chosen time, 1 week unless the writer picks another; then it leaves the pen
    page and stays in the pen log. "Until closed" keeps it until someone closes it. */
-const NOTE_LIFE=[['today','Today'],['3d','3 days'],['1w','1 week'],['closed','Until closed']];
 const NOTE_DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],NOTE_MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-function noteEnd(k){const d=new Date(walkDate+'T12:00:00');d.setDate(d.getDate()+(k==='3d'?3:7));return d;}
-function noteUntil(k='1w'){if(k==='closed')return 'Until someone closes it';if(k==='today')return 'Today only';const d=noteEnd(k);return 'Until '+NOTE_DAYS[d.getDay()]+' '+d.getDate()+' '+NOTE_MONTHS[d.getMonth()];}
-function noteUntilShort(k='1w'){return k==='closed'?'':k==='today'?'today only':'until '+NOTE_DAYS[noteEnd(k).getDay()];}
-function noteMeta(pe){return [pe.noteBy,noteUntilShort(pe.noteUntil)].filter(Boolean).join(' · ');}
-function noteLifeField(f){return '<div class="field st-note-life"><span>Show for</span>'+SentriUI.segment({variant:'view-switch',options:NOTE_LIFE,active:f.until||'1w',action:'note-until',ariaLabel:'Show for'})+'<p class="st-note-life-hint">'+esc(noteUntil(f.until||'1w'))+'</p></div>';}
+function noteEnd(n){const d=new Date(walkDate+'T12:00:00');d.setDate(d.getDate()+n);return d;}
+function noteUntil(n=7){const d=noteEnd(n);return 'Until '+NOTE_DAYS[d.getDay()]+' '+d.getDate()+' '+NOTE_MONTHS[d.getMonth()];}
+function noteMeta(pe){return pe.noteBy+' · until '+NOTE_DAYS[noteEnd(pe.noteDays||7).getDay()];}
+function noteDaysField(d){const n=d.days||7;return '<div class="st-panel st-note-days">'+SentriUI.stepper({label:'Show for',description:n+(n===1?' day':' days')+' · '+noteUntil(n),value:n,min:1,max:60,action:'note-days',key:'days',variant:'row'})+'</div>';}
+/* A note read in full: who and when on top, the note at reading size, how long it shows at the foot; the pencil edits it. */
+function noteCard(text,by,foot,footIcon,editAction,c_pen=''){const [name,...when]=String(by||'').split(' · ');return '<div class="st-panel st-note"><div class="st-note-head"><p class="st-note-by"><b>'+esc(name)+'</b>'+(when.length?' · '+esc(when.join(' · ')):'')+'</p>'+(editAction?SentriUI.iconButton({variant:'plain',icon:icon('edit'),label:'Edit note',action:editAction,value:c_pen}):'')+'</div><p class="st-note-text">'+esc(text)+'</p><p class="st-note-foot">'+icon(footIcon)+esc(foot)+'</p></div>';}
 function closePenNote(c,id){
  const pe=pen(c,id);if(!pe?.note)return false;
- const note={id:'note-'+Date.now()+'-'+(pe.closedNotes?.length||0),text:pe.note,by:pe.noteBy,until:pe.noteUntil,closedAt:'today 09:41',closedBy:'G. Hansen'};
+ const note={id:'note-'+Date.now()+'-'+(pe.closedNotes?.length||0),text:pe.note,by:pe.noteBy,days:pe.noteDays,closedAt:'today 09:41',closedBy:'G. Hansen'};
  (pe.closedNotes||=[]).push(note);pe.note='';pe.noteBy='';c.closedNoteId=note.id;
  addEvent(c,'Pen note closed',[id],note.text+' · Originally added by '+note.by,'Notes');return true;
 }
 function undoPenNoteClose(c,id){
  const pe=pen(c,id),note=pe?.closedNotes?.find(n=>n.id===c.closedNoteId);
  if(!note||note.reopenedAt||pe.note)return false;
- pe.note=note.text;pe.noteBy=note.by;pe.noteUntil=note.until;note.reopenedAt='today 09:41';c.closedNoteId=null;
+ pe.note=note.text;pe.noteBy=note.by;pe.noteDays=note.days;note.reopenedAt='today 09:41';c.closedNoteId=null;
  addEvent(c,'Pen note reopened',[id],note.text,'Notes');return true;
 }
 function applyRecord(c){const f=c.form,subjects=f.subjects||[],targets=subjects.map(id=>pig(c,id)).filter(Boolean);if(!targets.length)return false;
@@ -1434,7 +1434,7 @@ function overlay(c){if(c.view==='medicines')return medicinesPage(c);if(c.view===
  if(c.view==='fault-form')return sheet(c,'Report fault','Pen '+c.penId,(fieldSelect(c,'Device','device',[['','Choose device'],['Feeding station','Feeding station'],['Drinking station','Drinking station'],['Other','Other equipment']],f.device))+(f.device==='Other'?(SentriUI.field({label:"Device name",control:"<input data-v2=\"name\" value=\""+(esc(f.name||''))+"\" placeholder=\"e.g. gate beside the aisle\">"})):'')+(SentriUI.field({label:"Description",control:"<textarea data-v2=\"description\" placeholder=\"What is broken or not working?\">"+(esc(f.description||''))+"</textarea>"})),footer(back(),button('save-fault','Report fault','button primary','',!valid(c))));
  if(c.view==='fault-record'){const pe=pen(c,c.penId),x=pe.faults.find(x=>x.id===c.faultId);return sheet(c,x.name,`Pen ${pe.id} · ${x.open?'Open fault':'Resolved'}`,`<div class="instruction-detail">${esc(x.description)}<small>Reported ${x.time} · ${x.who}</small></div>${x.open?optNote('Resolution note',SentriUI.field({label:'Resolution note',labelHidden:true,variant:'textarea',control:'<textarea data-v2="resolution" placeholder="What was done?"></textarea>'}),''):`<p class="quiet-note">Resolved 09:41 · G. Hansen${x.resolution?'<br>'+esc(x.resolution):''}</p>`}`,footer(back(),x.open?button('close-fault','Resolve fault','button primary'):''));}
  if(c.view==='pen-observe')return sheet(c,'How the pen looks','Pen '+c.penId,SentriUI.choiceGroup(CC.penObservations.map(o=>SentriUI.choiceRow({label:o.en,mode:'multi',action:'pen-observe-toggle',value:o.id,selected:f.observations.includes(o.id)}))),footer(back(),button('save-pen-observe','Save','button primary')));
-if(c.view==='pen-note')return sheet(c,'Pen note','Pen '+c.penId,(SentriUI.field({label:"Note",control:"<textarea data-v2=\"note\">"+(esc(f.note||''))+"</textarea>"}))+noteLifeField(f),footer(back(),button('save-pen-note','Save note','button primary','',!valid(c))));
+if(c.view==='pen-note')return sheet(c,'Pen note','Pen '+c.penId,(SentriUI.field({label:"Note",control:"<textarea data-v2=\"note\">"+(esc(f.note||''))+"</textarea>"}))+noteDaysField(f),footer(back(),button('save-pen-note','Save note','button primary','',!valid(c))));
  if(c.view==='resolve'){const rows=f.subjects.flatMap(id=>cases(pig(c,id)).map(k=>({id,k})));return sheet(c,'Resolve conditions',scope(c),rows.map(({id,k})=>{const key=id+'|'+k.name,entry=pickerEntry(c,key,{items:[['','Keep open'],['recover','Recovered'],['strike','Entered in error']],label:'Outcome for '+k.name+' on '+id,target:'verdict',value:f.verdicts[key]||''});return `<div class="resolve-case"><div><strong>${id}</strong><span>${esc(k.name)} · day ${k.day}</span>${k.feedLinked?'<small>Recovery ends this case’s feed adjustment</small>':''}</div>${pickerTriggerButton(entry,key,'','Outcome for '+k.name+' on '+id)}</div>`;}).join('')+`<p class="quiet-note">Recovery keeps the case in history. Entered in error marks it as a correction.</p>`,footer(back(),button('save-resolve','Save outcomes','button primary','',!Object.values(f.verdicts).some(Boolean))));}
  if(c.view==='triage')return sheet(c,'Care instructions',scope(c),`${fieldSelect(c,'Care instruction','triage',careOptions,f.triage)}<p class="quiet-note">Care determines which conditions need attention. ${f.subjects.filter(id=>!cases(pig(c,id)).length).length} selected pigs have no open case and will stay unchanged.</p>`,footer(back(),button('save-triage','Save instructions','button primary')));
  if(c.view==='temperature'||c.view==='backfat')return sheet(c,c.view==='temperature'?'Record temperature':'Record backfat',scope(c),(SentriUI.field({label:(c.view==='temperature'?'Temperature · °C':'Backfat · mm'),control:"<input type=\"number\" inputmode=\"decimal\" step=\"0.1\" data-v2=\"measurement\" value=\""+(esc(f.measurement||''))+"\">"})),footer(back(),button('save-measurement','Save reading','button primary','',!valid(c))));
@@ -1463,7 +1463,7 @@ function installV2(){
  else if(a==='action-scope'){c.actionScope=v;c.restoreSheetScroll=0;}
  else if(a==='selected-fault'){c.form={faultPenIds:[...c.selectedPens]};if(c.selectedPens.size===1){c.penId=[...c.selectedPens][0];c.form={device:'',description:'',name:''};c.view='fault-form';}else c.view='choose-fault-pen';}
  else if(a==='selected-pen-note'){const key=[...c.selectedPens].sort().join(' ');if(c.penNoteDraft?.key!==key)c.penNoteDraft={key,note:''};c.form=c.penNoteDraft;c.view='selected-pen-note';} // the form is the draft: Back keeps it (drawer law)
- else if(a==='save-selected-note'&&c.form.note?.trim()){const ids=[...c.selectedPens];ids.forEach(id=>{pen(c,id).note=c.form.note.trim();pen(c,id).noteBy='G. Hansen · today 09:41';pen(c,id).noteUntil=c.form.until||'1w';});addEvent(c,'Pen note',ids,c.form.note.trim());c.penNoteDraft=null;c.selected.clear();c.selectedPens.clear();c.reviewOnly=false;c.view='list';}
+ else if(a==='save-selected-note'&&c.form.note?.trim()){const ids=[...c.selectedPens];ids.forEach(id=>{pen(c,id).note=c.form.note.trim();pen(c,id).noteBy='G. Hansen · today 09:41';pen(c,id).noteDays=c.form.days||7;});addEvent(c,'Pen note',ids,c.form.note.trim());c.penNoteDraft=null;c.selected.clear();c.selectedPens.clear();c.reviewOnly=false;c.view='list';}
  else if(a==='batch-detail'){c.batchId=v;c.view='batch-detail';}
  else if(a==='show-batch'){c.filterKeep=false;c.batchFilter=v;c.stage='All';c.healthFilter='All';c.healthStatus='All';c.manualOnly=false;c.triageFilter='All';c.lens='All';c.scroll=0;c.view='list';}
  else if(a==='environment')c.view='environment';
@@ -1484,9 +1484,9 @@ function installV2(){
  else if(a==='read-pen-note'){c.penId=v;c.closedNoteId=null;c.view='read-pen-note';}
  else if(a==='close-pen-note'){closePenNote(c,c.penId);}
  else if(a==='undo-close-pen-note'){undoPenNoteClose(c,c.penId);}
- else if(a==='note-until'){c.form.until=v;}
- else if(a==='pen-note'){c.penId=v;const d=(c.penDrafts||={});d['note:'+v]||={note:pen(c,v).note,until:pen(c,v).noteUntil||'1w'};c.form=d['note:'+v];c.view='pen-note';}else if(a==='pen-observe'){c.penId=v;const d=(c.penDrafts||={});d['observe:'+v]||={observations:[...(pen(c,v).observations||[])]};c.form=d['observe:'+v];c.view='pen-observe';}
- else if(a==='save-pen-note'&&valid(c)){pen(c,c.penId).note=c.form.note.trim();delete c.penDrafts?.['note:'+c.penId];pen(c,c.penId).noteBy='G. Hansen · today 09:41';pen(c,c.penId).noteUntil=c.form.until||'1w';addEvent(c,'Pen note',[c.penId],c.form.note.trim());c.view=c.navTrail?.at(-1)?.view==='read-pen-note'?'read-pen-note':'pen-detail';}
+ else if(a==='note-days'){c.form.days=Math.max(1,Math.min(60,(c.form.days||7)+(+el.dataset.step||0)));}
+ else if(a==='pen-note'){c.penId=v;const d=(c.penDrafts||={});d['note:'+v]||={note:pen(c,v).note,days:pen(c,v).noteDays||7};c.form=d['note:'+v];c.view='pen-note';}else if(a==='pen-observe'){c.penId=v;const d=(c.penDrafts||={});d['observe:'+v]||={observations:[...(pen(c,v).observations||[])]};c.form=d['observe:'+v];c.view='pen-observe';}
+ else if(a==='save-pen-note'&&valid(c)){pen(c,c.penId).note=c.form.note.trim();delete c.penDrafts?.['note:'+c.penId];pen(c,c.penId).noteBy='G. Hansen · today 09:41';pen(c,c.penId).noteDays=c.form.days||7;addEvent(c,'Pen note',[c.penId],c.form.note.trim());c.view=c.navTrail?.at(-1)?.view==='read-pen-note'?'read-pen-note':'pen-detail';}
  else if(a==='pig-profile'){c.pigId=v;c.profileTab='details';c.pigLogFilter='All';c.view='pig-profile';}
  else if(a==='tick-pen'){tickPen(c,v);}
  else if(a==='pig-actions'){c.actionsGridAll=false;c.selected=new Set([v]);c.selectedPens.clear();c.actionScope='pigs';c.form={};c.view='actions';}
@@ -1520,12 +1520,12 @@ function round3Overlay(c){const pe=pen(c,c.penId);
  if(c.view==='read-pen-note'){
   const closed=pe.closedNotes?.find(n=>n.id===c.closedNoteId&&!n.reopenedAt);
   const text=closed?closed.text:pe.note,author=closed?closed.by:pe.noteBy;
-  return sheet(c,'Pen note','Pen '+pe.id,'<div class="st-panel st-note"><p class="st-note-text">'+esc(text)+'</p><div class="st-note-meta"><p>'+esc(author)+'<br>'+esc(closed?'Closed '+closed.closedAt+' · '+closed.closedBy+' · kept in the pen log':noteUntil(pe.noteUntil))+'</p>'+(!closed&&pe.note?button('pen-note','Edit','text-button st-note-edit',pe.id):'')+'</div></div>',footer(back(),closed?button('undo-close-pen-note','Undo close','button primary','',!!pe.note):pe.note?button('close-pen-note','Close note','button primary'):''));
+  return sheet(c,'Pen note','Pen '+pe.id,noteCard(text,author,closed?'Closed '+closed.closedAt+' by '+closed.closedBy+'':noteUntil(pe.noteDays).replace('Until','Shows until'),closed?'check':'clock',!closed&&pe.note?'pen-note':'',pe.id),footer(back(),closed?button('undo-close-pen-note','Undo close','button primary','',!!pe.note):pe.note?button('close-pen-note','Close note','button primary'):''));
  }
 
  if(c.view==='actions'&&c.actionScope==='pens'&&c.selectedPens.size)return sheet(c,'Actions',selectionLabel(c),`<div class="compact-actions st-panel st-row-group st-action-list">${action('selected-pen-note','note','Pen note','A note attached to the selected pens')}${action('feed-edit-selected','feed','Feed','Adjust daily feed for these pigs')}</div>`,footer(back(),''),'menu');
  if(c.view==='choose-fault-pen')return sheet(c,'Report fault','Choose one pen',`<p class="quiet-note">A fault belongs to one device in one pen.</p><div class="compact-actions st-panel st-row-group st-action-list">${(c.form.faultPenIds||[...c.selectedPens]).map(id=>action('new-fault','pen','Pen '+id,countLabel(pen(c,id).pigs.length),id)).join('')}</div>`,footer(back(),''));
- if(c.view==='selected-pen-note')return sheet(c,'Pen note',[...c.selectedPens].join(' · '),(SentriUI.field({label:"Note",control:"<textarea data-v2=\"note\">"+(esc(c.form.note||''))+"</textarea>"}))+noteLifeField(c.form),footer(back(),button('save-selected-note',`Save to ${c.selectedPens.size} ${c.selectedPens.size===1?'pen':'pens'}`,'button primary','',!c.form.note?.trim())));
+ if(c.view==='selected-pen-note')return sheet(c,'Pen note',[...c.selectedPens].join(' · '),(SentriUI.field({label:"Note",control:"<textarea data-v2=\"note\">"+(esc(c.form.note||''))+"</textarea>"}))+noteDaysField(c.form),footer(back(),button('save-selected-note',`Save to ${c.selectedPens.size} ${c.selectedPens.size===1?'pen':'pens'}`,'button primary','',!c.form.note?.trim())));
  if(c.view==='batch-detail'){const b=c.batches.find(b=>b.id===c.batchId);return sheet(c,'Batch '+b.id,`${b.stage} · ${b.pigIds.length} pigs · ${unitName(c)}`,`<section class="detail-section"><h4>Batch tracker</h4><div class="batch-tracker-tasks batch-tracker-detail">${batchTrackerContent(c,b)}</div></section><div class="detail-line"><span>Pens</span><strong>${b.pens.join(' · ')}</strong></div>`,footer(back(),button('show-batch','Show pigs in this batch','button primary',b.id)));}
  if(c.view==='environment')return sheet(c,'Environment',unitName(c),environmentBody(c),footer(back(),''));
  return null;
