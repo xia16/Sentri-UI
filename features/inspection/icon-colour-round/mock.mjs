@@ -22,6 +22,9 @@ const options = {
   ink: ['#2a3628', '#ffffff'],    // a dark tile, white icon
   tealSolid: ['#1f7a6d', '#ffffff'],   // a solid teal tile, white icon (the iOS Settings pattern, one colour)
   violetSolid: ['#5b4ba8', '#ffffff'], // a solid violet tile, white icon
+  // From the palette as it is (owner asked, 2026-11-03: our colours, not new ones). Token names, so the build needs no new token.
+  rangeFill: ['var(--range-fill)', 'var(--paper)'], // the slider fill's olive green, white icon
+  inkToken: ['var(--ink)', 'var(--paper)'],         // the ink, white icon
 };
 
 const only = process.env.ONLY ? process.env.ONLY.split(',') : null;
