@@ -381,21 +381,25 @@ async function taskMap(name, o) {
     const host = document.createElement('div'); host.innerHTML = U.penMap({ lanes: o.lanes, depth: o.depth, pens, entrance: 'Entrance', key: 'recv' });
     host.querySelectorAll('.st-pen-tile').forEach((t) => {
       const c = t.dataset.pen, v = o.tiles[c];
-      t.innerHTML = '<span class="m-pc">' + c + '</span>' + (v ? '<span class="m-pn">' + v[0] + '</span>' : '');
+      const [n, cap] = v ? v[0].split('/').map(Number) : [0, 1];
+      t.innerHTML = '<span class="m-pc">' + c + '</span>' + (n ? '<span class="m-pn">' + n + '</span><span class="m-fill"><i style="width:' + (100 * n / cap) + '%"></i></span>' : '');
       if (v && v[1]) t.classList.add(v[1]);
     });
     const list = document.querySelector('.room-list'); list.classList.add('m-count');
     list.innerHTML = o.key + '<div class="m-map">' + host.innerHTML + '</div>';
     const walk = document.createTreeWalker(document.querySelector('.st-task-dock, [data-ds="TaskDock"]') || document.body, NodeFilter.SHOW_TEXT);
     while (walk.nextNode()) if (walk.currentNode.nodeValue.trim() === 'Pen map') walk.currentNode.nodeValue = 'Pen list';
-    const st = document.createElement('style'); st.textContent = PLAN_CSS + '.room-list.m-count{padding-bottom:24px}'; document.head.append(st);
+    const st = document.createElement('style'); st.textContent = PLAN_CSS + '.room-list.m-count{padding-bottom:24px}.m-count .m-map .st-pen-tile{position:relative;overflow:hidden}' // the fill line only where room matters: pens not counted
+      + '.m-count .m-fill{position:absolute;left:12px;right:12px;bottom:8px;height:4px;border-radius:2px;background:var(--handle,#dce0d4)}'
+      + '.m-count .m-fill i{display:block;height:100%;border-radius:2px;background:var(--muted,#657060)}'
+      + '.m-count .st-pen-tile.m-done .m-fill{display:none}.m-count .m-map .st-pen-tile:has(.m-fill){padding-bottom:10px}'; document.head.append(st);
   }, { PLAN_CSS, o });
   await p.waitForTimeout(400);
   await p.screenshot({ path: path.join(out, name) });
   await p.close();
 }
 const keyOf = (counted) => '<p class="m-plankey">' + (counted ? '<span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span>' : '')
-  + '<span><i class="m-k-plan"></i>Planned</span><span><b>9/15</b> In / capacity</span></p>';
+  + '<span><i class="m-k-plan"></i>Planned</span><span>Pens hold <b>15</b></span></p>';
 const unit9 = (over) => {
   const t = { A1: ['0/15', 'm-plan'], A2: ['0/15', 'm-plan'], A3: ['0/15', 'm-plan'], A4: ['0/15', 'm-plan'], B1: ['0/15', 'm-plan'], B2: ['0/15', 'm-plan'],
     B3: ['0/15', 'm-free'], B4: ['0/15', 'm-free'], C1: ['15/15', 'm-free'], C2: ['9/15', 'm-free'], C3: ['0/15', 'm-free'], C4: ['0/15', 'm-free'] };
