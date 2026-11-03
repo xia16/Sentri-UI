@@ -7968,7 +7968,7 @@
               "children": [
                {
                 "type": "outcome",
-                "id": "fa-e14-died-row-opens-her-record",
+                "id": "fa-e10-died-row-opens-ended-record",
                 "label": "A Sow died row opens her record: the card headed Sow died, her piglets under it",
                 "tree": "E-10",
                 "gwt": {
@@ -7983,7 +7983,7 @@
                   "says": "her record leads to her piglets. When she dies her record is the finished record: the ring card, its head band Sow died"
                  }
                 ],
-                "result": "not-run"
+                "result": "pass"
                }
               ]
              },
@@ -9109,7 +9109,7 @@
               "children": [
                {
                 "type": "outcome",
-                "id": "fa-m23-death-shows-her-record",
+                "id": "fa-m1-sow-death-ends-session",
                 "label": "Her death ends the session without Finish; her record shows Sow died and her piglets",
                 "tree": "M-1",
                 "gwt": {
@@ -9129,7 +9129,7 @@
                   "says": "No Allocate step. … her record is the finished record … then Piglets · Foster or move"
                  }
                 ],
-                "result": "not-run"
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -9162,7 +9162,7 @@
                  },
                  {
                   "type": "outcome",
-                  "id": "fa-m24-row-says-piglets",
+                  "id": "fa-m11-back-row-says-to-allocate",
                   "label": "Back after the death: her row says \"9 piglets\" over Sow died, and nothing to allocate",
                   "tree": "M-11",
                   "gwt": {
@@ -9177,7 +9177,7 @@
                     "says": "Her room row reads 7 piglets over Sow died, settled (nothing to decide)"
                    }
                   ],
-                  "result": "not-run"
+                  "result": "pass"
                  },
                  {
                   "type": "action",
@@ -9186,7 +9186,7 @@
                   "children": [
                    {
                     "type": "outcome",
-                    "id": "fa-m25-row-opens-her-record",
+                    "id": "fa-m17-row-opens-allocation-sheet",
                     "label": "Tapping her row opens her record again",
                     "tree": "M-17",
                     "gwt": {
@@ -9201,7 +9201,7 @@
                       "says": "her record leads to her piglets"
                      }
                     ],
-                    "result": "not-run"
+                    "result": "pass"
                    }
                   ]
                  }
@@ -9377,7 +9377,7 @@
             "children": [
              {
               "type": "outcome",
-              "id": "fa-m26-piglets-open-her-list",
+              "id": "fa-m7-allocation-sheet-after-death",
               "label": "Piglets opens her litter: a row per piglet with an ID, one row for those without, Back",
               "tree": "M-26",
               "gwt": {
@@ -9392,7 +9392,7 @@
                 "says": "Her piglets are Inspection's pen list for one litter … Back at the bottom, and ··· Actions · N beside it once something is ticked"
                }
               ],
-              "result": "not-run"
+              "result": "pass"
              },
              {
               "type": "action",
@@ -9449,7 +9449,7 @@
                   "children": [
                    {
                     "type": "outcome",
-                    "id": "fa-m28-foster-sends-the-ticked",
+                    "id": "fa-m18-partial-move-keeps-the-rest",
                     "label": "Sent: the three leave her list for 000418, and Sent and moved says so",
                     "tree": "M-28",
                     "gwt": {
@@ -9464,7 +9464,33 @@
                       "says": "Actions on the ticked piglets: Foster or Move … Each takes its piglets off the list into Sent and moved"
                      }
                     ],
-                    "result": "not-run"
+                    "result": "pass"
+                   },
+                   {
+                    "type": "action",
+                    "id": "sow-death.piglets.tick3.foster.send.room",
+                    "label": "Back to the room",
+                    "children": [
+                     {
+                      "type": "outcome",
+                      "id": "fa-m19-rest-hand-reared",
+                      "label": "The rest stay with her: her row says \"4 piglets\"",
+                      "tree": "M-19",
+                      "gwt": {
+                       "given": "Three of a dead sow's 7 piglets were just sent to another sow.",
+                       "when": "The worker goes back to the room.",
+                       "then": "Her row says 4 piglets over Sow died; the 4 stay with her."
+                      },
+                      "authority": [
+                       {
+                        "src": "PRD",
+                        "at": "Decisions · Owner decisions, 2026-11-03 · Her piglets and fostering",
+                        "says": "Piglets nobody moves stay with her … she leaves the list once every piglet is fostered, moved or recorded dead"
+                       }
+                      ],
+                      "result": "pass"
+                     }
+                    ]
                    }
                   ]
                  }
@@ -9495,6 +9521,37 @@
                   "result": "not-run"
                  }
                 ]
+               },
+               {
+                "type": "action",
+                "id": "sow-death.piglets.tick3.actions",
+                "label": "Actions",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "fa-m16-no-rearing-pen-no-option",
+                  "label": "Actions on the ticked piglets offer Foster and Move, no Hand-rear and no rearing pen",
+                  "tree": "M-16",
+                  "gwt": {
+                   "given": "Three of a dead sow's piglets are ticked.",
+                   "when": "The worker opens Actions.",
+                   "then": "Foster and Move are offered; there is no Hand-rear and no rearing pen."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "Decisions · Owner decisions, 2026-11-03 · Her piglets and fostering",
+                    "says": "Actions on the ticked piglets: Foster or Move"
+                   },
+                   {
+                    "src": "PRD",
+                    "at": "Decisions · Owner decisions, 2026-11-03 · Her piglets and fostering",
+                    "says": "Piglets nobody moves stay with her … no Keep button"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
                }
               ]
              },
@@ -9505,7 +9562,7 @@
               "children": [
                {
                 "type": "outcome",
-                "id": "fa-m30-back-changes-nothing",
+                "id": "fa-m15-back-leaves-row-to-allocate",
                 "label": "Back from her piglets changes nothing",
                 "tree": "M-30",
                 "gwt": {
@@ -9520,7 +9577,7 @@
                   "says": "Piglets nobody moves stay with her … nothing to confirm"
                  }
                 ],
-                "result": "not-run"
+                "result": "pass"
                }
               ]
              },
@@ -9531,7 +9588,7 @@
               "children": [
                {
                 "type": "outcome",
-                "id": "fa-m31-all-fostered-she-leaves",
+                "id": "fa-m8-all-fostered-she-leaves",
                 "label": "Every piglet fostered: none left with her, and she leaves the task",
                 "tree": "M-8",
                 "gwt": {
@@ -9546,7 +9603,33 @@
                   "says": "she leaves the list once every piglet is fostered, moved or recorded dead"
                  }
                 ],
-                "result": "not-run"
+                "result": "pass"
+               },
+               {
+                "type": "action",
+                "id": "sow-death.piglets.all.overview",
+                "label": "Back to the room, Task overview",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "fa-m9-overview-counts-who-left",
+                  "label": "Task overview counts her under Left the task and the totals still add up",
+                  "tree": "M-9",
+                  "gwt": {
+                   "given": "Every piglet of a dead sow has been fostered.",
+                   "when": "The worker opens the Task overview.",
+                   "then": "It counts her under Left the task as 1 sow died, and the whole-task progress counts 18 sows."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "Decisions · Owner decisions, 2026-11-03 · Her piglets and fostering",
+                    "says": "Piglets nobody moves stay with her … she leaves the list once every piglet is fostered, moved or recorded dead"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
                }
               ]
              },
@@ -9573,6 +9656,84 @@
                  }
                 ],
                 "result": "not-run"
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "sow-death.piglets.room",
+              "label": "Back to the room without moving any",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-m12-hand-reared-row-stays",
+                "label": "Nothing moved: her row says \"7 piglets\" over Sow died and stays",
+                "tree": "M-12",
+                "gwt": {
+                 "given": "A dead sow's piglet list is open and nothing is ticked.",
+                 "when": "The worker goes back to the room.",
+                 "then": "Her row stays and says 7 piglets over Sow died; nothing asks to allocate them."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · Owner decisions, 2026-11-03 · Her piglets and fostering",
+                  "says": "Piglets nobody moves stay with her … she leaves the list once every piglet is fostered, moved or recorded dead"
+                 }
+                ],
+                "result": "pass"
+               },
+               {
+                "type": "action",
+                "id": "sow-death.piglets.room.open",
+                "label": "tap her row",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "fa-m13-hand-reared-row-opens-record",
+                  "label": "Her row opens her record, where her piglets are",
+                  "tree": "M-13",
+                  "gwt": {
+                   "given": "A dead sow's row says 7 piglets.",
+                   "when": "The worker taps the row.",
+                   "then": "Her record opens, with her Piglets under the card."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "Decisions · Owner decisions, 2026-11-03 · Her piglets and fostering",
+                    "says": "her record leads to her piglets"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "sow-death.piglets.move-all",
+              "label": "Tick all, Actions, Move, Pen B1",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-m14-rearing-pen-she-leaves",
+                "label": "Every piglet moved to a pen: none left with her, and she leaves the task",
+                "tree": "M-14",
+                "gwt": {
+                 "given": "A dead sow has 7 piglets.",
+                 "when": "The worker ticks all of them and moves them to Pen B1.",
+                 "then": "Her list says no piglets are left with her, and she leaves the room list."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · Owner decisions, 2026-11-03 · Her piglets and fostering",
+                  "says": "Piglets nobody moves stay with her … she leaves the list once every piglet is fostered, moved or recorded dead"
+                 }
+                ],
+                "result": "pass"
                }
               ]
              }

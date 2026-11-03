@@ -44,7 +44,7 @@ States: E0 Home, Farrowing section · E1 Home, Choose unit · E2 room list (Unit
 | E-7 | E2 | Filter, due range | ? Q3 — does it hide Active and Done sows? | S (open) — PRD Scope silent; review tasks-built-3 | blocker `fa-e7-due-filter-scope` |
 | E-8 | E2 | tap an Active row | → Counting | S — PRD Anchor; flow | `fa-e8-active-row-opens-counting` |
 | E-9 | E2 | tap a Done row | → the locked record, no counter | S — RUL After the lock | `fa-e9-done-row-opens-record` |
-| E-10 | E2 | tap a Sow died row | → her record: the card headed Sow died, Piglets · Foster or move under it | S — owner decision 2026-11-03 (was: the allocation sheet, 2026-10-10) | `fa-e14-died-row-opens-her-record` |
+| E-10 | E2 | tap a Sow died row | → her record: the card headed Sow died, Piglets · Foster or move under it | S — owner decision 2026-11-03 (was: the allocation sheet, 2026-10-10) | `fa-e10-died-row-opens-ended-record` |
 | E-11 | E2 | Scan ear tag | → ~~her sheet~~ superseded 2026-10-12 (Scan listed each scanned sow), then amended 2026-10-22: a read in Scan ear tags opens her farrowing drawer over Scan, not the room; see §8b S-21 | S — PRD Scope, then owner decisions 2026-10-12 and 2026-10-22 | pending `fa-e11-scan-ear-tag` (superseded by S-21; the read is the demo control, which the runner cannot tap) |
 | E-12 | E2 | read every row | → recorded counts only: no "born N", no "0 dead", no pencil | owner decision 2026-10-10 | `fa-e12-rows-recorded-counts-only` |
 | E-13 | E3 | Find a sow, type 4 | → the same rows, same rules | owner decision 2026-10-10 | `fa-e13-search-rows-recorded-counts-only` |
@@ -145,19 +145,25 @@ States: M0 Report death on The sow over C0 · M1 Ended (sow died).
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
-| M-1 | M0 | Prolapse, hold Save | → session ends without Finish; her record: the card headed Sow died, Piglets · Foster or move | S — RUL Starting and ending; owner decision 2026-11-03 | `fa-m23-death-shows-her-record` |
-| M-2 | M1 | Back to the room | → she stays as a Sow died row, "N piglets", settled (nothing to decide) | S — RUL Starting and ending ("She stays in the room"); owner decision 2026-11-03 | `fa-m2-dead-sow-stays-in-room`, `fa-m24-row-says-piglets` |
+| M-1 | M0 | Prolapse, hold Save | → session ends without Finish; her record: the card headed Sow died, Piglets · Foster or move | S — RUL Starting and ending; owner decision 2026-11-03 | `fa-m1-sow-death-ends-session` |
+| M-2 | M1 | Back to the room | → she stays as a Sow died row, "N piglets", settled (nothing to decide) | S — RUL Starting and ending ("She stays in the room"); owner decision 2026-11-03 | `fa-m2-dead-sow-stays-in-room`, `fa-m11-back-row-says-to-allocate` |
 | M-3 | M0 | Prolapse, tap (no hold) | → nothing recorded | S — RUL Starting and ending (hold-to-commit) | `fa-m3-sow-death-needs-hold` |
 | M-4 | M1 | record a piglet death (Record dead) | → recorded; her alive count drops, born unchanged | S — owner decision 2026-10-10 (answers Q5) | `fa-m4-piglet-deaths-after-sow-died` |
 | M-5 | M0 | Other | → an optional free-text line | S — RUL Starting and ending | — |
 | M-6 | M1 | her alive piglets | → they stay with her (hand-reared in her crate) until someone fosters or moves them (M-26 on); nothing to confirm | S — owner decision 2026-11-03 | — |
-| M-17 | M1 | tap her row in the room | → her record again | S — owner decision 2026-11-03 | `fa-m25-row-opens-her-record` |
-| M-26 | M1 | Piglets | → her piglets (Inspection's pen list for one litter): N alive, a row per ID, one row for those without, Back; no Actions while nothing is ticked | S — owner decision 2026-11-03 | `fa-m26-piglets-open-her-list` |
+| M-17 | M1 | tap her row in the room | → her record again | S — owner decision 2026-11-03 | `fa-m17-row-opens-allocation-sheet` |
+| M-26 | M1 | Piglets | → her piglets (Inspection's pen list for one litter): N alive, a row per ID, one row for those without, Back; no Actions while nothing is ticked | S — owner decision 2026-11-03 | `fa-m7-allocation-sheet-after-death` |
 | M-27 | M26 | tick two IDs and the row without ID | → ··· Actions · 3 beside Back | S — owner decision 2026-11-03 | `fa-m27-ticked-count-on-actions` |
-| M-28 | M27 | Actions › Foster, tap a sow | → a confirm: To <ID>, the IDs, Send 3 piglets; sending takes them off her list into Sent and moved | S — owner decision 2026-11-03 | `fa-m35-foster-confirms-the-sow`, `fa-m28-foster-sends-the-ticked` |
+| M-28 | M27 | Actions › Foster, tap a sow | → a confirm: To <ID>, the IDs, Send 3 piglets; sending takes them off her list into Sent and moved | S — owner decision 2026-11-03 | `fa-m35-foster-confirms-the-sow`, `fa-m18-partial-move-keeps-the-rest` |
 | M-29 | M27 | Actions › Move, tap a pen | → they leave her list for that pen, Sent and moved says so | S — owner decision 2026-11-03 | `fa-m29-move-moves-the-ticked` |
-| M-30 | M26 | Back | → her record; nothing changed | S — owner decision 2026-11-03 | `fa-m30-back-changes-nothing` |
-| M-8 | M26 | Tick all, Foster them all | → none left with her; she leaves the room list | S — owner decision 2026-11-03 | `fa-m31-all-fostered-she-leaves` |
+| M-30 | M26 | Back | → her record; nothing changed | S — owner decision 2026-11-03 | `fa-m15-back-leaves-row-to-allocate` |
+| M-8 | M26 | Tick all, Foster them all | → none left with her; she leaves the room list | S — owner decision 2026-11-03 | `fa-m8-all-fostered-she-leaves` |
+| M-9 | M8 | back to the room, Task overview | → "Left the task · 1 sow died"; progress counts 18; every total adds up | S — owner decision 2026-11-03 | `fa-m9-overview-counts-who-left` |
+| M-12 | M26 | back to the room, nothing moved | → her row "7 piglets" over Sow died, stays; nothing asks to allocate | S — owner decision 2026-11-03 | `fa-m12-hand-reared-row-stays` |
+| M-13 | M12 | tap her row | → her record, Piglets under the card | S — owner decision 2026-11-03 | `fa-m13-hand-reared-row-opens-record` |
+| M-14 | M26 | Tick all, Move them all to a pen | → none left with her; she leaves the room list | S — owner decision 2026-11-03 | `fa-m14-rearing-pen-she-leaves` |
+| M-16 | M27 | Actions | → Foster and Move; no Hand-rear, no rearing pen | S — owner decision 2026-11-03 | `fa-m16-no-rearing-pen-no-option` |
+| M-19 | M28 | back to the room after a partial send | → her row "4 piglets"; the rest stay with her | S — owner decision 2026-11-03 | `fa-m19-rest-hand-reared` |
 | M-33 | M26 | type in Piglet ID | → only the IDs that match; the row without ID steps aside | S — owner decision 2026-11-03 | `fa-m33-search-filters-her-list` |
 | M-34 | M26 | type a number in the count without ID | → that many ticked (the phone's keypad) | S — owner decision 2026-11-03 | `fa-m34-count-typed-ticks-that-many` |
 | M-35 | M26 | Scan, a tag read | → that piglet ticked; a read never unticks | S — owner decision 2026-11-03 | — (the reader is simulated outside the phone) |
@@ -281,7 +287,7 @@ task with laggards and an unsaved draft somewhere (K, Q2) · **s7** interrupted:
 
 ## 9 · Open questions (decision-blockers)
 
-1. ~~**Q1 · Is fostering in Farrowing's scope?**~~ *Answered 2026-11-03 by the owner: yes, everywhere (a sow's piglets, Foster piglets from her Actions). `fa-z1-fostering-scope` is retired; C-7 is `fa-c5-foster-from-actions`.*
+1. ~~**Q1 · Is fostering in Farrowing's scope?**~~ *Answered 2026-11-03 by the owner: yes, everywhere (a sow's piglets, Foster piglets from her Actions). the blocker `fa-z1-fostering-scope` is gone; C-7 is `fa-c5-foster-from-actions`. The Allocate leaves keep their ids, rewritten to her piglets (a design PR keeps every leaf).*
 2. **Q2 · Can the task end while a sow is farrowing?** The PRD blocks it ("blocked while farrowing is open", with
    CLOSURE: drafts block too); the contract C9 says "close never blocks on them" (ACTIVE sows list informationally),
    SYN §6 E2 recommends warn + doors, and RUL piglet-processing Round 4 allows End with review items open.
