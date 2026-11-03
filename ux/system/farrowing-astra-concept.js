@@ -335,7 +335,7 @@ const roomLenses=['Awaiting','Active','Done','All'];
 const defaultRoomFilter=()=>({from:-7,to:7,pmin:0,pmax:6});
 // Parity is a range like the due days (owner, 2026-11-02): 0 to 6+, the top end open.
 const parityDay=n=>n===6?'6+':String(n);
-const paritySlider=(d,key,counts)=>SentriUI.rangeSlider({counts,min:0,max:6,value:[d.pmin,d.pmax],title:'Parity',icon:icon('profile'),key,names:['pmin','pmax'],labels:['Lowest parity','Highest parity'],format:parityDay,summary:(a,b)=>parityRangeLabel({pmin:a,pmax:b}),ends:['0','3','6+']});
+const paritySlider=(d,key,counts)=>SentriUI.rangeSlider({counts,min:0,max:6,value:[d.pmin,d.pmax],title:'Parity',icon:icon('pig'),key,names:['pmin','pmax'],labels:['Lowest parity','Highest parity'],format:parityDay,summary:(a,b)=>parityRangeLabel({pmin:a,pmax:b}),ends:['0','3','6+']});
 // The chosen span on the title row, short (owner, 2026-11-02: too much text): days from today as numbers against the rail's words.
 // "−2 to +1 days", "+3 days", "Today"; an open end keeps its +: "−7+ to −3 days".
 const dueNum=n=>n===0?"0":(n>0?"+":"−")+Math.abs(n)+(Math.abs(n)===7?"+":"");
@@ -549,7 +549,7 @@ function scanSetup(c,preset=''){
    list. Scan turns the list itself to scanning: each read ticks her and marks her row; a pig from another unit is not added. Then the verb's
    own form (Inspection's), filled once and saved for every pig chosen. Death is not here: it can't be undone, so it stays one pig at a time.
    Copy (owner): the sheet is plain "Actions", its line "Pigs in Unit 7"; not "For several sows", "Many pigs at once" or "bulk". */
-const batchVerbs=[['health','condition','Condition','Disease or symptom'],['treatment','treat','Treat','Record treatment'],['triage','alert','Care','Care instructions'],['note','note','Note','Add a note'],['body','measure','Measure','Measurements & condition'],['feed','feed','Feed','Adjust feed'],['transfer','transfer','Transfer','Transfer']];
+const batchVerbs=[['health','condition','Condition','Disease or symptom'],['treatment','treat','Treat','Record treatment'],['triage','care','Care','Care instructions'],['note','note','Note','Add a note'],['body','measure','Measure','Measurements & condition'],['feed','feed','Feed','Adjust feed'],['transfer','transfer','Transfer','Transfer']];
 const batchScans=['000431','004305','000434','000512','000392','000999','000622','004811','000437'];   // what "Simulate scan" reads while choosing: 000434 is in Unit 3, 000512 died, 000622 was sold, 000437 farrows in Unit 6
 /* A read that can't join this list adds nothing (owner reviews, 2026-10-22), but it is not lost: it goes into the list itself, at the top,
    where the eye is after a read, with no tick box, each row a door to her record. Why, in the order that matters: no pig has this tag (a
@@ -682,8 +682,8 @@ function penDetails(c){
  return roomSheet(ZH?rowText.pen(c.detailPen):'Pen '+c.detailPen,
   `<section class="pen-page-section">${verbs}</section>`+
   (attention.length?section(penPage.attention,'alert',`<div class="compact-actions st-panel st-row-group">${attention.join('')}</div>`):'')+
-  section(penPage.now,'details',SentriUI.facts(now,{columns:now.length}))+
-  `<section class="pen-page-section"><div class="compact-actions st-panel st-row-group">${penActionRow('room-pen-log','clock',penPage.log,penPage.logLine)}</div></section>`,false,'pen-detail-sheet');
+  section(penPage.now,'pen',SentriUI.facts(now,{columns:now.length}))+
+  `<section class="pen-page-section"><div class="compact-actions st-panel st-row-group">${penActionRow('room-pen-log','history',penPage.log,penPage.logLine)}</div></section>`,false,'pen-detail-sheet');
 }
 function penSubpage(s,c){
  if(!['roomPenFeed','roomPenReadNote','roomPenNote','roomPenFault','roomPenFaultRecord'].includes(s.view))return null;
@@ -883,7 +883,7 @@ function litterHeading(disabled=false){return SentriUI.heading({title:'Litter su
 function aliveCard(s){
  const b=s.bornDraft||0,di=draftDied(s),bd=draftBornDead(s),dr=visitDraft(s);
  const chip=(tone,glyph,n,word)=>`<span class="alive-chip" data-tone="${tone}">${icon(glyph)}<b>${n}</b>${word}</span>`;
- const side=dr?`<span class="alive-chips">${b?chip('add','farrow','+'+b,'born'):''}${di?chip('sub','trend-down','−'+di,'died'):''}${bd?chip('quiet','minus',bd,'born dead'):''}</span>`
+ const side=dr?`<span class="alive-chips">${b?chip('add','pig','+'+b,'born'):''}${di?chip('sub','death','−'+di,'died'):''}${bd?chip('quiet','minus',bd,'born dead'):''}</span>`
   :'';
  return `<div class="alive-surface"><button type="button" class="alive-card" data-action="litter" aria-label="Alive ${aliveNow(s)}${dr?', not saved yet':''}. Open litter details"><span class="alive-label">Alive${dr?' <span class="alive-draft">· Not saved yet</span>':''}</span><span class="alive-go">Details${icon('chevron')}</span><span class="alive-row"><span class="alive-figure">${aliveNow(s)}</span>${side}</span></button>${lastRun(s)}</div>`;
 }
@@ -892,14 +892,14 @@ function lastRun(s){
  const e=lastSave(s);if(!e||visitDraft(s)||s.locked&&!e.afterLock)return '';
  const v=e.visit,b=v.born||0,di=sum(v.dead.slice(2)),bd=v.dead[0]+v.dead[1],chip=(n,w)=>`<span class="alive-chip"><b>${n}</b>${w}</span>`;
  const when=[e.day==='Today'?'':e.day,e.time].filter(Boolean).join(' ');
- const undo=canUndo(s)?SentriUI.button({label:'Undo',register:'text',icon:icon('return'),action:'undoAsk',className:'alive-undo',attrs:{'aria-label':`Undo the ${when} save`}}):'';
+ const undo=canUndo(s)?SentriUI.button({label:'Undo',register:'text',icon:icon('undo'),action:'undoAsk',className:'alive-undo',attrs:{'aria-label':`Undo the ${when} save`}}):'';
  return `<div class="alive-run"><div class="alive-run-copy"><small>Saved ${esc(when)} · ${esc(initials(e.who))}</small><span class="alive-run-chips">${b?chip('+'+b,'born'):''}${di?chip('−'+di,'died'):''}${bd?chip(bd,'born dead'):''}</span></div>${undo}</div>`;
 }
 function count(s){
  const dr=visitDraft(s),back=SentriUI.backButton({action:'close'});
  // One row of keys under the card (owner, 2026-11-02): − takes back a + not yet saved, + Born alive, Death opens Report death.
  const n=s.bornDraft||0;
- const keys=`<div class="count-keys" role="group" aria-label="Count this visit"><button type="button" class="count-key" data-action="bornAlive" data-value="-1" aria-label="Take back one born alive"${n?'':' aria-disabled="true"'}>${icon('minus')}</button><button type="button" class="count-key" data-tone="plus" data-action="bornAlive" data-value="1">${icon('plus')}<span>Born alive</span></button><button type="button" class="count-key" data-tone="death" data-action="death" aria-label="Report death">${icon('trend-down')}<span>Death</span></button></div>`;
+ const keys=`<div class="count-keys" role="group" aria-label="Count this visit"><button type="button" class="count-key" data-action="bornAlive" data-value="-1" aria-label="Take back one born alive"${n?'':' aria-disabled="true"'}>${icon('minus')}</button><button type="button" class="count-key" data-tone="plus" data-action="bornAlive" data-value="1">${icon('plus')}<span>Born alive</span></button><button type="button" class="count-key" data-tone="death" data-action="death" aria-label="Report death">${icon('death')}<span>Death</span></button></div>`;
  const body=aliveCard(s)+keys;
  return {cls:'count-body',body,corner:dr?cornerClear('clearVisit'):null,footer:dr?footer(back,SentriUI.button({label:'Save',register:'primary',action:'saveVisit'}),'execution-completion'):footer(back,SentriUI.button({label:'Finish farrowing',register:'primary',action:'finish',disabled:!born(s)})+SentriUI.iconButton({action:'sowActions',icon:icon('more'),label:'Actions for sow '+s.tag}),'execution-completion count-footer')};
 }
@@ -908,7 +908,7 @@ function finish(s){
  return {cls:'finish-body',body:`${metrics([['Born',born(s)],['Alive',s.alive],['Dead',sum(s.dead)]])}<section class="finish-condition" aria-label="Piglet condition">${conditionHeading()}<div class="finish-rows">${rows}</div></section>`,footer:footer(SentriUI.backButton({action:'returnCount'}),hold('lock','Finish farrowing',!born(s)))};
 }
 function moreSowActions(s){return btn('sowActions',`Actions ${icon('chevron')}`,'more-sow-actions').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`);}
-function recordActions(s){const pending=sum(s.deathDraft);return `<div class="record-inline-actions" aria-label="Record actions"><div class="record-action-group" role="group" aria-label="Quick actions">${btn('death',`${icon('alert')}<span>Record dead</span>${pending?`<small>${pending} unsaved</small>`:''}`,'record-toolbar-action')}${btn('sowActions',`${icon('more')}<span>Actions</span>`,'record-toolbar-action record-toolbar-more').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)}</div></div>`;}
+function recordActions(s){const pending=sum(s.deathDraft);return `<div class="record-inline-actions" aria-label="Record actions"><div class="record-action-group" role="group" aria-label="Quick actions">${btn('death',`${icon('death')}<span>Record dead</span>${pending?`<small>${pending} unsaved</small>`:''}`,'record-toolbar-action')}${btn('sowActions',`${icon('more')}<span>Actions</span>`,'record-toolbar-action record-toolbar-more').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)}</div></div>`;}
 function recordNavigation(primary=''){return footer(SentriUI.backButton({action:'close'}),primary,'execution-completion');}
 // Her piglets (owner, 2026-11-03): a sow at farrowing is her and her litter, so her record opens her piglets, the list Inspection shows
 // for a pen: a row per piglet with an ID, then one row for those without (its count says how many; the count opens the number pad).
@@ -931,7 +931,7 @@ function litterRows(s){
 function litterPage(s){
  const f=litterDraft(s),k=litterPicked(s),n=s.alive,all=f.ids.length===fosterIds(s).length&&f.count===fosterNoId(s);
  const scan=f.idScan?`<div class="litter-scan">${SentriUI.scanBar({state:f.idScan==='waiting'?'waiting':'scanning',device:'Reader 1',text:f.idScan==='waiting'?'':'Scan piglet tags',stop:{action:'fosterIdScanStop'}})}</div>`:'';
- const list=n?`<section class="litter-list">${SentriUI.heading({title:`${n} alive`,kind:'section',level:4,action:{label:all?'Clear':'Tick all',action:'litterAll'}})}${scan}${SentriUI.rowGroup(litterRows(s))}</section>`:`<p class="st-find-hint">No piglets left with her.</p>`;
+ const list=n?`<section class="litter-list"><div class="litter-head">${SentriUI.heading({title:`${n} alive`,kind:'section',level:4})}${SentriUI.button({label:all?'Clear':'Tick all',register:'text',action:'litterAll'})}</div>${scan}${SentriUI.rowGroup(litterRows(s))}</section>`:`<p class="st-find-hint">No piglets left with her.</p>`;
  const dock=SentriUI.taskDock({label:'Piglet tools',className:'litter-dock',primary:k?null:{action:'fosterIdScan',label:'Scan',attrs:{'aria-label':'Scan piglet tags'}},content:k?`<span class="litter-picked">${pigletWord(k)} selected</span>${btn('litterActions',`${icon('grid')}<span>Actions</span>`,'button primary selection-action')}`:''});
  const page=SentriUI.sheet({variant:'page',title:'Piglets',line:`${s.ended?'Sow died':'Sow'} · ${s.tag} · ${sowPlace(s)}`,back:{action:'featureBack'},body:list+allocSentList(s),bodyClass:'litter-body',footer:dock,className:'feature-page litter-page',label:'Piglets',bar:status()});
  if(s.view==='allocConfirm')return '<div class="page-background" inert aria-hidden="true">'+fosterPage(s)+'</div>'+allocConfirm(s);   // over the sows
@@ -947,19 +947,19 @@ function litterCountSheet(s){
 // Actions on the ticked piglets: what a litter's piglets can do from the floor.
 function litterActionsSheet(s){
  const k=litterPicked(s);
- const rows=SentriUI.row({variant:'navigation',icon:icon('transfer'),title:'Foster',description:'Send to another sow',trail:'chevron',action:'allocToSow'})+SentriUI.row({variant:'navigation',icon:icon('move'),title:'Move',description:'To another pen',trail:'chevron',action:'allocToPen'});
+ const rows=SentriUI.row({variant:'navigation',icon:icon('pig'),title:'Foster',description:'Send to another sow',trail:'chevron',action:'allocToSow'})+SentriUI.row({variant:'navigation',icon:icon('transfer'),title:'Move',description:'To another pen',trail:'chevron',action:'allocToPen'});
  return SentriUI.sheet({variant:'drawer',surface:'menu',title:pigletWord(k),line:{text:[{text:'Sow '+s.tag}]},body:SentriUI.rowGroup(rows),bodyClass:'alloc-done-body',footer:footer(SentriUI.backButton({action:'featureBack'})),size:'short',sizing:'content',label:'Actions for '+pigletWord(k),scrim:{action:'featureBack',label:'Back to her piglets'}});
 }
 // Send: the sow is chosen on the sow picker; this confirms who takes which piglets.
 function allocConfirm(s){
  const f=s.fosterDraft,other=fosterSow(s,f.target);if(!other)return '';const n=f.ids.length+f.count;
- const what=SentriUI.row({variant:'navigation',icon:icon('transfer'),title:`${n} piglet${n===1?'':'s'}`,description:[f.ids.length?'ID '+f.ids.join(', '):'',f.count?`${f.count} without ID`:''].filter(Boolean).join(' · ')});
+ const what=SentriUI.row({variant:'navigation',icon:icon('pig'),title:`${n} piglet${n===1?'':'s'}`,description:[f.ids.length?'ID '+f.ids.join(', '):'',f.count?`${f.count} without ID`:''].filter(Boolean).join(' · ')});
  return SentriUI.sheet({variant:'drawer',surface:'menu',title:'Send piglets',line:{text:[{text:'To '},{text:other.tag,strong:true},{text:` · ${rowText.pen(other.pen)} · ${other.farm?other.stage:rowText.alive(other.alive)}`}]},body:SentriUI.rowGroup(what),bodyClass:'alloc-done-body',footer:footer(SentriUI.backButton({action:'featureBack'}),btn('saveFoster',`Send ${n} piglet${n===1?'':'s'}`,'button primary')),size:'short',sizing:'content',label:'Send piglets',scrim:{action:'featureBack',label:'Back to the sows'}});
 }
 // What has gone where so far: one row per send or move, where they went, the IDs that went and how many.
 function allocSentList(s){
  if(!(s.allocSent||[]).length)return '';
- const row=x=>SentriUI.row({variant:'navigation',icon:icon(x.kind==='moved'?'barn':'transfer'),title:x.kind==='moved'?`To ${x.where}`:`To ${x.tag} · ${rowText.pen(x.pen)}`,description:x.ids.length?'ID '+x.ids.join(', '):'Without ID',trailing:{text:String(x.n)}});
+ const row=x=>SentriUI.row({variant:'navigation',icon:icon(x.kind==='moved'?'transfer':'pig'),title:x.kind==='moved'?`To ${x.where}`:`To ${x.tag} · ${rowText.pen(x.pen)}`,description:x.ids.length?'ID '+x.ids.join(', '):'Without ID',trailing:{text:String(x.n)}});
  return `<section class="allocate-sent">${SentriUI.heading({title:'Sent and moved',kind:'group',level:4})}${SentriUI.rowGroup(s.allocSent.map(row).join(''))}</section>`;
 }
 // Move to a pen is Move's destination picker (features/move: her unit pinned first, her own crate dimmed, search reaches any pen and the
@@ -1013,7 +1013,7 @@ function finishedDetails(s){
 function locked(s){
  const e=s.events[0];
  const ab=s.productionOutcome==='abortion'?s.events.find(e=>e.text.startsWith('Abortion')):null;
- if(!ab&&!s.ended)return {cls:'completed-record-body finished-record-body',body:finishedCard(s)+litterDoor(s)+lastRun(s),footer:footer(SentriUI.backButton({action:'close'}),btn('sowActions',`${icon('more')}<span>Actions</span>`,'button secondary').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)+btn('death',`${icon('alert')}<span>Record dead</span>`,'button secondary'),'execution-completion finished-footer')};
+ if(!ab&&!s.ended)return {cls:'completed-record-body finished-record-body',body:finishedCard(s)+litterDoor(s)+lastRun(s),footer:footer(SentriUI.backButton({action:'close'}),btn('sowActions',`${icon('more')}<span>Actions</span>`,'button secondary').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)+btn('death',`${icon('death')}<span>Record dead</span>`,'button secondary'),'execution-completion finished-footer')};
  const body=ab?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Aborted',ab.text.replace(/^Abortion · ?/,''),[ab.day,ab.time].filter(Boolean).join(' '),initials(ab.who)].filter(Boolean).join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:s.ended?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Sow died',s.sowCause.toLowerCase(),...diedStamp(s)].join(' · ')})}${litterDoor(s)}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:'';
  return {cls:'completed-record-body',body:`${body}${recordActions(s)}`,footer:recordNavigation()};
 }
@@ -1021,7 +1021,7 @@ function locked(s){
 // sow herself); the chosen group's causes count below. Done takes the counts to the visit, still unsaved; Back leaves without them.
 function reportDeath(s){
  const sow=s.mode==='sow',g=s.group||'died',idx=g==='bornDead'?[0,1]:[2,3,4,5],room=s.alive+(s.bornDraft||0)-draftDied(s);
- const tiles=SentriTask.choice({label:'What died',action:'deathGroup',options:[{value:'bornDead',label:'Born dead',icon:'minus',pressed:!sow&&g==='bornDead'},{value:'died',label:'Died after birth',icon:'trend-down',pressed:!sow&&g==='died'},{value:'sow',label:'The sow',icon:'alert',pressed:sow}]});
+ const tiles=SentriTask.choice({label:'What died',action:'deathGroup',options:[{value:'bornDead',label:'Born dead',icon:'minus',pressed:!sow&&g==='bornDead'},{value:'died',label:'Died after birth',icon:'death',pressed:!sow&&g==='died'},{value:'sow',label:'The sow',icon:'pig',pressed:sow}]});
  const causes=idx.map(i=>farmStepper({label:types[i],value:s.deathDraft[i],min:0,max:i>=2?s.deathDraft[i]+Math.max(0,room):null,action:'deadStep',key:i+',',reserveHint:false},i+',')).join('');
  const photos=`<div class="photo-field">${SentriUI.photos({items:s.photos.map((src,i)=>({id:String(i),src})),action:'addPhoto',viewAction:'photo',active:sow?!!s.sowCause:!!sum(s.deathDraft)})}<input type="file" data-field="photo" accept="image/*" capture="environment" class="visually-hidden" tabindex="-1"></div>`;
  const sowBody=SentriUI.choiceRadios({label:'Cause',key:'sowCause',action:'sowCause',options:['Farrowing','Prolapse','Found dead','Other'].map(label=>({value:label,label})),selected:s.sowCause||''})+(s.sowCause==='Other'?SentriUI.optionalRow({label:'Details',value:s.sowNote||'',face:'row',icon:icon('note'),inline:SentriUI.field({label:'Details',labelHidden:true,control:`<input aria-label="Details" data-field="sowNote" value="${esc(s.sowNote)}">`})}):'')+photos+SentriUI.banner({tone:'danger',headline:'Saving ends farrowing',consequence:`${s.alive} alive stay under piglet care`});
@@ -1056,15 +1056,15 @@ function deathBreakdown(s){return detailSheet(s,'Death breakdown',SentriUI.facts
 function profile(s){return `<iframe class="sow-detail-frame" title="Sow details · ${esc(s.tag)}" src="inspection-astra-concept.html?layout=focus&embed=sow&v=stage-actions-15${ZH?'&lang=zh':''}"></iframe>`;}
 const sowDetailContexts=new WeakMap();
 function sowActionCatalogue(s){return [
- {id:'miscarriage',title:'Record abortion',group:'production',scope:'farrowing',sub:'Record a pregnancy loss',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':s.locked?'Farrowing is already finished.':''},
- {id:'piglets',title:'Piglet processing',group:'production',scope:'piglet-processing',sub:`Care and identity · ${s.piglets.filter(p=>p.state==='Alive').length} identified · ${s.unidentified} without identity`,icon:'profile',reason:!born(s)?'Record the litter first.':''},
- {id:'death',inDrawer:true,title:'Record piglet deaths',group:'production',scope:'piglet-processing',sub:'Record stillbirths and deaths in this litter',icon:'alert',reason:s.productionOutcome?'A production outcome is already recorded.':!born(s)?'Record the litter first.':''},
- {id:'countReconcile',title:'Reconcile piglet count',group:'production',scope:'piglet-processing',sub:`System count ${s.alive} · explain a mismatch`,icon:'note',reason:!born(s)?'Record the litter first.':''},
- {id:'sow-death',inDrawer:true,title:'Record sow death',group:'health',sub:'Record the death of this sow',reason:s.ended?'Sow death is already recorded.':''},
- {id:'foster',title:'Foster piglets',group:'production',scope:'piglet-processing',sub:'Send or receive piglets between litters',icon:'hospital',reason:!s.alive?'No live piglets recorded.':''},
+ {id:'miscarriage',title:'Record abortion',group:'production',icon:'pregnancy',scope:'farrowing',sub:'Record a pregnancy loss',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':s.locked?'Farrowing is already finished.':''},
+ {id:'piglets',title:'Piglet processing',group:'production',scope:'piglet-processing',sub:`Care and identity · ${s.piglets.filter(p=>p.state==='Alive').length} identified · ${s.unidentified} without identity`,icon:'pig',reason:!born(s)?'Record the litter first.':''},
+ {id:'death',inDrawer:true,title:'Record piglet deaths',group:'production',scope:'piglet-processing',sub:'Record stillbirths and deaths in this litter',icon:'death',reason:s.productionOutcome?'A production outcome is already recorded.':!born(s)?'Record the litter first.':''},
+ {id:'countReconcile',title:'Reconcile piglet count',group:'production',scope:'piglet-processing',sub:`System count ${s.alive} · explain a mismatch`,icon:'count',reason:!born(s)?'Record the litter first.':''},
+ {id:'sow-death',inDrawer:true,title:'Record sow death',icon:'death',group:'health',sub:'Record the death of this sow',reason:s.ended?'Sow death is already recorded.':''},
+ {id:'foster',title:'Foster piglets',group:'production',scope:'piglet-processing',sub:'Send or receive piglets between litters',icon:'pig',reason:!s.alive?'No live piglets recorded.':''},
  {id:'remove-batch',title:'Remove from batch',group:'production',scope:'other',sub:'Remove this sow without recording a litter',icon:'close',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':''},
- {id:'not-in-pig',title:'Mark not in pig',group:'production',scope:'farrowing',sub:'Record the outcome and return to rebreed watch',icon:'alert',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':''},
- {id:'move-batch',title:'Move to another farrowing batch',group:'production',scope:'other',sub:'Keep the sow in the production plan',icon:'transfer',reason:'No destination farrowing batches are connected in this preview.'},
+ {id:'not-in-pig',title:'Mark not in pig',group:'production',scope:'farrowing',sub:'Record the outcome and return to rebreed watch',icon:'pregnancy',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':''},
+ {id:'move-batch',title:'Move to another farrowing batch',group:'production',scope:'other',sub:'Keep the sow in the production plan',icon:'batch',reason:'No destination farrowing batches are connected in this preview.'},
  {id:'marker',title:s.markers.length?'Edit note':'Add note',content:s.markers.length>0,group:'routine',sub:s.markers[0]?.text||'Leave a note or describe a visible marker',icon:'note',reason:s.ended?'This sow has died.':''},
  {id:'transfer',title:'Transfer sow',group:'routine',sub:'Move this sow to another unit or pen',icon:'transfer',reason:s.ended?'This sow has died.':''}
 ];}
@@ -1117,7 +1117,7 @@ function processingCare(s){
 function processingRecords(s){
  const q=s.pigletQuery.trim().toLowerCase(),rows=s.piglets.map((p,index)=>({p,index})).filter(({p})=>!q||p.tag.toLowerCase().includes(q)||p.notch.toLowerCase().includes(q));
  const alive=s.piglets.filter(p=>p.state==='Alive').length;
- return SentriUI.facts([{label:'Alive litter',value:s.alive},{label:'Identified',value:alive},{label:'Without identity',value:s.unidentified}],{columns:3})+`${s.unidentified?`<div class="feature-warning">${icon('alert')}<span><strong>${s.unidentified} piglets do not have identity details</strong><small>The litter count remains valid. Add identity only when it is known.</small></span></div>`:''}<label class="piglet-search">${icon('search')}<input type="search" data-piglet-search value="${esc(s.pigletQuery)}" placeholder="Search ear tag or notch"></label><div class="identity-tools">${btn('scanPiglet',`${icon('scan')}<span>Scan tag</span>`,'feature-tool')}${btn('notchPiglet',`${icon('details')}<span>Ear notch</span>`,'feature-tool')}${btn('addPiglet',`${icon('plus')}<span>Add piglet</span>`,'feature-tool')}</div><div class="piglet-roster">${rows.map(({p,index})=>`<article class="piglet-row${p.state==='Dead'?' is-dead':''}"><label class="piglet-select"><input type="checkbox" data-action="togglePiglet" data-value="${esc(p.tag)}"${s.pigletSelected.includes(p.tag)?' checked':''}${p.state==='Dead'?' disabled':''}><span class="visually-hidden">Select ${esc(p.tag)}</span></label><button data-action="editPiglet" data-value="${index}" class="piglet-row-main"><strong>${esc(p.tag||'Identity pending')}</strong><span>${esc([p.notch&&'notch '+p.notch,p.sex,p.weight&&p.weight+' kg'].filter(Boolean).join(' · ')||'Add identity details')}</span><small>${esc(p.state)}</small>${icon('chevron')}</button></article>`).join('')||'<p class="detail-empty">No piglets match this search.</p>'}</div>${SentriUI.panel(SentriUI.row({action:'foster',icon:icon('transfer'),title:'Foster piglets',description:'Send or receive piglets between litters'}),{className:'st-row-group'})}`;
+ return SentriUI.facts([{label:'Alive litter',value:s.alive},{label:'Identified',value:alive},{label:'Without identity',value:s.unidentified}],{columns:3})+`${s.unidentified?`<div class="feature-warning">${icon('alert')}<span><strong>${s.unidentified} piglets do not have identity details</strong><small>The litter count remains valid. Add identity only when it is known.</small></span></div>`:''}<label class="piglet-search">${icon('search')}<input type="search" data-piglet-search value="${esc(s.pigletQuery)}" placeholder="Search ear tag or notch"></label><div class="identity-tools">${btn('scanPiglet',`${icon('scan')}<span>Scan tag</span>`,'feature-tool')}${btn('notchPiglet',`${icon('tag')}<span>Ear notch</span>`,'feature-tool')}${btn('addPiglet',`${icon('plus')}<span>Add piglet</span>`,'feature-tool')}</div><div class="piglet-roster">${rows.map(({p,index})=>`<article class="piglet-row${p.state==='Dead'?' is-dead':''}"><label class="piglet-select"><input type="checkbox" data-action="togglePiglet" data-value="${esc(p.tag)}"${s.pigletSelected.includes(p.tag)?' checked':''}${p.state==='Dead'?' disabled':''}><span class="visually-hidden">Select ${esc(p.tag)}</span></label><button data-action="editPiglet" data-value="${index}" class="piglet-row-main"><strong>${esc(p.tag||'Identity pending')}</strong><span>${esc([p.notch&&'notch '+p.notch,p.sex,p.weight&&p.weight+' kg'].filter(Boolean).join(' · ')||'Add identity details')}</span><small>${esc(p.state)}</small>${icon('chevron')}</button></article>`).join('')||'<p class="detail-empty">No piglets match this search.</p>'}</div>${SentriUI.panel(SentriUI.row({action:'foster',icon:icon('pig'),title:'Foster piglets',description:'Send or receive piglets between litters'}),{className:'st-row-group'})}`;
 }
 function pigletCarePage(s){
  const care=s.pigletTab==='care';

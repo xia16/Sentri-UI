@@ -350,7 +350,6 @@ button.st-row:disabled{cursor:default}
 
 /* Shared chooser: catalogue = flat; short ungrouped choices = one muted inset.
    A second text line never changes selection behavior or adds a nested card. */
-.inspection-phone .sheet.picker-step:is(.medicine-picker-step,.health-picker-step)>.sheet-body{background:var(--st-paper)}
 .inspection-phone .sheet.picker-step .st-chooser-list{border:0;border-radius:0;background:transparent;min-width:0;flex:none}
 .inspection-phone .sheet.picker-step .st-chooser-list[data-chooser-tone="inset"]{padding:0}
 .inspection-phone .sheet.picker-step .catalog-path{background:transparent}
@@ -385,7 +384,7 @@ button.st-row:disabled{cursor:default}
 .st-choice-trail svg{width:var(--size-20);height:var(--size-20);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .st-choice-row[data-mode="navigate"] .st-choice-trail{color:var(--st-muted)}
 .st-choice-row[data-mode="navigate"] .st-choice-trail svg{width:var(--size-18);height:var(--size-18)}
-.st-choice-trail input[type="checkbox"]{width:var(--size-20);height:var(--size-20);margin:0;accent-color:var(--st-ink)}
+.st-choice-trail input[type="checkbox"]{width:var(--size-20);height:var(--size-20);margin:0;accent-color:var(--select-mark)}
 .st-choice-search.st-choice-search{position:relative;margin:0 0 var(--space-20)}
 .st-choice-search input::-webkit-search-cancel-button,.st-choice-search input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
 /* The search field in a picker, a sheet or a list (choiceSearch): the host sizes the input, which stays the box; the search glyph
@@ -404,7 +403,7 @@ button.st-row:disabled{cursor:default}
 /* In a picker sheet every option row is one height: one line and a wrapped two-line label both fit the 56px row. */
 .st-picker-body .st-choice-row.st-choice-row{padding-block:var(--space-8)}
 /* Search stays at the top of the sheet while the one list scrolls under it (sticky in the sheet body, never a second scroller). */
-.sheet-body>.st-picker-body>.st-choice-search,.sheet-body>*>.st-picker-body>.st-choice-search{position:sticky;top:calc(-1 * var(--space-section));z-index:1;margin:calc(-1 * var(--space-section)) calc(-1 * var(--space-gutter-sheet)) var(--space-12);padding:var(--space-section) var(--space-gutter-sheet) var(--space-8);background:var(--paper)}
+.sheet-body>.st-picker-body>.st-choice-search,.sheet-body>*>.st-picker-body>.st-choice-search{position:sticky;top:calc(-1 * var(--space-section));z-index:1;margin:calc(-1 * var(--space-section)) calc(-1 * var(--space-gutter-sheet)) var(--space-12);padding:var(--space-section) var(--space-gutter-sheet) var(--space-8);background:var(--st-context-bg,var(--paper))}
 /* Toast: what was just saved, on the ink above the page's dock (the Android snackbar). Solid, never see-through: it is read in sun
    and glare. A glyph says how it went (done: a check on the green; offline: no-signal, saved on this phone), the title what was done,
    the second line for whom or where it went. It rises in once and never takes a tap. */
@@ -701,7 +700,8 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-picker-field.error .st-picker-hint{color:var(--red)}
 .st-choice-label,.st-choice-meta{overflow-wrap:anywhere;white-space:normal}
 .st-choice-row[data-mode="single"] .st-choice-trail{color:var(--ink)}
-.st-choice-trail input[type="checkbox"]{accent-color:var(--ink)}
+/* A ticked multi-select box is green with a white tick (select-mark, owner 2026-11-03); its row stays white. */
+.st-choice-trail input[type="checkbox"]{accent-color:var(--select-mark)}
 .st-choice-row[data-mode="multi"]:has(:checked) .st-choice-label{font-weight:var(--type-weight-strong)}
 .st-picker-value.is-names{display:flex;align-items:baseline;gap:var(--space-6);white-space:normal;overflow:visible}
 .st-picker-names{min-width:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
@@ -780,8 +780,7 @@ button.st-row[data-variant="tick"]:active:not(:disabled){background:var(--st-pre
 .st-row-chevron[data-rail="edit"]{align-items:center;gap:var(--space-4);font-size:var(--type-description-size)}
 
 .st-row[data-variant="select-door"]{padding:0 var(--space-row-x) 0 0;gap:0}
-.st-row[data-variant="select-door"][data-ticked],.st-row[data-variant="select-door"]:has(input:checked){background:var(--well)}
-/* Just scanned (data-arrival, owner 2026-10-20; any row a read lands on, 2026-10-22): the pale progress wash for a moment, never the ticked well; "off" fades it back before the host drops the attribute. A ticked row keeps its well. */
+/* Just scanned (data-arrival, owner 2026-10-20; any row a read lands on, 2026-10-22): the pale progress wash for a moment; "off" fades it back to white before the host drops the attribute. A ticked row stays white: the green box says it (owner, 2026-11-03). */
 .st-row[data-arrival]{transition:background-color .9s ease-out}
 .st-row[data-arrival="on"]{background:var(--progress-wash);transition-duration:.12s}
 @media(prefers-reduced-motion:reduce){.st-row[data-variant="select-door"][data-arrival]{transition:none}}
@@ -1319,8 +1318,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-choice-heading.st-choice-heading:has(> svg) { display: flex; align-items: center; gap: 6px; padding-left: 0; }
 .st-choice-heading > svg { width: 16px; height: 16px; flex: none; }
 
-/* Row · select: fill:false (a box whose tick doesn't tint its cell; the Inspection pen header, owner 2026-10-18). */
-.st-row[data-variant="select-door"][data-fill="none"]:has(input:checked){background:transparent}
 /* Row · Animal · group (owner, 2026-10-18): animals without an ID as one row. The name ("14 pigs") leads with a muted glyph and is
    sans, the tags take the context line, the door has no chevron, and a 48px count field ends the row: idle (not ticked) its
    number is ink-2 at 500, which holds 7:1 at 17px. The padding keeps the Animal row's height. */
@@ -1671,3 +1668,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .litter-list .litter-scan{margin:0 0 8px}
 .farrowing-phone .litter-dock .litter-picked{flex:1 1 auto;min-width:0;display:flex;align-items:center;padding:0 4px;color:var(--ink);font:600 15px/1.3 var(--font-sans)}
 .farrowing-phone .litter-dock .selection-action{flex:0 0 auto;width:auto;min-width:94px;padding:10px 16px}
+.farrowing-phone .litter-door{margin-bottom:16px}
+.farrowing-phone .litter-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.farrowing-phone .litter-head .st-heading{flex:1;min-width:0}

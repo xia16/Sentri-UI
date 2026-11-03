@@ -30,7 +30,7 @@ const R={
   default:()=>page({title:'Pen log'}),
   fact:()=>page({title:'Farrowing',back:{action:'today',label:'Back to Today'},line:{text:[{text:'Last record '},{text:'08:41',strong:true},{text:' · G.H'}]},body:rows(2,'Sow')}),
   longest:()=>page({title:'Farrowing room log'}),
-  action:()=>page({title:'Saved work',pageAction:{icon:window.SentriIcons.icon('clock'),label:'Past uploads',action:'past-uploads'},body:rows(2,'Task')}),
+  action:()=>page({title:'Saved work',pageAction:{icon:window.SentriIcons.icon('history'),label:'Past uploads',action:'past-uploads'},body:rows(2,'Task')}),
   badge:()=>page({title:'Farrowing',back:{action:'today',label:'Back to Today'},line:{text:[{text:'Last record '},{text:'08:41',strong:true},{text:' · G.H'}]},pageAction:{icon:window.SentriIcons.icon('upload'),count:2,label:'2 records from this task waiting to upload',action:'task-sync'},body:rows(2,'Sow')}),
   zh:()=>page({title:'分娩舍 3 号',back:{action:'back',label:'返回'},line:{text:[{text:'最近记录 '},{text:'08:41',strong:true},{text:' · G.H'}]},body:rows(2,'母猪')})
 };
