@@ -50,8 +50,8 @@ function seed(preset='count'){
  if(preset==='history'){s.view='history';s.back='locked';}
  if(preset==='details'||preset==='details-first'){s.view='litter';s.litterBack='locked';}
  if(preset==='details-first'){s.parity=1;s.history=[];}
- // A visit just saved by this phone's worker; 'undo' opens Litter details and asks to take back the last action (owner, 2026-11-03).
- if(preset==='saved'||preset==='undo'){s.bornDraft=3;act(s,'saveVisit');if(preset==='undo'){s.litterBack='count';s.view='litter';act(s,'undoAsk');}}
+ // A visit just saved by this phone's worker; 'undo' opens Details › Farrowing log and asks to take back the top action (owner, 2026-11-03).
+ if(preset==='saved'||preset==='undo'){s.bornDraft=3;act(s,'saveVisit');if(preset==='undo'){s.litterBack='count';s.pageBack='litter';s.view='history';act(s,'undoAsk');}}
  return s;
 }
 const born=s=>s.locked?s.frozen:s.alive+sum(s.dead)+(s.moved||0),floor=s=>Math.max(0,s.anchor-sum(s.dead)-(s.moved||0));
@@ -79,7 +79,7 @@ const ME='G. Hansen';
 const lastSave=s=>{const e=s.events[0];return e&&e.visit&&e.kind!=='withdrawn'?e:null;};
 const topAction=s=>{const e=s.events.find(e=>e.kind!=='withdrawn'&&(e.visit||e.text.startsWith('Farrowing finished')));return e&&e.visit&&(!s.locked||e.afterLock)?e:null;};
 const canUndo=s=>!!topAction(s)&&!visitDraft(s)&&!sum(s.deathDraft);
-const actionText=e=>{const v=e.visit,b=v.born||0,di=sum(v.dead.slice(2)),bd=v.dead[0]+v.dead[1];return [b?'+'+b+' born':'',di?'−'+di+' died':'',bd?bd+' born dead':''].filter(Boolean).join(' · ');};
+const actionText=e=>e.text;   // the log's own words, in the question and on the log row
 const actionWhen=e=>[[e.day==='Today'?'':e.day,e.time].filter(Boolean).join(' '),initials(e.who)].filter(Boolean).join(' · ');
 function event(s,text,kind='',photos=[]){s.events.unshift({text,kind,day:'Today',time:'09:41',who:ME,photos:[...photos]});s.stamp='09:41';}
 // A saved visit or Record dead keeps what it was, so Undo can bring it back. Saved again after Undo: one line marked Corrected with what it
@@ -222,7 +222,7 @@ function atlasScreen(s,c){
  if(v==='profile'&&s.actionsEntry)return 'farrowing.sow-actions';
  return null;
 }
-const presets=[['room','Room list'],['count','Counting'],['visit','Counting · not saved yet'],['saved','Counting · just saved'],['undo','Undo the last save'],['litter','Litter details'],['details','Details · a finished sow'],['details-first','Details · no earlier litters'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['locked','Locked record'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · allocate piglets'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['reconcile','Reconcile piglet count'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · listening'],['scan-read','Scan · her drawer opened'],['scan-pig','Scan · a pig not in Farrowing'],['scan-dead','Scan · a pig that died'],['scan-unknown','Scan · a tag with no pig'],['scan-stopped','Scan · stopped'],['batch-sheet','Actions · pigs in this unit'],['batch-none','Choose pigs · none yet'],['batch-pick','Choose pigs · 3 chosen'],['batch-search','Choose pigs · search'],['batch-filter','Choose pigs · filter'],['batch-scanning','Choose pigs · scanning'],['batch-waiting','Choose pigs · waiting for the reader'],['batch-missed','Choose pigs · reads that cannot join'],['batch-form','Actions · the form'],['batch-saved','Actions · saved']];
+const presets=[['room','Room list'],['count','Counting'],['visit','Counting · not saved yet'],['saved','Counting · just saved'],['undo','Undo the last save'],['litter','Details · while she farrows'],['details','Details · a finished sow'],['details-first','Details · no earlier litters'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['locked','Locked record'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · allocate piglets'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['reconcile','Reconcile piglet count'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · listening'],['scan-read','Scan · her drawer opened'],['scan-pig','Scan · a pig not in Farrowing'],['scan-dead','Scan · a pig that died'],['scan-unknown','Scan · a tag with no pig'],['scan-stopped','Scan · stopped'],['batch-sheet','Actions · pigs in this unit'],['batch-none','Choose pigs · none yet'],['batch-pick','Choose pigs · 3 chosen'],['batch-search','Choose pigs · search'],['batch-filter','Choose pigs · filter'],['batch-scanning','Choose pigs · scanning'],['batch-waiting','Choose pigs · waiting for the reader'],['batch-missed','Choose pigs · reads that cannot join'],['batch-form','Actions · the form'],['batch-saved','Actions · saved']];
 const cards=[{title:'Find the next sow',caption:'<strong>The room, in context.</strong> Filter by state, jump to a pen, and open each sow’s live record.',initial:'room'},{title:'Finish with confidence',caption:'<strong>Two observations, then the lock.</strong> Clear rows, optional details and a deliberate final action.',initial:'finish'},{title:'Read the whole litter',caption:'<strong>Current facts, with their context.</strong> Finish details stay readable; the history opens on its own page.',initial:'locked'}];
 const states=cards.map(c=>{const r=seed(c.initial);restoreDraft(r);return r;});
 // Scenario gate hook (scripts/run-scenarios.mjs): read-only access to the live records for record assertions. Draws nothing.
@@ -820,7 +820,7 @@ function roomAfterRender(i){
 }
 function litterHeading(disabled=false){return SentriUI.heading({title:'Litter summary',icon:icon('record'),action:disabled?'':{label:'View log',action:'history',ariaLabel:'Open farrowing log'},kind:'section',level:3});}
 // The Alive card (owner, 2026-10-23): alive now is the figure, the draft applied; this visit's changes are chips at its right until
-// Save. The card opens Litter details (totals, the log). Under a divider it names the last save (owner, 2026-11-02): when and who as its
+// Save. The card opens Details (the log row, this litter). Under a divider it names the last save (owner, 2026-11-02): when and who as its
 // header, that run's results on one line as quiet chips, and a quiet Undo for the worker who saved it; hidden while a visit is unsaved.
 function aliveCard(s){
  const b=s.bornDraft||0,di=draftDied(s),bd=draftBornDead(s),dr=visitDraft(s);
@@ -856,7 +856,7 @@ function allocate(s){
 // The finished sow (owner, 2026-11-02): her drawer says only what happened this time, one ring of where the litter went in a card that
 // opens Details (a tappable card in a white drawer: white body, tinted head band); her actions sit in the bar, nothing stacked in the body.
 // The head band (owner, 2026-11-03): Finished and the day; the time and who finished her sit under Farrowing log on Details.
-function finishedLine(s){const e=s.events.find(e=>e.text.startsWith('Farrowing finished'));return ['Finished '+s.finished.replace(/^Today · /,'').replace(' · ',' '),e?.who?initials(e.who):''].filter(Boolean).join(' · ');}
+function logLine(s){const e=s.events.find(e=>e.kind!=='withdrawn');if(!e)return '';return [actionText(e),actionWhen(e)].join(' · ');}
 const litterParts=s=>({born:born(s),alive:s.alive,after:sum(s.dead.slice(2)),bornDead:s.dead[0]+s.dead[1]});
 function finishedCard(s){
  const p=litterParts(s),total=Math.max(1,p.alive+p.after+p.bornDead),C=2*Math.PI*58;
@@ -880,7 +880,7 @@ function finishedDetails(s){
  const facts=`<dl class="finished-facts"><div><dt>Weak</dt><dd>${s.weak}</dd></div><div><dt>Deformed</dt><dd>${s.deformed}</dd></div><div><dt>Assisted</dt><dd>${assistanceLabel(s.assisted)||'–'}</dd></div><div><dt>Weight</dt><dd>${s.weight?esc(s.weight)+'<small>kg</small>':'–'}</dd></div></dl>`;
  const total=Math.max(1,p.alive+p.after+p.bornDead),bar=`<div class="finished-bar" aria-hidden="true">${[['alive',p.alive],['after',p.after],['dead',p.bornDead]].map(([k,n])=>n?`<i data-part="${k}" style="flex:${n}"></i>`:'').join('')}</div>`;
  const head=(title,meta,glyph)=>SentriUI.heading({title,meta,icon:icon(glyph),kind:'section',level:3});
- const litterSec=`<section class="finished-section">${head('This litter',`${p.born} born`,'pig')}<div class="st-panel finished-panel">${bar}${parts}${facts}</div></section>`;
+ const litterSec=`<section class="finished-section">${head('This litter',`${p.born} born`,'pig')}<div class="st-panel finished-panel">${bar}${parts}${s.locked?facts:''}</div></section>`;
  const lits=taskClosureReview(c).finished.map(x=>x.record);
  const measures=[['Born alive',x=>born(x)-x.dead[0]-x.dead[1]],['Born dead',x=>x.dead[0]+x.dead[1]],['Died after birth',x=>sum(x.dead.slice(2))]];
  const fmt=n=>Number.isInteger(n)?String(n):n.toFixed(1);
@@ -891,7 +891,7 @@ function finishedDetails(s){
  const nth=n=>n+([,'st','nd','rd'][n%100>10&&n%100<14?0:n%10]||'th');
  const chart=`<div class="finished-chart" role="img" aria-label="Weaned out of born alive per litter, target ${target}">${cols.map(l=>`<span class="finished-litter"${l.now?' data-now=""':''}><i data-series="born" style="height:${y(l.bornAlive)}px"><b>${l.bornAlive}</b><i data-series="weaned" style="height:${y(l.weaned)}px"><b>${l.weaned}</b></i></i></span>`).join('')}<i class="finished-target" style="bottom:${y(target)}px"></i></div><p class="finished-axis">${cols.map(l=>`<span${l.now?' data-now=""':''}>${l.now?'This litter':nth(l.parity)+' litter'}</span>`).join('')}</p><p class="finished-legend"><span><i data-key="weaned"></i>Weaned / alive</span><span><i data-key="born"></i>Born alive</span><span><i data-key="target"></i>Target ${target}</span></p>`;
  const selfSec=`<section class="finished-section">${head('Against herself',past.length?(past.length>2?`Last 3 of ${past.length+1} litters`:`${cols.length} litters`):'Parity '+s.parity,'history')}${past.length?`<div class="st-panel finished-panel">${chart}</div>`:`<div class="finished-first">${icon('calendar')}<p><strong>No earlier litters on record</strong>Her past litters show here once they're recorded.</p></div>`}</section>`;
- return SentriUI.sheet({variant:'page',title:'Details',back:{action:'back'},body:lastAction(s)+litterSec+batchSec+selfSec+SentriUI.rowGroup(SentriUI.row({title:'Farrowing log',description:finishedLine(s),action:'history',trail:'chevron'}),{className:'litter-doors'}),bodyClass:'finished-details-body',footer:false,className:'detail-sheet finished-details',label:'Details',bar:status()});
+ return SentriUI.sheet({variant:'page',title:'Details',back:{action:'back'},body:SentriUI.rowGroup(SentriUI.row({title:'Farrowing log',description:logLine(s),action:'history',trail:'chevron'}),{className:'details-log'})+litterSec+(s.locked?batchSec+selfSec:''),bodyClass:'finished-details-body',footer:false,className:'detail-sheet finished-details',label:'Details',bar:status()});
 }
 function locked(s){
  const e=s.events[0];
@@ -920,23 +920,16 @@ function history(s){
  if(s.pending)list.unshift({text:s.pending>0?`+${s.pending} alive · this visit`:`${-s.pending} died · this visit`,day:'Today',time:s.stamp,who:'G. Hansen',kind:'open'});
  const groups=[];
  for(const e of list){if(groups.at(-1)?.day!==e.day)groups.push({day:e.day,events:[]});groups.at(-1).events.push(e);}
- const logGroups=groups.map(group=>({label:group.day,entries:group.events.map(e=>({title:e.text,detail:e.kind==='withdrawn'?(e.withdrawn?`Withdrawn ${e.withdrawn.time} · ${initials(e.withdrawn.who)}`:'Withdrawn'):'',...(e.kind==='corrected'?{corrected:true,was:e.was}:{}),at:e.time,by:e.who,extraHtml:e.photos?.length?`<div class="photos">${e.photos.map((p,i)=>btn('savedPhoto',`<img src="${esc(p)}" alt="Recorded photo ${i+1}">`,'',p)).join('')}</div>`:''}))}));
+ const top=canUndo(s)&&topAction(s),undo=`<button type="button" class="log-undo" data-action="undoAsk" aria-label="Undo ${top?actionText(top):''}">${icon('undo')}<span>Undo</span></button>`;
+ const logGroups=groups.map(group=>({label:group.day,entries:group.events.map(e=>({title:e.text,detail:e.kind==='withdrawn'?(e.withdrawn?`Withdrawn ${e.withdrawn.time} · ${initials(e.withdrawn.who)}`:'Withdrawn'):'',...(e.kind==='corrected'?{corrected:true,was:e.was}:{}),at:e.time,by:e.who,extraHtml:(e===top?undo:e.kind==='withdrawn'?'<i class="log-withdrawn" hidden></i>':'')+(e.photos?.length?`<div class="photos">${e.photos.map((p,i)=>btn('savedPhoto',`<img src="${esc(p)}" alt="Recorded photo ${i+1}">`,'',p)).join('')}</div>`:'')}))}));
  const body=SentriUI.log(logGroups,{empty:'Counts and saved updates will appear here.'});
  return detailSheet(s,s.productionOutcome?'Production log':'Farrowing log',body);
 }
 function popup(s){const p=s.popup;if(!p)return'';if(p.kind==='undo'){const e=topAction(s);if(!e)return '';return SentriUI.sheet({variant:'dialog',title:`Undo ${actionText(e)}?`,body:`<p class="undo-note">The counts go back. The log keeps it as Withdrawn.</p>`,footer:footer(btn('cancelPopup','Back','button secondary'),btn('undoLast','Undo','button primary'))});}if(p.kind==='photo')return SentriUI.sheet({variant:'dialog',title:'Photo',body:`<img src="${esc(p.src)}" alt="Death record attachment">`,footer:footer(SentriUI.backButton({action:'cancelPopup'}),p.editable?btn('deletePhoto','Delete','button primary danger'):'')});
 return '';
 }
-// Litter details (owner, 2026-10-23): the saved litter by line, then its totals; the log opens from here (Edit record is gone, 2026-11-02).
-// Last action (owner, 2026-11-03): the top of her stack, on top of Details; tapping it asks to take it back. None to take back, no section.
-function lastAction(s){const e=canUndo(s)&&topAction(s);if(!e)return '';return `<section class="last-action">${SentriUI.heading({title:'Last action',icon:icon('undo'),kind:'section',level:3})}${SentriUI.rowGroup(SentriUI.row({title:actionText(e),description:actionWhen(e),action:'undoAsk',trail:'chevron',attrs:{'aria-label':`Last action: ${actionText(e)}, ${actionWhen(e)}. Undo`}}))}</section>`;}
-function litter(s){
- if(s.locked&&!s.ended&&!s.productionOutcome)return finishedDetails(s);
- // while she farrows: the litter's facts card, the totals as figures, then every cause three across, – where there is none
- const card=SentriUI.panel(SentriUI.facts([{label:'Total born',value:born(s)},{label:'Dead',value:sum(s.dead)},{label:'Alive',value:s.alive}],{variant:'figures',panel:false})+SentriUI.facts(types.map((t,i)=>({label:t,value:s.dead[i]||'–'})),{columns:3,variant:'record'}),{className:'facts-surface'});
- const doors=SentriUI.rowGroup(SentriUI.row({title:'Farrowing log',action:'history',trail:'chevron'}),{className:'litter-doors'});
- return detailSheet(s,'Litter details',lastAction(s)+card+doors);
-}
+// Details (owner, 2026-11-03): one page while she farrows and after Finish; the old Litter details grid is gone.
+function litter(s){return finishedDetails(s);}
 function deathBreakdown(s){return detailSheet(s,'Death breakdown',SentriUI.facts([...s.dead.map((n,i)=>n?{label:types[i],value:n}:null).filter(Boolean),{label:'Total dead',value:sum(s.dead)}]),'compact');}
 function profile(s){return `<iframe class="sow-detail-frame" title="Sow details · ${esc(s.tag)}" src="inspection-astra-concept.html?layout=focus&embed=sow&v=stage-actions-15${ZH?'&lang=zh':''}"></iframe>`;}
 const sowDetailContexts=new WeakMap();

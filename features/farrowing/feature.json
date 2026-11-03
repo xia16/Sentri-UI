@@ -1017,7 +1017,7 @@
       "preset": "count",
       "figma": "",
       "notes": {
-        "purpose": "Count her litter while she farrows: alive now as one figure and one row of keys (−, + Born alive, Death), all held as this visit's draft until Save (owner, 2026-10-23; keys 2026-11-02). The last save is on Details, not here (2026-11-03).",
+        "purpose": "Count her litter while she farrows: alive now as one figure and one row of keys (−, + Born alive, Death), all held as this visit's draft until Save (owner, 2026-10-23; keys 2026-11-02). The last save is taken back in the Farrowing log, not here (2026-11-03).",
         "states": [
           "Nothing entered: the card is Alive, Details › and the figure; the bar is Back · Finish farrowing · ···",
           "A visit entered: see Counting · not saved yet (farrowing.count-draft)"
@@ -1067,7 +1067,7 @@
           "\"Born = Alive + Σ Dead … Derived, never entered\" (Model)",
           "A visit is a draft until Save; died after birth lowers Alive, born dead does not (owner, 2026-10-23)",
           "Drawers are the tint with white cards (owner, 2026-11-03: no white background anymore)",
-          "Undo is a stack (owner, 2026-11-03): Details shows her last action on top; anyone can take back only the top one, again down the stack (Finish the floor); the counts go back and the log keeps it marked Withdrawn with when and by whom"
+          "Undo is in the Farrowing log (owner, 2026-11-03): Details opens with the log row, its last action under it; in the log the top action carries Undo; anyone takes back only the top one, again down the stack (Finish the floor); the counts go back and the line stays marked Withdrawn with when and by whom"
         ],
         "issues": []
       }
@@ -1126,7 +1126,7 @@
       "preset": "saved",
       "figma": "",
       "notes": {
-        "purpose": "Right after a Save: the drawer as before with the new figure; the save is taken back from Details (Last action), not here (owner, 2026-11-03).",
+        "purpose": "Right after a Save: the drawer as before with the new figure; the save is taken back in the Farrowing log, not here (owner, 2026-11-03).",
         "states": [
           "A visit entered: the chips are the visit (farrowing.count-draft)"
         ],
@@ -1135,7 +1135,7 @@
             "name": "Alive card",
             "at": "Alive",
             "shows": "Alive, Details › and the new figure; nothing names the save.",
-            "logic": "The save is the top of her stack on Details.",
+            "logic": "The save is the top of her stack in the Farrowing log.",
             "source": "farrowing-astra-concept.js aliveCard()"
           }
         ],
@@ -1146,7 +1146,7 @@
           },
           {
             "control": "Details ›",
-            "does": "opens Litter details"
+            "does": "opens Details"
           }
         ],
         "copy": [
@@ -1157,7 +1157,7 @@
         ],
         "rules": [
           "No Edit record (owner, 2026-11-02)",
-          "Undo is a stack (owner, 2026-11-03): Details shows her last action on top; anyone can take back only the top one, again down the stack (Finish the floor); the counts go back and the log keeps it marked Withdrawn with when and by whom"
+          "Undo is in the Farrowing log (owner, 2026-11-03): Details opens with the log row, its last action under it; in the log the top action carries Undo; anyone takes back only the top one, again down the stack (Finish the floor); the counts go back and the line stays marked Withdrawn with when and by whom"
         ],
         "issues": []
       }
@@ -1171,16 +1171,16 @@
       "preset": "undo",
       "figma": "",
       "notes": {
-        "purpose": "One short question before the last action is taken back, opened from Last action on Details.",
+        "purpose": "One short question before the top action is taken back, opened from Undo on the top line of the Farrowing log.",
         "states": [
-          "Over Litter details while she farrows; after Finish the same question over Details (a Record dead)"
+          "Over the Farrowing log, while she farrows and after Finish"
         ],
         "elements": [
           {
             "name": "Question",
-            "at": "Undo +3 born?",
-            "shows": "The shared dialog: \"Undo +3 born?\", one line \"The counts go back. The log keeps it as Withdrawn.\", and Back · Undo.",
-            "logic": "The title names the action (+3 born · −1 died · 1 born dead). Undo withdraws it: counts go back, the log line stays marked Withdrawn <time> · <who>; the next action down becomes the top.",
+            "at": "Undo +3 born alive?",
+            "shows": "The shared dialog: \"Undo +3 born alive?\", one line \"The counts go back. The log keeps it as Withdrawn.\", and Back · Undo.",
+            "logic": "The title names the action in the log's own words. Undo withdraws it: counts go back, the line stays marked Withdrawn <time> · <who>; Undo moves to the next action down.",
             "source": "farrowing-astra-concept.js popup(), undoLast()"
           }
         ],
@@ -1205,7 +1205,7 @@
         ],
         "rules": [
           "No Edit record (owner, 2026-11-02)",
-          "Undo is a stack (owner, 2026-11-03): Details shows her last action on top; anyone can take back only the top one, again down the stack (Finish the floor); the counts go back and the log keeps it marked Withdrawn with when and by whom"
+          "Undo is in the Farrowing log (owner, 2026-11-03): Details opens with the log row, its last action under it; in the log the top action carries Undo; anyone takes back only the top one, again down the stack (Finish the floor); the counts go back and the line stays marked Withdrawn with when and by whom"
         ],
         "issues": []
       }
@@ -1374,49 +1374,42 @@
     },
     {
       "id": "farrowing.litter",
-      "name": "Litter details",
+      "name": "Details · while she farrows",
       "zh": "窝详情",
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "litter",
       "figma": "",
       "notes": {
-        "purpose": "The saved litter in full, one tap from the Alive card: her last action on top (to take it back), the totals, every line, and the door to its log.",
+        "purpose": "Details while she farrows, one tap from the Alive card: the Farrowing log row on top (her last action under it), then This litter. The comparisons come at Finish (owner, 2026-11-03: the old Litter details grid is gone).",
         "elements": [
           {
-            "name": "Last action",
-            "at": "Last action",
-            "shows": "A section on top: the undo glyph, \"Last action\", then one row: what it did (+3 born · −1 died) over when · who (Aug 26 08:20 · L.M), with a chevron.",
-            "logic": "The top of her stack: the newest save not withdrawn. Tapping it asks to take it back (farrowing.undo). With nothing to take back the section is gone.",
-            "source": "farrowing-astra-concept.js lastAction(), topAction()"
-          },
-          {
-            "name": "Litter",
-            "at": "Total born",
-            "shows": "The finished record's facts card: Total born · Dead · Alive as figures, then the six causes three across; a cause with none reads –.",
-            "logic": "Total born = Alive + Dead (+ moved).",
-            "source": "farrowing-astra-concept.js litter()"
-          },
-          {
-            "name": "Doors",
+            "name": "Farrowing log",
             "at": "Farrowing log",
-            "shows": "Farrowing log ›, one row.",
-            "logic": "Edit record is gone (owner, 2026-11-02): a fat finger is undone from the Alive card.",
-            "source": "farrowing-astra-concept.js litter()"
+            "shows": "One white row on top: \"Farrowing log\" over her newest standing line, what · when · who (\"+1 crushed · Aug 28 14:02 · L.M\"), a chevron.",
+            "logic": "Opens the log, where the top action carries Undo. A withdrawn line is not the last action.",
+            "source": "farrowing-astra-concept.js logLine(), finishedDetails()"
+          },
+          {
+            "name": "This litter",
+            "at": "This litter",
+            "shows": "The pig glyph, \"This litter\", \"14 born\"; one white card: the bar, then Alive now, Died after birth and Born dead with their causes. Weak, Deformed, Assisted and Weight wait for Finish.",
+            "logic": "The same card as the finished Details.",
+            "source": "farrowing-astra-concept.js finishedDetails()"
           }
         ],
         "copy": [
-          "(raw) Last action",
-          "(raw) Litter details",
-          "(raw) Total born · Dead · Alive",
-          "(raw) Stillborn · Mummified · Crushed · Scours · Starve-out · Other",
-          "(raw) Farrowing log"
+          "(raw) Details",
+          "(raw) Farrowing log",
+          "(raw) This litter · <n> born",
+          "(raw) Alive now · Died after birth · Born dead"
         ],
         "edge": [],
         "issues": [],
         "rules": [
           "Drawers are the tint with white cards (owner, 2026-11-03: no white background anymore)",
-          "Undo is a stack (owner, 2026-11-03): Details shows her last action on top; anyone can take back only the top one, again down the stack (Finish the floor); the counts go back and the log keeps it marked Withdrawn with when and by whom"
+          "One Details page while she farrows and after Finish (owner, 2026-11-03)",
+          "Undo is in the Farrowing log (owner, 2026-11-03): Details opens with the log row, its last action under it; in the log the top action carries Undo; anyone takes back only the top one, again down the stack (Finish the floor); the counts go back and the line stays marked Withdrawn with when and by whom"
         ]
       }
     },
@@ -1557,7 +1550,7 @@
           "Drawers are the tint with white cards (owner, 2026-11-03: no white background anymore); the card's head band is white under its divider",
           "No stacking: the finished sow's actions sit in the bar (Back · Actions · Record dead)",
           "\"Born … locks at Finish\" (Model)",
-          "Undo is a stack (owner, 2026-11-03): Details shows her last action on top; anyone can take back only the top one, again down the stack (Finish the floor); the counts go back and the log keeps it marked Withdrawn with when and by whom; the band says Finished and the day, the time and who finished her sit under Farrowing log on Details"
+          "Undo is in the Farrowing log (owner, 2026-11-03): Details opens with the log row, its last action under it; in the log the top action carries Undo; anyone takes back only the top one, again down the stack (Finish the floor); the counts go back and the line stays marked Withdrawn with when and by whom; the band says Finished and the day, the time and who finished her sit under Farrowing log on Details"
         ],
         "issues": [
           "A died or aborted sow keeps the earlier record face; the Death breakdown page is no longer opened from a finished sow (its causes are on Details)."
@@ -1577,11 +1570,11 @@
         "states": [],
         "elements": [
           {
-            "name": "Last action",
-            "at": "Last action",
-            "shows": "On top when something was recorded since Finish: the action (−1 died) over when · who (Aug 28 14:02 · L.M), a chevron.",
-            "logic": "The top of her stack above the finish; tapping it asks to take it back. Gone when nothing was recorded since Finish.",
-            "source": "farrowing-astra-concept.js lastAction()"
+            "name": "Farrowing log",
+            "at": "Farrowing log",
+            "shows": "One white row on top: \"Farrowing log\" over her newest standing line, what · when · who (\"+1 crushed · Aug 28 14:02 · L.M\"), a chevron.",
+            "logic": "Opens the log, where the top action carries Undo. A withdrawn line is not the last action.",
+            "source": "farrowing-astra-concept.js logLine(), finishedDetails()"
           },
           {
             "name": "This litter",
@@ -1603,18 +1596,10 @@
             "shows": "One bar per litter: the whole bar is born alive (its figure above), the solid part weaned (its figure inside); for this litter the solid part is alive now. At most three bars, her two latest earlier litters and this one, named by number (1st litter · 2nd litter · This litter); with more the meta reads Last 3 of N litters; the target line dashed; the legend one centred line: Weaned / alive · Born alive · Target 12.",
             "logic": "Earlier litters come from her production records (sample data here). Target = the batch's born-alive target (12).",
             "source": "farrowing-astra-concept.js finishedDetails(), pastLitters()"
-          },
-          {
-            "name": "Farrowing log",
-            "at": "Farrowing log",
-            "shows": "One row at the foot of the page, with when she finished and by whom under it (\"Finished Aug 27 08:12 · G.H\").",
-            "logic": "The log moved here from the record (View log is gone from the drawer).",
-            "source": "farrowing-astra-concept.js finishedDetails()"
           }
         ],
         "controls": [],
         "copy": [
-          "(raw) Last action",
           "(raw) Details",
           "(raw) This litter · Against her batch · Against herself",
           "(raw) This sow · Batch average · Batch range",
@@ -1628,7 +1613,7 @@
           "No stacking: the finished sow's actions sit in the bar (Back · Actions · Record dead)",
           "Headers law: a page one Back away from the sow's drawer carries no header line",
           "Comparisons keep signal only (owner, 2026-11-02): weak, deformed, weight, dates and sow weights stay out of the comparisons",
-          "Undo is a stack (owner, 2026-11-03): Details shows her last action on top; anyone can take back only the top one, again down the stack (Finish the floor); the counts go back and the log keeps it marked Withdrawn with when and by whom"
+          "Undo is in the Farrowing log (owner, 2026-11-03): Details opens with the log row, its last action under it; in the log the top action carries Undo; anyone takes back only the top one, again down the stack (Finish the floor); the counts go back and the line stays marked Withdrawn with when and by whom"
         ],
         "issues": [
           "Earlier litters are sample data in this prototype; the sow profile's production records hold the real ones."
@@ -1648,11 +1633,11 @@
         "states": [],
         "elements": [
           {
-            "name": "Last action",
-            "at": "Last action",
-            "shows": "On top when something was recorded since Finish: the action (−1 died) over when · who (Aug 28 14:02 · L.M), a chevron.",
-            "logic": "The top of her stack above the finish; tapping it asks to take it back. Gone when nothing was recorded since Finish.",
-            "source": "farrowing-astra-concept.js lastAction()"
+            "name": "Farrowing log",
+            "at": "Farrowing log",
+            "shows": "One white row on top: \"Farrowing log\" over her newest standing line, what · when · who (\"+1 crushed · Aug 28 14:02 · L.M\"), a chevron.",
+            "logic": "Opens the log, where the top action carries Undo. A withdrawn line is not the last action.",
+            "source": "farrowing-astra-concept.js logLine(), finishedDetails()"
           },
           {
             "name": "This litter",
@@ -1674,18 +1659,10 @@
             "shows": "A dashed placeholder: \"No earlier litters on record · Her past litters show here once they're recorded.\" One message for every reason: a first litter, or a sow whose earlier litters were never recorded here.",
             "logic": "No earlier litter on record.",
             "source": "farrowing-astra-concept.js finishedDetails(), pastLitters()"
-          },
-          {
-            "name": "Farrowing log",
-            "at": "Farrowing log",
-            "shows": "One row at the foot of the page, with when she finished and by whom under it (\"Finished Aug 27 08:12 · G.H\").",
-            "logic": "The log moved here from the record (View log is gone from the drawer).",
-            "source": "farrowing-astra-concept.js finishedDetails()"
           }
         ],
         "controls": [],
         "copy": [
-          "(raw) Last action",
           "(raw) Details",
           "(raw) This litter · Against her batch · Against herself",
           "(raw) This sow · Batch average · Batch range",
@@ -1699,7 +1676,7 @@
           "No stacking: the finished sow's actions sit in the bar (Back · Actions · Record dead)",
           "Headers law: a page one Back away from the sow's drawer carries no header line",
           "Comparisons keep signal only (owner, 2026-11-02): weak, deformed, weight, dates and sow weights stay out of the comparisons",
-          "Undo is a stack (owner, 2026-11-03): Details shows her last action on top; anyone can take back only the top one, again down the stack (Finish the floor); the counts go back and the log keeps it marked Withdrawn with when and by whom"
+          "Undo is in the Farrowing log (owner, 2026-11-03): Details opens with the log row, its last action under it; in the log the top action carries Undo; anyone takes back only the top one, again down the stack (Finish the floor); the counts go back and the line stays marked Withdrawn with when and by whom"
         ],
         "issues": []
       }
@@ -1780,19 +1757,28 @@
             "logic": "Group label is the event's day text; the sample mixes relative (\"5 days ago\") and absolute (\"Aug 26\") labels and is not newest-first.",
             "source": "farrowing-astra-concept.js history()",
             "at": "G.H"
+          },
+          {
+            "name": "Undo",
+            "at": "Undo",
+            "shows": "On the top action only, top right of its entry: the undo glyph and \"Undo\", a 44px text action in ink.",
+            "logic": "The top of her stack: the newest save not withdrawn (after Finish, only what came after it). Tapping it asks first (farrowing.undo). Nothing left to take back, no Undo.",
+            "source": "farrowing-astra-concept.js history(), topAction()"
           }
         ],
         "controls": [],
         "copy": [
           "(raw) Farrowing log",
           "(raw) Counts and saved updates will appear here.",
-          "(raw) Corrected · Was +3 born alive · Withdrawn · Farrowing finished"
+          "(raw) Undo",
+          "(raw) Withdrawn <time> · <who>"
         ],
         "edge": [],
         "rules": [
           "\"One ledger surface, the Farrowing record page … Read-only, the list is the reveal\" (After the lock)",
           "\"Dates speak relative within the week\" (Names and glyphs)",
-          "\"the page title is Farrowing record\" (Names and glyphs, copy pass)"
+          "\"the page title is Farrowing record\" (Names and glyphs, copy pass)",
+          "Undo is in the Farrowing log (owner, 2026-11-03): Details opens with the log row, its last action under it; in the log the top action carries Undo; anyone takes back only the top one, again down the stack (Finish the floor); the counts go back and the line stays marked Withdrawn with when and by whom"
         ],
         "issues": [
           "Title is \"Farrowing log\"; the copy pass names it \"Farrowing record\".",

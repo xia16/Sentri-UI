@@ -1810,7 +1810,7 @@
   {
    "type": "entry",
    "id": "edit",
-   "label": "Take back the last action from Details → log",
+   "label": "Take back the last action in the Farrowing log",
    "children": [
     {
      "type": "state",
@@ -1888,37 +1888,50 @@
          "type": "outcome",
          "id": "fa-x10-back-with-change-asks-save",
          "tree": "X-10",
-         "label": "Details opens with the last action on top: +3 born, 09:41 · G.H",
+         "label": "Details opens with the Farrowing log, its last action under it",
          "gwt": {
-          "given": "G.H just saved +3 born.",
+          "given": "G.H just saved +3 born alive.",
           "when": "The worker opens Details from the Alive card.",
-          "then": "Litter details opens with Last action on top: +3 born, 09:41 · G.H."
+          "then": "Details opens with Farrowing log on top, \"+3 born alive · 09:41 · G.H\" under it, then This litter; no Undo on Details, no comparisons while she farrows."
          },
          "authority": [
           {
            "src": "owner",
            "at": "decision 2026-11-03",
-           "says": "Undo leaves the drawers: Details shows the last action on top; anyone can take back only the top one, again down the stack; the counts go back and the log keeps it as Withdrawn"
+           "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
           }
          ],
          "visible": [
           {
-           "text": "Last action",
+           "text": "Farrowing log",
            "in": "sheet",
            "hard": "dead-end"
           },
           {
-           "text": "09:41 · G.H",
+           "text": "+3 born alive · 09:41 · G.H",
            "in": "sheet",
-           "says": "when and who",
+           "says": "the last action under the log row",
            "hard": "wrong-fact"
           },
           {
            "el": "[data-action='undoAsk']",
            "in": "sheet",
-           "is": "enabled",
-           "says": "the last action can be taken back",
-           "hard": "dead-end"
+           "is": "absent",
+           "says": "Undo is in the log, not on Details",
+           "hard": "broken-ruling"
+          },
+          {
+           "text": "Total born",
+           "in": "sheet",
+           "absent": true,
+           "says": "the old Litter details grid is gone",
+           "hard": "broken-ruling"
+          },
+          {
+           "text": "Against her batch",
+           "in": "sheet",
+           "absent": true,
+           "says": "no comparisons while she farrows"
           }
          ],
          "children": []
@@ -1926,8 +1939,9 @@
         {
          "type": "action",
          "id": "edit.during.undo-ask",
-         "label": "the Last action row",
+         "label": "Farrowing log, Undo on the top line",
          "taps": [
+          "[data-action='history']",
           "[data-action='undoAsk']"
          ],
          "children": [
@@ -1935,24 +1949,24 @@
            "type": "outcome",
            "id": "fa-x11-ask-discard-drops-change",
            "tree": "X-11",
-           "label": "The question names the action and changes nothing until answered",
+           "label": "In the log the top action carries Undo; the question names it and changes nothing until answered",
            "gwt": {
-            "given": "Details shows Last action +3 born.",
-            "when": "The worker taps it.",
-            "then": "The shared dialog asks Undo +3 born? (Back / Undo); nothing changes yet."
+            "given": "The Farrowing log is open; +3 born alive is on top with Undo.",
+            "when": "The worker taps Undo.",
+            "then": "The shared dialog asks Undo +3 born alive? (Back / Undo); nothing changes yet."
            },
            "authority": [
             {
              "src": "owner",
              "at": "decision 2026-11-03",
-             "says": "Undo leaves the drawers: Details shows the last action on top; anyone can take back only the top one, again down the stack; the counts go back and the log keeps it as Withdrawn"
+             "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
             }
            ],
            "visible": [
             {
-             "text": "Undo +3 born?",
+             "text": "Undo +3 born alive?",
              "in": "sheet",
-             "says": "the question names the action",
+             "says": "the question names the action in the log's words",
              "hard": "broken-ruling"
             },
             {
@@ -1987,25 +2001,32 @@
              "type": "outcome",
              "id": "fa-x12-ask-save-posts-correction",
              "tree": "X-12",
-             "label": "Undo takes it back: the counts go back, the log keeps it as Withdrawn, the next action is on top",
+             "label": "Undo takes it back: the counts go back, the line stays as Withdrawn, Undo moves to the next one down",
              "gwt": {
-              "given": "The question Undo +3 born? is open.",
+              "given": "The question Undo +3 born alive? is open.",
               "when": "The worker taps Undo.",
-              "then": "Alive is 9 and born 14 again; the save stays in the log marked Withdrawn; Last action now shows the save before it (+3 born · −1 died, L.M)."
+              "then": "Alive is 9 and born 14 again; the line stays in the log marked Withdrawn 09:41 · G.H; Undo now sits on +3 born alive · 1 crushed (L.M)."
              },
              "authority": [
               {
                "src": "owner",
                "at": "decision 2026-11-03",
-               "says": "Undo leaves the drawers: Details shows the last action on top; anyone can take back only the top one, again down the stack; the counts go back and the log keeps it as Withdrawn"
+               "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
               }
              ],
              "visible": [
               {
-               "text": "+3 born · −1 died",
+               "text": "Withdrawn 09:41 · G.H",
                "in": "sheet",
-               "says": "the next action down is on top",
+               "says": "who took it back and when",
                "hard": "wrong-fact"
+              },
+              {
+               "el": "[aria-label='Undo +3 born alive · 1 crushed']",
+               "in": "sheet",
+               "is": "enabled",
+               "says": "Undo moved to the next one down",
+               "hard": "dead-end"
               }
              ],
              "record": [
@@ -2020,7 +2041,7 @@
             {
              "type": "action",
              "id": "edit.during.undo.again",
-             "label": "the Last action row, Undo",
+             "label": "Undo on the top line, Undo",
              "taps": [
               "[data-action='undoAsk']",
               "[data-action='undoLast']"
@@ -2032,21 +2053,22 @@
                "tree": "X-2",
                "label": "Anyone can take back the next one down: L.M's save goes too",
                "gwt": {
-                "given": "After one undo, Last action shows L.M's save (+3 born · −1 died).",
+                "given": "After one undo, Undo sits on L.M's save (+3 born alive · 1 crushed).",
                 "when": "G.H takes it back.",
-                "then": "Alive is 7 and born 11; both saves stay in the log marked Withdrawn."
+                "then": "Alive is 7 and born 11; both saves stay in the log marked Withdrawn; Undo sits on the next one down."
                },
                "authority": [
                 {
                  "src": "owner",
                  "at": "decision 2026-11-03",
-                 "says": "Undo leaves the drawers: Details shows the last action on top; anyone can take back only the top one, again down the stack; the counts go back and the log keeps it as Withdrawn"
+                 "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
                 }
                ],
                "visible": [
                 {
-                 "text": "Last action",
+                 "el": "[aria-label='Undo +4 born alive · 1 crushed · 1 other']",
                  "in": "sheet",
+                 "is": "enabled",
                  "says": "the stack goes on",
                  "hard": "dead-end"
                 }
@@ -2063,37 +2085,33 @@
               {
                "type": "action",
                "id": "edit.during.undo.log",
-               "label": "Farrowing log",
+               "label": "Back",
                "taps": [
-                "[data-action='history']"
+                "[data-action='back']"
                ],
                "children": [
                 {
                  "type": "outcome",
                  "id": "fa-x4-edit-clear-discards",
                  "tree": "X-4",
-                 "label": "The log keeps what was taken back, marked Withdrawn with when and by whom",
+                 "label": "Back on Details the log row shows the newest line still standing",
                  "gwt": {
                   "given": "Two saves were taken back by G.H.",
-                  "when": "The worker opens Farrowing log.",
-                  "then": "Both lines are still there, each marked Withdrawn 09:41 · G.H."
+                  "when": "The worker goes back to Details.",
+                  "then": "Farrowing log reads \"+4 born alive · 1 crushed · 1 other · Aug 26 08:12 · G.H\": withdrawn lines are not the last action."
                  },
                  "authority": [
                   {
                    "src": "owner",
                    "at": "decision 2026-11-03",
-                   "says": "Undo leaves the drawers: Details shows the last action on top; anyone can take back only the top one, again down the stack; the counts go back and the log keeps it as Withdrawn"
+                   "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
                   }
                  ],
                  "visible": [
                   {
-                   "screen": "farrowing.history",
-                   "hard": "dead-end"
-                  },
-                  {
-                   "text": "Withdrawn 09:41 · G.H",
+                   "text": "+4 born alive · 1 crushed · 1 other · Aug 26 08:12 · G.H",
                    "in": "sheet",
-                   "says": "who took it back",
+                   "says": "the newest standing line",
                    "hard": "wrong-fact"
                   }
                  ],
@@ -2129,9 +2147,10 @@
       {
        "type": "action",
        "id": "edit.locked.undo",
-       "label": "Details, the Last action row, Undo",
+       "label": "Details, Farrowing log, Undo on the top line, Undo",
        "taps": [
         ".finished-card-body",
+        "[data-action='history']",
         "[data-action='undoAsk']",
         "[data-action='undoLast']"
        ],
@@ -2140,23 +2159,28 @@
          "type": "outcome",
          "id": "fa-x5-correct-born-after-lock",
          "tree": "X-5",
-         "label": "After Finish the last Record dead is taken back from Details; Born stays 14",
+         "label": "After Finish the last Record dead is taken back in the log; Born stays 14",
          "gwt": {
-          "given": "A finished sow (born 14); G.H just recorded one crushed death.",
-          "when": "The worker opens Details and takes back the last action.",
-          "then": "Born stays 14, the crushed death is gone (8 alive), and the finish line is kept."
+          "given": "A finished sow (born 14); two deaths were recorded after Finish, the newest one crushed.",
+          "when": "The worker opens Details, then Farrowing log, and takes back the top action.",
+          "then": "Born stays 14, that crushed death is gone (8 alive), and the finish line is kept."
          },
          "authority": [
           {
            "src": "owner",
            "at": "decision 2026-11-03",
-           "says": "Undo leaves the drawers: Details shows the last action on top; anyone can take back only the top one, again down the stack; the counts go back and the log keeps it as Withdrawn"
+           "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
           }
          ],
          "visible": [
           {
-           "screen": "farrowing.details",
+           "screen": "farrowing.history",
            "hard": "dead-end"
+          },
+          {
+           "text": "Withdrawn 09:41 · G.H",
+           "in": "sheet",
+           "hard": "wrong-fact"
           }
          ],
          "record": [
@@ -2176,7 +2200,7 @@
         {
          "type": "action",
          "id": "edit.locked.undo.scours",
-         "label": "the Last action row, Undo",
+         "label": "Undo on the top line, Undo",
          "taps": [
           "[data-action='undoAsk']",
           "[data-action='undoLast']"
@@ -2186,22 +2210,22 @@
            "type": "outcome",
            "id": "fa-x6-log-shows-correction",
            "tree": "X-6",
-           "label": "Finish is the floor: with nothing recorded since, Last action is gone",
+           "label": "Finish is the floor: nothing above it left, no Undo in the log",
            "gwt": {
-            "given": "After one undo, Last action shows L.M's crushed death recorded after Finish.",
+            "given": "One death recorded after Finish is left, with Undo on it.",
             "when": "The worker takes it back too.",
-            "then": "Last action is gone: what was recorded before Finish cannot be taken back here."
+            "then": "No line carries Undo any more: what was recorded before Finish cannot be taken back."
            },
            "authority": [
             {
              "src": "owner",
              "at": "decision 2026-11-03",
-             "says": "Undo leaves the drawers: Details shows the last action on top; anyone can take back only the top one, again down the stack; the counts go back and the log keeps it as Withdrawn"
+             "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
             }
            ],
            "visible": [
             {
-             "el": ".last-action",
+             "el": ".log-undo",
              "in": "sheet",
              "is": "absent",
              "says": "nothing left above the finish",

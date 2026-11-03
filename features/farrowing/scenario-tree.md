@@ -68,12 +68,12 @@ States: C0 Farrowing, nothing entered (000418: alive 9, dead 1·1·2·0·0·1).
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
-| C-1 | C0 | open | → the Alive card names no last save (it is on Details, Last action) | S — owner decisions 2026-10-23 (Counting), 2026-11-03 | `fa-c1-receipt-says-saved` |
+| C-1 | C0 | open | → the Alive card names no last save (it is taken back in the Farrowing log) | S — owner decisions 2026-10-23 (Counting), 2026-11-03 | `fa-c1-receipt-says-saved` |
 | C-2 | C0 | read the death key | → it reads **Death** (the down arrow) and opens Report death | S — owner decisions 2026-10-23 (Counting), keys 2026-11-02 | `fa-c2-tool-reads-record-dead` |
 | C-3 | C0 | + then − on Born alive | → Born alive − greys at 0; Alive 9 and born 14 unchanged (a saved visit is fixed by undoing it, §6) | S — owner decisions 2026-10-23 (Counting); owner decision 2026-11-02 | `fa-c3-minus-clamps-at-floor` |
 | C-4 | C0 | idle 90 min | → the visit folds into one log line | S — RUL Surfaces (visit ends after ~90 min idle); contract C3 (draft) | pending `fa-c4-idle-fold` |
 | C-5 | C0 | Death | → the Report death level (§4) | S — owner decisions 2026-10-23 (Counting) | via D-* |
-| C-6 | C0 | the Alive card › Details | → Litter details: the totals and the Farrowing log (Edit record is gone, owner 2026-11-02) | S — owner decisions 2026-10-23 (Counting); owner decision 2026-11-02 | — |
+| C-6 | C0 | the Alive card › Details | → Details: the Farrowing log row on top, then This litter (Edit record is gone, owner 2026-11-02; one Details page, 2026-11-03) | S — owner decisions 2026-10-23 (Counting); owner decisions 2026-11-02, 2026-11-03 | — |
 | C-7 | C0 | More actions › Foster piglets | ? Q1 | S (conflict) — RUL After the lock (parked) vs feature.json foster screen | blocker `fa-z1-fostering-scope` |
 
 ## 4 · The dead drawer draft (D)
@@ -117,7 +117,7 @@ States: F0 the record with a visit waiting (from D1) · F1 *retired* (Finish wit
 
 ## 6 · Take back the last action (X)
 
-No Edit record (owner, 2026-11-02): what is saved is in. Undo is a stack (owner, 2026-11-03): Details shows her last action on top; anyone
+No Edit record (owner, 2026-11-02): what is saved is in. Undo is in the Farrowing log (owner, 2026-11-03): its top action carries Undo; anyone
 can take back only the top one, again down the stack, Finish the floor; the counts go back and the log keeps it marked Withdrawn. Edit record, Edit finish details and Correct born are gone, and so are their rows' old
 meanings: the row ids below are kept with the leaves that now check the Undo.
 
@@ -127,17 +127,17 @@ recorded by G.H.
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
 | X-1 | X0 | first change | *retired*: the amber banner and change summary are gone; see X-9. Leaf `fa-x1-change-shows-banner-and-summary` retired | owner decision 2026-10-10 | — |
-| X-2 | X0 › Details › Undo | the Last action row, Undo | → anyone takes back the next one down: L.M's save goes too; alive 7, born 11, both kept as Withdrawn | owner decision 2026-11-03 | `fa-x2-save-correction` |
+| X-2 | X-12 | Undo on the top line, Undo | → anyone takes back the next one down: L.M's save goes too; alive 7, born 11, both kept as Withdrawn | owner decision 2026-11-03 | `fa-x2-save-correction` |
 | X-3 | X0 + change | Back | *retired*: Back with unsaved changes now asks (X-10) instead of silently keeping the draft. Leaf `fa-x3-edit-back-keeps-draft` retired | owner decision 2026-10-10 | — |
-| X-4 | after X-2 | Farrowing log | → both lines kept, each marked Withdrawn 09:41 · G.H | owner decision 2026-11-03 | `fa-x4-edit-clear-discards` |
-| X-5 | X1 | Details, the Last action row, Undo | → the crushed death is taken back: 8 alive, born stays 14, the finish line kept | owner decisions 2026-11-02, 2026-11-03 | `fa-x5-correct-born-after-lock` |
-| X-6 | X1 after X-5 | the Last action row, Undo | → L.M's post-Finish death goes too; Last action is gone (Finish is the floor) | owner decision 2026-11-03 | `fa-x6-log-shows-correction` |
+| X-4 | after X-2 | Back | → Details: the log row shows the newest line still standing (+4 born alive · 1 crushed · 1 other · Aug 26 08:12 · G.H) | owner decision 2026-11-03 | `fa-x4-edit-clear-discards` |
+| X-5 | X1 | Details, Farrowing log, Undo on the top line, Undo | → the crushed death is taken back: 8 alive, born stays 14, the finish line kept | owner decisions 2026-11-02, 2026-11-03 | `fa-x5-correct-born-after-lock` |
+| X-6 | X1 after X-5 | Undo on the top line, Undo | → L.M's post-Finish death goes too; no line carries Undo (Finish is the floor) | owner decision 2026-11-03 | `fa-x6-log-shows-correction` |
 | X-7 | X1 | a piglet dies after the lock | ? Q4 — which door owns post-lock deaths | S (open) — RUL After the lock vs review tasks-built-24 | blocker `fa-x7-post-lock-death-door` |
 | X-8 | — | *retired*: there is no Alive correction any more (owner, 2026-11-02); Q7 is answered | owner decision 2026-11-02 | — |
 | X-9 | X0 | look | → the drawer names no last save and offers no Undo (Alive 12 · Details ›); no banner | owner decision 2026-11-03 | `fa-x9-changed-row-shows-was` |
-| X-10 | X0 | Details | → Litter details opens with Last action on top: +3 born, 09:41 · G.H | owner decision 2026-11-03 | `fa-x10-back-with-change-asks-save` |
-| X-11 | X-10 | the Last action row | → the shared dialog asks `Undo +3 born?` (Back / Undo); nothing changes until it is answered | owner decision 2026-11-03 | `fa-x11-ask-discard-drops-change` |
-| X-12 | X-11 | Undo | → the counts go back (9 alive, born 14); the save stays in the log marked Withdrawn; Last action shows the save before it | owner decision 2026-11-03 | `fa-x12-ask-save-posts-correction` |
+| X-10 | X0 | Details | → Details opens with Farrowing log on top, `+3 born alive · 09:41 · G.H` under it, then This litter; no Undo here, no comparisons while she farrows | owner decision 2026-11-03 | `fa-x10-back-with-change-asks-save` |
+| X-11 | X-10 | Farrowing log, Undo on the top line | → the shared dialog asks `Undo +3 born alive?` (Back / Undo); nothing changes until it is answered | owner decision 2026-11-03 | `fa-x11-ask-discard-drops-change` |
+| X-12 | X-11 | Undo | → the counts go back (9 alive, born 14); the line stays marked Withdrawn 09:41 · G.H; Undo moves to the save before it | owner decision 2026-11-03 | `fa-x12-ask-save-posts-correction` |
 
 ## 7 · Sow death (M)
 
