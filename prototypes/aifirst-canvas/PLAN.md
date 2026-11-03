@@ -1,0 +1,54 @@
+# Farm view v3: plan (owner review, 3 Nov evening)
+
+Canvas: https://claude.ai/artifact/3d1Q4z2YMnFwmFBXtaCeMm (v68 live). Page: `aifirst/project/ActLayout3JS.dc.html`. View mode only; Edit layout stays as it is.
+
+## The model in one line
+
+**Left = the location card** (where you are: farm, zone, section, room, pen, the pig in it). **Right = batches** (calendar or list, a batch, its running task, a pig met through the batch). **Bottom bar = doing** (Select, Batches, Cameras, Equipment, Actions). Every Back and every click on empty ground goes **up one level**, never out.
+
+## Tickets, in build order (each one shippable, each walked at 960 and 1360)
+
+### T1 · Camera framing (small, first)
+- Zone or section click: the area fills about 80% of the free stage (between the card, the right panel and the bar), a little of its surroundings left in view. Today it sits small in the middle.
+- Room click: the room fills the free stage like screenshot 2 (rows readable), not screenshot 3 (whole site).
+- Opening Batches never moves the camera. Opening a batch moves only if its pens are out of view.
+- Done when: zone, section and room each fill 75–85% of the free area at both widths.
+
+### T2 · The location card (replaces the room header pills and the pig panel)
+- Rename: "location card" everywhere. One card, top left, ~360 px wide, collapsible to its title row.
+- Every level: breadcrumb, title, then sections in this order, each only when it has something:
+  1. **Pigs here**: a small breakdown (stacked bar, not a pie: easier to read at 360 px) by stage or status; clicking a segment filters the 3D to those pens. Replaces "186 sows · !5" and its ‹ › stepper; flags stay visible in 3D.
+  2. **Unit details** (room): size, pens, places, door; folded by default.
+  3. **Readings** (room sensors): one line each ("22.4 °C · 61 % · NH₃ 8 ppm · 2 min ago"); click opens a trend sub-page (24 h / 7 d chart).
+  4. **Equipment** bound at this level (room, section or zone): name, state, its control; pen-targetable devices (moving floor, feeder) list per pen with a bulk action. Preview-marked ("nothing is sent yet").
+- Pen click: the card becomes the pen. One pig: that pig directly. Several pigs: a list (tag, or for untagged pigs the batch and production status, as on the phone). Devices on the pen with their controls.
+- Bar: remove the "Pen D17" chip and Clear. Add **Cameras** (opens the room's feed) and **Equipment** (opens the card's Equipment section). The room header pill row is removed.
+
+### T3 · The pig (lean, as on the phone's pig profile, features/pig-profile)
+- **Top**: tag, type and stage with days ("Gilt · 65 days", "In pig · day 61"), age, parity, batch chip, pen.
+- **Running task** (only if one is active on her): the task, her state in it, who marked what and when ("Heat check · in heat · marked by Zhao Min 06:40").
+- **Waiting on someone** and **Health** only when there is something (a health tag, a treatment, a decision). No empty health block.
+- **Notes** only when there is a note.
+- Click-through rows (sub-pages, each with Back): Performance (her past batches and litters), Feed, Weight & backfat, Log (moves and every event; "Moves" goes here).
+- Group pens: the pigs listed first; untagged pigs shown as batch + status.
+
+### T4 · Batches (right panel)
+- Opens on a **batch calendar**: weeks across, one row per batch, its tasks as bars, today marked. A toggle at the top: Calendar | List.
+- A batch selected: its pens get an **outline** (ring on the floor edge); pen colours are not changed. The rest stays as it is.
+- Batch page, lean: header, Running now, next 3 coming up (+ "All dates ›"), and rows that open **sub-pages**: Compared with earlier batches ›, Plan ›, Flags ›.
+- A running task: pen floors take the **phone's task colours** (status colour convention, PR 297: one hue per status; blue in progress, green done, amber attention). Clicking a progress-bar segment or a legend row highlights only those pigs.
+- **Filters** for the task, like the phone (Farrowing: due in N days, parity; Breeding: in heat, bred; etc.): chips above the legend.
+- A pig clicked while a batch is open opens as a sub-page of the batch (Back → the batch); same pig component as T3 (one look).
+
+### T5 · Devices and readings (after T2)
+- Device control sub-page from the card: state, setting (Auto or a value), reason field, "Preview: nothing is sent to equipment yet". Pen-level vs room-level per the device kind (the engine's `serves`).
+- Readings sub-page: 24 h and 7 d line charts with the room's range shaded.
+
+## Calls I made (owner said design calls are mine; say if any is wrong)
+1. Breakdown is a stacked bar, not a pie (narrow card, clickable segments).
+2. Pig info lives in the left card normally, and as a batch sub-page only when a batch is open (both render the same component).
+3. The left card widens from 280 to ~360 px to hold pig and device content.
+
+## Who builds
+- T1 here (small). T2–T5 by Codex (`gpt-6.1-sol`, the worker tier) on `mini`, one ticket at a time (they all edit the same file), each with a brief, then reviewed and walked here before publishing.
+- Transport: dispatch sends a git branch. The canvas is not in the repo, so the sources need a working branch in Sentri-UI (proposed `aifirst-canvas`, a `prototypes/aifirst/` folder, never merged). That push needs the owner's OK.

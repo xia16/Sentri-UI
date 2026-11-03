@@ -1,0 +1,1916 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Barn view 3D</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div ref="{{setRoot}}" style="{{rootStyle}}">
+
+  <!-- title line -->
+  <div style="flex: none; height: 44px; display: flex; align-items: center; gap: 12px; padding: 0 20px; box-sizing: border-box; min-width: 0">
+    <h1 style="margin: 0; font-size: 15px; line-height: 22px; font-weight: 600; letter-spacing: -0.005em; white-space: nowrap">Barn view</h1>
+    <span style="font-size: 13px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0">{{sub}}</span>
+  </div>
+
+  <!-- stage -->
+  <div style="flex: 1 1 auto; min-height: 0; position: relative; border-top: 1px solid #E3E6E1; background: #F3F2EE; overflow: hidden; isolation: isolate">
+    <div ref="{{setMount}}" style="position: absolute; inset: 0"></div>
+    <div ref="{{setLabels}}" aria-label="Labels" style="position: absolute; inset: 0; pointer-events: none; overflow: hidden"></div>
+
+    <sc-if value="{{loading}}" hint-placeholder-val="{{true}}">
+      <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #626C66">{{loadMsg}}</div>
+    </sc-if>
+
+    <!-- room context, top left -->
+    <sc-if value="{{isRoom}}" hint-placeholder-val="{{false}}">
+      <div style="{{roomCardStyle}}">
+        <button type="button" onClick="{{goFarm}}" style="height: 40px; display: flex; align-items: center; gap: 4px; padding: 0 12px 0 8px; border: 0; border-radius: 9px; background: transparent; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevL}}"></path></svg>
+          Farm
+        </button>
+        <span style="width: 1px; height: 26px; background: #E3E6E1; margin-right: 10px; flex-shrink: 0"></span>
+        <div style="min-width: 0">
+          <div style="font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap">{{room.name}}</div>
+          <div style="font-size: 12.5px; line-height: 17px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{room.sum}}</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- camera tools, top right -->
+    <sc-if value="{{ready}}" hint-placeholder-val="{{false}}">
+      <div style="{{camStyle}}">
+        <button type="button" onClick="{{toAngle}}" aria-pressed="{{angleOn}}" style="{{angleStyle}}">3D</button>
+        <button type="button" onClick="{{toPlan}}" aria-pressed="{{planOn}}" style="{{planStyle}}">Plan</button>
+        <span style="width: 1px; height: 22px; background: #E3E6E1; margin: 0 4px"></span>
+        <button type="button" onClick="{{turnLeft}}" aria-label="Turn left" style="{{iconBtn}}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.turnL}}"></path></svg>
+        </button>
+        <button type="button" onClick="{{turnRight}}" aria-label="Turn right" style="{{iconBtn}}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.turnR}}"></path></svg>
+        </button>
+        <button type="button" onClick="{{fit}}" aria-label="Fit to the screen" style="{{iconBtn}}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.fit}}"></path></svg>
+        </button>
+        <span style="width: 1px; height: 22px; background: #E3E6E1; margin: 0 4px"></span>
+        <button type="button" onClick="{{zoomOut}}" aria-label="Zoom out" style="{{iconBtn}}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.minus}}"></path></svg>
+        </button>
+        <button type="button" onClick="{{zoomIn}}" aria-label="Zoom in" style="{{iconBtn}}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.plus}}"></path></svg>
+        </button>
+      </div>
+    </sc-if>
+
+    <!-- who is on the farm, farm view -->
+    <sc-if value="{{showCount}}" hint-placeholder-val="{{false}}">
+      <div style="{{countStyle}}">
+        <span style="font-size: 13px; font-weight: 600; white-space: nowrap">{{count.all}}</span>
+        <sc-for list="{{count.parts}}" as="t" hint-placeholder-count="5">
+          <span style="font-size: 12.5px; color: #626C66; white-space: nowrap">{{t.name}} <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #121815; font-weight: 500">{{t.n}}</span></span>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{showHint}}" hint-placeholder-val="{{false}}">
+      <div style="{{hintStyle}}">{{hint}}</div>
+    </sc-if>
+
+    <!-- pen card, follows its pen -->
+    <div ref="{{setCard}}" style="{{cardStyle}}">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px">
+        <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 18px; line-height: 24px; font-weight: 500">{{card.code}}</div>
+        <button type="button" onClick="{{closeCard}}" aria-label="Close pen details" style="width: 36px; height: 36px; margin: -8px -10px 0 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 8px; background: transparent; color: #626C66; cursor: pointer">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.x}}"></path></svg>
+        </button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 7px; font-size: 13px; margin-top: 2px">
+        <span style="{{card.sw}}"></span>
+        {{card.type}}
+      </div>
+      <div style="font-size: 13px; color: #121815; margin-top: 6px">{{card.pigs}}</div>
+      <div style="font-size: 12.5px; color: #626C66; margin-top: 1px">{{card.where}}</div>
+      <div style="{{card.noteStyle}}">{{card.size}}</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["farm","gestation","farrowing","nursery","pen"],"default":"farm"},"$preview":{"width":1360,"height":830}}'>
+// <inlined>
+const PIGS_MODULE = (function () {
+// pigs.module.js: believable low-poly pigs for the Sentri 3D barn view.
+// ES module, loaded with dynamic import('./pigs.module.js'). Everything is built from a THREE passed in.
+//   const kit = pigKit(THREE);
+//   const field = kit.field();                       // one InstancedMesh per variety, per detail level
+//   field.add('sow-stand', { x, y, z, yaw, s, sx, sz, tone });
+//   const g = field.build();                         // { hi, lo, base } groups (base = soft shadows, lamp glow)
+// Metres, +x is the way a pig faces, +y up. Sows are 180 cm, finishers 120 cm, weaners 65 cm, piglets 34 cm.
+
+function makeRng(seed) {
+  let a = seed >>> 0;
+  const f = () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  f.n = (lo, hi) => lo + (hi - lo) * f();
+  f.i = (lo, hi) => Math.floor(lo + (hi - lo + 1) * f());
+  f.pick = (arr) => arr[Math.floor(f() * arr.length)];
+  f.chance = (p) => f() < p;
+  f.sgn = () => (f() < 0.5 ? -1 : 1);
+  return f;
+}
+
+const CLASSES = { sow: 1.8, finisher: 1.2, weaner: 0.65, piglet: 0.34 };
+// How big every pig is drawn, against the 1.8 m sow above: one scale for every variety. Pen and rail sizes stay real, so the pen reads around each animal.
+const PIG_SCALE = 0.7;
+
+// the varieties, in the order of the pig sheet
+const VARIETIES = [
+  { key: 'sow-stand', name: 'Sow, standing', cm: 180 },
+  { key: 'sow-sternal', name: 'Sow, lying on her belly', cm: 180 },
+  { key: 'sow-side', name: 'Sow, lying on her side', cm: 180 },
+  { key: 'piglet-suckle', name: 'Piglets, suckling', cm: 34, group: true },
+  { key: 'piglet-sternal', name: 'Piglets, sleeping', cm: 34, group: true },
+  { key: 'weaner-stand', name: 'Weaner, standing', cm: 65 },
+  { key: 'weaner-sternal', name: 'Weaners, lying in a huddle', cm: 65, group: true },
+  { key: 'finisher-stand', name: 'Finisher, standing', cm: 120 },
+  { key: 'finisher-sternal', name: 'Finisher, lying', cm: 120 }
+];
+
+const COL = { skin: '#EED0C6', belly: '#F1D6CD', ear: '#E5B3AA', snout: '#E5ADA6', hoof: '#CDBFB8', eye: '#2A2523', teat: '#E6B2AB' };
+
+// ---- geometry helpers ----------------------------------------------------------------------
+function accum(T) {
+  const P = [], N = [], C = [];
+  const v = new T.Vector3();
+  return {
+    add(geo, m, color) {
+      const g = geo.index ? geo.toNonIndexed() : geo.clone();
+      g.applyMatrix4(m);
+      const p = g.attributes.position.array, n = g.attributes.normal.array;
+      const c = new T.Color(color);
+      for (let i = 0; i < p.length; i += 3) { P.push(p[i], p[i + 1], p[i + 2]); v.set(n[i], n[i + 1], n[i + 2]).normalize(); N.push(v.x, v.y, v.z); C.push(c.r, c.g, c.b); }
+      g.dispose();
+    },
+    finish(ground) {
+      let minY = 0;
+      if (ground) { minY = 1e9; for (let i = 1; i < P.length; i += 3) minY = Math.min(minY, P[i]); }
+      const col = new Float32Array(C.length);
+      for (let i = 0; i < P.length; i += 3) {
+        P[i + 1] -= minY;
+        const ny = N[i + 1], y = P[i + 1];
+        const down = Math.max(0, Math.min(1, ny * 0.5 + 0.5));
+        const ao = (0.8 + 0.2 * down) * (0.86 + 0.14 * Math.max(0, Math.min(1, y / 0.14)));
+        col[i] = C[i] * ao; col[i + 1] = C[i + 1] * ao; col[i + 2] = C[i + 2] * ao;
+      }
+      const g = new T.BufferGeometry();
+      g.setAttribute('position', new T.Float32BufferAttribute(P, 3));
+      g.setAttribute('normal', new T.Float32BufferAttribute(N, 3));
+      g.setAttribute('color', new T.BufferAttribute(col, 3));
+      g.computeBoundingSphere();
+      return g;
+    }
+  };
+}
+
+// a smooth body of revolution-ish shape: stations [x, centreY, radiusY, radiusZ], Catmull-Rom between them
+function loft(T, st, nA, nR) {
+  const N = st.length;
+  const cr = (p0, p1, p2, p3, t) => 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t);
+  const g = (k) => st[Math.max(0, Math.min(N - 1, k))];
+  const rows = [];
+  for (let a = 0; a <= nA; a++) {
+    const u = a / nA * (N - 1), i = Math.min(N - 2, Math.floor(u)), t = u - i;
+    const r = [0, 1, 2, 3].map((c) => cr(g(i - 1)[c], g(i)[c], g(i + 1)[c], g(i + 2)[c], t));
+    r[2] = Math.max(0.012, r[2]); r[3] = Math.max(0.012, r[3]);
+    rows.push(r);
+  }
+  const pos = [], idx = [];
+  rows.forEach((r) => { for (let j = 0; j < nR; j++) { const an = j / nR * Math.PI * 2; pos.push(r[0], r[1] + r[2] * Math.sin(an), r[3] * Math.cos(an)); } });
+  for (let a = 0; a < nA; a++) for (let j = 0; j < nR; j++) {
+    const j2 = (j + 1) % nR, p = a * nR, q = (a + 1) * nR;
+    idx.push(p + j, q + j, q + j2, p + j, q + j2, p + j2);
+  }
+  const f0 = pos.length / 3; pos.push(rows[0][0] - 0.02, rows[0][1], 0);
+  const f1 = pos.length / 3; pos.push(rows[nA][0] + 0.02, rows[nA][1], 0);
+  for (let j = 0; j < nR; j++) { const j2 = (j + 1) % nR; idx.push(f0, j2, j); idx.push(f1, nA * nR + j, nA * nR + j2); }
+  const geo = new T.BufferGeometry();
+  geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+const BASE = [
+  [-0.90, 0.56, 0.05, 0.05],
+  [-0.86, 0.58, 0.17, 0.15],
+  [-0.76, 0.61, 0.31, 0.235],
+  [-0.58, 0.62, 0.38, 0.285],
+  [-0.28, 0.60, 0.375, 0.27],
+  [0.06, 0.585, 0.385, 0.275],
+  [0.34, 0.58, 0.385, 0.27],
+  [0.50, 0.56, 0.34, 0.245],
+  [0.62, 0.52, 0.27, 0.205],
+  [0.72, 0.485, 0.245, 0.19],
+  [0.85, 0.44, 0.185, 0.145],
+  [0.96, 0.405, 0.13, 0.10],
+  [1.05, 0.385, 0.095, 0.078],
+  [1.12, 0.38, 0.075, 0.068],
+  [1.15, 0.378, 0.03, 0.03]
+];
+const LM = 2.04;
+const sm = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+
+function stationsFor(spec) {
+  const kid = spec.kid || 0;
+  return BASE.map((s) => {
+    let [x, cy, ry, rz] = s;
+    const head = sm(0.5, 0.7, x);
+    ry *= (1 + 0.28 * head * kid) * (1 - 0.1 * kid); rz *= (1 + 0.3 * head * kid) * (1 - 0.04 * kid);
+    cy += 0.07 * kid;
+    if (spec.headDrop) cy -= spec.headDrop * sm(0.45, 1.0, x);
+    if (spec.pose === 'sternal') {
+      const body = 1 - sm(0.45, 0.8, x);
+      const ry2 = ry * (0.8 - 0.02 * head), rz2 = rz * 1.07;
+      const cyB = ry2 + 0.012;
+      const cyH = Math.max(0.3 + 0.04 * sm(0.7, 1, x) * 0, ry2 + 0.012);
+      ry = ry2; rz = rz2; cy = cyB * body + Math.max(cyH, cyB) * (1 - body);
+      if (x > 0.7) cy = Math.max(cy - 0.06 * sm(0.7, 1.05, x), ry + 0.012);
+    }
+    return [x, cy, ry, rz];
+  });
+}
+
+function interp(st, x) {
+  for (let i = 0; i < st.length - 1; i++) if (x >= st[i][0] && x <= st[i + 1][0]) { const t = (x - st[i][0]) / (st[i + 1][0] - st[i][0]); return [1, 2, 3].map((c) => st[i][c] + (st[i + 1][c] - st[i][c]) * t); }
+  return st[st.length - 1].slice(1);
+}
+
+function buildGeo(T, spec, lod) {
+  const hi = lod === 'hi', xs = lod === 'xs';
+  const acc = accum(T);
+  const k = spec.len / LM;
+  const st = stationsFor(spec);
+  const M = new T.Matrix4(), A = new T.Matrix4(), B = new T.Matrix4(), E = new T.Euler();
+  const pose = new T.Matrix4();
+  const lateral = spec.pose === 'side' || spec.pose === 'sideB';
+  if (lateral) {
+    const th = spec.pose === 'side' ? -Math.PI / 2 : Math.PI / 2;
+    pose.makeRotationX(th);
+    pose.premultiply(new T.Matrix4().makeTranslation(0, 0, spec.pose === 'side' ? 0.58 : -0.58));
+  }
+  const scale = new T.Matrix4().makeScale(k, k, k);
+  const put = (geo, local, color) => { M.copy(scale).multiply(pose).multiply(local); acc.add(geo, M, color); };
+  const rot = (rx, ry, rz) => B.makeRotationFromEuler(E.set(rx, ry, rz, 'XYZ'));
+  const tr = (x, y, z) => new T.Matrix4().makeTranslation(x, y, z);
+  const sc = (x, y, z) => new T.Matrix4().makeScale(x, y, z);
+
+  // body, neck and head in one smooth piece
+  const body = loft(T, st, hi ? 24 : xs ? 6 : 9, hi ? 12 : xs ? 5 : 6);
+  put(body, new T.Matrix4(), COL.skin);
+  body.dispose();
+
+  const sph = (w, h) => new T.SphereGeometry(1, w, h);
+  const cyl = (rt, rb, h, seg) => new T.CylinderGeometry(rt, rb, h, seg);
+  const seg = hi ? 9 : 5;
+
+  // snout disc and ears
+  const tip = interp(st, 1.12);
+  const snout = cyl(0.057, 0.052, 0.05, 12);
+  if (hi) put(snout, tr(1.14, tip[0] - 0.002, 0).multiply(rot(0, 0, Math.PI / 2)), COL.snout);
+  snout.dispose();
+  const ear = sph(10, 7);
+  const hp = interp(st, 0.70);
+  if (hi) [1, -1].forEach((sd) => {
+    const m = tr(0.71, hp[0] + hp[1] * 0.74, sd * 0.135).multiply(rot(sd * 0.9, 0, -0.65)).multiply(sc(0.13, 0.016, 0.082));
+    put(ear, m, COL.ear);
+  });
+  ear.dispose();
+  if (hi) {
+    const eye = sph(6, 5);
+    const ep = interp(st, 0.9);
+    [1, -1].forEach((sd) => put(eye, tr(0.93, ep[0] + ep[1] * 0.3, sd * ep[2] * 0.88).multiply(sc(0.014, 0.014, 0.014)), COL.eye));
+    eye.dispose();
+    const tail = new T.TorusGeometry(0.045, 0.011, 5, 12, Math.PI * 1.55);
+    put(tail, tr(-0.9, 0.55, 0).multiply(rot(0, 0, 2.2)), COL.skin);
+    tail.dispose();
+  }
+
+  // legs: a thick upper leg and a slimmer lower one, a hoof at the end
+  const leg = (x, z, top, uLen, lLen, rTop, rBot, phiU, phiL) => {
+    if (xs) return;
+    if (!hi) {
+      const one = new T.CylinderGeometry(rTop * 0.8, rBot, uLen + lLen, 4, 1, true);
+      put(one, tr(x, top, z).multiply(rot(0, 0, (phiU + phiL) / 2)).multiply(tr(0, -(uLen + lLen) / 2, 0)), COL.skin);
+      one.dispose();
+      return;
+    }
+    const up = cyl(rTop, (rTop + rBot) / 2, uLen, seg);
+    const m1 = tr(x, top, z).multiply(rot(0, 0, phiU)).multiply(tr(0, -uLen / 2, 0));
+    put(up, m1, COL.skin);
+    up.dispose();
+    const kx = x + uLen * Math.sin(phiU), ky = top - uLen * Math.cos(phiU);
+    const lo = cyl((rTop + rBot) / 2, rBot, lLen, seg);
+    const m2 = tr(kx, ky, z).multiply(rot(0, 0, phiL)).multiply(tr(0, -lLen / 2, 0));
+    put(lo, m2, COL.skin);
+    lo.dispose();
+    const hf = cyl(rBot * 0.97, rBot * 1.05, 0.04, hi ? 8 : 5);
+    put(hf, tr(kx, ky, z).multiply(rot(0, 0, phiL)).multiply(tr(0, -lLen - 0.015, 0)), COL.hoof);
+    hf.dispose();
+  };
+  if (lateral) {
+    // lying on her side: legs and udder are on the same side. Legs reach out from the belly, bent, resting low.
+    const S = spec.pose === 'side' ? 1 : -1, tk = spec.tuck ? 0.42 : 1;
+    const P = (a) => new T.Vector3(a[0], a[1], S * (0.30 + (a[2] - 0.30) * tk));
+    const Z = new T.Vector3(0, 1, 0), qq = new T.Quaternion();
+    const tube = (a, b, r0, r1, color, sg) => {
+      const d = b.clone().sub(a), len = d.length();
+      qq.setFromUnitVectors(Z, d.clone().normalize());
+      const g = new T.CylinderGeometry(r1, r0, len, sg);
+      M.copy(scale).multiply(new T.Matrix4().compose(a.clone().add(b).multiplyScalar(0.5), qq, new T.Vector3(1, 1, 1)));
+      acc.add(g, M, color); g.dispose();
+    };
+    const hoofAt = (a, b, r) => {
+      const d = b.clone().sub(a).normalize();
+      qq.setFromUnitVectors(Z, d);
+      const g = new T.CylinderGeometry(r * 0.95, r * 1.05, 0.045, hi ? 8 : 5);
+      M.copy(scale).multiply(new T.Matrix4().compose(b.clone().addScaledVector(d, 0.01), qq, new T.Vector3(1, 1, 1)));
+      acc.add(g, M, COL.hoof); g.dispose();
+    };
+    const legs = [
+      [[0.40, 0.17, 0.30], [0.52, 0.0, 0.52], [0.50, -0.2, 0.64], 0.088, 0.06, 0.044],
+      [[0.40, -0.15, 0.30], [0.52, -0.2, 0.52], [0.64, -0.235, 0.62], 0.088, 0.06, 0.044],
+      [[-0.58, 0.17, 0.30], [-0.68, 0.02, 0.50], [-0.64, -0.2, 0.62], 0.108, 0.07, 0.046],
+      [[-0.58, -0.15, 0.30], [-0.70, -0.21, 0.50], [-0.82, -0.235, 0.58], 0.108, 0.07, 0.046]
+    ];
+    legs.forEach((l) => {
+      const a = P(l[0]), b = P(l[1]), c = P(l[2]);
+      if (!hi) { tube(a, c, l[3] * 0.8, l[5], COL.skin, 4); return; }
+      tube(a, b, l[3], l[4], COL.skin, seg);
+      const kn = sph(8, 6);
+      M.copy(scale).multiply(new T.Matrix4().compose(b, new T.Quaternion(), new T.Vector3(l[4], l[4], l[4])));
+      acc.add(kn, M, COL.skin); kn.dispose();
+      tube(b, c, l[4], l[5], COL.skin, seg);
+      hoofAt(b, c, l[5]);
+    });
+  } else if (spec.pose === 'stand' || spec.pose === 'suckle') {
+    const fr = spec.pose === 'suckle' ? 0.12 : 0;
+    const pf = lateral ? 0.55 : 0, pr = lateral ? -0.4 : 0;
+    const lift = 0.07 * (spec.kid || 0);
+    const topF = (lateral ? 0.5 : 0.42) + lift, topR = (lateral ? 0.52 : 0.44) + lift;
+    const kk = (lateral ? 1.18 : 1) * (1 + lift * 1.6);
+    [1, -1].forEach((sd) => {
+      const jit = lateral ? (sd > 0 ? 1.15 : 0.8) : 1;
+      leg(0.38, sd * 0.17, topF, 0.22 * kk, 0.16 * kk, lateral ? 0.082 : 0.1, 0.04, 0.06 + pf * jit - fr, -0.04 + pf * 0.45 * jit - fr);
+      leg(-0.56, sd * 0.185, topR, 0.22 * kk, 0.17 * kk, lateral ? 0.09 : 0.118, 0.043, -0.3 + pr * jit, lateral ? -0.5 * jit : 0.3);
+    });
+  } else {
+    // lying on the belly: forelegs folded forward, hind feet tucked at the flanks
+    const flat = (x0, y, z, len, r) => {
+      if (!hi) return;
+      const geoL = cyl(r * 0.9, r, len, seg);
+      put(geoL, tr(x0 + len / 2, y, z).multiply(rot(0, 0, -Math.PI / 2)), COL.skin);
+      geoL.dispose();
+      const hf = cyl(r * 1.0, r * 1.05, 0.045, hi ? 8 : 5);
+      put(hf, tr(x0 + len + 0.02, y, z).multiply(rot(0, 0, -Math.PI / 2)), COL.hoof);
+      hf.dispose();
+    };
+    [1, -1].forEach((sd) => {
+      flat(0.36, 0.055, sd * 0.2, 0.3, 0.055);
+      flat(-0.5, 0.05, sd * 0.285, 0.23, 0.052);
+    });
+  }
+
+  // teats along the belly of the sow lying on her side
+  if (hi && lateral && spec.len > 1.5) {
+    const tg = sph(6, 4);
+    for (let i = 0; i < 8; i++) {
+      const x = -0.56 + i * 0.1;
+      const s = interp(st, x);
+      [1, -1].forEach((sd) => put(tg, tr(x, s[0] - s[1] * 0.955, sd * 0.088).multiply(sc(0.017, 0.019, 0.017)), COL.teat));
+    }
+    tg.dispose();
+  }
+  return acc.finish(true);
+}
+
+const SPECS = (() => {
+  const mk = (cls, pose, o) => Object.assign({ cls: cls, pose: pose, len: CLASSES[cls], kid: { sow: 0, finisher: 0.15, weaner: 0.45, piglet: 0.85 }[cls] }, o || {});
+  const out = {};
+  ['sow', 'finisher', 'weaner', 'piglet'].forEach((c) => {
+    ['stand', 'sternal', 'side', 'sideB'].forEach((p) => { if ((p === 'side' || p === 'sideB') && c === 'finisher') return; out[c + '-' + p] = mk(c, p); });
+  });
+  out['piglet-suckle'] = mk('piglet', 'suckle', { headDrop: 0.15 });
+  out['weaner-suckle'] = mk('weaner', 'suckle', { headDrop: 0.15 });
+  out['sow-sideT'] = mk('sow', 'side', { tuck: true });
+  out['sow-sideTB'] = mk('sow', 'sideB', { tuck: true });
+  out['finisher-side'] = mk('finisher', 'side');
+  out['finisher-sideB'] = mk('finisher', 'sideB');
+  return out;
+})();
+
+// ---- rails and panels (barn furniture), one InstancedMesh each ------------------------------
+function railSet(T) {
+  const bars = [], panels = [];
+  return {
+    bar(x0, y0, z0, x1, y1, z1, r) { bars.push([x0, y0, z0, x1, y1, z1, r || 0.018]); },
+    panel(cx, cy, cz, sx, sy, sz) { panels.push([cx, cy, cz, sx, sy, sz]); },
+    count() { return bars.length + panels.length; },
+    build(matBar, matPanel, shadow) {
+      const g = new T.Group();
+      if (bars.length) {
+        const geo = new T.CylinderGeometry(1, 1, 1, 6, 1);
+        const im = new T.InstancedMesh(geo, matBar, bars.length);
+        const m = new T.Matrix4(), q = new T.Quaternion(), a = new T.Vector3(), b = new T.Vector3(), d = new T.Vector3(), up = new T.Vector3(0, 1, 0), s = new T.Vector3(), p = new T.Vector3();
+        bars.forEach((r, i) => {
+          a.set(r[0], r[1], r[2]); b.set(r[3], r[4], r[5]); d.subVectors(b, a); const len = Math.max(0.001, d.length()); d.normalize();
+          q.setFromUnitVectors(up, d); p.addVectors(a, b).multiplyScalar(0.5); s.set(r[6], len, r[6]);
+          m.compose(p, q, s); im.setMatrixAt(i, m);
+        });
+        im.frustumCulled = false; im.castShadow = !!shadow; im.receiveShadow = false;
+        g.add(im);
+      }
+      if (panels.length) {
+        const geo = new T.BoxGeometry(1, 1, 1);
+        const im = new T.InstancedMesh(geo, matPanel, panels.length);
+        const m = new T.Matrix4(), q = new T.Quaternion(), s = new T.Vector3(), p = new T.Vector3();
+        panels.forEach((r, i) => { p.set(r[0], r[1], r[2]); s.set(r[3], r[4], r[5]); m.compose(p, q, s); im.setMatrixAt(i, m); });
+        im.frustumCulled = false; im.castShadow = !!shadow; im.receiveShadow = true;
+        g.add(im);
+      }
+      return g;
+    },
+    dispose() { }
+  };
+}
+
+// ---- the kit ----------------------------------------------------------------------------------
+function pigKit(T) {
+  const geos = {};
+  const geoFor = (key, lod) => {
+    const id = key + ':' + lod;
+    if (!geos[id]) {
+      if (!SPECS[key]) throw new Error('No pig variety ' + key);
+      geos[id] = buildGeo(T, SPECS[key], lod);
+    }
+    return geos[id];
+  };
+  const radial = (stops, size) => {
+    const c = document.createElement('canvas'); c.width = c.height = size || 128;
+    const x = c.getContext('2d'); const g = x.createRadialGradient(c.width / 2, c.height / 2, 0, c.width / 2, c.height / 2, c.width / 2);
+    stops.forEach((s) => g.addColorStop(s[0], s[1]));
+    x.fillStyle = g; x.fillRect(0, 0, c.width, c.height);
+    const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; return t;
+  };
+  const shadowTex = radial([[0, 'rgba(40,30,28,0.62)'], [0.45, 'rgba(40,30,28,0.34)'], [1, 'rgba(40,30,28,0)']]);
+  const glowTex = radial([[0, 'rgba(255,170,70,0.62)'], [0.35, 'rgba(255,184,96,0.34)'], [1, 'rgba(255,200,120,0)']]);
+  const mat = new T.MeshStandardMaterial({ vertexColors: true, roughness: 0.82, metalness: 0 });
+  const shadowMat = new T.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+  const glowMat = new T.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
+  const hoodMat = new T.MeshStandardMaterial({ color: '#D9D6CE', roughness: 0.5, metalness: 0.1, emissive: '#FF8A2A', emissiveIntensity: 0.0 });
+  const hoodOnMat = new T.MeshStandardMaterial({ color: '#E9E4DA', roughness: 0.5, metalness: 0.1, emissive: '#FF8B2B', emissiveIntensity: 0.55 });
+  const bulbMat = new T.MeshBasicMaterial({ color: '#FFD08A' });
+  const unitPlane = new T.PlaneGeometry(1, 1); unitPlane.rotateX(-Math.PI / 2);
+  const hoodGeo = new T.ConeGeometry(0.15, 0.13, 14, 1, true); hoodGeo.translate(0, 0.065, 0);
+  const bulbGeo = new T.SphereGeometry(0.045, 8, 6);
+
+  // soft contact shadow footprint (length, width) per variety, metres
+  const foot = (key) => { const s = SPECS[key], L = s.len; const lat = s.pose === 'side' || s.pose === 'sideB'; return lat ? [L * 1.1, L * 0.62] : s.pose === 'sternal' ? [L * 1.18, L * 0.5] : [L * 1.12, L * 0.36]; };
+
+  const kit = {
+    THREE: T, mat: mat, geo: geoFor, specs: SPECS, shadowMat: shadowMat, glowMat: glowMat, hoodMat: hoodMat, hoodOnMat: hoodOnMat, bulbMat: bulbMat,
+    rng: makeRng,
+    field() {
+      const list = {}, lamps = [], glows = [];
+      const f = {
+        add(key, o) {
+          (list[key] = list[key] || []).push(o);
+        },
+        // a heat lamp hood centred at (x, y, z); glow puts the warm light on the floor at (x, gy, z)
+        lamp(x, y, z, on, gy) { lamps.push({ x: x, y: y, z: z, on: on, gy: gy }); },
+        count() { let n = 0; Object.keys(list).forEach((k) => { n += list[k].length; }); return n; },
+        build() {
+          const hi = new T.Group(), lo = new T.Group(), xs = new T.Group(), base = new T.Group(), fix = new T.Group();
+          const m = new T.Matrix4(), q = new T.Quaternion(), p = new T.Vector3(), s = new T.Vector3(), c = new T.Color(), Y = new T.Vector3(0, 1, 0);
+          const shadowItems = [];
+          Object.keys(list).forEach((key) => {
+            const arr = list[key];
+            ['hi', 'lo', 'xs'].forEach((lod) => {
+              const im = new T.InstancedMesh(geoFor(key, lod), mat, arr.length);
+              arr.forEach((o, i) => {
+                const k = o.s == null ? 1 : o.s;
+                q.setFromAxisAngle(Y, o.yaw || 0); p.set(o.x, o.y || 0, o.z); s.set(k * PIG_SCALE * (o.sx == null ? 1 : o.sx), k * PIG_SCALE * (o.sy == null ? 1 : o.sy), k * PIG_SCALE * (o.sz == null ? 1 : o.sz));
+                m.compose(p, q, s); im.setMatrixAt(i, m);
+                const t = o.tone == null ? 1 : o.tone; c.setRGB(t, t * 0.992, t * 0.985); im.setColorAt(i, c);
+              });
+              im.frustumCulled = false; im.castShadow = false; im.receiveShadow = true;
+              (lod === 'hi' ? hi : lod === 'lo' ? lo : xs).add(im);
+            });
+            const fp = foot(key);
+            arr.forEach((o) => { if (o.shadow !== false) shadowItems.push({ o: o, fp: fp, key: key }); });
+          });
+          if (shadowItems.length) {
+            const im = new T.InstancedMesh(unitPlane, shadowMat, shadowItems.length);
+            shadowItems.forEach((it, i) => {
+              const o = it.o, k = o.s == null ? 1 : o.s;
+              q.setFromAxisAngle(Y, o.yaw || 0); p.set(o.x, (o.y || 0) + 0.012, o.z); s.set(it.fp[0] * k * PIG_SCALE * (o.sx == null ? 1 : o.sx), 1, it.fp[1] * k * PIG_SCALE * (o.sz == null ? 1 : o.sz));
+              // the footprint is centred on the body, a little ahead of the pivot
+              const fw = 0.05 * SPECS[it.key].len * PIG_SCALE; p.x += Math.cos(o.yaw || 0) * fw * k; p.z -= Math.sin(o.yaw || 0) * fw * k;
+              m.compose(p, q, s); im.setMatrixAt(i, m);
+            });
+            im.frustumCulled = false; im.renderOrder = 1; base.add(im);
+          }
+          if (lamps.length) {
+            const on = lamps.filter((l) => l.on), off = lamps.filter((l) => !l.on);
+            [[on, hoodOnMat], [off, hoodMat]].forEach((pair) => {
+              const ls = pair[0]; if (!ls.length) return;
+              const im = new T.InstancedMesh(hoodGeo, pair[1], ls.length);
+              ls.forEach((l, i) => { p.set(l.x, l.y, l.z); q.identity(); s.set(1, 1, 1); m.compose(p, q, s); im.setMatrixAt(i, m); });
+              im.frustumCulled = false; fix.add(im);
+            });
+            if (on.length) {
+              const bi = new T.InstancedMesh(bulbGeo, bulbMat, on.length);
+              const gi = new T.InstancedMesh(unitPlane, glowMat, on.length);
+              on.forEach((l, i) => {
+                p.set(l.x, l.y - 0.01, l.z); q.identity(); s.set(1, 1, 1); m.compose(p, q, s); bi.setMatrixAt(i, m);
+                p.set(l.x, l.gy + 0.016, l.z); s.set(1.35, 1, 1.35); m.compose(p, q, s); gi.setMatrixAt(i, m);
+              });
+              bi.frustumCulled = false; gi.frustumCulled = false; gi.renderOrder = 2; fix.add(bi); base.add(gi);
+            }
+          }
+          return { hi: hi, lo: lo, xs: xs, base: base, fix: fix };
+        }
+      };
+      void glows;
+      return f;
+    },
+    dispose() { Object.keys(geos).forEach((k) => geos[k].dispose()); mat.dispose(); shadowTex.dispose(); glowTex.dispose(); }
+  };
+  return kit;
+}
+
+// ---- arranging pigs and their furniture ---------------------------------------------------------
+// Every helper works in the pen's own frame: (x, z) is the pen centre, y the floor top, head = +1 or -1 is
+// the side of the feeder (x), and +z is toward the door. rng is a makeRng() function.
+
+const vary = (rng, o) => Object.assign({ tone: 1 + rng.n(-0.04, 0.04) }, o);
+const sizeJ = (rng) => 1 + rng.n(-0.06, 0.06);
+
+// the sow in a gestation stall. pose: stand | sternal | side. belly = +1 or -1 (z side of her belly)
+function stallSow(field, rng, o) {
+  const h = o.head, k = sizeJ(rng), tone = 1 + rng.n(-0.04, 0.04);
+  if (o.pose === 'stand') {
+    field.add('sow-stand', { x: o.x + h * rng.n(0.0, 0.07), y: o.y, z: o.z + rng.n(-0.04, 0.04), yaw: h > 0 ? 0 : Math.PI, s: k, sz: 1, tone: tone });
+  } else if (o.pose === 'sternal') {
+    field.add('sow-sternal', { x: o.x + h * rng.n(-0.2, 0.05), y: o.y, z: o.z + rng.n(-0.03, 0.03), yaw: h > 0 ? 0 : Math.PI, s: k, sz: 0.97, tone: tone });
+  } else {
+    const key = (h > 0) === (o.belly > 0) ? 'sow-sideT' : 'sow-sideTB';
+    field.add(key, { x: o.x + h * rng.n(-0.2, 0.05), y: o.y, z: o.z, yaw: h > 0 ? 0 : Math.PI, s: k * 0.97, sz: 0.88, tone: tone });
+  }
+}
+
+// poses for the stalls of one lane, filled[] says which stalls hold a sow
+function stallPoses(rng, filled) {
+  const n = filled.length, out = [];
+  for (let j = 0; j < n; j++) {
+    if (!filled[j]) { out.push(null); continue; }
+    const r = rng();
+    out.push(r < 0.3 ? { pose: 'stand' } : r < 0.3 + 0.7 * 0.8 ? { pose: 'sternal' } : { pose: 'side', belly: rng() < 0.65 ? 1 : -1 });
+  }
+  // a sow on her side stretches her legs a little into the stall she faces: that stall may not hold a standing sow
+  for (let j = 0; j < n; j++) {
+    const p = out[j];
+    if (p && p.pose === 'side') [j - 1, j + 1].forEach((q) => { if (out[q] && out[q].pose === 'stand') out[q] = { pose: 'sternal' }; });
+  }
+  return out;
+}
+
+// piglets in a heap: piled two or three deep around (cx, cz)
+function pigletHeap(field, rng, cx, cz, y, n) {
+  for (let i = 0; i < n; i++) {
+    const layer = i < 5 ? 0 : i < 9 ? 1 : 2;
+    const a = i * 2.39996 + rng.n(-0.3, 0.3), r = PIG_SCALE * (layer === 0 ? 0.1 + rng.n(0, 0.06) : layer === 1 ? 0.05 + rng.n(0, 0.06) : rng.n(0, 0.05));
+    const side = rng() < 0.4;
+    field.add(side ? (rng() < 0.5 ? 'piglet-side' : 'piglet-sideB') : 'piglet-sternal', vary(rng, { x: cx + Math.cos(a) * r, y: y + layer * 0.075 * PIG_SCALE, z: cz + Math.sin(a) * r * 0.9, yaw: rng.n(0, Math.PI * 2), s: sizeJ(rng), shadow: layer === 0 }));
+  }
+}
+
+// a farrowing crate: sow on her side in the middle, belly toward +z. mode: suck | heap | mixed
+function crateFill(field, rails, rng, o) {
+  const h = o.head, y = o.y, S = 0.93 * sizeJ(rng);
+  const PS = PIG_SCALE;
+  const hx = o.x - h * 1.14, hz = o.z + 0.63;
+  // pose 'stand' | 'sternal' puts the sow up before she farrows; she lies on her side otherwise
+  if (o.sow !== false && (o.pose === 'stand' || o.pose === 'sternal')) field.add('sow-' + o.pose, { x: o.x - h * 0.02, y: y, z: o.z, yaw: h > 0 ? 0 : Math.PI, s: S, tone: 1 + rng.n(-0.04, 0.04) });
+  else if (o.sow !== false) field.add(h > 0 ? 'sow-side' : 'sow-sideB', { x: o.x - h * 0.02, y: y, z: o.z, yaw: h > 0 ? 0 : Math.PI, s: S, tone: 1 + rng.n(-0.04, 0.04) });
+  const n = o.litter || 0;
+  const nS = o.mode === 'suck' ? n : o.mode === 'mixed' ? Math.round(n * 0.58) : 0;
+  const nH = n - nS;
+  const sp = PS * Math.max(0.072, Math.min(0.088, 0.78 / Math.max(1, nS - 1)));
+  for (let i = 0; i < nS; i++) {
+    const u = (i - (nS - 1) / 2) * sp - 0.08 * PS;
+    field.add('piglet-suckle', vary(rng, { x: o.x + h * u + rng.n(-0.01, 0.01), y: y, z: o.z + 0.55 * PS + rng.n(-0.02, 0.016), yaw: Math.PI / 2 + rng.n(-0.13, 0.13), s: sizeJ(rng), shadow: true }));
+  }
+  if (nH > 0) pigletHeap(field, rng, hx, hz, y, nH);
+  if (o.lamp !== false && n > 0) {
+    // pole at the pen corner, an arm over the heap, a cord down to the hood
+    heatLamp(field, rails, y, hx, hz, o.x - h * 1.3, o.z + 0.88);
+  }
+}
+
+// the crate itself (rails the sow lies between)
+function crateRails(rails, o) {
+  const h = o.head, y = o.y, x0 = o.x - 0.94, x1 = o.x + 0.94;
+  [-0.45, 0.45].forEach((dz) => {
+    rails.bar(x0, y + 0.96, o.z + dz, x1, y + 0.96, o.z + dz, 0.02);
+    rails.bar(x0, y + 0.64, o.z + dz, x1, y + 0.64, o.z + dz, 0.016);
+    [x0, x1].forEach((px) => rails.bar(px, y, o.z + dz, px, y + 0.96, o.z + dz, 0.02));
+  });
+  [x0, x1].forEach((px) => rails.bar(px, y + 0.96, o.z - 0.45, px, y + 0.96, o.z + 0.45, 0.02));
+  // feeder at the head end
+  rails.panel(o.x + h * 1.2, y + 0.07, o.z, 0.3, 0.14, 0.52);
+}
+
+// a nursery or finisher pen: a huddle lying in one corner, a few standing at the feeder. cls: weaner | finisher
+function groupPenFill(field, rails, rng, o) {
+  const cls = o.cls || 'weaner', h = o.head, y = o.y, n = o.n;
+  const len = CLASSES[cls] * PIG_SCALE;
+  const nStand = Math.min(n, rng.i(2, 4));
+  const nLie = n - nStand;
+  const front = o.x + h * (o.sx / 2 - 0.34);       // front face of the feeder
+  const hopW = 0.34;
+  rails.panel(o.x + h * (o.sx / 2 - 0.17), y + 0.27, o.z, hopW * 0.8, 0.54, Math.min(0.6, o.sz * 0.4));
+  rails.panel(o.x + h * (o.sx / 2 - 0.2), y + 0.05, o.z, 0.46, 0.1, Math.min(1.0, o.sz * 0.66));
+  const nose = len / 2.04 * 1.15 + 0.05;
+  const stride = Math.min(0.5, (o.sz - 0.3) / Math.max(1, nStand));
+  for (let i = 0; i < nStand; i++) {
+    const zz = o.z + (i - (nStand - 1) / 2) * stride + rng.n(-0.04, 0.04);
+    field.add(cls + '-stand', vary(rng, { x: front - h * (nose + rng.n(0, 0.12)), y: y, z: zz, yaw: (h > 0 ? 0 : Math.PI) + rng.n(-0.22, 0.22), s: sizeJ(rng) }));
+  }
+  const side = rng.sgn();
+  huddle(field, rng, cls, o.x - h * (o.sx / 2 - len * 0.95), o.z + side * Math.max(0, o.sz / 2 - 0.52), y, nLie);
+}
+
+// pigs lying side by side in a huddle, a couple on top
+function huddle(field, rng, cls, cx, cz, y, n) {
+  const len = CLASSES[cls] * PIG_SCALE;
+  const slots = [];
+  for (let c = 0; c < 2; c++) for (let r = 0; r < 4; r++) slots.push([(c - 0.5) * len * 0.9, (r - 1.5) * len * 0.32]);
+  for (let i = slots.length - 1; i > 0; i--) { const j = rng.i(0, i); const t = slots[i]; slots[i] = slots[j]; slots[j] = t; }
+  for (let i = 0; i < n; i++) {
+    const sl = slots[i % slots.length];
+    const top = i >= slots.length;
+    const k = rng() < 0.45 ? (rng() < 0.5 ? cls + '-side' : cls + '-sideB') : cls + '-sternal';
+    field.add(k, vary(rng, { x: cx + sl[0] + rng.n(-0.06, 0.06), y: y + (top ? 0.12 * PIG_SCALE : 0), z: cz + sl[1] + rng.n(-0.05, 0.05), yaw: rng.n(-0.45, 0.45) + (rng() < 0.5 ? Math.PI : 0), s: sizeJ(rng), shadow: !top }));
+  }
+}
+
+// a heat lamp hung over (hx, hz) from a pole standing at (px, pz)
+function heatLamp(field, rails, y, hx, hz, px, pz) {
+  rails.bar(px, y, pz, px, y + 1.3, pz, 0.016);
+  rails.bar(px, y + 1.3, pz, hx, y + 1.3, hz, 0.014);
+  rails.bar(hx, y + 1.3, hz, hx, y + 0.76, hz, 0.006);
+  field.lamp(hx, y + 0.62, hz, true, y);
+}
+
+// a pen of adult pigs on open floor (gilts, boars, sick sows): spread without overlaps
+function openPenFill(field, rng, o) {
+  const pts = [];
+  const R = (o.r || 0.62) * PIG_SCALE / 0.7 * 0.8;
+  for (let i = 0; i < o.n; i++) {
+    let best = null, bd = -1;
+    for (let t = 0; t < 40; t++) {
+      const x = o.x + rng.n(-o.sx / 2 + 1.0, o.sx / 2 - 1.0), z = o.z + rng.n(-o.sz / 2 + 0.6, o.sz / 2 - 0.6);
+      let d = 1e9; pts.forEach((p) => { d = Math.min(d, Math.hypot(p.x - x, (p.z - z) * 1.4)); });
+      if (d > bd) { bd = d; best = { x: x, z: z }; }
+      if (d > R * 2.2) break;
+    }
+    pts.push(best);
+  }
+  pts.forEach((p) => {
+    const r = rng(); const k = sizeJ(rng) * (o.scale || 1);
+    const yaw = rng.n(0, Math.PI * 2);
+    if (r < 0.4) field.add('sow-stand', vary(rng, { x: p.x, y: o.y, z: p.z, yaw: yaw, s: k }));
+    else if (r < 0.88) field.add('sow-sternal', vary(rng, { x: p.x, y: o.y, z: p.z, yaw: yaw, s: k, sz: 0.97 }));
+    else field.add(rng() < 0.5 ? 'sow-side' : 'sow-sideB', vary(rng, { x: p.x, y: o.y, z: p.z, yaw: yaw, s: k * 0.97 }));
+  });
+}
+
+return { makeRng, CLASSES, PIG_SCALE, VARIETIES, railSet, pigKit, stallSow, stallPoses, pigletHeap, crateFill, crateRails, groupPenFill, huddle, heatLamp, openPenFill };
+})();
+// </inlined>
+class Component extends DCLogic {
+  icons() {
+    return {
+      plus: 'M12 5v14 M5 12h14',
+      minus: 'M5 12h14',
+      chevL: 'M15 6l-6 6 6 6',
+      x: 'M18 6 6 18 M6 6l12 12',
+      fit: 'M4 9V4h5 M15 4h5v5 M20 15v5h-5 M9 20H4v-5',
+      turnL: 'M3 12a9 9 0 1 0 3-6.7 M3 4v5h5',
+      turnR: 'M21 12a9 9 0 1 1-3-6.7 M21 4v5h-5'
+    };
+  }
+  // pen-type colours: block tints the floor of the pen
+  colors() {
+    return [
+      { fill: '#E1EBD9', block: '#A7C497' },
+      { fill: '#E1E6EC', block: '#A2B0C1' },
+      { fill: '#F6E6C6', block: '#E2BD74' },
+      { fill: '#DAE8F5', block: '#93B8DE' },
+      { fill: '#E9E2F4', block: '#B7A6DB' },
+      { fill: '#F5E0E0', block: '#DCA0A0' }
+    ];
+  }
+  // typical pen size (cm) for a use
+  heightOf(use) { return { Gestation: 1.0, Boars: 1.1, Farrowing: 0.95, Nursery: 0.65, Finishing: 0.9, Gilts: 1.0, Sick: 1.0 }[use] || 0.9; }
+  mkType(id, name, per, use, w, l, c, nn) {
+    const low = name.toLowerCase();
+    return { id: id, name: name, per: per, use: use, w: w, l: l, c: c, u1: nn[0], uN: nn[1], s1: low, s2: low + 's' };
+  }
+  types() {
+    return [
+      this.mkType('gest', 'Gestation stall', 1, 'Gestation', 65, 210, 0, ['sow', 'sows']),
+      this.mkType('boar', 'Boar pen', 1, 'Boars', 300, 350, 1, ['boar', 'boars']),
+      this.mkType('crate', 'Farrowing crate', 1, 'Farrowing', 180, 270, 2, ['sow + litter', 'sows + litters']),
+      this.mkType('nurs', 'Nursery pen', 10, 'Nursery', 150, 240, 3, ['pig', 'pigs']),
+      this.mkType('gilt', 'Gilt pen', 10, 'Gilts', 300, 500, 4, ['gilt', 'gilts']),
+      this.mkType('sick', 'Sick pen', 2, 'Sick', 250, 400, 5, ['sow', 'sows'])
+    ];
+  }
+  fmt(n) { return Number(n).toLocaleString('en-US'); }
+  letter(i) { return String.fromCharCode(65 + i); }
+  ln(t, n) { return { t: t, n: n }; }
+  rep(k, t, n) { const a = []; for (let i = 0; i < k; i++) a.push(this.ln(t, n)); return a; }
+  R(id, name, sec, num, lanes, extra) { return Object.assign({ id: id, name: name, sec: sec, num: num, x: 0, z: 0, rot: 0, flip: false, lanes: lanes, ends: [] }, extra || {}); }
+
+  // ---------- the farm ----------
+  farmData() {
+    const types = this.types();
+    const zones = [{ id: 'z1', name: 'Production Zone 1', code: 'Z1' }, { id: 'z2', name: 'Isolation Zone', code: 'Z2' }];
+    const secs = [
+      { id: 's-gest', name: 'Gestation', code: 'GES', zone: 'z1' },
+      { id: 's-far', name: 'Farrowing', code: 'FAR', zone: 'z1' },
+      { id: 's-nur', name: 'Nursery', code: 'NUR', zone: 'z1' },
+      { id: 's-q', name: 'Quarantine', code: 'QUA', zone: 'z2' }
+    ];
+    const rooms = [
+      this.R('g1', 'Gestation 1', 's-gest', 1, this.rep(4, 'gest', 50).concat([this.ln('boar', 6)])),
+      this.R('g2', 'Gestation 2', 's-gest', 2, this.rep(4, 'gest', 50)),
+      this.R('sick', 'Sick room', 's-gest', 3, [this.ln('sick', 2), this.ln('sick', 2)], { ends: [{ t: 'sick', each: 12, size: { w: 400, l: 700 }, lanes: [0, 1] }] })
+    ];
+    [1, 2, 3, 4].forEach((k) => rooms.push(this.R('fr' + k, 'Farrowing Room ' + k, 's-far', k, this.rep(2, 'crate', 26))));
+    rooms.push(this.R('n1', 'Nursery 1', 's-nur', 1, this.rep(2, 'nurs', 26)), this.R('n2', 'Nursery 2', 's-nur', 2, this.rep(2, 'nurs', 26)));
+    rooms.push(this.R('q1', 'Quarantine 1', 's-q', 1, [this.ln('gilt', 6)]));
+    return { types: types, zones: zones, secs: secs, rooms: rooms };
+  }
+  M() { if (!this.m) this.m = this.farmData(); return this.m; }
+  typeOf(id) { return this.M().types.find((t) => t.id === id) || this.M().types[0]; }
+  colorOf(id) { return this.colors()[this.typeOf(id).c % 6]; }
+  perOf(p) { return p.each != null ? p.each : this.typeOf(p.t).per; }
+  sizeOf(p) {
+    const t = this.typeOf(p.t), s = p.size || { w: t.w, l: t.l };
+    return { w: s.w / 100, d: s.l / 100, h: this.heightOf(t.use) };
+  }
+  roomById(id) { return this.M().rooms.find((r) => r.id === id) || null; }
+  secById(id) { return this.M().secs.find((s) => s.id === id) || null; }
+  roomsOf(secId) { return this.M().rooms.filter((r) => r.sec === secId); }
+
+  // ---------- geometry (metres), as the layout builds it ----------
+  geom(r) {
+    const AL = 1.2, FRONT = 1.9, BACK = 0.9, TW = 0.25;
+    const n = r.lanes.length;
+    const lanes = new Array(n);
+    let cx = AL;
+    r.lanes.forEach((l, i) => { const d = this.sizeOf(l); lanes[i] = { i: i, l: l, x0: cx, x1: cx + d.d, w: d.w, h: d.h, len: l.n * d.w }; cx += d.d + AL; });
+    let W = n ? cx : 9;
+    const ends = (r.ends || []).map((e, k) => {
+      const cov = e.lanes.map((i) => lanes[i]).filter(Boolean);
+      const sz = this.sizeOf(e);
+      const mid = (Math.min(...cov.map((c) => c.x0)) + Math.max(...cov.map((c) => c.x1))) / 2;
+      const x0 = Math.max(0.3, mid - sz.d / 2), x1 = x0 + sz.d;
+      W = Math.max(W, x1 + AL);
+      return { k: k, e: e, x0: x0, x1: x1, z0: FRONT + Math.max(0, ...cov.map((c) => c.len)) + 0.35, len: sz.w, h: sz.h, code: this.letter(n + k) + '1', lanes: e.lanes };
+    });
+    const maxLen = Math.max(0, ...lanes.map((a) => a.len), ...ends.map((e) => e.z0 - FRONT + e.len));
+    const L = Math.max(FRONT + maxLen + BACK, 6);
+    let best = AL / 2, acc = 0;
+    const byX = lanes.slice().sort((a, b) => a.x0 - b.x0);
+    for (let k = 0; k <= byX.length; k++) { const ax = acc + AL / 2; if (Math.abs(ax - W / 2) < Math.abs(best - W / 2)) best = ax; if (k < byX.length) acc += AL + (byX[k].x1 - byX[k].x0); }
+    const doorX = Math.min(Math.max(best, 1.1), W - 1.1);
+    const ow = W + 2 * TW, ol = L + 2 * TW;
+    return { W: W, L: L, TW: TW, FRONT: FRONT, AL: AL, lanes: lanes, ends: ends, doorX: doorX, ow: ow, ol: ol, fw: ow, fl: ol };
+  }
+  fp(r) { const g = this.geom(r); return { x0: r.x, z0: r.z, x1: r.x + g.fw, z1: r.z + g.fl, fw: g.fw, fl: g.fl }; }
+  bbox(rooms) {
+    const b = { x0: 1e9, z0: 1e9, x1: -1e9, z1: -1e9 };
+    rooms.forEach((r) => { const f = this.fp(r); b.x0 = Math.min(b.x0, f.x0); b.z0 = Math.min(b.z0, f.z0); b.x1 = Math.max(b.x1, f.x1); b.z1 = Math.max(b.z1, f.z1); });
+    return b;
+  }
+  pad(b, l, f, r, k) { return { x0: b.x0 - l, x1: b.x1 + r, z0: b.z0 - k, z1: b.z1 + f }; }
+  union(a, b) { return { x0: Math.min(a.x0, b.x0), z0: Math.min(a.z0, b.z0), x1: Math.max(a.x1, b.x1), z1: Math.max(a.z1, b.z1) }; }
+  autoLayout() {
+    const m = this.M();
+    const AL = 2.6, SG = 11;
+    const placed = [];
+    m.zones.forEach((z) => {
+      let x = 4;
+      const mine = [];
+      m.secs.filter((s) => s.zone === z.id).forEach((s) => {
+        x += 2.6;
+        this.roomsOf(s.id).forEach((r) => { const g = this.geom(r); r.x = x; r.z = -Math.round(g.fl); x += g.fw + AL; mine.push(r); });
+        x = x - AL + 2.6 + SG;
+      });
+      placed.push(mine);
+    });
+    const b0 = placed[0] && placed[0].length ? this.bbox(placed[0]) : null;
+    placed.forEach((rs, k) => {
+      if (k === 0 || !rs.length || !b0) return;
+      const b = this.bbox(rs);
+      const dx = Math.round(b0.x1 - b.x1 - 4), dz = Math.round(b0.z0 - 34 - b.z1);
+      rs.forEach((r) => { r.x += dx; r.z += dz; });
+    });
+    m.secs.forEach((s) => { const rs = this.roomsOf(s.id); if (rs.length) s.rect = this.pad(this.bbox(rs), 2.6, 5.5, 2.6, 3.8); });
+    m.zones.forEach((z) => {
+      const ss = m.secs.filter((s) => s.zone === z.id && s.rect);
+      if (!ss.length) return;
+      let b = ss[0].rect;
+      ss.forEach((s) => { b = this.union(b, s.rect); });
+      z.rect = this.pad(b, 4, 4.5, 4, 5);
+    });
+  }
+
+  // ---------- who lives where ----------
+  hs(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  tag() { this.tagN = (this.tagN || 0) + 1; return '20' + String(1000 + (this.tagN * 2711) % 8999).padStart(4, '0'); }
+  // what is in every pen: cell[code] = { sow, litter, mode, n, note, ... }, plus the room's label and counts
+  makePlan() {
+    const P = this.P, plan = {};
+    this.tagN = 0;
+    const all = { sows: 0, boars: 0, gilts: 0, piglets: 0, weaners: 0 };
+    this.M().rooms.forEach((r) => {
+      const rng = P.makeRng(this.hs(r.id) + 5);
+      const cell = {};
+      const tot = { sows: 0, boars: 0, gilts: 0, piglets: 0, weaners: 0 };
+      let name = r.name, detail = '';
+      if (r.id === 'g1') {
+        [50, 50, 36, 12].forEach((k, i) => { for (let j = 0; j < k; j++) { cell[this.letter(i) + (j + 1)] = { sow: this.tag() }; tot.sows += 1; } });
+        for (let j = 0; j < 4; j++) { cell['E' + (j + 1)] = { boar: 'B' + (500 + j * 3 + 1), n: 1 }; tot.boars += 1; }
+        detail = tot.sows + ' sows · ' + tot.boars + ' boars';
+      } else if (r.id === 'g2') {
+        const flag = { B14: 'Lame', B17: 'To watch', C3: 'Lame', C22: 'Off feed', D40: 'To watch' };
+        const empty = {};
+        let k = 0;
+        while (k < 14) { const c = this.letter(rng.i(0, 3)) + rng.i(1, 50); if (!empty[c] && !flag[c]) { empty[c] = true; k++; } }
+        for (let i = 0; i < 4; i++) for (let j = 1; j <= 50; j++) { const c = this.letter(i) + j; if (empty[c]) continue; cell[c] = { sow: this.tag(), flag: flag[c] || '' }; tot.sows += 1; }
+        detail = tot.sows + ' sows';
+      } else if (r.id === 'sick') {
+        ['A1', 'B1', 'C1'].forEach((c) => { cell[c] = { sow: this.tag(), flag: 'Sick' }; tot.sows += 1; });
+        detail = '3 sows';
+      } else if (r.id === 'fr2') {
+        const L = [];
+        for (let i = 0; i < 50; i++) L.push(Math.max(8, Math.min(14, Math.round(11.6 + (rng() + rng() + rng() - 1.5) * 4.2))));
+        L[2] = 12;
+        let sum = L.reduce((a, b) => a + b, 0);
+        while (sum !== 580) { const i = rng.i(0, 49); if (i === 2) continue; if (sum < 580 && L[i] < 14) { L[i]++; sum++; } else if (sum > 580 && L[i] > 8) { L[i]--; sum--; } }
+        let n = 0;
+        for (let i = 0; i < 2; i++) for (let j = 1; j <= 25; j++) {
+          const c = this.letter(i) + j;
+          const rr = rng();
+          cell[c] = { sow: c === 'A3' ? '204518' : this.tag(), litter: L[n], mode: c === 'A3' ? 'mixed' : rr < 0.45 ? 'suck' : rr < 0.9 ? 'heap' : 'mixed', batch: 32 };
+          n++; tot.sows += 1; tot.piglets += cell[c].litter;
+        }
+        detail = 'Batch 32 · ' + tot.sows + ' sows, ' + tot.piglets + ' piglets';
+      } else if (r.id === 'fr1') detail = 'Batch 33 moving in Wed 4 Nov';
+      else if (r.id === 'fr3') detail = 'Drying';
+      else if (r.id === 'fr4') detail = 'Ready';
+      else if (r.id === 'n1' || r.id === 'n2') {
+        const total = r.id === 'n1' ? 470 : 488, batch = r.id === 'n1' ? 30 : 31;
+        const per = []; for (let i = 0; i < 52; i++) per.push(9);
+        let extra = total - 52 * 9;
+        while (extra > 0) { const i = rng.i(0, 51); if (per[i] === 9) { per[i] = 10; extra--; } }
+        let n = 0;
+        for (let i = 0; i < 2; i++) for (let j = 1; j <= 26; j++) { cell[this.letter(i) + j] = { n: per[n], batch: batch }; tot.weaners += per[n]; n++; }
+        detail = 'Batch ' + batch + ' · ' + tot.weaners + ' weaners';
+      } else if (r.id === 'q1') {
+        for (let j = 1; j <= 6; j++) { cell['A' + j] = { n: 4, gilts: true }; tot.gilts += 4; }
+        detail = '24 gilts';
+      }
+      Object.keys(tot).forEach((k) => { all[k] += tot[k]; });
+      plan[r.id] = { cell: cell, name: name, detail: detail, tot: tot };
+    });
+    this.plan = plan; this.all = all;
+    this.allN = all.sows + all.boars + all.gilts + all.piglets + all.weaners;
+  }
+  roomSum(r) {
+    const p = this.plan[r.id];
+    return p ? p.detail : '';
+  }
+
+  // ---------- states ----------
+  eff(start) { return ['farm', 'gestation', 'farrowing', 'nursery', 'pen'].indexOf(start) >= 0 ? start : 'farm'; }
+  defaults(start) {
+    const e = this.eff(start);
+    const base = { startSeen: start, ready: false, err: '', narrow: false, avail: this.availH || 760, view: 'farm', roomId: '', pen: '', plan: false };
+    const o = {
+      gestation: { view: 'room', roomId: 'g2' },
+      farrowing: { view: 'room', roomId: 'fr2' },
+      nursery: { view: 'room', roomId: 'n1' },
+      pen: { view: 'room', roomId: 'fr2', pen: 'A3' }
+    }[e] || {};
+    return Object.assign(base, o);
+  }
+  ui() {
+    const start = this.props.start || 'farm';
+    return (this.U && this.U.startSeen === start) ? this.U : this.defaults(start);
+  }
+  put(p) { const n = Object.assign({}, this.ui(), p); this.U = n; this.setState(n); this.dirty = true; return n; }
+
+  // ---------- lifecycle ----------
+  componentDidMount() {
+    this.alive = true;
+    const local = './vendor/three.module.min.js';
+    const cdn = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js';
+    const pigsUrl = './pigs.module.js';
+    this.measure();
+    this.onWin = () => { this.measure(); };
+    window.addEventListener('resize', this.onWin);
+    Promise.all([import(local).catch(() => import(cdn)), Promise.resolve(PIGS_MODULE)]).then((r) => {
+      if (!this.alive) return;
+      this.T = r[0]; this.P = r[1];
+      try { this.init(); } catch (e) { console.error(e); this.put({ err: 'The 3D view could not start on this computer.' }); }
+    }).catch((e) => { console.error(e); this.put({ err: 'The 3D view could not load.' }); });
+  }
+  componentDidUpdate() {
+    this.dirty = true;
+    if (this.T && this.renderer && this.applied !== (this.props.start || 'farm')) this.applyStart();
+  }
+  componentWillUnmount() {
+    this.alive = false;
+    cancelAnimationFrame(this.raf);
+    if (this.ro) this.ro.disconnect();
+    if (this.onWin) window.removeEventListener('resize', this.onWin);
+    const c = this.renderer && this.renderer.domElement;
+    if (c && this.h) { c.removeEventListener('pointerdown', this.h.down); window.removeEventListener('pointermove', this.h.move); window.removeEventListener('pointerup', this.h.up); c.removeEventListener('wheel', this.h.wheel); c.removeEventListener('pointerleave', this.h.leave); c.removeEventListener('contextmenu', this.h.ctx); window.removeEventListener('keydown', this.h.key); }
+    if (this.world) this.disposeTree(this.world);
+    if (this.patchRoot) this.disposeTree(this.patchRoot);
+    if (this.kit) this.kit.dispose();
+    if (this.renderer) { this.renderer.dispose(); if (c && c.parentNode) c.parentNode.removeChild(c); }
+    if (this.labels) this.labels.forEach((L) => L.el.remove());
+  }
+  disposeTree(o) {
+    o.traverse((x) => {
+      if (x.geometry && !x.userData.shared) x.geometry.dispose();
+      if (x.material && x.userData.ownMat) (Array.isArray(x.material) ? x.material : [x.material]).forEach((m) => m.dispose());
+    });
+  }
+  measure() {
+    const el = this.rootEl;
+    if (!el) return;
+    const top = el.getBoundingClientRect().top;
+    let bottom = window.innerHeight;
+    let p = el.parentElement;
+    while (p && p !== document.body) {
+      const cs = getComputedStyle(p);
+      if (/(auto|scroll|hidden)/.test(cs.overflowY) && p.clientHeight > 0) { bottom = Math.min(bottom, p.getBoundingClientRect().bottom - (parseFloat(cs.paddingBottom) || 0)); break; }
+      p = p.parentElement;
+    }
+    const h = Math.max(520, Math.floor(bottom - top));
+    if (h !== this.availH) { this.availH = h; if (this.state) this.put({ avail: h }); }
+  }
+
+  // ---------- three setup ----------
+  init() {
+    const T = this.T;
+    this.PAPER = '#F3F2EE';
+    const r = new T.WebGLRenderer({ antialias: true });
+    r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    r.shadowMap.enabled = true;
+    r.shadowMap.type = T.PCFSoftShadowMap;
+    r.shadowMap.autoUpdate = false;
+    r.domElement.style.display = 'block';
+    r.domElement.style.touchAction = 'none';
+    r.domElement.setAttribute('aria-label', '3D view of the barns and the pigs in them');
+    this.mountEl.appendChild(r.domElement);
+    this.renderer = r;
+
+    const scene = new T.Scene();
+    scene.background = new T.Color(this.PAPER);
+    scene.fog = new T.Fog(this.PAPER, 300, 900);
+    this.scene = scene;
+    this.camera = new T.PerspectiveCamera(30, 1, 0.5, 6000);
+
+    scene.add(new T.HemisphereLight('#FFFFFF', '#E2DED4', 2.0));
+    const sun = new T.DirectionalLight('#FFF7EC', 1.6);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(4096, 4096);
+    sun.shadow.bias = -0.0004;
+    sun.shadow.normalBias = 0.03;
+    scene.add(sun); scene.add(sun.target);
+    this.sun = sun;
+
+    const sheet = new T.Mesh(new T.PlaneGeometry(6000, 6000), new T.MeshBasicMaterial({ color: this.PAPER }));
+    sheet.rotation.x = -Math.PI / 2; sheet.position.y = -0.01;
+    scene.add(sheet);
+    const catcher = new T.Mesh(new T.PlaneGeometry(6000, 6000), new T.ShadowMaterial({ color: '#3B3A33', opacity: 0.14 }));
+    catcher.rotation.x = -Math.PI / 2; catcher.receiveShadow = true;
+    scene.add(catcher);
+
+    const std = (c) => new T.MeshStandardMaterial({ color: c, roughness: 0.92, metalness: 0 });
+    this.mat = {
+      wall: std('#FFFFFF'),
+      arrow: new T.MeshBasicMaterial({ color: '#8A938D', transparent: true, opacity: 1 }),
+      ink: new T.MeshBasicMaterial({ color: '#121815' }),
+      hit: new T.MeshBasicMaterial({ visible: false }),
+      bar: new T.MeshStandardMaterial({ color: '#D3D8D5', roughness: 0.5, metalness: 0 }),
+      panel: new T.MeshStandardMaterial({ color: '#F1F1ED', roughness: 0.85, metalness: 0 })
+    };
+    this.unitBox = new T.BoxGeometry(1, 1, 1); this.unitBox.translate(0, 0.5, 0);
+    this.kit = this.P.pigKit(T);
+
+    this.world = new T.Group(); scene.add(this.world);
+    this.patchRoot = new T.Group(); scene.add(this.patchRoot);
+    this.labels = new Map();
+    this.rooms = [];
+    this.cam = { tx: 0, ty: 0, tz: 0, dist: 200, yaw: 0.3, pitch: 0.7 };
+    this.ray = new T.Raycaster();
+    this.v = new T.Vector3();
+
+    this.resize();
+    this.ro = new ResizeObserver(() => { this.resize(); });
+    this.ro.observe(this.mountEl);
+    this.bindPointer();
+    this.applyStart();
+    if (window.__dbg) window.__bb = this;
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (!this.alive) return; this.labels.forEach((L) => { L.w = 0; if (L.ws) L.ws = []; }); this.dirty = true; });
+    const loop = () => { if (!this.alive) return; this.raf = requestAnimationFrame(loop); this.frame(); };
+    loop();
+  }
+  resize() {
+    const el = this.mountEl;
+    const W = Math.max(1, el.clientWidth), H = Math.max(1, el.clientHeight);
+    if (W === this.W && H === this.H) return;
+    const first = !this.W;
+    this.W = W; this.H = H;
+    this.renderer.setSize(W, H);
+    this.camera.aspect = W / H; this.camera.updateProjectionMatrix();
+    this.dirty = true;
+    const narrow = W < 1100;
+    if (this.state && this.ui().narrow !== narrow) this.put({ narrow: narrow });
+    if (!first && this.siteBox && this.ui().ready) { this.cam = this.presetFor(this.ui()); }
+  }
+
+  applyStart() {
+    const start = this.props.start || 'farm';
+    this.applied = start;
+    this.m = this.farmData();
+    this.autoLayout();
+    this.makePlan();
+    const d = Object.assign(this.defaults(start), { ready: true, narrow: this.W < 1100, avail: this.availH || 760 });
+    const zr = this.M().zones.filter((z) => z.rect);
+    if (zr.length) { let b = zr[0].rect; zr.forEach((z) => { b = this.union(b, z.rect); }); this.off = { x: -Math.round((b.x0 + b.x1) / 2), z: -Math.round((b.z0 + b.z1) / 2) }; } else this.off = { x: 0, z: 0 };
+    this.buildAll();
+    this.U = d;
+    this.setState(d);
+    this.dirty = true;
+    this.cam = this.presetFor(d);
+    this.hoverRoom = ''; this.hoverPen = null;
+    this.updateSel();
+  }
+
+  // ---------- scene build ----------
+  buildAll() {
+    if (this.world.children.length) this.disposeTree(this.world);
+    this.world.clear();
+    this.labels.forEach((L) => L.el.remove());
+    this.labels = new Map();
+    this.rooms = [];
+    this.Y = { YZ: 0.37, YS: 0.67, YF: 0.79, WH: 2.1 };
+    this.buildPatches();
+    this.M().rooms.forEach((r) => this.createRoom(r));
+    this.computeSite();
+    this.dirty = true;
+  }
+  computeSite() {
+    const T = this.T, o = this.off;
+    const b = new T.Box3(new T.Vector3(1e9, 0, 1e9), new T.Vector3(-1e9, 3, -1e9));
+    const add = (r) => { b.min.x = Math.min(b.min.x, r.x0 + o.x); b.min.z = Math.min(b.min.z, r.z0 + o.z); b.max.x = Math.max(b.max.x, r.x1 + o.x); b.max.z = Math.max(b.max.z, r.z1 + o.z); };
+    this.M().zones.forEach((z) => { if (z.rect) add(z.rect); });
+    this.M().secs.forEach((z) => { if (z.rect) add(z.rect); });
+    this.M().rooms.forEach((r) => add(this.fp(r)));
+    this.siteBox = b;
+    const pts = [];
+    const corner = (r) => { [[r.x0, r.z0], [r.x1, r.z0], [r.x0, r.z1], [r.x1, r.z1]].forEach((p) => { pts.push(new T.Vector3(p[0] + o.x, 0, p[1] + o.z)); pts.push(new T.Vector3(p[0] + o.x, 2.9, p[1] + o.z)); }); };
+    this.M().zones.forEach((z) => { if (z.rect) corner(z.rect); });
+    this.M().secs.forEach((z) => { if (z.rect) corner(z.rect); });
+    this.M().rooms.forEach((r) => corner(this.fp(r)));
+    const rp = [];
+    this.M().rooms.forEach((r) => { const f = this.fp(r); [[f.x0 - 2, f.z0 - 2], [f.x1 + 2, f.z0 - 2], [f.x0 - 2, f.z1 + 2], [f.x1 + 2, f.z1 + 2]].forEach((p) => { rp.push(new T.Vector3(p[0] + o.x, 0, p[1] + o.z)); rp.push(new T.Vector3(p[0] + o.x, 1.2, p[1] + o.z)); }); });
+    this.sitePts = rp;
+    void pts;
+    this.fitShadow(b);
+  }
+  zoneMat(i) { return ['#E8ECE3', '#EFEAE1', '#E6EAEF'][i % 3]; }
+  buildPatches() {
+    const T = this.T, o = this.off, Y = this.Y;
+    this.patchRoot.clear();
+    const plate = (rc, r, depth, color, y) => {
+      const x0 = rc.x0 + o.x, x1 = rc.x1 + o.x, z0 = rc.z0 + o.z, z1 = rc.z1 + o.z;
+      const rr = Math.max(0.3, Math.min(r, (x1 - x0) / 2 - 0.2, (z1 - z0) / 2 - 0.2));
+      const s = new T.Shape();
+      const a = x0, b = x1, c = -z1, d = -z0;
+      s.moveTo(a + rr, c); s.lineTo(b - rr, c); s.quadraticCurveTo(b, c, b, c + rr); s.lineTo(b, d - rr); s.quadraticCurveTo(b, d, b - rr, d); s.lineTo(a + rr, d); s.quadraticCurveTo(a, d, a, d - rr); s.lineTo(a, c + rr); s.quadraticCurveTo(a, c, a + rr, c);
+      const g = new T.ExtrudeGeometry(s, { depth: depth, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.08, bevelSegments: 2, curveSegments: 8 });
+      g.rotateX(-Math.PI / 2);
+      const mesh = new T.Mesh(g, new T.MeshStandardMaterial({ color: color, roughness: 0.92, metalness: 0 }));
+      mesh.position.y = y + 0.06;
+      mesh.receiveShadow = true;
+      mesh.userData.ownMat = true;
+      this.patchRoot.add(mesh);
+    };
+    this.M().zones.forEach((z, i) => {
+      if (!z.rect) return;
+      plate(z.rect, 3, 0.25, this.zoneMat(i), i * 0.004);
+      this.label('zone:' + z.id, 'zone', z.name, z.rect.x0 + o.x + 2.0, Y.YZ, z.rect.z1 + o.z - 1.5, { prio: 1 });
+    });
+    this.M().secs.forEach((s, i) => {
+      if (!s.rect) return;
+      plate(s.rect, 1.6, 0.18, '#F9F9F6', Y.YZ + i * 0.004);
+      this.label('sec:' + s.id, 'sec', s.name, s.rect.x0 + o.x + 1.4, Y.YS, s.rect.z0 + o.z + 1.6, { prio: 2 });
+    });
+  }
+  ringGeom(x0, x1, z0, z1, w) {
+    const T = this.T;
+    const s = new T.Shape();
+    s.moveTo(x0, -z1); s.lineTo(x1, -z1); s.lineTo(x1, -z0); s.lineTo(x0, -z0); s.lineTo(x0, -z1);
+    const hole = new T.Path();
+    hole.moveTo(x0 + w, -z1 + w); hole.lineTo(x0 + w, -z0 - w); hole.lineTo(x1 - w, -z0 - w); hole.lineTo(x1 - w, -z1 + w); hole.lineTo(x0 + w, -z1 + w);
+    s.holes.push(hole);
+    const g = new T.ShapeGeometry(s); g.rotateX(-Math.PI / 2);
+    return g;
+  }
+
+  createRoom(r) {
+    const T = this.T, Y = this.Y, P = this.P;
+    const gm = this.geom(r);
+    const W = gm.W, L = gm.L, TW = gm.TW;
+    const X0 = -W / 2, Z0 = L / 2;
+    const g = new T.Group();
+    this.world.add(g);
+    const floorMat = new T.MeshStandardMaterial({ color: '#FFFFFF', roughness: 0.95, metalness: 0 });
+    const floor = new T.Mesh(this.unitBox, floorMat);
+    floor.userData.ownMat = true; floor.userData.shared = true;
+    floor.scale.set(W + 2 * TW, Y.YF - Y.YS, L + 2 * TW);
+    floor.position.set(0, Y.YS, 0);
+    floor.receiveShadow = true;
+    g.add(floor);
+    const walls = new T.Group();
+    walls.position.y = Y.YF;
+    g.add(walls);
+    const edgeMat = new T.LineBasicMaterial({ color: '#97A099', transparent: true, opacity: 0.75 });
+    const seg = (x0, x1, z0, z1) => {
+      if (x1 - x0 < 0.05) return;
+      const m = new T.Mesh(this.unitBox, this.mat.wall);
+      m.userData.shared = true;
+      m.scale.set(x1 - x0, Y.WH, z1 - z0);
+      m.position.set((x0 + x1) / 2, 0, (z0 + z1) / 2);
+      m.castShadow = true; m.receiveShadow = true;
+      walls.add(m);
+      const e = new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(x1 - x0, Y.WH, z1 - z0)), edgeMat);
+      e.position.set((x0 + x1) / 2, Y.WH / 2, (z0 + z1) / 2);
+      walls.add(e);
+    };
+    const xa = X0 - TW, xb = X0 + W + TW, zf = Z0 + TW, zb = Z0 - L - TW;
+    seg(xa, xb, zb, Z0 - L);
+    seg(xa, X0, Z0 - L, Z0);
+    seg(X0 + W, xb, Z0 - L, Z0);
+    const dx0 = X0 + gm.doorX - 0.8, dx1 = X0 + gm.doorX + 0.8;
+    seg(xa, dx0, Z0, zf);
+    seg(dx1, xb, Z0, zf);
+    walls.scale.y = 0.4;
+    // door arrow on the corridor, pointing in
+    const sh = new T.Shape();
+    const aw = 0.13, hw = 0.42, al = 1.0, hl = 0.5;
+    sh.moveTo(-aw, 0); sh.lineTo(aw, 0); sh.lineTo(aw, al - hl); sh.lineTo(hw, al - hl); sh.lineTo(0, al); sh.lineTo(-hw, al - hl); sh.lineTo(-aw, al - hl); sh.lineTo(-aw, 0);
+    const ag = new T.ShapeGeometry(sh); ag.rotateX(-Math.PI / 2);
+    const arrow = new T.Mesh(ag, this.mat.arrow);
+    arrow.position.set(X0 + gm.doorX, Y.YS + 0.015, Z0 + TW + 1.9);
+    g.add(arrow);
+
+    // pens
+    const pens = [];
+    gm.lanes.forEach((ln) => {
+      for (let j = 0; j < ln.l.n; j++) {
+        const cz = Z0 - (gm.FRONT + j * ln.w + ln.w / 2);
+        pens.push({ code: this.letter(ln.i) + (j + 1), lane: ln.i, j: j, t: ln.l.t, src: ln.l, x: X0 + (ln.x0 + ln.x1) / 2, z: cz, sx: (ln.x1 - ln.x0) - 0.14, sz: ln.w - Math.min(0.1, ln.w * 0.16), h: ln.h, w: ln.w, depth: ln.x1 - ln.x0 });
+      }
+    });
+    gm.ends.forEach((en) => {
+      pens.push({ code: en.code, end: en.k, t: en.e.t, src: en.e, x: X0 + (en.x0 + en.x1) / 2, z: Z0 - (en.z0 + en.len / 2), sx: (en.x1 - en.x0) - 0.14, sz: en.len - 0.12, h: en.h, w: en.len, depth: en.x1 - en.x0 });
+    });
+    const plan = this.plan[r.id];
+    const y0 = Y.YF + 0.02;
+    const rng = P.makeRng(this.hs(r.id) + 99);
+    const field = this.kit.field(), rails = P.railSet(T);
+
+    // floor tiles, tinted by pen type, and invisible boxes to click on
+    const floors = new T.InstancedMesh(this.unitBox, floorMat.clone(), Math.max(1, pens.length));
+    floors.material.userData = {}; floors.userData.ownMat = true; floors.userData.shared = true;
+    floors.count = pens.length; floors.receiveShadow = true;
+    const hitIm = new T.InstancedMesh(this.unitBox, this.mat.hit, Math.max(1, pens.length));
+    hitIm.count = pens.length; hitIm.userData.shared = true;
+    const mtx = new T.Matrix4(), q = new T.Quaternion(), pos = new T.Vector3(), sc = new T.Vector3();
+    pens.forEach((p, i) => {
+      pos.set(p.x, Y.YF, p.z); sc.set(p.depth - 0.05, 0.02, p.w - 0.05); mtx.compose(pos, q, sc); floors.setMatrixAt(i, mtx);
+      pos.set(p.x, Y.YF, p.z); sc.set(p.sx, p.h, p.sz); mtx.compose(pos, q, sc); hitIm.setMatrixAt(i, mtx);
+    });
+    g.add(floors); g.add(hitIm);
+
+    // furniture and pigs, lane by lane
+    const bar = (x0, y, z0, x1, y1, z1, rr) => rails.bar(x0, y0 + y, z0, x1, y0 + y1, z1, rr || 0.016);
+    gm.lanes.forEach((ln) => {
+      const ps = pens.filter((p) => p.lane === ln.i);
+      const n = ps.length, t = ln.l.t;
+      const xA = X0 + ln.x0, xB = X0 + ln.x1, xM = (xA + xB) / 2, head = ln.i % 2 === 0 ? 1 : -1;
+      const zb = (j) => Z0 - (gm.FRONT + j * ln.w);
+      const info = (p) => plan.cell[p.code] || null;
+      if (t === 'gest') {
+        const filled = ps.map((p) => !!(info(p) && info(p).sow));
+        const poses = P.stallPoses(rng, filled);
+        for (let j = 0; j <= n; j++) {
+          [0.22, 0.62, 0.95].forEach((hy) => bar(xA + 0.03, hy, zb(j), xB - 0.03, hy, zb(j)));
+          [xA + 0.04, xB - 0.04].forEach((px) => bar(px, 0, zb(j), px, 0.95, zb(j), 0.02));
+        }
+        ps.forEach((p, j) => {
+          rails.panel(head > 0 ? xB + 0.12 : xA - 0.12, Y.YF + 0.07, p.z, 0.24, 0.14, 0.46);
+          if (poses[j]) P.stallSow(field, rng, { x: p.x, z: p.z, y: y0, head: head, pose: poses[j].pose, belly: poses[j].belly || 1 });
+        });
+      } else if (t === 'crate' || t === 'nurs') {
+        const ph = t === 'crate' ? 0.38 : 0.6;
+        for (let j = 0; j <= n; j++) {
+          rails.panel(xM, y0 + ph / 2, zb(j), ln.x1 - ln.x0 - 0.05, ph, 0.04);
+          bar(xA + 0.03, ph + 0.07, zb(j), xB - 0.03, ph + 0.07, zb(j), 0.02);
+          [xA + 0.03, xB - 0.03].forEach((px) => bar(px, 0, zb(j), px, ph + 0.3, zb(j), 0.02));
+        }
+        [0.3, 0.72].forEach((hy) => [xA + 0.03, xB - 0.03].forEach((px) => bar(px, hy, zb(0), px, hy, zb(n), 0.016)));
+        ps.forEach((p) => {
+          const c = info(p);
+          if (t === 'crate') {
+            P.crateRails(rails, { x: p.x, z: p.z, y: y0, head: head });
+            if (c && c.sow) P.crateFill(field, rails, rng, { x: p.x, z: p.z, y: y0, head: head, litter: c.litter, mode: c.mode });
+          } else if (c) P.groupPenFill(field, rails, rng, { x: p.x, z: p.z, y: y0, sx: ln.x1 - ln.x0 - 0.05, sz: ln.w - 0.05, head: head, n: c.n, cls: 'weaner' });
+        });
+      } else {
+        // boar, gilt and sick pens: open rails
+        for (let j = 0; j <= n; j++) {
+          [0.3, 0.65, 1.0].forEach((hy) => bar(xA + 0.03, hy, zb(j), xB - 0.03, hy, zb(j)));
+          [xA + 0.03, xM, xB - 0.03].forEach((px) => bar(px, 0, zb(j), px, 1.0, zb(j), 0.02));
+        }
+        [0.3, 0.65, 1.0].forEach((hy) => [xA + 0.03, xB - 0.03].forEach((px) => bar(px, hy, zb(0), px, hy, zb(n), 0.016)));
+        ps.forEach((p) => {
+          const c = info(p);
+          if (!c) return;
+          if (c.boar) P.openPenFill(field, rng, { x: p.x, z: p.z, y: y0, sx: ln.x1 - ln.x0, sz: ln.w, n: 1, scale: 1.12, r: 0.8 });
+          else if (c.sow) P.openPenFill(field, rng, { x: p.x, z: p.z, y: y0, sx: ln.x1 - ln.x0, sz: ln.w, n: 1 });
+          else if (c.gilts) P.openPenFill(field, rng, { x: p.x, z: p.z, y: y0, sx: ln.x1 - ln.x0, sz: ln.w, n: c.n });
+        });
+      }
+    });
+    gm.ends.forEach((en) => {
+      const p = pens.find((x) => x.end === en.k);
+      const xA = X0 + en.x0, xB = X0 + en.x1, zA = Z0 - (en.z0 + en.len), zB = Z0 - en.z0;
+      [0.3, 0.65, 1.0].forEach((hy) => {
+        bar(xA, hy, zA, xB, hy, zA); bar(xA, hy, zB, xB, hy, zB); bar(xA, hy, zA, xA, hy, zB); bar(xB, hy, zA, xB, hy, zB);
+      });
+      [[xA, zA], [xB, zA], [xA, zB], [xB, zB], [(xA + xB) / 2, zA], [(xA + xB) / 2, zB], [xA, (zA + zB) / 2], [xB, (zA + zB) / 2]].forEach((q2) => bar(q2[0], 0, q2[1], q2[0], 1.0, q2[1], 0.02));
+      const c = plan.cell[p.code];
+      if (c && c.sow) P.openPenFill(field, rng, { x: p.x, z: p.z, y: y0, sx: en.x1 - en.x0, sz: en.len, n: 1 });
+    });
+
+    const built = field.build();
+    g.add(built.hi); g.add(built.lo); g.add(built.xs); g.add(built.base); g.add(built.fix);
+    const rg = rails.build(this.mat.bar, this.mat.panel, false);
+    g.add(rg);
+
+    const hit = new T.Mesh(this.unitBox, this.mat.hit);
+    hit.scale.set(W + 2 * TW, Y.WH + 0.2, L + 2 * TW + 4);
+    hit.position.set(0, Y.YS, 2);
+    hit.userData.shared = true;
+    g.add(hit);
+    const selG = new T.Group();
+    g.add(selG);
+
+    const rm = { id: r.id, r: r, g: g, walls: walls, floorMat: floorMat, edgeMat: edgeMat, floors: floors, hitIm: hitIm, hit: hit, pens: pens, selG: selG, gm: gm, X0: X0, Z0: Z0, hi: built.hi, lo: built.lo, xs: built.xs, rg: rg, fix: built.fix, hov: 0, count: field.count() };
+    this.rooms.push(rm);
+    this.placeRoom(rm);
+    this.paintRoom(rm);
+    this.labelRoom(rm);
+    this.label('door:' + r.id, 'door', 'Door', X0 + gm.doorX + 0.9, Y.YS, Z0 + TW + 1.45, { rm: rm, roomId: r.id });
+    pens.forEach((p) => {
+      const c = plan.cell[p.code];
+      this.label('pen:' + r.id + ':' + p.code, 'pen', p.code, p.x, Y.YF + p.h + 0.1, p.z, { rm: rm, roomId: r.id, pen: p, flagged: !!(c && c.flag) });
+      if (c && c.flag) this.label('flag:' + r.id + ':' + p.code, 'flag', '!', p.x, Y.YF + 0.95, p.z, { rm: rm, roomId: r.id, pen: p, tip: c.flag });
+    });
+    return rm;
+  }
+  labelRoom(rm) {
+    const Y = this.Y, p = this.plan[rm.id], r = rm.r;
+    const sec = this.secById(r.sec);
+    const sn = sec ? sec.name : '';
+    const short = sn && r.name.indexOf(sn + ' ') === 0 && /^[A-Za-z]/.test(r.name.slice(sn.length + 1)) ? r.name.slice(sn.length + 1) : r.name;
+    const num = /(\d+)$/.exec(r.name);
+    const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const nm = '<span style="font-weight:600">' + esc(r.name) + '</span>';
+    const dt = esc(p.detail);
+    const html = [
+      nm + (dt ? '<span style="font-weight:500; color:#626C66"> · ' + dt + '</span>' : ''),
+      '<span style="display:block; font-weight:600; line-height:16px">' + esc(r.name) + '</span>' + (dt ? '<span style="display:block; font-weight:500; color:#626C66; font-size:11.5px; line-height:15px">' + dt + '</span>' : ''),
+      '<span style="font-weight:600">' + esc(short) + '</span>',
+      '<span style="font-weight:600">' + esc(num ? num[1] : short) + '</span>'
+    ];
+    this.label('room:' + r.id, 'room', r.name, 0, Y.YF + 0.9, -rm.gm.L / 2 + 1.2, { rm: rm, roomId: r.id, sec: r.sec, html: html, full: r.name + (p.detail ? ' · ' + p.detail : '') });
+  }
+  // put the room's group where the model says
+  placeRoom(rm) {
+    const r = rm.r, o = this.off, Y = this.Y;
+    const gm = rm.gm;
+    rm.g.position.set(r.x + gm.fw / 2 + o.x, 0, r.z + gm.fl / 2 + o.z);
+    rm.g.rotation.y = (r.rot || 0) * Math.PI / 2;
+    rm.g.updateMatrixWorld(true);
+    const T = this.T;
+    rm.box = new T.Box3(new T.Vector3(r.x + o.x, Y.YS, r.z + o.z), new T.Vector3(r.x + gm.fw + o.x, Y.YF + Y.WH, r.z + gm.fl + o.z));
+    rm.centre = rm.box.getCenter(new T.Vector3());
+  }
+  wpos(rm, x, y, z) { return this.v.set(x, y, z).applyMatrix4(rm.g.matrixWorld); }
+
+  paintRoom(rm) {
+    const T = this.T;
+    const c = new T.Color(), white = new T.Color('#FFFFFF');
+    const hp = this.hoverPen && this.hoverPen.roomId === rm.id ? this.hoverPen.code : '';
+    rm.pens.forEach((p, i) => {
+      c.set(this.colorOf(p.t).block).lerp(white, 0.86);
+      if (p.code === hp) c.multiplyScalar(0.93);
+      rm.floors.setColorAt(i, c);
+    });
+    if (rm.floors.instanceColor) rm.floors.instanceColor.needsUpdate = true;
+    rm.floorMat.color.set('#FFFFFF').lerp(new T.Color('#EAF2EA'), rm.hov);
+    rm.edgeMat.color.set('#97A099').lerp(new T.Color('#2D3A32'), rm.hov);
+  }
+
+  fitShadow(box) {
+    const T = this.T;
+    const c = box.getCenter(new T.Vector3());
+    const size = box.getSize(new T.Vector3());
+    const R = Math.max(size.x, size.z) * 0.62 + 6;
+    const dir = new T.Vector3(0.9, 1.05, -0.28).normalize();
+    this.sun.position.copy(c).addScaledVector(dir, R * 2.2);
+    this.sun.target.position.copy(c);
+    const sc = this.sun.shadow.camera;
+    sc.left = -R; sc.right = R; sc.top = R; sc.bottom = -R; sc.near = 1; sc.far = R * 5;
+    sc.updateProjectionMatrix();
+    this.sun.shadow.needsUpdate = true;
+  }
+
+  // ---------- labels ----------
+  label(key, kind, text, x, y, z, opts) {
+    let L = this.labels.get(key);
+    if (!L) {
+      const btn = kind === 'room';
+      const el = document.createElement(btn ? 'button' : 'div');
+      if (btn) el.type = 'button';
+      el.style.cssText = this.labelCss(kind, false);
+      el.style.display = 'none';
+      this.labelsEl.appendChild(el);
+      L = { key: key, kind: kind, el: el, pos: new this.T.Vector3(), local: new this.T.Vector3(), shown: false, text: null, w: 0, h: 0, on: null };
+      this.labels.set(key, L);
+      if (kind === 'room') {
+        el.addEventListener('click', () => this.goRoom(L.roomId));
+        el.addEventListener('pointerenter', () => { this.hoverRoom = L.roomId; this.dirty = true; });
+        el.addEventListener('pointerleave', () => { if (this.hoverRoom === L.roomId) this.hoverRoom = ''; this.dirty = true; });
+      }
+      el.addEventListener('wheel', (e) => { if (this.h) this.h.wheel(e); }, { passive: false });
+    }
+    Object.assign(L, opts);
+    if (opts && opts.rm) L.local.set(x, y, z); else L.pos.set(x, y, z);
+    if (kind === 'room') { if (L.text !== text || !L.ws) { L.text = text; L.ws = []; L.variant = -1; this.variant(L, 0); } }
+    else if (kind === 'flag') { if (L.text !== text) { L.text = text; L.el.innerHTML = '!<span style="position:absolute; left:10px; top:22px; width:2px; height:8px; background:#121815"></span>'; L.w = 0; } L.el.setAttribute('title', L.tip || 'Needs a look'); L.el.setAttribute('aria-label', 'Needs a look: ' + (L.tip || '')); }
+    else if (L.text !== text) { L.text = text; L.el.textContent = text; L.w = 0; }
+    return L;
+  }
+  // room names: name and what is in it, or less when the labels would touch
+  variant(L, v) {
+    if (L.variant === v && L.w) return;
+    L.variant = v;
+    L.el.innerHTML = L.html[v];
+    L.el.setAttribute('aria-label', 'Open ' + L.full);
+    if (!L.ws[v]) { const d = L.el.style.display; L.el.style.display = ''; L.ws[v] = [L.el.offsetWidth, L.el.offsetHeight]; L.el.style.display = d; }
+    L.w = L.ws[v][0]; L.h = L.ws[v][1];
+  }
+  labelCss(kind, on) {
+    const halo = 'text-shadow: 0 0 2px #FFFFFF, 0 0 3px #FFFFFF, 0 0 6px rgba(255,255,255,0.9);';
+    const base = 'position:absolute; left:0; top:0; white-space:nowrap; will-change:transform; box-sizing:border-box; font-family: Geist, Inter, system-ui, sans-serif;';
+    if (kind === 'zone') return base + 'pointer-events:none; font-size:13px; line-height:18px; font-weight:600; color:#121815; letter-spacing:-0.005em; padding:1px 0;' + halo;
+    if (kind === 'sec') return base + 'pointer-events:none; font-size:12px; line-height:16px; font-weight:600; color:#4A544E; padding:1px 0;' + halo;
+    if (kind === 'room') return base + 'border:' + (on ? '1.5px solid #121815' : '1px solid #DCE0DA') + '; margin:0; pointer-events:auto; cursor:pointer; min-height:26px; padding:0 9px; font-size:12px; line-height:24px; font-weight:600; color:#121815; text-align:left; background:rgba(255,255,255,0.96); border-radius:8px; box-shadow:0 1px 2px rgba(18,24,21,0.06); transition: border-color .15s;';
+    if (kind === 'pen') return base + "pointer-events:none; font-family: 'Geist Mono', ui-monospace, monospace; font-size:11px; line-height:14px; font-weight:500; color:#1E2A22;" + halo;
+    if (kind === 'flag') return base + 'width:22px; height:22px; border-radius:6px; background:#121815; color:#FFFFFF; font-size:13px; line-height:22px; font-weight:700; text-align:center; box-shadow:0 1px 3px rgba(18,24,21,0.25); pointer-events:none;';
+    if (kind === 'door') return base + 'pointer-events:none; font-size:12px; line-height:16px; font-weight:500; color:#4A544E;' + halo;
+    return base;
+  }
+  placeLabels() {
+    const u = this.ui(), cam = this.camera, v = this.v, W = this.W, H = this.H;
+    const roomView = u.view === 'room';
+    const camPos = cam.position;
+    const proj = (p) => { v.copy(p).project(cam); return { x: (v.x * 0.5 + 0.5) * W, y: (-v.y * 0.5 + 0.5) * H, ok: v.z < 1 && v.z > -1 }; };
+    this.labels.forEach((L) => { if (L.rm) L.pos.copy(L.local).applyMatrix4(L.rm.g.matrixWorld); });
+    // pen codes: every pen when there is room for it, else 1, 5, 10 …
+    const stride = {};
+    this.rooms.forEach((rm) => {
+      if (!(roomView && rm.id === u.roomId)) return;
+      rm.gm.lanes.forEach((ln) => {
+        const ps = rm.pens.filter((p) => p.lane === ln.i);
+        let s = 1;
+        if (ps.length > 1) {
+          const a = proj(this.wpos(rm, ps[0].x, this.Y.YF, ps[0].z).clone()), b = proj(this.wpos(rm, ps[1].x, this.Y.YF, ps[1].z).clone());
+          const pitch = Math.hypot(a.x - b.x, a.y - b.y);
+          s = [1, 2, 5, 10, 25, 50].find((k) => k * pitch >= 95) || 100;
+          if (pitch < 3) s = 0;
+        }
+        const keep = {};
+        if (s) {
+          const n = ps.length, cand = [1];
+          for (let j = s; j < n; j += s) cand.push(j);
+          let last = -1e9;
+          cand.forEach((j) => { if (j - last >= s * 0.8) { keep[j] = true; last = j; } });
+          if (n > 1) { if (n - last < s * 0.8) delete keep[last]; keep[n] = true; }
+        }
+        stride[rm.id + ':' + ln.i] = { s: s, keep: keep };
+      });
+    });
+    const placed = [];
+    const cands = [];
+    this.labels.forEach((L) => {
+      let want = false;
+      const k = L.kind;
+      if (k === 'zone' || k === 'sec') want = !roomView;
+      else if (k === 'room') want = !roomView;
+      else if (k === 'door') want = roomView && L.roomId === u.roomId;
+      else if (k === 'flag') want = roomView && L.roomId === u.roomId && !u.plan;
+      else if (k === 'pen') {
+        if (roomView && L.roomId === u.roomId) {
+          const p = L.pen;
+          if (p.end != null) want = true;
+          else { const st = stride[L.roomId + ':' + p.lane]; if (st && st.s) want = !!st.keep[p.j + 1]; }
+          if (u.pen === p.code || L.flagged) want = false;
+        }
+      }
+      L.want = want;
+      if (want) { const q = proj(L.pos); want = q.ok && q.x > -60 && q.x < W + 60 && q.y > -30 && q.y < H + 30; L.sx = q.x; L.sy = q.y; }
+      L.vis = want;
+      if (want) cands.push(L);
+    });
+    cands.forEach((L) => { if (!L.w) { const d = L.el.style.display; L.el.style.display = ''; L.w = L.el.offsetWidth; L.h = L.el.offsetHeight; L.el.style.display = d; } });
+    const rectOf = (L, dy) => {
+      const o = dy || 0;
+      if (L.kind === 'sec') return { l: L.sx, t: L.sy - L.h + o, r: L.sx + L.w, b: L.sy + o };
+      if (L.kind === 'flag') return { l: L.sx - L.w / 2, t: L.sy - L.h - 8, r: L.sx + L.w / 2, b: L.sy - 8 };
+      if (L.kind === 'zone' || L.kind === 'door') return { l: L.sx, t: L.sy - L.h / 2 + o, r: L.sx + L.w, b: L.sy + L.h / 2 + o };
+      return { l: L.sx - L.w / 2, t: L.sy - L.h / 2 + o, r: L.sx + L.w / 2, b: L.sy + L.h / 2 + o };
+    };
+    const hits = (a) => placed.some((b) => a.l < b.r + 6 && a.r > b.l - 6 && a.t < b.b + 3 && a.b > b.t - 3);
+    const stage = this.labelsEl.parentNode, sb = stage.getBoundingClientRect();
+    const reserved = [];
+    Array.prototype.forEach.call(stage.children, (el) => {
+      if (el === this.mountEl || el === this.labelsEl) return;
+      const cs = getComputedStyle(el);
+      if (cs.position !== 'absolute' || cs.visibility === 'hidden' || cs.display === 'none') return;
+      const b = el.getBoundingClientRect();
+      if (b.width > 0 && b.width < W * 0.98) reserved.push({ l: b.left - sb.left - 4, t: b.top - sb.top - 4, r: b.right - sb.left + 4, b: b.bottom - sb.top + 4 });
+    });
+    const under = (a) => reserved.some((b) => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t);
+    cands.forEach((L) => { const r0 = rectOf(L); if (under(r0) || ((L.kind === 'zone' || L.kind === 'sec') && (r0.l < 6 || r0.r > W - 6))) L.vis = false; });
+    cands.filter((L) => L.vis && L.kind === 'pen').forEach((L) => { L.dy = 0; });
+    const names = cands.filter((L) => L.vis && (L.kind === 'zone' || L.kind === 'sec')).sort((a, b) => a.prio - b.prio);
+    names.forEach((L) => { const r = rectOf(L); if (!hits(r)) placed.push(r); else L.vis = false; });
+    // room names: the whole section in one form; neighbours step up and down when they would touch
+    const roomL = cands.filter((L) => L.vis && L.kind === 'room');
+    const bySec = {};
+    roomL.forEach((L) => { (bySec[L.sec] = bySec[L.sec] || []).push(L); });
+    Object.keys(bySec).forEach((sid) => {
+      const ls = bySec[sid].sort((a, b) => a.sx - b.sx);
+      let done = false;
+      for (let vv = 0; vv < 4 && !done; vv++) {
+        ls.forEach((L) => this.variant(L, vv));
+        const trial = [];
+        let ok = true;
+        for (const L of ls) {
+          let got = null;
+          for (const mul of [0, 1, -1, 2, -2]) {
+            const dy = mul * (L.h + 6), r = rectOf(L, dy);
+            if (!hits(r) && !trial.some((t) => r.l < t.r.r + 4 && r.r > t.r.l - 4 && r.t < t.r.b + 3 && r.b > t.r.t - 3)) { got = { dy: dy, r: r }; break; }
+          }
+          if (!got) { ok = false; break; }
+          trial.push(got);
+        }
+        if (ok) { ls.forEach((L, i) => { L.dy = trial[i].dy; placed.push(trial[i].r); }); done = true; }
+      }
+      if (!done) ls.forEach((L) => { this.variant(L, 3); L.dy = 0; L.vis = L.roomId === this.hoverRoom; });
+    });
+    cands.filter((L) => L.vis && L.kind === 'door').forEach((L) => { const r = rectOf(L); if (!hits(r)) placed.push(r); else L.vis = false; });
+    this.labels.forEach((L) => {
+      if (L.vis) {
+        const r = rectOf(L, L.kind === 'room' ? L.dy : 0);
+        if (L.kind === 'room') { const sh = Math.max(0, 8 - r.l, 0) - Math.max(0, r.r - (W - 8)); r.l += sh; r.r += sh; }
+        L.el.style.transform = 'translate(' + Math.round(r.l) + 'px,' + Math.round(r.t) + 'px)';
+        if (!L.shown) { L.el.style.display = ''; L.shown = true; }
+        let on = false;
+        if (L.kind === 'room') on = this.hoverRoom === L.roomId;
+        if (L.on !== on) { L.on = on; const html = L.html ? L.el.innerHTML : null; L.el.style.cssText = this.labelCss(L.kind, on); L.el.style.display = ''; L.el.style.transform = 'translate(' + Math.round(r.l) + 'px,' + Math.round(r.t) + 'px)'; void html; }
+      } else if (L.shown) { L.el.style.display = 'none'; L.shown = false; }
+    });
+  }
+  placeCard() {
+    const el = this.cardEl;
+    if (!el) return;
+    const u = this.ui();
+    const rm = u.pen && u.view === 'room' ? this.rooms.find((x) => x.id === u.roomId) : null;
+    const p = rm ? rm.pens.find((x) => x.code === u.pen) : null;
+    if (!p) { el.style.visibility = 'hidden'; return; }
+    const wp = this.wpos(rm, p.x, this.Y.YF + 0.4, p.z).clone().project(this.camera);
+    const sx = (wp.x * 0.5 + 0.5) * this.W, sy = (-wp.y * 0.5 + 0.5) * this.H;
+    const w = el.offsetWidth || 228, h = el.offsetHeight || 120;
+    const half = Math.max(p.sx, p.sz) * 0.5;
+    const pxPerM = this.H / (2 * Math.tan(this.camera.fov * Math.PI / 360) * this.camera.position.distanceTo(this.wpos(rm, p.x, this.Y.YF, p.z)));
+    const gap = 18 + half * pxPerM * 0.92;
+    let x = sx + gap, y = sy - h / 2;
+    if (x + w > this.W - 12) x = sx - gap - w;
+    y = Math.max(70, Math.min(this.H - h - 12, y));
+    x = Math.max(12, Math.min(this.W - w - 12, x));
+    el.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)';
+    el.style.visibility = 'visible';
+  }
+
+  // ---------- the pen that is open ----------
+  updateSel() {
+    const T = this.T;
+    const u = this.ui();
+    this.rooms.forEach((rm) => {
+      rm.selG.traverse((x) => { if (x.geometry) x.geometry.dispose(); });
+      rm.selG.clear();
+      if (u.view !== 'room' || u.roomId !== rm.id || !u.pen) return;
+      const p = rm.pens.find((x) => x.code === u.pen);
+      if (!p) return;
+      const hw = p.depth / 2 - 0.01, hd = p.w / 2 - 0.01;
+      const m = new T.Mesh(this.ringGeom(p.x - hw, p.x + hw, p.z - hd, p.z + hd, 0.03), this.mat.ink);
+      m.position.y = this.Y.YF + 0.032;
+      rm.selG.add(m);
+    });
+    this.dirty = true;
+  }
+
+  // ---------- camera ----------
+  applyCam() {
+    const c = this.cam, cp = Math.cos(c.pitch);
+    this.camera.position.set(c.tx + Math.sin(c.yaw) * cp * c.dist, c.ty + Math.sin(c.pitch) * c.dist, c.tz + Math.cos(c.yaw) * cp * c.dist);
+    this.camera.lookAt(c.tx, c.ty, c.tz);
+    this.camera.updateMatrixWorld();
+    this.scene.fog.near = c.dist * 1.6; this.scene.fog.far = c.dist * 5;
+    if (this.mat) this.mat.arrow.opacity = Math.max(0, Math.min(1, (150 - c.dist) / 60));
+  }
+  insets(u) {
+    if (u.view === 'room') return { t: 76, b: 40, l: 28, r: 28 };
+    return { t: 72, b: u.narrow ? 120 : 92, l: 28, r: 28 };
+  }
+  fitCam(box, yaw, pitch, ins, given) {
+    const T = this.T, cam = this.camera, W = this.W, H = this.H;
+    const save = this.cam;
+    const pts = given ? given.slice() : [];
+    if (!given) for (let i = 0; i < 8; i++) pts.push(new T.Vector3(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z));
+    const rect = { l: ins.l, r: W - ins.r, t: ins.t, b: H - ins.b };
+    const c = box.getCenter(new T.Vector3());
+    let tx = c.x, ty = c.y * 0.3, tz = c.z, dist = 100;
+    const v = new T.Vector3();
+    const place = (d) => { this.cam = { tx: tx, ty: ty, tz: tz, dist: d, yaw: yaw, pitch: pitch }; this.applyCam(); cam.updateMatrixWorld(); cam.matrixWorldInverse.copy(cam.matrixWorld).invert(); };
+    const bounds = () => { let l = 1e9, r = -1e9, t = 1e9, b = -1e9; pts.forEach((p) => { v.copy(p).project(cam); const sx = (v.x * 0.5 + 0.5) * W, sy = (-v.y * 0.5 + 0.5) * H; l = Math.min(l, sx); r = Math.max(r, sx); t = Math.min(t, sy); b = Math.max(b, sy); }); return { l: l, r: r, t: t, b: b }; };
+    for (let it = 0; it < 4; it++) {
+      let lo = 3, hi = 4000;
+      for (let k = 0; k < 36; k++) { const mid = Math.sqrt(lo * hi); place(mid); const bb = bounds(); if (bb.r - bb.l <= rect.r - rect.l && bb.b - bb.t <= rect.b - rect.t) hi = mid; else lo = mid; }
+      dist = hi; place(dist);
+      const bb = bounds();
+      const dx = (rect.l + rect.r) / 2 - (bb.l + bb.r) / 2, dy = (rect.t + rect.b) / 2 - (bb.t + bb.b) / 2;
+      const wpp = 2 * dist * Math.tan(cam.fov * Math.PI / 360) / H;
+      const right = new T.Vector3().setFromMatrixColumn(cam.matrixWorld, 0), up = new T.Vector3().setFromMatrixColumn(cam.matrixWorld, 1);
+      tx += -right.x * dx * wpp + up.x * dy * wpp; ty += -right.y * dx * wpp + up.y * dy * wpp; tz += -right.z * dx * wpp + up.z * dy * wpp;
+    }
+    const out = { tx: tx, ty: ty, tz: tz, dist: dist, yaw: yaw, pitch: pitch };
+    this.cam = save; this.applyCam();
+    return out;
+  }
+  // a room is shown from its door, close enough to see the pigs: the first lanes of pens
+  roomCam(rm, u) {
+    const TOP = 1.5702, T = this.T;
+    const th = (rm.r.rot || 0) * Math.PI / 2, gm = rm.gm;
+    if (gm.L <= 22) return this.fitCam(rm.box, (u.plan ? Math.PI / 2 : 1.0) + th, u.plan ? TOP : 0.86, this.insets(u));
+    const t = rm.r.lanes.length ? rm.r.lanes[0].t : '';
+    const prm = { gest: { d: 24, depth: 8.4, pitch: 0.82, yaw: 0.4 }, crate: { d: 14.2, depth: 5.0, pitch: 0.76, yaw: 0.5 }, nurs: { d: 15.2, depth: 5.8, pitch: 0.78, yaw: 0.46 } }[t] || { d: 18, depth: 6, pitch: 0.78, yaw: 0.45 };
+    const asp = this.W / this.H;
+    const k = Math.max(1, 1.6 / asp);
+    const pw = this.wpos(rm, 0, this.Y.YF + 0.3, rm.Z0 - gm.FRONT - (u.plan ? gm.L * 0.4 : prm.depth)).clone();
+    if (u.plan) return this.fitCam(rm.box, Math.PI / 2 + th, TOP, this.insets(u));
+    return { tx: pw.x, ty: pw.y, tz: pw.z, dist: prm.d * k, yaw: prm.yaw + th, pitch: prm.pitch };
+  }
+  penCam(rm, p, u) {
+    const th = (rm.r.rot || 0) * Math.PI / 2;
+    const asp = this.W / this.H;
+    const d = { crate: 7.4, gest: 6.8, nurs: 8.2, boar: 9.0, gilt: 11, sick: 10 }[p.t] || 8;
+    const pw = this.wpos(rm, p.x, this.Y.YF + 0.35, p.z).clone();
+    return { tx: pw.x, ty: pw.y, tz: pw.z, dist: d * Math.max(1, 1.5 / asp), yaw: 0.8 + th, pitch: u.plan ? 1.5702 : 1.1 };
+  }
+  presetFor(u) {
+    const TOP = 1.5702;
+    if (u.view === 'room') {
+      const rm = this.rooms.find((x) => x.id === u.roomId);
+      if (rm) {
+        const p = u.pen ? rm.pens.find((x) => x.code === u.pen) : null;
+        return p ? this.penCam(rm, p, u) : this.roomCam(rm, u);
+      }
+    }
+    return this.fitCam(this.siteBox, u.plan ? 0 : 0.36, u.plan ? TOP : 0.74, this.insets(u), this.sitePts);
+  }
+  tweenTo(to, ms) {
+    const from = Object.assign({}, this.cam);
+    let dy = to.yaw - from.yaw;
+    while (dy > Math.PI) dy -= 2 * Math.PI;
+    while (dy < -Math.PI) dy += 2 * Math.PI;
+    to = Object.assign({}, to, { yaw: from.yaw + dy });
+    this.tw = { from: from, to: to, t0: performance.now(), ms: ms || 950 };
+    this.dirty = true;
+  }
+
+  // ---------- actions ----------
+  goRoom(id) {
+    const u = this.ui();
+    if (u.view === 'room' && u.roomId === id && !u.pen) return;
+    const n = this.put({ view: 'room', roomId: id, pen: '' });
+    this.hoverRoom = '';
+    this.updateSel();
+    this.tweenTo(this.presetFor(n), 1100);
+  }
+  goFarm() {
+    const n = this.put({ view: 'farm', roomId: '', pen: '' });
+    this.hoverPen = null;
+    this.updateSel();
+    this.tweenTo(this.presetFor(n), 1000);
+  }
+  openPen(rm, p) {
+    const u = this.ui();
+    if (u.pen === p.code && u.roomId === rm.id) return;
+    const n = this.put({ pen: p.code });
+    this.updateSel();
+    this.tweenTo(this.presetFor(n), 900);
+  }
+  closePen() {
+    const u = this.ui();
+    if (!u.pen) return;
+    const n = this.put({ pen: '' });
+    this.updateSel();
+    this.tweenTo(this.presetFor(n), 900);
+  }
+
+  // ---------- pointer ----------
+  bindPointer() {
+    const c = this.renderer.domElement;
+    const T = this.T;
+    const ndc = new T.Vector2();
+    const setRay = (e) => {
+      const b = c.getBoundingClientRect();
+      ndc.set(((e.clientX - b.left) / b.width) * 2 - 1, -((e.clientY - b.top) / b.height) * 2 + 1);
+      this.ray.setFromCamera(ndc, this.camera);
+    };
+    const pick = (e) => {
+      setRay(e);
+      const u = this.ui();
+      if (u.view === 'room') {
+        const rm = this.rooms.find((x) => x.id === u.roomId);
+        if (rm) {
+          const h = this.ray.intersectObject(rm.hitIm, false)[0];
+          if (h && h.instanceId != null) return { rm: rm, pen: rm.pens[h.instanceId] };
+        }
+      }
+      const hs = this.ray.intersectObjects(this.rooms.filter((x) => !(u.view === 'room' && x.id === u.roomId)).map((x) => x.hit), false);
+      if (hs[0]) return { roomId: this.rooms.find((x) => x.hit === hs[0].object).id };
+      return null;
+    };
+    let down = null;
+    const h = {};
+    h.down = (e) => {
+      down = { x: e.clientX, y: e.clientY, btn: e.button, moved: false, lx: e.clientX, ly: e.clientY, kind: 'orbit' };
+      if (e.button === 1 || (e.button === 2 && e.shiftKey) || (e.button === 0 && e.shiftKey)) down.kind = 'pan';
+      this.tw = null;
+      try { c.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    };
+    h.move = (e) => {
+      const u = this.ui();
+      if (down) {
+        const dx = e.clientX - down.lx, dy = e.clientY - down.ly;
+        if (!down.moved && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 4) { down.moved = true; c.style.cursor = 'grabbing'; }
+        if (down.moved) {
+          const cm = this.cam;
+          if (down.kind === 'pan') {
+            const wpp = 2 * cm.dist * Math.tan(this.camera.fov * Math.PI / 360) / this.H;
+            const rx = Math.cos(cm.yaw), rz = -Math.sin(cm.yaw), fx = -Math.sin(cm.yaw), fz = -Math.cos(cm.yaw);
+            const k = 1 / Math.max(0.5, Math.sin(cm.pitch));
+            cm.tx += -rx * dx * wpp + fx * dy * wpp * k; cm.tz += -rz * dx * wpp + fz * dy * wpp * k;
+            this.clampCam(); this.dirty = true;
+          } else {
+            cm.yaw -= dx * 0.0055;
+            cm.pitch = Math.max(0.42, Math.min(1.5702, cm.pitch + dy * 0.0045));
+            if (u.plan && cm.pitch < 1.45) this.put({ plan: false });
+            this.clampCam(); this.dirty = true;
+          }
+        }
+        down.lx = e.clientX; down.ly = e.clientY;
+        return;
+      }
+      if (e.target !== c) return;
+      const hit = pick(e);
+      let hr = '', hp = null;
+      if (hit && hit.roomId) hr = hit.roomId;
+      if (hit && hit.pen) hp = { roomId: hit.rm.id, code: hit.pen.code };
+      const changed = hr !== (this.hoverRoom || '') || JSON.stringify(hp) !== JSON.stringify(this.hoverPen || null);
+      if (changed) {
+        const old = this.hoverPen;
+        this.hoverRoom = hr; this.hoverPen = hp;
+        if (old || hp) this.rooms.forEach((rm) => { if ((old && old.roomId === rm.id) || (hp && hp.roomId === rm.id)) this.paintRoom(rm); });
+        this.dirty = true;
+      }
+      c.style.cursor = hr || hp ? 'pointer' : 'grab';
+    };
+    h.up = (e) => {
+      if (!down) return;
+      const d = down; down = null;
+      c.style.cursor = 'grab';
+      if (d.moved || e.button !== d.btn || e.target !== c) return;
+      const u = this.ui();
+      const hit = pick(e);
+      if (hit && hit.pen) this.openPen(hit.rm, hit.pen);
+      else if (hit && hit.roomId) this.goRoom(hit.roomId);
+      else if (u.view === 'room' && u.pen) this.closePen();
+    };
+    h.wheel = (e) => {
+      e.preventDefault();
+      this.tw = null;
+      const cm = this.cam;
+      const nd = Math.max(3.5, Math.min(700, cm.dist * Math.exp(e.deltaY * 0.0012)));
+      const b = c.getBoundingClientRect();
+      ndc.set(((e.clientX - b.left) / b.width) * 2 - 1, -((e.clientY - b.top) / b.height) * 2 + 1);
+      this.ray.setFromCamera(ndc, this.camera);
+      const pl = new T.Plane(new T.Vector3(0, 1, 0), -this.Y.YS);
+      const p = new T.Vector3();
+      if (this.ray.ray.intersectPlane(pl, p)) { const k = nd / cm.dist; cm.tx = p.x + (cm.tx - p.x) * k; cm.tz = p.z + (cm.tz - p.z) * k; }
+      cm.dist = nd;
+      this.clampCam();
+      this.dirty = true;
+    };
+    h.leave = () => { if (this.hoverRoom || this.hoverPen) { const old = this.hoverPen; this.hoverRoom = ''; this.hoverPen = null; if (old) this.rooms.forEach((rm) => { if (rm.id === old.roomId) this.paintRoom(rm); }); this.dirty = true; } };
+    h.ctx = (e) => e.preventDefault();
+    h.key = (e) => {
+      if (e.key !== 'Escape') return;
+      const u = this.ui();
+      if (u.view === 'room' && u.pen) this.closePen();
+      else if (u.view === 'room') this.goFarm();
+    };
+    c.addEventListener('pointerdown', h.down);
+    window.addEventListener('pointermove', h.move);
+    window.addEventListener('pointerup', h.up);
+    c.addEventListener('wheel', h.wheel, { passive: false });
+    c.addEventListener('pointerleave', h.leave);
+    c.addEventListener('contextmenu', h.ctx);
+    window.addEventListener('keydown', h.key);
+    c.style.cursor = 'grab';
+    this.h = h;
+  }
+  clampCam() {
+    const b = this.siteBox, cm = this.cam;
+    cm.tx = Math.max(b.min.x - 50, Math.min(b.max.x + 50, cm.tx));
+    cm.tz = Math.max(b.min.z - 50, Math.min(b.max.z + 50, cm.tz));
+  }
+  zoomBy(k) {
+    const to = Object.assign({}, this.cam, { dist: Math.max(3.5, Math.min(700, this.cam.dist * k)) });
+    this.tweenTo(to, 380);
+  }
+
+  // ---------- frame ----------
+  frame() {
+    const now = performance.now();
+    const dt = Math.min(0.05, (now - (this.last || now)) / 1000);
+    this.last = now;
+    if (window.__alwaysDirty) this.dirty = true;
+    let dirty = this.dirty;
+    this.dirty = false;
+    if (this.tw) {
+      const t = Math.min(1, (now - this.tw.t0) / this.tw.ms);
+      const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const a = this.tw.from, b = this.tw.to;
+      const lift = 1 + 0.18 * Math.sin(Math.PI * e) * Math.min(1, Math.abs(Math.log(b.dist / a.dist)));
+      this.cam = { tx: a.tx + (b.tx - a.tx) * e, ty: a.ty + (b.ty - a.ty) * e, tz: a.tz + (b.tz - a.tz) * e, dist: Math.exp(Math.log(a.dist) + (Math.log(b.dist) - Math.log(a.dist)) * e) * lift, yaw: a.yaw + (b.yaw - a.yaw) * e, pitch: a.pitch + (b.pitch - a.pitch) * e };
+      if (t >= 1) this.tw = null;
+      dirty = true;
+    }
+    const u = this.ui();
+    const sm = 1 - Math.exp(-dt * 7);
+    (this.rooms || []).forEach((rm) => {
+      const th = u.view === 'farm' && this.hoverRoom === rm.id ? 1 : 0;
+      if (Math.abs(rm.hov - th) > 0.002) { rm.hov += (th - rm.hov) * Math.min(1, sm * 2); this.paintRoom(rm); dirty = true; } else if (rm.hov !== th) { rm.hov = th; this.paintRoom(rm); dirty = true; }
+    });
+    if (!dirty || !this.W) return;
+    this.applyCam();
+    // pigs in full detail only where the camera is near, one soft stand-in elsewhere
+    const cp = this.camera.position;
+    (this.rooms || []).forEach((rm) => {
+      const d = rm.box.distanceToPoint(cp);
+      rm.hi.visible = d < 28; rm.lo.visible = d >= 28 && d < 100; rm.xs.visible = d >= 100;
+      rm.rg.visible = rm.fix.visible = rm.box.distanceToPoint(cp) < 110;
+    });
+    this.renderer.render(this.scene, this.camera);
+    this.placeLabels();
+    this.placeCard();
+  }
+
+  // ---------- template values ----------
+  renderVals() {
+    const u = this.ui();
+    const ic = this.icons();
+    const FL = 'background: rgba(255, 255, 255, 0.96); border: 1px solid #E3E6E1; border-radius: 12px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 8px 24px rgba(18, 24, 21, 0.06);';
+    const seg = (on) => 'height: 36px; padding: 0 14px; border: 0; border-radius: 8px; font: inherit; font-size: 13px; font-weight: ' + (on ? '600' : '500') + '; cursor: pointer; background: ' + (on ? '#EEF0EC' : 'transparent') + '; color: ' + (on ? '#121815' : '#4A544E');
+    const ready = u.ready && !u.err;
+    const isRoom = u.view === 'room' && ready;
+    const rcur = isRoom ? this.roomById(u.roomId) : null;
+    const plan = this.plan || null;
+    const room = rcur ? { name: rcur.name, sum: this.roomSum(rcur) } : { name: '', sum: '' };
+    const sw = (t, size) => 'width: ' + size + 'px; height: ' + size + 'px; border-radius: 3px; flex-shrink: 0; background: ' + this.colorOf(t).block + '; box-shadow: inset 0 0 0 1px rgba(18, 24, 21, 0.10)';
+
+    // ----- pen card -----
+    let card = { code: '', type: '', sw: '', pigs: '', where: '', size: '', noteStyle: 'font-size: 12.5px; color: #626C66; margin-top: 1px' };
+    if (rcur && plan && u.pen) {
+      const lanes = rcur.lanes.length;
+      const ci = u.pen.charCodeAt(0) - 65, num = parseInt(u.pen.slice(1), 10);
+      const tgt = ci < lanes ? rcur.lanes[ci] : (rcur.ends || [])[ci - lanes];
+      const c = plan[rcur.id].cell[u.pen];
+      if (tgt) {
+        const t = this.typeOf(tgt.t);
+        const lane = ci < lanes ? 'Lane ' + this.letter(ci) + ' · ' + (num === 1 ? 'first pen from the door' : 'pen ' + num + ' from the door') : 'Across lanes ' + tgt.lanes.map((i) => this.letter(i)).join(' and ');
+        let pigs = 'Empty', where = lane, size = '', note = false;
+        if (c && c.sow && c.litter) { pigs = 'Sow ' + c.sow; where = c.litter + ' piglets, 9 days'; size = 'Batch ' + c.batch; }
+        else if (c && c.sow) { pigs = 'Sow ' + c.sow; where = lane; size = c.flag ? (c.flag === 'Sick' ? 'In the sick room' : c.flag + ' · needs a look') : ''; note = !!c.flag; }
+        else if (c && c.boar) { pigs = 'Boar ' + c.boar; where = lane; }
+        else if (c && c.gilts) { pigs = c.n + ' gilts'; where = rcur.name; size = lane; }
+        else if (c && c.n) { pigs = c.n + ' weaners'; where = 'Batch ' + c.batch; size = lane; }
+        else { size = ''; }
+        card = { code: u.pen, type: t.name, sw: sw(tgt.t, 12), pigs: pigs, where: where, size: size, noteStyle: 'font-size: 12.5px; margin-top: 1px; color: ' + (note ? '#8A5A12' : '#626C66') + '; ' + (size ? '' : 'display: none') };
+      }
+    }
+    const count = plan ? { all: this.fmt(this.allN) + ' pigs', parts: [['Sows', this.all.sows], ['Boars', this.all.boars], ['Gilts', this.all.gilts], ['Piglets', this.all.piglets], ['Weaners', this.all.weaners]].map((d) => ({ name: d[0], n: this.fmt(d[1]) })) } : { all: '', parts: [] };
+    const showCount = ready && !isRoom && !!plan;
+    return {
+      ic: ic,
+      setRoot: (el) => { if (el) { this.rootEl = el; if (!this.availH) this.measure(); } },
+      rootStyle: "width: 100%; height: " + (u.avail || 760) + "px; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; overflow: hidden",
+      sub: plan ? 'Hillside Sow Farm · ' + this.fmt(this.allN) + ' pigs' : 'Hillside Sow Farm',
+      setMount: (el) => { if (el) this.mountEl = el; },
+      setLabels: (el) => { if (el) this.labelsEl = el; },
+      setCard: (el) => { if (el) this.cardEl = el; },
+      loading: !ready || !!u.err,
+      loadMsg: u.err || 'Loading the 3D model…',
+      isRoom: isRoom,
+      room: room,
+      roomCardStyle: 'position: absolute; top: 14px; left: 14px; display: flex; align-items: center; gap: 4px; padding: 4px 14px 4px 4px; ' + FL + ' max-width: calc(100% - 420px); box-sizing: border-box; animation: sentriRise 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both',
+      ready: ready,
+      camStyle: 'position: absolute; top: 14px; right: 14px; display: flex; align-items: center; gap: 2px; padding: 4px; ' + FL,
+      iconBtn: 'width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 8px; background: transparent; color: #121815; cursor: pointer',
+      angleOn: !u.plan, planOn: u.plan, angleStyle: seg(!u.plan), planStyle: seg(u.plan),
+      toAngle: () => { if (!this.ui().plan) return; const nn = this.put({ plan: false }); this.tweenTo(this.presetFor(nn), 900); },
+      toPlan: () => { if (this.ui().plan) return; const nn = this.put({ plan: true }); this.tweenTo(this.presetFor(nn), 900); },
+      turnLeft: () => this.tweenTo(Object.assign({}, this.cam, { yaw: this.cam.yaw + Math.PI / 4 }), 600),
+      turnRight: () => this.tweenTo(Object.assign({}, this.cam, { yaw: this.cam.yaw - Math.PI / 4 }), 600),
+      fit: () => this.tweenTo(this.presetFor(this.ui()), 700),
+      zoomIn: () => this.zoomBy(0.7),
+      zoomOut: () => this.zoomBy(1.42),
+      goFarm: () => this.goFarm(),
+      showCount: showCount, count: count,
+      countStyle: 'position: absolute; left: 14px; bottom: 14px; max-width: calc(100% - 28px); box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 16px; padding: 10px 16px; ' + FL,
+      showHint: ready,
+      hint: isRoom ? 'Click a pen to see who is in it · Drag to turn · Scroll to zoom' : 'Click a room to go in · Drag to turn · Scroll to zoom',
+      hintStyle: 'position: absolute; right: 18px; bottom: 18px; font-size: 12px; color: #6B746E; pointer-events: none; text-align: right',
+      card: card,
+      cardStyle: 'position: absolute; left: 0; top: 0; visibility: hidden; width: 228px; box-sizing: border-box; padding: 12px 14px 12px 16px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 12px; box-shadow: 0 2px 4px rgba(18, 24, 21, 0.06), 0 12px 32px rgba(18, 24, 21, 0.10)',
+      closeCard: () => this.closePen()
+    };
+  }
+}
+</script>
+</body>
+</html>

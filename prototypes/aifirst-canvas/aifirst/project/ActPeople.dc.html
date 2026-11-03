@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>People and invite</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; min-height: calc(100vh - 68px); display: flex; flex-direction: column; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+<div style="width: 100%; flex: 1; max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+<!-- ============ LIST ============ -->
+<sc-if value="{{isList}}" hint-placeholder-val="{{true}}">
+<div>
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">People</h1>
+    <button type="button" onClick="{{openInvite}}" style="height: 36px; padding: 0 14px 0 11px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; display: inline-flex; align-items: center; gap: 7px; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #C5F06A; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.plus}}"></path></svg>
+      Invite someone
+    </button>
+  </div>
+
+  <div style="display: inline-flex; gap: 2px; margin-top: 20px; padding: 3px; border: 1px solid #E8EBE5; border-radius: 12px">
+    <sc-for list="{{segs}}" as="g" hint-placeholder-count="3">
+      <button type="button" aria-pressed="{{g.on}}" onClick="{{g.pick}}" style="height: 32px; padding: 0 14px; border: 0; border-radius: 9px; background: {{g.bg}}; color: {{g.ink}}; font: inherit; font-size: 13.5px; font-weight: {{g.weight}}; display: inline-flex; align-items: center; gap: 7px; cursor: pointer">
+        {{g.label}}
+        <sc-if value="{{g.hasCount}}" hint-placeholder-val="{{true}}">
+          <span style="font-size: 12.5px; font-weight: 500; color: {{g.countInk}}">{{g.count}}</span>
+        </sc-if>
+      </button>
+    </sc-for>
+  </div>
+
+  <div style="margin-top: 8px">
+    <sc-for list="{{sections}}" as="sec" hint-placeholder-count="1">
+      <div>
+        <sc-if value="{{sec.showLabel}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; align-items: baseline; gap: 8px; padding: 22px 4px 4px">
+            <h2 style="margin: 0; font-size: 12px; font-weight: 500; color: #626C66">{{sec.label}}</h2>
+            <span style="font-size: 12px; color: #626C66">{{sec.count}}</span>
+          </div>
+        </sc-if>
+        <sc-for list="{{sec.rows}}" as="r" hint-placeholder-count="5">
+          <button type="button" onClick="{{r.open}}" style="width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 12px 4px; border: 0; border-top: {{r.topLine}}; background: transparent; font: inherit; text-align: left; color: inherit; cursor: pointer">
+            <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 50%; background: {{r.avBg}}; color: {{r.avInk}}; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0">{{r.ini}}</span>
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+              <span style="display: flex; align-items: baseline; gap: 8px">
+                <span style="font-size: 14px; font-weight: 500; color: {{r.nameInk}}">{{r.name}}</span>
+                <sc-if value="{{r.guest}}" hint-placeholder-val="{{false}}">
+                  <span style="font-size: 12px; color: #626C66">Guest</span>
+                </sc-if>
+              </span>
+              <span style="font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.line}}</span>
+            </span>
+            <sc-if value="{{r.hasSince}}" hint-placeholder-val="{{false}}">
+              <span style="font-size: 12.5px; color: #626C66; flex-shrink: 0">Since <span style="font-family: 'Geist Mono', ui-monospace, monospace; color: #3B4540">{{r.since}}</span></span>
+            </sc-if>
+            <sc-if value="{{r.hasChip}}" hint-placeholder-val="{{false}}">
+              <span style="display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; background: {{r.chipBg}}; color: {{r.chipInk}}; font-size: 12px; font-weight: 500; white-space: nowrap; flex-shrink: 0">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: {{r.chipDot}}"></span>
+                {{r.chipText}}
+              </span>
+            </sc-if>
+          </button>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ INVITE ============ -->
+<sc-if value="{{isInvite}}" hint-placeholder-val="{{false}}">
+<div>
+  <sc-if value="{{sent}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding: 8px 8px 8px 14px; border-radius: 12px; background: #F0F2EE; color: #3B4540; font-size: 13.5px; font-weight: 500; line-height: 1.45; animation: sentriRise 0.4s ease both">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      <span style="flex: 1; min-width: 0">Saved <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">08:41</span> · {{receiptTail}}</span>
+      <button type="button" onClick="{{undoSend}}" style="height: 32px; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <div style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">
+    <button type="button" onClick="{{toList}}" style="padding: 0; border: 0; background: transparent; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer">People</button>
+    <span aria-hidden="true">›</span>
+    <span>Invite</span>
+  </div>
+  <h1 style="margin: 8px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{inv.title}}</h1>
+
+  <!-- editable proposal -->
+  <sc-if value="{{notSent}}" hint-placeholder-val="{{true}}">
+  <div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 16px; margin-top: 24px">
+      <sc-for list="{{fields}}" as="f" hint-placeholder-count="5">
+        <div style="{{f.cell}}; min-width: 0">
+          <div style="display: flex; align-items: center; gap: 7px; height: 20px; margin-bottom: 6px">
+            <sc-if value="{{f.changed}}" hint-placeholder-val="{{false}}">
+              <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #2FA36B; flex-shrink: 0"></span>
+            </sc-if>
+            <label for="{{f.id}}" style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</label>
+            <sc-if value="{{f.changed}}" hint-placeholder-val="{{false}}">
+              <span style="font-size: 12px; color: #626C66; text-decoration: line-through; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{f.old}}</span>
+              <button type="button" onClick="{{f.revert}}" style="border: 0; background: transparent; padding: 0; font: inherit; font-size: 12px; font-weight: 500; color: #3B4540; cursor: pointer; text-decoration: underline; flex-shrink: 0">Undo</button>
+            </sc-if>
+          </div>
+          <input id="{{f.id}}" value="{{f.value}}" onChange="{{f.change}}" placeholder="{{f.placeholder}}" style="width: 100%; box-sizing: border-box; height: 42px; padding: 0 13px; border: 1px solid {{f.border}}; border-radius: 11px; background: #FFFFFF; font: inherit; font-size: 14px; color: #121815; outline: none">
+          <sc-if value="{{f.warn}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; align-items: flex-start; gap: 7px; margin-top: 6px; font-size: 12.5px; line-height: 1.45; color: #7A4A00"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #D99A1E; flex-shrink: 0; margin-top: 7px"></span>{{f.warnText}}</div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top: 22px">
+      <div style="font-size: 12px; font-weight: 500; color: #626C66; margin-bottom: 6px">How they answer</div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <sc-for list="{{modes}}" as="m" hint-placeholder-count="2">
+          <button type="button" aria-pressed="{{m.on}}" onClick="{{m.pick}}" style="display: flex; align-items: flex-start; gap: 11px; padding: 12px 14px; border: 1px solid {{m.border}}; border-radius: 12px; background: #FFFFFF; font: inherit; text-align: left; color: inherit; cursor: pointer">
+            <span aria-hidden="true" style="width: 16px; height: 16px; margin-top: 2px; box-sizing: border-box; border-radius: 50%; border: {{m.ring}}; flex-shrink: 0"></span>
+            <span style="display: flex; flex-direction: column">
+              <span style="font-size: 14px; font-weight: 500">{{m.label}}</span>
+              <span style="font-size: 12.5px; color: #626C66">{{m.note}}</span>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px">
+      <button type="button" aria-expanded="{{moreOpen}}" onClick="{{toggleMore}}" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 0; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+        More options
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{moreIcon}}"></path></svg>
+      </button>
+      <sc-if value="{{moreOpen}}" hint-placeholder-val="{{false}}">
+        <div style="margin-top: 8px">
+          <label for="inv-note" style="display: block; font-size: 12px; font-weight: 500; color: #626C66; margin-bottom: 6px">Note to visitor</label>
+          <textarea id="inv-note" value="{{note}}" onChange="{{onNote}}" placeholder="Optional. For example: park at the gate and call Adam." style="width: 100%; box-sizing: border-box; min-height: 76px; padding: 10px 13px; border: 1px solid #E2E5DF; border-radius: 11px; font: inherit; font-size: 14px; color: #121815; outline: none; resize: vertical"></textarea>
+        </div>
+      </sc-if>
+    </div>
+
+  </div>
+  </sc-if>
+
+  <!-- sent: the proposal reads as the record -->
+  <sc-if value="{{sent}}" hint-placeholder-val="{{false}}">
+  <div style="margin-top: 24px">
+    <sc-for list="{{summary}}" as="r" hint-placeholder-count="6">
+      <div style="display: flex; align-items: baseline; gap: 16px; padding: 12px 0; border-top: {{r.topLine}}">
+        <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #626C66">{{r.k}}</span>
+        <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">{{r.v}}</span>
+      </div>
+    </sc-for>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<!-- ============ RECORD ============ -->
+<sc-if value="{{isRecord}}" hint-placeholder-val="{{false}}">
+<div>
+  <button type="button" onClick="{{toList}}" style="display: inline-flex; align-items: center; gap: 2px; margin-left: -4px; padding: 4px 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevLeft}}"></path></svg>
+    People
+  </button>
+
+  <div style="display: flex; align-items: center; gap: 16px; margin-top: 14px">
+    <span aria-hidden="true" style="width: 60px; height: 60px; border-radius: 50%; background: {{rec.avBg}}; color: {{rec.avInk}}; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600; flex-shrink: 0">{{rec.ini}}</span>
+    <div style="min-width: 0">
+      <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{rec.name}}</h1>
+      <div style="font-size: 14px; color: #3B4540">{{rec.roleLine}}</div>
+      <div style="font-size: 13.5px; color: #626C66">{{rec.phone}}</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 8px; margin-top: 20px; font-size: 14px; font-weight: 500">
+    <span style="width: 8px; height: 8px; border-radius: 50%; background: {{rec.dot}}; animation: {{rec.pulse}}"></span>
+    {{rec.state}}
+  </div>
+
+  <sc-if value="{{rec.canInvite}}" hint-placeholder-val="{{false}}">
+    <button type="button" onClick="{{openInvite}}" style="margin-top: 14px; height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; color: #121815; cursor: pointer">Invite {{rec.name}}</button>
+  </sc-if>
+
+  <div style="margin-top: 30px">
+    <h2 style="margin: 0 0 4px; font-size: 15px; font-weight: 600">{{rec.listHead}}</h2>
+    <sc-for list="{{rec.rows}}" as="d" hint-placeholder-count="3">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 11px 0; border-top: {{d.topLine}}">
+        <span style="font-size: 14px; color: #1E2622">{{d.a}}</span>
+        <span style="font-size: 13.5px; color: {{d.bInk}}; font-family: {{d.bFont}}">{{d.b}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{rec.canLeave}}" hint-placeholder-val="{{false}}">
+  <div style="margin-top: 30px">
+    <h2 style="margin: 0 0 4px; font-size: 15px; font-weight: 600">Leaving</h2>
+    <sc-for list="{{leaveRows}}" as="l" hint-placeholder-count="3">
+      <div style="display: flex; align-items: center; gap: 16px; padding: 10px 0; border-top: {{l.topLine}}">
+        <button type="button" onClick="{{l.pick}}" style="width: 176px; flex-shrink: 0; height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; color: {{l.ink}}; text-align: left; cursor: pointer">{{l.label}}</button>
+        <span style="flex: 1; min-width: 0; font-size: 13px; line-height: 1.4; color: #3B4540">{{l.effect}}</span>
+      </div>
+    </sc-for>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<!-- ============ LEAVING CONFIRM ============ -->
+<sc-if value="{{isLeaving}}" hint-placeholder-val="{{false}}">
+<div>
+  <sc-if value="{{done}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding: 8px 8px 8px 14px; border-radius: 12px; background: #F0F2EE; color: #3B4540; font-size: 13.5px; font-weight: 500; line-height: 1.45; animation: sentriRise 0.4s ease both">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      <span style="flex: 1; min-width: 0">Saved <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">08:52</span> · {{lv.receiptHead}} {{lv.receiptTail}}</span>
+      <button type="button" onClick="{{undoLeave}}" style="height: 32px; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+  <sc-if value="{{notDone}}" hint-placeholder-val="{{true}}">
+    <button type="button" onClick="{{backToRecord}}" style="display: inline-flex; align-items: center; gap: 2px; margin-left: -4px; padding: 4px 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevLeft}}"></path></svg>
+      {{lv.name}}
+    </button>
+  </sc-if>
+  <h1 style="margin: 10px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{lv.title}}</h1>
+  <div style="margin-top: 18px; padding: 16px 18px; border-radius: 14px; background: #F6F7F4">
+    <div style="font-size: 15px; line-height: 1.5; color: #121815">{{lv.effect}}</div>
+  </div>
+</div>
+</sc-if>
+
+</div>
+
+<!-- ============ STICKY FOOTERS ============ -->
+<sc-if value="{{footInvite}}" hint-placeholder-val="{{false}}">
+<div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+  <div style="max-width: 760px; margin: 0 auto; padding: 12px 32px; box-sizing: border-box; display: flex; align-items: center; gap: 10px">
+    <span style="flex: 1; min-width: 0; font-size: 13px; line-height: 1.4; color: #3B4540">{{barSummary}}</span>
+    <button type="button" onClick="{{discard}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer">Discard</button>
+    <button type="button" onClick="{{send}}" style="height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; opacity: {{sendOpacity}}; cursor: pointer; white-space: nowrap">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      {{sendLabel}}
+    </button>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{footBack}}" hint-placeholder-val="{{false}}">
+<div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+  <div style="max-width: 760px; margin: 0 auto; padding: 12px 32px; box-sizing: border-box; display: flex; align-items: center; gap: 10px">
+    <button type="button" onClick="{{backToPeople}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer">Back to People</button>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{footLeave}}" hint-placeholder-val="{{false}}">
+<div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+  <div style="max-width: 760px; margin: 0 auto; padding: 12px 32px; box-sizing: border-box; display: flex; align-items: center; gap: 10px">
+    <span style="flex: 1; min-width: 0; font-size: 13px; line-height: 1.4; color: #3B4540">{{lv.barSummary}}</span>
+    <button type="button" onClick="{{backToRecord}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer">Discard</button>
+    <button type="button" onClick="{{confirmLeave}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #9A2C17; cursor: pointer; white-space: nowrap">{{lv.button}}</button>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["list","invite","sent","record","leaving"],"default":"list"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      plus: 'M12 5v14 M5 12h14',
+      check: 'M20 6 9 17l-5-5',
+      chevDown: 'M6 9l6 6 6-6',
+      chevUp: 'M18 15l-6-6-6 6',
+      chevLeft: 'M15 18l-6-6 6-6'
+    };
+  }
+
+  roster() {
+    const D = ['Thu 29 Oct', 'Wed 28 Oct', 'Tue 27 Oct'];
+    const on = (id, name, role, since, extra) => Object.assign({ id, name, role, kind: 'staff', status: 'on', since, days: D, tasks: 4 }, extra || {});
+    return [
+      on('adam', 'Adam', 'Owner', '05:48', { avBg: '#151B17', avInk: '#FFFFFF', ini: 'A', tasks: 0 }),
+      on('liwei', 'Li Wei', 'Farrowing manager', '06:12', { avBg: '#FDE7C2', avInk: '#6B4300', ini: 'LW', tasks: 9, phone: '+86 139 5521 0386', hours: ['06:09 – 16:40', '06:15 – 16:22', '06:11 – 17:05'] }),
+      on('wangfang', 'Wang Fang', 'Nursery manager', '06:05', { avBg: '#E2F0DA', avInk: '#203D2B', ini: 'WF', tasks: 7 }),
+      on('zhaomin', 'Zhao Min', 'Gestation lead', '06:20', { avBg: '#F3E8F7', avInk: '#5B2D6E', ini: 'ZM', tasks: 8 }),
+      on('liuyang', 'Liu Yang', 'Farrowing technician', '06:14'),
+      on('sunqing', 'Sun Qing', 'Farrowing technician', '06:18'),
+      on('malin', 'Ma Lin', 'Gestation technician', '06:22'),
+      on('zhoujie', 'Zhou Jie', 'Breeding technician', '06:30'),
+      on('heping', 'He Ping', 'Nursery technician', '06:09'),
+      on('xudan', 'Xu Dan', 'Nursery technician', '06:11'),
+      on('gaofeng', 'Gao Feng', 'Maintenance', '07:02'),
+      on('linhua', 'Lin Hua', 'Cook', '05:30', { tasks: 2 }),
+      on('tangyu', 'Tang Yu', 'Feed and water', '06:40'),
+      on('guomei', 'Guo Mei', 'Wash crew', '06:25'),
+      { id: 'zhanghao', name: 'Zhang Hao', kind: 'guest', status: 'coming', role: 'Feed-line contractor', company: 'Northfield Feed Services', dates: 'Mon 2 – Tue 3 Nov', purpose: 'Repair the feed line in Gestation 1', host: 'Zhao Min', chipText: 'Needs your yes', chipTone: 'amber' },
+      { id: 'qianwei', name: 'Liu Yang', kind: 'guest', status: 'coming', role: 'Feed-line contractor', company: 'Northfield Feed Services', dates: 'Mon 2 – Tue 3 Nov', purpose: 'Repair the feed line in Gestation 1', host: 'Zhao Min', chipText: 'Needs your yes', chipTone: 'amber' },
+      { id: 'yutao', name: 'Ma Tao', kind: 'guest', status: 'coming', role: 'Feed-line contractor', company: 'Northfield Feed Services', dates: 'Mon 2 – Tue 3 Nov', purpose: 'Repair the feed line in Gestation 1', host: 'Zhao Min', chipText: 'Needs your yes', chipTone: 'amber' },
+      { id: 'drchen', name: 'Dr. Chen', kind: 'guest', status: 'coming', role: 'Visiting vet', company: 'Hartland Vet Group', dates: 'Wed 4 Nov', purpose: 'Weekly herd check, Farrowing Rooms 1–4', host: 'Li Wei', chipText: 'Invite not sent', chipTone: 'neutral', avBg: '#D7E6FB', avInk: '#1F4470', ini: 'DC' },
+      { id: 'hujun', name: 'Wu Jun', kind: 'guest', status: 'coming', role: 'Delivery driver', company: 'Tong Feed Mill', dates: 'Thu 5 Nov', purpose: 'Feed delivery, bins outside the fence', host: 'Zhao Min', chipText: 'Needs your yes', chipTone: 'amber' },
+      { id: 'tianyue', name: 'Tian Yue', kind: 'staff', status: 'coming', role: 'Farrowing technician', dates: 'Mon 2 Nov', purpose: 'First day', host: 'Li Wei', chipText: 'Starts Mon 2 Nov', chipTone: 'neutral' },
+      { id: 'dengkai', name: 'Deng Kai', kind: 'staff', status: 'left', role: 'Farrowing technician', leftText: 'Left 28 Oct', days: ['Wed 28 Oct', 'Tue 27 Oct', 'Mon 26 Oct'] },
+      { id: 'yanmei', name: 'Yan Mei', kind: 'staff', status: 'left', role: 'Cook', leftText: 'Left 12 Oct', days: ['Mon 12 Oct', 'Sun 11 Oct', 'Sat 10 Oct'] },
+      { id: 'baolong', name: 'Bao Long', kind: 'staff', status: 'left', role: 'Maintenance', leftText: 'Left 3 Sep', days: ['Thu 3 Sep', 'Wed 2 Sep', 'Tue 1 Sep'] }
+    ];
+  }
+
+  defaults(start) {
+    const base = {
+      startSeen: start, view: 'list', tab: 'today', personId: 'liwei',
+      vals: { name: 'Dr. Chen', contact: 'chen@hartlandvet.cn', visit: 'Wed 4 Nov', host: 'Li Wei', purpose: 'Weekly herd check, Farrowing Rooms 1–4' },
+      note: '', mode: 'link', moreOpen: false, sent: false,
+      leaveKind: 'end', done: false, gone: {}
+    };
+    if (start === 'invite') return Object.assign(base, { view: 'invite' });
+    if (start === 'sent') return Object.assign(base, { view: 'invite', sent: true, tab: 'coming' });
+    if (start === 'record') return Object.assign(base, { view: 'record' });
+    if (start === 'leaving') return Object.assign(base, { view: 'leaving' });
+    return base;
+  }
+
+  cur() {
+    const start = this.props.start || 'list';
+    const st = this.state || {};
+    const base = this.defaults(start);
+    return st.startSeen === start ? Object.assign(base, st) : base;
+  }
+
+  renderVals() {
+    const s = this.cur();
+    const set = (p) => this.setState(Object.assign({}, this.cur(), p));
+    const ic = this.icons();
+    const tones = {
+      amber: { bg: '#FFF0D1', ink: '#7A4A00', dot: '#D99A1E' },
+      neutral: { bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90' },
+      ok: { bg: '#E7F4EA', ink: '#1F5534', dot: '#2D7A4B' }
+    };
+    const line = '1px solid #EFF1EC';
+
+    // ---- roster with today's changes applied
+    const roster = this.roster()
+      .filter((p) => s.gone[p.id] !== 'delete')
+      .map((p, i) => {
+        const q = Object.assign({}, p);
+        if (!q.ini) q.ini = p.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+        if (!q.avBg) { q.avBg = '#F0F2EE'; q.avInk = '#3B4540'; }
+        if (!q.phone) q.phone = '+86 138 ' + (4010 + i * 37) + ' ' + (1200 + i * 91);
+        const g = s.gone[p.id];
+        if (g === 'end' || g === 'leaves') { q.status = 'left'; q.leftText = 'Left 30 Oct'; }
+        if (p.id === 'drchen' && s.sent) { q.chipText = 'Invite sent'; q.chipTone = 'neutral'; }
+        return q;
+      });
+    const by = (st) => roster.filter((p) => p.status === st);
+    const nOn = by('on').length, nComing = by('coming').length, nLeft = by('left').length;
+    const find = (id) => roster.find((p) => p.id === id) || this.roster().find((p) => p.id === id);
+
+    // ---- list
+    const toRow = (p, mode) => {
+      const t = tones[p.chipTone || 'neutral'];
+      let lineText = p.role;
+      if (p.status === 'coming' && p.kind === 'guest') lineText = [p.role, p.company, p.dates].filter(Boolean).join(' · ');
+      const showSince = p.status === 'on';
+      const showChip = p.status !== 'on';
+      let chipText = p.chipText, ct = t;
+      if (p.status === 'left') { chipText = p.leftText; ct = tones.neutral; }
+      return {
+        ini: p.ini, avBg: p.avBg, avInk: p.avInk, name: p.name, line: lineText,
+        nameInk: p.status === 'left' ? '#3B4540' : '#121815',
+        guest: p.kind === 'guest',
+        hasSince: showSince, since: p.since,
+        hasChip: showChip, chipText, chipBg: ct.bg, chipInk: ct.ink, chipDot: ct.dot,
+        open: () => set({ view: 'record', personId: p.id })
+      };
+    };
+    const rowsOf = (arr) => arr.map((p, i) => Object.assign(toRow(p), { topLine: i ? line : '0' }));
+    let sections;
+    if (s.tab === 'today') sections = [{ showLabel: false, rows: rowsOf(by('on')) }];
+    else if (s.tab === 'coming') sections = [{ showLabel: false, rows: rowsOf(by('coming')) }];
+    else sections = [
+      { showLabel: true, label: 'On farm today', count: nOn, rows: rowsOf(by('on')) },
+      { showLabel: true, label: 'Coming', count: nComing, rows: rowsOf(by('coming')) },
+      { showLabel: true, label: 'Left', count: nLeft, rows: rowsOf(by('left')) }
+    ];
+    const segDefs = [
+      { id: 'today', label: 'On farm today', count: nOn },
+      { id: 'coming', label: 'Coming', count: nComing },
+      { id: 'everyone', label: 'Everyone' }
+    ];
+    const segs = segDefs.map((g) => {
+      const on = s.tab === g.id;
+      return {
+        label: g.label, on, hasCount: g.count !== undefined, count: g.count,
+        bg: on ? '#F0F2EE' : 'transparent', ink: on ? '#121815' : '#3B4540', weight: on ? 600 : 500,
+        countInk: on ? '#3B4540' : '#626C66',
+        pick: () => set({ tab: g.id })
+      };
+    });
+
+    // ---- invite
+    const v = s.vals;
+    const initial = this.defaults('list').vals;
+    const fieldDefs = [
+      { id: 'name', label: 'Name', placeholder: 'Full name', cell: '' },
+      { id: 'contact', label: 'Phone or email', placeholder: 'Where to send the form', cell: '' },
+      { id: 'visit', label: 'Visit', placeholder: 'For example Mon 2 – Tue 3 Nov', cell: '' },
+      { id: 'host', label: 'Host', placeholder: 'Who they will meet', cell: '' },
+      { id: 'purpose', label: 'Purpose', placeholder: 'Why they are coming', cell: 'grid-column: 1 / -1' }
+    ];
+    const setVal = (id, nv) => set({ vals: Object.assign({}, s.vals, { [id]: nv }) });
+    const validEmail = (x) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x);
+    const validPhone = (x) => /^\+?[0-9 ()-]{7,}$/.test(x);
+    const warnFor = (id) => {
+      const x = (v[id] || '').trim();
+      if (id === 'name' && !x) return 'Add a name.';
+      if (id === 'contact' && !x) return 'Add a phone number or email so the form can reach them.';
+      if (id === 'contact' && !validEmail(x) && !validPhone(x)) return 'Use a phone number or an email address.';
+      return '';
+    };
+    const fields = fieldDefs.map((f) => {
+      const warn = warnFor(f.id);
+      return {
+        id: 'inv-' + f.id, label: f.label, placeholder: f.placeholder, cell: f.cell || 'grid-column: auto',
+        value: v[f.id], changed: v[f.id] !== initial[f.id], old: initial[f.id] || 'empty',
+        warn: !!warn, warnText: warn, border: warn ? '#D99A1E' : '#E2E5DF',
+        revert: () => setVal(f.id, initial[f.id]),
+        change: (e) => setVal(f.id, e.target.value)
+      };
+    });
+    const nEdits = fieldDefs.filter((f) => v[f.id] !== initial[f.id]).length;
+    const nm = (v.name || '').trim();
+    const ready = !warnFor('name') && !warnFor('contact');
+    const modeDefs = [
+      { id: 'link', label: 'Send a form link', note: 'They answer on their own phone.' },
+      { id: 'now', label: 'Fill it in for them now', note: 'You give the answers yourself.' }
+    ];
+    const modes = modeDefs.map((m) => ({
+      label: m.label, note: m.note, on: s.mode === m.id,
+      border: s.mode === m.id ? '#121815' : '#E2E5DF',
+      ring: s.mode === m.id ? '5px solid #121815' : '1.5px solid #DADED6',
+      pick: () => set({ mode: m.id })
+    }));
+    const who = nm || 'someone';
+    const inv = { title: 'Invite ' + who };
+    const now = s.mode === 'now';
+    const sendLabel = now ? (nm ? 'Fill in the form for ' + nm : 'Fill in the form') : (nm ? 'Send invite to ' + nm : 'Send invite');
+    const receiptTail = now ? 'Form filled in. ' + (nm || 'The visitor') + "'s answers are in Decisions." : 'Invite sent. ' + (nm ? nm + "'s answers" : 'Their answers') + ' will arrive in Decisions.';
+    const barSummary = (nEdits ? nEdits + (nEdits === 1 ? ' edit' : ' edits') + ' · ' : 'New invite · ') + (now ? 'you fill in the form' : 'form link') + ' · you approve in Decisions';
+    const summary = [
+      { k: 'Name', v: v.name },
+      { k: 'Phone or email', v: v.contact },
+      { k: 'Visit', v: v.visit },
+      { k: 'Host', v: v.host },
+      { k: 'Purpose', v: v.purpose },
+      { k: 'How they answer', v: now ? 'You filled it in' : 'Form link' }
+    ].concat(s.note ? [{ k: 'Note to visitor', v: s.note }] : []).map((r, i) => Object.assign(r, { topLine: i ? line : '0' }));
+
+    // ---- record
+    const p = find(s.personId) || roster[1];
+    let state, dot = '#2D7A4B', pulse = 'none', rows, listHead;
+    const stampDays = (days, hours) => days.map((d, i) => ({ a: d, b: hours ? hours[i] : '', bFont: "'Geist Mono', ui-monospace, monospace", bInk: '#3B4540' }));
+    if (p.status === 'on') {
+      state = 'On farm since ' + p.since + ' today';
+      pulse = 'sentriPulseG 2s ease-out infinite';
+      listHead = 'Recent days';
+      rows = stampDays(p.days, p.hours || [String(p.since) + ' – 16:30', '06:12 – 16:18', '06:16 – 16:44']);
+    } else if (p.status === 'left') {
+      state = p.leftText; dot = '#8E9C90'; listHead = 'Last days on the farm';
+      rows = stampDays(p.days || ['Thu 29 Oct', 'Wed 28 Oct', 'Tue 27 Oct'], ['06:10 – 16:35', '06:14 – 16:20', '06:12 – 16:41']);
+    } else {
+      const sentNow = p.id === 'drchen' && s.sent;
+      state = sentNow ? 'Invite sent 08:41' : (p.chipText + (p.id === 'drchen' ? '' : ''));
+      dot = p.chipTone === 'amber' ? '#D99A1E' : '#8E9C90';
+      listHead = 'The visit';
+      const plain = { bFont: 'inherit', bInk: '#3B4540' };
+      rows = [
+        Object.assign({ a: p.dates, b: p.kind === 'guest' ? 'Dates' : 'Starts' }, plain),
+        Object.assign({ a: p.purpose, b: 'Purpose' }, plain),
+        Object.assign({ a: p.host, b: 'Host' }, plain)
+      ];
+      if (p.company) rows.splice(1, 0, Object.assign({ a: p.company, b: 'Company' }, plain));
+    }
+    rows = rows.map((r, i) => Object.assign(r, { topLine: i ? line : '0' }));
+    const rec = {
+      name: p.name, ini: p.ini, avBg: p.avBg, avInk: p.avInk, phone: p.phone,
+      roleLine: p.role + ' · ' + (p.kind === 'guest' ? 'Guest' : 'Staff'),
+      state, dot, pulse, listHead, rows,
+      canInvite: p.id === 'drchen' && !s.sent,
+      canLeave: p.status === 'on' && p.kind === 'staff' && p.id !== 'adam'
+    };
+    const leaveRows = [
+      { id: 'leaves', label: 'Leaves the farm', effect: 'Record stays. ' + p.name + ' can come back.', ink: '#121815' },
+      { id: 'end', label: 'End employment', effect: 'No longer staff. Record and history stay.', ink: '#121815' },
+      { id: 'delete', label: 'Delete', effect: 'Only for someone added by mistake. Past records keep the name.', ink: '#9A2C17' }
+    ].map((l, i) => Object.assign(l, { topLine: i ? line : '0', pick: () => set({ view: 'leaving', leaveKind: l.id, done: false }) }));
+
+    // ---- leaving confirm
+    const n = p.name, poss = n + "'s";
+    const kinds = {
+      leaves: { title: n + ' leaves the farm', effect: n + ' shows as left from today. The record stays, and ' + n + ' can come back.', button: 'Mark ' + n + ' as left', head: n + ' marked as left.', tail: 'The record stays.', tasks: true },
+      end: { title: 'End ' + poss + ' employment', effect: n + ' is no longer staff from today. Their record and history stay.', button: 'End ' + poss + ' employment', head: poss + ' employment ended.', tail: 'Record and history stay.', tasks: true },
+      del: { title: 'Delete ' + n, effect: n + ' is removed from People. Past records keep the name.', button: 'Delete ' + n, head: n + ' deleted.', tail: 'Past records keep the name.', tasks: false }
+    };
+    const kk = kinds[s.leaveKind === 'delete' ? 'del' : s.leaveKind] || kinds.end;
+    const lv = {
+      name: n, title: kk.title, effect: kk.effect, button: kk.button,
+      receiptHead: kk.head, receiptTail: kk.tail,
+      barSummary: kk.tasks ? (p.tasks || 4) + ' open tasks go back to Production' : 'Past records keep the name'
+    };
+
+    const isList = s.view === 'list', isInvite = s.view === 'invite', isRecord = s.view === 'record', isLeaving = s.view === 'leaving';
+    const toList = () => set({ view: 'list', tab: (s.sent && s.view === 'invite') ? 'coming' : s.tab });
+
+    return {
+      ic, isList, isInvite, isRecord, isLeaving,
+      segs, sections,
+      openInvite: () => set({ view: 'invite', sent: false }),
+      undoSend: () => set({ sent: false }),
+      undoLeave: () => { const g = Object.assign({}, s.gone); delete g[p.id]; set({ done: false, gone: g }); },
+      toList: () => set({ view: 'list' }),
+      sent: s.sent, notSent: !s.sent, fields, modes, inv, summary, barSummary,
+      receiptTail,
+      note: s.note, onNote: (e) => set({ note: e.target.value }),
+      moreOpen: s.moreOpen, moreIcon: s.moreOpen ? ic.chevUp : ic.chevDown,
+      toggleMore: () => set({ moreOpen: !s.moreOpen }),
+      rec, leaveRows, lv, done: s.done, notDone: !s.done,
+      backToRecord: () => set({ view: 'record' }),
+      backToPeople: () => set({ view: 'list', tab: s.view === 'invite' ? 'coming' : s.tab }),
+      confirmLeave: () => set({ done: true, gone: Object.assign({}, s.gone, { [p.id]: s.leaveKind }) }),
+      footInvite: isInvite && !s.sent,
+      footBack: (isInvite && s.sent) || (isLeaving && s.done),
+      footLeave: isLeaving && !s.done,
+      sendLabel, sendOpacity: ready ? 1 : 0.4,
+      send: () => { if (ready) set({ sent: true }); },
+      discard: () => { const d = this.defaults('list'); set({ view: 'list', vals: d.vals, note: '', mode: 'link', moreOpen: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

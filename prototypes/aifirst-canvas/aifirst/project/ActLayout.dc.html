@@ -1,0 +1,1484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Farm layout</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div onPointerUp="{{endDrag}}" style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+<div style="{{colStyle}}">
+
+  <!-- saved strip -->
+  <sc-if value="{{showSaved}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 8px; background: #F6F7F4; border-radius: 10px; padding: 6px 8px 6px 12px; margin-bottom: 20px; font-size: 13px; color: #3B4540; animation: sentriRise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      <span style="flex: 1"><span style="font-weight: 600; color: #121815">Saved</span> <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">09:12</span></span>
+      <button type="button" onClick="{{undoSave}}" style="height: 30px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <!-- draft strip -->
+  <sc-if value="{{showDraft}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 8px; background: #F6F7F4; border-radius: 10px; padding: 8px 12px; margin-bottom: 20px; font-size: 13px; color: #626C66">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex-shrink: 0; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.file}}"></path></svg>
+      <span><span style="font-weight: 600; color: #121815">Draft</span>{{draftRest}}</span>
+    </div>
+  </sc-if>
+
+  <!-- ============ INTRO ============ -->
+  <sc-if value="{{isIntro}}" hint-placeholder-val="{{false}}">
+    <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; color: #626C66; text-transform: uppercase">Farm setup &#8250; Farm layout</div>
+    <h1 style="margin: 6px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Farm layout</h1>
+    <p style="margin: 8px 0 0; font-size: 15px; color: #3B4540; max-width: 560px">Sentri needs the places where your pigs live, drawn the way you walk them.</p>
+
+    <div style="margin-top: 26px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px">
+      <sc-for list="{{levels}}" as="lv" hint-placeholder-count="5">
+        <sc-if value="{{lv.sep}}" hint-placeholder-val="{{false}}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: #9AA39C; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg>
+        </sc-if>
+        <button type="button" aria-pressed="{{lv.on}}" onClick="{{lv.pick}}" style="{{lv.style}}">{{lv.label}}</button>
+      </sc-for>
+    </div>
+    <p style="margin: 12px 0 0; min-height: 44px; font-size: 15px; line-height: 1.45; color: #1E2622; max-width: 600px">{{levelText}}</p>
+
+    <div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start">
+      <div style="{{ex.zoneStyle}}">
+        <div style="font-size: 14px; font-weight: 600; color: #121815">Production Zone 1</div>
+        <sc-for list="{{ex.sections}}" as="es" hint-placeholder-count="2">
+          <div style="{{es.style}}">
+            <div style="font-size: 12px; font-weight: 600; color: #626C66; margin-bottom: 6px">{{es.name}}</div>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+              <sc-for list="{{es.rooms}}" as="er" hint-placeholder-count="2">
+                <div style="{{er.style}}">
+                  <div style="font-size: 13px; font-weight: 600; color: #121815; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{er.name}}</div>
+                  <div style="margin-top: 8px; {{er.mini.style}}">
+                    <sc-for list="{{er.mini.lanes}}" as="ml" hint-placeholder-count="2">
+                      <div style="{{ml.style}}"><sc-for list="{{ml.cells}}" as="mc" hint-placeholder-count="6"><span style="{{mc.style}}"></span></sc-for></div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center">
+        <div style="font-size: 12px; font-weight: 600; color: #626C66; margin-bottom: 8px; align-self: flex-start">Room 1, up close</div>
+        <div style="{{ex.roomStyle}}">
+          <div style="display: flex; gap: 16px">
+            <sc-for list="{{ex.lanes}}" as="xl" hint-placeholder-count="2">
+              <div style="{{xl.style}}">
+                <sc-for list="{{xl.cells}}" as="xc" hint-placeholder-count="6"><span style="{{xc.style}}">{{xc.code}}</span></sc-for>
+                <span style="height: 20px; display: flex; align-items: center; font-size: 13px; font-weight: 700; color: #121815">{{xl.letter}}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="position: absolute; left: 50%; bottom: -1px; transform: translate(-50%, 50%); height: 26px; padding: 0 9px; box-sizing: border-box; background: #FFFFFF; border-left: 2px solid #121815; border-right: 2px solid #121815; display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #121815; white-space: nowrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: #121815; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.up}}"></path></svg>
+            Door
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 28px; display: flex; justify-content: flex-end">
+      <button type="button" onClick="{{next}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 20px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer">
+        Next
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #FFFFFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.right}}"></path></svg>
+      </button>
+    </div>
+  </sc-if>
+
+  <!-- ============ FARM CANVAS ============ -->
+  <sc-if value="{{isMap}}" hint-placeholder-val="{{true}}">
+    <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; color: #626C66; text-transform: uppercase">Farm setup &#8250; Farm layout</div>
+    <h1 style="margin: 6px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Farm layout</h1>
+    <div style="margin-top: 6px; font-size: 13.5px; color: #626C66">{{countLine}}</div>
+    <sc-if value="{{noLegend}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 14px; font-size: 13px; color: #626C66">Pen types appear as you add pens</div>
+    </sc-if>
+    <sc-if value="{{hasLegend}}" hint-placeholder-val="{{true}}">
+      <div style="margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px">
+        <span style="font-size: 12px; font-weight: 500; color: #626C66; margin-right: 4px">Pen types</span>
+        <sc-for list="{{legend}}" as="lg" hint-placeholder-count="6">
+          <button type="button" aria-pressed="{{lg.on}}" onClick="{{lg.pick}}" style="{{lg.style}}">
+            <span style="width: 10px; height: 10px; border-radius: 3px; background: {{lg.mid}}; flex-shrink: 0"></span>
+            <span style="font-weight: 500; color: {{lg.ink}}">{{lg.name}}</span>
+            <span style="color: {{lg.ink}}; opacity: 0.78">{{lg.unit}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div style="margin-top: 18px; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px">
+      <!-- work area -->
+      <div style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; border: 1px solid #E8EBE5; border-radius: 16px; overflow: hidden; background-color: #FBFBF9; background-image: radial-gradient(circle, #D6DBD2 1px, transparent 1.2px); background-size: 18px 18px">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 10px; background: #FFFFFF; border-bottom: 1px solid #E8EBE5">
+          <div style="display: flex; gap: 4px">
+            <sc-for list="{{tools}}" as="tl" hint-placeholder-count="3">
+              <button type="button" aria-pressed="{{tl.on}}" onClick="{{tl.pick}}" style="{{tl.style}}">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg>
+                {{tl.label}}
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{hasMode}}" hint-placeholder-val="{{false}}">
+            <span style="font-size: 13px; color: #3B4540">{{modeText}}</span>
+            <button type="button" onClick="{{cancelMode}}" style="height: 32px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: #626C66; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Cancel</button>
+          </sc-if>
+          <div style="margin-left: auto; display: flex; align-items: center; gap: 4px">
+            <button type="button" aria-label="Smaller" disabled="{{zoomOutOff}}" onClick="{{zoomOut}}" style="width: 32px; height: 32px; padding: 0; border: 1px solid #DADED6; border-radius: 8px; background: #FFFFFF; color: #121815; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; opacity: {{zoomOutOp}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round"><path d="{{ic.minus}}"></path></svg></button>
+            <button type="button" aria-label="Bigger" disabled="{{zoomInOff}}" onClick="{{zoomIn}}" style="width: 32px; height: 32px; padding: 0; border: 1px solid #DADED6; border-radius: 8px; background: #FFFFFF; color: #121815; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; opacity: {{zoomInOp}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg></button>
+            <button type="button" onClick="{{zoomFit}}" style="height: 32px; padding: 0 10px; border: 1px solid #DADED6; border-radius: 8px; background: #FFFFFF; color: #121815; font: inherit; font-size: 12.5px; font-weight: 500; cursor: pointer">Fit</button>
+          </div>
+        </div>
+
+        <div style="overflow: auto; padding: 18px; min-height: 360px; box-sizing: border-box">
+          <sc-if value="{{noZones}}" hint-placeholder-val="{{false}}">
+            <button type="button" onClick="{{addZone}}" style="width: 100%; height: 300px; box-sizing: border-box; border: 1.5px dashed #AEB6AD; border-radius: 18px; background: rgba(255,255,255,0.7); color: #121815; font: inherit; font-size: 15px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg>
+              Zone
+            </button>
+          </sc-if>
+          <div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 18px">
+            <sc-for list="{{zones}}" as="z" hint-placeholder-count="2">
+              <div style="{{z.style}}">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px">
+                  <button type="button" aria-label="{{z.aria}}" onClick="{{z.pick}}" style="display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 8px; margin-left: -8px; border: 0; border-radius: 8px; background: transparent; font: inherit; color: #121815; cursor: pointer">
+                    <span style="font-size: 14px; font-weight: 600">{{z.name}}</span>
+                    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11.5px; color: #626C66">{{z.code}}</span>
+                  </button>
+                  <span style="margin-left: auto; font-size: 12px; color: #626C66; white-space: nowrap">{{z.meta}}</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 10px">
+                  <sc-for list="{{z.sections}}" as="sc" hint-placeholder-count="3">
+                    <div onDragOver="{{sc.over}}" onDrop="{{sc.drop}}" style="{{sc.style}}">
+                      <button type="button" aria-label="{{sc.aria}}" onClick="{{sc.pick}}" style="display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 6px; margin: -2px 0 6px -6px; border: 0; border-radius: 7px; background: transparent; font: inherit; color: #3B4540; cursor: pointer">
+                        <span style="font-size: 12.5px; font-weight: 600">{{sc.name}}</span>
+                        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; color: #626C66; background: #F0F2EE; border-radius: 5px; padding: 0 5px; line-height: 18px">{{sc.code}}</span>
+                      </button>
+                      <sc-if value="{{sc.dropHint}}" hint-placeholder-val="{{false}}"><span style="margin-left: 6px; font-size: 12px; font-weight: 500; color: #121815">Drop here</span></sc-if>
+                      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                        <sc-for list="{{sc.rooms}}" as="r" hint-placeholder-count="3">
+                          <button type="button" draggable="true" onDragStart="{{r.dragStart}}" onDragEnd="{{r.dragEnd}}" aria-label="{{r.aria}}" onClick="{{r.pick}}" onDoubleClick="{{r.open}}" style="{{r.style}}">
+                            <span style="display: block; min-width: 0; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span>
+                            <span style="display: flex; align-items: center; gap: 6px; min-height: 22px">
+                              <span style="flex: 1; min-width: 0; font-size: 12px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.summary}}</span>
+                              <sc-if value="{{r.gm}}" hint-placeholder-val="{{false}}"><span title="The General Manager has a question about this room" style="width: 22px; height: 22px; flex-shrink: 0; border-radius: 6px; background: #151B17; color: #C5F06A; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">GM</span></sc-if>
+                              <sc-if value="{{r.hasTag}}" hint-placeholder-val="{{false}}"><span style="flex-shrink: 0; height: 19px; padding: 0 7px; border-radius: 999px; background: #F0F2EE; color: #3B4540; font-size: 11.5px; font-weight: 500; display: inline-flex; align-items: center">{{r.tag}}</span></sc-if>
+                            </span>
+                            <span style="display: flex; flex-direction: column; justify-content: flex-end; height: {{r.miniH}}; margin-top: 6px">
+                              <sc-if value="{{r.empty}}" hint-placeholder-val="{{false}}">
+                                <span style="height: 100%; box-sizing: border-box; border: 1px dashed #CDD3CA; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #626C66">No pens yet</span>
+                              </sc-if>
+                              <span style="{{r.mini.style}}">
+                                <sc-for list="{{r.mini.lanes}}" as="ml" hint-placeholder-count="2">
+                                  <span style="{{ml.style}}"><sc-for list="{{ml.cells}}" as="mc" hint-placeholder-count="12"><span style="{{mc.style}}"></span></sc-for></span>
+                                </sc-for>
+                                <sc-for list="{{r.mini.ends}}" as="me" hint-placeholder-count="0"><span style="{{me.style}}"></span></sc-for>
+                              </span>
+                            </span>
+                          </button>
+                        </sc-for>
+                        <button type="button" aria-label="{{sc.addLabel}}" onClick="{{sc.addRoom}}" style="{{sc.addStyle}}">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg>
+                          {{sc.addText}}
+                        </button>
+                      </div>
+                    </div>
+                  </sc-for>
+                  <button type="button" aria-label="{{z.addLabel}}" onClick="{{z.addSection}}" style="{{z.addStyle}}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg>
+                    {{z.addText}}
+                  </button>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{zoneTarget}}" hint-placeholder-val="{{false}}">
+              <button type="button" onClick="{{addZone}}" style="width: 260px; height: 200px; box-sizing: border-box; border: 1.5px dashed #121815; border-radius: 18px; background: #F5FAF2; color: #121815; font: inherit; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg>
+                Put zone here
+              </button>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+
+      <!-- inspector -->
+      <sc-if value="{{hasZones}}" hint-placeholder-val="{{true}}">
+        <div style="flex: 1 1 300px; min-width: 0; box-sizing: border-box; border: 1px solid #E8EBE5; border-radius: 16px; padding: 16px 18px 18px; background: #FFFFFF">
+          <div style="font-size: 12px; font-weight: 500; color: #626C66">{{ins.kicker}}</div>
+          <div style="margin-top: 2px; font-size: 15px; font-weight: 600">{{ins.title}}</div>
+
+          <sc-if value="{{ins.isFarm}}" hint-placeholder-val="{{true}}">
+            <div style="margin-top: 12px; display: flex; flex-direction: column">
+              <sc-for list="{{ins.rows}}" as="ir" hint-placeholder-count="6">
+                <div style="display: flex; align-items: baseline; gap: 12px; padding: 7px 0; border-top: 1px solid #EFF1EC; font-size: 13.5px">
+                  <span style="flex: 1; color: #3B4540">{{ir.label}}</span>
+                  <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 500; color: #121815">{{ir.value}}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ins.hasName}}" hint-placeholder-val="{{false}}">
+            <label style="margin-top: 14px; display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 500; color: #626C66">Name
+              <input value="{{ins.name}}" onInput="{{ins.rename}}" style="height: 40px; box-sizing: border-box; padding: 0 12px; border: 1px solid #E2E5DF; border-radius: 11px; background: #FFFFFF; font: inherit; font-size: 14px; color: #121815">
+            </label>
+          </sc-if>
+          <sc-if value="{{ins.isSection}}" hint-placeholder-val="{{false}}">
+            <label style="margin-top: 12px; display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 500; color: #626C66">Short code
+              <input value="{{ins.code}}" onInput="{{ins.onCode}}" maxlength="3" style="width: 96px; height: 40px; box-sizing: border-box; padding: 0 12px; border: 1px solid #E2E5DF; border-radius: 11px; background: #FFFFFF; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 0.04em; color: #121815; text-transform: uppercase">
+            </label>
+            <div style="margin-top: 12px; font-size: 12px; font-weight: 500; color: #626C66">Photo</div>
+            <sc-if value="{{ins.noPhoto}}" hint-placeholder-val="{{true}}">
+              <label onDragOver="{{ins.photoOver}}" onDrop="{{ins.photoDrop}}" style="margin-top: 5px; height: 96px; box-sizing: border-box; border: 1.5px dashed #C9CFC6; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 13px; color: #3B4540; cursor: pointer; background: #FBFBF9">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: #3B4540; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.upload}}"></path></svg>
+                <span>Drop a photo or click to choose</span>
+                <input type="file" accept="image/*" onChange="{{ins.photoPick}}" style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none">
+              </label>
+            </sc-if>
+            <sc-if value="{{ins.hasPhoto}}" hint-placeholder-val="{{false}}">
+              <div style="margin-top: 5px; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid #E8EBE5; border-radius: 12px">
+                <span style="width: 40px; height: 40px; border-radius: 8px; background: #F0F2EE; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.image}}"></path></svg></span>
+                <span style="flex: 1; min-width: 0; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ins.photo}}</span>
+                <button type="button" onClick="{{ins.photoRemove}}" style="height: 32px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; color: #626C66; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Remove</button>
+              </div>
+            </sc-if>
+            <div style="margin-top: 6px; font-size: 12px; color: #626C66">A photo helps the General Manager count pens</div>
+          </sc-if>
+
+          <sc-if value="{{ins.hasFacts}}" hint-placeholder-val="{{false}}">
+            <div style="margin-top: 14px; display: flex; flex-direction: column">
+              <sc-for list="{{ins.facts}}" as="fc" hint-placeholder-count="3">
+                <div style="display: flex; align-items: baseline; gap: 12px; padding: 7px 0; border-top: 1px solid #EFF1EC; font-size: 13.5px">
+                  <span style="flex: 0 0 auto; color: #626C66">{{fc.label}}</span>
+                  <span style="flex: 1; text-align: right; color: #121815; {{fc.style}}">{{fc.value}}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ins.isRoom}}" hint-placeholder-val="{{false}}">
+            <label style="margin-top: 12px; display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 500; color: #626C66">Move to
+              <select onChange="{{ins.move}}" style="height: 40px; box-sizing: border-box; padding: 0 10px; border: 1px solid #E2E5DF; border-radius: 11px; background: #FFFFFF; font: inherit; font-size: 14px; color: #121815; cursor: pointer">
+                <sc-for list="{{ins.moveOpts}}" as="mo" hint-placeholder-count="4"><option value="{{mo.value}}" selected="{{mo.selected}}">{{mo.label}}</option></sc-for>
+              </select>
+            </label>
+            <button type="button" onClick="{{ins.open}}" style="margin-top: 16px; width: 100%; height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer">
+              Open room
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #FFFFFF; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg>
+            </button>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- ============ ROOM CANVAS ============ -->
+  <sc-if value="{{isRoom}}" hint-placeholder-val="{{false}}">
+    <button type="button" onClick="{{back}}" style="display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 8px 0 4px; margin-left: -6px; border: 0; border-radius: 8px; background: transparent; color: #3B4540; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevL}}"></path></svg>
+      Farm layout
+    </button>
+    <h1 style="margin: 6px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{rm.name}}</h1>
+    <div style="margin-top: 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0; font-size: 13px; color: #626C66">
+      <span>{{rm.where}}</span>
+      <span aria-hidden="true" style="color: #B7BEB6; padding: 0 7px">&#183;</span>
+      <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">{{rm.code}}</span>
+      <sc-if value="{{rm.hasPigs}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="color: #B7BEB6; padding: 0 7px">&#183;</span><span>{{rm.pigs}}</span></sc-if>
+      <sc-if value="{{rm.hasTag}}" hint-placeholder-val="{{false}}"><span style="margin-left: 10px; height: 21px; padding: 0 8px; border-radius: 999px; background: #F0F2EE; color: #3B4540; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center">{{rm.tag}}</span></sc-if>
+      <sc-if value="{{rm.gmMeta}}" hint-placeholder-val="{{false}}"><span title="The General Manager has a question about this room" style="margin-left: 10px; width: 22px; height: 22px; border-radius: 6px; background: #151B17; color: #C5F06A; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">GM</span></sc-if>
+    </div>
+
+    <div style="margin-top: 18px; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px">
+      <!-- palette -->
+      <div style="flex: 1 1 236px; min-width: 0; max-width: 100%">
+        <div style="font-size: 12px; font-weight: 500; color: #626C66; margin-bottom: 8px">Draw with</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px">
+          <sc-for list="{{pal}}" as="pl" hint-placeholder-count="8">
+            <button type="button" aria-pressed="{{pl.on}}" onClick="{{pl.pick}}" style="{{pl.style}}">
+              <sc-if value="{{pl.hasSwatch}}" hint-placeholder-val="{{true}}"><span style="width: 14px; height: 14px; border-radius: 4px; background: {{pl.mid}}; flex-shrink: 0"></span></sc-if>
+              <sc-if value="{{pl.hasIcon}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{pl.icon}}"></path></svg></sc-if>
+              <span style="flex: 1; text-align: left; font-weight: 500; white-space: nowrap">{{pl.label}}</span>
+              <span style="color: {{pl.subInk}}; font-size: 12px; white-space: nowrap">{{pl.sub}}</span>
+            </button>
+          </sc-for>
+          <sc-if value="{{formClosed}}" hint-placeholder-val="{{true}}">
+            <button type="button" onClick="{{openForm}}" style="display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 12px 0 10px; border: 1px dashed #AEB6AD; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg>
+              New pen type
+            </button>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{form.open}}" hint-placeholder-val="{{false}}">
+          <div style="margin-top: 10px; background: #F6F7F4; border-radius: 14px; padding: 12px 14px 14px">
+            <div style="font-size: 13.5px; font-weight: 600">New pen type</div>
+            <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end">
+              <label style="flex: 1 1 160px; min-width: 0; display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 500; color: #626C66">Name
+                <input value="{{form.name}}" onInput="{{form.onName}}" placeholder="For example: Gestation stall" style="height: 40px; box-sizing: border-box; padding: 0 12px; border: 1px solid #E2E5DF; border-radius: 11px; background: #FFFFFF; font: inherit; font-size: 14px; color: #121815">
+              </label>
+              <div style="display: flex; flex-direction: column; gap: 5px">
+                <span id="per-label" style="font-size: 12px; font-weight: 500; color: #626C66">Pigs per pen</span>
+                <span style="display: inline-flex; align-items: center; height: 40px; box-sizing: border-box; border: 1px solid #E2E5DF; border-radius: 11px; background: #FFFFFF; overflow: hidden">
+                  <button type="button" aria-label="One pig fewer per pen" onClick="{{form.dec}}" style="width: 36px; height: 38px; border: 0; background: transparent; color: #121815; display: inline-flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round"><path d="{{ic.minus}}"></path></svg></button>
+                  <input aria-labelledby="per-label" inputmode="numeric" value="{{form.per}}" onInput="{{form.onPer}}" style="width: 36px; height: 38px; border: 0; padding: 0; text-align: center; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; color: #121815; background: transparent">
+                  <button type="button" aria-label="One pig more per pen" onClick="{{form.inc}}" style="width: 36px; height: 38px; border: 0; background: transparent; color: #121815; display: inline-flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg></button>
+                </span>
+              </div>
+              <label style="flex: 1 1 120px; display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 500; color: #626C66">Used for
+                <select onChange="{{form.onUse}}" style="height: 40px; box-sizing: border-box; padding: 0 10px; border: 1px solid #E2E5DF; border-radius: 11px; background: #FFFFFF; font: inherit; font-size: 14px; color: #121815; cursor: pointer">
+                  <sc-for list="{{form.uses}}" as="u" hint-placeholder-count="8"><option value="{{u.value}}" selected="{{u.selected}}">{{u.value}}</option></sc-for>
+                </select>
+              </label>
+            </div>
+            <div style="margin-top: 12px; display: flex; gap: 8px; align-items: center">
+              <button type="button" disabled="{{form.addOff}}" onClick="{{form.add}}" style="{{form.addStyle}}">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: {{form.checkInk}}; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+                Add pen type
+              </button>
+              <button type="button" onClick="{{form.cancel}}" style="height: 36px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: #626C66; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer">Cancel</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{mg.show}}" hint-placeholder-val="{{false}}">
+          <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #E8EBE5">
+            <div style="font-size: 13px; color: {{mg.ink}}">{{mg.text}}</div>
+            <button type="button" disabled="{{mg.off}}" onClick="{{mg.merge}}" style="{{mg.style}}">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: {{mg.checkInk}}; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+              Merge into one pen
+            </button>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- floor -->
+      <div style="flex: 999 1 520px; min-width: 0">
+        <div style="overflow-x: auto; padding: 22px 30px 24px; margin: -22px -8px 0; user-select: none; -webkit-user-select: none">
+          <div style="display: flex; justify-content: center; min-width: min-content">
+            <div style="{{dr.roomStyle}}">
+              <div style="{{dr.gridStyle}}">
+                <sc-for list="{{dr.items}}" as="it" hint-placeholder-count="20">
+                  <sc-if value="{{it.isBand}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="{{it.style}}"></span></sc-if>
+                  <sc-if value="{{it.isCell}}" hint-placeholder-val="{{true}}"><button type="button" aria-label="{{it.aria}}" onPointerDown="{{it.down}}" onPointerEnter="{{it.enter}}" onClick="{{it.click}}" style="{{it.style}}">{{it.code}}</button></sc-if>
+                  <sc-if value="{{it.isFree}}" hint-placeholder-val="{{false}}"><button type="button" aria-label="{{it.aria}}" onPointerDown="{{it.down}}" onPointerEnter="{{it.enter}}" onClick="{{it.click}}" style="{{it.style}}"></button></sc-if>
+                  <sc-if value="{{it.isGap}}" hint-placeholder-val="{{false}}"><button type="button" aria-label="{{it.aria}}" onPointerDown="{{it.down}}" onPointerEnter="{{it.enter}}" onClick="{{it.click}}" style="{{it.style}}">{{it.text}}</button></sc-if>
+                  <sc-if value="{{it.isHead}}" hint-placeholder-val="{{false}}">
+                    <button type="button" aria-label="{{it.aria}}" aria-pressed="{{it.on}}" onClick="{{it.pick}}" style="{{it.style}}">
+                      <span style="font-size: 13.5px; font-weight: 700">{{it.letter}}</span>
+                      <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11.5px; font-weight: 500; color: {{it.countInk}}">{{it.count}}</span>
+                    </button>
+                  </sc-if>
+                  <sc-if value="{{it.isCtrl}}" hint-placeholder-val="{{false}}">
+                    <span style="{{it.style}}">
+                      <button type="button" aria-label="{{it.decLabel}}" onClick="{{it.dec}}" style="width: 32px; height: 32px; padding: 0; border: 1px solid #DADED6; border-radius: 8px; background: #FFFFFF; color: #121815; display: inline-flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round"><path d="{{ic.minus}}"></path></svg></button>
+                      <button type="button" aria-label="{{it.incLabel}}" onClick="{{it.inc}}" style="width: 32px; height: 32px; padding: 0; border: 1px solid #DADED6; border-radius: 8px; background: #FFFFFF; color: #121815; display: inline-flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg></button>
+                    </span>
+                  </sc-if>
+                  <sc-if value="{{it.isHint}}" hint-placeholder-val="{{false}}">
+                    <span style="{{it.style}}">
+                      <span style="display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 999px; background: #121815; color: #FFFFFF; font-size: 12.5px; font-weight: 500; white-space: nowrap; box-shadow: 0 12px 32px rgba(18,24,21,0.12)">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{it.arrow}}"></path></svg>
+                        {{it.text}}
+                      </span>
+                    </span>
+                  </sc-if>
+                </sc-for>
+              </div>
+              <span style="{{dr.doorStyle}}">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; flex-shrink: 0; fill: none; stroke: #121815; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{dr.arrow}}"></path></svg>
+                <span>Door</span>
+              </span>
+              <sc-if value="{{dr.gm}}" hint-placeholder-val="{{false}}">
+                <span title="The General Manager is asking where the door is" style="{{dr.gmStyle}}">GM</span>
+              </sc-if>
+              <sc-for list="{{dr.ghosts}}" as="g" hint-placeholder-count="3">
+                <button type="button" aria-label="{{g.aria}}" onClick="{{g.pick}}" style="{{g.style}}">Door here</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 6px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 0; font-size: 13px; color: #626C66">
+          <sc-for list="{{roomSum}}" as="rs" hint-placeholder-count="4"><span style="white-space: nowrap"><sc-if value="{{rs.sep}}" hint-placeholder-val="{{true}}"><span aria-hidden="true" style="color: #B7BEB6; padding: 0 7px">&#183;</span></sc-if>{{rs.label}} <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 500; color: #121815">{{rs.value}}</span></span></sc-for>
+        </div>
+        <sc-if value="{{rm.hasLanes}}" hint-placeholder-val="{{true}}">
+          <div style="margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; font-size: 13.5px; color: #3B4540">
+            <span>Lane A is on the</span>
+            <span style="display: inline-flex; padding: 3px; background: #F0F2EE; border-radius: 11px">
+              <sc-for list="{{sideOpts}}" as="so" hint-placeholder-count="2">
+                <button type="button" aria-pressed="{{so.on}}" onClick="{{so.pick}}" style="{{so.style}}">{{so.label}}</button>
+              </sc-for>
+            </span>
+            <span style="color: #626C66">as you walk in</span>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- inspector -->
+      <div style="flex: 1 1 300px; min-width: 0; box-sizing: border-box; border: 1px solid #E8EBE5; border-radius: 16px; padding: 16px 18px 18px; background: #FFFFFF">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <div style="flex: 1; min-width: 0">
+            <div style="font-size: 12px; font-weight: 500; color: #626C66">{{ri.kicker}}</div>
+            <div style="margin-top: 2px; font-size: 15px; font-weight: 600">{{ri.title}}</div>
+          </div>
+          <sc-if value="{{ri.canClose}}" hint-placeholder-val="{{false}}">
+            <button type="button" aria-label="Back to the room" onClick="{{ri.close}}" style="width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: #626C66; display: inline-flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round"><path d="{{ic.x}}"></path></svg></button>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{ri.isRoom}}" hint-placeholder-val="{{true}}">
+          <label style="margin-top: 14px; display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 500; color: #626C66">Name
+            <input value="{{ri.name}}" onInput="{{ri.rename}}" style="height: 40px; box-sizing: border-box; padding: 0 12px; border: 1px solid #E2E5DF; border-radius: 11px; background: #FFFFFF; font: inherit; font-size: 14px; color: #121815">
+          </label>
+        </sc-if>
+
+        <sc-if value="{{ri.hasErr}}" hint-placeholder-val="{{false}}">
+          <div style="margin-top: 12px; display: flex; align-items: flex-start; gap: 8px; padding: 8px 12px; border-radius: 10px; background: #FCE7E2; color: #9A2C17; font-size: 13.5px">
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; fill: none; stroke: #9A2C17; stroke-width: 2.2; stroke-linecap: round"><path d="{{ic.alert}}"></path></svg>
+            <span>{{ri.err}}</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ri.isEnd}}" hint-placeholder-val="{{false}}">
+          <div style="margin-top: 14px; font-size: 12px; font-weight: 500; color: #626C66">Across lanes</div>
+          <div style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px">
+            <sc-for list="{{ri.spans}}" as="sp" hint-placeholder-count="2">
+              <button type="button" aria-pressed="{{sp.on}}" aria-label="{{sp.aria}}" onClick="{{sp.pick}}" style="{{sp.style}}">{{sp.label}}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ri.hasChips}}" hint-placeholder-val="{{false}}">
+          <div style="margin-top: 14px; font-size: 12px; font-weight: 500; color: #626C66">Pen type</div>
+          <div style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px">
+            <sc-for list="{{ri.chips}}" as="ch" hint-placeholder-count="6">
+              <button type="button" aria-pressed="{{ch.on}}" onClick="{{ch.pick}}" style="{{ch.style}}">
+                <span style="width: 12px; height: 12px; border-radius: 4px; background: {{ch.mid}}; flex-shrink: 0"></span>
+                <span style="font-weight: 500">{{ch.name}}</span>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ri.noType}}" hint-placeholder-val="{{false}}"><div style="margin-top: 6px; font-size: 13px; color: #7A4A00">Pick a pen type.</div></sc-if>
+        </sc-if>
+
+        <sc-if value="{{ri.hasSteppers}}" hint-placeholder-val="{{false}}">
+          <div style="margin-top: 14px; display: flex; flex-wrap: wrap; gap: 12px 20px">
+            <sc-for list="{{ri.steppers}}" as="st" hint-placeholder-count="2">
+              <div style="display: flex; flex-direction: column; gap: 5px">
+                <span style="font-size: 12px; font-weight: 500; color: #626C66">{{st.label}}</span>
+                <span style="display: inline-flex; align-items: center; height: 40px; box-sizing: border-box; border: 1px solid #E2E5DF; border-radius: 11px; background: #FFFFFF; overflow: hidden; opacity: {{st.opacity}}">
+                  <button type="button" aria-label="{{st.decLabel}}" disabled="{{st.off}}" onClick="{{st.dec}}" style="width: 36px; height: 38px; border: 0; background: transparent; color: #121815; display: inline-flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round"><path d="{{ic.minus}}"></path></svg></button>
+                  <input aria-label="{{st.aria}}" inputmode="numeric" disabled="{{st.off}}" value="{{st.value}}" onInput="{{st.onInput}}" style="width: 44px; height: 38px; border: 0; padding: 0; text-align: center; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; color: #121815; background: transparent">
+                  <button type="button" aria-label="{{st.incLabel}}" disabled="{{st.off}}" onClick="{{st.inc}}" style="width: 36px; height: 38px; border: 0; background: transparent; color: #121815; display: inline-flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg></button>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ri.hasFacts}}" hint-placeholder-val="{{true}}">
+          <div style="margin-top: 14px; display: flex; flex-direction: column">
+            <sc-for list="{{ri.facts}}" as="fc" hint-placeholder-count="3">
+              <div style="display: flex; align-items: baseline; gap: 12px; padding: 7px 0; border-top: 1px solid #EFF1EC; font-size: 13.5px">
+                <span style="flex: 0 0 auto; color: #626C66">{{fc.label}}</span>
+                <span style="flex: 1; text-align: right; color: #121815; {{fc.style}}">{{fc.value}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ri.hasActions}}" hint-placeholder-val="{{false}}">
+          <div style="margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px">
+            <sc-for list="{{ri.actions}}" as="ac" hint-placeholder-count="2">
+              <button type="button" disabled="{{ac.off}}" onClick="{{ac.fn}}" style="{{ac.style}}">{{ac.label}}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+
+<!-- save bar -->
+<sc-if value="{{hasBar}}" hint-placeholder-val="{{false}}">
+  <div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5; z-index: 5">
+    <div style="{{barStyle}}">
+      <div style="flex: 1 1 220px; min-width: 0; font-size: 13.5px; color: #3B4540">
+        <sc-for list="{{barBits}}" as="bb" hint-placeholder-count="2"><sc-if value="{{bb.sep}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="color: #B7BEB6; padding: 0 6px">&#183;</span></sc-if><span style="{{bb.style}}">{{bb.text}}</span></sc-for>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <button type="button" onClick="{{discard}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer">Discard</button>
+        <button type="button" disabled="{{saveOff}}" onClick="{{save}}" style="{{saveStyle}}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: {{checkInk}}; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+          {{saveLabel}}
+        </button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["saved","intro","start","canvas","draft","pens","room","paint","merge","sickroom","ready","edit","blocked","roomnew","empty","structure","filling","pentypes","complete","record"],"default":"saved"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      check: 'M20 6 9 17l-5-5',
+      plus: 'M12 5v14 M5 12h14',
+      minus: 'M5 12h14',
+      x: 'M18 6 6 18 M6 6l12 12',
+      chevR: 'M9 6l6 6-6 6',
+      chevL: 'M15 6l-6 6 6 6',
+      up: 'M12 19V5 M6 11l6-6 6 6',
+      down: 'M12 5v14 M6 13l6 6 6-6',
+      left: 'M19 12H5 M11 6l-6 6 6 6',
+      right: 'M5 12h14 M13 6l6 6-6 6',
+      upload: 'M12 15V4 M7 9l5-5 5 5 M5 15v4h14v-4',
+      file: 'M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z M14 3v5h5',
+      image: 'M4 5h16v14H4z M4 16l5-5 4 4 3-3 4 4 M15.5 9.5v.01',
+      alert: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M12 8v5 M12 16.5v.01',
+      cursor: 'M6 3l12 9-5.5 1.2L15 20l-2.6 1.2-2.6-6.6L6 18z',
+      eraser: 'M4 15.5 13.5 6l5 5L9 20.5H6.5z M13 21h7 M9 10.5l5 5',
+      merge: 'M4 4h6v6H4z M14 4h6v6h-6z M4 14h16v6H4z'
+    };
+  }
+  clone(o) { return JSON.parse(JSON.stringify(o)); }
+  letter(i) { return String.fromCharCode(65 + i); }
+  fmt(n) { return Number(n).toLocaleString('en-US'); }
+  plural(n, one, many) { return this.fmt(n) + ' ' + (n === 1 ? one : many); }
+
+  // muted pen-type colours: sage, slate, amber, blue, lilac, rose
+  colors() {
+    return [
+      { fill: '#E1EBD9', mid: '#9DBB8C', line: '#C3D5B7', ink: '#2C4A27' },
+      { fill: '#E1E6EC', mid: '#97A6B8', line: '#C6CFD9', ink: '#2F3D4C' },
+      { fill: '#F6E6C6', mid: '#DDB262', line: '#E8CD98', ink: '#664510' },
+      { fill: '#DAE8F5', mid: '#87AFD9', line: '#B7CFE8', ink: '#21466A' },
+      { fill: '#E9E2F4', mid: '#AE9BD6', line: '#D2C6E7', ink: '#46336B' },
+      { fill: '#F5E0E0', mid: '#D79595', line: '#E7C2C2', ink: '#7A2C2C' }
+    ];
+  }
+  none() { return { fill: '#F6F7F4', mid: '#CDD3CA', line: '#CDD3CA', ink: '#626C66' }; }
+  uses() { return ['Gestation', 'Farrowing', 'Nursery', 'Finishing', 'Quarantine', 'Boars', 'Sick', 'Other']; }
+  unitsFor(use) {
+    return ({ Gestation: ['sow', 'sows'], Farrowing: ['sow + litter', 'sows + litters'], Quarantine: ['gilt', 'gilts'], Boars: ['boar', 'boars'] })[use] || ['pig', 'pigs'];
+  }
+  kit() {
+    return [
+      { id: 'gest', name: 'Gestation stall', per: 1, use: 'Gestation', u1: 'sow', uN: 'sows', s1: 'stall', s2: 'stalls', c: 0 },
+      { id: 'boar', name: 'Boar pen', per: 1, use: 'Boars', u1: 'boar', uN: 'boars', s1: 'boar pen', s2: 'boar pens', c: 1 },
+      { id: 'crate', name: 'Farrowing crate', per: 1, use: 'Farrowing', u1: 'sow + litter', uN: 'sows + litters', s1: 'crate', s2: 'crates', c: 2 },
+      { id: 'nurs', name: 'Nursery pen', per: 10, use: 'Nursery', u1: 'pig', uN: 'pigs', s1: 'nursery pen', s2: 'nursery pens', c: 3 },
+      { id: 'gilt', name: 'Gilt pen', per: 10, use: 'Quarantine', u1: 'gilt', uN: 'gilts', s1: 'gilt pen', s2: 'gilt pens', c: 4 },
+      { id: 'sick', name: 'Sick pen', per: 2, use: 'Sick', u1: 'sow', uN: 'sows', s1: 'sick pen', s2: 'sick pens', c: 5 }
+    ];
+  }
+  ln(t, n, each) { return { t: t, n: n, each: each == null ? null : each }; }
+  rep(k, t, n) { const a = []; for (let i = 0; i < k; i++) a.push(this.ln(t, n)); return a; }
+  room(id, name, lanes, extra) { return Object.assign({ id: id, name: name, lanes: lanes, ends: [], door: 'bottom', aLeft: true, occ: null }, extra || {}); }
+
+  // Hillside farm. o.lanes: rooms have pens. o.sick: the sick room exists. o.occ: pigs live there (saved farm).
+  farm(o) {
+    const lanes = o.lanes !== false, occ = !!o.occ;
+    const L = (a) => lanes ? a : [];
+    const O = (who, idx, live) => occ ? { occ: { who: who, lanes: idx, live: live || who } } : {};
+    const gest = [
+      this.room('g1', 'Gestation 1', L(this.rep(4, 'gest', 50).concat([this.ln('boar', 6)])), O('148 sows and 4 boars live here', [0, 1, 2, 3, 4])),
+      this.room('g2', 'Gestation 2', L(this.rep(4, 'gest', 50)), O('164 sows live here', [0, 1, 2, 3]))
+    ];
+    if (o.sick) gest.push(this.room('sick', 'Sick room', L([this.ln('sick', 2), this.ln('sick', 2)]), { door: 'top', ends: lanes ? [{ t: 'sick', each: 12, len: 2, lanes: [0, 1] }] : [] }));
+    const far = [1, 2, 3, 4].map((k) => this.room('fr' + k, 'Farrowing Room ' + k, L(this.rep(2, 'crate', 26)), k === 2 ? O("Batch 32's sows", [0, 1], '50 sows of Batch 32 live here') : {}));
+    const nur = [
+      this.room('n1', 'Nursery 1', L(this.rep(2, 'nurs', 26)), O("Batch 30's pigs", [0, 1], '470 pigs of Batch 30 live here')),
+      this.room('n2', 'Nursery 2', L(this.rep(2, 'nurs', 26)), O("Batch 31's pigs", [0, 1], '488 pigs of Batch 31 live here'))
+    ];
+    return {
+      types: lanes ? this.kit() : [],
+      zones: [
+        { id: 'z1', name: 'Production Zone 1', sections: [
+          { id: 's-gest', name: 'Gestation', code: 'GES', rooms: gest },
+          { id: 's-far', name: 'Farrowing', code: 'FAR', rooms: far },
+          { id: 's-nur', name: 'Nursery', code: 'NUR', rooms: nur }
+        ] },
+        { id: 'z2', name: 'Isolation Zone', sections: [
+          { id: 's-q', name: 'Quarantine', code: 'QUA', rooms: [this.room('q1', 'Quarantine 1', L([this.ln('gilt', 6)]))] }
+        ] }
+      ]
+    };
+  }
+  blank() { return { zones: [], types: [] }; }
+  closedForm() { return { open: false, name: '', per: 1, use: 'Other' }; }
+
+  defaults(start) {
+    const base = { startSeen: start, view: 'map', roomId: '', farm: this.blank(), base: this.blank(), draft: false, src: 'plan', gm: [], strip: false, prev: null, blocked: null, seq: 100, lvl: 'room', hl: '', form: this.closedForm(), pick: null, mode: '', zoom: 1, dragId: '', rsel: null, tool: 'select', box: null, hint: false };
+    const D = (f, extra) => Object.assign(base, { farm: f, base: this.clone(f), draft: true }, extra || {});
+    const S = (f, extra) => Object.assign(base, { farm: f, base: this.farm({ sick: true, occ: true }) }, extra || {});
+    const saved = () => this.farm({ sick: true, occ: true });
+    if (start === 'intro') return Object.assign(base, { view: 'intro' });
+    if (start === 'start') return Object.assign(base, { draft: true, src: 'hand' });
+    if (start === 'draft') return D(this.farm({ lanes: false }));
+    if (start === 'pens') return D(this.farm({ sick: true }), { gm: ['fr4', 'sick'] });
+    if (start === 'ready') return D(this.farm({ sick: true }));
+    if (start === 'sickroom') return D(this.farm({ sick: true }), { gm: ['fr4', 'sick'], view: 'room', roomId: 'sick', rsel: { kind: 'end', j: 0 } });
+    if (start === 'canvas') return S(saved(), { pick: { kind: 'section', id: 's-far' } });
+    if (start === 'room') return S(saved(), { view: 'room', roomId: 'g1', rsel: { kind: 'lane', i: 0 } });
+    if (start === 'paint') {
+      const f = saved();
+      f.zones[0].sections[0].rooms.push(this.room('g3', 'Gestation 3', [this.ln('gest', 6)], { door: 'top' }));
+      return S(f, { view: 'room', roomId: 'g3', tool: 'gest', hint: true });
+    }
+    if (start === 'merge') return S(saved(), { view: 'room', roomId: 'n1', tool: 'merge', box: { c0: 0, c1: 1, p0: 10, p1: 11 } });
+    if (start === 'edit') {
+      const f = saved();
+      this.findRoom(f, 'g2').room.lanes.push(this.ln('gest', 4));
+      return S(f, { view: 'room', roomId: 'g2', rsel: { kind: 'lane', i: 4 } });
+    }
+    if (start === 'blocked') return S(saved(), { view: 'room', roomId: 'fr2', rsel: { kind: 'lane', i: 1 }, blocked: { room: 'fr2', i: 1 } });
+    return S(saved());
+  }
+
+  findRoom(f, id) {
+    for (const z of f.zones) for (const s of z.sections) for (const r of s.rooms) if (r.id === id) return { room: r, section: s, zone: z };
+    return null;
+  }
+  typeOf(f, id) { return f.types.find((t) => t.id === id) || null; }
+  colorOf(f, id) { const t = this.typeOf(f, id); return t ? this.colors()[t.c % 6] : this.none(); }
+  per(f, l) { if (l.each != null) return l.each; const t = this.typeOf(f, l.t); return t ? t.per : 0; }
+  places(f, r) { return r.lanes.reduce((a, l) => a + Math.max(0, l.n || 0) * this.per(f, l), 0) + (r.ends || []).reduce((a, e) => a + this.per(f, e), 0); }
+  pensOf(r) { return r.lanes.filter((l) => (l.n || 0) > 0).map((l) => ({ t: l.t, n: l.n, each: l.each })).concat((r.ends || []).map((e) => ({ t: e.t, n: 1, each: e.each }))); }
+  unit(t, n) { return this.fmt(n) + ' ' + (n === 1 ? t.u1 : t.uN); }
+  summary(f, r) {
+    const order = [], count = {};
+    this.pensOf(r).forEach((l) => { const k = l.t || '?'; if (!(k in count)) { order.push(k); count[k] = 0; } count[k] += l.n; });
+    return order.map((k) => { const t = this.typeOf(f, k); const n = count[k]; return t ? this.plural(n, t.s1, t.s2) : this.plural(n, 'pen', 'pens') + ' without a type'; }).join(' · ');
+  }
+  usedFor(f, r) {
+    const out = [];
+    this.pensOf(r).forEach((l) => { const t = this.typeOf(f, l.t); if (t && out.indexOf(t.use) < 0) out.push(t.use); });
+    return out.join(' · ') || 'Nothing yet';
+  }
+  secCode(sc) { return String(sc.code || String(sc.name || '').replace(/[^A-Za-z]/g, '').slice(0, 3)).toUpperCase() || '—'; }
+  roomCode(f, id) {
+    let out = '';
+    f.zones.forEach((z, zi) => z.sections.forEach((sc) => sc.rooms.forEach((r, ri) => {
+      if (r.id !== id) return;
+      const m = /(\d+)$/.exec(r.name);
+      out = 'Z' + (zi + 1) + '-' + this.secCode(sc) + '-' + (m ? m[1] : ri + 1);
+    })));
+    return out;
+  }
+
+  // the block's mini pen map: one row per lane, pen 1 on the left; merged pens as wide cells at the far right
+  mini(f, r, hl) {
+    const idx = [];
+    r.lanes.forEach((l, i) => { if ((l.n || 0) > 0) idx.push(i); });
+    const L = idx.length;
+    if (!L) return { style: 'display: none', lanes: [], ends: [] };
+    const units = idx.map((i) => r.lanes[i].n * ((r.lanes[i].each != null && r.lanes[i].each >= 6) ? 2 : 1));
+    const maxU = Math.max(1, ...units);
+    const g = maxU > 24 ? 1 : 2;
+    const h = L <= 2 ? 9 : L === 3 ? 7 : L <= 5 ? 4 : 3;
+    const rowOf = (i) => idx.indexOf(i);
+    const ends = (r.ends || []).filter((e) => e.lanes.some((i) => rowOf(i) >= 0));
+    const eU = Math.max(2, Math.ceil(maxU * 0.12));
+    return {
+      style: 'display: grid; grid-template-columns: ' + [maxU + 'fr'].concat(ends.map(() => eU + 'fr')).join(' ') + '; grid-template-rows: repeat(' + L + ', ' + h + 'px); column-gap: 3px; row-gap: 2px',
+      lanes: idx.map((i, row) => {
+        const l = r.lanes[i];
+        const c = this.colorOf(f, l.t);
+        const span = (l.each != null && l.each >= 6) ? 2 : 1;
+        const dim = hl && l.t !== hl;
+        const w = span === 1 ? 'calc((100% - ' + ((maxU - 1) * g) + 'px) / ' + maxU + ')' : 'calc((100% - ' + ((maxU - 1) * g) + 'px) / ' + maxU + ' * 2 + ' + g + 'px)';
+        const cells = [];
+        for (let k = 0; k < Math.min(l.n, 120); k++) cells.push({ style: 'display: block; flex: 0 0 auto; width: ' + w + '; height: 100%; border-radius: ' + (maxU > 24 ? 1 : 2) + 'px; background: ' + c.mid + '; opacity: ' + (dim ? 0.18 : 1) });
+        return { style: 'grid-column: 1; grid-row: ' + (row + 1) + '; display: flex; gap: ' + g + 'px; height: 100%', cells: cells };
+      }),
+      ends: ends.map((e, j) => {
+        const rows = e.lanes.map(rowOf).filter((x) => x >= 0);
+        const c = this.colorOf(f, e.t);
+        return { style: 'display: block; grid-column: ' + (j + 2) + '; grid-row: ' + (Math.min(...rows) + 1) + ' / ' + (Math.max(...rows) + 2) + '; border-radius: 2px; background: ' + c.mid + '; opacity: ' + (hl && e.t !== hl ? 0.18 : 1) };
+      })
+    };
+  }
+
+  // lane letters: only painted columns get one; empty columns between are aisles
+  letters(r) { const out = []; let n = 0; r.lanes.forEach((l) => out.push((l.n || 0) > 0 ? this.letter(n++) : '')); return { list: out, count: n }; }
+  endCodes(r) {
+    const lt = this.letters(r);
+    let multi = 0;
+    return (r.ends || []).map((e) => {
+      const ls = e.lanes.filter((i) => i < r.lanes.length);
+      if (ls.length === 1 && lt.list[ls[0]]) return lt.list[ls[0]] + ((r.lanes[ls[0]].n || 0) + 1);
+      return this.letter(lt.count + (multi++)) + '1';
+    });
+  }
+
+  // the room floor: a grid you paint pens onto; it re-orients with the door
+  floor(f, r, o) {
+    const vert = r.door === 'top' || r.door === 'bottom';
+    const mono = "font-family: 'Geist Mono', ui-monospace, monospace;";
+    const out = { items: [], ghosts: [] };
+    const cols = r.lanes.map((l) => l).concat([{ t: '', n: 0, virt: true }]);
+    while (cols.length < 4) cols.push({ t: '', n: 0, virt: true });
+    const N = cols.length;
+    const lt = this.letters(r);
+    const codes = this.endCodes(r);
+    const head = vert ? 8 : 5, thr = vert ? 12 : 8;
+    const along = vert ? 32 : 46, gA = vert ? 4 : 6, gC = 10;
+    const cross = vert ? Math.max(48, Math.min(64, Math.floor((470 - (N - 1) * gC) / N))) : 66;
+    const info = cols.map((l, i) => {
+      const n = Math.max(0, l.n || 0);
+      const span = (l.each != null && l.each >= 6) ? 2 : 1;
+      const items = []; let pos = 1;
+      if (n > 0) {
+        if (n * span <= thr) { for (let k = 1; k <= n; k++) { items.push({ k: k, pos: pos, span: span }); pos += span; } }
+        else {
+          for (let k = 1; k <= head; k++) { items.push({ k: k, pos: pos, span: 1 }); pos++; }
+          items.push({ gap: n - head - 2, from: head + 1, to: n - 2, pos: pos, span: 1 }); pos++;
+          items.push({ k: n - 1, pos: pos, span: 1 }); pos++;
+          items.push({ k: n, pos: pos, span: 1 }); pos++;
+        }
+      }
+      const ctrl = n > 0 && o.tool === 'select' ? pos : 0;
+      if (ctrl) pos++;
+      return { l: l, i: i, n: n, items: items, ctrl: ctrl, end: pos, letter: i < r.lanes.length ? lt.list[i] : '', virt: !!l.virt };
+    });
+    const ends = (r.ends || []).map((e, j) => {
+      const ls = e.lanes.filter((i) => i < r.lanes.length);
+      if (!ls.length) return null;
+      const len = Math.max(1, e.len || 1);
+      const pos = Math.max(...ls.map((i) => info[i].end));
+      ls.forEach((i) => { info[i].end = pos + len; });
+      return { e: e, j: j, ls: ls, pos: pos, len: len, code: codes[j] };
+    }).filter((x) => x);
+    const anyPens = r.lanes.some((l) => (l.n || 0) > 0);
+    const R = Math.max(anyPens ? 4 : 8, ...info.map((x) => x.end));
+    const A = R + 1;
+    const reversed = (r.door === 'top' || r.door === 'right') ? r.aLeft : !r.aLeft;
+    const crossOf = (i) => reversed ? N - 1 - i : i;
+    const alongRev = r.door === 'bottom' || r.door === 'right';
+    const place = (c, a, span, cspan) => {
+      const aStart = alongRev ? (A - (a + span - 1)) : (a + 1);
+      const aCss = aStart + ' / span ' + span;
+      const cCss = (c + 1) + ' / span ' + (cspan || 1);
+      return vert ? 'grid-column: ' + cCss + '; grid-row: ' + aCss + ';' : 'grid-row: ' + cCss + '; grid-column: ' + aCss + ';';
+    };
+    const tracks = [];
+    for (let t = 1; t <= A; t++) { const a = alongRev ? A - t : t - 1; tracks.push((a === 0 ? (vert ? 30 : 46) : along) + 'px'); }
+    out.gridStyle = 'display: grid; touch-action: none; ' + (vert
+      ? 'grid-template-columns: repeat(' + N + ', ' + cross + 'px); grid-template-rows: ' + tracks.join(' ') + '; column-gap: ' + gC + 'px; row-gap: ' + gA + 'px'
+      : 'grid-template-rows: repeat(' + N + ', ' + cross + 'px); grid-template-columns: ' + tracks.join(' ') + '; row-gap: ' + gC + 'px; column-gap: ' + gA + 'px');
+    out.roomStyle = 'position: relative; display: inline-block; box-sizing: border-box; border: 2px solid #121815; border-radius: 14px; padding: 30px 40px; background: #FFFFFF';
+
+    const box = o.box;
+    const inBox = (i, p, span) => !!box && i >= Math.min(box.c0, box.c1) && i <= Math.max(box.c0, box.c1) && p + (span || 1) - 1 >= Math.min(box.p0, box.p1) && p <= Math.max(box.p0, box.p1);
+    const boxRing = ' box-shadow: inset 0 0 0 2px #121815; border-color: #121815;';
+    const sel = o.sel || {};
+    const ev = (d) => ({ down: (e) => o.down(d, e), enter: (e) => o.enter(d, e), click: () => o.click(d) });
+    const paintMode = o.tool !== 'select';
+
+    // selected lane band
+    if (sel.kind === 'lane' && info[sel.i] && info[sel.i].n > 0) {
+      const bad = o.blockedLane === sel.i;
+      out.items.push({ isBand: true, style: place(crossOf(sel.i), 0, (info[sel.i].ctrl || (info[sel.i].items.slice(-1)[0].pos + info[sel.i].items.slice(-1)[0].span - 1)) + 1) + ' margin: -6px; border-radius: 12px; background: ' + (bad ? '#FCE7E2' : '#F0F2EE') });
+    }
+    info.forEach((x) => {
+      const c = crossOf(x.i);
+      if (x.n > 0) {
+        const t = this.typeOf(f, x.l.t);
+        const col = this.colorOf(f, x.l.t);
+        const on = sel.kind === 'lane' && sel.i === x.i;
+        out.items.push({
+          isHead: true, letter: x.letter, count: String(x.n), on: on, pick: () => o.selectLane(x.i),
+          aria: 'Lane ' + x.letter + ', ' + x.n + ' pens', countInk: on ? '#C9D1CB' : '#626C66',
+          style: place(c, 0, 1) + ' display: flex; flex-direction: ' + (vert ? 'row' : 'column') + '; align-items: center; justify-content: center; gap: ' + (vert ? '6px' : '0') + '; padding: 0; border: 0; border-radius: 9px; font: inherit; line-height: 1.15; cursor: pointer; ' + (on ? 'background: #121815; color: #FFFFFF' : 'background: transparent; color: #121815')
+        });
+        x.items.forEach((p) => {
+          if (p.gap != null) {
+            const d = { kind: 'gap', i: x.i, p: p.pos, from: p.from, to: p.to };
+            out.items.push(Object.assign({ isGap: true, text: vert ? p.gap + ' more' : p.gap + '\nmore', aria: x.letter + p.from + ' to ' + x.letter + p.to,
+              style: place(c, p.pos, 1) + ' box-sizing: border-box; width: 100%; height: 100%; padding: 0; display: flex; align-items: center; justify-content: center; text-align: center; white-space: pre-line; line-height: 1.1; border: 1px dashed ' + col.line + '; border-radius: 7px; background: transparent; color: ' + col.ink + '; font: inherit; font-size: 11.5px; font-weight: 500; cursor: pointer;' + (inBox(x.i, p.pos) ? boxRing : '') }, ev(d)));
+            return;
+          }
+          const d = { kind: 'pen', i: x.i, p: p.pos, k: p.k };
+          const isSel = sel.kind === 'lane' && sel.i === x.i && sel.k === p.k;
+          const isNew = o.isNew(x.i, p.k);
+          out.items.push(Object.assign({
+            isCell: true, code: x.letter + p.k, aria: 'Pen ' + x.letter + p.k + (t ? ', ' + t.name : ''),
+            style: place(c, p.pos, p.span) + ' box-sizing: border-box; width: 100%; height: 100%; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 7px; cursor: pointer; ' + mono + ' font-size: 11.5px; font-weight: 500; ' +
+              (t ? 'background: ' + col.fill + '; border: 1px solid ' + col.line + '; color: ' + col.ink + ';' : 'background: #FFFFFF; border: 1px dashed #AEB6AD; color: #626C66;') +
+              (isNew ? ' outline: 2px solid #2FA36B; outline-offset: 1px;' : '') + (isSel || inBox(x.i, p.pos, p.span) ? boxRing : '')
+          }, ev(d)));
+        });
+        if (x.ctrl) out.items.push({
+          isCtrl: true, dec: () => o.step(x.i, -1), inc: () => o.step(x.i, 1),
+          decLabel: 'One pen fewer in lane ' + x.letter, incLabel: 'One pen more in lane ' + x.letter,
+          style: place(c, x.ctrl, 1) + ' display: flex; flex-direction: ' + (vert ? 'row' : 'column') + '; align-items: center; justify-content: center; gap: 4px'
+        });
+      }
+      // empty floor after everything in this column
+      for (let p = x.end; p <= R; p++) {
+        const target = x.n + (p - x.end + 1);
+        const d = { kind: 'free', i: x.i, p: p, target: target, virt: x.virt };
+        out.items.push(Object.assign({
+          isFree: true, aria: 'Empty floor' + (paintMode ? ', paint a pen here' : ''),
+          style: place(c, p, 1) + ' box-sizing: border-box; width: 100%; height: 100%; padding: 0; border-radius: 7px; cursor: ' + (paintMode ? 'crosshair' : 'default') + '; background: ' + (paintMode ? 'rgba(255,255,255,0.9)' : 'transparent') + '; border: 1px dashed ' + (paintMode ? '#C2C9BF' : '#E2E5DF') + ';' + (inBox(x.i, p) ? ' box-shadow: inset 0 0 0 2px #121815; background: #F0F2EE;' : '')
+        }, ev(d)));
+      }
+    });
+    ends.forEach((x) => {
+      const cs = x.ls.map(crossOf);
+      const c0 = Math.min(...cs), c1 = Math.max(...cs);
+      const col = this.colorOf(f, x.e.t);
+      const t = this.typeOf(f, x.e.t);
+      const isSel = sel.kind === 'end' && sel.j === x.j;
+      const d = { kind: 'end', i: x.ls[0], j: x.j, p: x.pos, ls: x.ls };
+      out.items.push(Object.assign({
+        isCell: true, code: x.code,
+        aria: 'Pen ' + x.code + (t ? ', ' + t.name : '') + (x.ls.length > 1 ? ', across lanes ' + x.ls.map((i) => lt.list[i] || '').join(' ') : ''),
+        style: place(c0, x.pos, x.len, c1 - c0 + 1) + ' box-sizing: border-box; width: 100%; height: 100%; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; ' + mono + ' font-size: 12.5px; font-weight: 500; ' +
+          (t ? 'background: ' + col.fill + '; border: 1px solid ' + col.line + '; color: ' + col.ink + ';' : 'background: #FFFFFF; border: 1px dashed #AEB6AD; color: #626C66;') + (isSel ? boxRing : '')
+      }, ev(d)));
+    });
+    // pointer hint: where to drag next
+    if (o.hint) {
+      const x = info.filter((y) => y.n > 0 && !y.virt).slice(-1)[0];
+      if (x) {
+        const words = { top: ['down', 'Drag down to add pens'], bottom: ['up', 'Drag up to add pens'], left: ['right', 'Drag right to add pens'], right: ['left', 'Drag left to add pens'] }[r.door];
+        const c = crossOf(x.i);
+        const span = Math.min(3, N - 1);
+        const c0 = reversed ? Math.max(0, c - span) : c + 1;
+        const cspan = reversed ? Math.max(1, c - c0) : Math.max(1, Math.min(span, N - c0));
+        out.items.push({ isHint: true, text: words[1], arrow: this.icons()[words[0]], style: place(c0, x.end, 1, cspan) + ' pointer-events: none; display: flex; align-items: center; justify-content: ' + (reversed ? 'flex-end' : 'flex-start') + '; z-index: 2' });
+      }
+    }
+    // door: a gap in the wall, its jambs, a label and an arrow pointing in
+    const d = r.door;
+    const base = 'position: absolute; box-sizing: border-box; background: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 600; color: #121815; white-space: nowrap; ';
+    const jH = 'border-left: 2px solid #121815; border-right: 2px solid #121815; height: 26px; padding: 0 10px; gap: 4px; ';
+    const jV = 'border-top: 2px solid #121815; border-bottom: 2px solid #121815; width: 48px; height: 66px; flex-direction: column; gap: 2px; ';
+    out.doorStyle = base + ({
+      bottom: jH + 'left: 50%; bottom: -1px; transform: translate(-50%, 50%)',
+      top: jH + 'left: 50%; top: -1px; transform: translate(-50%, -50%)',
+      left: jV + 'top: 50%; left: -1px; transform: translate(-50%, -50%)',
+      right: jV + 'top: 50%; right: -1px; transform: translate(50%, -50%)'
+    })[d];
+    out.arrow = this.icons()[{ bottom: 'up', top: 'down', left: 'right', right: 'left' }[d]];
+    out.gm = !!o.gm;
+    const gmB = 'position: absolute; width: 24px; height: 24px; border-radius: 7px; background: #151B17; color: #C5F06A; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 0 0 3px #FFFFFF; ';
+    out.gmStyle = gmB + ({
+      bottom: 'left: calc(50% + 50px); bottom: -1px; transform: translateY(50%)',
+      top: 'left: calc(50% + 50px); top: -1px; transform: translateY(-50%)',
+      left: 'top: calc(50% + 44px); left: -1px; transform: translateX(-50%)',
+      right: 'top: calc(50% + 44px); right: -1px; transform: translateX(50%)'
+    })[d];
+    const gBase = 'position: absolute; height: 32px; padding: 0 11px; box-sizing: border-box; border: 1px dashed #AEB6AD; border-radius: 999px; background: #FFFFFF; color: #626C66; font: inherit; font-size: 12px; font-weight: 500; white-space: nowrap; cursor: pointer; z-index: 3; ';
+    const gPos = {
+      bottom: 'left: 50%; bottom: -1px; transform: translate(-50%, 50%)',
+      top: 'left: 50%; top: -1px; transform: translate(-50%, -50%)',
+      left: 'top: 50%; left: -1px; transform: translate(-50%, -50%); width: 48px; height: auto; padding: 6px 2px; white-space: normal; line-height: 1.2; border-radius: 12px',
+      right: 'top: 50%; right: -1px; transform: translate(50%, -50%); width: 48px; height: auto; padding: 6px 2px; white-space: normal; line-height: 1.2; border-radius: 12px'
+    };
+    ['top', 'right', 'bottom', 'left'].filter((w) => w !== d).forEach((w) => {
+      out.ghosts.push({ style: gBase + gPos[w], aria: 'Put the door on the ' + w + ' wall', pick: () => o.door(w) });
+    });
+
+    // what a box selection would merge
+    out.merge = { valid: false, count: 0, reason: '' };
+    if (box) {
+      const c0 = Math.min(box.c0, box.c1), c1 = Math.max(box.c0, box.c1), p0 = Math.min(box.p0, box.p1), p1 = Math.max(box.p0, box.p1);
+      let count = 0, bad = '', len = 1, tp = '', each = 0;
+      const colsOut = [];
+      for (let i = c0; i <= c1; i++) {
+        const x = info[i];
+        if (!x || x.virt) continue;
+        if (ends.some((e) => e.ls.indexOf(i) >= 0 && e.pos <= p1 && e.pos + e.len - 1 >= p0)) { bad = 'Part of this is already one pen.'; break; }
+        let ks = [], rows = 0;
+        x.items.forEach((p) => {
+          if (!(p.pos + (p.span || 1) - 1 >= p0 && p.pos <= p1)) return;
+          if (p.gap != null) { for (let k = p.from; k <= p.to; k++) ks.push(k); } else ks.push(p.k);
+          rows++;
+        });
+        let free = 0;
+        for (let p = x.end; p <= R; p++) if (p >= p0 && p <= p1) { free++; rows++; }
+        if (ks.length && Math.max(...ks) !== x.n) { bad = 'Select up to the last pen of each lane.'; break; }
+        if (ks.length && !tp) tp = x.l.t;
+        count += ks.length + free;
+        each += ks.length * this.per(f, x.l) + free * 0;
+        len = Math.max(len, Math.min(3, rows));
+        colsOut.push({ i: i, minK: ks.length ? Math.min(...ks) : null, free: free });
+      }
+      if (!bad && count < 2) bad = 'Select two or more pens or floor squares.';
+      out.merge = { valid: !bad, reason: bad, count: count, cols: colsOut, len: len, t: tp, each: each };
+    }
+    return out;
+  }
+
+  renderVals() {
+    const start = this.props.start || 'saved';
+    const alias = { empty: 'intro', structure: 'draft', filling: 'draft', pentypes: 'pens', complete: 'ready', record: 'saved', created: 'saved', roomnew: 'paint' };
+    const known = ['saved', 'intro', 'start', 'canvas', 'draft', 'pens', 'room', 'paint', 'merge', 'sickroom', 'ready', 'edit', 'blocked'];
+    const eff = known.indexOf(start) >= 0 ? start : (alias[start] || 'saved');
+    const fresh = !this.state || this.state.startSeen !== start;
+    const s = fresh ? this.defaults(eff) : this.state;
+    const set = (p) => this.setState(Object.assign({}, s, { startSeen: start }, p));
+    const live = () => (this.state && this.state.startSeen === start) ? this.state : s;
+    const setLive = (fn) => { const st = live(); const p = fn(st); if (p) this.setState(Object.assign({}, st, { startSeen: start }, p)); };
+    const f = s.farm;
+    const ic = this.icons();
+    const val = (e) => e && e.target ? e.target.value : '';
+    const num = (v) => { const n = parseInt(String(v).replace(/[^0-9]/g, ''), 10); return isNaN(n) ? null : n; };
+    const editFarm = (fn, extra) => { const nf = this.clone(f); fn(nf); set(Object.assign({ farm: nf, strip: false }, extra || {})); };
+    const editRoom = (id, fn, extra) => editFarm((nf) => { const fr = this.findRoom(nf, id); if (fr) fn(fr.room, nf); }, Object.assign({ gm: s.gm.filter((g) => g !== id), blocked: null }, extra || {}));
+    const wide = { colStyle: 'max-width: 1296px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box', barStyle: 'max-width: 1296px; margin: 0 auto; padding: 12px 32px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px' };
+
+    // ---------- counts ----------
+    let nS = 0, nR = 0, total = 0, emptyRooms = 0, untyped = 0;
+    const byUse = {};
+    f.zones.forEach((z) => z.sections.forEach((sc) => { nS++; sc.rooms.forEach((r) => {
+      nR++;
+      if (!this.pensOf(r).length) emptyRooms++;
+      this.pensOf(r).forEach((l) => { const t = this.typeOf(f, l.t); if (!t) { untyped++; return; } const p = l.n * this.per(f, l); total += p; byUse[t.use] = (byUse[t.use] || 0) + p; });
+    }); }));
+    const countParts = nR === 0 ? ['No rooms yet'] : [this.plural(f.zones.length, 'zone', 'zones'), this.plural(nS, 'section', 'sections'), this.plural(nR, 'room', 'rooms')];
+    if (total) countParts.push(this.fmt(total) + ' places');
+    const order = ['Gestation', 'Farrowing', 'Nursery', 'Finishing', 'Quarantine', 'Boars', 'Sick', 'Other'];
+
+    // ---------- changes against the saved (or received) layout ----------
+    const bRooms = {};
+    s.base.zones.forEach((z) => z.sections.forEach((sc) => sc.rooms.forEach((r) => { bRooms[r.id] = { r: r, s: sc.id }; })));
+    let changes = 0;
+    const cRooms = {};
+    const roomChanges = (r, sid) => {
+      const bb = bRooms[r.id];
+      if (!bb) return 1;
+      const b = bb.r;
+      let c = 0;
+      if (bb.s !== sid) c++;
+      if (b.name !== r.name) c++;
+      if (b.door !== r.door) c++;
+      if (b.aLeft !== r.aLeft) c++;
+      for (let i = 0; i < Math.max(b.lanes.length, r.lanes.length); i++) if (JSON.stringify(b.lanes[i] || null) !== JSON.stringify(r.lanes[i] || null)) c++;
+      if (JSON.stringify(b.ends || []) !== JSON.stringify(r.ends || [])) c++;
+      return c;
+    };
+    const roomIds = {};
+    f.zones.forEach((z) => z.sections.forEach((sc) => sc.rooms.forEach((r) => { roomIds[r.id] = 1; const c = roomChanges(r, sc.id); if (c) { cRooms[r.id] = c; changes += c; } })));
+    Object.keys(bRooms).forEach((k) => { if (!roomIds[k]) { changes++; cRooms[k] = 1; } });
+    const bZ = {}, bS = {};
+    s.base.zones.forEach((z) => { bZ[z.id] = z.name; z.sections.forEach((sc) => { bS[sc.id] = JSON.stringify([sc.name, sc.code || '', sc.photo || '']); }); });
+    f.zones.forEach((z) => { if (bZ[z.id] !== z.name) changes++; z.sections.forEach((sc) => { if (bS[sc.id] !== JSON.stringify([sc.name, sc.code || '', sc.photo || ''])) changes++; }); });
+    const bT = {};
+    s.base.types.forEach((t) => { bT[t.id] = 1; });
+    f.types.forEach((t) => { if (!bT[t.id]) changes++; });
+
+    // ---------- farm canvas ----------
+    const W = [128, 152, 184][s.zoom];
+    const miniH = [22, 28, 34][s.zoom] + 'px';
+    const pick = s.pick || null;
+    const isPicked = (kind, id) => !!pick && pick.kind === kind && pick.id === id;
+    const mode = s.mode || '';
+    const nextRoomName = (sec) => {
+      let best = null, max = 0;
+      sec.rooms.forEach((r) => { const m = /^(.*?)(\d+)$/.exec(r.name); if (m) { best = m[1]; max = Math.max(max, +m[2]); } });
+      return best != null ? best + (max + 1) : sec.name + ' 1';
+    };
+    const moveRoom = (rid, sid) => editFarm((nf) => {
+      const fr = this.findRoom(nf, rid);
+      if (!fr || fr.section.id === sid) return;
+      fr.section.rooms = fr.section.rooms.filter((x) => x.id !== rid);
+      nf.zones.forEach((z) => z.sections.forEach((sc) => { if (sc.id === sid) sc.rooms.push(fr.room); }));
+    }, { dragId: '', pick: { kind: 'room', id: rid } });
+    const target = (on) => on ? 'border: 1.5px dashed #121815; background: #F5FAF2; color: #121815;' : 'border: 1.5px dashed #C9CFC6; background: rgba(255,255,255,0.6); color: #3B4540;';
+    const zones = f.zones.map((z, zi) => {
+      const rc = z.sections.reduce((a, sc) => a + sc.rooms.length, 0);
+      return {
+        name: z.name, code: 'Z' + (zi + 1),
+        aria: 'Zone ' + z.name,
+        meta: this.plural(z.sections.length, 'section', 'sections') + ' · ' + this.plural(rc, 'room', 'rooms'),
+        pick: () => set({ pick: { kind: 'zone', id: z.id } }),
+        style: 'box-sizing: border-box; background: #EEF1EA; border-radius: 18px; padding: 10px 14px 14px; min-width: 260px; max-width: 100%;' + (isPicked('zone', z.id) ? ' box-shadow: 0 0 0 2px #121815;' : ''),
+        addLabel: 'Add a section to ' + z.name,
+        addText: mode === 'section' ? 'Put section here' : 'Section',
+        addStyle: 'align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 14px; border-radius: 12px; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; ' + target(mode === 'section'),
+        addSection: () => { const id = 's' + (s.seq + 1); editFarm((nf) => { nf.zones.find((x) => x.id === z.id).sections.push({ id: id, name: 'New section', code: '', rooms: [] }); }, { seq: s.seq + 1, mode: '', pick: { kind: 'section', id: id } }); },
+        sections: z.sections.map((sc) => {
+          const dropOk = !!s.dragId && !sc.rooms.some((x) => x.id === s.dragId);
+          return {
+            name: sc.name, code: this.secCode(sc), aria: 'Section ' + sc.name,
+            pick: () => set({ pick: { kind: 'section', id: sc.id } }),
+            dropHint: dropOk,
+            over: (e) => { if (e && e.preventDefault) e.preventDefault(); },
+            drop: (e) => { if (e && e.preventDefault) e.preventDefault(); let rid = ''; try { rid = e.dataTransfer.getData('text/plain'); } catch (er) {} rid = rid || live().dragId; if (rid) moveRoom(rid, sc.id); },
+            style: 'box-sizing: border-box; border-radius: 14px; padding: 8px 10px 10px; background: rgba(255,255,255,0.55);' + (isPicked('section', sc.id) ? ' box-shadow: 0 0 0 2px #121815; background: #FFFFFF;' : dropOk ? ' box-shadow: 0 0 0 1.5px #121815; background: #F5FAF2;' : ' box-shadow: 0 0 0 1px #E1E5DD;'),
+            addLabel: 'Add a room to ' + sc.name,
+            addText: mode === 'room' ? 'Put room here' : 'Room',
+            addStyle: 'width: ' + W + 'px; min-height: ' + (W > 150 ? 112 : 100) + 'px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 12px; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; ' + target(mode === 'room'),
+            addRoom: () => {
+              const id = 'r' + (s.seq + 1);
+              editFarm((nf) => {
+                const sec = nf.zones.find((x) => x.id === z.id).sections.find((x) => x.id === sc.id);
+                sec.rooms.push(this.room(id, nextRoomName(sec), [], { door: 'top' }));
+              }, { seq: s.seq + 1, mode: '', pick: { kind: 'room', id: id } });
+            },
+            rooms: sc.rooms.map((r) => {
+              const pl = this.places(f, r);
+              const empty = !this.pensOf(r).length;
+              const isNew = !bRooms[r.id];
+              const edited = !isNew && !!cRooms[r.id];
+              const tag = s.draft && s.src === 'hand' ? '' : (isNew && !s.draft ? 'New' : (edited || (isNew && s.draft) ? 'Edited' : ''));
+              const sum = empty ? '' : this.summary(f, r);
+              const on = isPicked('room', r.id);
+              return {
+                name: r.name, places: empty ? '' : this.fmt(pl), summary: sum,
+                empty: empty, mini: this.mini(f, r, s.hl), miniH: miniH,
+                gm: s.gm.indexOf(r.id) >= 0, hasTag: !!tag, tag: tag,
+                aria: r.name + ', ' + (empty ? 'no pens yet' : sum + ', ' + this.fmt(pl) + ' places'),
+                pick: () => set({ pick: { kind: 'room', id: r.id } }),
+                open: () => set({ view: 'room', roomId: r.id, rsel: null, tool: 'select', box: null, blocked: null, strip: false, form: f.types.length ? this.closedForm() : s.form, hint: false }),
+                dragStart: (e) => { try { e.dataTransfer.setData('text/plain', r.id); e.dataTransfer.effectAllowed = 'move'; } catch (er) {} setTimeout(() => setLive(() => ({ dragId: r.id })), 0); },
+                dragEnd: () => setTimeout(() => setLive((st) => st.dragId ? { dragId: '' } : null), 0),
+                style: 'width: ' + W + 'px; box-sizing: border-box; display: flex; flex-direction: column; align-items: stretch; text-align: left; padding: 9px 10px 10px; border-radius: 12px; background: #FFFFFF; font: inherit; color: #121815; cursor: grab; ' + (on ? 'border: 1px solid #121815; box-shadow: inset 0 0 0 1px #121815' : 'border: 1px solid #E3E7DF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)') + (s.dragId === r.id ? '; opacity: 0.45' : '')
+              };
+            })
+          };
+        })
+      };
+    });
+    const legend = f.types.map((t) => {
+      const c = this.colors()[t.c % 6];
+      const on = s.hl === t.id;
+      return {
+        name: t.name, unit: this.unit(t, t.per), mid: c.mid, ink: c.ink, on: on,
+        pick: () => set({ hl: on ? '' : t.id }),
+        style: 'display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 11px 0 10px; border: 1px solid ' + c.line + '; border-radius: 999px; background: ' + c.fill + '; font: inherit; font-size: 12.5px; cursor: pointer; ' + (on ? 'box-shadow: inset 0 0 0 1.5px #121815; border-color: #121815' : '')
+      };
+    });
+    const tools = [['zone', 'Zone'], ['section', 'Section'], ['room', 'Room']].map((x) => ({
+      label: x[1], on: mode === x[0],
+      pick: () => set({ mode: mode === x[0] ? '' : x[0] }),
+      style: 'display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 12px 0 10px; border-radius: 9px; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; ' + (mode === x[0] ? 'border: 1px solid #121815; background: #121815; color: #FFFFFF' : 'border: 1px solid #DADED6; background: #FFFFFF; color: #121815')
+    }));
+    const modeText = { zone: 'Click the dashed place to add a zone', section: 'Click inside a zone to add a section', room: 'Click inside a section to add a room' }[mode] || '';
+
+    // inspector on the farm canvas
+    let ins = { kicker: 'Farm', title: 'This farm', isFarm: true, rows: [] };
+    const facts = (arr) => arr.map((x) => ({ label: x[0], value: x[1], style: x[2] || '' }));
+    const monoS = "font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 500;";
+    ins.rows = [['Zones', String(f.zones.length)], ['Sections', String(nS)], ['Rooms', String(nR)], ['Places', this.fmt(total)]].concat(order.filter((u) => byUse[u]).map((u) => [u, this.fmt(byUse[u])])).map((x) => ({ label: x[0], value: x[1] }));
+    if (pick && pick.kind === 'zone') {
+      const zi = f.zones.findIndex((x) => x.id === pick.id);
+      const z = f.zones[zi];
+      if (z) {
+        let pl = 0, rc = 0;
+        z.sections.forEach((sc) => sc.rooms.forEach((r) => { rc++; pl += this.places(f, r); }));
+        ins = { kicker: 'Zone', title: z.name || 'Zone', hasName: true, name: z.name,
+          rename: (e) => { const v = val(e); editFarm((nf) => { nf.zones.find((x) => x.id === z.id).name = v; }); },
+          hasFacts: true, facts: facts([['Code', 'Z' + (zi + 1), monoS], ['Sections', String(z.sections.length)], ['Rooms', String(rc)], ['Places', this.fmt(pl), monoS]]) };
+      }
+    } else if (pick && pick.kind === 'section') {
+      let sc = null, zz = null;
+      f.zones.forEach((z) => z.sections.forEach((x) => { if (x.id === pick.id) { sc = x; zz = z; } }));
+      if (sc) {
+        const pl = sc.rooms.reduce((a, r) => a + this.places(f, r), 0);
+        const editSec = (fn) => editFarm((nf) => { nf.zones.forEach((z) => z.sections.forEach((x) => { if (x.id === sc.id) fn(x); })); });
+        const setPhoto = (name) => { if (name) editSec((x) => { x.photo = name; }); };
+        ins = { kicker: 'Section in ' + zz.name, title: sc.name || 'Section', hasName: true, name: sc.name, isSection: true,
+          rename: (e) => { const v = val(e); editSec((x) => { x.name = v; }); },
+          code: sc.code != null && sc.code !== '' ? sc.code : this.secCode(sc),
+          onCode: (e) => { const v = String(val(e)).replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase(); editSec((x) => { x.code = v; }); },
+          noPhoto: !sc.photo, hasPhoto: !!sc.photo, photo: sc.photo || '',
+          photoOver: (e) => { if (e && e.preventDefault) e.preventDefault(); },
+          photoDrop: (e) => { if (e && e.preventDefault) e.preventDefault(); const fl = e && e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; setPhoto(fl ? fl.name : 'Photo.jpg'); },
+          photoPick: (e) => { const fl = e && e.target && e.target.files && e.target.files[0]; setPhoto(fl ? fl.name : ''); },
+          photoRemove: () => editSec((x) => { x.photo = ''; }),
+          hasFacts: true, facts: facts([['Rooms', String(sc.rooms.length)], ['Places', this.fmt(pl), monoS]]) };
+      }
+    } else if (pick && pick.kind === 'room') {
+      const fr = this.findRoom(f, pick.id);
+      if (fr) {
+        const r = fr.room;
+        const opts = [];
+        f.zones.forEach((z) => z.sections.forEach((sc) => opts.push({ value: sc.id, label: sc.name + (f.zones.length > 1 ? ' · ' + z.name : ''), selected: sc.id === fr.section.id })));
+        ins = { kicker: 'Room in ' + fr.section.name, title: r.name || 'Room', hasName: true, name: r.name, isRoom: true,
+          rename: (e) => { const v = val(e); editRoom(r.id, (x) => { x.name = v; }); },
+          hasFacts: true, facts: facts([['Code', this.roomCode(f, r.id), monoS], ['Used for', this.usedFor(f, r)], ['Places', this.fmt(this.places(f, r)), monoS]]),
+          moveOpts: opts, move: (e) => moveRoom(r.id, val(e)),
+          open: () => set({ view: 'room', roomId: r.id, rsel: null, tool: 'select', box: null, blocked: null, strip: false, form: f.types.length ? this.closedForm() : { open: true, name: '', per: 1, use: 'Other' }, hint: false }) };
+      }
+    }
+
+    // ---------- room canvas ----------
+    const cur = s.view === 'room' ? this.findRoom(f, s.roomId) : null;
+    let rm = { hasLanes: false }, dr = { items: [], ghosts: [], merge: {} }, ri = {}, sideOpts = [], roomSum = [], pal = [], mg = { show: false };
+    const formOpen = !!(s.form && s.form.open);
+    if (cur) {
+      const r = cur.room;
+      const id = r.id;
+      const b = bRooms[id] ? bRooms[id].r : null;
+      const blockedLane = s.blocked && s.blocked.room === id ? s.blocked.i : -1;
+      const tag = !b ? (s.draft ? '' : 'New') : (cRooms[id] && !(s.draft && s.src === 'hand') ? 'Edited' : '');
+      const gmHere = s.gm.indexOf(id) >= 0;
+      const lt = this.letters(r);
+      const codes = this.endCodes(r);
+      let rsel = s.rsel;
+      if (rsel && rsel.kind === 'lane' && !(r.lanes[rsel.i] && r.lanes[rsel.i].n > 0)) rsel = null;
+      if (rsel && rsel.kind === 'end' && !(r.ends || [])[rsel.j]) rsel = null;
+      rm = {
+        name: r.name || 'Room', where: cur.zone.name + ' › ' + cur.section.name, code: this.roomCode(f, id),
+        hasPigs: !!(r.occ && r.occ.live), pigs: r.occ ? r.occ.live : '',
+        hasTag: !!tag, tag: tag, gmMeta: gmHere && id !== 'sick',
+        hasLanes: lt.count > 0
+      };
+      const tool = s.tool || 'select';
+      // painting: every change reads the latest state so a fast drag never loses a square
+      const paint = (d, tl) => setLive((st) => {
+        const nf = this.clone(st.farm);
+        const fr = this.findRoom(nf, id);
+        if (!fr) return null;
+        const x = fr.room;
+        x.ends = x.ends || [];
+        if (tl === 'erase') {
+          if (d.kind === 'end') x.ends.splice(d.j, 1);
+          else if (d.kind === 'pen' && x.lanes[d.i]) x.lanes[d.i].n = Math.min(x.lanes[d.i].n, d.k - 1);
+          else if (d.kind === 'gap' && x.lanes[d.i]) x.lanes[d.i].n = Math.min(x.lanes[d.i].n, d.from - 1);
+          else return { painting: true };
+          while (x.lanes.length && !(x.lanes[x.lanes.length - 1].n > 0) && !x.ends.some((e) => e.lanes.indexOf(x.lanes.length - 1) >= 0)) x.lanes.pop();
+        } else {
+          if (d.kind === 'end') { const e = x.ends[d.j]; if (!e || e.t === tl) return { painting: true }; e.t = tl; }
+          else {
+            let l = x.lanes[d.i];
+            if (!l) { while (x.lanes.length < d.i) x.lanes.push(this.ln('', 0)); l = this.ln(tl, 0); x.lanes.push(l); }
+            const want = d.kind === 'free' ? Math.max(l.n || 0, d.target) : (l.n || 0);
+            if (want === l.n && l.t === tl) return { painting: true };
+            l.n = want;
+            if (l.t !== tl) { l.t = tl; l.each = null; }
+          }
+        }
+        return { farm: nf, strip: false, hint: false, painting: true, gm: st.gm.filter((g) => g !== id), blocked: null };
+      });
+      const handlers = {
+        down: (d, e) => {
+          if (tool === 'select') return;
+          if (tool === 'merge') { setLive(() => ({ box: { c0: d.i, c1: d.i, p0: d.p, p1: d.p }, boxing: true })); return; }
+          paint(d, tool);
+        },
+        enter: (d, e) => {
+          if (!e || e.buttons !== 1) return;
+          const st = live();
+          if (tool === 'merge' && st.boxing && st.box) { if (st.box.c1 !== d.i || st.box.p1 !== d.p) setLive(() => ({ box: Object.assign({}, st.box, { c1: d.i, p1: d.p }) })); return; }
+          if (tool !== 'select' && tool !== 'merge' && st.painting) paint(d, tool);
+        },
+        click: (d) => {
+          if (tool !== 'select') return;
+          if (d.kind === 'pen') set({ rsel: { kind: 'lane', i: d.i, k: d.k } });
+          else if (d.kind === 'gap') set({ rsel: { kind: 'lane', i: d.i } });
+          else if (d.kind === 'end') set({ rsel: { kind: 'end', j: d.j } });
+          else set({ rsel: null });
+        }
+      };
+      dr = this.floor(f, r, {
+        sel: rsel || {}, tool: tool, box: s.box, hint: !!s.hint && tool !== 'select' && tool !== 'erase' && tool !== 'merge',
+        blockedLane: blockedLane, gm: gmHere && id === 'sick',
+        down: handlers.down, enter: handlers.enter, click: handlers.click,
+        selectLane: (i) => set({ rsel: { kind: 'lane', i: i }, tool: 'select', box: null }),
+        step: (i, k) => editRoom(id, (x) => { x.lanes[i].n = Math.max(1, (x.lanes[i].n || 0) + k); }),
+        door: (w) => editRoom(id, (x) => { x.door = w; }),
+        isNew: (i, k) => !s.draft && !!b && (!b.lanes[i] || k > (b.lanes[i].n || 0))
+      });
+      sideOpts = [['Left', true], ['Right', false]].map((o) => {
+        const on = r.aLeft === o[1];
+        return {
+          label: o[0], on: on,
+          pick: () => editRoom(id, (x) => { x.aLeft = o[1]; }),
+          style: 'height: 34px; padding: 0 16px; border: 0; border-radius: 8px; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer; ' + (on ? 'background: #FFFFFF; color: #121815; box-shadow: 0 1px 2px rgba(18,24,21,0.10)' : 'background: transparent; color: #626C66')
+        };
+      });
+      // live summary under the room
+      const pens = this.pensOf(r);
+      const ru = {};
+      pens.forEach((l) => { const t = this.typeOf(f, l.t); if (t) ru[t.use] = (ru[t.use] || 0) + l.n * this.per(f, l); });
+      roomSum = [['Lanes', String(lt.count)], ['Pens', this.fmt(pens.reduce((a, l) => a + l.n, 0))]].concat(order.filter((u) => ru[u]).map((u) => [u, this.fmt(ru[u])])).map((x, i) => ({ label: x[0], value: x[1], sep: i > 0 }));
+
+      // palette
+      const palBtn = (on) => 'display: inline-flex; align-items: center; gap: 8px; flex: 1 1 212px; min-height: 38px; padding: 0 12px 0 10px; border-radius: 10px; font: inherit; font-size: 13px; color: #121815; cursor: pointer; box-sizing: border-box; ' + (on ? 'border: 1px solid #121815; box-shadow: inset 0 0 0 1px #121815; background: #FFFFFF' : 'border: 1px solid #E2E5DF; background: #FFFFFF');
+      const setTool = (tl) => set({ tool: tl, box: null, rsel: tl === 'select' ? s.rsel : null, hint: tl !== 'select' && tl !== 'erase' && tl !== 'merge' ? s.hint : false });
+      pal = [{ label: 'Select', sub: '', icon: ic.cursor, hasIcon: true, hasSwatch: false, on: tool === 'select', pick: () => setTool('select') }]
+        .concat(f.types.map((t) => { const c = this.colors()[t.c % 6]; return { label: t.name, sub: this.unit(t, t.per), mid: c.mid, hasSwatch: true, hasIcon: false, on: tool === t.id, pick: () => setTool(t.id) }; }))
+        .concat([
+          { label: 'Eraser', sub: '', icon: ic.eraser, hasIcon: true, hasSwatch: false, on: tool === 'erase', pick: () => setTool('erase') },
+          { label: 'Merge', sub: '', icon: ic.merge, hasIcon: true, hasSwatch: false, on: tool === 'merge', pick: () => setTool('merge') }
+        ]).map((x) => Object.assign(x, { style: palBtn(x.on), subInk: '#626C66' }));
+      const mInfo = dr.merge || {};
+      if (tool === 'merge') {
+        mg = {
+          show: true,
+          text: !s.box ? 'Drag over pens to pick the ones to join.' : (mInfo.valid ? this.plural(mInfo.count, 'square', 'squares') + ' picked' : mInfo.reason),
+          ink: !s.box || mInfo.valid ? '#3B4540' : '#7A4A00',
+          off: !mInfo.valid, checkInk: mInfo.valid ? '#C5F06A' : '#B7BEB6',
+          style: 'margin-top: 8px; display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; border: 0; border-radius: 10px; font: inherit; font-size: 13.5px; font-weight: 500; ' + (mInfo.valid ? 'background: #121815; color: #FFFFFF; cursor: pointer' : 'background: #E8EBE5; color: #8A948D; cursor: not-allowed'),
+          merge: () => {
+            if (!mInfo.valid) return;
+            const tp = mInfo.t || (this.typeOf(f, tool) ? tool : '') || (r.lanes.filter((l) => l.n > 0).slice(-1)[0] || {}).t || (f.types[0] || {}).id || '';
+            const tt = this.typeOf(f, tp);
+            let each = 0;
+            mInfo.cols.forEach((c) => {
+              const l = r.lanes[c.i];
+              const pensIn = c.minK != null ? (l.n - c.minK + 1) : 0;
+              each += pensIn * this.per(f, l) + c.free * (tt ? tt.per : 1);
+            });
+            const nEnds = (r.ends || []).length;
+            editRoom(id, (x) => {
+              mInfo.cols.forEach((c) => { if (c.minK != null) x.lanes[c.i].n = c.minK - 1; });
+              x.ends = (x.ends || []).concat([{ t: tp, each: tt && tt.per === each ? null : each, len: mInfo.len, lanes: mInfo.cols.map((c) => c.i) }]);
+            }, { box: null, tool: 'select', rsel: { kind: 'end', j: nEnds } });
+          }
+        };
+      }
+
+      // inspector on the room canvas
+      const chipStyle = (on, c) => 'display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 12px 0 10px; border-radius: 999px; font: inherit; font-size: 13px; color: #121815; cursor: pointer; ' + (on ? 'background: ' + c.fill + '; border: 1px solid #121815; box-shadow: inset 0 0 0 1px #121815' : 'background: #FFFFFF; border: 1px solid #DADED6');
+      const btn = (danger, off) => 'height: 36px; padding: 0 12px; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 500; background: #FFFFFF; ' + (off ? 'border: 1px solid #E8EBE5; color: #B7BEB6; cursor: not-allowed' : 'border: 1px solid #DADED6; cursor: pointer; color: ' + (danger ? '#9A2C17' : '#121815'));
+      const close = () => set({ rsel: null });
+      if (rsel && rsel.kind === 'end') {
+        const j = rsel.j;
+        const e = r.ends[j];
+        const t = this.typeOf(f, e.t);
+        const per = this.per(f, e);
+        const code = codes[j];
+        const editEnd = (fn) => editRoom(id, (x, nf) => { fn(x.ends[j], nf, x); });
+        ri = {
+          kicker: e.lanes.length > 1 ? 'One pen across lanes' : 'Pen', title: 'Pen ' + code, canClose: true, close: close,
+          isEnd: e.lanes.length > 0,
+          spans: r.lanes.map((l, i) => ({ l: l, i: i })).filter((x) => x.l.n > 0 || e.lanes.indexOf(x.i) >= 0).map((x) => {
+            const on = e.lanes.indexOf(x.i) >= 0;
+            const label = lt.list[x.i] || 'Aisle';
+            return { label: label, on: on, aria: 'Across lane ' + label,
+              pick: () => editEnd((en) => { if (on && en.lanes.length > 1) en.lanes = en.lanes.filter((k) => k !== x.i); else if (!on) en.lanes = en.lanes.concat([x.i]).sort((a, b2) => a - b2); }),
+              style: 'min-width: 44px; height: 36px; padding: 0 14px; border-radius: 999px; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; ' + (on ? 'background: #121815; color: #FFFFFF; border: 1px solid #121815' : 'background: #FFFFFF; color: #121815; border: 1px solid #DADED6') };
+          }),
+          hasChips: true, noType: !t,
+          chips: f.types.map((x) => { const c = this.colors()[x.c % 6]; const on = x.id === e.t; return { name: x.name, mid: c.mid, on: on, style: chipStyle(on, c), pick: () => editEnd((en) => { en.t = x.id; }) }; }),
+          hasSteppers: true,
+          steppers: [{ label: 'Pigs in this pen', aria: 'Pigs in pen ' + code, value: t ? String(per) : '', off: !t, opacity: t ? 1 : 0.5,
+            decLabel: 'One pig fewer in ' + code, incLabel: 'One pig more in ' + code,
+            dec: () => editEnd((en, nf) => { const tt = this.typeOf(nf, en.t); const v = Math.max(1, this.per(nf, en) - 1); en.each = tt && tt.per === v ? null : v; }),
+            inc: () => editEnd((en, nf) => { const tt = this.typeOf(nf, en.t); const v = this.per(nf, en) + 1; en.each = tt && tt.per === v ? null : v; }),
+            onInput: (ev) => { const v = num(val(ev)); editEnd((en, nf) => { const tt = this.typeOf(nf, en.t); en.each = v == null || (tt && tt.per === v) ? null : v; }); } }],
+          hasFacts: true, facts: facts([['Default for ' + (t ? t.name : 'the type'), t ? this.unit(t, t.per) : '—']]),
+          hasActions: true,
+          actions: [
+            { label: 'Split into pens', off: false, style: btn(false, false), fn: () => editRoom(id, (x) => { const en = x.ends[j]; en.lanes.forEach((i) => { if (x.lanes[i]) { x.lanes[i].n = (x.lanes[i].n || 0) + (en.len || 1); if (!x.lanes[i].t) x.lanes[i].t = en.t; } }); x.ends.splice(j, 1); }, { rsel: null }) },
+            { label: 'Remove pen', off: false, style: btn(true, false), fn: () => editRoom(id, (x) => { x.ends.splice(j, 1); }, { rsel: null }) }
+          ]
+        };
+      } else if (rsel && rsel.kind === 'lane') {
+        const i = rsel.i;
+        const lane = r.lanes[i];
+        const t = this.typeOf(f, lane.t);
+        const per = this.per(f, lane);
+        const ch = lt.list[i];
+        const occupied = !!(r.occ && b && b.lanes[i] && r.occ.lanes.indexOf(i) >= 0);
+        let err = '';
+        if (blockedLane === i && b && b.lanes[i]) { const bt = this.typeOf(s.base, b.lanes[i].t) || t; err = this.plural(b.lanes[i].n, bt.s1, bt.s2) + ' hold ' + r.occ.who + '. Move them first.'; }
+        ri = {
+          kicker: rsel.k ? 'Pen in lane ' + ch : 'Lane', title: rsel.k ? 'Pen ' + ch + rsel.k : 'Lane ' + ch, canClose: true, close: close,
+          hasErr: !!err, err: err,
+          hasChips: true, noType: !t,
+          chips: f.types.map((x) => { const c = this.colors()[x.c % 6]; const on = x.id === lane.t; return { name: x.name, mid: c.mid, on: on, style: chipStyle(on, c), pick: () => editRoom(id, (y) => { y.lanes[i].t = x.id; y.lanes[i].each = null; }) }; }),
+          hasSteppers: true,
+          steppers: [
+            { label: 'Pens in lane ' + ch, aria: 'Pens in lane ' + ch, value: String(lane.n || 0), off: false, opacity: 1,
+              decLabel: 'One pen fewer in lane ' + ch, incLabel: 'One pen more in lane ' + ch,
+              dec: () => editRoom(id, (x) => { x.lanes[i].n = Math.max(1, (x.lanes[i].n || 0) - 1); }),
+              inc: () => editRoom(id, (x) => { x.lanes[i].n = (x.lanes[i].n || 0) + 1; }),
+              onInput: (e) => { const v = num(val(e)); editRoom(id, (x) => { x.lanes[i].n = v == null ? 0 : Math.min(v, 400); }); } },
+            { label: 'Pigs per pen', aria: 'Pigs per pen in lane ' + ch, value: t ? String(per) : '', off: !t, opacity: t ? 1 : 0.5,
+              decLabel: 'One pig fewer per pen in lane ' + ch, incLabel: 'One pig more per pen in lane ' + ch,
+              dec: () => editRoom(id, (x, nf) => { const tt = this.typeOf(nf, x.lanes[i].t); const v = Math.max(1, this.per(nf, x.lanes[i]) - 1); x.lanes[i].each = tt && tt.per === v ? null : v; }),
+              inc: () => editRoom(id, (x, nf) => { const tt = this.typeOf(nf, x.lanes[i].t); const v = this.per(nf, x.lanes[i]) + 1; x.lanes[i].each = tt && tt.per === v ? null : v; }),
+              onInput: (e) => { const v = num(val(e)); editRoom(id, (x, nf) => { const tt = this.typeOf(nf, x.lanes[i].t); x.lanes[i].each = v == null || (tt && tt.per === v) ? null : v; }); } }
+          ],
+          hasFacts: true, facts: facts([['Places in lane ' + ch, this.fmt(Math.max(0, lane.n || 0) * per), monoS]]),
+          hasActions: true,
+          actions: [
+            { label: 'Copy lane ' + ch, off: false, style: btn(false, false), fn: () => editRoom(id, (x) => { x.lanes.splice(i + 1, 0, this.ln(lane.t, lane.n, lane.each)); x.ends = (x.ends || []).map((e) => Object.assign({}, e, { lanes: e.lanes.map((k) => k > i ? k + 1 : k) })); }, { rsel: { kind: 'lane', i: i + 1 } }) },
+            { label: 'Remove lane ' + ch, off: blockedLane === i, style: btn(true, blockedLane === i), fn: () => {
+              if (occupied) { set({ blocked: { room: id, i: i }, strip: false }); return; }
+              editRoom(id, (x) => {
+                x.lanes.splice(i, 1);
+                x.ends = (x.ends || []).map((e) => Object.assign({}, e, { lanes: e.lanes.filter((k) => k !== i).map((k) => k > i ? k - 1 : k) })).filter((e) => e.lanes.length);
+              }, { rsel: null });
+            } }
+          ]
+        };
+      } else {
+        ri = {
+          kicker: 'Room', title: r.name || 'Room', isRoom: true, name: r.name,
+          rename: (e) => { const v = val(e); editRoom(id, (x) => { x.name = v; }); },
+          hasFacts: true, facts: facts([['Code', this.roomCode(f, id), monoS], ['Used for', this.usedFor(f, r)], ['Places', this.fmt(this.places(f, r)), monoS]])
+        };
+      }
+    }
+
+    // ---------- new pen type form ----------
+    const fm = s.form || this.closedForm();
+    const setForm = (p) => set({ form: Object.assign({}, fm, p) });
+    const nameOk = String(fm.name || '').trim().length > 0 && (fm.per || 0) > 0;
+    const form = {
+      open: formOpen, name: fm.name, per: fm.per ? String(fm.per) : '',
+      onName: (e) => setForm({ name: val(e) }),
+      onPer: (e) => setForm({ per: num(val(e)) }),
+      dec: () => setForm({ per: Math.max(1, (fm.per || 1) - 1) }),
+      inc: () => setForm({ per: (fm.per || 0) + 1 }),
+      onUse: (e) => setForm({ use: val(e) }),
+      uses: this.uses().map((u) => ({ value: u, selected: u === fm.use })),
+      addOff: !nameOk,
+      checkInk: nameOk ? '#C5F06A' : '#B7BEB6',
+      addStyle: 'display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; border: 0; border-radius: 10px; font: inherit; font-size: 13.5px; font-weight: 500; ' + (nameOk ? 'background: #121815; color: #FFFFFF; cursor: pointer' : 'background: #E8EBE5; color: #8A948D; cursor: not-allowed'),
+      cancel: () => set({ form: this.closedForm() }),
+      add: () => {
+        if (!nameOk) return;
+        const tid = 't' + (s.seq + 1);
+        const name = String(fm.name).trim();
+        const u = this.unitsFor(fm.use);
+        const nt = { id: tid, name: name, per: fm.per, use: fm.use, u1: u[0], uN: u[1], s1: name.toLowerCase(), s2: name.toLowerCase() + 's', c: f.types.length % 6 };
+        const nf = this.clone(f);
+        nf.types.push(nt);
+        set({ farm: nf, form: this.closedForm(), tool: tid, seq: s.seq + 1, strip: false, box: null, hint: true });
+      }
+    };
+
+    // ---------- intro ----------
+    const lvl = s.lvl || 'room';
+    const lvls = [['zone', 'Zone'], ['section', 'Section'], ['room', 'Room'], ['lane', 'Lane'], ['pen', 'Pen']];
+    const texts = {
+      zone: 'A part of your site you keep separate, like the production area or the isolation shed.',
+      section: "A group of rooms, however you think of them: by building or by what they're for.",
+      room: 'A space you fill, empty and wash as one. Batches move room by room.',
+      lane: 'A line of pens running away from the door, lettered A, B, C.',
+      pen: 'A crate, stall or group pen, numbered from the door: A1 is the first one you reach.'
+    };
+    const levels = lvls.map((x, i) => ({
+      label: x[1], sep: i > 0, on: lvl === x[0],
+      pick: () => set({ lvl: x[0] }),
+      style: 'height: 36px; padding: 0 15px; border: 0; border-radius: 999px; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer; ' + (lvl === x[0] ? 'background: #121815; color: #FFFFFF' : 'background: #F0F2EE; color: #3B4540')
+    }));
+    const ring = 'outline: 2px solid #121815; outline-offset: 3px;';
+    const exFarm = { types: this.kit() };
+    const exTile = (name, tid, k, n) => ({ name: name, mini: this.mini(exFarm, { lanes: this.rep(k, tid, n) }, ''), style: 'min-width: 0; box-sizing: border-box; padding: 9px 11px 11px; border-radius: 12px; background: #FFFFFF;' + (lvl === 'room' ? 'border: 1px solid #121815; box-shadow: inset 0 0 0 1px #121815;' : 'border: 1px solid #E8EBE5;') });
+    const secStyle = 'margin: 8px -8px 0; padding: 6px 8px 8px; border-radius: 12px;' + (lvl === 'section' ? ring : '');
+    const amber = this.colors()[2];
+    const ex = {
+      zoneStyle: 'flex: 1 1 300px; min-width: 0; box-sizing: border-box; background: #F6F7F4; border-radius: 16px; padding: 12px 16px 12px;' + (lvl === 'zone' ? ring : ''),
+      sections: [
+        { name: 'Gestation', style: secStyle, rooms: [exTile('Gestation 1', 'gest', 4, 14)] },
+        { name: 'Farrowing', style: secStyle, rooms: [exTile('Room 1', 'crate', 2, 6), exTile('Room 2', 'crate', 2, 6)] }
+      ],
+      roomStyle: 'position: relative; box-sizing: border-box; border: 2px solid #121815; border-radius: 12px; padding: 14px 18px 18px; background: ' + (lvl === 'room' ? '#F0F2EE' : '#FFFFFF') + ';',
+      lanes: ['A', 'B'].map((L) => ({
+        letter: L,
+        style: 'display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px; border-radius: 10px;' + (lvl === 'lane' ? 'outline: 2px solid #121815; outline-offset: 1px; background: #F0F2EE;' : ''),
+        cells: [6, 5, 4, 3, 2, 1].map((k) => {
+          const first = L === 'A' && k === 1;
+          return {
+            code: L + k,
+            style: "width: 54px; height: 25px; box-sizing: border-box; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11.5px; font-weight: 500; " +
+              (lvl === 'pen' && first ? 'background: #121815; color: #FFFFFF; border: 1px solid #121815;' : 'background: ' + amber.fill + '; color: ' + amber.ink + '; border: 1px solid ' + amber.line + ';') +
+              (lvl === 'pen' && !first ? 'box-shadow: inset 0 0 0 1.5px #121815;' : '')
+          };
+        })
+      }))
+    };
+
+    // ---------- save bar ----------
+    const isIntro = s.view === 'intro';
+    let barBits = [], hasBar = false, saveOff = false, saveLabel = 'Save layout';
+    const B = (text, style) => ({ text: text, style: style || '' });
+    if (s.draft && !isIntro && nR > 0) {
+      hasBar = true;
+      barBits.push(B('Draft', 'font-weight: 600; color: #121815'), B(this.plural(nR, 'room', 'rooms')));
+      let issue = '';
+      if (emptyRooms) issue = emptyRooms === 1 ? '1 room needs pens' : emptyRooms + ' rooms need pens';
+      else if (untyped) issue = untyped === 1 ? '1 lane needs a pen type' : untyped + ' lanes need a pen type';
+      if (issue) barBits.push(B(issue, 'color: #7A4A00; font-weight: 500'));
+      else if (total) barBits.push(B(this.fmt(total) + ' places'));
+      saveOff = !!issue;
+    } else if (!s.draft && changes > 0 && !isIntro) {
+      hasBar = true;
+      barBits.push(B(changes === 1 ? '1 change' : changes + ' changes', 'font-weight: 600; color: #121815'));
+      const delta = {};
+      const tally = (r, sign) => this.pensOf(r).forEach((l) => { if (l.t) delta[l.t] = (delta[l.t] || 0) + sign * l.n; });
+      Object.keys(cRooms).forEach((rid) => {
+        const a = this.findRoom(f, rid), bb = this.findRoom(s.base, rid);
+        if (a) tally(a.room, 1);
+        if (bb) tally(bb.room, -1);
+      });
+      Object.keys(delta).forEach((k) => {
+        const n = delta[k]; if (!n) return;
+        const t = this.typeOf(f, k) || this.typeOf(s.base, k);
+        if (!t) return;
+        barBits.push(B(this.plural(Math.abs(n), t.s1, t.s2) + (n > 0 ? ' added' : ' removed')));
+      });
+      if (untyped) { barBits.push(B(untyped === 1 ? '1 lane needs a pen type' : untyped + ' lanes need a pen type', 'color: #7A4A00; font-weight: 500')); saveOff = true; }
+      const ids = Object.keys(cRooms);
+      if (cur && ids.length === 1 && ids[0] === cur.room.id && changes === cRooms[ids[0]]) saveLabel = 'Save room';
+    }
+    barBits = barBits.map((x, i) => Object.assign(x, { sep: i > 0 }));
+
+    return {
+      ic: ic,
+      colStyle: isIntro ? 'max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box' : wide.colStyle,
+      barStyle: wide.barStyle,
+      isIntro: isIntro,
+      isMap: s.view === 'map' || (s.view === 'room' && !cur),
+      isRoom: !!cur,
+      showSaved: !!s.strip,
+      showDraft: !!s.draft && !isIntro && nR > 0,
+      draftRest: s.src === 'plan' ? ' · from your plan · not saved' : ' · not saved',
+      levels: levels, levelText: texts[lvl], ex: ex,
+      next: () => set({ view: 'map', farm: this.blank(), base: this.blank(), draft: true, src: 'hand', gm: [], strip: false, hl: '', pick: null, mode: '' }),
+      countLine: countParts.join(' · '),
+      hasLegend: legend.length > 0, legend: legend, noLegend: legend.length === 0,
+      noZones: f.zones.length === 0, hasZones: f.zones.length > 0,
+      zones: zones, tools: tools,
+      hasMode: !!mode, modeText: modeText, cancelMode: () => set({ mode: '' }),
+      zoneTarget: mode === 'zone' && f.zones.length > 0,
+      zoomIn: () => set({ zoom: Math.min(2, s.zoom + 1) }), zoomOut: () => set({ zoom: Math.max(0, s.zoom - 1) }), zoomFit: () => set({ zoom: 0 }),
+      zoomInOff: s.zoom >= 2, zoomOutOff: s.zoom <= 0, zoomInOp: s.zoom >= 2 ? 0.4 : 1, zoomOutOp: s.zoom <= 0 ? 0.4 : 1,
+      ins: ins,
+      addZone: () => { const id = 'z' + (s.seq + 1); editFarm((nf) => { nf.zones.push({ id: id, name: 'Zone ' + (nf.zones.length + 1), sections: [{ id: 's' + (s.seq + 2), name: 'Section 1', code: '', rooms: [] }] }); }, { seq: s.seq + 2, mode: '', pick: { kind: 'zone', id: id } }); },
+      rm: rm, dr: dr, ri: ri, pal: pal, mg: mg, sideOpts: sideOpts, roomSum: roomSum, form: form,
+      formClosed: !formOpen,
+      openForm: () => {
+        const sec = cur ? cur.section.name : '';
+        set({ form: { open: true, name: '', per: 1, use: this.uses().indexOf(sec) >= 0 ? sec : 'Other' } });
+      },
+      endDrag: () => { const st = this.state; if (st && st.startSeen === start && (st.painting || st.boxing)) this.setState(Object.assign({}, st, { painting: false, boxing: false })); },
+      back: () => set({ view: 'map', blocked: null, strip: false, form: this.closedForm(), pick: cur ? { kind: 'room', id: cur.room.id } : s.pick, box: null, tool: 'select' }),
+      hasBar: hasBar, barBits: barBits,
+      saveOff: saveOff, saveLabel: saveLabel,
+      checkInk: saveOff ? '#B7BEB6' : '#C5F06A',
+      saveStyle: 'display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; border: 0; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 500; ' + (saveOff ? 'background: #E8EBE5; color: #8A948D; cursor: not-allowed' : 'background: #121815; color: #FFFFFF; cursor: pointer'),
+      discard: () => {
+        if (s.draft) { set({ view: 'intro', farm: this.blank(), base: this.blank(), draft: false, gm: [], blocked: null, strip: false, form: this.closedForm(), pick: null }); return; }
+        set({ farm: this.clone(s.base), blocked: null, strip: false, box: null, view: cur && !bRooms[cur.room.id] ? 'map' : s.view });
+      },
+      save: () => {
+        if (saveOff) return;
+        set({ prev: { farm: this.clone(f), base: this.clone(s.base), draft: s.draft, gm: s.gm.slice() }, base: this.clone(f), draft: false, gm: [], blocked: null, strip: true, form: this.closedForm() });
+      },
+      undoSave: () => { if (!s.prev) { set({ strip: false }); return; } set({ farm: s.prev.farm, base: s.prev.base, draft: s.prev.draft, gm: s.prev.gm, prev: null, strip: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+[
+  {"op": "set_farm", "name": "Island Acres"},
+  {"op": "add_pen_type", "id": "crate", "name": "Farrowing crate", "uses": ["Farrowing"], "per": 1, "w": 180, "l": 260},
+  {"op": "add_zone", "name": "Island Acres"},
+  {"op": "add_section", "name": "Farrowing house", "code": "FAR", "zone": "Island Acres"},
+  {"op": "add_room", "name": "Farrowing 1", "section": "Farrowing house", "at": {"x": 0, "z": 0}, "door": {"wall": "south"}, "aisle": {"wall": 0, "between": 222}, "lanes": [{"runs": [{"type": "crate", "n": 20}]}, {"runs": [{"type": "crate", "n": 20}]}]},
+  {"op": "copy_room", "room": "Farrowing 1", "times": 10, "side": "east", "gap": 0}
+]

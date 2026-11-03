@@ -1,0 +1,128 @@
+{
+ "version": 1,
+ "types": [
+  {
+   "id": "sick",
+   "name": "Sick pen",
+   "uses": [
+    "Sick"
+   ],
+   "perPen": {
+    "Sick": 2
+   },
+   "w": 250,
+   "l": 400,
+   "color": 0
+  },
+  {
+   "id": "large",
+   "name": "Sick pen, large",
+   "uses": [
+    "Sick"
+   ],
+   "perPen": {
+    "Sick": 8
+   },
+   "w": 900,
+   "l": 400,
+   "color": 1
+  }
+ ],
+ "zones": [
+  {
+   "id": "sketch-farm",
+   "name": "Sketch farm",
+   "code": "Z1"
+  }
+ ],
+ "sections": [
+  {
+   "id": "isolation",
+   "name": "Isolation",
+   "code": "ISO",
+   "zone": "sketch-farm"
+  }
+ ],
+ "rooms": [
+  {
+   "id": "sketch-room",
+   "name": "Sketch room",
+   "section": "isolation",
+   "num": 1,
+   "at": {
+    "x": 0,
+    "z": -435
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "sick",
+       "n": 2
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "sick",
+       "n": 2
+      }
+     ]
+    }
+   ],
+   "outline": [
+    [
+     0,
+     0
+    ],
+    [
+     1160,
+     0
+    ],
+    [
+     1160,
+     220
+    ],
+    [
+     1340,
+     360
+    ],
+    [
+     1460,
+     610
+    ],
+    [
+     1460,
+     860
+    ],
+    [
+     1340,
+     1080
+    ],
+    [
+     1160,
+     1215
+    ],
+    [
+     0,
+     1215
+    ]
+   ],
+   "ends": [
+    {
+     "at": "far",
+     "runs": [
+      {
+       "type": "large",
+       "n": 1
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "name": "The owner's sketch"
+}

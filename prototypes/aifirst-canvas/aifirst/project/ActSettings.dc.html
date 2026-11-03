@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Farm settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; min-height: calc(100vh - 68px); display: flex; flex-direction: column; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+<div style="width: 100%; flex: 1; max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+<!-- ============ RECORD ============ -->
+<sc-if value="{{isRecord}}" hint-placeholder-val="{{true}}">
+<div>
+  <sc-if value="{{changed}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding: 10px 14px; border: 1px solid #E8EBE5; border-radius: 14px; background: #F6F7F4; color: #3B4540; animation: sentriRise 0.4s ease both">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      <span style="flex: 1; min-width: 0; font-size: 14px"><span style="font-weight: 500">{{receiptHead}}</span> {{receiptTail}}</span>
+      <button type="button" onClick="{{undoSave}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Farm settings</h1>
+
+  <sc-for list="{{groups}}" as="g" hint-placeholder-count="6">
+    <div>
+      <h2 style="margin: 0; padding: 28px 0 6px; font-size: 12px; font-weight: 500; color: #626C66">{{g.title}}</h2>
+      <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="4">
+        <div style="border-top: {{r.topLine}}">
+          <div style="display: flex; align-items: baseline; gap: 16px; padding: 11px 0">
+            <span style="width: 138px; flex-shrink: 0; font-size: 13px; color: #626C66">{{r.k}}</span>
+            <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">
+              <sc-if value="{{r.editing}}" hint-placeholder-val="{{false}}">
+                <input value="{{r.draft}}" onChange="{{r.onDraft}}" aria-label="{{r.k}}" style="width: 100%; box-sizing: border-box; height: 34px; margin: -6px 0; padding: 0 11px; border: 1px solid #DADED6; border-radius: 9px; background: #FFFFFF; font: inherit; font-size: 14px; color: #121815; outline: none">
+              </sc-if>
+              <sc-if value="{{r.showValue}}" hint-placeholder-val="{{true}}">
+                <span><sc-if value="{{r.dot}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: #D99A1E; vertical-align: 2px"></span></sc-if><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13.5px">{{r.t}}</span>{{r.v}}<sc-if value="{{r.hasOld}}" hint-placeholder-val="{{false}}"><span style="margin-left: 10px; font-size: 13px; color: #626C66; text-decoration: line-through">{{r.old}}</span></sc-if></span>
+              </sc-if>
+            </span>
+            <button type="button" onClick="{{r.act}}" aria-label="{{r.aria}}" style="flex-shrink: 0; min-width: 44px; height: 28px; margin: -4px -8px -4px 0; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #626C66; text-align: right; cursor: pointer">{{r.actLabel}}</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-for>
+
+  <p style="margin: 32px 0 0; font-size: 12.5px; color: #626C66">Everyone with console access can change these. Roles come later.</p>
+</div>
+</sc-if>
+
+<!-- ============ CHANGE PROPOSAL ============ -->
+<sc-if value="{{isChange}}" hint-placeholder-val="{{false}}">
+<div>
+  <div style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">
+    <button type="button" onClick="{{toRecord}}" style="padding: 0; border: 0; background: transparent; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer">Farm settings</button>
+    <span aria-hidden="true">›</span>
+    <span>Day starts</span>
+  </div>
+  <h1 style="margin: 8px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Day starts</h1>
+
+  <div style="margin-top: 22px">
+    <div style="display: flex; align-items: center; height: 20px; margin-bottom: 6px">
+      <label for="set-day" style="font-size: 12px; font-weight: 500; color: #626C66">Day starts</label>
+      <sc-if value="{{differs}}" hint-placeholder-val="{{true}}">
+        <span aria-hidden="true" style="margin-left: 8px; width: 7px; height: 7px; border-radius: 50%; background: #D99A1E"></span>
+      </sc-if>
+    </div>
+    <div style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap">
+      <input id="set-day" value="{{val}}" onChange="{{onVal}}" placeholder="06:00" style="width: 140px; box-sizing: border-box; height: 42px; padding: 0 13px; border: 1px solid {{fieldBorder}}; border-radius: 11px; background: {{fieldBg}}; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; color: #121815; outline: none">
+      <span style="display: inline-flex; align-items: center; gap: 10px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px">
+        <span style="color: #626C66; text-decoration: line-through">{{from}}</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.arrow}}"></path></svg>
+        <span style="color: #121815; font-weight: 500">{{shown}}</span>
+      </span>
+    </div>
+    <sc-if value="{{invalid}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 8px; font-size: 13px; color: #9A2C17">Type a time such as 05:30.</div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{validDay}}" hint-placeholder-val="{{true}}">
+    <button type="button" onClick="{{toggleMoves}}" aria-expanded="{{movesExpanded}}" style="margin-top: 26px; display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 13.5px; font-weight: 500; color: #3B4540; cursor: pointer">
+      See what moves
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{movesRot}}"><path d="{{ic.chev}}"></path></svg>
+    </button>
+    <sc-if value="{{movesOpen}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 6px">
+        <sc-for list="{{evidence}}" as="e" hint-placeholder-count="3">
+          <div style="display: flex; align-items: baseline; gap: 16px; padding: 10px 0; border-top: {{e.topLine}}">
+            <span style="width: 110px; flex-shrink: 0; font-size: 12.5px; color: #626C66">{{e.k}}</span>
+            <span style="flex: 1; min-width: 0; font-size: 13.5px; color: #1E2622">{{e.v}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </sc-if>
+</div>
+</sc-if>
+
+<!-- ============ WHO DECIDES ============ -->
+<sc-if value="{{isWho}}" hint-placeholder-val="{{false}}">
+<div>
+  <sc-if value="{{whoStrip}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding: 10px 14px; border: 1px solid #E8EBE5; border-radius: 14px; background: #F6F7F4; color: #3B4540; animation: sentriRise 0.4s ease both">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      <span style="font-size: 14px"><span style="font-weight: 500">Saved 11:02</span> ·</span>
+      <button type="button" onClick="{{undoWho}}" style="height: 28px; margin-left: -6px; padding: 0 6px; border: 0; background: transparent; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <div style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">
+    <button type="button" onClick="{{toRecord}}" style="padding: 0; border: 0; background: transparent; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer">Farm settings</button>
+    <span aria-hidden="true">›</span>
+    <span>Who decides</span>
+  </div>
+  <h1 style="margin: 8px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Who decides</h1>
+  <p style="margin: 8px 0 0; max-width: 520px; font-size: 14px; color: #626C66">Your team reads this whenever it sends you or anyone something. Write it the way you'd tell a new manager.</p>
+
+  <div style="margin-top: 22px; border-bottom: 1px solid #EFF1EC">
+    <sc-for list="{{rules}}" as="x" hint-placeholder-count="7">
+      <div style="display: flex; align-items: flex-start; gap: 14px; padding: 12px 0; border-top: {{x.topLine}}">
+        <span style="width: 18px; flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; line-height: 21px; color: #626C66">{{x.n}}</span>
+        <div style="flex: 1; min-width: 0">
+          <sc-if value="{{x.editing}}" hint-placeholder-val="{{false}}">
+            <textarea id="{{x.fid}}" aria-label="{{x.aria}}" autofocus rows="{{x.rows}}" placeholder="Write a sentence, for example: Feed orders go to Gao Feng." value="{{x.text}}" onChange="{{x.onText}}" style="display: block; width: 100%; box-sizing: border-box; margin: -7px 0; padding: 6px 11px; border: 1px solid #DADED6; border-radius: 9px; background: #FFFFFF; font: inherit; font-size: 14px; line-height: 21px; color: #121815; resize: none; outline: none"></textarea>
+          </sc-if>
+          <sc-if value="{{x.reading}}" hint-placeholder-val="{{true}}">
+            <button type="button" onClick="{{x.edit}}" aria-label="{{x.aria}}" style="display: block; width: 100%; padding: 0; border: 0; background: transparent; font: inherit; font-size: 14px; line-height: 21px; text-align: left; color: {{x.color}}; cursor: text">
+              <sc-if value="{{x.dot}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: #D99A1E; vertical-align: 2px"></span></sc-if><span style="text-decoration: {{x.deco}}; text-decoration-color: #7FB596; text-decoration-thickness: 1.5px; text-underline-offset: 4px">{{x.shown}}</span>
+            </button>
+            <sc-if value="{{x.hasOld}}" hint-placeholder-val="{{false}}">
+              <div style="margin-top: 3px; font-size: 13px; line-height: 19px; color: #626C66; text-decoration: line-through">{{x.old}}</div>
+            </sc-if>
+          </sc-if>
+        </div>
+        <span style="flex-shrink: 0; min-width: 72px; font-size: 12.5px; line-height: 21px; color: #626C66; text-align: right; white-space: nowrap">{{x.count}}</span>
+        <button type="button" onClick="{{x.remove}}" aria-label="{{x.removeAria}}" style="flex-shrink: 0; width: 28px; height: 28px; margin: -4px -6px -4px 0; padding: 0; border: 0; border-radius: 8px; background: transparent; display: inline-flex; align-items: center; justify-content: center; cursor: pointer">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #8A938D; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.x}}"></path></svg>
+        </button>
+      </div>
+    </sc-for>
+  </div>
+
+  <button type="button" onClick="{{addRule}}" style="margin-top: 14px; height: 36px; padding: 0 12px 0 0; border: 0; background: transparent; display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #121815; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.plus}}"></path></svg>
+    Add a sentence
+  </button>
+
+  <p style="margin: 18px 0 0; font-size: 12.5px; color: #626C66">If nothing matches, it goes to Adam and the General Manager asks whether to add a sentence.</p>
+</div>
+</sc-if>
+
+</div>
+
+<!-- ============ STICKY FOOTER ============ -->
+<sc-if value="{{showBar}}" hint-placeholder-val="{{false}}">
+<div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+  <div style="max-width: 760px; margin: 0 auto; padding: 12px 32px; box-sizing: border-box; display: flex; align-items: center; gap: 10px">
+    <span aria-hidden="true" style="width: 7px; height: 7px; border-radius: 50%; background: #D99A1E; flex-shrink: 0"></span>
+    <span style="flex: 1; min-width: 0; font-size: 13.5px; color: #3B4540">{{barText}}</span>
+    <button type="button" onClick="{{discard}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer">Discard</button>
+    <button type="button" onClick="{{save}}" style="height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; opacity: {{saveOpacity}}; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      {{saveLabel}}
+    </button>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["record","change","changed","who","whochange","whosaved"],"default":"record"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      check: 'M20 6 9 17l-5-5',
+      arrow: 'M5 12h14 M13 6l6 6-6 6',
+      chev: 'M9 18l6-6-6-6',
+      x: 'M18 6 6 18 M6 6l12 12',
+      plus: 'M12 5v14 M5 12h14'
+    };
+  }
+
+  componentDidUpdate() {
+    const id = (this.cur() || {}).ruleEdit;
+    if (id && this._focusedId !== id) {
+      this._focusedId = id;
+      setTimeout(() => {
+        const el = document.getElementById('who-' + id);
+        if (el) { el.focus(); const n = el.value.length; try { el.setSelectionRange(n, n); } catch (e) {} }
+      }, 30);
+    } else if (!id) { this._focusedId = ''; }
+  }
+
+  whoBase() {
+    return [
+      { id: 'r1', text: 'Vaccination plans and treatments: Dr. Chen and Adam decide; either can approve.' },
+      { id: 'r2', text: 'Li Wei decides moves into and out of the farrowing rooms. Copy Adam.' },
+      { id: 'r3', text: 'Zhao Min decides gestation and quarantine moves; Wang Fang the nursery. Copy Adam.' },
+      { id: 'r4', text: 'Gao Feng handles repairs, water and feed equipment.' },
+      { id: 'r5', text: 'Visitors go to Adam.' },
+      { id: 'r6', text: 'Anything sent outside the farm, or that costs over \u00A55,000, goes to Adam.' },
+      { id: 'r7', text: 'Everything else goes to Adam.' }
+    ];
+  }
+
+  whoWithFeed() {
+    const b = this.whoBase();
+    b.splice(4, 0, { id: 'feed', text: 'Feed orders go to Gao Feng; copy Adam.', bar: 'Feed orders will go to Gao Feng' });
+    return b;
+  }
+
+  defaults(start) {
+    const wb = this.whoBase();
+    const base = {
+      startSeen: start, view: 'record', dayStart: '06:00', val: '05:30',
+      editId: '', edits: {}, over: {}, savedOld: {}, moves: false,
+      rules: wb, whoBase: wb.slice(), whoPrev: null, whoStrip: false, ruleEdit: '', seq: 0
+    };
+    if (start === 'who') return Object.assign(base, { view: 'who' });
+    if (start === 'whochange') return Object.assign(base, { view: 'who', rules: this.whoWithFeed() });
+    if (start === 'whosaved') return Object.assign(base, { view: 'who', rules: this.whoWithFeed(), whoBase: this.whoWithFeed(), whoPrev: wb.slice(), whoStrip: true });
+    if (start === 'change') return Object.assign(base, { view: 'change' });
+    if (start === 'changed') return Object.assign(base, { dayStart: '05:30', savedOld: { day: '06:00', rep: '06:00' } });
+    return base;
+  }
+
+  cur() {
+    const start = this.props.start || 'record';
+    const st = this.state || {};
+    const base = this.defaults(start);
+    return st.startSeen === start ? Object.assign(base, st) : base;
+  }
+
+  renderVals() {
+    const s = this.cur();
+    const set = (p) => this.setState(Object.assign({}, this.cur(), p));
+    const ic = this.icons();
+    const line = '1px solid #EFF1EC';
+
+    const day = s.dayStart;
+    const defs = [
+      { title: 'Farm', rows: [
+        ['name', 'Name', '', 'Hillside Sow Farm', 'change'],
+        ['addr', 'Address', '', '18 Riverside Road, Jiangyin', 'change'],
+        ['reg', 'Registry number', 'JS-320281-0457', '', 'change'],
+        ['tz', 'Time zone and units', '', 'China time · kg · °C', 'change']
+      ] },
+      { title: 'Working week', rows: [
+        ['days', 'Days', '', 'Mon–Sat, Sunday mornings for feeding only', 'change'],
+        ['day', 'Day starts', day, '', 'day'],
+        ['rem', 'Task reminders', '', '3 days before', 'change']
+      ] },
+      { title: 'Teams', rows: [
+        ['tg', 'Gestation team', '', 'Zhao Min · Gestation 1–2, Quarantine 1', 'change'],
+        ['tf', 'Farrowing team', '', 'Li Wei · Farrowing Rooms 1–4', 'change'],
+        ['tn', 'Nursery team', '', 'Wang Fang · Nursery 1–2', 'change'],
+        ['tm', 'Maintenance', '', 'Gao Feng', 'change']
+      ] },
+      { title: 'Who decides', rows: [
+        ['who', 'Your rules', '', s.whoBase.length + ' rules in your words · used 14 times this week', 'who']
+      ] },
+      { title: 'Places', rows: [
+        ['lay', 'Farm layout', '', '9 rooms, 700 pens', 'open'],
+        ['pt', 'Pen types', '', 'Stall, Farrowing crate, Group pen, Boar pen', 'change']
+      ] },
+      { title: 'Production', rows: [
+        ['l1', 'Line 1', '', 'Every 3 weeks · 50 sows', 'open']
+      ] },
+      { title: 'Reports and reminders', rows: [
+        ['rep', 'Daily report', day, ', in the app and on your phone', 'change'],
+        ['dec', 'Decisions', '', 'On your phone when urgent', 'change']
+      ] }
+    ];
+    const pendingIds = Object.keys(s.edits).filter((k) => s.edits[k] !== undefined);
+    const groups = defs.map((g) => ({
+      title: g.title,
+      rows: g.rows.map((d, i) => {
+        const id = d[0], kind = d[4];
+        const isDay = id === 'day';
+        const full = d[2] + d[3];
+        const overText = s.over[id];
+        const curText = overText !== undefined ? overText : full;
+        const pending = s.edits[id] !== undefined && s.edits[id] !== curText;
+        const editing = s.editId === id;
+        const draft = s.edits[id] !== undefined ? s.edits[id] : curText;
+        const saved = s.savedOld[id];
+        const plain = pending || overText !== undefined;
+        const act = kind === 'open'
+          ? () => {}
+          : kind === 'who'
+            ? () => set({ view: 'who', rules: s.whoBase.slice(), ruleEdit: '', whoStrip: false, savedOld: {} })
+          : isDay
+            ? () => set({ view: 'change', val: day === '06:00' ? '05:30' : day, savedOld: {} })
+            : () => set({ editId: editing ? '' : id, savedOld: {} });
+        return {
+          k: d[1],
+          t: plain ? '' : d[2],
+          v: pending ? s.edits[id] : plain ? overText : d[3],
+          topLine: i ? line : '0',
+          editing,
+          showValue: !editing,
+          draft,
+          onDraft: (ev) => set({ edits: Object.assign({}, s.edits, { [id]: ev.target.value }) }),
+          dot: !editing && (pending || saved !== undefined),
+          hasOld: !editing && (pending || saved !== undefined),
+          old: pending ? curText : (saved || ''),
+          actLabel: (kind === 'open' || kind === 'who') ? 'Open' : editing ? 'Done' : 'Change',
+          aria: ((kind === 'open' || kind === 'who') ? 'Open ' : editing ? 'Finish editing ' : 'Change ') + d[1].toLowerCase(),
+          act
+        };
+      })
+    }));
+    const pendingCount = pendingIds.filter((k) => {
+      const d = defs.reduce((a, g) => a.concat(g.rows), []).find((r) => r[0] === k);
+      const base = s.over[k] !== undefined ? s.over[k] : d[2] + d[3];
+      return s.edits[k] !== base;
+    }).length;
+
+    // ---- day-start change
+    const val = (s.val || '').trim();
+    const valid = /^([01]?\d|2[0-3]):[0-5]\d$/.test(val);
+    const nice = valid ? (val.length === 4 ? '0' + val : val) : '';
+    const differs = valid && nice !== day;
+    const shown = valid ? nice : '--:--';
+    const hhmm = valid ? nice : 'the new time';
+    const evidence = [
+      { k: 'Phones', v: 'Daily tasks will appear on phones at ' + hhmm + '.' },
+      { k: 'Daily report', v: 'The daily report moves to ' + hhmm + ' too.' },
+      { k: 'Recurring tasks', v: '14 recurring tasks keep their order. None move days.' }
+    ].map((e, i) => Object.assign(e, { topLine: i ? line : '0' }));
+
+    // ---- who decides
+    const isWho = s.view === 'who';
+    const counts = { r1: 3, r2: 2, r3: 2, r4: 3, r5: 1, r6: 1, r7: 2, feed: 0 };
+    const baseMap = {};
+    s.whoBase.forEach((b) => { baseMap[b.id] = b.text; });
+    const live = s.rules.filter((r) => r.text.trim());
+    const liveIds = {};
+    live.forEach((r) => { liveIds[r.id] = true; });
+    const adds = live.filter((r) => baseMap[r.id] === undefined);
+    const edited = live.filter((r) => baseMap[r.id] !== undefined && baseMap[r.id] !== r.text);
+    const removed = s.whoBase.filter((b) => !liveIds[b.id]);
+    const nWho = adds.length + edited.length + removed.length;
+    const rules = s.rules.map((r, i) => {
+      const isNew = baseMap[r.id] === undefined;
+      const wasEdited = !isNew && r.text.trim() && baseMap[r.id] !== r.text;
+      const editing = s.ruleEdit === r.id;
+      const empty = !r.text.trim();
+      return {
+        n: i + 1,
+        topLine: i ? line : '0',
+        editing, reading: !editing,
+        fid: 'who-' + r.id,
+        aria: 'Sentence ' + (i + 1),
+        rows: Math.max(1, Math.ceil(r.text.length / 52)),
+        text: r.text,
+        shown: empty ? 'Write a sentence' : r.text,
+        color: empty ? '#626C66' : '#121815',
+        dot: !empty && (isNew || wasEdited),
+        deco: !empty && isNew ? 'underline' : 'none',
+        hasOld: !!wasEdited,
+        old: wasEdited ? baseMap[r.id] : '',
+        count: isNew && !empty ? 'New' : (counts[r.id] === undefined ? '' : counts[r.id] + ' this week'),
+        edit: () => set({ ruleEdit: r.id }),
+        onText: (ev) => { const v = ev.target.value; const c = this.cur(); this.setState(Object.assign({}, c, { rules: c.rules.map((q) => (q.id === r.id ? Object.assign({}, q, { text: v }) : q)) })); },
+        remove: () => set({ rules: this.cur().rules.filter((q) => q.id !== r.id), ruleEdit: '' }),
+        removeAria: 'Remove sentence ' + (i + 1)
+      };
+    });
+    const addRule = () => { const c = this.cur(); const id = 'n' + c.seq; set({ rules: c.rules.concat([{ id, text: '' }]), ruleEdit: id, seq: c.seq + 1 }); };
+    const whoBarText = nWho + (nWho === 1 ? ' change' : ' changes') + ' · ' + ((nWho === 1 && adds.length === 1 && adds[0].bar) ? adds[0].bar : 'Your team routes by the new wording');
+    const whoSave = () => { if (!nWho) return; const c = this.cur(); set({ whoPrev: c.whoBase.slice(), whoBase: live.map((r) => Object.assign({}, r)), rules: live.map((r) => Object.assign({}, r)), whoStrip: true, ruleEdit: '' }); };
+    const undoWho = () => { const c = this.cur(); set({ rules: (c.whoPrev || c.whoBase).slice(), whoBase: (c.whoPrev || c.whoBase).slice(), whoPrev: null, whoStrip: false }); };
+
+    const isChange = s.view === 'change';
+    const changed = !isChange && Object.keys(s.savedOld).length > 0;
+    const savedDay = s.savedOld.day !== undefined;
+    const receiptHead = 'Saved 08:41';
+    const receiptTail = savedDay ? '· Day now starts at ' + day + '.' : '· ' + Object.keys(s.savedOld).length + (Object.keys(s.savedOld).length === 1 ? ' setting' : ' settings') + ' changed.';
+
+    const showBar = isWho ? nWho > 0 : isChange ? true : pendingCount > 0;
+    const barText = isWho ? whoBarText : isChange
+      ? (differs ? '1 change · Phones and report move to ' + nice : (valid ? 'No change' : 'Enter a time to save'))
+      : pendingCount + (pendingCount === 1 ? ' change' : ' changes');
+    const canSave = isWho ? nWho > 0 : isChange ? differs : pendingCount > 0;
+
+    const save = () => {
+      if (!canSave) return;
+      if (isWho) {
+        whoSave();
+      } else if (isChange) {
+        set({ view: 'record', dayStart: nice, savedOld: { day: day, rep: day }, editId: '' });
+      } else {
+        const over = Object.assign({}, s.over);
+        const savedOld = {};
+        pendingIds.forEach((k) => {
+          const d = defs.reduce((a, g) => a.concat(g.rows), []).find((r) => r[0] === k);
+          const base = over[k] !== undefined ? over[k] : d[2] + d[3];
+          if (s.edits[k] !== base) { savedOld[k] = base; over[k] = s.edits[k]; }
+        });
+        set({ over, savedOld, edits: {}, editId: '' });
+      }
+    };
+    const undoSave = () => {
+      const over = Object.assign({}, s.over);
+      let dayStart = s.dayStart;
+      Object.keys(s.savedOld).forEach((k) => {
+        if (k === 'day') dayStart = s.savedOld.day;
+        else if (k !== 'rep') delete over[k];
+      });
+      set({ over, dayStart, savedOld: {} });
+    };
+
+    return {
+      ic, groups, evidence, receiptHead, receiptTail,
+      isRecord: s.view === 'record', isChange, isWho, rules, addRule, undoWho, whoStrip: s.whoStrip,
+      changed,
+      val: s.val,
+      differs, invalid: !valid && (s.val || '').length > 0, validDay: valid,
+      fieldBorder: differs ? '#D99A1E' : '#E2E5DF', fieldBg: '#FFFFFF',
+      from: day, shown,
+      onVal: (e) => set({ val: e.target.value }),
+      toRecord: () => set({ view: 'record', rules: s.whoBase.slice(), ruleEdit: '', whoStrip: false }),
+      movesOpen: s.moves, movesExpanded: s.moves ? 'true' : 'false',
+      movesRot: s.moves ? 'rotate(90deg)' : 'rotate(0deg)',
+      toggleMoves: () => set({ moves: !s.moves }),
+      showBar, barText,
+      saveLabel: isWho ? ((nWho === 1 && adds.length === 1) ? 'Save sentence' : 'Save sentences') : isChange ? (valid ? 'Start the day at ' + nice : 'Start the day') : 'Save settings',
+      saveOpacity: canSave ? 1 : 0.4,
+      save,
+      discard: () => (isWho ? set({ rules: s.whoBase.slice(), ruleEdit: '' }) : isChange ? set({ view: 'record' }) : set({ edits: {}, editId: '' })),
+      undoSave
+    };
+  }
+}
+</script>
+</body>
+</html>

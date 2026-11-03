@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Automations</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+<!-- ================= LIST ================= -->
+<sc-if value="{{isList}}" hint-placeholder-val="{{true}}">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Automations</h1>
+  <p style="margin: 6px 0 0; font-size: 14px; color: #3B4540">{{sentence}}</p>
+
+  <sc-if value="{{hasProposal}}" hint-placeholder-val="{{true}}">
+    <h2 style="margin: 24px 0 0; font-size: 15px; font-weight: 600">Waiting for you</h2>
+    <button type="button" onClick="{{openProposal}}" style="margin-top: 10px; display: flex; align-items: flex-start; gap: 12px; width: 100%; box-sizing: border-box; padding: 14px 16px; border: 1px solid #D5E7CF; border-radius: 14px; background: #F5FAF2; font: inherit; text-align: left; color: inherit; cursor: pointer">
+      <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0; margin-top: 1px; background: #151B17; color: #C5F06A; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center">GM</span>
+      <span style="flex: 1; min-width: 0; display: block">
+        <span style="display: block; font-size: 14px; font-weight: 500; line-height: 1.4; color: #121815">Create weaning tasks automatically, 28 days after farrowing?</span>
+        <span style="display: block; margin-top: 3px; font-size: 12.5px; color: #626C66">You have set these up by hand for the last 6 batches.</span>
+      </span>
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; margin-top: 5px; flex-shrink: 0; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+    </button>
+  </sc-if>
+
+  <sc-for list="{{groups}}" as="g" hint-placeholder-count="5">
+    <div style="margin-top: 26px; display: flex; align-items: center; gap: 10px">
+      <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0; background: {{g.markBg}}; color: {{g.markInk}}; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{g.initials}}</span>
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">{{g.name}}</h2>
+      <span style="min-width: 22px; height: 22px; box-sizing: border-box; padding: 0 7px; border-radius: 999px; background: #F0F2EE; color: #3B4540; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">{{g.count}}</span>
+    </div>
+    <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.04)">
+      <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="2">
+        <button type="button" onClick="{{r.open}}" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; padding: 13px 16px; border: 0; border-top: {{r.border}}; background: transparent; font: inherit; text-align: left; color: inherit; cursor: pointer">
+          <span style="flex: 1; min-width: 0; display: block">
+            <span style="display: block; font-size: 14px; font-weight: 500; line-height: 1.4; color: #121815">{{r.name}}</span>
+            <span style="display: block; margin-top: 2px; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.meta}}</span>
+          </span>
+          <sc-if value="{{r.hasChip}}" hint-placeholder-val="{{false}}">
+            <span style="display: inline-flex; align-items: center; gap: 6px; height: 22px; box-sizing: border-box; padding: 0 9px; border-radius: 999px; background: {{r.chipBg}}; color: {{r.chipInk}}; font-size: 12px; font-weight: 500; white-space: nowrap; flex-shrink: 0">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: {{r.chipDot}}"></span>{{r.chip}}
+            </span>
+          </sc-if>
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+        </button>
+      </sc-for>
+    </div>
+  </sc-for>
+</sc-if>
+
+<!-- ================= JOB RECORD ================= -->
+<sc-if value="{{isJob}}" hint-placeholder-val="{{false}}">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 36px">
+    <button type="button" onClick="{{back}}" style="border: 0; background: transparent; padding: 0; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">‹ Automations</button>
+    <sc-if value="{{job.showPause}}" hint-placeholder-val="{{true}}">
+      <button type="button" onClick="{{startPause}}" style="height: 36px; box-sizing: border-box; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; cursor: pointer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.pause}}"></path></svg>
+        Pause
+      </button>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{strip.show}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 14px; display: flex; align-items: flex-start; flex-wrap: wrap; gap: 10px 12px; padding: 12px 14px; border-radius: 12px; background: {{strip.bg}}; color: {{strip.ink}}; animation: {{strip.anim}}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; fill: none; stroke: {{strip.dot}}; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{strip.icon}}"></path></svg>
+      <span style="flex: 1 1 260px; min-width: 0; font-size: 14px; line-height: 1.5">{{strip.text}}</span>
+      <sc-if value="{{strip.hasTime}}" hint-placeholder-val="{{false}}">
+        <span style="flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; margin-top: 1px">{{strip.time}}</span>
+      </sc-if>
+      <sc-if value="{{strip.hasAction}}" hint-placeholder-val="{{false}}">
+        <button type="button" onClick="{{strip.action}}" style="height: 32px; box-sizing: border-box; padding: 0 12px; border: 1px solid rgba(18, 24, 21, 0.14); border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; cursor: pointer">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><path d="{{strip.actionIcon}}"></path></svg>
+          {{strip.actionLabel}}
+        </button>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <div style="margin-top: 18px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">{{job.crumb}}</div>
+  <h1 style="margin: 6px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2; text-wrap: balance">{{job.name}}</h1>
+  <p style="margin: 8px 0 0; font-size: 14px; color: #3B4540">{{job.sentence}}</p>
+  <div style="margin-top: 14px; display: flex; align-items: center; gap: 10px">
+    <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0; background: {{job.markBg}}; color: {{job.markInk}}; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{job.initials}}</span>
+    <span style="flex: 1; min-width: 0; font-size: 12.5px; color: #626C66">{{job.raised}}</span>
+  </div>
+
+  <h2 style="margin: 26px 0 0; font-size: 15px; font-weight: 600">How it runs</h2>
+  <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.04)">
+    <sc-for list="{{runsRows}}" as="r" hint-placeholder-count="3">
+      <div style="display: flex; align-items: baseline; gap: 16px; padding: 12px 16px; border-top: {{r.border}}">
+        <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #626C66">{{r.k}}</span>
+        <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">{{r.v}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <h2 style="margin: 26px 0 0; font-size: 15px; font-weight: 600">What it may do</h2>
+  <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.04)">
+    <sc-for list="{{mayRows}}" as="r" hint-placeholder-count="2">
+      <div style="display: flex; align-items: baseline; gap: 16px; padding: 12px 16px; border-top: {{r.border}}">
+        <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #626C66">{{r.k}}</span>
+        <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">{{r.v}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="margin-top: 26px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">{{job.runsHeading}}</h2>
+    <span style="font-size: 12.5px; color: #626C66">{{job.runsNote}}</span>
+  </div>
+  <sc-if value="{{job.hasRuns}}" hint-placeholder-val="{{true}}">
+    <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.04)">
+      <sc-for list="{{runs}}" as="r" hint-placeholder-count="5">
+        <div style="display: flex; align-items: baseline; gap: 16px; padding: 12px 16px; border-top: {{r.border}}">
+          <span style="width: 138px; flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #3B4540; white-space: nowrap">{{r.when}}</span>
+          <span style="flex: 1; min-width: 0; font-size: 14px; color: #1E2622">{{r.text}}</span>
+          <sc-if value="{{r.hasChip}}" hint-placeholder-val="{{false}}">
+            <span style="display: inline-flex; align-items: center; gap: 6px; height: 22px; box-sizing: border-box; padding: 0 9px; border-radius: 999px; background: {{r.chipBg}}; color: {{r.chipInk}}; font-size: 12px; font-weight: 500; white-space: nowrap; flex-shrink: 0; align-self: center">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: {{r.chipDot}}"></span>{{r.chip}}
+            </span>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+  <sc-if value="{{job.noRuns}}" hint-placeholder-val="{{false}}">
+    <p style="margin: 10px 0 0; font-size: 14px; color: #626C66">{{job.noRunsText}}</p>
+  </sc-if>
+</sc-if>
+
+<!-- ================= PROPOSAL ================= -->
+<sc-if value="{{isProposal}}" hint-placeholder-val="{{false}}">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 36px">
+    <button type="button" onClick="{{back}}" style="border: 0; background: transparent; padding: 0; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">‹ Automations</button>
+  </div>
+
+  <sc-if value="{{strip.show}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 14px; display: flex; align-items: flex-start; flex-wrap: wrap; gap: 10px 12px; padding: 12px 14px; border-radius: 12px; background: {{strip.bg}}; color: {{strip.ink}}; animation: {{strip.anim}}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; fill: none; stroke: {{strip.dot}}; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{strip.icon}}"></path></svg>
+      <span style="flex: 1 1 260px; min-width: 0; font-size: 14px; line-height: 1.5">{{strip.text}}</span>
+    </div>
+  </sc-if>
+
+  <div style="margin-top: 18px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Automations · New</div>
+  <h1 style="margin: 6px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2; text-wrap: balance">Create weaning tasks automatically</h1>
+  <p style="margin: 8px 0 0; font-size: 14px; color: #3B4540">{{prop.lead}}</p>
+
+  <sc-if value="{{prop.open}}" hint-placeholder-val="{{true}}">
+    <div style="margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px">
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; min-height: 20px; margin-bottom: 4px">
+          <label for="prop-from" style="font-size: 12px; font-weight: 500; color: #626C66">Start from</label>
+          <sc-if value="{{prop.fromChanged}}" hint-placeholder-val="{{false}}">
+            <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #2FA36B"></span>
+            <span style="font-size: 12px; color: #626C66; text-decoration: line-through">{{prop.fromWas}}</span>
+          </sc-if>
+        </div>
+        <select id="prop-from" onChange="{{onFrom}}" style="width: 100%; box-sizing: border-box; height: 42px; border: 1px solid #E2E5DF; background: #FFFFFF; border-radius: 11px; padding: 0 11px; font: inherit; font-size: 14px; color: #121815; outline: none">
+          <sc-for list="{{fromOptions}}" as="o" hint-placeholder-count="2">
+            <option value="{{o.value}}" selected="{{o.selected}}">{{o.label}}</option>
+          </sc-for>
+        </select>
+      </div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; min-height: 20px; margin-bottom: 4px">
+          <label for="prop-days" style="font-size: 12px; font-weight: 500; color: #626C66">Days after farrowing</label>
+          <sc-if value="{{prop.daysChanged}}" hint-placeholder-val="{{false}}">
+            <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #2FA36B"></span>
+            <span style="font-size: 12px; color: #626C66; text-decoration: line-through">28</span>
+          </sc-if>
+        </div>
+        <input id="prop-days" value="{{prop.days}}" onChange="{{onDays}}" inputmode="numeric" style="width: 100%; box-sizing: border-box; height: 42px; border: 1px solid {{prop.daysBorder}}; background: #FFFFFF; border-radius: 11px; padding: 0 12px; font: inherit; font-size: 14px; color: #121815; outline: none">
+      </div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; min-height: 20px; margin-bottom: 4px">
+          <label for="prop-team" style="font-size: 12px; font-weight: 500; color: #626C66">Sent to</label>
+          <sc-if value="{{prop.teamChanged}}" hint-placeholder-val="{{false}}">
+            <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #2FA36B"></span>
+            <span style="font-size: 12px; color: #626C66; text-decoration: line-through">Li Wei’s team</span>
+          </sc-if>
+        </div>
+        <select id="prop-team" onChange="{{onTeam}}" style="width: 100%; box-sizing: border-box; height: 42px; border: 1px solid #E2E5DF; background: #FFFFFF; border-radius: 11px; padding: 0 11px; font: inherit; font-size: 14px; color: #121815; outline: none">
+          <sc-for list="{{teamOptions}}" as="o" hint-placeholder-count="2">
+            <option value="{{o.value}}" selected="{{o.selected}}">{{o.label}}</option>
+          </sc-for>
+        </select>
+      </div>
+    </div>
+
+    <sc-if value="{{prop.daysBad}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: #9A2C17">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex-shrink: 0; fill: none; stroke: #D9583B; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.alert}}"></path></svg>
+        <span style="flex: 1; min-width: 0">Use 1 to 60 days.</span>
+        <button type="button" onClick="{{fixDays}}" style="height: 28px; padding: 0 10px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; white-space: nowrap; cursor: pointer">Use 28</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{prop.skipWarn}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: #7A4A00">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex-shrink: 0; fill: none; stroke: #D99A1E; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.alert}}"></path></svg>
+        <span style="flex: 1; min-width: 0">Batches 33 and 34 have no weaning task yet.</span>
+        <button type="button" onClick="{{fixFrom}}" style="height: 28px; padding: 0 10px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; white-space: nowrap; cursor: pointer">Start from 33</button>
+      </div>
+    </sc-if>
+
+    <p style="margin: 18px 0 0; font-size: 13px; color: #626C66">Done by hand so far: Batches 27 to 32, each at farrowing day + 28.</p>
+
+    <button type="button" onClick="{{toggleSee}}" aria-expanded="{{seeOpen}}" style="margin-top: 14px; display: flex; align-items: center; gap: 6px; border: 0; background: transparent; padding: 4px 0; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{seeRot}}"><path d="{{ic.chev}}"></path></svg>
+      {{seeLabel}}
+    </button>
+    <sc-if value="{{seeOpen}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 8px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden">
+        <sc-for list="{{createRows}}" as="c" hint-placeholder-count="3">
+          <div style="display: flex; align-items: baseline; gap: 16px; padding: 12px 16px; border-top: {{c.border}}">
+            <span style="width: 78px; flex-shrink: 0; font-size: 14px; font-weight: 500; color: #121815">{{c.batch}}</span>
+            <span style="flex: 1; min-width: 0; font-size: 14px; color: #1E2622">{{c.what}}</span>
+            <span style="flex-shrink: 0; font-size: 12.5px; color: #626C66; text-align: right">{{c.when}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </sc-if>
+</sc-if>
+
+</div>
+
+<!-- ================= STICKY FOOTER ================= -->
+<sc-if value="{{showFoot}}" hint-placeholder-val="{{false}}">
+<div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+  <div style="max-width: 760px; margin: 0 auto; padding: 12px 32px 16px; box-sizing: border-box">
+    <sc-if value="{{foot.normal}}" hint-placeholder-val="{{true}}">
+      <div style="margin-bottom: 8px; font-size: 12.5px; color: #626C66">{{foot.hint}}</div>
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+        <button type="button" onClick="{{foot.second}}" style="height: 40px; box-sizing: border-box; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; white-space: nowrap; cursor: pointer">{{foot.secondLabel}}</button>
+        <button type="button" onClick="{{foot.go}}" disabled="{{foot.off}}" style="height: 40px; box-sizing: border-box; padding: 0 16px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; opacity: {{foot.opacity}}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{foot.icon}}"></path></svg>
+          {{foot.label}}
+        </button>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["list","job","failed","pause","paused","proposal","created"],"default":"list"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      chev: 'M9 18l6-6-6-6',
+      x: 'M18 6 6 18 M6 6l12 12',
+      check: 'M20 6 9 17l-5-5',
+      pause: 'M10 4H6v16h4z M18 4h-4v16h4z',
+      play: 'M6 4l14 8-14 8z',
+      undo: 'M3 7v6h6 M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13',
+      message: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+      alert: 'M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z M12 9v4 M12 17h.01'
+    };
+  }
+
+  marks() {
+    return {
+      GM: { bg: '#151B17', ink: '#C5F06A', name: 'General Manager' },
+      PR: { bg: '#F6EBD3', ink: '#6E4500', name: 'Production' },
+      VT: { bg: '#DCEEF2', ink: '#0E5568', name: 'Vet' },
+      BS: { bg: '#ECE7FB', ink: '#47309A', name: 'Biosecurity' },
+      EQ: { bg: '#FBE4DC', ink: '#8C3519', name: 'Equipment' }
+    };
+  }
+
+  tones() {
+    return {
+      amber: { bg: '#FFF0D1', ink: '#7A4A00', dot: '#D99A1E' },
+      wrong: { bg: '#FCE7E2', ink: '#9A2C17', dot: '#D9583B' },
+      ok: { bg: '#E7F4EA', ink: '#1F5534', dot: '#2D7A4B' },
+      neutral: { bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90' }
+    };
+  }
+
+  // flag on a run: 'told' = it messaged you, 'failed' = it did not work
+  jobs() {
+    return [
+      {
+        id: 'drchen', by: 'GM', name: 'Herd summary to Dr. Chen', failed: true,
+        sentence: 'Emails Dr. Chen last week’s health notes, the day before his visit.',
+        raised: 'General Manager · since September',
+        when: 'Tuesdays 07:00', next: 'Tue 3 Nov, 07:00', stops: 'Never',
+        meta: 'Tuesdays 07:00 · Failed Tue 27 Oct',
+        own: 'Writes the summary from the health records.',
+        comes: 'One email to Dr. Chen’s saved address. You get a copy in chat.',
+        pauseBtn: 'Pause the Tuesday email', pauseEffect: 'Stops the Tuesday 07:00 email to Dr. Chen until you resume it. The report says it is paused.',
+        fail: 'The last run failed on Tue 27 Oct: the email address was rejected. Nothing was sent. The next run, Tue 3 Nov at 07:00, will fail the same way.',
+        runs: [
+          ['Tue 27 Oct · 07:00', 'Email address rejected. Nothing was sent.', 'failed'],
+          ['Tue 20 Oct · 07:00', 'Sent to Dr. Chen. Copy in your chat.', ''],
+          ['Tue 13 Oct · 07:00', 'Sent to Dr. Chen. Copy in your chat.', ''],
+          ['Tue 6 Oct · 07:00', 'Sent to Dr. Chen. Copy in your chat.', ''],
+          ['Tue 29 Sep · 07:00', 'Sent to Dr. Chen. Copy in your chat.', '']
+        ]
+      },
+      {
+        id: 'daily', by: 'GM', name: 'Daily report',
+        sentence: 'Writes the morning report: what changed, what slipped, what needs you.',
+        raised: 'General Manager · since the farm was added',
+        when: 'Every day 06:00', next: 'Sat 31 Oct, 06:00', stops: 'Never',
+        meta: 'Every day 06:00 · Last run today 06:00',
+        own: 'Reads yesterday’s records, results and tasks in every room.',
+        comes: 'The report, in your chat at 06:00. Anything that needs a yes or no becomes a decision.',
+        pauseBtn: 'Pause the 06:00 report', pauseEffect: 'Stops the 06:00 report until you resume it. You can still ask for one in chat.',
+        runs: [
+          ['Fri 30 Oct · 06:00', 'Report posted. 7 decisions waiting.', ''],
+          ['Thu 29 Oct · 06:00', 'Report posted.', ''],
+          ['Wed 28 Oct · 06:00', 'Report posted. 2 tasks not reported.', ''],
+          ['Tue 27 Oct · 06:00', 'Report posted.', ''],
+          ['Mon 26 Oct · 06:00', 'Report posted.', '']
+        ]
+      },
+      {
+        id: 'weekly', by: 'GM', name: 'Weekly report',
+        sentence: 'Sums up the week by batch: losses, treatments, tasks done, what is next.',
+        raised: 'General Manager · since the farm was added',
+        when: 'Mondays 06:30', next: 'Mon 2 Nov, 06:30', stops: 'Never',
+        meta: 'Mondays 06:30 · Last run Mon 26 Oct',
+        own: 'Reads the week’s records for each batch and room.',
+        comes: 'The report, in your chat. Anything that needs a yes or no becomes a decision.',
+        pauseBtn: 'Pause the Monday report', pauseEffect: 'Stops the Monday 06:30 report until you resume it.',
+        runs: [
+          ['Mon 26 Oct · 06:30', 'Report posted. Batch 32 losses flagged.', ''],
+          ['Mon 19 Oct · 06:30', 'Report posted.', ''],
+          ['Mon 12 Oct · 06:30', 'Report posted.', ''],
+          ['Mon 5 Oct · 06:30', 'Report posted.', ''],
+          ['Mon 28 Sep · 06:30', 'Report posted.', '']
+        ]
+      },
+      {
+        id: 'chase', by: 'PR', name: 'Chase unreported tasks',
+        sentence: 'Asks the team lead about any task due today that nobody has reported.',
+        raised: 'Production · since September',
+        when: 'Every day 14:00', next: 'Today, 14:00', stops: 'Never',
+        meta: 'Every day 14:00 · Last run yesterday 14:00',
+        own: 'Checks today’s tasks and messages the team lead on their phone.',
+        comes: 'Tasks still open go in tomorrow’s report. A decision only if a task has to move.',
+        pauseBtn: 'Pause the 14:00 check', pauseEffect: 'Stops the 14:00 check until you resume it. Open tasks still show in the report.',
+        runs: [
+          ['Thu 29 Oct · 14:00', 'Asked Li Wei about 2 tasks. Both reported by 15:10.', ''],
+          ['Wed 28 Oct · 14:00', 'Nothing open.', ''],
+          ['Tue 27 Oct · 14:00', 'Asked Wang Fang about 1 task. Reported by 14:35.', ''],
+          ['Mon 26 Oct · 14:00', 'Nothing open.', ''],
+          ['Sun 25 Oct · 14:00', 'Nothing open.', '']
+        ]
+      },
+      {
+        id: 'losses', by: 'VT', name: 'Batch 32 losses',
+        sentence: 'Checks Batch 32’s piglet losses against the 8% target and tells you if they rise.',
+        raised: 'Vet · set up from chat, Mon 26 Oct',
+        when: 'Every day 07:00', next: 'Sat 31 Oct, 07:00', stops: 'When Batch 32 weans, Fri 13 Nov',
+        meta: 'Every day 07:00 · Last run today 07:00',
+        own: 'Counts losses in Farrowing Room 2 and compares them with the 8% target.',
+        comes: 'A chat message when losses rise. A decision only if Vet wants to change a task.',
+        pauseBtn: 'Pause the 07:00 check', pauseEffect: 'Stops the 07:00 loss check until you resume it. The report says it is paused.',
+        runs: [
+          ['Fri 30 Oct · 07:00', 'Losses 9.8%. No new losses.', ''],
+          ['Thu 29 Oct · 07:00', 'Losses 9.8%. No new losses.', ''],
+          ['Wed 28 Oct · 07:00', 'Losses 9.8%. 1 new loss.', 'told'],
+          ['Tue 27 Oct · 07:00', 'Losses 9.7%. 2 new losses.', 'told'],
+          ['Mon 26 Oct · 07:00', 'Losses 9.4%, against 8%. First check.', 'told']
+        ]
+      },
+      {
+        id: 'triage', by: 'VT', name: 'Watch for sick clusters',
+        sentence: 'Tells you when 3 or more pigs in one room change triage on the same day.',
+        raised: 'Vet · since September',
+        when: 'After every health record', next: 'Runs when a record comes in', stops: 'Never',
+        meta: 'After every health record · Last told you Wed 28 Oct',
+        own: 'Counts triage changes by room as records come in.',
+        comes: 'A chat message with the room and the pigs. A single pig goes only in the report.',
+        pauseBtn: 'Pause the cluster watch', pauseEffect: 'Stops the cluster watch until you resume it. Single pigs still show in the report.',
+        runsHeading: 'When it spoke', runsNote: 'Only runs that found something.',
+        runs: [
+          ['Wed 28 Oct · 09:40', 'Gestation 2: 4 sows with lameness moved up.', 'told'],
+          ['Mon 12 Oct · 15:05', 'Nursery 1: 3 pigs with scours moved to Watch.', 'told']
+        ]
+      },
+      {
+        id: 'sampling', by: 'BS', name: 'Monday sampling tasks',
+        sentence: 'Creates the week’s sampling tasks from the sampling plan and sends them to the teams.',
+        raised: 'Biosecurity · from the sampling plan',
+        when: 'Mondays 06:00', next: 'Mon 2 Nov, 06:00', stops: 'Never',
+        meta: 'Mondays 06:00 · Last run Mon 26 Oct',
+        own: 'Creates the tasks and sends them to the team phones.',
+        comes: 'A line in the report with what was sent. A decision if the plan needs a change.',
+        pauseBtn: 'Pause the Monday tasks', pauseEffect: 'Stops the Monday 06:00 sampling tasks until you resume it. Sampling you already planned still happens.',
+        runs: [
+          ['Mon 26 Oct · 06:00', 'Sent 6 sampling tasks to Zhao Min’s team.', ''],
+          ['Mon 19 Oct · 06:00', 'Sent 6 sampling tasks to Zhao Min’s team.', ''],
+          ['Mon 12 Oct · 06:00', 'Sent 6 sampling tasks to Zhao Min’s team.', ''],
+          ['Mon 5 Oct · 06:00', 'Sent 4 sampling tasks to Zhao Min’s team.', ''],
+          ['Mon 28 Sep · 06:00', 'Sent 6 sampling tasks to Zhao Min’s team.', '']
+        ]
+      },
+      {
+        id: 'labs', by: 'BS', name: 'Read new lab results',
+        sentence: 'Reads each lab report when it arrives and matches it to its round.',
+        raised: 'Biosecurity · since September',
+        when: 'When a result arrives', next: 'Runs when a lab report arrives', stops: 'Never',
+        meta: 'When a result arrives · Last run Thu 29 Oct',
+        own: 'Reads the report and updates the round it belongs to.',
+        comes: 'A negative goes in the report. A positive or a failed antibody test comes to you at once.',
+        pauseBtn: 'Pause reading lab results', pauseEffect: 'Lab reports will wait unread until you resume it. Failed tests will not reach you.',
+        runsHeading: 'Recent results', runsNote: 'Only runs that found something.',
+        runs: [
+          ['Thu 29 Oct · 14:20', 'Batch 29 result: 6 of 10 below. Decision opened.', 'told'],
+          ['Thu 15 Oct · 11:05', 'Batch 31 swabs: all negative. In the report.', ''],
+          ['Wed 7 Oct · 10:30', 'Batch 30 result: 10 of 10 above. Round closed.', '']
+        ]
+      },
+      {
+        id: 'feed', by: 'EQ', name: 'Gestation 2 feed intake',
+        sentence: 'Compares each day’s feed intake in Gestation 2 with the week before.',
+        raised: 'Equipment · since Tue 27 Oct',
+        when: 'Every day 06:00', next: 'Sat 31 Oct, 06:00', stops: 'When intake is back to normal for 3 days',
+        meta: 'Every day 06:00 · Last run today 06:00',
+        own: 'Reads the feed counts, and the water line B pressure when intake drops.',
+        comes: 'A chat message when intake falls 5% or more. A repair task only after you say yes.',
+        pauseBtn: 'Pause the 06:00 check', pauseEffect: 'Stops the 06:00 feed check until you resume it. Intake drops will not reach you.',
+        runs: [
+          ['Fri 30 Oct · 06:00', 'Intake −6%. Pressure still low. Already told you.', ''],
+          ['Thu 29 Oct · 06:00', 'Intake −5%. Water line B pressure is low.', 'told'],
+          ['Wed 28 Oct · 06:00', 'Intake −3%. Under the 5% line.', ''],
+          ['Tue 27 Oct · 06:00', 'Intake −1%. First check.', '']
+        ]
+      }
+    ];
+  }
+
+  fmtDate(ms) {
+    const d = new Date(ms);
+    const wd = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getUTCDay()];
+    const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getUTCMonth()];
+    return wd + ' ' + d.getUTCDate() + ' ' + mo;
+  }
+
+  farrowing() {
+    return { 33: Date.UTC(2026, 10, 7), 34: Date.UTC(2026, 10, 28), 35: Date.UTC(2026, 11, 18) };
+  }
+
+  teams() {
+    return [{ value: 'li', label: 'Li Wei’s team', short: 'Li Wei’s team' }, { value: 'wang', label: 'Wang Fang’s team', short: 'Wang Fang’s team' }];
+  }
+
+  propDefaults() {
+    return { days: '28', team: 'li', from: '33' };
+  }
+
+  // The job the weaning proposal turns into once approved.
+  weaningJob(p) {
+    const n = Math.max(1, parseInt(p.days, 10) || 28);
+    const F = this.farrowing();
+    const first = p.from === '33' ? 33 : 35;
+    const team = this.teams().filter((t) => t.value === p.team)[0].short;
+    return {
+      id: 'weaning', by: 'GM', name: 'Weaning tasks', fresh: true,
+      sentence: 'Creates a weaning task ' + n + ' days after farrowing for each batch, from Batch ' + first + ' on.',
+      raised: 'General Manager · saved 09:12',
+      when: 'When a batch starts farrowing', next: 'Batch ' + first + ' starts farrowing ' + this.fmtDate(F[first]), stops: 'Never',
+      meta: 'Farrowing day + ' + n + ' · Not run yet',
+      own: 'Creates the weaning task and sends it to ' + team + '.',
+      comes: 'A line in the report listing each task it made. Nothing else.',
+      pauseBtn: 'Pause weaning tasks', pauseEffect: 'Stops new weaning tasks being created until you resume it. Tasks already made stay.',
+      noRunsText: 'No runs yet. The first is when Batch ' + first + ' starts farrowing.',
+      runs: []
+    };
+  }
+
+  defaults(start) {
+    const base = {
+      startSeen: start, view: 'list', openId: '', pausing: false, paused: {},
+      prop: this.propDefaults(), seeOpen: false, outcome: ''
+    };
+    if (start === 'job') return Object.assign(base, { view: 'job', openId: 'losses' });
+    if (start === 'failed') return Object.assign(base, { view: 'job', openId: 'drchen' });
+    if (start === 'pause') return Object.assign(base, { view: 'job', openId: 'losses', pausing: true });
+    if (start === 'paused') return Object.assign(base, { view: 'job', openId: 'losses', paused: { losses: '09:12' } });
+    if (start === 'proposal') return Object.assign(base, { view: 'proposal' });
+    if (start === 'created') return Object.assign(base, { view: 'job', openId: 'weaning', outcome: 'created' });
+    return base;
+  }
+
+  renderVals() {
+    const start = this.props.start || 'list';
+    const st = this.state || {};
+    const s = st.startSeen === start ? Object.assign(this.defaults(start), st) : this.defaults(start);
+    const set = (p) => this.setState(Object.assign({}, s, p, { startSeen: start }));
+    const I = this.icons();
+    const M = this.marks();
+    const T = this.tones();
+    const F = this.farrowing();
+    const created = s.outcome === 'created';
+
+    // ---------- all jobs ----------
+    const all = this.jobs();
+    if (created) {
+      const w = this.weaningJob(s.prop);
+      const at = all.map((j) => j.id).lastIndexOf('weekly');
+      all.splice(at + 1, 0, w);
+    }
+    const byId = {};
+    all.forEach((j) => { byId[j.id] = j; });
+    const isPaused = (id) => !!s.paused[id];
+    const hasProposal = !s.outcome;
+
+    // ---------- list ----------
+    const nFailed = all.filter((j) => j.failed && !isPaused(j.id)).length;
+    const nPaused = all.filter((j) => isPaused(j.id)).length;
+    const nRunning = all.length - nPaused;
+    let sentence = 'Jobs your team runs for you. ' + nRunning + ' running.';
+    if (nPaused > 0) sentence += ' ' + nPaused + ' paused.';
+    if (nFailed > 0) sentence += ' ' + nFailed + ' failed its last run.';
+    const order = ['GM', 'PR', 'VT', 'BS', 'EQ'];
+    const groups = order.map((code) => {
+      const js = all.filter((j) => j.by === code);
+      const sorted = js.filter((j) => j.failed).concat(js.filter((j) => !j.failed));
+      return {
+        code, flagged: js.some((j) => j.failed && !isPaused(j.id)), name: M[code].name, initials: code, markBg: M[code].bg, markInk: M[code].ink, count: js.length,
+        rows: sorted.map((j, n) => {
+          const p = isPaused(j.id);
+          const tone = p ? T.neutral : T.wrong;
+          return {
+            name: j.name,
+            meta: p ? j.meta.split(' · ')[0] + ' · Paused since ' + s.paused[j.id] : j.meta,
+            hasChip: p || !!j.failed,
+            chip: p ? 'Paused' : 'Failed last run', chipBg: tone.bg, chipInk: tone.ink, chipDot: tone.dot,
+            border: n === 0 ? 'none' : '1px solid #EFF1EC',
+            open: () => set({ view: 'job', openId: j.id, pausing: false })
+          };
+        })
+      };
+    });
+    const orderedGroups = groups.filter((g) => g.flagged).concat(groups.filter((g) => !g.flagged));
+
+    // ---------- proposal bits ----------
+    const p = s.prop;
+    const nDays = parseInt(p.days, 10);
+    const daysOk = nDays >= 1 && nDays <= 60;
+    const n = daysOk ? nDays : 28;
+    const team = this.teams().filter((t) => t.value === p.team)[0];
+    const first = p.from === '33' ? 33 : 35;
+    const batches = first === 33 ? [33, 34, 35] : [35];
+    const addDays = (ms) => ms + n * 86400000;
+    const proposalOpen = !s.outcome;
+    const lead = 'From Batch ' + first + ' on, a weaning task is created ' + n + ' days after farrowing and sent to ' + team.short + '.';
+    const changed = { from: p.from !== '33', days: p.days !== '28', team: p.team !== 'li' };
+    const nChanges = (changed.from ? 1 : 0) + (changed.days ? 1 : 0) + (changed.team ? 1 : 0);
+    const prop = {
+      lead, open: proposalOpen,
+      days: p.days, daysChanged: changed.days, daysBad: !daysOk, daysBorder: daysOk ? '#E2E5DF' : '#D9583B',
+      teamChanged: changed.team, fromChanged: changed.from, fromWas: 'Batch 33', skipWarn: p.from === '35'
+    };
+    const teamOptions = this.teams().map((t) => ({ value: t.value, label: t.label, selected: t.value === p.team }));
+    const fromOptions = [{ value: '33', label: 'Batch 33', selected: p.from === '33' }, { value: '35', label: 'Batch 35', selected: p.from === '35' }];
+    const createRows = batches.map((b, i) => ({
+      batch: 'Batch ' + b, what: 'Weaning check on ' + this.fmtDate(addDays(F[b])), when: 'farrowing from ' + this.fmtDate(F[b]),
+      border: i === 0 ? 'none' : '1px solid #EFF1EC'
+    }));
+    createRows.push({ batch: 'Later', what: 'The same for every new batch, on farrowing day + ' + n, when: team.short, border: '1px solid #EFF1EC' });
+    const firstDue = this.fmtDate(addDays(F[first]));
+    const seeLabel = s.seeOpen ? 'Hide the tasks it creates' : 'See the tasks it creates';
+
+    // ---------- job record ----------
+    const job = byId[s.openId] || all[0];
+    const paused = isPaused(job.id);
+    const failedNow = s.view === 'job' && !!job.failed && !paused && !s.pausing;
+    let strip = { show: false, text: '', time: '', hasTime: false, hasAction: false, actionLabel: '', actionIcon: I.check, action: () => {}, bg: T.ok.bg, ink: T.ok.ink, dot: T.ok.dot, icon: I.check, anim: 'none' };
+    if (s.view === 'job' && paused) {
+      strip = Object.assign(strip, { show: true, text: 'Paused at ' + s.paused[job.id] + '. Nothing runs until you resume.', hasAction: true, actionLabel: 'Resume', actionIcon: I.play, bg: T.neutral.bg, ink: T.neutral.ink, dot: T.neutral.dot, icon: I.pause, anim: 'sentriRise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both',
+        action: () => { const q = Object.assign({}, s.paused); delete q[job.id]; set({ paused: q }); } });
+    } else if (failedNow) {
+      strip = Object.assign(strip, { show: true, text: job.fail, bg: T.wrong.bg, ink: T.wrong.ink, dot: T.wrong.dot, icon: I.alert });
+    } else if (s.view === 'job' && created && job.id === 'weaning') {
+      strip = Object.assign(strip, { show: true, text: 'Saved 09:12 · Weaning tasks are created on farrowing day + ' + n + ', from Batch ' + first + ' on. The first is due ' + firstDue + '.', hasAction: true, actionLabel: 'Undo', actionIcon: I.undo, bg: T.neutral.bg, ink: T.neutral.ink, dot: T.ok.dot, anim: 'sentriRise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both',
+        action: () => set({ outcome: '', view: 'proposal', openId: '' }) });
+    }
+    if (s.view === 'proposal' && s.outcome === 'discarded') {
+      strip = Object.assign(strip, { show: true, text: 'Discarded 09:12 · Weaning tasks stay a hand job.', bg: T.neutral.bg, ink: T.neutral.ink, dot: T.neutral.dot, icon: I.x, anim: 'sentriRise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both' });
+    }
+    const jobView = {
+      crumb: 'Automations · ' + M[job.by].name, name: job.name, sentence: job.sentence, raised: job.raised,
+      initials: job.by, markBg: M[job.by].bg, markInk: M[job.by].ink,
+      showPause: !paused && !s.pausing,
+      runsHeading: job.runsHeading || 'Recent runs', runsNote: job.runsNote || '',
+      hasRuns: job.runs.length > 0, noRuns: job.runs.length === 0, noRunsText: job.noRunsText || ''
+    };
+    const kv = (arr) => arr.map((r, i) => ({ k: r[0], v: r[1], border: i === 0 ? 'none' : '1px solid #EFF1EC' }));
+    const nextText = paused ? 'Skipped while paused' : job.next;
+    const runsRows = kv([['When', job.when], ['Next run', nextText], ['Stops when', job.stops]]);
+    const mayRows = kv([['On its own', job.own], ['Comes to you', job.comes]]);
+    const runs = job.runs.map((r, i) => {
+      const t = r[2] === 'failed' ? T.wrong : T.neutral;
+      return {
+        when: r[0], text: r[1], border: i === 0 ? 'none' : '1px solid #EFF1EC',
+        hasChip: r[2] === 'failed' || r[2] === 'told', chip: r[2] === 'failed' ? 'Failed' : 'Told you', chipBg: t.bg, chipInk: t.ink, chipDot: t.dot
+      };
+    });
+
+    // ---------- save bar ----------
+    const foot = { normal: true, hint: '', label: '', icon: I.check, off: false, opacity: '1', go: () => {}, second: () => {}, secondLabel: 'Discard' };
+    let showFoot = false;
+    if (s.view === 'job' && s.pausing && !paused) {
+      showFoot = true;
+      foot.hint = '1 change · ' + job.pauseEffect; foot.label = job.pauseBtn; foot.icon = I.pause;
+      foot.go = () => { const q = Object.assign({}, s.paused); q[job.id] = '09:12'; set({ paused: q, pausing: false }); };
+      foot.second = () => set({ pausing: false });
+    } else if (s.view === 'proposal' && proposalOpen) {
+      showFoot = true;
+      const nTasks = batches.length;
+      foot.hint = (nChanges > 0 ? nChanges + (nChanges === 1 ? ' change · ' : ' changes · ') : '') + nTasks + (nTasks === 1 ? ' weaning task' : ' weaning tasks') + ' created now · future tasks only';
+      foot.label = 'Create weaning tasks from Batch ' + first + ' on';
+      foot.off = !daysOk; foot.opacity = daysOk ? '1' : '0.4';
+      foot.go = () => set({ outcome: 'created', view: 'job', openId: 'weaning' });
+      foot.second = () => set({ outcome: 'discarded' });
+    }
+
+    return {
+      ic: I, isList: s.view === 'list', isJob: s.view === 'job', isProposal: s.view === 'proposal',
+      sentence, hasProposal, groups: orderedGroups,
+      openProposal: () => set({ view: 'proposal', openId: '' }),
+      back: () => set({ view: 'list', openId: '', pausing: false }),
+      job: jobView, strip, runsRows, mayRows, runs,
+      startPause: () => set({ pausing: true }),
+      prop, teamOptions, fromOptions, createRows,
+      onDays: (e) => set({ prop: Object.assign({}, p, { days: e.target.value }) }),
+      onTeam: (e) => set({ prop: Object.assign({}, p, { team: e.target.value }) }),
+      onFrom: (e) => set({ prop: Object.assign({}, p, { from: e.target.value }) }),
+      fixDays: () => set({ prop: Object.assign({}, p, { days: '28' }) }),
+      fixFrom: () => set({ prop: Object.assign({}, p, { from: '33' }) }),
+      seeOpen: !!s.seeOpen, seeRot: s.seeOpen ? 'rotate(90deg)' : 'none', seeLabel,
+      toggleSee: () => set({ seeOpen: !s.seeOpen }),
+      showFoot, foot
+    };
+  }
+}
+</script>
+</body>
+</html>

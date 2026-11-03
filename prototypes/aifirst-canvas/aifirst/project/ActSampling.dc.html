@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sampling and results</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+<!-- ============ LIST ============ -->
+<sc-if value="{{isList}}" hint-placeholder-val="{{true}}">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Sampling and results</h1>
+  <p style="margin: 6px 0 0; font-size: 14px; color: #626C66">{{summary}}</p>
+
+  <!-- 1. Result back -->
+  <sc-if value="{{needsOpen}}" hint-placeholder-val="{{true}}">
+    <div style="margin-top: 28px; display: flex; align-items: center; gap: 8px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Result back · needs you</h2>
+      <span style="min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; background: #121815; color: #C5F06A; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">1</span>
+    </div>
+    <button type="button" onClick="{{openRecord}}" style="margin-top: 10px; width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #D5E7CF; border-radius: 14px; background: #F5FAF2; font: inherit; color: inherit; text-align: left; cursor: pointer; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <span style="flex: 1; min-width: 0">
+        <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">PRRS antibodies · Batch 29 · 10 sows</span>
+        <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Round check · lab report matched to 10 samples</span>
+      </span>
+      <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #3B4540; white-space: nowrap">Thu 29 Oct</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+    </button>
+  </sc-if>
+
+  <!-- 2. At the lab -->
+  <div style="margin-top: 28px; display: flex; align-items: baseline; gap: 8px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">At the lab</h2>
+    <span style="font-size: 13px; color: #626C66">2</span>
+  </div>
+  <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <sc-for list="{{lab}}" as="r" hint-placeholder-count="2">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-top: {{r.top}}">
+        <span style="flex: 1; min-width: 0">
+          <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{r.what}}</span>
+          <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.why}}</span>
+        </span>
+        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66; white-space: nowrap">{{r.date}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- 3. Waiting to collect -->
+  <div style="margin-top: 28px; display: flex; align-items: baseline; gap: 8px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">Waiting to collect</h2>
+    <span style="font-size: 13px; color: #626C66">2</span>
+  </div>
+  <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <sc-for list="{{waiting}}" as="r" hint-placeholder-count="2">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-top: {{r.top}}">
+        <span style="flex: 1; min-width: 0">
+          <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{r.what}}</span>
+          <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.why}}</span>
+        </span>
+        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66; white-space: nowrap">{{r.date}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- 4. Filed this month (collapsed) -->
+  <button type="button" onClick="{{toggleFiled}}" aria-expanded="{{filedExpanded}}" style="margin-top: 28px; display: flex; align-items: baseline; gap: 8px; padding: 0; border: 0; background: transparent; font: inherit; color: inherit; cursor: pointer; text-align: left">
+    <span style="font-size: 15px; font-weight: 600">Filed this month</span>
+    <span style="font-size: 13px; color: #626C66">{{filedCount}}</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="align-self: center; width: 15px; height: 15px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{filedRot}}"><path d="{{ic.chev}}"></path></svg>
+  </button>
+  <sc-if value="{{filedOpen}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{filedRows}}" as="r" hint-placeholder-count="5">
+        <button type="button" onClick="{{r.open}}" style="width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 0; border-top: {{r.top}}; background: transparent; font: inherit; color: inherit; text-align: left; cursor: {{r.cursor}}">
+          <span style="flex: 1; min-width: 0">
+            <span style="display: block; font-size: 14px; font-weight: 500; color: #121815; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.what}}</span>
+            <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.why}}</span>
+          </span>
+          <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66; white-space: nowrap">{{r.date}}</span>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+</sc-if>
+
+<!-- ============ RECORD / FILED ============ -->
+<sc-if value="{{isRecord}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToList}}" style="display: inline-flex; align-items: center; gap: 2px; margin: 0 0 14px -4px; padding: 2px 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: rotate(180deg)"><path d="{{ic.chev}}"></path></svg>
+    Sampling and results
+  </button>
+
+  <!-- receipt -->
+  <sc-if value="{{isFiled}}" hint-placeholder-val="{{false}}">
+    <div style="margin: 0 0 20px; display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 14px; border-radius: 12px; background: #F0F2EE; color: #3B4540; font-size: 13.5px; font-weight: 500; line-height: 1.45; animation: sentriRise 0.4s ease-out">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      <span style="flex: 1; min-width: 0">Saved <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">08:52</span> · Result filed on Batch 29. &#8216;Revaccinate Batch 29?&#8217; is in Decisions.</span>
+      <button type="button" style="height: 32px; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer; white-space: nowrap">Open decision</button>
+      <button type="button" onClick="{{undoFile}}" style="height: 32px; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <!-- discarded -->
+  <sc-if value="{{wrongSent}}" hint-placeholder-val="{{false}}">
+    <div style="margin: 0 0 20px; display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 14px; border-radius: 12px; background: #F0F2EE; animation: sentriRise 0.4s ease-out">
+      <span style="flex: 1; min-width: 0; font-size: 13.5px; font-weight: 500; color: #3B4540">Discarded. Nothing is filed.</span>
+      <button type="button" onClick="{{takeBack}}" style="height: 32px; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer; white-space: nowrap">Bring it back</button>
+    </div>
+  </sc-if>
+
+  <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Biosecurity · Test results</div>
+  <div style="margin-top: 6px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">PRRS antibodies · Batch 29</h1>
+    <sc-if value="{{isFiled}}" hint-placeholder-val="{{false}}">
+      <span style="display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; background: #E7F4EA; color: #1F5534; font-size: 12.5px; font-weight: 500"><span style="width: 6px; height: 6px; border-radius: 50%; background: #2D7A4B"></span>Filed</span>
+    </sc-if>
+    <sc-if value="{{notFiled}}" hint-placeholder-val="{{true}}">
+      <span style="display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; background: #FFF0D1; color: #7A4A00; font-size: 12.5px; font-weight: 500"><span style="width: 6px; height: 6px; border-radius: 50%; background: #D99A1E"></span>Result back</span>
+    </sc-if>
+  </div>
+  <sc-if value="{{isFiled}}" hint-placeholder-val="{{false}}">
+    <p style="margin: 8px 0 0; font-size: 14px; color: #3B4540">The results are on the 10 sows sampled on Fri 23 Oct.</p>
+  </sc-if>
+
+  <!-- step line -->
+  <div style="margin-top: 24px; display: flex; align-items: flex-start">
+    <sc-for list="{{steps}}" as="st" hint-placeholder-count="4">
+      <div style="flex: 1; min-width: 0">
+        <div style="display: flex; align-items: center">
+          <span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 50%; background: {{st.dot}}"></span>
+          <span style="flex: 1; height: 1px; margin: 0 8px; background: {{st.line}}"></span>
+        </div>
+        <div style="margin-top: 8px; font-size: 13px; font-weight: 500; color: #121815">{{st.label}}</div>
+        <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #3B4540">{{st.date}}</div>
+        <div style="margin-top: 1px; padding-right: 8px; font-size: 12.5px; color: #626C66">{{st.who}}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- result table -->
+  <div style="margin-top: 28px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">Result</h2>
+    <span style="font-size: 13px; color: #3B4540">{{summaryLine}}</span>
+  </div>
+  <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <div style="display: grid; grid-template-columns: 0.7fr 1.3fr 1fr 1fr; align-items: center; padding: 9px 16px; background: #F6F7F4; border-bottom: 1px solid #E8EBE5; font-size: 12px; font-weight: 500; color: #626C66">
+      <span>Sample</span><span>Pig tag</span><span>S/P value</span><span>Against 0.4</span>
+    </div>
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="10">
+      <div style="display: grid; grid-template-columns: 0.7fr 1.3fr 1fr 1fr; align-items: center; padding: 6px 16px; min-height: 36px; box-sizing: border-box; border-top: {{r.top}}">
+        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #3B4540">{{r.sample}}</span>
+        <span style="display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0">
+          <span style="display: flex; align-items: center; gap: 7px">
+            <sc-if value="{{r.changed}}" hint-placeholder-val="{{false}}">
+              <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #2FA36B; flex-shrink: 0"></span>
+            </sc-if>
+            <label for="{{r.id}}" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Pig tag for {{r.sample}}</label>
+            <sc-if value="{{r.editable}}" hint-placeholder-val="{{true}}">
+            <input id="{{r.id}}" value="{{r.tag}}" onChange="{{r.change}}" style="width: 92px; box-sizing: border-box; height: 30px; padding: 0 9px; border: 1px solid {{r.border}}; border-radius: 8px; background: #FFFFFF; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13.5px; color: #121815">
+            </sc-if>
+            <sc-if value="{{r.locked}}" hint-placeholder-val="{{false}}">
+              <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13.5px; color: #121815">{{r.tag}}</span>
+            </sc-if>
+            <sc-if value="{{r.changed}}" hint-placeholder-val="{{false}}">
+              <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #626C66; text-decoration: line-through">{{r.old}}</span>
+            </sc-if>
+          </span>
+          <sc-if value="{{r.warn}}" hint-placeholder-val="{{false}}">
+            <span style="display: flex; align-items: baseline; gap: 6px; font-size: 12.5px; line-height: 1.4; color: #7A4A00"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #D99A1E; flex-shrink: 0; align-self: center"></span>{{r.warnText}}<button type="button" onClick="{{r.revert}}" style="border: 0; background: transparent; padding: 0; font: inherit; font-size: 12.5px; font-weight: 600; color: #121815; cursor: pointer; text-decoration: underline">Use {{r.old}}</button></span>
+          </sc-if>
+        </span>
+        <span><span style="display: inline-block; min-width: 48px; padding: 2px 10px; box-sizing: border-box; border-radius: 8px; background: {{r.valBg}}; color: {{r.valInk}}; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13.5px; font-weight: 500; text-align: center">{{r.val}}</span></span>
+        <span style="font-size: 13px; color: {{r.sideInk}}">{{r.side}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- report -->
+  <h2 style="margin: 28px 0 0; font-size: 15px; font-weight: 600">Lab report</h2>
+  <div style="margin-top: 10px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+    <button type="button" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.file}}"></path></svg>
+      Open lab report (PDF)
+    </button>
+    <span style="font-size: 12.5px; color: #626C66">Regional Vet Lab · 2 pages</span>
+  </div>
+</sc-if>
+
+</div>
+
+<!-- sticky save bar (record, not yet filed) -->
+<sc-if value="{{showFooter}}" hint-placeholder-val="{{false}}">
+  <div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+    <div style="max-width: 760px; margin: 0 auto; padding: 14px 32px; box-sizing: border-box; display: flex; align-items: center; gap: 10px">
+      <span style="flex: 1; min-width: 0; font-size: 13px; line-height: 1.4; color: #3B4540">{{barSummary}}</span>
+      <button type="button" onClick="{{discard}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer">Discard</button>
+      <button type="button" onClick="{{fileIt}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; opacity: {{fileOpacity}}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+        File result on Batch 29
+      </button>
+    </div>
+  </div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["list","record","filed"],"default":"list"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      chev: 'M9 18l6-6-6-6',
+      check: 'M20 6 9 17l-5-5',
+      undo: 'M3 7v6h6 M21 17a9 9 0 0 0-15-6.7L3 13',
+      file: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M8 13h8 M8 17h5',
+      x: 'M18 6 6 18 M6 6l12 12'
+    };
+  }
+
+  defaults(start) {
+    const base = { startSeen: start, view: 'list', filedDone: false, filedOpen: false, wrongSent: false, tagEdits: {} };
+    if (start === 'record') return Object.assign(base, { view: 'record' });
+    if (start === 'filed') return Object.assign(base, { view: 'filed', filedDone: true });
+    return base;
+  }
+
+  renderVals() {
+    const start = this.props.start || 'list';
+    const fresh = !this.state || this.state.startSeen !== start;
+    const s = fresh ? this.defaults(start) : Object.assign(this.defaults(start), this.state);
+    const set = (p) => this.setState(Object.assign({ startSeen: start }, s, p));
+    const ic = this.icons();
+
+    const lab = [
+      { what: 'PRRS oral fluids · Gestation 1 · 6 pens', why: 'Routine, every 8 weeks · Regional Vet Lab', date: 'Since Sat 24 Oct' },
+      { what: 'PED swabs · feed truck', why: 'Investigation · Biosecurity', date: 'Since Mon 26 Oct' }
+    ];
+    const labRows = lab.map((r, i) => Object.assign({}, r, { top: i === 0 ? '0' : '1px solid #EFF1EC' }));
+    const waiting = [
+      { what: 'Water quality · line B', why: 'Routine, monthly · Equipment', date: 'Due Mon 2 Nov', top: '0' },
+      { what: 'PRRS antibodies · Batch 31 round · 10 sows', why: 'Vaccination round check · Vet', date: 'Due Tue 17 Nov', top: '1px solid #EFF1EC' }
+    ];
+    const filedBase = [
+      { what: 'PRRS antibodies · Batch 28 · 10 sows', why: '7 of 10 above 0.4 · no action', date: 'Wed 21 Oct' },
+      { what: 'Water quality · line A', why: 'Within range', date: 'Thu 15 Oct' },
+      { what: 'Salmonella swabs · Farrowing Room 2', why: 'Negative', date: 'Tue 13 Oct' },
+      { what: 'PED swabs · Nursery 1', why: 'Negative', date: 'Fri 9 Oct' },
+      { what: 'Feed mycotoxin · Farrowing Room 3', why: 'Within range', date: 'Mon 5 Oct' }
+    ];
+    const filedAll = (s.filedDone ? [{ what: 'PRRS antibodies · Batch 29 · 10 sows', why: '4 of 10 above 0.4 · Revaccinate Batch 29? raised', date: 'Fri 30 Oct', open: true }] : []).concat(filedBase);
+    const filedRows = filedAll.map((r, i) => ({
+      what: r.what, why: r.why, date: r.date,
+      top: i === 0 ? '0' : '1px solid #EFF1EC',
+      cursor: r.open ? 'pointer' : 'default',
+      open: () => { if (r.open) set({ view: 'filed' }); }
+    }));
+
+    const needsOpen = !s.filedDone;
+    const atLab = labRows.length;
+    const summary = (needsOpen ? '1 result needs you. ' : 'Nothing needs you. ') + atLab + ' at the lab, 2 waiting to collect.';
+
+    // Record data
+    const tags = ['204518', '207731', '203390', '209124', '205867', '201446', '208052', '206379', '202915', '210043'];
+    const vals = [0.18, 0.62, 0.12, 0.27, 0.48, 0.33, 0.91, 0.09, 0.40, 0.22];
+    const rows = tags.map((tag, i) => {
+      const v = vals[i];
+      const above = v >= 0.4;
+      const cur = s.tagEdits[i] !== undefined ? s.tagEdits[i] : tag;
+      const dupAt = tags.map((x, j) => (s.tagEdits[j] !== undefined ? s.tagEdits[j] : x)).indexOf(cur);
+      let warnText = '';
+      if (!/^[0-9]{6}$/.test(cur)) warnText = 'Tags are 6 digits.';
+      else if (dupAt !== i) warnText = 'Already on S' + (dupAt + 1) + '.';
+      const setTag = (nv) => set({ tagEdits: Object.assign({}, s.tagEdits, { [i]: nv }) });
+      return {
+        id: 'smp-tag-' + (i + 1),
+        editable: s.view !== 'filed', locked: s.view === 'filed',
+        sample: 'S' + (i + 1),
+        tag: cur,
+        old: tag,
+        changed: cur !== tag,
+        warn: !!warnText, warnText: warnText,
+        border: warnText ? '#D99A1E' : '#E2E5DF',
+        change: (e) => setTag((e && e.target ? e.target.value : '').trim()),
+        revert: () => setTag(tag),
+        val: v.toFixed(2),
+        valBg: !above ? '#FCE7E2' : 'transparent',
+        valInk: !above ? '#9A2C17' : '#121815',
+        side: above ? 'Above' : 'Below',
+        sideInk: above ? '#1F5534' : '#3B4540',
+        top: i === 0 ? '0' : '1px solid #EFF1EC'
+      };
+    });
+
+    const stepsBase = [
+      { label: 'Requested', date: 'Tue 20 Oct', who: 'Vet, round check' },
+      { label: 'Collected', date: 'Fri 23 Oct', who: 'Zhao Min, 10 sows' },
+      { label: 'At lab', date: 'Sat 24 Oct', who: 'Regional Vet Lab' },
+      { label: 'Result', date: 'Thu 29 Oct', who: 'PDF, 2 pages' }
+    ];
+    const steps = stepsBase.map((st, i) => Object.assign({}, st, {
+      dot: i === 3 ? '#121815' : '#8E9C90',
+      line: i === 3 ? 'transparent' : '#DADED6'
+    }));
+
+    const isRecordView = s.view === 'record' || s.view === 'filed';
+    const isFiledView = s.view === 'filed';
+    const canFile = !s.wrongSent && rows.every((r) => !r.warn);
+    const nEdits = rows.filter((r) => r.changed).length;
+
+    return {
+      ic,
+      isList: s.view === 'list',
+      isRecord: isRecordView,
+      isFiled: isFiledView,
+      notFiled: isRecordView && !isFiledView,
+      summary,
+      needsOpen,
+      lab: labRows,
+      waiting,
+      filedRows,
+      filedCount: filedAll.length,
+      filedOpen: s.filedOpen,
+      filedExpanded: s.filedOpen ? 'true' : 'false',
+      filedRot: s.filedOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+      toggleFiled: () => set({ filedOpen: !s.filedOpen }),
+      openRecord: () => set({ view: 'record' }),
+      backToList: () => set({ view: 'list' }),
+      steps,
+      undoFile: () => set({ view: 'record', filedDone: false }),
+      rows,
+      summaryLine: '4 of 10 above the protective level (S/P ≥ 0.4)',
+      barSummary: (nEdits ? nEdits + (nEdits === 1 ? ' tag changed' : ' tags changed') + ' · ' : 'New result · ') + '10 samples, 4 of 10 above 0.4',
+      showFooter: s.view === 'record' && !s.wrongSent,
+      fileOpacity: canFile ? 1 : 0.4,
+      fileIt: () => { if (canFile) set({ view: 'filed', filedDone: true }); },
+      discard: () => set({ wrongSent: true }),
+      wrongSent: s.wrongSent && !isFiledView,
+      takeBack: () => set({ wrongSent: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

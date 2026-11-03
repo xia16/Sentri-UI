@@ -1,0 +1,94 @@
+{
+ "version": 1,
+ "types": [
+  {
+   "id": "group",
+   "name": "Group pen",
+   "uses": [
+    "Gestation"
+   ],
+   "perPen": {
+    "Gestation": 14
+   },
+   "w": 483,
+   "l": 564,
+   "color": 0
+  },
+  {
+   "id": "stall",
+   "name": "Gestation stall",
+   "uses": [
+    "Gestation"
+   ],
+   "perPen": {
+    "Gestation": 1
+   },
+   "w": 65,
+   "l": 210,
+   "color": 1
+  }
+ ],
+ "zones": [
+  {
+   "id": "barn-site",
+   "name": "Barn site",
+   "code": "Z1"
+  }
+ ],
+ "sections": [
+  {
+   "id": "group-gestation",
+   "name": "Group gestation",
+   "code": "GRO",
+   "zone": "barn-site"
+  }
+ ],
+ "rooms": [
+  {
+   "id": "gestation-barn",
+   "name": "Gestation barn",
+   "section": "group-gestation",
+   "num": 1,
+   "at": {
+    "x": 0,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "group",
+       "n": 10
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "group",
+       "n": 10
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 92
+   },
+   "ends": [
+    {
+     "at": "far",
+     "runs": [
+      {
+       "type": "stall",
+       "n": 24
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "name": "Prestage gestation barn"
+}

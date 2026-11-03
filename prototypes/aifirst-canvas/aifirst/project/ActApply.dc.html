@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Review and apply a plan</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+
+<div style="max-width: 880px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+  <!-- Receipt strip -->
+  <sc-if value="{{showStrip}}" hint-placeholder-val="{{false}}">
+  <div style="display: flex; align-items: center; gap: 10px; margin: 0 0 20px; padding: 10px 14px; border: 1px solid #E8EBE5; border-radius: 12px; background: #F6F7F4; color: #3B4540; font-size: 14px; font-weight: 500; animation: sentriRise 0.35s ease-out both">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+    <span>{{stripText}}</span>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{discarded}}" hint-placeholder-val="{{false}}">
+  <div style="display: flex; align-items: center; gap: 10px; margin: 0 0 20px; padding: 10px 14px; border: 1px solid #E8EBE5; border-radius: 12px; background: #F6F7F4; color: #3B4540; font-size: 14px; animation: sentriRise 0.35s ease-out both">
+    <span style="flex: 1; min-width: 0"><span style="font-weight: 500">Discarded 08:46</span> &#183; nothing was changed on the farm.</span>
+    <button type="button" onClick="{{undoDiscard}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Undo</button>
+  </div>
+  </sc-if>
+
+  <!-- ============ DRAFT ============ -->
+  <sc-if value="{{isDraft}}" hint-placeholder-val="{{false}}">
+  <div style="display: flex; align-items: center; gap: 4px; margin: 0 0 22px; padding-bottom: 12px; border-bottom: 1px solid #EFF1EC">
+    <span style="display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: 10px; background: #F0F2EE; font-size: 13px; font-weight: 500; color: #121815">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #3B4540; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.file}}"></path></svg>
+      Vaccination programme · draft 3
+    </span>
+  </div>
+
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Vaccination programme</h1>
+  <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin: 10px 0 0">
+    <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; background: #F0F2EE; color: #3B4540; font-size: 12px; font-weight: 500">Draft 3 · changed 08:31</span>
+  </div>
+
+  <div style="margin-top: 24px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <div style="display: grid; grid-template-columns: 1.1fr 0.8fr 2.2fr 0.7fr; gap: 16px; padding: 10px 18px; background: #F6F7F4; font-size: 12px; font-weight: 500; color: #626C66">
+      <span>Vaccine</span><span>For</span><span>When</span><span>Dose</span>
+    </div>
+    <sc-for list="{{vaxRows}}" as="v" hint-placeholder-count="5">
+    <div style="display: grid; grid-template-columns: 1.1fr 0.8fr 2.2fr 0.7fr; gap: 16px; align-items: baseline; padding: 13px 18px; border-top: 1px solid #EFF1EC; font-size: 14px">
+      <span style="font-weight: 600; color: #121815"><sc-if value="{{v.dot}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: #D99A1E; vertical-align: 2px"></span></sc-if>{{v.name}}</span>
+      <span style="color: #3B4540">{{v.who}}</span>
+      <span style="color: #1E2622">{{v.when}}<sc-if value="{{v.hasOld}}" hint-placeholder-val="{{false}}"><span style="display: block; font-size: 13px; color: #626C66; text-decoration: line-through">{{v.old}}</span></sc-if></span>
+      <span style="color: #3B4540">{{v.dose}}</span>
+    </div>
+    </sc-for>
+  </div>
+
+  <p style="margin: 14px 0 0; font-size: 14px; color: #1E2622"><span style="font-weight: 600"><span aria-hidden="true" style="display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: #D99A1E; vertical-align: 2px"></span>Antibody check</span> <span style="color: #3B4540">PRRS, 10 sows per round, 28 days after</span></p>
+
+  </sc-if>
+
+  <!-- ============ REVIEW / RUNNING / DONE / PARTIAL ============ -->
+  <sc-if value="{{isPlan}}" hint-placeholder-val="{{true}}">
+  <div>
+    <sc-if value="{{showCrumb}}" hint-placeholder-val="{{true}}">
+    <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Vaccination programme</div>
+    </sc-if>
+    <h1 style="margin: 8px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{title}}</h1>
+    <sc-if value="{{showSentence}}" hint-placeholder-val="{{true}}">
+    <p style="margin: 10px 0 0; max-width: 620px; font-size: 14px; color: #3B4540">{{sentence}}</p>
+    </sc-if>
+    <sc-if value="{{showFirst}}" hint-placeholder-val="{{true}}">
+    <p style="display: flex; align-items: center; gap: 8px; margin: 8px 0 0; font-size: 13px; color: #626C66">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.clock}}"></path></svg>
+      First thing that happens: 48 vaccinations for Batch 34 on Fri 13 Nov.
+    </p>
+    </sc-if>
+  </div>
+
+  <!-- The change list: the signature -->
+  <div style="margin-top: 24px">
+    <sc-if value="{{showListHead}}" hint-placeholder-val="{{true}}">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 8px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">{{listHead}}</h2>
+      <span style="font-size: 12.5px; color: #626C66">Untick anything you would rather leave out</span>
+    </div>
+    </sc-if>
+    <div style="border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{rows}}" as="row" hint-placeholder-count="7">
+      <div style="border-top: {{row.bt}}; padding: 14px 18px">
+        <div style="display: flex; align-items: flex-start; gap: 12px">
+          <span style="width: 14px; flex-shrink: 0; padding-top: 5px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #626C66">{{row.num}}</span>
+
+          <!-- status column -->
+          <span style="width: 20px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center">
+            <sc-if value="{{row.isReview}}" hint-placeholder-val="{{true}}">
+            <label style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin: 0 -2px; cursor: pointer">
+              <input type="checkbox" checked="{{row.checked}}" onChange="{{row.toggle}}" aria-label="{{row.ariaLabel}}" style="width: 18px; height: 18px; margin: 0; accent-color: #121815; cursor: pointer">
+            </label>
+            </sc-if>
+            <sc-if value="{{row.stDone}}" hint-placeholder-val="{{false}}">
+            <span style="width: 20px; height: 20px; border-radius: 50%; background: #E7F4EA; display: flex; align-items: center; justify-content: center">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: #2D7A4B; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+            </span>
+            </sc-if>
+            <sc-if value="{{row.stRun}}" hint-placeholder-val="{{false}}">
+            <span style="width: 10px; height: 10px; border-radius: 50%; background: #2FA36B; animation: sentriPulseG 1.4s ease-out infinite"></span>
+            </sc-if>
+            <sc-if value="{{row.stWait}}" hint-placeholder-val="{{false}}">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #DADED6"></span>
+            </sc-if>
+            <sc-if value="{{row.stFail}}" hint-placeholder-val="{{false}}">
+            <span style="width: 20px; height: 20px; border-radius: 50%; background: #FCE7E2; display: flex; align-items: center; justify-content: center">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: #9A2C17; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.x}}"></path></svg>
+            </span>
+            </sc-if>
+            <sc-if value="{{row.stNeutral}}" hint-placeholder-val="{{false}}">
+            <span style="width: 20px; height: 20px; border-radius: 50%; background: #F0F2EE; display: flex; align-items: center; justify-content: center">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: #3B4540; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.clock}}"></path></svg>
+            </span>
+            </sc-if>
+          </span>
+
+          <!-- area icon -->
+          <span style="width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0; background: {{row.tileBg}}; color: {{row.tileInk}}; opacity: {{row.tileOpacity}}; display: flex; align-items: center; justify-content: center">
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><path d="{{row.iconPath}}"></path></svg>
+          </span>
+
+          <!-- the line -->
+          <div style="flex: 1 1 260px; min-width: 0; padding-top: 3px">
+            <div style="font-size: 14px; font-weight: 500; line-height: 1.45; color: {{row.mainInk}}">{{row.main}}</div>
+            <sc-if value="{{row.showFlag}}" hint-placeholder-val="{{false}}">
+            <div style="display: inline-flex; align-items: flex-start; gap: 8px; margin-top: 8px; padding: 5px 10px; border-radius: 8px; background: #FFF0D1; color: #7A4A00; font-size: 12.5px; line-height: 1.45">
+              <span aria-hidden="true" style="width: 6px; height: 6px; margin-top: 7px; border-radius: 50%; background: #D99A1E; flex-shrink: 0"></span>
+              <span>Leaves the farm: sent to the supplier only after you approve this.</span>
+            </div>
+            </sc-if>
+            <sc-if value="{{row.showFail}}" hint-placeholder-val="{{false}}">
+            <div style="display: inline-flex; align-items: flex-start; gap: 8px; margin-top: 8px; padding: 5px 10px; border-radius: 8px; background: #FCE7E2; color: #9A2C17; font-size: 12.5px; line-height: 1.45">
+              <span aria-hidden="true" style="width: 6px; height: 6px; margin-top: 7px; border-radius: 50%; background: #D9583B; flex-shrink: 0"></span>
+              <span>Couldn't reach Huayu Vet Supply's order site. Nothing was sent.</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 10px">
+              <button type="button" onClick="{{retry}}" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">
+                Try again
+              </button>
+              <button type="button" onClick="{{orderLater}}" style="height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Order later</button>
+              <span style="font-size: 12.5px; color: #626C66">Order later sends it to Decisions tomorrow.</span>
+            </div>
+            </sc-if>
+          </div>
+
+          <!-- right side: teammate and disclosure -->
+          <div style="display: flex; align-items: center; gap: 14px; flex-shrink: 0; padding-top: 1px">
+            <span style="display: inline-flex; align-items: center; gap: 8px; height: 28px; font-size: 12.5px; color: #626C66">
+              <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 8px; background: {{row.markBg}}; color: {{row.markInk}}; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600">{{row.markInitials}}</span>
+              <span style="min-width: 76px">{{row.whoName}}</span>
+            </span>
+            <sc-if value="{{row.showDetails}}" hint-placeholder-val="{{true}}">
+            <button type="button" onClick="{{row.toggleOpen}}" aria-expanded="{{row.open}}" style="display: inline-flex; align-items: center; justify-content: flex-end; gap: 4px; width: 72px; height: 28px; padding: 0 4px 0 6px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #626C66; cursor: pointer">
+              Details
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{row.chevRot}}"><path d="{{ic.chevDown}}"></path></svg>
+            </button>
+            </sc-if>
+            <sc-if value="{{row.openSlot}}" hint-placeholder-val="{{false}}">
+            <span style="width: 56px; display: flex; justify-content: flex-end">
+              <sc-if value="{{row.showOpen}}" hint-placeholder-val="{{false}}">
+              <button type="button" onClick="{{noop}}" aria-label="{{row.openLabel}}" style="display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 4px 0 6px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 13px; font-weight: 600; color: #121815; cursor: pointer">
+                Open
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.arrowUpRight}}"></path></svg>
+              </button>
+              </sc-if>
+            </span>
+            </sc-if>
+          </div>
+        </div>
+
+        <!-- folded details -->
+        <sc-if value="{{row.openPanel}}" hint-placeholder-val="{{false}}">
+        <div style="margin: 12px 0 0 98px; padding-left: 14px; border-left: 2px solid #EFF1EC; display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{row.lines}}" as="l" hint-placeholder-count="3">
+          <div style="display: flex; gap: 12px; font-size: 13px; line-height: 1.5; color: #1E2622">
+            <sc-if value="{{l.hasLead}}" hint-placeholder-val="{{true}}">
+            <span style="min-width: {{row.leadW}}; flex-shrink: 0; font-family: {{l.leadFont}}; font-size: {{l.leadSize}}; color: #121815; font-weight: {{l.leadWeight}}">{{l.lead}}</span>
+            </sc-if>
+            <span style="color: #3B4540; min-width: 0">{{l.text}}</span>
+          </div>
+          </sc-for>
+          <sc-if value="{{row.hasUndo}}" hint-placeholder-val="{{true}}">
+          <div style="margin-top: 4px; font-size: 12.5px; color: #626C66">{{row.undo}}</div>
+          </sc-if>
+        </div>
+        </sc-if>
+      </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{showLeftOut}}" hint-placeholder-val="{{false}}">
+    <p style="margin: 12px 0 0; font-size: 13px; color: #626C66">{{leftOutText}}</p>
+    </sc-if>
+  </div>
+  </sc-if>
+
+</div>
+
+<!-- ============ STICKY FOOTERS ============ -->
+<sc-if value="{{showBar}}" hint-placeholder-val="{{true}}">
+<div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+  <div style="max-width: 880px; margin: 0 auto; padding: 12px 32px; box-sizing: border-box; display: flex; align-items: center; gap: 10px">
+    <span style="flex: 1; min-width: 0; font-size: 13.5px; color: #3B4540">{{barText}}</span>
+    <button type="button" onClick="{{discard}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer">Discard</button>
+    <button type="button" onClick="{{approve}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; border: 0; border-radius: 10px; background: {{approveBg}}; color: {{approveInk}}; font: inherit; font-size: 14px; font-weight: 500; cursor: {{approveCursor}}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: {{approveCheck}}; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      {{approveLabel}}
+    </button>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["draft","review","running","done","partial"],"default":"draft"},"$preview":{"width":1360,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      check: 'M20 6 9 17l-5-5',
+      x: 'M18 6 6 18 M6 6l12 12',
+      chev: 'M9 18l6-6-6-6',
+      chevDown: 'M6 9l6 6 6-6',
+      clock: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 6v6l4 2',
+      file: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M8 13h8 M8 17h5',
+      arrowUpRight: 'M7 17 17 7 M8 7h9v9',
+      syringe: 'M18 2l4 4 M17 7l3-3 M19 9 8.7 19.3a2.4 2.4 0 0 1-3.4 0l-.6-.6a2.4 2.4 0 0 1 0-3.4L15 5 M9 11l4 4 M5 19l-3 3 M14 4l6 6',
+      calendar: 'M8 2v4 M16 2v4 M3 10h18 M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
+      tube: 'M14.5 2v17.5a2.5 2.5 0 0 1-5 0V2 M8.5 2h7 M9.5 14h5',
+      pill: 'M10.5 20.5l10-10a5 5 0 0 0-7-7l-10 10a5 5 0 0 0 7 7z M8.5 8.5l7 7',
+      clipboard: 'M9 2h6v4H9z M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M9 12h6 M9 16h4',
+      message: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+      book: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5'
+    };
+  }
+
+  changeList(I) {
+    const VT = { name: 'Vet', init: 'VT', bg: '#DCEEF2', ink: '#0E5568' };
+    const BS = { name: 'Biosecurity', init: 'BS', bg: '#ECE7FB', ink: '#47309A' };
+    const GM = { name: 'GM', init: 'GM', bg: '#151B17', ink: '#C5F06A' };
+    const tVet = { bg: '#DCEEF2', ink: '#0E5568' };
+    const tPlan = { bg: '#F6EBD3', ink: '#6E4500' };
+    const tBio = { bg: '#ECE7FB', ink: '#47309A' };
+    const tOut = { bg: '#FFF0D1', ink: '#7A4A00' };
+    const tPeople = { bg: '#E2F0DA', ink: '#203D2B' };
+    const tNeutral = { bg: '#F0F2EE', ink: '#3B4540' };
+    return [
+      { id: 1, title: 'Create 5 vaccination plans', present: 'Creating vaccination plans…', result: '5 plans created', who: VT, icon: I.syringe, tile: tVet, leadW: '104px',
+        lines: [
+          { lead: 'PRRS', text: 'Sows · day 100 of gestation · MLV 2 ml' },
+          { lead: 'PCV2', text: 'Piglets · day 21 · 1 ml' },
+          { lead: 'Mycoplasma', text: 'Piglets · day 21 · 2 ml' },
+          { lead: 'PED', text: 'Gilts · 5 and 2 weeks before farrowing · 2 ml' },
+          { lead: 'Parvo/Lepto', text: 'Gilts · 3 weeks before first breeding · 2 ml' }
+        ], undo: 'Plans and rounds can be removed until the first task is done.' },
+      { id: 2, title: 'Schedule 9 rounds over the next 8 weeks, 412 vaccinations', present: 'Scheduling rounds…', result: '9 rounds scheduled, first Fri 13 Nov', who: VT, icon: I.calendar, tile: tPlan, leadW: '104px',
+        lines: [
+          { lead: 'Fri 13 Nov', mono: true, text: 'PCV2 and Mycoplasma · Batch 34 · 48 vaccinations' },
+          { lead: 'Mon 16 Nov', mono: true, text: 'PRRS · Batch 31 sows · 62 vaccinations' },
+          { lead: 'Fri 20 Nov', mono: true, text: 'PED · Batch 33 gilts · 36 vaccinations' },
+          { lead: 'Mon 23 Nov', mono: true, text: 'Parvo/Lepto · Batch 35 gilts · 30 vaccinations' },
+          { lead: '', text: '+5 more rounds' },
+          { lead: '', text: 'Tasks reach Zhao Min\'s and Wang Fang\'s phones 3 days before each round.' }
+        ], undo: 'Plans and rounds can be removed until the first task is done.' },
+      { id: 3, title: 'Add antibody checks after each PRRS round, 4 sampling tasks', present: 'Adding antibody checks…', result: '4 sampling tasks added', who: BS, icon: I.tube, tile: tBio, leadW: '104px',
+        lines: [
+          { lead: 'Mon 14 Dec', mono: true, text: '10 sows, 28 days after the Mon 16 Nov PRRS round' },
+          { lead: '', text: 'Then 3 more, 28 days after each later PRRS round.' }
+        ], undo: 'Sampling tasks can be removed until the first one is done.' },
+      { id: 4, title: 'Add 2 vaccines to the medicine list', present: 'Adding vaccines to the medicine list…', result: '2 vaccines added', who: VT, icon: I.pill, tile: tVet, leadW: '150px',
+        lines: [
+          { lead: 'Ingelvac PCV2 FLEX', text: 'PCV2 · piglets · 1 ml' },
+          { lead: 'M+PAC', text: 'Mycoplasma · piglets · 2 ml' }
+        ], undo: 'Vaccines can be taken off the list at any time.' },
+      { id: 5, title: 'Draft an order to Huayu Vet Supply, 6 products, about ¥18,400', present: 'Sending the order to Huayu Vet Supply…', result: 'Order sent to Huayu Vet Supply, waiting for their confirmation', who: GM, icon: I.arrowUpRight, tile: tOut, leadW: '104px', flag: true, openLabel: 'Open the order',
+        lines: [
+          { lead: 'Supplier', text: 'Huayu Vet Supply' },
+          { lead: 'Products', text: 'PRRS, PED, Parvo/Lepto, Ingelvac PCV2 FLEX, M+PAC, needles' },
+          { lead: 'Total', text: 'About ¥18,400' }
+        ], undo: 'The order can\'t be recalled once the supplier confirms.' },
+      { id: 6, title: 'Tell Zhao Min and Wang Fang; first tasks reach phones Tue 10 Nov', present: 'Telling Zhao Min and Wang Fang…', result: 'Zhao Min and Wang Fang told', who: GM, icon: I.message, tile: tPeople, leadW: '104px',
+        lines: [
+          { lead: 'Zhao Min', text: 'Gestation lead · PRRS, PED and Parvo/Lepto rounds' },
+          { lead: 'Wang Fang', text: 'Nursery manager · PCV2 and Mycoplasma rounds' },
+          { lead: '', text: 'Each gets a message now.' }
+        ], undo: '' },
+      { id: 7, title: 'Save the programme as a farm note', present: 'Saving the farm note…', result: 'Farm note saved', who: GM, icon: I.book, tile: tNeutral, leadW: '104px',
+        lines: [
+          { lead: 'Note', text: 'Vaccination programme · draft 3, saved where the whole team can read it' }
+        ], undo: 'The note can be deleted at any time.' }
+    ];
+  }
+
+  defaults(start) {
+    return {
+      view: start,
+      ticks: { 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true },
+      open: {},
+      progress: start === 'running' ? 3 : 0,
+      doneAt: '08:44',
+      orderFix: '',
+      discarded: false
+    };
+  }
+
+  getS() {
+    const start = this.props.start || 'draft';
+    const st = this.state || {};
+    if (st.startSeen !== start) return Object.assign(this.defaults(start), { startSeen: start });
+    return Object.assign(this.defaults(start), st);
+  }
+
+  setS(patch) {
+    const start = this.props.start || 'draft';
+    this.setState(Object.assign({}, this.getS(), patch, { startSeen: start }));
+  }
+
+  later(fn, ms) {
+    this._timers = this._timers || [];
+    this._timers.push(setTimeout(fn, ms));
+  }
+
+  clearTimers() {
+    (this._timers || []).forEach((t) => clearTimeout(t));
+    this._timers = [];
+  }
+
+  componentDidUpdate(prev) {
+    if (prev && prev.start !== this.props.start) this.clearTimers();
+  }
+
+  componentWillUnmount() {
+    this.clearTimers();
+  }
+
+  plural(n, one, many) {
+    return n + ' ' + (n === 1 ? one : many);
+  }
+
+  renderVals() {
+    const I = this.icons();
+    const s = this.getS();
+    const all = this.changeList(I);
+    const view = s.view;
+    const planView = view !== 'draft';
+    const isReview = view === 'review';
+    const included = isReview ? all : all.filter((c) => s.ticks[c.id]);
+    const M = included.length;
+    const leftOut = all.length - M;
+
+    const rows = included.map((c, j) => {
+      const ticked = !!s.ticks[c.id];
+      const open = !!s.open[c.id];
+      let st = 'review';
+      if (view === 'running') st = j < s.progress ? 'done' : j === s.progress ? 'run' : 'wait';
+      if (view === 'done') st = 'done';
+      if (view === 'partial') {
+        st = 'done';
+        if (c.id === 5) st = s.orderFix === 'trying' ? 'run' : s.orderFix === 'later' ? 'neutral' : 'fail';
+      }
+      let main = c.title;
+      if (st === 'done') main = c.result;
+      if (st === 'run') main = s.orderFix === 'trying' && c.id === 5 ? 'Trying again…' : c.present;
+      if (st === 'neutral') main = 'Order moved to Decisions for Sat 31 Oct. Nothing was sent.';
+      const mainInk = st === 'wait' ? '#626C66' : st === 'review' && !ticked ? '#626C66' : '#121815';
+      const showDetails = view !== 'running';
+      const lines = c.lines.map((l) => ({
+        hasLead: !!l.lead,
+        lead: l.lead,
+        leadFont: l.mono ? "'Geist Mono', ui-monospace, monospace" : 'inherit',
+        leadSize: l.mono ? '12.5px' : '13px',
+        leadWeight: l.mono ? '400' : '500',
+        text: l.text
+      }));
+      return {
+        num: String(j + 1),
+        bt: j === 0 ? '0' : '1px solid #EFF1EC',
+        isReview: st === 'review',
+        checked: ticked,
+        ariaLabel: (ticked ? 'Leave out: ' : 'Include: ') + c.title,
+        toggle: () => { const t = Object.assign({}, s.ticks); t[c.id] = !t[c.id]; this.setS({ ticks: t }); },
+        stDone: st === 'done',
+        stRun: st === 'run',
+        stWait: st === 'wait',
+        stFail: st === 'fail',
+        stNeutral: st === 'neutral',
+        tileBg: c.tile.bg,
+        tileInk: c.tile.ink,
+        tileOpacity: st === 'review' && !ticked ? '0.45' : '1',
+        iconPath: c.icon,
+        main: main,
+        mainInk: mainInk,
+        showFlag: st === 'review' && !!c.flag,
+        showFail: st === 'fail',
+        markBg: c.who.bg,
+        markInk: c.who.ink,
+        markInitials: c.who.init,
+        whoName: c.who.name,
+        showDetails: showDetails,
+        open: open,
+        openPanel: showDetails && open,
+        chevRot: open ? 'rotate(180deg)' : 'none',
+        toggleOpen: () => { const o = Object.assign({}, s.open); o[c.id] = !o[c.id]; this.setS({ open: o }); },
+        openSlot: view === 'done' || view === 'partial',
+        showOpen: st === 'done' && view !== 'running',
+        openLabel: 'Open: ' + c.result,
+        lines: lines,
+        leadW: c.leadW,
+        hasUndo: !!c.undo,
+        undo: c.undo
+      };
+    });
+
+    // Header copy
+    let title = 'Set up the farm vaccination programme';
+    let sentence = '5 vaccination plans and 9 rounds over the next 8 weeks. Nothing changes on the farm until you set them up.';
+    if (view === 'running') { title = 'Setting up… ' + Math.min(s.progress, M) + ' of ' + M + ' done'; sentence = ''; }
+    if (view === 'done') { title = 'Farm vaccination programme'; sentence = '5 vaccination plans set up and the next 8 weeks scheduled.'; }
+    if (view === 'partial') {
+      if (s.orderFix === 'later') { title = '6 of 7 set up. The order waits in Decisions.'; sentence = 'Decisions will ask you about the order again tomorrow, Sat 31 Oct.'; }
+      else { title = '6 of 7 set up. 1 needs you.'; sentence = 'Everything else is done. The order to Huayu Vet Supply was not sent.'; }
+    }
+
+    const ticked = all.filter((c) => s.ticks[c.id]).length;
+    const approveLabel = ticked === 0 ? 'Nothing ticked' : 'Set up ' + this.plural(ticked, 'change', 'changes');
+
+    return {
+      ic: I,
+      noop: () => {},
+      isDraft: view === 'draft',
+      isPlan: planView,
+      isReview: isReview,
+            showStrip: view === 'done' && !s.discarded,
+      stripText: 'Saved ' + s.doneAt + ' · ' + this.plural(M, 'change', 'changes') + ' set up.',
+      showCrumb: true,
+      title: title,
+      sentence: sentence,
+      showSentence: !!sentence,
+      showFirst: isReview && !s.discarded,
+      showListHead: isReview,
+      listHead: this.plural(rows.length, 'change', 'changes'),
+      rows: rows,
+      showLeftOut: (isReview && leftOut === 0 && false) || (isReview ? all.length - ticked > 0 : false),
+      leftOutText: all.length - ticked + ' left out.',
+      vaxRows: [
+        { name: 'PRRS', who: 'Sows', when: 'Day 100 of gestation', dose: 'MLV 2 ml', dot: false },
+        { name: 'PCV2', who: 'Piglets', when: 'Day 21', dose: '1 ml', dot: false },
+        { name: 'Mycoplasma', who: 'Piglets', when: 'Day 21', dose: '2 ml', dot: true },
+        { name: 'PED', who: 'Gilts', when: '5 and 2 weeks before farrowing', dose: '2 ml', dot: true, hasOld: true, old: '6 and 3 weeks before farrowing' },
+        { name: 'Parvo/Lepto', who: 'Gilts', when: '3 weeks before first breeding', dose: '2 ml', dot: false }
+      ],
+      thisIsThePlan: () => this.setS({ view: 'review', open: {} }),
+      discarded: !!s.discarded,
+      showBar: (view === 'draft' || isReview) && !s.discarded,
+      barText: view === 'draft' ? '3 changes since draft 2' : (ticked === 0 ? 'Nothing ticked' : this.plural(ticked, 'change', 'changes') + (s.ticks[2] ? ' · 412 vaccinations over 8 weeks' : '')),
+      discard: () => this.setS({ discarded: true }),
+      undoDiscard: () => this.setS({ discarded: false }),
+      approveLabel: view === 'draft' ? 'This is the plan' : approveLabel,
+      approveBg: isReview && ticked === 0 ? '#F0F2EE' : '#121815',
+      approveInk: isReview && ticked === 0 ? '#626C66' : '#FFFFFF',
+      approveCheck: isReview && ticked === 0 ? '#8E9C90' : '#C5F06A',
+      approveCursor: isReview && ticked === 0 ? 'default' : 'pointer',
+      approve: () => {
+        if (view === 'draft') { this.setS({ view: 'review', open: {} }); return; }
+        const cur = this.getS();
+        const chosen = all.filter((c) => cur.ticks[c.id]).length;
+        if (chosen === 0) return;
+        this.clearTimers();
+        this.setS({ view: 'running', progress: 0, open: {}, doneAt: '08:44' });
+        const step = Math.round(2700 / chosen);
+        for (let k = 1; k <= chosen; k++) this.later(() => this.setS({ progress: k }), step * k);
+        this.later(() => this.setS({ view: 'done', progress: chosen }), step * chosen + 380);
+      },
+      retry: () => {
+        this.setS({ orderFix: 'trying' });
+        this.later(() => this.setS({ view: 'done', orderFix: '', doneAt: '08:45' }), 1400);
+      },
+      orderLater: () => this.setS({ orderFix: 'later' })
+    };
+  }
+}
+</script>
+</body>
+</html>

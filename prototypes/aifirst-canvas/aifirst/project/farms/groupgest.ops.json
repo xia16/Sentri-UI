@@ -1,0 +1,9 @@
+[
+  {"op": "set_farm", "name": "Prestage gestation barn"},
+  {"op": "add_pen_type", "id": "group", "name": "Group pen", "uses": ["Gestation"], "per": 14, "w": 483, "l": 564},
+  {"op": "add_pen_type", "id": "stall", "name": "Gestation stall", "uses": ["Gestation"], "per": 1, "w": 65, "l": 210},
+  {"op": "add_zone", "name": "Barn site"},
+  {"op": "add_section", "name": "Group gestation", "code": "GRO", "zone": "Barn site"},
+  {"op": "add_room", "name": "Gestation barn", "section": "Group gestation", "at": {"x": 0, "z": 0}, "door": {"wall": "south"}, "aisle": {"wall": 0, "between": 92}, "lanes": [{"runs": [{"type": "group", "n": 10}]}, {"runs": [{"type": "group", "n": 10}]}]},
+  {"op": "add_end_row", "room": "Gestation barn", "at": "far", "runs": [{"type": "stall", "n": 24}]}
+]

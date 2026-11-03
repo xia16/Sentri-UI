@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Medicines and stock</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+<!-- ============ LIST ============ -->
+<sc-if value="{{isList}}" hint-placeholder-val="{{true}}">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Medicines</h1>
+  <p style="margin: 6px 0 0; font-size: 14px; color: #626C66">{{summary}}</p>
+
+  <div style="position: relative; margin-top: 18px">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="position: absolute; left: 13px; top: 14px; width: 16px; height: 16px; fill: none; stroke: #626C66; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.search}}"></path></svg>
+    <label for="med-search" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Find a product</label>
+    <input id="med-search" type="text" value="{{queryText}}" onInput="{{onQuery}}" placeholder="Find a product, or say what it is for" style="width: 100%; box-sizing: border-box; height: 44px; border: 1px solid transparent; border-radius: 11px; background: #F0F2EE; padding: 0 12px 0 38px; font: inherit; font-size: 14px; color: #121815; outline: none">
+  </div>
+
+  <!-- browse -->
+  <sc-if value="{{browse}}" hint-placeholder-val="{{true}}">
+
+    <sc-if value="{{hasNeeds}}" hint-placeholder-val="{{true}}">
+      <div style="margin-top: 26px; display: flex; align-items: center; gap: 8px">
+        <h2 style="margin: 0; font-size: 15px; font-weight: 600">Needs you</h2>
+        <span style="min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; background: #121815; color: #C5F06A; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">{{needsCount}}</span>
+      </div>
+      <sc-for list="{{needs}}" as="n" hint-placeholder-count="2">
+        <button type="button" onClick="{{n.open}}" style="margin-top: 10px; width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #D5E7CF; border-radius: 14px; background: #F5FAF2; font: inherit; color: inherit; text-align: left; cursor: pointer; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+          <span style="flex: 1; min-width: 0">
+            <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{n.title}}</span>
+            <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{n.sub}}</span>
+          </span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+        </button>
+      </sc-for>
+    </sc-if>
+
+    <div style="margin-top: 28px; display: flex; align-items: baseline; gap: 8px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Low or expiring</h2>
+      <span style="font-size: 13px; color: #626C66">{{lowCount}}</span>
+    </div>
+    <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{lowRows}}" as="r" hint-placeholder-count="4">
+        <button type="button" onClick="{{r.open}}" style="width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 13px 16px; border: 0; border-top: {{r.top}}; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+          <span style="flex: 1; min-width: 0">
+            <span style="display: block; font-size: 14px; font-weight: 500; color: #121815; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span>
+            <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.line}}</span>
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px; background: #FFF0D1; color: #7A4A00; font-size: 12.5px; font-weight: 500; white-space: nowrap">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #D99A1E"></span>{{r.chip}}
+          </span>
+        </button>
+      </sc-for>
+    </div>
+
+    <button type="button" onClick="{{toggleEnough}}" aria-expanded="{{enoughExpanded}}" style="margin-top: 28px; display: flex; align-items: baseline; gap: 8px; padding: 0; border: 0; background: transparent; font: inherit; color: inherit; cursor: pointer; text-align: left">
+      <span style="font-size: 15px; font-weight: 600">Enough stock</span>
+      <span style="font-size: 13px; color: #626C66">{{enoughCount}}</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="align-self: center; width: 15px; height: 15px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{enoughRot}}"><path d="{{ic.chev}}"></path></svg>
+    </button>
+    <sc-if value="{{enoughOpen}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+        <sc-for list="{{enoughRows}}" as="r" hint-placeholder-count="19">
+          <button type="button" onClick="{{r.open}}" style="width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 11px 16px; border: 0; border-top: {{r.top}}; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+            <span style="flex: 1; min-width: 0">
+              <span style="display: block; font-size: 14px; font-weight: 500; color: #121815; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span>
+              <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.line}}</span>
+            </span>
+            <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66; white-space: nowrap">{{r.right}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- search results -->
+  <sc-if value="{{searching}}" hint-placeholder-val="{{false}}">
+    <div style="margin: 20px 0 10px; font-size: 12.5px; color: #626C66">{{resultsText}}</div>
+    <sc-if value="{{hasResults}}" hint-placeholder-val="{{true}}">
+      <div style="border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+        <sc-for list="{{resultRows}}" as="r" hint-placeholder-count="4">
+          <button type="button" onClick="{{r.open}}" style="width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 0; border-top: {{r.top}}; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+            <span style="flex: 1; min-width: 0">
+              <span style="display: block; font-size: 14px; font-weight: 500; color: #121815; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span>
+              <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.line}}</span>
+            </span>
+            <sc-if value="{{r.hasChip}}" hint-placeholder-val="{{false}}">
+              <span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px; background: #FFF0D1; color: #7A4A00; font-size: 12.5px; font-weight: 500; white-space: nowrap">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #D99A1E"></span>{{r.chip}}
+              </span>
+            </sc-if>
+            <sc-if value="{{r.hasRight}}" hint-placeholder-val="{{true}}">
+              <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66; white-space: nowrap">{{r.right}}</span>
+            </sc-if>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{noResults}}" hint-placeholder-val="{{false}}">
+      <div style="border: 1px solid #E8EBE5; border-radius: 14px; padding: 24px 18px; text-align: center; color: #626C66; font-size: 13.5px">Nothing on the list matches.</div>
+    </sc-if>
+  </sc-if>
+
+</sc-if>
+
+<!-- ============ RECORD ============ -->
+<sc-if value="{{isRecord}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToList}}" style="display: inline-flex; align-items: center; gap: 2px; margin: 0 0 14px -4px; padding: 2px 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: rotate(180deg)"><path d="{{ic.chev}}"></path></svg>
+    Medicines
+  </button>
+
+  <sc-if value="{{rec.hasSaved}}" hint-placeholder-val="{{false}}">
+    <div style="margin: 0 0 20px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid #E8EBE5; border-radius: 14px; background: #F6F7F4; animation: sentriRise 0.4s ease-out">
+      <span style="flex: 1; min-width: 0; font-size: 13.5px; color: #3B4540">Saved <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">10:47</span> · {{rec.savedText}}</span>
+      <button type="button" onClick="{{undoCount}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">{{rec.crumb}}</div>
+  <div style="margin-top: 6px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{rec.title}}</h1>
+    <span style="display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; background: {{rec.chipBg}}; color: {{rec.chipInk}}; font-size: 12.5px; font-weight: 500">
+      <span style="width: 6px; height: 6px; border-radius: 50%; background: {{rec.chipDot}}"></span>{{rec.chip}}
+    </span>
+  </div>
+  <p style="margin: 8px 0 0; font-size: 14px; color: #3B4540">{{rec.lede}}</p>
+
+  <sc-if value="{{rec.hasAction}}" hint-placeholder-val="{{true}}">
+    <button type="button" onClick="{{rec.actionGo}}" style="margin-top: 20px; width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #D5E7CF; border-radius: 14px; background: #F5FAF2; font: inherit; color: inherit; text-align: left; cursor: pointer; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <span style="flex: 1; min-width: 0">
+        <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{rec.actionTitle}}</span>
+        <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66">{{rec.actionSub}}</span>
+      </span>
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+    </button>
+  </sc-if>
+  <sc-if value="{{rec.hasStrip}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 20px; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid #DADED6; border-radius: 14px; background: #F6F7F4">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: #3B4540; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.truck}}"></path></svg>
+      <span style="flex: 1; min-width: 0; font-size: 14px; color: #1E2622"><span style="font-weight: 500; color: #121815">{{rec.stripTitle}}</span> {{rec.stripRest}}</span>
+    </div>
+  </sc-if>
+
+  <h2 style="margin: 28px 0 0; font-size: 15px; font-weight: 600">About this product</h2>
+  <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <sc-for list="{{rec.facts}}" as="f" hint-placeholder-count="3">
+      <div style="display: flex; align-items: flex-start; gap: 16px; padding: 12px 16px; border-top: {{f.top}}">
+        <span style="width: 110px; flex-shrink: 0; font-size: 13px; color: #626C66; padding-top: 1px">{{f.label}}</span>
+        <span style="flex: 1; min-width: 0">
+          <span style="display: block; font-size: 14px; color: #121815">{{f.value}}</span>
+          <sc-if value="{{f.hasSub}}" hint-placeholder-val="{{false}}">
+            <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66">{{f.sub}}</span>
+          </sc-if>
+        </span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="margin-top: 28px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">On the shelf</h2>
+    <div style="display: flex; align-items: center; gap: 10px">
+      <sc-if value="{{rec.changed}}" hint-placeholder-val="{{false}}">
+        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: #626C66"><span style="width: 6px; height: 6px; border-radius: 50%; background: #121815"></span><span style="text-decoration: line-through">{{rec.was}}</span></span>
+      </sc-if>
+      <button type="button" aria-label="One less" onClick="{{countDown}}" style="width: 32px; height: 32px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 18px; line-height: 1; cursor: pointer">&#8722;</button>
+      <label for="med-count" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Count on the shelf</label>
+      <input id="med-count" type="text" value="{{rec.shown}}" onInput="{{typeCount}}" style="width: 56px; height: 32px; padding: 0 6px; box-sizing: border-box; border: 1px solid #E2E5DF; border-radius: 10px; background: #FFFFFF; font: inherit; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; color: #121815; text-align: center; outline: none">
+      <button type="button" aria-label="One more" onClick="{{countUp}}" style="width: 32px; height: 32px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 18px; line-height: 1; cursor: pointer">+</button>
+      <span style="width: 54px; font-size: 13px; color: #626C66">{{rec.unitWord}}</span>
+    </div>
+  </div>
+  <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <sc-for list="{{rec.batches}}" as="b" hint-placeholder-count="2">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 11px 16px; border-top: {{b.top}}">
+        <span style="width: 90px; flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #3B4540">{{b.code}}</span>
+        <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">{{b.qty}}</span>
+        <span style="font-size: 13px; color: {{b.expInk}}">{{b.exp}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="margin-top: 28px"><h2 style="margin: 0; font-size: 15px; font-weight: 600">Recent use</h2></div>
+  <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <sc-for list="{{rec.recent}}" as="u" hint-placeholder-count="3">
+      <div style="display: flex; align-items: baseline; gap: 14px; padding: 11px 16px; border-top: {{u.top}}">
+        <span style="width: 90px; flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #3B4540">{{u.date}}</span>
+        <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">{{u.what}}</span>
+        <span style="font-size: 12.5px; color: #626C66; white-space: nowrap">{{u.who}}</span>
+      </div>
+    </sc-for>
+  </div>
+  <sc-if value="{{rec.hasWeekly}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 8px; font-size: 12.5px; color: #626C66">{{rec.weekly}}</div>
+  </sc-if>
+</sc-if>
+
+<!-- ============ ORDER ============ -->
+<sc-if value="{{isOrder}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backFromProposal}}" style="display: inline-flex; align-items: center; gap: 2px; margin: 0 0 14px -4px; padding: 2px 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: rotate(180deg)"><path d="{{ic.chev}}"></path></svg>
+    {{backLabel}}
+  </button>
+
+  <sc-if value="{{ordered}}" hint-placeholder-val="{{false}}">
+    <div style="margin: 0 0 20px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid #E8EBE5; border-radius: 14px; background: #F6F7F4; animation: sentriRise 0.4s ease-out">
+      <span style="flex: 1; min-width: 0; font-size: 13.5px; color: #3B4540">Saved <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">10:32</span> · Order sent to {{ord.supName}}, arriving {{ord.arrive}}</span>
+      <button type="button" onClick="{{undoOrder}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+  <sc-if value="{{rejected}}" hint-placeholder-val="{{false}}">
+    <div style="margin: 0 0 20px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid #E8EBE5; border-radius: 14px; background: #F6F7F4; animation: sentriRise 0.4s ease-out">
+      <span style="flex: 1; min-width: 0; font-size: 13.5px; color: #3B4540">Order draft discarded. Nothing was ordered.</span>
+      <button type="button" onClick="{{takeBackOrder}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Medicines · Order</div>
+  <h1 style="margin: 6px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{ord.title}}</h1>
+  <p style="margin: 8px 0 0; font-size: 14px; color: #3B4540">5 bottles on the shelf, 1.2 used a day. The shelf is empty on Tue 3 Nov.</p>
+
+  <div style="margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+    <div>
+      <div style="height: 20px; font-size: 12px; font-weight: 500; color: #626C66">Medicine</div>
+      <div style="margin-top: 6px; height: 44px; box-sizing: border-box; padding: 0 12px; display: flex; align-items: center; border: 1px solid #E2E5DF; border-radius: 11px; background: #F6F7F4; font-size: 14px; color: #121815">Amoxicillin LA · 100 ml</div>
+    </div>
+    <div>
+      <div style="display: flex; align-items: center; gap: 8px; height: 20px">
+        <label for="med-qty" style="font-size: 12px; font-weight: 500; color: #626C66">Quantity</label>
+        <sc-if value="{{qtyChanged}}" hint-placeholder-val="{{false}}">
+          <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #626C66"><span style="width: 6px; height: 6px; border-radius: 50%; background: #121815"></span><span style="text-decoration: line-through">10</span></span>
+        </sc-if>
+      </div>
+      <div style="margin-top: 6px; height: 44px; display: flex; align-items: center; gap: 8px">
+        <button type="button" aria-label="One less" onClick="{{qtyDown}}" style="width: 44px; height: 44px; flex-shrink: 0; border: 1px solid #DADED6; border-radius: 11px; background: #FFFFFF; color: #121815; font: inherit; font-size: 20px; line-height: 1; cursor: pointer">&#8722;</button>
+        <input id="med-qty" type="text" value="{{qtyVal}}" onInput="{{typeQty}}" style="width: 56px; height: 44px; padding: 0 6px; box-sizing: border-box; border: 1px solid {{qtyBorder}}; border-radius: 11px; background: #FFFFFF; font: inherit; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 15px; color: #121815; text-align: center; outline: none">
+        <button type="button" aria-label="One more" onClick="{{qtyUp}}" style="width: 44px; height: 44px; flex-shrink: 0; border: 1px solid #DADED6; border-radius: 11px; background: #FFFFFF; color: #121815; font: inherit; font-size: 20px; line-height: 1; cursor: pointer">+</button>
+        <span style="font-size: 13px; color: #626C66; white-space: nowrap">bottles of 100 ml</span>
+      </div>
+      <div style="margin-top: 6px; font-size: 12.5px; color: {{qtyNoteInk}}">{{qtyNote}}</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 24px; display: flex; align-items: center; gap: 8px; height: 20px">
+    <span style="font-size: 12px; font-weight: 500; color: #626C66">Supplier</span>
+    <sc-if value="{{supChanged}}" hint-placeholder-val="{{false}}">
+      <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #626C66"><span style="width: 6px; height: 6px; border-radius: 50%; background: #121815"></span><span style="text-decoration: line-through">Hartland Vet Group</span></span>
+    </sc-if>
+  </div>
+  <div style="margin-top: 6px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <sc-for list="{{choices}}" as="c" hint-placeholder-count="2">
+      <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0; border-top: {{c.top}}; background: {{c.bg}}; font: inherit; color: inherit; text-align: left; cursor: {{c.cursor}}; opacity: {{c.opacity}}">
+        <span style="width: 18px; height: 18px; flex-shrink: 0; box-sizing: border-box; border-radius: 50%; border: 1.5px solid {{c.ring}}; display: flex; align-items: center; justify-content: center">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: {{c.dot}}"></span>
+        </span>
+        <span style="flex: 1; min-width: 0">
+          <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{c.title}}</span>
+          <span style="display: block; margin-top: 1px; font-size: 12.5px; color: {{c.subInk}}">{{c.sub}}</span>
+        </span>
+        <span style="text-align: right; white-space: nowrap">
+          <span style="display: block; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #121815">{{c.total}}</span>
+          <span style="display: block; font-size: 12.5px; color: #626C66">{{c.unit}}</span>
+        </span>
+      </button>
+    </sc-for>
+  </div>
+</sc-if>
+
+<!-- ============ DELIVERY ============ -->
+<sc-if value="{{isDelivery}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backFromProposal}}" style="display: inline-flex; align-items: center; gap: 2px; margin: 0 0 14px -4px; padding: 2px 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: rotate(180deg)"><path d="{{ic.chev}}"></path></svg>
+    {{backLabel}}
+  </button>
+
+  <sc-if value="{{booked}}" hint-placeholder-val="{{false}}">
+    <div style="margin: 0 0 20px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid #E8EBE5; border-radius: 14px; background: #F6F7F4; animation: sentriRise 0.4s ease-out">
+      <span style="flex: 1; min-width: 0; font-size: 13.5px; color: #3B4540">Saved <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">10:41</span> · 3 products booked in.{{del.owedDone}}</span>
+      <button type="button" onClick="{{undoBook}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+  <sc-if value="{{delDiscarded}}" hint-placeholder-val="{{false}}">
+    <div style="margin: 0 0 20px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid #E8EBE5; border-radius: 14px; background: #F6F7F4; animation: sentriRise 0.4s ease-out">
+      <span style="flex: 1; min-width: 0; font-size: 13.5px; color: #3B4540">Delivery discarded. Nothing is booked in.</span>
+      <button type="button" onClick="{{undoDiscard}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Medicines · Stock in</div>
+  <h1 style="margin: 6px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{del.title}}</h1>
+  <p style="margin: 8px 0 0; font-size: 14px; color: #3B4540">{{del.lede}}</p>
+
+  <div style="margin-top: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+    <button type="button" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.file}}"></path></svg>
+      Open the delivery note (photo)
+    </button>
+    <span style="font-size: 12.5px; color: #626C66">Hartland Vet Group · from Li Wei, 09:12</span>
+  </div>
+
+  <div style="margin-top: 28px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">On the note</h2>
+    <span style="font-size: 13px; color: #626C66">Order of Tue 27 Oct</span>
+  </div>
+  <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <div style="display: grid; grid-template-columns: 1.55fr 1.5fr 0.95fr 0.95fr; gap: 10px; align-items: center; padding: 9px 16px; background: #F6F7F4; border-bottom: 1px solid #E8EBE5; font-size: 12px; font-weight: 500; color: #626C66">
+      <span>Product</span><span>Quantity</span><span>Batch</span><span>Expires</span>
+    </div>
+    <sc-for list="{{lines}}" as="l" hint-placeholder-count="3">
+      <div style="padding: 10px 16px; border-top: {{l.top}}">
+        <div style="display: grid; grid-template-columns: 1.55fr 1.5fr 0.95fr 0.95fr; gap: 10px; align-items: center">
+          <span style="min-width: 0">
+            <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{l.name}}</span>
+            <span style="display: block; font-size: 12.5px; color: #626C66">{{l.pack}}</span>
+          </span>
+          <span style="display: flex; align-items: center; gap: 6px">
+            <input type="text" aria-label="{{l.qtyAria}}" value="{{l.qtyVal}}" onInput="{{l.typeQty}}" style="width: 44px; height: 34px; padding: 0 4px; box-sizing: border-box; border: 1px solid {{l.qtyBorder}}; border-radius: 9px; background: #FFFFFF; font: inherit; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13.5px; color: #121815; text-align: center; outline: none">
+            <span style="font-size: 13px; color: #626C66">{{l.unit}}</span>
+            <sc-if value="{{l.changed}}" hint-placeholder-val="{{false}}">
+              <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #626C66"><span style="width: 6px; height: 6px; border-radius: 50%; background: #121815"></span><span style="text-decoration: line-through">{{l.was}}</span></span>
+            </sc-if>
+          </span>
+          <input type="text" aria-label="{{l.batchAria}}" value="{{l.batch}}" onInput="{{l.typeBatch}}" style="width: 100%; min-width: 0; height: 34px; padding: 0 8px; box-sizing: border-box; border: 1px solid {{l.batchBorder}}; border-radius: 9px; background: #FFFFFF; font: inherit; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #121815; outline: none">
+          <input type="text" aria-label="{{l.expAria}}" value="{{l.exp}}" onInput="{{l.typeExp}}" style="width: 100%; min-width: 0; height: 34px; padding: 0 8px; box-sizing: border-box; border: 1px solid {{l.expBorder}}; border-radius: 9px; background: #FFFFFF; font: inherit; font-size: 13px; color: #121815; outline: none">
+        </div>
+        <sc-if value="{{l.hasNote}}" hint-placeholder-val="{{false}}">
+          <div style="margin-top: 6px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12.5px; color: {{l.noteInk}}">
+            <span>{{l.note}}</span>
+            <sc-if value="{{l.hasFix}}" hint-placeholder-val="{{false}}">
+              <button type="button" onClick="{{l.fix}}" style="height: 26px; padding: 0 10px; border: 1px solid #DADED6; border-radius: 999px; background: #FFFFFF; color: #121815; font: inherit; font-size: 12.5px; font-weight: 500; cursor: pointer">{{l.fixLabel}}</button>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+
+  <button type="button" onClick="{{toggleMoves}}" aria-expanded="{{movesExpanded}}" style="margin-top: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    See what stock becomes
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{movesRot}}"><path d="{{ic.chev}}"></path></svg>
+  </button>
+  <sc-if value="{{seeMoves}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF">
+      <sc-for list="{{changes}}" as="c" hint-placeholder-count="3">
+        <div style="display: flex; align-items: center; gap: 14px; padding: 11px 16px; border-top: {{c.top}}">
+          <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">{{c.name}}</span>
+          <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13.5px; color: #121815; white-space: nowrap">{{c.move}}</span>
+          <span style="width: 118px; text-align: right; font-size: 12.5px; color: #626C66">{{c.note}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+</sc-if>
+
+</div>
+
+<!-- sticky save bar -->
+<sc-if value="{{bar.show}}" hint-placeholder-val="{{false}}">
+  <div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+    <div style="max-width: 760px; margin: 0 auto; padding: 14px 32px; box-sizing: border-box; display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+      <span style="flex: 1; min-width: 220px; font-size: 13.5px; color: #3B4540">{{bar.text}}</span>
+      <button type="button" onClick="{{bar.discard}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer">Discard</button>
+      <button type="button" onClick="{{bar.primary}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; opacity: {{bar.opacity}}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+        {{bar.label}}
+      </button>
+    </div>
+  </div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["list","all","record","order","ordered","delivery","booked"],"default":"list"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      chev: 'M9 18l6-6-6-6',
+      check: 'M20 6 9 17l-5-5',
+      undo: 'M3 7v6h6 M21 17a9 9 0 0 0-15-6.7L3 13',
+      search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z M21 21l-4.3-4.3',
+      file: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M8 13h8 M8 17h5',
+      chat: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+      bang: 'M12 7v6 M12 17h.01',
+      truck: 'M1 3h15v13H1z M16 8h4l3 3v5h-7z M5.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z M18.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z'
+    };
+  }
+
+  defaults(start) {
+    const base = {
+      startSeen: start, view: 'list', from: 'list', openId: 'amox', q: '', enoughOpen: false,
+      ordered: false, rejected: false, qty: '10', supplier: 'hart',
+      booked: false, delDiscarded: false, seeMoves: false,
+      dv: {
+        prrs: { q: '2', b: 'PM-4471', e: 'Mar 2027' },
+        melox: { q: '6', b: 'MX-0938', e: 'Jun 2028' },
+        iron: { q: '8', b: 'FD-1190', e: 'Aug 2028' }
+      },
+      counts: {}, draftCount: null, draftFor: '', lastCount: null
+    };
+    if (start === 'all') return Object.assign(base, { enoughOpen: true });
+    if (start === 'record') return Object.assign(base, { view: 'record' });
+    if (start === 'order') return Object.assign(base, { view: 'order' });
+    if (start === 'ordered') return Object.assign(base, { view: 'order', ordered: true });
+    if (start === 'delivery') return Object.assign(base, { view: 'delivery' });
+    if (start === 'booked') return Object.assign(base, { view: 'delivery', booked: true });
+    return base;
+  }
+
+  products() {
+    const U = (s, p) => ({ u: s, up: p });
+    return [
+      { id: 'amox', name: 'Amoxicillin LA', pack: '100 ml', cat: 'Antibiotics', wd: 14, stock: 5, un: U('bottle', 'bottles'), days: 4,
+        used: 'Lameness, joint ill, chest infections', under: '2 sows under it until Thu 12 Nov',
+        batches: [{ code: 'AX-2204', n: 3, exp: 'Aug 2028' }, { code: 'AX-2231', n: 2, exp: 'Oct 2028' }],
+        recent: [
+          { date: 'Thu 29 Oct', what: '2 sows · 40 ml', who: 'Zhao Min' },
+          { date: 'Thu 29 Oct', what: '6 weaners, Nursery 2 · 90 ml', who: 'Wang Fang' },
+          { date: 'Wed 28 Oct', what: '3 sows · 60 ml', who: 'Zhao Min' }],
+        weekly: 'Used per week: 3, 4, 5, then 8 bottles this week.' },
+      { id: 'melox', name: 'Meloxicam', pack: '100 ml', cat: 'Pain relief', wd: 5, stock: 3, un: U('bottle', 'bottles'), days: 6,
+        used: 'Pain and swelling, mostly lame sows', under: '204518 and 205102 until Tue 3 Nov',
+        batches: [{ code: 'MX-0871', n: 3, exp: 'Apr 2028' }],
+        recent: [
+          { date: 'Thu 29 Oct', what: '2 sows · 30 ml', who: 'Zhao Min' },
+          { date: 'Wed 28 Oct', what: '2 sows · 30 ml', who: 'Zhao Min' },
+          { date: 'Tue 27 Oct', what: '1 sow · 15 ml', who: 'Zhao Min' }] },
+      { id: 'pen', name: 'Penicillin G', pack: '100 ml', cat: 'Antibiotics', wd: 5, stock: 4, un: U('bottle', 'bottles'), days: 40,
+        used: 'Navel and joint infections in piglets', expSoon: 'Tue 17 Nov',
+        batches: [{ code: 'PG-1907', n: 4, exp: 'Tue 17 Nov', soon: true }],
+        recent: [{ date: 'Tue 20 Oct', what: '2 piglets · 3 ml', who: 'Li Wei' }] },
+      { id: 'cef', name: 'Ceftiofur', pack: '100 ml', cat: 'Antibiotics', wd: 5, stock: 6, un: U('bottle', 'bottles'), days: 25,
+        used: 'Chest infections and mastitis', last: { date: 'Mon 26 Oct', what: '1 sow · 15 ml', who: 'Li Wei' } },
+      { id: 'tula', name: 'Tulathromycin', pack: '100 ml', cat: 'Antibiotics', wd: 33, stock: 3, un: U('bottle', 'bottles'), days: 30,
+        used: 'Chest infections in weaners', last: { date: 'Mon 26 Oct', what: '8 weaners · 24 ml', who: 'Wang Fang' } },
+      { id: 'tyl', name: 'Tylosin', pack: '100 ml', cat: 'Antibiotics', wd: 14, stock: 5, un: U('bottle', 'bottles'), days: 38,
+        used: 'Joint and gut infections', last: { date: 'Sat 24 Oct', what: '4 weaners · 20 ml', who: 'Wang Fang' } },
+      { id: 'oxy', name: 'Oxytetracycline LA', pack: '100 ml', cat: 'Antibiotics', wd: 28, stock: 4, un: U('bottle', 'bottles'), days: 45,
+        used: 'Chest infections and lameness', last: { date: 'Fri 23 Oct', what: '2 sows · 40 ml', who: 'Zhao Min' } },
+      { id: 'flu', name: 'Flunixin', pack: '100 ml', cat: 'Pain relief', wd: 24, stock: 3, un: U('bottle', 'bottles'), days: 70,
+        used: 'Fever and severe pain', last: { date: 'Wed 21 Oct', what: '1 sow · 20 ml', who: 'Li Wei' } },
+      { id: 'ive', name: 'Ivermectin', pack: '100 ml', cat: 'Parasite control', wd: 28, stock: 6, un: U('bottle', 'bottles'), days: 120,
+        used: 'Worming sows and gilts', last: { date: 'Mon 12 Oct', what: '40 gilts · 120 ml', who: 'Zhao Min' } },
+      { id: 'fen', name: 'Fenbendazole', pack: '1 kg pack', cat: 'Parasite control', wd: 5, stock: 3, un: U('pack', 'packs'), days: 90,
+        used: 'Worming through the feed', last: { date: 'Tue 6 Oct', what: 'Nursery 1 · 1 pack', who: 'Wang Fang' } },
+      { id: 'oxt', name: 'Oxytocin', pack: '100 ml', cat: 'Hormones', wd: 0, stock: 4, un: U('bottle', 'bottles'), days: 18,
+        used: 'Slow or stalled farrowing', last: { date: 'Wed 21 Oct', what: '2 sows · 4 ml', who: 'Li Wei' } },
+      { id: 'clo', name: 'Cloprostenol', pack: '20 ml', cat: 'Hormones', wd: 1, stock: 3, un: U('bottle', 'bottles'), days: 26,
+        used: 'Bringing farrowing on', last: { date: 'Thu 22 Oct', what: '3 sows · 6 ml', who: 'Li Wei' } },
+      { id: 'alt', name: 'Altrenogest', pack: '1 L', cat: 'Hormones', wd: 9, stock: 2, un: U('bottle', 'bottles'), days: 52,
+        used: 'Heat control for gilts', last: { date: 'Mon 5 Oct', what: 'Quarantine 1 · 120 ml', who: 'Zhao Min' } },
+      { id: 'iron', name: 'Iron dextran', pack: '100 ml', cat: 'Vitamins and iron', wd: 0, stock: 4, un: U('bottle', 'bottles'), days: 12,
+        used: 'Piglets, day 1 to 3', batches: [{ code: 'FD-0877', n: 4, exp: 'Jul 2028' }],
+        last: { date: 'Sat 24 Oct', what: 'Batch 32, last litters · 2 bottles', who: 'Li Wei' } },
+      { id: 'vite', name: 'Vitamin E + selenium', pack: '100 ml', cat: 'Vitamins and iron', wd: 0, stock: 6, un: U('bottle', 'bottles'), days: 60,
+        used: 'Sows before farrowing', last: { date: 'Mon 19 Oct', what: '12 sows · 60 ml', who: 'Li Wei' } },
+      { id: 'vitb', name: 'Vitamin B complex', pack: '100 ml', cat: 'Vitamins and iron', wd: 0, stock: 5, un: U('bottle', 'bottles'), days: 80,
+        used: 'Weak or off-feed pigs', last: { date: 'Fri 16 Oct', what: '3 sows · 30 ml', who: 'Zhao Min' } },
+      { id: 'prrs', name: 'PRRS MLV vaccine', pack: '50-dose vial', cat: 'Vaccines', wd: null, stock: 40, un: U('dose', 'doses'), days: null,
+        need: 48, plan: 'Batch 34’s booster needs 48 on Fri 13 Nov', planShort: 'Batch 34 needs 48 on Fri 13 Nov',
+        used: 'PRRS booster for sows', batches: [{ code: 'PM-4102', n: 40, exp: 'Jan 2027' }],
+        recent: [{ date: 'Tue 20 Oct', what: '48 sows, Batch 31 round', who: 'Zhao Min' }] },
+      { id: 'pcv', name: 'PCV2 vaccine', pack: '100-dose vial', cat: 'Vaccines', wd: null, stock: 520, un: U('dose', 'doses'), days: null,
+        need: 493, plan: 'Batch 32’s piglets need 493 at weaning, Fri 13 Nov', planShort: 'Batch 32 needs 493 on Fri 13 Nov',
+        used: 'PCV2 for piglets at weaning', last: { date: 'Fri 23 Oct', what: '488 piglets, Batch 31', who: 'Wang Fang' } },
+      { id: 'myc', name: 'Mycoplasma vaccine', pack: '100-dose vial', cat: 'Vaccines', wd: null, stock: 600, un: U('dose', 'doses'), days: null,
+        need: 0, plan: 'No plan needs them this month', planShort: 'No plan this month',
+        used: 'Mycoplasma for piglets', last: { date: 'Fri 23 Oct', what: '488 piglets, Batch 31', who: 'Wang Fang' } },
+      { id: 'ery', name: 'Parvo + erysipelas vaccine', pack: '50-dose vial', cat: 'Vaccines', wd: null, stock: 120, un: U('dose', 'doses'), days: null,
+        need: 24, plan: 'The 24 gilts in Quarantine 1 need it before breeding', planShort: '24 gilts need it before breeding',
+        used: 'Gilts before first breeding', last: { date: 'Wed 14 Oct', what: '22 gilts', who: 'Zhao Min' } },
+      { id: 'sal', name: 'Glucose / saline', pack: '500 ml bag', cat: 'Other', wd: 0, stock: 12, un: U('bag', 'bags'), days: 60,
+        used: 'Weak piglets and dehydrated sows', last: { date: 'Mon 26 Oct', what: '4 piglets · 2 bags', who: 'Li Wei' } },
+      { id: 'pro', name: 'Probiotic paste', pack: '30 ml tube', cat: 'Other', wd: 0, stock: 8, un: U('tube', 'tubes'), days: 50,
+        used: 'Scouring piglets and weaners', last: { date: 'Sun 25 Oct', what: '12 piglets · 1 tube', who: 'Wang Fang' } },
+      { id: 'ele', name: 'Electrolytes + multivitamins', pack: '1 kg tub', cat: 'Other', wd: 0, stock: 4, un: U('tub', 'tubs'), days: 35,
+        used: 'Stress, heat and weaning', last: { date: 'Tue 27 Oct', what: 'Nursery 2 water · 1 tub', who: 'Wang Fang' } }
+    ];
+  }
+
+  renderVals() {
+    const start = this.props.start || 'list';
+    const fresh = !this.state || this.state.startSeen !== start;
+    const s = fresh ? this.defaults(start) : Object.assign(this.defaults(start), this.state);
+    const set = (p) => this.setState(Object.assign({ startSeen: start }, s, p));
+    const ic = this.icons();
+    const P = this.products();
+    const byId = {};
+    P.forEach((p) => { byId[p.id] = p; });
+    const money = (n) => '¥' + n.toLocaleString('en-US');
+    const toInt = (v) => parseInt(String(v).replace(/[^0-9]/g, ''), 10) || 0;
+    const topOf = (i) => (i === 0 ? '0' : '1px solid #EFF1EC');
+    const OK = '#E2E5DF', BAD = '#D9583B';
+
+    // delivery lines (editable)
+    const ordered = { prrs: 2, melox: 6, iron: 10 };
+    const noteQty = { prrs: 2, melox: 6, iron: 8 };
+    const dq = (id) => toInt(s.dv[id].q);
+    const delivered = { prrs: dq('prrs') * 50, melox: dq('melox'), iron: dq('iron') };
+
+    const stockOf = (p) => (s.counts[p.id] != null ? s.counts[p.id] : p.stock) + (s.booked ? (delivered[p.id] || 0) : 0);
+    const qtyText = (p, n) => n + ' ' + (n === 1 ? p.un.u : p.un.up);
+    const daysAt = (p, n) => (p.days ? Math.floor(n / (p.stock / p.days) + 0.001) : null);
+    const daysOf = (p) => daysAt(p, stockOf(p));
+    const sup = {
+      hart: { name: 'Hartland Vet Group', price: 298, arrive: 'Mon 2 Nov', before: true },
+      midv: { name: 'Midvale Agri Supply', price: 270, arrive: 'Wed 4 Nov', before: false }
+    };
+    const supNow = sup[s.supplier];
+
+    const flagOf = (p) => {
+      const d = daysOf(p);
+      if (d !== null && d <= 7) return { chip: d <= 0 ? 'Out of stock' : 'About ' + d + ' ' + (d === 1 ? 'day' : 'days') + ' left', rank: d };
+      if (p.need && stockOf(p) < p.need) return { chip: 'Short ' + (p.need - stockOf(p)) + ' doses', rank: 20 };
+      if (p.expSoon) return { chip: 'Expires ' + p.expSoon, rank: 30 };
+      return null;
+    };
+    const lineOf = (p) => {
+      const f = flagOf(p);
+      const st = qtyText(p, stockOf(p));
+      if (p.id === 'amox') return st + (s.ordered ? ' · order sent, arrives ' + supNow.arrive : ' · supplier delivers in 2 days');
+      if (p.id === 'melox') return st + (s.booked ? ' · used on the lame sows' : ' · ' + delivered.melox + ' more in the delivery to book');
+      if (p.id === 'prrs' && f) return st + ' · ' + p.planShort;
+      if (p.id === 'pen') return st + ' · will expire before they are used';
+      if (p.need !== undefined) return st + ' · ' + p.planShort;
+      return st + ' · ' + p.cat;
+    };
+    const rightOf = (p) => { const d = daysOf(p); return d === null ? 'covers plans' : 'about ' + d + ' days'; };
+
+    const flagged = P.map((p) => ({ p, f: flagOf(p) })).filter((x) => x.f).sort((a, b) => a.f.rank - b.f.rank);
+    const rest = P.filter((p) => !flagOf(p)).sort((a, b) => (daysOf(a) === null ? 9999 : daysOf(a)) - (daysOf(b) === null ? 9999 : daysOf(b)));
+    const openRec = (id) => () => set({ view: 'record', openId: id, from: 'list', draftCount: null, draftFor: '' });
+
+    // needs you
+    const needs = [];
+    if (!s.ordered && !s.rejected) needs.push({ title: 'Order 10 × 100 ml Amoxicillin', sub: 'Draft · 4 days left, the supplier delivers in 2', open: () => set({ view: 'order', from: 'list' }) });
+    if (!s.booked && !s.delDiscarded) needs.push({ title: 'Book in Friday’s delivery', sub: 'Hartland Vet Group · 3 products, note photo from Li Wei', open: () => set({ view: 'delivery', from: 'list' }) });
+
+    const q = (s.q || '').trim().toLowerCase();
+    const searching = q.length > 0;
+    const results = P.filter((p) => (p.name + ' ' + p.cat + ' ' + p.used + ' ' + p.pack).toLowerCase().indexOf(q) !== -1);
+    const resultRows = results.map((p, i) => {
+      const f = flagOf(p);
+      return { name: p.name + ' · ' + p.pack, line: lineOf(p), top: topOf(i), hasChip: !!f, chip: f ? f.chip : '', hasRight: !f, right: rightOf(p), open: openRec(p.id) };
+    });
+    const summary = (needs.length ? needs.length + ' need you · ' : '') + flagged.length + ' low or expiring · ' + P.length + ' products';
+
+    // ---------- record ----------
+    const cur = byId[s.openId] || byId.amox;
+    const curFlag = flagOf(cur);
+    const curDays = daysOf(cur);
+    const curStock = stockOf(cur);
+    const addDelivered = s.booked ? (delivered[cur.id] || 0) : 0;
+    const shown = (s.draftCount !== null && s.draftFor === cur.id) ? s.draftCount : curStock;
+    const changed = shown !== curStock;
+    const batchSrc = (cur.batches || [{ code: cur.id.slice(0, 2).toUpperCase() + '-' + (1000 + P.indexOf(cur) * 57), n: cur.stock, exp: 'Aug 2028' }]).map((b) => ({ code: b.code, n: b.n, exp: 'Expires ' + b.exp, soon: !!b.soon }));
+    if (s.booked && cur.id === 'prrs') batchSrc.push({ code: s.dv.prrs.b, n: delivered.prrs, exp: 'Expires ' + s.dv.prrs.e, soon: false });
+    if (s.booked && cur.id === 'melox') batchSrc.push({ code: s.dv.melox.b, n: delivered.melox, exp: 'Expires ' + s.dv.melox.e, soon: false });
+    if (s.booked && cur.id === 'iron') batchSrc.push({ code: s.dv.iron.b, n: delivered.iron, exp: 'Expires ' + s.dv.iron.e, soon: false });
+    const sumB = batchSrc.reduce((a, b) => a + b.n, 0);
+    let cut = sumB - shown;
+    const bn = batchSrc.map((b) => b.n);
+    for (let i = bn.length - 1; i >= 0 && cut > 0; i--) { const t = Math.min(bn[i], cut); bn[i] -= t; cut -= t; }
+    if (cut < 0) bn[bn.length - 1] += -cut;
+    const batchRows = batchSrc.map((b, i) => ({ code: b.code, qty: qtyText(cur, bn[i]), exp: b.exp, expInk: b.soon ? '#7A4A00' : '#626C66', top: topOf(i) }));
+    const recentSrc = cur.recent || [cur.last];
+    const recentRows = recentSrc.map((u, i) => Object.assign({}, u, { top: topOf(i) }));
+    const wdText = cur.wd === null ? 'None' : (cur.wd === 0 ? 'None (0 days)' : cur.wd + ' days');
+    const facts = [
+      { label: 'Withdrawal', value: wdText, sub: cur.under || '', hasSub: !!cur.under },
+      { label: 'Used for', value: cur.used, sub: '', hasSub: false },
+      { label: 'Supplier', value: 'Hartland Vet Group', sub: 'Delivers in 2 days', hasSub: true }
+    ].map((f, i) => Object.assign(f, { top: topOf(i) }));
+    let lede;
+    if (curDays !== null) lede = qtyText(cur, curStock) + ' on the shelf, about ' + curDays + ' ' + (curDays === 1 ? 'day' : 'days') + ' at this week’s use.';
+    else lede = qtyText(cur, curStock) + ' on the shelf. ' + cur.plan + '.';
+    let chipBg = '#F0F2EE', chipInk = '#3B4540', chipDot = '#8E9C90', chipText;
+    if (curFlag) { chipBg = '#FFF0D1'; chipInk = '#7A4A00'; chipDot = '#D99A1E'; chipText = curFlag.chip; }
+    else chipText = curDays === null ? 'Covers plans' : 'About ' + curDays + ' days left';
+
+    let act = { hasAction: false, actionTitle: '', actionSub: '', actionGo: () => {} };
+    let strip = { hasStrip: false, stripTitle: '', stripRest: '' };
+    if (cur.id === 'amox') {
+      if (s.ordered) strip = { hasStrip: true, stripTitle: 'On order.', stripRest: qtyOrder() + ' × 100 ml from ' + supNow.name + ', arriving ' + supNow.arrive + '.' };
+      else if (!s.rejected) act = { hasAction: true, actionTitle: 'Order draft: 10 × 100 ml', actionSub: 'The shelf is empty on Tue 3 Nov. Supplier delivers in 2 days.', actionGo: () => set({ view: 'order', from: 'record' }) };
+    }
+    if (delivered[cur.id] && !s.booked && !s.delDiscarded) {
+      act = { hasAction: true, actionTitle: 'In Friday’s delivery: ' + qtyText(cur, delivered[cur.id]) + ' to book in', actionSub: 'Note photo from Li Wei, 09:12. Stock changes when you book it.', actionGo: () => set({ view: 'delivery', from: 'record' }) };
+    }
+    function qtyOrder() { return toInt(s.qty); }
+    const savedHere = s.lastCount && s.lastCount.id === cur.id;
+    const rec = Object.assign({
+      crumb: 'Medicines · ' + cur.cat,
+      title: cur.name + ' · ' + cur.pack,
+      chip: chipText, chipBg, chipInk, chipDot, lede,
+      facts, batches: batchRows, recent: recentRows,
+      shown: String(shown), changed, was: String(curStock),
+      unitWord: cur.un.up,
+      hasSaved: !!savedHere, savedText: cur.name + ' count set to ' + qtyText(cur, curStock),
+      hasWeekly: !!cur.weekly, weekly: cur.weekly || ''
+    }, act, strip);
+    const setDraft = (n) => set({ draftCount: Math.max(0, Math.min(9999, n)), draftFor: cur.id });
+
+    // ---------- order ----------
+    const qtyN = toInt(s.qty);
+    const total = qtyN * supNow.price;
+    const qtyBad = qtyN < 1;
+    const ord = {
+      supName: supNow.name, arrive: supNow.arrive,
+      title: s.ordered ? 'Amoxicillin LA order' : 'Order Amoxicillin LA'
+    };
+    const locked = s.ordered || s.rejected;
+    const choiceDefs = [
+      { key: 'hart', title: 'Hartland Vet Group', sub: 'Arrives Mon 2 Nov · up ¥28 since September', price: 298 },
+      { key: 'midv', title: 'Midvale Agri Supply', sub: 'Arrives Wed 4 Nov, a day after the shelf is empty', price: 270, warn: true }
+    ];
+    const choices = choiceDefs.map((c, i) => {
+      const on = s.supplier === c.key;
+      return {
+        title: c.title, sub: c.sub, subInk: c.warn ? '#7A4A00' : '#626C66',
+        total: qtyN > 0 ? money(qtyN * c.price) : '', unit: money(c.price) + ' a bottle',
+        top: topOf(i), bg: on ? '#F5FAF2' : '#FFFFFF', pressed: on ? 'true' : 'false',
+        ring: on ? '#121815' : '#DADED6', dot: on ? '#121815' : 'transparent',
+        cursor: locked ? 'default' : 'pointer', opacity: locked && !on ? 0.45 : 1,
+        pick: () => { if (!locked) set({ supplier: c.key }); }
+      };
+    });
+    const setQty = (n) => { if (!locked) set({ qty: String(Math.max(0, Math.min(99, n))) }); };
+
+    // ---------- delivery ----------
+    const dvDefs = [
+      { id: 'prrs', name: 'PRRS MLV vaccine', pack: '50-dose vial', unit: 'vials' },
+      { id: 'melox', name: 'Meloxicam', pack: '100 ml bottle', unit: 'bottles' },
+      { id: 'iron', name: 'Iron dextran', pack: '100 ml bottle', unit: 'bottles' }
+    ];
+    const delLocked = s.booked || s.delDiscarded;
+    const setDv = (id, f, v) => { const dv = JSON.parse(JSON.stringify(s.dv)); dv[id][f] = v; set({ dv }); };
+    let delErrors = 0;
+    const lines = dvDefs.map((d, i) => {
+      const v = s.dv[d.id];
+      const n = toInt(v.q);
+      const ex = ordered[d.id];
+      const qtyBadL = n < 1;
+      const batchBad = !(v.b || '').trim();
+      const expBad = !(v.e || '').trim();
+      if (qtyBadL || batchBad || expBad) delErrors++;
+      let note = '', noteInk = '#626C66', hasFix = false, fixLabel = '';
+      if (qtyBadL) { note = 'Enter at least 1.'; noteInk = '#9A2C17'; }
+      else if (batchBad) { note = 'Needs a batch number.'; noteInk = '#9A2C17'; }
+      else if (expBad) { note = 'Needs an expiry date.'; noteInk = '#9A2C17'; }
+      else if (n < ex) { note = 'Ordered ' + ex + '. ' + (ex - n) + ' still owed.'; noteInk = '#7A4A00'; hasFix = true; fixLabel = 'Set to ' + ex; }
+      else if (n > ex) { note = 'Ordered ' + ex + '. This is ' + (n - ex) + ' more.'; noteInk = '#7A4A00'; hasFix = true; fixLabel = 'Set to ' + ex; }
+      return {
+        name: d.name, pack: d.id === 'prrs' ? d.pack + ' · ' + (n * 50) + ' doses' : d.pack, unit: d.unit,
+        qtyVal: v.q, qtyAria: d.name + ' quantity', qtyBorder: qtyBadL ? BAD : OK,
+        batch: v.b, batchAria: d.name + ' batch', batchBorder: batchBad ? BAD : OK,
+        exp: v.e, expAria: d.name + ' expiry', expBorder: expBad ? BAD : OK,
+        changed: n !== noteQty[d.id] && !qtyBadL, was: String(noteQty[d.id]),
+        hasNote: !!note, note, noteInk, hasFix, fixLabel,
+        fix: () => { if (!delLocked) setDv(d.id, 'q', String(ex)); },
+        typeQty: (e) => { if (!delLocked) setDv(d.id, 'q', e.target.value.replace(/[^0-9]/g, '').slice(0, 4)); },
+        typeBatch: (e) => { if (!delLocked) setDv(d.id, 'b', e.target.value); },
+        typeExp: (e) => { if (!delLocked) setDv(d.id, 'e', e.target.value); },
+        top: topOf(i)
+      };
+    });
+    const ironN = dq('iron');
+    const changes = [
+      { name: 'PRRS MLV vaccine', move: '40 → ' + (40 + delivered.prrs), note: 'Covers Batch 34' },
+      { name: 'Meloxicam', move: '3 → ' + (3 + delivered.melox), note: 'about ' + Math.floor((3 + delivered.melox) / 0.5) + ' days' },
+      { name: 'Iron dextran', move: '4 → ' + (4 + ironN), note: 'about ' + Math.floor((4 + ironN) / (4 / 12)) + ' days' }
+    ].map((c, i) => Object.assign(c, { top: topOf(i) }));
+    const owed = ironN > 0 ? ordered.iron - ironN : 0;
+    const owedText = owed > 0 ? ' ' + owed + ' bottles of iron dextran still owed.' : '';
+    const del = {
+      title: s.booked ? 'Friday’s delivery, booked in' : 'Book in Friday’s delivery',
+      lede: s.booked ? 'The three products are on the shelf with their batch numbers and expiry dates.' : 'Check the lines against the boxes. Stock changes when you book it in.',
+      owedDone: owedText
+    };
+
+    // ---------- save bar ----------
+    const view = s.view;
+    let bar = { show: false, text: '', label: '', opacity: 1, primary: () => {}, discard: () => {} };
+    if (view === 'order' && !locked) {
+      bar = {
+        show: true,
+        text: qtyN > 0 ? 'Order of ' + money(total) + ' to ' + supNow.name + ' · arrives ' + supNow.arrive : 'Enter a quantity to order',
+        label: qtyN > 0 ? 'Order ' + qtyN + ' × 100 ml Amoxicillin' : 'Order Amoxicillin',
+        opacity: qtyBad ? 0.4 : 1,
+        primary: () => { if (!qtyBad) set({ ordered: true }); },
+        discard: () => set({ rejected: true })
+      };
+    } else if (view === 'delivery' && !delLocked) {
+      const edits = dvDefs.filter((d) => dq(d.id) !== noteQty[d.id]).length;
+      bar = {
+        show: true,
+        text: '3 products to book in' + (edits ? ' · ' + edits + ' changed' : '') + (owed > 0 ? ' · ' + owed + ' iron dextran still owed' : ' · closes the order of Tue 27 Oct'),
+        label: 'Book in 3 products',
+        opacity: delErrors ? 0.4 : 1,
+        primary: () => { if (!delErrors) set({ booked: true }); },
+        discard: () => set({ delDiscarded: true })
+      };
+    } else if (view === 'record' && changed) {
+      const dNew = daysAt(cur, shown);
+      bar = {
+        show: true,
+        text: '1 change · ' + cur.name + ' ' + curStock + ' → ' + qtyText(cur, shown) + (dNew !== null ? ' · about ' + dNew + ' days' : ''),
+        label: 'Save count',
+        opacity: 1,
+        primary: () => {
+          const counts = Object.assign({}, s.counts);
+          const prev = s.counts[cur.id] != null ? s.counts[cur.id] : null;
+          counts[cur.id] = shown - addDelivered;
+          set({ counts, draftCount: null, draftFor: '', lastCount: { id: cur.id, prev } });
+        },
+        discard: () => set({ draftCount: null, draftFor: '' })
+      };
+    }
+
+    return {
+      ic,
+      isList: view === 'list', isRecord: view === 'record', isOrder: view === 'order', isDelivery: view === 'delivery',
+      summary,
+      queryText: s.q,
+      onQuery: (e) => set({ q: e.target.value }),
+      browse: !searching, searching,
+      hasNeeds: needs.length > 0, needsCount: needs.length, needs,
+      lowCount: flagged.length,
+      lowRows: flagged.map((x, i) => ({ name: x.p.name + ' · ' + x.p.pack, line: lineOf(x.p), chip: x.f.chip, top: topOf(i), open: openRec(x.p.id) })),
+      enoughOpen: s.enoughOpen, enoughCount: rest.length,
+      enoughExpanded: s.enoughOpen ? 'true' : 'false',
+      enoughRot: s.enoughOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+      toggleEnough: () => set({ enoughOpen: !s.enoughOpen }),
+      enoughRows: rest.map((p, i) => ({ name: p.name + ' · ' + p.pack, line: lineOf(p), right: rightOf(p), top: topOf(i), open: openRec(p.id) })),
+      resultRows, hasResults: results.length > 0, noResults: results.length === 0,
+      resultsText: results.length + (results.length === 1 ? ' product' : ' products'),
+
+      rec,
+      backToList: () => set({ view: 'list', draftCount: null, draftFor: '' }),
+      backFromProposal: () => set({ view: s.from === 'record' ? 'record' : 'list' }),
+      backLabel: s.from === 'record' ? cur.name : 'Medicines',
+      countDown: () => setDraft(shown - 1),
+      countUp: () => setDraft(shown + 1),
+      typeCount: (e) => setDraft(toInt(e.target.value)),
+      undoCount: () => {
+        const counts = Object.assign({}, s.counts);
+        if (s.lastCount.prev === null) delete counts[s.lastCount.id]; else counts[s.lastCount.id] = s.lastCount.prev;
+        set({ counts, lastCount: null });
+      },
+
+      ord, ordered: s.ordered, rejected: s.rejected,
+      undoOrder: () => set({ ordered: false }),
+      takeBackOrder: () => set({ rejected: false }),
+      qtyVal: s.qty, typeQty: (e) => setQty(toInt(e.target.value)),
+      qtyDown: () => setQty(qtyN - 1), qtyUp: () => setQty(qtyN + 1),
+      qtyChanged: qtyN !== 10,
+      qtyBorder: qtyBad ? BAD : OK,
+      qtyNote: qtyBad ? 'Enter at least 1 bottle.' : 'Lasts about ' + Math.floor(qtyN / 1.2) + ' days at 1.2 a day.',
+      qtyNoteInk: qtyBad ? '#9A2C17' : '#626C66',
+      supChanged: s.supplier !== 'hart',
+      choices,
+
+      del, booked: s.booked, delDiscarded: s.delDiscarded,
+      lines, changes,
+      seeMoves: s.seeMoves,
+      toggleMoves: () => set({ seeMoves: !s.seeMoves }),
+      movesExpanded: s.seeMoves ? 'true' : 'false',
+      movesRot: s.seeMoves ? 'rotate(90deg)' : 'rotate(0deg)',
+      undoBook: () => set({ booked: false }),
+      undoDiscard: () => set({ delDiscarded: false }),
+
+      bar
+    };
+  }
+}
+</script>
+</body>
+</html>

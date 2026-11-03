@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vaccination plan and round</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+  <sc-if value="{{showReceipt}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 10px; background: #F0F2EE; color: #3B4540; border-radius: 12px; padding: 8px 8px 8px 14px; margin-bottom: 20px; font-size: 13.5px; font-weight: 500; line-height: 1.45; animation: sentriRise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      <span style="flex: 1; min-width: 0">Saved <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">08:24</span> · {{receiptText}}</span>
+      <button type="button" onClick="{{undoSave}}" style="height: 32px; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Health › Vaccination</span>
+    <h1 style="margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -0.025em; color: #121815">{{title}}</h1>
+    <sc-if value="{{leadDot}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; align-items: baseline; gap: 9px; font-size: 14px; color: #3B4540; line-height: 1.5">
+        <span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: {{leadDotColor}}; flex-shrink: 0; align-self: center"></span>
+        <span style="flex: 1; min-width: 0">{{lead}}</span>
+      </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{isDiscarded}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 10px; background: #F0F2EE; color: #3B4540; border-radius: 12px; padding: 8px 8px 8px 14px; margin-top: 24px; font-size: 13.5px; font-weight: 500">
+      <span style="flex: 1">Discarded. Nothing was sent.</span>
+      <button type="button" onClick="{{bringBack}}" style="height: 32px; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Bring it back</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isProposalLive}}" hint-placeholder-val="{{true}}">
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 16px; margin-top: 24px">
+      <sc-for list="{{fields}}" as="f" hint-placeholder-count="6">
+        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+          <div style="display: flex; align-items: center; gap: 7px; min-height: 20px">
+            <sc-if value="{{f.changed}}" hint-placeholder-val="{{false}}">
+              <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #2FA36B; flex-shrink: 0"></span>
+            </sc-if>
+            <label for="{{f.id}}" style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</label>
+            <sc-if value="{{f.changed}}" hint-placeholder-val="{{false}}">
+              <span style="font-size: 12px; color: #626C66; text-decoration: line-through; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{f.old}}</span>
+              <button type="button" onClick="{{f.revert}}" style="border: 0; background: transparent; padding: 0; font: inherit; font-size: 12px; font-weight: 500; color: #3B4540; cursor: pointer; text-decoration: underline; flex-shrink: 0">Undo</button>
+            </sc-if>
+          </div>
+          <input id="{{f.id}}" value="{{f.value}}" onChange="{{f.change}}" style="height: 42px; box-sizing: border-box; width: 100%; border: 1px solid #E2E5DF; background: #FFFFFF; border-radius: 11px; padding: 0 13px; font: inherit; font-size: 14px; color: #121815">
+          <sc-if value="{{f.warn}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; font-size: 12.5px; line-height: 1.45; color: #7A4A00">
+              <span style="display: flex; gap: 7px; align-items: flex-start"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #D99A1E; flex-shrink: 0; margin-top: 7px"></span>{{f.warnText}}</span>
+              <sc-if value="{{f.hasFix}}" hint-placeholder-val="{{false}}">
+                <button type="button" onClick="{{f.fix}}" style="border: 0; background: transparent; padding: 0; font: inherit; font-size: 12.5px; font-weight: 600; color: #121815; cursor: pointer; text-decoration: underline">{{f.fixLabel}}</button>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px">
+      <span style="font-size: 12.5px; color: #626C66">Follows Batch 34's dates.</span>
+      <button type="button" onClick="{{toggleMore}}" aria-expanded="{{moreOpen}}" style="display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; padding: 6px 0 6px 8px; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+        More options
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{moreRot}}"><path d="{{ic.chevDown}}"></path></svg>
+      </button>
+    </div>
+    <sc-if value="{{moreOpen}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; flex-direction: column; margin-top: 4px; border-top: 1px solid #EFF1EC">
+        <sc-for list="{{moreRows}}" as="m" hint-placeholder-count="3">
+          <div style="display: flex; gap: 16px; padding: 10px 0; border-bottom: 1px solid #EFF1EC; font-size: 14px">
+            <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #626C66">{{m.label}}</span>
+            <span style="flex: 1; min-width: 0; color: #1E2622">{{m.value}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div style="margin-top: 22px; padding-top: 4px; border-top: 1px solid #EFF1EC">
+      <button type="button" onClick="{{toggleCreates}}" aria-expanded="{{createsOpen}}" style="display: inline-flex; align-items: center; gap: 5px; min-height: 40px; border: 0; background: transparent; padding: 0; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+        {{createsLabel}}
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{createsRot}}"><path d="{{ic.chevDown}}"></path></svg>
+      </button>
+      <sc-if value="{{createsOpen}}" hint-placeholder-val="{{false}}">
+      <ol style="list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column">
+        <sc-for list="{{created}}" as="c" hint-placeholder-count="3">
+          <li style="display: flex; gap: 14px; align-items: stretch">
+            <div style="width: 12px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center">
+              <span aria-hidden="true" style="width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; margin-top: 6px; border: 2px solid {{c.dotBorder}}; background: {{c.dotBg}}"></span>
+              <sc-if value="{{c.hasLine}}" hint-placeholder-val="{{true}}">
+                <span aria-hidden="true" style="flex: 1; width: 2px; margin: 3px 0 0; border-radius: 2px; background: #E2E5DF"></span>
+              </sc-if>
+            </div>
+            <div style="flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 14px; padding-bottom: {{c.pad}}px; line-height: 22px">
+              <span style="width: 86px; flex-shrink: 0; font-family: {{c.dateFont}}; font-size: 12.5px; color: #626C66">{{c.date}}</span>
+              <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">{{c.text}}</span>
+              <span style="font-size: 12.5px; color: #626C66; text-align: right">{{c.who}}</span>
+            </div>
+          </li>
+        </sc-for>
+      </ol>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 22px; padding-top: 14px; border-top: 1px solid #EFF1EC">
+        <span style="display: flex; align-items: baseline; gap: 10px">
+          <span style="font-size: 12px; font-weight: 500; color: #626C66">Pigs</span>
+          <span style="font-size: 14px; color: #121815">{{pigsSummary}}</span>
+        </span>
+        <button type="button" onClick="{{toggleList}}" aria-expanded="{{listOpen}}" style="border: 0; background: transparent; padding: 6px 0 6px 8px; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">{{listLabel}}</button>
+      </div>
+      <sc-if value="{{listOpen}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; max-height: 132px; overflow-y: auto">
+          <sc-for list="{{tags}}" as="t" hint-placeholder-count="12">
+            <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; line-height: 20px; padding: 1px 9px; border-radius: 999px; background: {{t.bg}}; color: {{t.ink}}">{{t.tag}}</span>
+          </sc-for>
+        </div>
+      </sc-if>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isRound}}" hint-placeholder-val="{{false}}">
+    <ol style="list-style: none; margin: 28px 0 0; padding: 0; display: flex; flex-direction: column">
+      <sc-for list="{{steps}}" as="st" hint-placeholder-count="4">
+        <li style="display: flex; gap: 16px; align-items: stretch">
+          <div style="width: 22px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center">
+            <sc-if value="{{st.isDone}}" hint-placeholder-val="{{true}}">
+              <span style="width: 22px; height: 22px; border-radius: 50%; background: #2D7A4B; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+              </span>
+            </sc-if>
+            <sc-if value="{{st.isNow}}" hint-placeholder-val="{{false}}">
+              <span style="width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; border: 2px solid #121815; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #121815"></span>
+              </span>
+            </sc-if>
+            <sc-if value="{{st.isLater}}" hint-placeholder-val="{{false}}">
+              <span style="width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; border: 2px solid #DADED6; background: #FFFFFF; flex-shrink: 0"></span>
+            </sc-if>
+            <sc-if value="{{st.isFailed}}" hint-placeholder-val="{{false}}">
+              <span style="width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; border: 2px solid #D9583B; background: #FCE7E2; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 11px; height: 11px; fill: none; stroke: #9A2C17; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.x}}"></path></svg>
+              </span>
+            </sc-if>
+            <sc-if value="{{st.hasLine}}" hint-placeholder-val="{{true}}">
+              <span aria-hidden="true" style="flex: 1; width: 2px; margin: 4px 0; border-radius: 2px; background: {{st.lineColor}}"></span>
+            </sc-if>
+          </div>
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; padding-bottom: {{st.pad}}px">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; line-height: 22px">
+              <span style="font-size: 15px; font-weight: 600; color: {{st.titleInk}}"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">{{st.stateWord}}: </span>{{st.title}}</span>
+              <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: {{st.dateInk}}; white-space: nowrap">{{st.date}}</span>
+            </div>
+            <sc-if value="{{st.hasChip}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px">
+                <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; color: #9A2C17; background: #FCE7E2; border-radius: 999px; padding: 2px 10px 2px 8px">
+                  <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #D9583B"></span>
+                  {{st.chip}}
+                </span>
+                <span style="font-size: 14px; color: #3B4540">{{st.chipTail}}</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{st.hasLine1}}" hint-placeholder-val="{{true}}">
+              <span style="font-size: 14px; line-height: 1.5; color: {{st.textInk}}">{{st.text}}</span>
+            </sc-if>
+            <sc-if value="{{st.hasHandled}}" hint-placeholder-val="{{false}}">
+              <button type="button" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; margin-top: 3px; padding: 0; min-height: 28px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #1F5534; cursor: pointer">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+                {{st.handledText}}
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.arrowRight}}"></path></svg>
+              </button>
+            </sc-if>
+            <sc-if value="{{st.hasDecision}}" hint-placeholder-val="{{false}}">
+              <button type="button" style="display: flex; align-items: center; gap: 10px; margin-top: 8px; width: 100%; box-sizing: border-box; min-height: 46px; padding: 8px 14px; border: 1px solid #D5E7CF; border-radius: 12px; background: #F5FAF2; font: inherit; text-align: left; cursor: pointer">
+                <span style="flex: 1; font-size: 14px; font-weight: 600; color: #121815">{{st.decision}}</span>
+                <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; color: #7A4A00; background: #FFF0D1; border-radius: 999px; padding: 2px 10px 2px 8px">
+                  <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #D99A1E"></span>
+                  Waiting for you
+                </span>
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0"><path d="{{ic.arrowRight}}"></path></svg>
+              </button>
+            </sc-if>
+          </div>
+        </li>
+      </sc-for>
+    </ol>
+
+    <div style="margin-top: 32px; padding-top: 6px; border-top: 1px solid #EFF1EC">
+      <button type="button" onClick="{{togglePlan}}" aria-expanded="{{planOpen}}" style="display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 44px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 15px; font-weight: 600; color: #121815; cursor: pointer; text-align: left">
+        The plan
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{planRot}}"><path d="{{ic.chevDown}}"></path></svg>
+      </button>
+      <sc-if value="{{planOpen}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; padding-bottom: 6px">
+          <sc-for list="{{planRows}}" as="p" hint-placeholder-count="6">
+            <div style="display: flex; gap: 16px; padding: 9px 0; border-top: 1px solid #EFF1EC; font-size: 14px">
+              <span style="width: 130px; flex-shrink: 0; font-size: 13px; color: #626C66">{{p.label}}</span>
+              <span style="flex: 1; min-width: 0; color: #1E2622">{{p.value}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="margin-top: 26px; padding-top: 18px; border-top: 1px solid #EFF1EC">
+      <h2 style="margin: 0 0 4px; font-size: 15px; line-height: 1.4; font-weight: 600">Other rounds</h2>
+      <sc-for list="{{others}}" as="o" hint-placeholder-count="2">
+        <button type="button" onClick="{{o.open}}" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; min-height: 52px; padding: 0; border: 0; border-top: 1px solid #EFF1EC; background: transparent; font: inherit; text-align: left; cursor: pointer">
+          <span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: {{o.dot}}; flex-shrink: 0"></span>
+          <span style="font-size: 14px; font-weight: 500; color: #121815; white-space: nowrap">{{o.name}}</span>
+          <span style="flex: 1; min-width: 0; font-size: 13px; color: #626C66">{{o.status}}</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0"><path d="{{ic.arrowRight}}"></path></svg>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+</div>
+
+<sc-if value="{{isProposalLive}}" hint-placeholder-val="{{true}}">
+  <div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #EFF1EC; padding: 12px 0">
+    <div style="max-width: 760px; margin: 0 auto; padding: 0 32px; box-sizing: border-box; display: flex; align-items: center; gap: 10px">
+      <span style="flex: 1; min-width: 0; font-size: 13px; line-height: 1.4; color: #3B4540">{{barSummary}}</span>
+      <button type="button" onClick="{{discard}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer">Discard</button>
+      <button type="button" onClick="{{approve}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 14px; border: 0; border-radius: 10px; background: #121815; font: inherit; font-size: 14px; font-weight: 500; color: #FFFFFF; cursor: pointer; white-space: nowrap">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+        {{approveLabel}}
+      </button>
+    </div>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["proposal","receipt","round","failed"],"default":"proposal"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  defaults(start) {
+    const base = { startSeen: start, view: 'proposal', round: 'b34', receipt: false, discarded: false, vals: {}, edited: {}, moreOpen: false, listOpen: false, planOpen: false, createsOpen: false };
+    if (start === 'receipt') return Object.assign(base, { view: 'round', round: 'b34', receipt: true });
+    if (start === 'round') return Object.assign(base, { view: 'round', round: 'b31' });
+    if (start === 'failed') return Object.assign(base, { view: 'round', round: 'b29' });
+    return base;
+  }
+
+  icons() {
+    return {
+      check: 'M20 6 9 17l-5-5',
+      x: 'M18 6 6 18 M6 6l12 12',
+      undo: 'M3 7v6h6 M21 17a9 9 0 0 0-15-6.7L3 13',
+      chevDown: 'M6 9l6 6 6-6',
+      arrowRight: 'M5 12h14 M13 6l6 6-6 6',
+    };
+  }
+
+  renderVals() {
+    const start = this.props.start || 'proposal';
+    let s = Object.assign({}, this.defaults(start), this.state || {});
+    if (s.startSeen !== start) s = this.defaults(start);
+    const set = (p) => this.setState(Object.assign({}, s, p, { startSeen: start }));
+    const I = this.icons();
+
+    const FIELDS = [
+      { k: 'pigs', label: 'Pigs', def: 'Batch 34 · 48 sows' },
+      { k: 'vaccine', label: 'Vaccine', def: 'PRRS MLV · Ingelvac' },
+      { k: 'dose', label: 'Dose', def: '2 ml, neck muscle' },
+      { k: 'day', label: 'Day', def: 'Fri 13 Nov · day 100 of gestation' },
+      { k: 'team', label: 'Done by', def: "Zhao Min's team" },
+      { k: 'check', label: 'Antibody check', def: '10 sows, 28 days after' }
+    ];
+    const val = (k) => {
+      const f = FIELDS.filter((x) => x.k === k)[0];
+      return s.vals[k] !== undefined ? s.vals[k] : f.def;
+    };
+    const fields = FIELDS.map((f) => {
+      const cur = val(f.k);
+      const changed = cur !== f.def;
+      const setVal = (v) => {
+        const vals = Object.assign({}, s.vals, { [f.k]: v });
+        const edited = Object.assign({}, s.edited, { [f.k]: v !== f.def });
+        set({ vals: vals, edited: edited });
+      };
+      // Inline rules: one short line at the field, with a one-tap fix where there is one.
+      let warn = false, warnText = '', hasFix = false, fixLabel = '', fix = () => {};
+      if (f.k === 'pigs' && !/\d+\s*sow/.test(cur)) {
+        warn = true; warnText = 'Add how many sows, like "48 sows".';
+      } else if (f.k === 'pigs') {
+        warn = true; warnText = '2 sows are in treatment (204771, 204802). Done when they return, or flagged missed.';
+      }
+      if (f.k === 'day' && cur.indexOf('Fri 13 Nov') < 0) {
+        warn = true; warnText = 'Day 100 of gestation is Fri 13 Nov.';
+        hasFix = true; fixLabel = 'Use Fri 13 Nov'; fix = () => setVal(f.def);
+      }
+      return {
+        id: 'vx-' + f.k,
+        label: f.label,
+        changed: changed,
+        old: f.def,
+        value: cur,
+        warn: warn, warnText: warnText, hasFix: hasFix, fixLabel: fixLabel, fix: fix,
+        revert: () => setVal(f.def),
+        change: (e) => setVal(e && e.target ? e.target.value : '')
+      };
+    });
+    const editedCount = FIELDS.filter((f) => val(f.k) !== f.def).length;
+
+    // Facts pulled from what is typed, so the button and copy never lie.
+    const pigsText = val('pigs');
+    const nMatch = pigsText.match(/(\d+)\s*sow/);
+    const n = nMatch ? nMatch[1] : '';
+    const batchMatch = pigsText.match(/Batch\s*\d+/);
+    const batch = batchMatch ? batchMatch[0] : 'Batch 34';
+    const dayText = val('day');
+    const longMatch = dayText.match(/[A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2}/);
+    const dayLong = longMatch ? longMatch[0] : 'Fri 13 Nov';
+    const shortMatch = dayText.match(/(\d{1,2}) ([A-Z][a-z]{2})/);
+    const dayShort = shortMatch ? shortMatch[0] : '';
+    const team = val('team') || "Zhao Min's team";
+    const nPart = n ? n + ' ' : '';
+    const approveLabel = 'Send ' + nPart + 'vaccinations' + (dayShort ? ' for ' + dayShort : '');
+
+    // Round data
+    const std = (pigs, day) => [
+      { label: 'Pigs', value: pigs },
+      { label: 'Vaccine', value: 'PRRS MLV · Ingelvac' },
+      { label: 'Dose', value: '2 ml, neck muscle' },
+      { label: 'Day', value: day },
+      { label: 'Done by', value: "Zhao Min's team" },
+      { label: 'Antibody check', value: '10 sows, 28 days after' }
+    ];
+    const ROUNDS = {
+      b34: {
+        name: 'Batch 34 round', dot: '#8E9C90', short: 'Step 1 on Fri 13 Nov',
+        title: 'PRRS booster · ' + batch + ' round',
+        lead: 'Step 1 is scheduled for ' + dayLong,
+        leadDot: '#8E9C90',
+        plan: FIELDS.map((f) => ({ label: f.label, value: val(f.k) })),
+        steps: [
+          { state: 'now', title: 'Vaccination', date: dayLong, text: (n || '48') + ' sows · ' + team + ' · 2 in treatment will follow' },
+          { state: 'later', title: 'Missed pigs', date: 'After ' + dayLong, text: 'Any sow not done gets a catch-up decision from you.' },
+          { state: 'later', title: 'Antibody sampling', date: 'Fri 11 Dec', text: '10 sows · Biosecurity' },
+          { state: 'later', title: 'Result', date: 'After Fri 11 Dec', text: 'Closes the round if it passes; a fail asks you about revaccinating.' }
+        ]
+      },
+      b31: {
+        name: 'Batch 31 round', dot: '#D99A1E', short: 'Catch-up due Mon 2 Nov',
+        title: 'PRRS booster · Batch 31 round',
+        lead: 'Catch-up for 3 sows is due Mon 2 Nov',
+        leadDot: '#D99A1E',
+        plan: std('Batch 31 · 51 sows', 'Tue 20 Oct · day 100 of gestation'),
+        steps: [
+          { state: 'done', title: 'Vaccinated', date: 'Tue 20 Oct', text: "48 of 51 sows · Zhao Min's team" },
+          { state: 'now', title: 'Missed pigs', date: 'Mon 2 Nov', text: '3 sows · catch-up sent for Mon 2 Nov', handled: 'Catch-up decision · handled' },
+          { state: 'later', title: 'Antibody sampling', date: 'Tue 17 Nov', text: '10 sows · Biosecurity' },
+          { state: 'later', title: 'Result', date: 'After Tue 17 Nov', text: 'Closes the round if it passes; a fail asks you about revaccinating.' }
+        ]
+      },
+      b29: {
+        name: 'Batch 29 round', dot: '#D9583B', short: 'Result below target',
+        title: 'PRRS booster · Batch 29 round',
+        lead: 'The result is in. It did not pass.',
+        leadDot: '#D9583B',
+        plan: std('Batch 29 · 47 sows', 'Tue 29 Sep · day 100 of gestation'),
+        steps: [
+          { state: 'done', title: 'Vaccinated', date: 'Tue 29 Sep', text: "46 of 47 sows · Zhao Min's team" },
+          { state: 'done', title: 'Missed pigs', date: 'Thu 1 Oct', text: '1 sow · caught up Thu 1 Oct', handled: 'Catch-up decision · handled' },
+          { state: 'done', title: 'Antibody sampling', date: 'Tue 27 Oct', text: '10 sows · Biosecurity' },
+          { state: 'failed', title: 'Result', date: 'Thu 29 Oct', chip: '6 of 10 below', chipTail: 'the antibody target', decision: 'Revaccinate?' }
+        ]
+      }
+    };
+    const isRound = s.view === 'round';
+    const R = ROUNDS[s.round] || ROUNDS.b34;
+
+    const reached = (st) => st === 'done' || st === 'now' || st === 'failed';
+    const stateWord = { done: 'Done', now: 'Now', later: 'Later', failed: 'Failed' };
+    const steps = R.steps.map((st, i, arr) => {
+      const last = i === arr.length - 1;
+      const later = st.state === 'later';
+      const nextReached = !last && reached(arr[i + 1].state) && st.state === 'done';
+      return {
+        isDone: st.state === 'done', isNow: st.state === 'now', isLater: later, isFailed: st.state === 'failed',
+        stateWord: stateWord[st.state],
+        hasLine: !last,
+        lineColor: nextReached ? '#2D7A4B' : '#E2E5DF',
+        pad: last ? 0 : 26,
+        title: st.title,
+        titleInk: later ? '#626C66' : '#121815',
+        date: st.date,
+        dateInk: later ? '#626C66' : '#3B4540',
+        hasChip: !!st.chip, chip: st.chip || '', chipTail: st.chipTail || '',
+        hasLine1: !!st.text, text: st.text || '',
+        textInk: later ? '#626C66' : '#3B4540',
+        hasHandled: !!st.handled, handledText: st.handled || '',
+        hasDecision: !!st.decision, decision: st.decision || ''
+      };
+    });
+    const others = Object.keys(ROUNDS).filter((k) => k !== s.round).map((k) => ({
+      name: ROUNDS[k].name, status: ROUNDS[k].short, dot: ROUNDS[k].dot,
+      open: () => set({ view: 'round', round: k, receipt: false })
+    }));
+
+    // Proposal evidence
+    const created = [
+      { date: dayLong, text: (n || '48') + ' vaccinations', who: team, dateFont: "'Geist Mono', ui-monospace, monospace", dotBorder: '#121815', dotBg: '#121815', hasLine: true, pad: 12 },
+      { date: 'Fri 11 Dec', text: 'Sample 10 sows for antibodies', who: 'Biosecurity', dateFont: "'Geist Mono', ui-monospace, monospace", dotBorder: '#121815', dotBg: '#FFFFFF', hasLine: true, pad: 12 },
+      { date: 'If missed', text: 'A catch-up decision for you', who: '', dateFont: "'Geist', 'Inter', system-ui, sans-serif", dotBorder: '#DADED6', dotBg: '#FFFFFF', hasLine: false, pad: 0 }
+    ];
+    const tags = [];
+    for (let i = 0; i < 48; i++) {
+      const tag = String(204760 + i);
+      const flagged = tag === '204771' || tag === '204802';
+      tags.push({ tag: tag, bg: flagged ? '#FFF0D1' : '#F0F2EE', ink: flagged ? '#7A4A00' : '#3B4540' });
+    }
+
+    const isProposal = s.view === 'proposal';
+    const receiptText = (n || '48') + ' vaccinations sent to ' + team + ' for ' + dayLong;
+
+    return {
+      ic: I,
+      isRound: isRound,
+      isDiscarded: isProposal && s.discarded,
+      isProposalLive: isProposal && !s.discarded,
+      showReceipt: isRound && s.receipt,
+      receiptText: receiptText,
+      title: isProposal ? 'PRRS booster · ' + batch : R.title,
+      lead: R.lead,
+      leadDot: isRound,
+      barSummary: (editedCount ? editedCount + (editedCount === 1 ? ' edit' : ' edits') + ' · ' : 'New round · ') + (n || '48') + ' vaccinations, 10 samples',
+      leadDotColor: R.leadDot,
+      fields: fields,
+      undoSave: () => set({ view: 'proposal', receipt: false, discarded: false }),
+      moreOpen: s.moreOpen,
+      moreRot: s.moreOpen ? 'rotate(180deg)' : 'none',
+      toggleMore: () => set({ moreOpen: !s.moreOpen }),
+      moreRows: [
+        { label: 'Send tasks at', value: '06:00 on the day' },
+        { label: 'Missed pigs', value: 'Catch-up decision after 3 days' },
+        { label: 'Sows in treatment', value: 'Vaccinate when they return' }
+      ],
+      created: created,
+      pigsSummary: (n || '48') + ' sows',
+      listOpen: s.listOpen,
+      listLabel: s.listOpen ? 'Hide list' : 'Show list',
+      toggleList: () => set({ listOpen: !s.listOpen }),
+      tags: tags,
+      approveLabel: approveLabel,
+      approve: () => set({ view: 'round', round: 'b34', receipt: true }),
+      discard: () => set({ discarded: true }),
+      bringBack: () => set({ discarded: false }),
+      createsOpen: s.createsOpen,
+      createsRot: s.createsOpen ? 'rotate(180deg)' : 'none',
+      createsLabel: s.createsOpen ? 'Hide what this creates' : 'See what this creates (3 steps)',
+      toggleCreates: () => set({ createsOpen: !s.createsOpen }),
+      steps: steps,
+      planOpen: s.planOpen,
+      planRot: s.planOpen ? 'rotate(180deg)' : 'none',
+      togglePlan: () => set({ planOpen: !s.planOpen }),
+      planRows: R.plan,
+      others: others
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pigs and pig record</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 900px; display: flex; flex-direction: column">
+<div style="flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+<sc-if value="{{v.list}}" hint-placeholder-val="{{true}}">
+  <h1 style="margin: 0 0 16px; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Pigs</h1>
+  <div style="position: relative">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="position: absolute; left: 13px; top: 14px; width: 16px; height: 16px; fill: none; stroke: #626C66; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.search}}"></path></svg>
+    <label for="pig-search" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Find pigs</label>
+    <input id="pig-search" value="{{queryText}}" onChange="{{onQuery}}" placeholder="Tag, room or describe…" style="width: 100%; box-sizing: border-box; height: 44px; border: 1px solid transparent; border-radius: 11px; background: #F0F2EE; padding: 0 12px 0 38px; font: inherit; font-size: 14px; color: #121815; outline: none">
+  </div>
+  <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; min-height: 28px">
+    <sc-for list="{{chips}}" as="c" hint-placeholder-count="3">
+      <span style="display: inline-flex; align-items: center; gap: 2px; height: 28px; padding: 0 5px 0 12px; border-radius: 999px; background: #F0F2EE; color: #121815; font-size: 13px; font-weight: 500">
+        {{c.label}}
+        <button type="button" aria-label="{{c.aria}}" onClick="{{c.remove}}" style="width: 20px; height: 20px; border: 0; border-radius: 999px; background: transparent; color: #626C66; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.x}}"></path></svg>
+        </button>
+      </span>
+    </sc-for>
+  </div>
+  <div style="margin: 18px 0 10px; font-size: 12.5px; color: #626C66">{{countText}}</div>
+  <sc-if value="{{hasRows}}" hint-placeholder-val="{{true}}">
+    <div style="border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+        <button type="button" onClick="{{r.open}}" style="display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; align-items: center; gap: 14px; width: 100%; box-sizing: border-box; padding: 13px 18px; border: 0; border-top: {{r.top}}; background: transparent; text-align: left; font: inherit; color: inherit; cursor: pointer">
+          <span style="display: flex; flex-direction: column; gap: 1px">
+            <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 0.01em">{{r.tag}}</span>
+            <span style="font-size: 12.5px; color: #626C66">{{r.cat}}</span>
+          </span>
+          <span style="font-size: 13.5px; color: #3B4540">{{r.where}}</span>
+          <span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 500; white-space: nowrap; background: {{r.chipBg}}; color: {{r.chipInk}}">
+            <sc-if value="{{r.hasDot}}" hint-placeholder-val="{{true}}">
+              <span style="width: 6px; height: 6px; border-radius: 999px; background: {{r.chipDot}}"></span>
+            </sc-if>
+            {{r.chip}}
+          </span>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+  <sc-if value="{{noRows}}" hint-placeholder-val="{{false}}">
+    <div style="border: 1px solid #E8EBE5; border-radius: 14px; padding: 28px 18px; text-align: center; color: #626C66; font-size: 13.5px">No pig matches. Remove a filter or check the tag.</div>
+  </sc-if>
+</sc-if>
+
+<sc-if value="{{v.record}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToList}}" style="display: inline-flex; align-items: center; gap: 3px; margin: 0 0 14px -4px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevLeft}}"></path></svg>
+    Pigs
+  </button>
+  <sc-if value="{{hasReceipt}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; background: #F0F2EE; color: #3B4540; border-radius: 12px; padding: 8px 8px 8px 14px; font-size: 13.5px; font-weight: 500; line-height: 1.45; animation: sentriRise 0.4s ease-out both">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      <span style="flex: 1; min-width: 0">Saved <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">{{receipt.time}}</span> · {{receipt.text}}</span>
+      <button type="button" onClick="{{undoSave}}" style="height: 32px; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+  <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+    <h1 style="margin: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 26px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.2">{{rec.tag}}</h1>
+    <sc-if value="{{rec.hasTri}}" hint-placeholder-val="{{true}}">
+      <span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: {{rec.triBg}}; color: {{rec.triInk}}">
+        <span style="width: 6px; height: 6px; border-radius: 999px; background: {{rec.triDot}}"></span>
+        {{rec.triLabel}}
+      </span>
+    </sc-if>
+  </div>
+  <div style="margin-top: 6px; font-size: 14px; color: #3B4540">{{rec.identity}}</div>
+
+  <h2 style="margin: 28px 0 10px; font-size: 15px; font-weight: 600">Open findings</h2>
+  <sc-if value="{{rec.hasFindings}}" hint-placeholder-val="{{true}}">
+    <div style="border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{rec.findings}}" as="f" hint-placeholder-count="2">
+        <div style="padding: 15px 18px 14px; border-top: {{f.top}}">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px">
+            <div style="display: flex; flex-direction: column">
+              <span style="font-size: 14.5px; font-weight: 500">{{f.label}}</span>
+              <span style="font-size: 12.5px; color: #626C66">{{f.meta}}</span>
+            </div>
+            <sc-if value="{{f.isBetter}}" hint-placeholder-val="{{false}}">
+              <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 500; background: #E7F4EA; color: #1F5534">Better</span>
+            </sc-if>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px">
+            <sc-if value="{{f.canBetter}}" hint-placeholder-val="{{true}}">
+              <button type="button" onClick="{{f.better}}" style="height: 32px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Better</button>
+            </sc-if>
+            <button type="button" onClick="{{f.recovered}}" style="height: 32px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Recovered</button>
+            <button type="button" onClick="{{f.mistake}}" style="height: 32px; padding: 0 10px; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #626C66; cursor: pointer">Entered by mistake</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+  <sc-if value="{{rec.noFindings}}" hint-placeholder-val="{{false}}">
+    <div style="font-size: 13.5px; color: #626C66">No open findings.</div>
+  </sc-if>
+
+  <h2 style="margin: 28px 0 4px; font-size: 15px; font-weight: 600">Last events</h2>
+  <div>
+    <sc-for list="{{rec.events}}" as="e" hint-placeholder-count="5">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: {{e.top}}">
+        <span style="font-size: 14px; color: #1E2622">{{e.text}}</span>
+        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66; white-space: nowrap">{{e.date}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <h2 style="margin: 28px 0 10px; font-size: 15px; font-weight: 600">Actions</h2>
+  <div style="display: flex; flex-wrap: wrap; gap: 8px">
+    <button type="button" style="height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; color: #121815; cursor: pointer">Add a finding</button>
+    <button type="button" style="height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; color: #121815; cursor: pointer">Change triage</button>
+    <button type="button" style="height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; color: #121815; cursor: pointer">Move pen</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{v.proposal}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{discard}}" style="display: inline-flex; align-items: center; gap: 3px; margin: 0 0 14px -4px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevLeft}}"></path></svg>
+    <span style="font-family: 'Geist Mono', ui-monospace, monospace">{{pr.tag}}</span>
+  </button>
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{pr.title}}</h1>
+
+  <div style="display: flex; flex-direction: column; gap: 22px; margin-top: 26px">
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 12px; font-weight: 500; color: #626C66">Finding</span>
+      <span style="font-size: 15px; font-weight: 500">{{pr.findingLabel}}</span>
+      <span style="font-size: 12.5px; color: #626C66">{{pr.findingMeta}}</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 500; color: #626C66"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #2FA36B"></span>Now</span>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <sc-for list="{{pr.nowChoices}}" as="c" hint-placeholder-count="3">
+          <button type="button" aria-pressed="{{c.on}}" onClick="{{c.pick}}" style="height: 40px; padding: 0 16px; border-radius: 10px; font: inherit; font-size: 13.5px; cursor: pointer; border: 1px solid {{c.border}}; background: {{c.bg}}; color: {{c.ink}}; font-weight: {{c.weight}}">{{c.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; align-items: center; gap: 7px">
+        <sc-if value="{{pr.triChanged}}" hint-placeholder-val="{{true}}">
+          <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #2FA36B"></span>
+        </sc-if>
+        <span style="font-size: 12px; font-weight: 500; color: #626C66">Triage</span>
+        <sc-if value="{{pr.triChanged}}" hint-placeholder-val="{{true}}">
+          <span style="font-size: 12px; color: #626C66; text-decoration: line-through">{{pr.triWas}}</span>
+        </sc-if>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <sc-for list="{{pr.triChoices}}" as="c" hint-placeholder-count="3">
+          <button type="button" aria-pressed="{{c.on}}" onClick="{{c.pick}}" style="height: 40px; padding: 0 16px; border-radius: 10px; font: inherit; font-size: 13.5px; cursor: pointer; border: 1px solid {{c.border}}; background: {{c.bg}}; color: {{c.ink}}; font-weight: {{c.weight}}">{{c.label}}</button>
+        </sc-for>
+      </div>
+      <sc-if value="{{pr.triWarn}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 12.5px; line-height: 1.45; color: #7A4A00">
+          <span style="display: flex; gap: 7px; align-items: flex-start"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #D99A1E; flex-shrink: 0; margin-top: 7px"></span>{{pr.triWarnText}}</span>
+          <button type="button" onClick="{{pr.triFix}}" style="border: 0; background: transparent; padding: 0; font: inherit; font-size: 12.5px; font-weight: 600; color: #121815; cursor: pointer; text-decoration: underline">{{pr.triFixLabel}}</button>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 22px 48px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 12px; font-weight: 500; color: #626C66">Seen by</span>
+        <span style="display: flex; align-items: center; gap: 9px; height: 40px; font-size: 14px">
+          <span style="width: 26px; height: 26px; border-radius: 999px; background: #151B17; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600">A</span>
+          Adam
+        </span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <label for="pig-time" style="font-size: 12px; font-weight: 500; color: #626C66">Time</label>
+        <div style="display: flex; align-items: center; gap: 10px">
+          <input id="pig-time" value="{{pr.time}}" onChange="{{onTime}}" style="width: 96px; box-sizing: border-box; height: 40px; border: 1px solid #E2E5DF; border-radius: 11px; padding: 0 13px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; color: #121815; background: #FFFFFF; outline: none">
+          <span style="font-size: 12.5px; color: #626C66">today, Fri 30 Oct</span>
+        </div>
+        <sc-if value="{{pr.timeWarn}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; line-height: 1.45; color: #7A4A00"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #D99A1E; flex-shrink: 0; align-self: center"></span>Use 24-hour time, like 08:30.</div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <button type="button" aria-expanded="{{pr.more}}" onClick="{{toggleMore}}" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 5px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+        More options
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{pr.moreRot}}"><path d="{{ic.chevDown}}"></path></svg>
+      </button>
+      <sc-if value="{{pr.more}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label for="pig-note" style="font-size: 12px; font-weight: 500; color: #626C66">Note</label>
+          <input id="pig-note" value="{{pr.note}}" onChange="{{onNote}}" placeholder="Anything the next person should know" style="width: 100%; box-sizing: border-box; height: 44px; border: 1px solid #E2E5DF; border-radius: 11px; padding: 0 13px; font: inherit; font-size: 14px; color: #121815; background: #FFFFFF; outline: none">
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+</sc-if>
+
+</div>
+
+<sc-if value="{{v.proposal}}" hint-placeholder-val="{{false}}">
+  <div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+    <div style="max-width: 760px; margin: 0 auto; padding: 14px 32px; box-sizing: border-box; display: flex; align-items: center; gap: 10px">
+      <span style="flex: 1; min-width: 0; font-size: 13px; line-height: 1.4; color: #3B4540">{{pr.barSummary}}</span>
+      <button type="button" onClick="{{discard}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer">Discard</button>
+      <button type="button" onClick="{{save}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #C5F06A; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+        {{pr.primary}}
+      </button>
+    </div>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["list","record","finding","saved"],"default":"list"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z M21 21l-4.3-4.3',
+      x: 'M18 6 6 18 M6 6l12 12',
+      check: 'M20 6 9 17l-5-5',
+      chevLeft: 'M15 18l-6-6 6-6',
+      chevDown: 'M6 9l6 6 6-6',
+      chat: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'
+    };
+  }
+
+  // ---- data ------------------------------------------------------------
+  pigs() {
+    const lame = (side, sinceDay, sinceTime, by, sev, ev2) => ({
+      id: 'lame', label: 'Lame, ' + side, noun: 'lameness', short: 'lame', sev: sev,
+      meta: 'since ' + sinceDay + ' · ' + by,
+      ev: [[sinceDay + ' · ' + sinceTime, 'Lame, ' + side + ', found by ' + by], ev2]
+    });
+    const recheck = (by) => ['Thu 29 Oct · 09:15', 'Re-check by ' + by + ': still lame, eating well'];
+    const old = ['Mon 6 Apr · 14:05', 'Lame, right front. Recovered after 6 days'];
+    const temp = {
+      id: 'temp', label: 'Temperature 39.8 °C', noun: 'temperature', short: 'temperature', sev: 'watch',
+      meta: 'Thu 29 Oct · Zhao Min',
+      ev: [['Thu 29 Oct · 07:50', 'Temperature 39.8 °C, taken by Zhao Min'], ['Wed 21 Oct · 10:20', 'Temperature 38.6 °C, normal']]
+    };
+    const feed = {
+      id: 'feed', label: 'Off feed', noun: 'off feed', short: 'off feed', sev: 'watch',
+      meta: 'since Thu 29 Oct · Zhao Min',
+      ev: [['Thu 29 Oct · 17:30', 'Left half of the ration, noted by Zhao Min'], ['Mon 12 Oct · 08:10', 'Ate the full ration after the move']]
+    };
+    const G2 = 'Gestation 2';
+    const G1 = 'Gestation 1';
+    return [
+      { tag: '204518', cat: 'Sow', parity: 4, room: G2, pen: 14, batch: 34, day: 86, vet: true, findings: [lame('left hind', 'Wed 28 Oct', '16:40', 'Zhao Min', 'urgent', recheck('Zhao Min')), temp] },
+      { tag: '205102', cat: 'Sow', parity: 6, room: G2, pen: 17, batch: 33, day: 93, findings: [lame('right front', 'Thu 29 Oct', '07:40', 'Zhao Min', 'urgent', old)] },
+      { tag: '203377', cat: 'Sow', parity: 2, room: G2, pen: 9, batch: 34, day: 74, findings: [lame('left front', 'Tue 27 Oct', '11:20', 'Zhao Min', 'watch', recheck('Zhao Min'))] },
+      { tag: '205240', cat: 'Sow', parity: 3, room: G2, pen: 11, batch: 34, day: 67, findings: [lame('right hind', 'Wed 28 Oct', '08:05', 'Zhao Min', 'watch', recheck('Zhao Min'))] },
+      { tag: '204093', cat: 'Sow', parity: 3, room: G2, pen: 3, batch: 32, day: 104, findings: [feed] },
+      { tag: '205016', cat: 'Sow', parity: 2, room: G2, pen: 7, batch: 33, day: 71, findings: [] },
+      { tag: '203840', cat: 'Sow', parity: 5, room: G2, pen: 12, batch: 32, day: 102, findings: [] },
+      { tag: '205377', cat: 'Sow', parity: 1, room: G2, pen: 19, batch: 34, day: 61, findings: [] },
+      { tag: '204660', cat: 'Sow', parity: 4, room: G2, pen: 15, batch: 33, day: 79, findings: [] },
+      { tag: '206014', cat: 'Gilt', parity: 0, room: G2, pen: 21, batch: 35, day: 58, findings: [] },
+      { tag: '206122', cat: 'Gilt', parity: 0, room: G2, pen: 22, batch: 35, day: 44, findings: [] },
+      { tag: '203155', cat: 'Sow', parity: 3, room: G1, pen: 5, batch: 31, day: 108, findings: [lame('left hind', 'Wed 28 Oct', '13:30', 'Zhao Min', 'watch', recheck('Zhao Min'))] },
+      { tag: '202788', cat: 'Sow', parity: 6, room: G1, pen: 2, batch: 30, day: 95, findings: [] },
+      { tag: '204905', cat: 'Gilt', parity: 0, room: G1, pen: 8, batch: 31, day: 66, findings: [] }
+    ];
+  }
+
+  MON() { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; }
+  WD() { return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; }
+  addDays(n) { return new Date(Date.UTC(2026, 9, 30) + n * 86400000); }
+  dm(d) { return d.getUTCDate() + ' ' + this.MON()[d.getUTCMonth()]; }
+  wdm(d) { return this.WD()[d.getUTCDay()] + ' ' + this.dm(d); }
+
+  eventsFor(p) {
+    if (p.tag === '204518') {
+      return [
+        { text: 'Vaccinated PRRS', date: '13 Oct' },
+        { text: 'Moved to Gestation 2', date: '12 Oct' },
+        { text: 'Pregnancy confirmed', date: '2 Sep' },
+        { text: 'Bred', date: '5 Aug' },
+        { text: 'Weaned 12 piglets', date: '30 Jul' }
+      ];
+    }
+    const ev = [
+      { t: -17, text: 'Vaccinated PRRS', fixed: '13 Oct' },
+      { t: -18, text: 'Moved to ' + p.room, fixed: '12 Oct' },
+      { t: -(p.day - 28), text: 'Pregnancy confirmed' },
+      { t: -p.day, text: 'Bred' },
+      { t: -(p.day + 6), text: p.cat === 'Sow' ? 'Weaned ' + (9 + (p.parity % 4)) + ' piglets' : 'Selected as a gilt' }
+    ];
+    ev.sort((a, b) => b.t - a.t);
+    return ev.map((e) => ({ text: e.text, date: e.fixed || this.dm(this.addDays(e.t)) }));
+  }
+
+  // ---- state -----------------------------------------------------------
+  defaults(start) {
+    const base = {
+      view: 'list', pig: '204518', chips: { room: true, lame: true, sows: true }, q: null,
+      fid: null, kind: null, triEdited: false, tri: null, time: '08:30', more: false, note: '',
+      fixes: {}, triSet: {}, log: {}, receipt: null
+    };
+    if (start === 'record') return Object.assign(base, { view: 'record' });
+    if (start === 'finding') return Object.assign(base, { view: 'proposal', fid: 'lame', kind: 'better' });
+    if (start === 'saved') {
+      const pig = this.pigs()[0];
+      return Object.assign(base, this.commit(base, pig, 'lame', 'better', null, '08:30'));
+    }
+    return base;
+  }
+
+  getS() {
+    const start = this.props.start || 'list';
+    const st = this.state || {};
+    const d = this.defaults(start);
+    return st.startSeen === start ? Object.assign(d, st) : d;
+  }
+
+  // ---- triage rules ------------------------------------------------------
+  rank(sev) { return sev === 'urgent' ? 2 : sev === 'watch' ? 1 : 0; }
+  openOf(pig, fixes) {
+    const out = [];
+    pig.findings.forEach((f) => {
+      const st = fixes[pig.tag + ':' + f.id];
+      if (st && (st.status === 'recovered' || st.status === 'mistake')) return;
+      const better = !!(st && st.status === 'better');
+      out.push({ f: f, better: better, at: st ? st.at : null, sev: better ? 'watch' : f.sev });
+    });
+    return out;
+  }
+  derive(pig, fixes) {
+    let top = 0;
+    this.openOf(pig, fixes).forEach((o) => { top = Math.max(top, this.rank(o.sev)); });
+    return top === 2 ? 'urgent' : top === 1 ? 'watch' : 'normal';
+  }
+  effTri(pig, s) {
+    const o = s.triSet[pig.tag];
+    return o !== undefined ? o : this.derive(pig, s.fixes);
+  }
+  cap(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+  phraseShort(kind) { return kind === 'better' ? 'better' : kind === 'recovered' ? 'recovered' : 'entered by mistake'; }
+  phraseFull(kind) { return kind === 'better' ? 'is better' : kind === 'recovered' ? 'has recovered' : 'was entered by mistake'; }
+
+  commit(s, pig, fid, kind, triChosen, time) {
+    const f = pig.findings.filter((x) => x.id === fid)[0];
+    const fixes = Object.assign({}, s.fixes);
+    fixes[pig.tag + ':' + fid] = { status: kind, at: 'Fri 30 Oct · ' + time, by: 'Adam' };
+    const tri = triChosen || this.derive(pig, fixes);
+    const was = this.effTri(pig, s);
+    const triSet = Object.assign({}, s.triSet);
+    triSet[pig.tag] = tri;
+    const log = Object.assign({}, s.log);
+    log[pig.tag] = [{ text: this.cap(f.noun) + ' ' + this.phraseShort(kind), date: '30 Oct' }].concat(log[pig.tag] || []);
+    const triLine = tri === was ? 'Triage stays ' + this.cap(tri) + '.' : 'Triage is now ' + this.cap(tri) + '.';
+    return {
+      view: 'record', pig: pig.tag, fixes: fixes, triSet: triSet, log: log,
+      receipt: { tag: pig.tag, time: time, text: this.cap(f.short) + ' ' + this.phraseFull(kind) + ' on ' + pig.tag + '. ' + triLine, prev: { fixes: s.fixes, triSet: s.triSet, log: s.log } }
+    };
+  }
+
+  chipFor(pig, s) {
+    const tri = this.effTri(pig, s);
+    if (tri === 'urgent' || tri === 'watch') {
+      const opens = this.openOf(pig, s.fixes).slice().sort((a, b) => this.rank(b.sev) - this.rank(a.sev));
+      const pal = tri === 'urgent' ? { bg: '#FCE7E2', ink: '#9A2C17', dot: '#D9583B' } : { bg: '#FFF0D1', ink: '#7A4A00', dot: '#D99A1E' };
+      return Object.assign({ label: this.cap(tri) + (opens.length ? ' · ' + opens[0].f.short : ''), hasDot: true }, pal);
+    }
+    return { label: 'Gestation day ' + pig.day, bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90', hasDot: false };
+  }
+
+  // ---- render ------------------------------------------------------------
+  renderVals() {
+    const start = this.props.start || 'list';
+    const s = this.getS();
+    const set = (p) => this.setState(Object.assign({}, s, p, { startSeen: start }));
+    const I = this.icons();
+    const pigs = this.pigs();
+    const byTag = {};
+    pigs.forEach((p) => { byTag[p.tag] = p; });
+    const view = s.view;
+
+    // list --------------------------------------------------------------
+    const ch = s.chips;
+    const qDigits = s.q ? (s.q.match(/\d{3,}/) || [null])[0] : null;
+    const hasLame = (p) => this.openOf(p, s.fixes).some((o) => o.f.id === 'lame');
+    const filtered = pigs.filter((p) => (!ch.room || p.room === 'Gestation 2') && (!ch.sows || p.cat === 'Sow') && (!ch.lame || hasLame(p)) && (!qDigits || p.tag.indexOf(qDigits) !== -1));
+    filtered.sort((a, b) => {
+      const d = this.rank(this.effTri(b, s)) - this.rank(this.effTri(a, s));
+      return d !== 0 ? d : (a.tag < b.tag ? -1 : 1);
+    });
+    const rows = filtered.map((p, i) => {
+      const c = this.chipFor(p, s);
+      return {
+        tag: p.tag, cat: p.cat + (p.cat === 'Sow' ? ' · P' + p.parity : ''),
+        where: ch.room ? 'Pen ' + p.pen : p.room + ' · Pen ' + p.pen,
+        chip: c.label, chipBg: c.bg, chipInk: c.ink, chipDot: c.dot, hasDot: c.hasDot,
+        top: i === 0 ? '0' : '1px solid #EFF1EC',
+        open: () => set({ view: 'record', pig: p.tag, receipt: null })
+      };
+    });
+    const chipDefs = [
+      { k: 'room', label: 'Gestation 2' },
+      { k: 'lame', label: 'Lame' },
+      { k: 'sows', label: 'Sows' }
+    ].filter((c) => ch[c.k]).map((c) => ({
+      label: c.label, aria: 'Remove ' + c.label,
+      remove: () => set({ chips: Object.assign({}, ch, { [c.k]: false }), q: null })
+    }));
+    const derived = chipDefs.length === 0 ? '' : (ch.lame ? 'lame ' : '') + (ch.sows ? 'sows' : 'pigs') + (ch.room ? ' · Gestation 2' : '');
+    const queryText = s.q === null ? derived : s.q;
+    const n = rows.length;
+    const countText = n + (n === 1 ? ' pig' : ' pigs');
+
+    // record ------------------------------------------------------------
+    const pig = byTag[s.pig] || pigs[0];
+    const tri = this.effTri(pig, s);
+    const triPal = tri === 'urgent' ? { bg: '#FCE7E2', ink: '#9A2C17', dot: '#D9583B' } : { bg: '#FFF0D1', ink: '#7A4A00', dot: '#D99A1E' };
+    const opens = this.openOf(pig, s.fixes);
+    const dueTxt = pig.tag === '204518' ? 'Fri 27 Nov' : this.wdm(this.addDays(114 - pig.day));
+    const identity = [pig.cat === 'Sow' ? 'Sow · parity ' + pig.parity : 'Gilt', 'Batch ' + pig.batch, pig.room + ', Pen ' + pig.pen, 'due to farrow ' + dueTxt].join(' · ');
+    const goProposal = (fid, kind) => () => set({ view: 'proposal', fid: fid, kind: kind, now: kind, triEdited: false, tri: null, time: '08:30', more: false, note: '', receipt: null });
+    const findings = opens.map((o, i) => ({
+      label: o.f.label,
+      meta: o.better ? 'Better · ' + o.at + ' · Adam' : o.f.meta,
+      isBetter: o.better, canBetter: !o.better,
+      top: i === 0 ? '0' : '1px solid #EFF1EC',
+      better: goProposal(o.f.id, 'better'),
+      recovered: goProposal(o.f.id, 'recovered'),
+      mistake: goProposal(o.f.id, 'mistake')
+    }));
+    const evAll = (s.log[pig.tag] || []).concat(this.eventsFor(pig)).slice(0, 5);
+    const events = evAll.map((e, i) => ({ text: e.text, date: e.date, top: i === 0 ? '1px solid #EFF1EC' : '1px solid #EFF1EC' }));
+    const rec = {
+      tag: pig.tag, hasTri: tri === 'urgent' || tri === 'watch', triLabel: this.cap(tri), triBg: triPal.bg, triInk: triPal.ink, triDot: triPal.dot,
+      identity: identity, findings: findings, hasFindings: findings.length > 0, noFindings: findings.length === 0,
+      hasVet: !!pig.vet, events: events
+    };
+
+    // proposal ----------------------------------------------------------
+    const fnd = pig.findings.filter((x) => x.id === s.fid)[0] || pig.findings[0];
+    const kind = s.kind || 'better';
+    const hypo = Object.assign({}, s.fixes);
+    hypo[pig.tag + ':' + fnd.id] = { status: kind, at: '' };
+    const triDefault = this.derive(pig, hypo);
+    const triNow = s.triEdited ? s.tri : triDefault;
+    const was = this.effTri(pig, s);
+    const nowChoices = [['better', 'Better'], ['recovered', 'Recovered'], ['mistake', 'Entered by mistake']].map((c) => ({
+      label: c[1], on: kind === c[0],
+      border: kind === c[0] ? '#121815' : '#E2E5DF', bg: kind === c[0] ? '#F0F2EE' : '#FFFFFF', ink: '#121815', weight: kind === c[0] ? 600 : 500,
+      pick: () => set({ kind: c[0], now: c[0] })
+    }));
+    const triChoices = [['urgent', 'Urgent'], ['watch', 'Watch'], ['normal', 'Normal']].map((c) => {
+      const on = triNow === c[0];
+      return {
+        label: c[1], on: on,
+        border: on ? '#121815' : '#E2E5DF',
+        bg: on ? '#F0F2EE' : '#FFFFFF',
+        ink: '#121815', weight: on ? 600 : 500,
+        pick: () => set({ triEdited: true, tri: c[0] })
+      };
+    });
+    // Inline rules: triage can't sit below the highest finding still open; time must be HH:MM.
+    const triWarn = this.rank(triNow) < this.rank(triDefault);
+    const timeWarn = !/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test((s.time || '').trim());
+    const nChanges = 1 + (triNow !== was ? 1 : 0);
+    const triWord = triNow === was ? 'triage stays ' + this.cap(triNow) : 'triage to ' + this.cap(triNow);
+    const pr = {
+      tag: pig.tag,
+      title: 'Record: ' + fnd.noun + ' ' + this.phraseShort(kind),
+      findingLabel: fnd.label, findingMeta: fnd.meta,
+      nowChoices: nowChoices, triChoices: triChoices,
+      triChanged: triNow !== was, triWas: this.cap(was),
+      triWarn: triWarn, triWarnText: triWarn ? 'Findings are still open. Triage stays at least ' + this.cap(triDefault) + '.' : '', triFixLabel: 'Use ' + this.cap(triDefault), triFix: () => set({ triEdited: true, tri: triDefault }),
+      timeWarn: timeWarn,
+      barSummary: nChanges + (nChanges === 1 ? ' change' : ' changes') + ' · ' + (triNow === was ? 'triage stays ' + this.cap(was) : 'triage ' + this.cap(was) + ' to ' + this.cap(triNow)),
+      time: s.time, more: s.more, moreRot: s.more ? 'rotate(180deg)' : 'none', note: s.note,
+      primary: 'Save: ' + fnd.short + ', ' + this.phraseShort(kind) + '; ' + triWord
+    };
+
+    return {
+      ic: I,
+      v: { list: view === 'list', record: view === 'record', proposal: view === 'proposal' },
+      chips: chipDefs, queryText: queryText,
+      onQuery: (e) => set({ q: e.target.value }),
+      rows: rows, hasRows: n > 0, noRows: n === 0, countText: countText,
+      backToList: () => set({ view: 'list', receipt: null }),
+      rec: rec, hasReceipt: !!(s.receipt && s.receipt.tag === pig.tag), receipt: s.receipt || { time: '', text: '' },
+      pr: pr,
+      onTime: (e) => set({ time: e.target.value }),
+      onNote: (e) => set({ note: e.target.value }),
+      toggleMore: () => set({ more: !s.more }),
+      discard: () => set({ view: 'record' }),
+      undoSave: () => set(Object.assign({}, s.receipt && s.receipt.prev ? s.receipt.prev : {}, { receipt: null })),
+      save: () => set(this.commit(s, pig, fnd.id, kind, triNow, s.time || '08:30'))
+    };
+  }
+}
+</script>
+</body>
+</html>

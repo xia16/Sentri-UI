@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Import pigs</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+  <!-- receipt -->
+  <sc-if value="{{isDone}}" hint-placeholder-val="{{false}}">
+    <div style="margin: 0 0 20px; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid #E8EBE5; border-radius: 14px; background: #F6F7F4; color: #3B4540; animation: sentriRise 0.4s ease-out">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      <span style="flex: 1; min-width: 0; font-size: 14px; font-weight: 500">{{receiptCount}} pigs added <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px">09:12</span> &#183; {{receiptTail}}</span>
+      <button type="button" onClick="{{undoAdd}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Pigs &#8250; Import</div>
+  <div style="margin-top: 6px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Herd list.xlsx</h1>
+    <sc-if value="{{isDone}}" hint-placeholder-val="{{false}}">
+      <span style="display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; background: #E7F4EA; color: #1F5534; font-size: 12.5px; font-weight: 500"><span style="width: 6px; height: 6px; border-radius: 50%; background: #2D7A4B"></span>Added</span>
+    </sc-if>
+  </div>
+  <p style="margin: 8px 0 0; font-size: 14px; color: #3B4540">{{lede}}</p>
+
+  <!-- summary chips -->
+  <sc-if value="{{showChips}}" hint-placeholder-val="{{true}}">
+    <div style="margin-top: 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+      <sc-for list="{{chips}}" as="c" hint-placeholder-count="3">
+        <span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 11px; border-radius: 999px; background: {{c.bg}}; color: {{c.ink}}; font-size: 13px; font-weight: 500; white-space: nowrap">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: {{c.dot}}"></span>{{c.label}}
+        </span>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- need you -->
+  <sc-if value="{{showNeed}}" hint-placeholder-val="{{true}}">
+    <div style="margin-top: 28px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+      <div style="display: flex; align-items: center; gap: 8px">
+        <h2 style="margin: 0; font-size: 15px; font-weight: 600">To fix</h2>
+        <sc-if value="{{needBadge}}" hint-placeholder-val="{{true}}">
+          <span style="min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; background: #121815; color: #C5F06A; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">{{groupsLeft}}</span>
+        </sc-if>
+      </div>
+      <span style="font-size: 12.5px; color: #626C66">{{needMeta}}</span>
+    </div>
+
+    <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04); overflow: hidden">
+
+      <!-- group 1: pens not in layout -->
+      <div style="padding: 16px; background: {{g1.bg}}">
+        <sc-if value="{{g1.pending}}" hint-placeholder-val="{{true}}">
+          <div style="font-size: 14px; font-weight: 500; color: #121815">11 pens not in your layout</div>
+          <div style="margin-top: 2px; font-size: 13px; color: #3B4540"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">G3-B14 &#8230; G3-B24</span>. Closest match: Gestation 2, row B.</div>
+          <div style="margin-top: 12px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap">
+            <button type="button" onClick="{{g1.fix}}" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+              Use Gestation 2, B14&#8211;B24
+            </button>
+            <button type="button" onClick="{{g1.toggle}}" aria-expanded="{{g1.expanded}}" style="height: 36px; padding: 0 10px; border: 0; background: transparent; color: #3B4540; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer">{{g1.toggleLabel}}</button>
+          </div>
+          <sc-if value="{{g1.open}}" hint-placeholder-val="{{false}}">
+            <div style="margin-top: 10px">
+              <div style="display: grid; grid-template-columns: 88px 1fr 1.3fr; gap: 12px; padding: 6px 0; border-bottom: 1px solid #E8EBE5; font-size: 12px; font-weight: 500; color: #626C66"><span>Tag</span><span>In your sheet</span><span>Goes to</span></div>
+              <sc-for list="{{rows1}}" as="r" hint-placeholder-count="4">
+                <div style="display: grid; grid-template-columns: 88px 1fr 1.3fr; gap: 12px; align-items: center; min-height: 34px; border-top: {{r.top}}">
+                  <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #121815">{{r.tag}}</span>
+                  <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66">{{r.sheet}}</span>
+                  <span style="font-size: 13px; color: #1E2622">{{r.goes}}</span>
+                </div>
+              </sc-for>
+              <div style="padding-top: 6px; border-top: 1px solid #EFF1EC; font-size: 12.5px; color: #626C66">and 7 more in the same pens</div>
+            </div>
+          </sc-if>
+        </sc-if>
+        <sc-if value="{{g1.done}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span aria-hidden="true" style="width: 20px; height: 20px; flex-shrink: 0; border-radius: 50%; background: #E7F4EA; display: flex; align-items: center; justify-content: center"><svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: none; stroke: #2D7A4B; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg></span>
+            <span style="flex: 1; min-width: 0; font-size: 14px; color: #1E2622">Used Gestation 2, B14&#8211;B24 for 11 pigs</span>
+            <button type="button" onClick="{{g1.undo}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; color: #3B4540; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- group 2: no service date -->
+      <div style="padding: 16px; border-top: 1px solid #EFF1EC; background: {{g2.bg}}">
+        <sc-if value="{{g2.pending}}" hint-placeholder-val="{{true}}">
+          <div style="font-size: 14px; font-weight: 500; color: #121815">2 sows have no last service date</div>
+          <div style="margin-top: 2px; font-size: 13px; color: #3B4540">They will have no expected farrowing date until you add one.</div>
+          <div style="margin-top: 12px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap">
+            <button type="button" onClick="{{g2.fix}}" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+              Import without it
+            </button>
+            <button type="button" onClick="{{g2.toggle}}" aria-expanded="{{g2.expanded}}" style="height: 36px; padding: 0 10px; border: 0; background: transparent; color: #3B4540; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer">{{g2.toggleLabel}}</button>
+          </div>
+          <sc-if value="{{g2.open}}" hint-placeholder-val="{{false}}">
+            <div style="margin-top: 10px">
+              <div style="display: grid; grid-template-columns: 88px 1.4fr 0.8fr 1fr; gap: 12px; padding: 6px 0; border-bottom: 1px solid #E8EBE5; font-size: 12px; font-weight: 500; color: #626C66"><span>Tag</span><span>Room and pen</span><span>Parity</span><span>Last service</span></div>
+              <sc-for list="{{rows2}}" as="r" hint-placeholder-count="2">
+                <div style="display: grid; grid-template-columns: 88px 1.4fr 0.8fr 1fr; gap: 12px; align-items: center; min-height: 34px; border-top: {{r.top}}">
+                  <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #121815">{{r.tag}}</span>
+                  <span style="font-size: 13px; color: #1E2622">{{r.where}}</span>
+                  <span style="font-size: 13px; color: #1E2622">{{r.parity}}</span>
+                  <span style="font-size: 13px; color: #626C66">Not in sheet</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </sc-if>
+        <sc-if value="{{g2.done}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span aria-hidden="true" style="width: 20px; height: 20px; flex-shrink: 0; border-radius: 50%; background: #E7F4EA; display: flex; align-items: center; justify-content: center"><svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: none; stroke: #2D7A4B; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg></span>
+            <span style="flex: 1; min-width: 0; font-size: 14px; color: #1E2622">Importing 2 sows without a last service date</span>
+            <button type="button" onClick="{{g2.undo}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; color: #3B4540; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- group 3: duplicates -->
+      <div style="padding: 16px; border-top: 1px solid #EFF1EC; background: {{g3.bg}}">
+        <sc-if value="{{g3.pending}}" hint-placeholder-val="{{true}}">
+          <div style="font-size: 14px; font-weight: 500; color: #121815">3 tags appear twice</div>
+          <div style="margin-top: 2px; font-size: 13px; color: #3B4540">Keep one row for each. The older row is left out.</div>
+          <div style="margin-top: 12px">
+            <button type="button" onClick="{{g3.fix}}" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+              {{g3.fixLabel}}
+            </button>
+          </div>
+          <div style="margin-top: 12px">
+            <sc-for list="{{dups}}" as="d" hint-placeholder-count="3">
+              <div style="padding: 10px 0; border-top: 1px solid #EFF1EC">
+                <sc-if value="{{d.pending}}" hint-placeholder-val="{{true}}">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+                    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; color: #121815">{{d.tag}}</span>
+                    <button type="button" onClick="{{d.keep}}" style="height: 32px; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap">Keep the newer row</button>
+                  </div>
+                  <div style="margin-top: 6px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+                    <div>
+                      <div style="font-size: 12px; color: #626C66">Row {{d.oldRow}} &#183; older</div>
+                      <div style="font-size: 13px; color: #3B4540">{{d.oldWhere}}</div>
+                      <div style="font-size: 12.5px; color: #626C66">{{d.oldMeta}}</div>
+                    </div>
+                    <div>
+                      <div style="font-size: 12px; font-weight: 500; color: #121815">Row {{d.newRow}} &#183; newer</div>
+                      <div style="font-size: 13px; color: #1E2622">{{d.newWhere}}</div>
+                      <div style="font-size: 12.5px; color: #3B4540">{{d.newMeta}}</div>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{d.kept}}" hint-placeholder-val="{{false}}">
+                  <div style="display: flex; align-items: center; gap: 10px">
+                    <span aria-hidden="true" style="width: 20px; height: 20px; flex-shrink: 0; border-radius: 50%; background: #E7F4EA; display: flex; align-items: center; justify-content: center"><svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: none; stroke: #2D7A4B; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg></span>
+                    <span style="flex: 1; min-width: 0; font-size: 13.5px; color: #1E2622"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px">{{d.tag}}</span> &#183; kept row {{d.newRow}}</span>
+                    <button type="button" onClick="{{d.undo}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; color: #3B4540; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{g3.done}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span aria-hidden="true" style="width: 20px; height: 20px; flex-shrink: 0; border-radius: 50%; background: #E7F4EA; display: flex; align-items: center; justify-content: center"><svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: none; stroke: #2D7A4B; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg></span>
+            <span style="flex: 1; min-width: 0; font-size: 14px; color: #1E2622">Kept the newer row for 3 tags</span>
+            <button type="button" onClick="{{g3.undo}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; color: #3B4540; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+          </div>
+        </sc-if>
+      </div>
+
+    </div>
+  </sc-if>
+
+  <!-- left for later (partial add) -->
+  <sc-if value="{{showLeft}}" hint-placeholder-val="{{false}}">
+    <h2 style="margin: 28px 0 0; font-size: 15px; font-weight: 600">Left for later</h2>
+    <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{leftRows}}" as="l" hint-placeholder-count="3">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-top: {{l.top}}">
+          <span style="font-size: 14px; color: #1E2622">{{l.what}}</span>
+          <span style="font-size: 13px; color: #626C66; white-space: nowrap">{{l.count}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- what will be added -->
+  <h2 style="margin: 28px 0 0; font-size: 15px; font-weight: 600">{{addedHeading}}</h2>
+  <div style="margin-top: 8px">
+    <sc-for list="{{addRows}}" as="a" hint-placeholder-count="3">
+      <div style="display: flex; align-items: baseline; gap: 12px; padding: 8px 0; border-top: {{a.top}}">
+        <span style="min-width: 44px; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; color: #121815">{{a.n}}</span>
+        <span style="font-size: 14px; color: #1E2622">{{a.text}}</span>
+      </div>
+    </sc-for>
+  </div>
+  <div style="margin-top: 4px; padding-top: 8px; border-top: 1px solid #EFF1EC; font-size: 12.5px; color: #626C66">Piglets are counted per litter, not by tag.</div>
+
+  <!-- how we read your sheet (folded) -->
+  <button type="button" onClick="{{toggleFold}}" aria-expanded="{{foldExpanded}}" style="margin-top: 28px; display: flex; align-items: baseline; gap: 8px; padding: 0; border: 0; background: transparent; font: inherit; color: inherit; cursor: pointer; text-align: left">
+    <span style="font-size: 15px; font-weight: 600">Sheet columns</span>
+    <span style="font-size: 13px; color: #626C66">7 columns matched</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="align-self: center; width: 15px; height: 15px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{foldRot}}"><path d="{{ic.chev}}"></path></svg>
+  </button>
+  <sc-if value="{{foldOpen}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{cols}}" as="c" hint-placeholder-count="7">
+        <div style="display: flex; align-items: center; gap: 10px; padding: 9px 16px; border-top: {{c.top}}">
+          <span style="width: 76px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #3B4540">{{c.from}}</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.arrow}}"></path></svg>
+          <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">{{c.to}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+</div>
+
+<!-- sticky footer -->
+<sc-if value="{{showFooter}}" hint-placeholder-val="{{true}}">
+  <div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+    <div style="max-width: 760px; margin: 0 auto; padding: 14px 32px; box-sizing: border-box">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+        <button type="button" onClick="{{addAll}}" aria-disabled="{{addAllDisabled}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; cursor: {{addAllCursor}}; opacity: {{addAllOpacity}}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+          Add 618 pigs
+        </button>
+        <sc-if value="{{showReadyNow}}" hint-placeholder-val="{{true}}">
+          <button type="button" onClick="{{addReady}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer">{{readyLabel}}</button>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["check","resolved","done"],"default":"check"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      chev: 'M9 18l6-6-6-6',
+      check: 'M20 6 9 17l-5-5',
+      undo: 'M3 7v6h6 M21 17a9 9 0 0 0-15-6.7L3 13',
+      arrow: 'M5 12h14 M13 6l6 6-6 6'
+    };
+  }
+
+  defaults(start) {
+    const base = {
+      startSeen: start, g1: false, g2: false, keep: [false, false, false],
+      open1: false, open2: false, fold: false, done: false, addedCount: 618, asked: false
+    };
+    if (start === 'resolved') return Object.assign(base, { g1: true, g2: true, keep: [true, true, true] });
+    if (start === 'done') return Object.assign(base, { g1: true, g2: true, keep: [true, true, true], done: true, addedCount: 618 });
+    return base;
+  }
+
+  renderVals() {
+    const start = this.props.start || 'check';
+    const fresh = !this.state || this.state.startSeen !== start;
+    const s = fresh ? this.defaults(start) : Object.assign(this.defaults(start), this.state);
+    const set = (p) => this.setState(Object.assign({ startSeen: start }, s, p));
+    const ic = this.icons();
+
+    const keptCount = s.keep.filter(Boolean).length;
+    const allKept = keptCount === 3;
+    const needLeft = (s.g1 ? 0 : 11) + (s.g2 ? 0 : 2);
+    const dupLeft = 3 - keptCount;
+    const ready = 602 + (s.g1 ? 11 : 0) + (s.g2 ? 2 : 0) + keptCount;
+    const allResolved = ready === 618;
+    const groupsLeft = (s.g1 ? 0 : 1) + (s.g2 ? 0 : 1) + (allKept ? 0 : 1);
+    const anyFix = s.g1 || s.g2 || keptCount > 0;
+    const firstOpen = !s.g1 ? 1 : (!s.g2 ? 2 : (!allKept ? 3 : 0));
+    const hi = (n) => 'transparent';
+
+    const g1 = {
+      pending: !s.g1, done: s.g1, bg: hi(1),
+      fix: () => set({ g1: true }), undo: () => set({ g1: false }),
+      toggle: () => set({ open1: !s.open1 }), open: s.open1, expanded: s.open1 ? 'true' : 'false',
+      toggleLabel: s.open1 ? 'Hide rows' : 'Show rows'
+    };
+    const g2 = {
+      pending: !s.g2, done: s.g2, bg: hi(2),
+      fix: () => set({ g2: true }), undo: () => set({ g2: false }),
+      toggle: () => set({ open2: !s.open2 }), open: s.open2, expanded: s.open2 ? 'true' : 'false',
+      toggleLabel: s.open2 ? 'Hide rows' : 'Show rows'
+    };
+    const g3 = {
+      pending: !allKept, done: allKept, bg: hi(3),
+      fix: () => set({ keep: [true, true, true] }), undo: () => set({ keep: [false, false, false] }),
+      fixLabel: keptCount === 0 ? 'Keep the newer row for all 3' : 'Keep the newer row for the other ' + dupLeft
+    };
+
+    const rows1 = [
+      { tag: '211340', sheet: 'G3-B14', goes: 'Gestation 2 · B14' },
+      { tag: '211352', sheet: 'G3-B15', goes: 'Gestation 2 · B15' },
+      { tag: '211368', sheet: 'G3-B16', goes: 'Gestation 2 · B16' },
+      { tag: '211377', sheet: 'G3-B17', goes: 'Gestation 2 · B17' }
+    ].map((r, i) => Object.assign(r, { top: i === 0 ? '0' : '1px solid #EFF1EC' }));
+    const rows2 = [
+      { tag: '207415', where: 'Gestation 1 · C22', parity: 'Parity 1' },
+      { tag: '208960', where: 'Gestation 2 · A31', parity: 'Parity 2' }
+    ].map((r, i) => Object.assign(r, { top: i === 0 ? '0' : '1px solid #EFF1EC' }));
+
+    const dupBase = [
+      { tag: '204518', oldRow: 31, oldWhere: 'Gestation 1 · C07', oldMeta: 'Parity 2 · served 12 Aug', newRow: 402, newWhere: 'Gestation 2 · B33', newMeta: 'Parity 3 · served 21 Aug' },
+      { tag: '205102', oldRow: 118, oldWhere: 'Farrowing Room 2 · A09', oldMeta: 'Parity 4 · served 3 Jul', newRow: 577, newWhere: 'Farrowing Room 2 · A11', newMeta: 'Parity 4 · served 3 Jul' },
+      { tag: '203377', oldRow: 64, oldWhere: 'Gestation 1 · D41', oldMeta: 'Parity 1 · served 29 Sep', newRow: 509, newWhere: 'Gestation 1 · D14', newMeta: 'Parity 1 · served 29 Sep' }
+    ];
+    const dups = dupBase.map((d, i) => Object.assign({}, d, {
+      pending: !s.keep[i], kept: s.keep[i],
+      keep: () => set({ keep: s.keep.map((k, j) => (j === i ? true : k)) }),
+      undo: () => set({ keep: s.keep.map((k, j) => (j === i ? false : k)) })
+    }));
+
+    // chips
+    const chips = [];
+    chips.push({ label: ready + ' ready', bg: '#E7F4EA', ink: '#1F5534', dot: '#2D7A4B' });
+    if (needLeft > 0) chips.push({ label: needLeft + ' to fix', bg: '#FFF0D1', ink: '#7A4A00', dot: '#D99A1E' });
+    if (dupLeft > 0) chips.push({ label: dupLeft + (dupLeft === 1 ? ' duplicate' : ' duplicates'), bg: '#FCE7E2', ink: '#9A2C17', dot: '#D9583B' });
+
+    // what is added
+    const count = s.done ? s.addedCount : ready;
+    const sows = count - 6;
+    const addRows = [
+      { n: String(count), text: 'pigs: ' + sows + ' sows and gilts and 6 boars' },
+      { n: '6', text: 'running batches (B30–B35), with their stages' },
+      { n: '9', text: 'rooms, with their pigs in the right pens' }
+    ].map((a, i) => Object.assign(a, { top: i === 0 ? '0' : '1px solid #EFF1EC' }));
+
+    // left for later (partial add)
+    const leftCount = 618 - s.addedCount;
+    const leftAll = [];
+    if (!s.g1) leftAll.push({ what: '11 pens not in your layout', count: '11 pigs' });
+    if (!s.g2) leftAll.push({ what: '2 sows with no last service date', count: '2 sows' });
+    if (!allKept) leftAll.push({ what: 'Tags that appear twice', count: dupLeft + (dupLeft === 1 ? ' pig' : ' pigs') });
+    const leftRows = leftAll.map((l, i) => Object.assign(l, { top: i === 0 ? '0' : '1px solid #EFF1EC' }));
+
+    const cols = [
+      ['Tag', 'Pig ID'], ['Rm', 'Room'], ['Pen', 'Pen'], ['Cat', 'Type (Sow, Gilt, Boar)'],
+      ['Par', 'Parity'], ['LastServ', 'Last service date'], ['Batch', 'Batch']
+    ].map((c, i) => ({ from: c[0], to: c[1], top: i === 0 ? '0' : '1px solid #EFF1EC' }));
+
+    const addAll = () => { if (allResolved) set({ done: true, addedCount: 618 }); };
+    const addReady = () => { set({ done: true, addedCount: ready }); };
+
+    let lede;
+    if (s.done) lede = leftCount > 0 ? count + ' pigs are in. ' + leftCount + ' wait for you.' : '618 pigs are in 9 rooms. 6 batches are running.';
+    else lede = 'Adds 618 pigs to 9 rooms and brings in 6 running batches.';
+
+    return {
+      ic,
+      isDone: s.done,
+      receiptCount: String(s.addedCount),
+      receiptTail: leftCount > 0 ? leftCount + ' left for later.' : 'Nothing was skipped.',
+      lede,
+      undoAdd: () => set({ done: false }),
+      showChips: !s.done,
+      chips,
+      showNeed: !s.done,
+      groupsLeft,
+      needBadge: groupsLeft > 0,
+      needMeta: groupsLeft > 0 ? 'Sort these to add all 618' : 'All sorted',
+      g1, g2, g3, rows1, rows2, dups,
+      showLeft: s.done && leftCount > 0,
+      leftRows,
+      addedHeading: s.done ? 'What was added' : 'What will be added',
+      addRows,
+      foldOpen: s.fold,
+      foldExpanded: s.fold ? 'true' : 'false',
+      foldRot: s.fold ? 'rotate(90deg)' : 'rotate(0deg)',
+      toggleFold: () => set({ fold: !s.fold }),
+      cols,
+      showFooter: !s.done,
+      addAll,
+      addAllDisabled: allResolved ? 'false' : 'true',
+      addAllOpacity: allResolved ? 1 : 0.4,
+      addAllCursor: allResolved ? 'pointer' : 'default',
+      showReadyNow: !allResolved,
+      readyLabel: 'Add the ' + ready + ' ready now',
+      addReady
+    };
+  }
+}
+</script>
+</body>
+</html>

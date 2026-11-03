@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>For you</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+<!-- ================= LIST ================= -->
+<sc-if value="{{isList}}" hint-placeholder-val="{{true}}">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">For you</h1>
+  <div style="margin-top: 6px; display: flex; flex-wrap: wrap; align-items: center; font-size: 14px; line-height: 22px">
+    <sc-for list="{{counts}}" as="c" hint-placeholder-count="3">
+      <span style="display: inline-flex; align-items: center">
+        <sc-if value="{{c.sep}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="margin: 0 8px; color: #B9C2BB">·</span></sc-if>
+        <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="border: 0; background: transparent; padding: 0; font: inherit; color: {{c.ink}}; font-weight: {{c.weight}}; text-decoration: {{c.deco}}; text-underline-offset: 4px; text-decoration-thickness: 1px; cursor: pointer">{{c.label}}</button>
+      </span>
+    </sc-for>
+  </div>
+
+  <div style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px">
+    <sc-for list="{{chips}}" as="ch" hint-placeholder-count="6">
+      <button type="button" onClick="{{ch.pick}}" aria-pressed="{{ch.on}}" style="height: 30px; box-sizing: border-box; padding: 0 13px; border: 1px solid {{ch.edge}}; border-radius: 999px; background: {{ch.bg}}; color: {{ch.ink}}; font: inherit; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer">{{ch.label}}</button>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{showNone}}" hint-placeholder-val="{{false}}">
+    <p style="margin: 28px 0 0; font-size: 14px; color: #626C66">{{noneText}}</p>
+  </sc-if>
+
+  <!-- To you -->
+  <sc-if value="{{showYou}}" hint-placeholder-val="{{true}}">
+  <div style="margin-top: 26px; display: flex; align-items: center; gap: 8px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">To you</h2>
+    <span style="min-width: 22px; height: 22px; box-sizing: border-box; padding: 0 7px; border-radius: 999px; background: #121815; color: #C5F06A; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">{{youCount}}</span>
+  </div>
+  <div style="margin-top: 6px">
+    <sc-for list="{{decideRows}}" as="it" hint-placeholder-count="6">
+      <div style="border-top: {{it.line}}">
+        <button type="button" onClick="{{it.open}}" style="display: flex; align-items: flex-start; gap: 12px; width: calc(100% + 24px); margin: 0 -12px; box-sizing: border-box; padding: 13px 12px; border: 1px solid {{it.edge}}; border-radius: 12px; background: {{it.bg}}; font: inherit; text-align: left; color: inherit; cursor: pointer">
+          <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0; margin-top: 1px; background: {{it.markBg}}; color: {{it.markInk}}; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{it.initials}}</span>
+          <span style="flex: 1; min-width: 0; display: block">
+            <span style="display: block; font-size: 14px; font-weight: 500; line-height: 1.4; color: #121815">{{it.title}}</span>
+            <span style="display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.45; color: #626C66">{{it.meta}}</span>
+            <span style="display: block; margin-top: 1px; font-size: 12.5px; line-height: 1.45; color: #626C66"><span style="font-weight: 500; color: #3B4540">{{it.whyLabel}}</span> {{it.why}}</span>
+          </span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; margin-top: 4px; flex-shrink: 0; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+        </button>
+      </div>
+    </sc-for>
+    <sc-for list="{{todoRows}}" as="it" hint-placeholder-count="2">
+      <div style="border-top: {{it.line}}">
+        <div style="display: flex; align-items: flex-start; gap: 12px; width: calc(100% + 24px); margin: 0 -12px; box-sizing: border-box; padding: 13px 12px; border: 1px solid transparent">
+          <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0; margin-top: 1px; background: {{it.markBg}}; color: {{it.markInk}}; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{it.initials}}</span>
+          <span style="flex: 1; min-width: 0; display: block">
+            <label for="{{it.cid}}" style="display: block; font-size: 14px; font-weight: 500; line-height: 1.4; color: {{it.titleInk}}; cursor: pointer">{{it.title}}</label>
+            <sc-if value="{{it.pending}}" hint-placeholder-val="{{true}}">
+              <span style="display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.45; color: #626C66">{{it.meta}}</span>
+              <span style="display: block; margin-top: 1px; font-size: 12.5px; line-height: 1.45; color: #626C66"><span style="font-weight: 500; color: #3B4540">{{it.whyLabel}}</span> {{it.why}}</span>
+            </sc-if>
+            <sc-if value="{{it.isDone}}" hint-placeholder-val="{{false}}">
+              <span style="margin-top: 3px; display: flex; align-items: center; gap: 6px; font-size: 12.5px; line-height: 1.45; color: #1F5534; animation: sentriRise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: #2D7A4B; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+                <span style="font-weight: 500">Done</span>
+                <span aria-hidden="true" style="color: #B9C2BB">·</span>
+                <span style="font-family: 'Geist Mono', ui-monospace, monospace; color: #3B4540">{{it.doneAt}}</span>
+                <span aria-hidden="true" style="color: #B9C2BB">·</span>
+                <button type="button" onClick="{{it.undo}}" style="border: 0; background: transparent; padding: 0; font: inherit; font-weight: 500; color: #121815; text-decoration: underline; text-underline-offset: 3px; cursor: pointer">Undo</button>
+              </span>
+            </sc-if>
+          </span>
+          <input id="{{it.cid}}" type="checkbox" checked="{{it.ticked}}" onChange="{{it.toggle}}" style="width: 20px; height: 20px; margin: 1px 0 0; flex-shrink: 0; accent-color: #121815; cursor: pointer">
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  </sc-if>
+
+  <!-- Cc'd -->
+  <sc-if value="{{showCc}}" hint-placeholder-val="{{true}}">
+  <div style="margin-top: 30px; display: flex; align-items: center; gap: 8px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">Cc'd</h2>
+    <span style="min-width: 22px; height: 22px; box-sizing: border-box; padding: 0 7px; border-radius: 999px; background: #F0F2EE; color: #3B4540; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">{{ccCount}}</span>
+    <span style="flex: 1; min-width: 0; text-align: right; font-size: 12.5px; color: #626C66">Li Wei decides; you can too</span>
+  </div>
+  <div style="margin-top: 6px">
+    <sc-for list="{{ccRows}}" as="it" hint-placeholder-count="1">
+      <div style="border-top: {{it.line}}">
+        <button type="button" onClick="{{it.open}}" style="display: flex; align-items: flex-start; gap: 12px; width: calc(100% + 24px); margin: 0 -12px; box-sizing: border-box; padding: 13px 12px; border: 1px solid transparent; border-radius: 12px; background: transparent; font: inherit; text-align: left; color: inherit; cursor: pointer">
+          <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0; margin-top: 1px; background: {{it.markBg}}; color: {{it.markInk}}; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{it.initials}}</span>
+          <span style="flex: 1; min-width: 0; display: block">
+            <span style="display: block; font-size: 14px; font-weight: 500; line-height: 1.4; color: #121815">{{it.title}}</span>
+            <span style="display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.45; color: #626C66">{{it.meta}}</span>
+            <span style="display: block; margin-top: 1px; font-size: 12.5px; line-height: 1.45; color: #626C66"><span style="font-weight: 500; color: #3B4540">{{it.whyLabel}}</span> {{it.why}}</span>
+          </span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; margin-top: 4px; flex-shrink: 0; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+        </button>
+      </div>
+    </sc-for>
+  </div>
+  </sc-if>
+
+  <!-- Waiting on others -->
+  <sc-if value="{{showWait}}" hint-placeholder-val="{{true}}">
+  <div style="margin-top: 30px">
+    <button type="button" onClick="{{toggleWait}}" aria-expanded="{{waitOpen}}" style="display: flex; align-items: center; gap: 8px; border: 0; background: transparent; padding: 4px 0; font: inherit; color: inherit; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{waitRot}}"><path d="{{ic.chev}}"></path></svg>
+      <span style="font-size: 15px; font-weight: 600">Waiting on others</span>
+      <span style="min-width: 22px; height: 22px; box-sizing: border-box; padding: 0 7px; border-radius: 999px; background: #F0F2EE; color: #3B4540; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">{{waitCount}}</span>
+      <sc-if value="{{waitFolded}}" hint-placeholder-val="{{true}}"><span style="font-size: 12.5px; color: #626C66">{{waitWho}}</span></sc-if>
+    </button>
+    <sc-if value="{{waitOpen}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 6px">
+      <sc-for list="{{waitRows}}" as="it" hint-placeholder-count="3">
+        <div style="border-top: {{it.line}}">
+          <div style="display: flex; align-items: flex-start; gap: 12px; width: calc(100% + 24px); margin: 0 -12px; box-sizing: border-box; padding: 13px 12px; border: 1px solid transparent">
+            <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0; margin-top: 1px; background: {{it.markBg}}; color: {{it.markInk}}; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{it.initials}}</span>
+            <span style="flex: 1; min-width: 0; display: block">
+              <span style="display: block; font-size: 14px; font-weight: 500; line-height: 1.4; color: #1E2622">{{it.title}}</span>
+              <span style="display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.45; color: #626C66">{{it.meta}}</span>
+              <span style="display: block; margin-top: 1px; font-size: 12.5px; line-height: 1.45; color: #626C66"><span style="font-weight: 500; color: #3B4540">{{it.whyLabel}}</span> {{it.why}}</span>
+            </span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <!-- Handled today -->
+  <sc-if value="{{showHandled}}" hint-placeholder-val="{{true}}">
+  <div style="margin-top: 30px">
+    <button type="button" onClick="{{toggleHandled}}" aria-expanded="{{handledOpen}}" style="display: flex; align-items: center; gap: 8px; border: 0; background: transparent; padding: 4px 0; font: inherit; color: inherit; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{handledRot}}"><path d="{{ic.chev}}"></path></svg>
+      <span style="font-size: 15px; font-weight: 600">Handled today</span>
+      <span style="min-width: 22px; height: 22px; box-sizing: border-box; padding: 0 7px; border-radius: 999px; background: #F0F2EE; color: #3B4540; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">{{handledCount}}</span>
+    </button>
+    <sc-if value="{{handledOpen}}" hint-placeholder-val="{{true}}">
+    <div style="margin-top: 6px">
+      <sc-for list="{{handledRows}}" as="h" hint-placeholder-count="3">
+        <sc-if value="{{h.canOpen}}" hint-placeholder-val="{{false}}">
+          <button type="button" onClick="{{h.open}}" style="display: flex; align-items: center; gap: 12px; width: calc(100% + 24px); margin: 0 -12px; box-sizing: border-box; padding: 12px; border: 0; border-top: {{h.border}}; background: transparent; font: inherit; text-align: left; color: inherit; cursor: pointer; animation: {{h.anim}}">
+            <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0; background: {{h.markBg}}; color: {{h.markInk}}; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{h.initials}}</span>
+            <span style="flex: 1; min-width: 0; font-size: 14px; color: #1E2622; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{h.title}}</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px; height: 22px; box-sizing: border-box; padding: 0 9px; border-radius: 999px; background: {{h.bg}}; color: {{h.ink}}; font-size: 12px; font-weight: 500; white-space: nowrap; max-width: 240px; flex-shrink: 1; min-width: 0">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: {{h.dot}}; flex-shrink: 0"></span><span style="overflow: hidden; text-overflow: ellipsis">{{h.chip}}</span>
+            </span>
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+          </button>
+        </sc-if>
+        <sc-if value="{{h.fixed}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; align-items: center; gap: 12px; width: calc(100% + 24px); margin: 0 -12px; box-sizing: border-box; padding: 12px; border-top: {{h.border}}">
+            <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0; background: {{h.markBg}}; color: {{h.markInk}}; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{h.initials}}</span>
+            <span style="flex: 1; min-width: 0; font-size: 14px; color: #1E2622; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{h.title}}</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px; height: 22px; box-sizing: border-box; padding: 0 9px; border-radius: 999px; background: {{h.bg}}; color: {{h.ink}}; font-size: 12px; font-weight: 500; white-space: nowrap; max-width: 240px; min-width: 0">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: {{h.dot}}; flex-shrink: 0"></span><span style="overflow: hidden; text-overflow: ellipsis">{{h.chip}}</span>
+            </span>
+            <span aria-hidden="true" style="width: 14px; flex-shrink: 0"></span>
+          </div>
+        </sc-if>
+      </sc-for>
+    </div>
+    </sc-if>
+  </div>
+  </sc-if>
+</sc-if>
+
+<!-- ================= RECORD (shared header) ================= -->
+<sc-if value="{{isRec}}" hint-placeholder-val="{{false}}">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+    <button type="button" onClick="{{back}}" style="border: 0; background: transparent; padding: 0; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">‹ For you</button>
+    <sc-if value="{{rec.showDue}}" hint-placeholder-val="{{true}}">
+      <span style="display: inline-flex; align-items: center; gap: 6px; height: 22px; box-sizing: border-box; padding: 0 9px; border-radius: 999px; background: {{rec.dueBg}}; color: {{rec.dueInk}}; font-size: 12px; font-weight: 500; white-space: nowrap">
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: {{rec.dueDot}}"></span>{{rec.due}}
+      </span>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{done}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 14px; display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: 12px; background: {{receipt.bg}}; color: {{receipt.ink}}; animation: sentriRise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; margin-top: 3px; flex-shrink: 0; fill: none; stroke: {{receipt.dot}}; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{receipt.icon}}"></path></svg>
+      <span style="flex: 1; min-width: 0; display: block">
+        <span style="display: block; font-size: 14px; font-weight: 500; line-height: 1.5">{{receipt.head}}</span>
+        <span style="display: block; margin-top: 1px; font-size: 13px; line-height: 1.5; color: #3B4540">{{receipt.text}}</span>
+      </span>
+      <button type="button" onClick="{{undoEntry}}" style="flex-shrink: 0; height: 22px; padding: 0 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <div style="margin-top: 18px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">{{rec.crumb}}</div>
+  <h1 style="margin: 6px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2; text-wrap: balance">{{rec.title}}</h1>
+  <sc-if value="{{rec.showLead}}" hint-placeholder-val="{{true}}">
+    <p style="margin: 8px 0 0; font-size: 14px; color: #3B4540">{{rec.lead}}</p>
+  </sc-if>
+  <div style="margin-top: 14px; display: flex; align-items: flex-start; gap: 10px">
+    <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0; margin-top: 1px; background: {{rec.markBg}}; color: {{rec.markInk}}; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{rec.initials}}</span>
+    <span style="flex: 1; min-width: 0; display: block; font-size: 12.5px; line-height: 1.5; color: #626C66">
+      <span style="display: block"><span style="font-weight: 500; color: #3B4540">From {{rec.byName}}</span></span>
+      <span style="display: block">{{rec.meta}}</span>
+      <span style="display: block"><span style="font-weight: 500; color: #3B4540">{{rec.whyLabel}}</span> {{rec.why}}</span>
+    </span>
+  </div>
+
+  <!-- ---------- visitors ---------- -->
+  <sc-if value="{{isVisitors}}" hint-placeholder-val="{{true}}">
+    <div style="margin-top: 22px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.04)">
+      <sc-for list="{{visitorRows}}" as="v" hint-placeholder-count="5">
+        <div style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border-top: {{v.border}}">
+          <sc-if value="{{v.editable}}" hint-placeholder-val="{{true}}">
+            <input id="{{v.cid}}" type="checkbox" checked="{{v.ticked}}" onChange="{{v.toggle}}" style="width: 18px; height: 18px; margin: 2px 0 0; flex-shrink: 0; accent-color: #121815">
+          </sc-if>
+          <div style="flex: 1; min-width: 0">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+              <label for="{{v.cid}}" style="font-size: 14px; font-weight: 500; color: #121815; min-width: 0">{{v.name}} <span style="font-weight: 400; color: #626C66">· {{v.company}}</span></label>
+              <span style="flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #3B4540; white-space: nowrap">{{v.dates}}</span>
+            </div>
+            <div style="margin-top: 2px; font-size: 13px; color: #1E2622">{{v.purpose}} <span style="color: #626C66">· Host {{v.host}}</span></div>
+            <sc-if value="{{v.hasNote}}" hint-placeholder-val="{{false}}">
+              <div style="margin-top: 2px; font-size: 12.5px; color: #626C66">{{v.note}}</div>
+            </sc-if>
+            <div style="margin-top: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+              <span style="display: inline-flex; align-items: center; gap: 6px; height: 22px; box-sizing: border-box; padding: 0 9px; border-radius: 999px; background: {{v.testBg}}; color: {{v.testInk}}; font-size: 12px; font-weight: 500; white-space: nowrap">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: {{v.testDot}}"></span>{{v.test}}
+              </span>
+              <button type="button" onClick="{{v.fold}}" aria-expanded="{{v.open}}" style="display: inline-flex; align-items: center; gap: 4px; border: 0; background: transparent; padding: 0; font: inherit; font-size: 12.5px; font-weight: 500; color: #626C66; cursor: pointer">
+                Form answers
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{v.rot}}"><path d="{{ic.chevDown}}"></path></svg>
+              </button>
+          <sc-if value="{{v.done}}" hint-placeholder-val="{{false}}">
+                <span style="display: inline-flex; align-items: center; gap: 6px; height: 22px; box-sizing: border-box; padding: 0 9px; border-radius: 999px; background: {{v.outBg}}; color: {{v.outInk}}; font-size: 12px; font-weight: 500; white-space: nowrap; max-width: 62%; min-width: 0; margin-left: auto">
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: {{v.outDot}}; flex-shrink: 0"></span><span style="overflow: hidden; text-overflow: ellipsis">{{v.out}}</span>
+                </span>
+              </sc-if>
+            </div>
+            <sc-if value="{{v.open}}" hint-placeholder-val="{{false}}">
+              <div style="margin-top: 8px; padding-left: 12px; border-left: 1px solid #E8EBE5; display: flex; flex-direction: column; gap: 3px">
+                <sc-for list="{{v.answers}}" as="a" hint-placeholder-count="3">
+                  <div style="display: flex; gap: 12px; font-size: 12.5px"><span style="color: #626C66; flex: 1; min-width: 0">{{a.q}}</span><span style="color: #1E2622; font-weight: 500; flex-shrink: 0">{{a.a}}</span></div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- ---------- missed pigs ---------- -->
+  <sc-if value="{{isMissed}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 26px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">The 3 sows</h2>
+      <span style="font-size: 12.5px; color: #626C66">Batch 31 PRRS round, Tue 20 Oct</span>
+    </div>
+    <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.04)">
+      <sc-for list="{{sows}}" as="p" hint-placeholder-count="3">
+        <div style="display: flex; align-items: baseline; gap: 16px; padding: 13px 16px; border-top: {{p.border}}">
+          <span style="width: 64px; flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13.5px; font-weight: 500">{{p.tag}}</span>
+          <span style="width: 132px; flex-shrink: 0; font-size: 14px; color: #1E2622">{{p.place}}</span>
+          <span style="flex: 1; min-width: 0; font-size: 13px; color: #626C66">{{p.why}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- ---------- revaccinate ---------- -->
+  <sc-if value="{{isRevax}}" hint-placeholder-val="{{false}}">
+    <h2 style="margin: 26px 0 0; font-size: 15px; font-weight: 600">Antibody result</h2>
+    <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.04)">
+      <sc-for list="{{labRows}}" as="r" hint-placeholder-count="5">
+        <div style="display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-top: {{r.border}}">
+          <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #626C66">{{r.k}}</span>
+          <sc-if value="{{r.plain}}" hint-placeholder-val="{{true}}">
+            <span style="flex: 1; min-width: 0; font-family: {{r.font}}; font-size: 14px; color: #121815">{{r.v}}</span>
+          </sc-if>
+          <sc-if value="{{r.pair}}" hint-placeholder-val="{{false}}">
+            <span style="flex: 1; min-width: 0; display: flex; gap: 8px; flex-wrap: wrap">
+              <span style="display: inline-flex; align-items: center; gap: 6px; height: 22px; box-sizing: border-box; padding: 0 9px; border-radius: 999px; background: #E7F4EA; color: #1F5534; font-size: 12px; font-weight: 500"><span style="width: 6px; height: 6px; border-radius: 50%; background: #2D7A4B"></span>4 above</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; height: 22px; box-sizing: border-box; padding: 0 9px; border-radius: 999px; background: #FCE7E2; color: #9A2C17; font-size: 12px; font-weight: 500"><span style="width: 6px; height: 6px; border-radius: 50%; background: #D9583B"></span>6 below</span>
+            </span>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <button type="button" onClick="{{openPdf}}" style="margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; height: 36px; box-sizing: border-box; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.file}}"></path></svg>
+      Open lab report (PDF)
+    </button>
+    <h2 style="margin: 26px 0 0; font-size: 15px; font-weight: 600">Round it belongs to</h2>
+    <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.04)">
+      <sc-for list="{{roundRows}}" as="r" hint-placeholder-count="3">
+        <div style="display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-top: {{r.border}}">
+          <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #626C66">{{r.k}}</span>
+          <span style="flex: 1; min-width: 0; font-family: {{r.font}}; font-size: 14px; color: #121815">{{r.v}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- ---------- compact generic record ---------- -->
+  <sc-if value="{{isGeneric}}" hint-placeholder-val="{{false}}">
+    <h2 style="margin: 26px 0 0; font-size: 15px; font-weight: 600">{{generic.heading}}</h2>
+    <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.04)">
+      <sc-for list="{{generic.rows}}" as="r" hint-placeholder-count="4">
+        <div style="display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-top: {{r.border}}">
+          <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #626C66">{{r.k}}</span>
+          <span style="flex: 1; min-width: 0; font-family: {{r.font}}; font-size: 14px; color: #121815"><sc-if value="{{r.dot}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: #D99A1E; vertical-align: 2px"></span></sc-if>{{r.v}}<sc-if value="{{r.hasOld}}" hint-placeholder-val="{{false}}"><span style="margin-left: 10px; font-size: 13px; color: #626C66; text-decoration: line-through">{{r.old}}</span></sc-if></span>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{generic.hasLink}}" hint-placeholder-val="{{false}}">
+      <button type="button" onClick="{{openPdf}}" style="margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; height: 36px; box-sizing: border-box; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.file}}"></path></svg>
+        {{generic.link}}
+      </button>
+    </sc-if>
+    <sc-if value="{{generic.hasNote}}" hint-placeholder-val="{{false}}">
+      <p style="margin: 14px 0 0; font-size: 13px; color: #626C66">{{generic.note}}</p>
+    </sc-if>
+  </sc-if>
+</sc-if>
+
+</div>
+
+<!-- ================= STICKY FOOTER ================= -->
+<sc-if value="{{showFoot}}" hint-placeholder-val="{{false}}">
+<div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+  <div style="max-width: 760px; margin: 0 auto; padding: 12px 32px; box-sizing: border-box; display: flex; align-items: center; gap: 10px">
+    <span style="flex: 1; min-width: 0; font-size: 13.5px; color: #3B4540">{{foot.hint}}</span>
+    <sc-if value="{{foot.hasSecond}}" hint-placeholder-val="{{true}}">
+      <button type="button" onClick="{{foot.second}}" style="height: 40px; box-sizing: border-box; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; white-space: nowrap; cursor: pointer">Discard</button>
+    </sc-if>
+    <button type="button" onClick="{{foot.go}}" disabled="{{foot.off}}" style="height: 40px; box-sizing: border-box; padding: 0 16px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; cursor: pointer; opacity: {{foot.opacity}}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{foot.icon}}"></path></svg>
+      {{foot.label}}
+    </button>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["list","visitors","missed","revax","receipt","cc","others","todo"],"default":"list"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      chev: 'M9 18l6-6-6-6',
+      x: 'M18 6 6 18 M6 6l12 12',
+      chevDown: 'M6 9l6 6 6-6',
+      check: 'M20 6 9 17l-5-5',
+      file: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M8 13h8 M8 17h5',
+      arrowUpRight: 'M7 17 17 7 M8 7h9v9',
+      message: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'
+    };
+  }
+
+  marks() {
+    return {
+      GM: { bg: '#151B17', ink: '#C5F06A', name: 'General Manager' },
+      PR: { bg: '#F6EBD3', ink: '#6E4500', name: 'Production' },
+      VT: { bg: '#DCEEF2', ink: '#0E5568', name: 'Vet' },
+      BS: { bg: '#ECE7FB', ink: '#47309A', name: 'Biosecurity' },
+      EQ: { bg: '#FBE4DC', ink: '#8C3519', name: 'Equipment' },
+      AD: { bg: '#F0F2EE', ink: '#3B4540', name: 'You' }
+    };
+  }
+
+  // Everything that can sit on this list. kind: decide | todo | cc | wait.
+  // `why` quotes the farm's own Who-decides sentence in plain words.
+  items() {
+    const vac = 'vaccination plans go to Dr. Chen and Adam';
+    return [
+      { id: 'booster', kind: 'decide', by: 'VT', area: 'Health', title: 'Approve the PRRS booster plan for Batch 34', to: 'To you and Dr. Chen', due: 'Today 10:00', why: vac, told: 'Dr. Chen is told', hot: true, tone: 'amber', crumb: 'For you · Vaccination' },
+      { id: 'missed', kind: 'decide', by: 'VT', area: 'Health', title: "3 pigs were missed in Batch 31's PRRS round", to: 'To you · cc Zhao Min', due: 'Today', why: vac, told: 'Zhao Min is told', tone: 'neutral', crumb: 'For you · Vaccination' },
+      { id: 'revax', kind: 'decide', by: 'VT', area: 'Health', title: 'Revaccinate Batch 29?', to: 'To you and Dr. Chen', due: 'Wed 4 Nov', why: vac, told: 'Dr. Chen is told', tone: 'neutral', crumb: 'For you · Vaccination' },
+      { id: 'visitors', kind: 'decide', by: 'BS', area: 'Biosecurity', title: '5 visitors want to come in next week', to: 'To you', due: 'Thu 5 Nov', why: 'visitors go to Adam', told: 'the visitors are told', tone: 'neutral', crumb: 'For you · Biosecurity' },
+      { id: 'registry', kind: 'decide', by: 'GM', area: 'General', title: "File October's herd report on the Regional pig registry", to: 'To you', due: 'Thu 5 Nov', why: 'anything sent outside the farm goes to Adam', told: '', tone: 'neutral', crumb: 'For you · Reports' },
+      { id: 'weaning', kind: 'decide', by: 'GM', area: 'General', title: 'Create weaning tasks automatically, 28 days after farrowing?', to: 'To you', due: '', why: 'everything else goes to Adam', told: '', tone: 'neutral', crumb: 'For you · Task rules' },
+      { id: 'call', kind: 'todo', by: 'BS', area: 'Biosecurity', title: "Call Hartland to confirm Dr. Chen's visit time", to: 'To you', due: 'Mon 2 Nov', why: "Hartland's booking system is phone only" },
+      { id: 'form', kind: 'todo', by: 'GM', area: 'Production', title: 'Fill in the paper movement form for Batch 30', to: 'To you', due: 'Tue 10 Nov', why: 'Riverbend Finishing needs it on the truck' },
+      { id: 'move', kind: 'cc', by: 'PR', area: 'Production', title: 'Send Batch 31 out of Nursery 2 on Wed 2 Dec?', to: 'To Wang Fang · cc you', due: 'Mon 9 Nov', why: 'Wang Fang decides the nursery moves', told: 'Wang Fang is told', tone: 'neutral', crumb: 'For you · Production' },
+      { id: 'w-move', ref: 'move', kind: 'wait', by: 'PR', area: 'Production', title: 'Send Batch 31 out of Nursery 2 on Wed 2 Dec?', who: 'Wang Fang', due: 'Mon 9 Nov', why: 'Wang Fang decides the nursery moves' },
+      { id: 'w-water', kind: 'wait', by: 'EQ', area: 'Equipment', title: 'Check water line B pressure', who: 'Gao Feng', due: 'Today', why: 'Gao Feng handles repairs, water and feed equipment' },
+      { id: 'w-fridge', kind: 'wait', by: 'AD', area: 'Health', title: 'Count the vaccine fridge', who: 'Li Wei', due: 'Fri 6 Nov', why: 'you gave it to Li Wei' }
+    ];
+  }
+
+  seeds() {
+    return [
+      { by: 'EQ', area: 'Equipment', title: 'Replace 6 heat lamps in Farrowing Room 2', chip: 'Approved by you · 07:52', tone: 'ok' },
+      { by: 'PR', area: 'Production', title: 'Move 12 gilts to Gestation 2 on Sat 31 Oct', chip: 'Not approved by Zhao Min · 07:40', tone: 'neutral' }
+    ];
+  }
+
+
+  tones() {
+    return {
+      amber: { bg: '#FFF0D1', ink: '#7A4A00', dot: '#D99A1E' },
+      wrong: { bg: '#FCE7E2', ink: '#9A2C17', dot: '#D9583B' },
+      ok: { bg: '#E7F4EA', ink: '#1F5534', dot: '#2D7A4B' },
+      neutral: { bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90' }
+    };
+  }
+
+
+  visitors() {
+    const q = (a, b, c) => [
+      { q: 'Pigs on another farm in the last 72 h', a: a },
+      { q: 'Unwell in the last 7 days', a: b },
+      { q: 'Will shower in and wear farm boots', a: c }
+    ];
+    return [
+      { id: 'v1', name: 'Zhang Hao', first: 'Zhang', company: 'Northfield Feed Services', dates: 'Mon 2 – Tue 3 Nov', purpose: 'Repair the feed line in Gestation 1', host: 'Zhao Min', test: false, note: 'Asked: could they come the week after?', answers: q('No', 'No', 'Yes') },
+      { id: 'v2', name: 'Liu Yang', first: 'Liu', company: 'Northfield Feed Services', dates: 'Mon 2 – Tue 3 Nov', purpose: 'Repair the feed line in Gestation 1', host: 'Zhao Min', test: true, note: '', answers: q('No', 'No', 'Yes') },
+      { id: 'v3', name: 'Ma Tao', first: 'Ma', company: 'Northfield Feed Services', dates: 'Mon 2 – Tue 3 Nov', purpose: 'Repair the feed line in Gestation 1', host: 'Zhao Min', test: true, note: '', answers: q('No', 'No', 'Yes') },
+      { id: 'v4', name: 'Dr. Chen', company: 'Hartland Vet Group', dates: 'Wed 4 Nov', purpose: 'Weekly herd check, Farrowing Rooms 1–4', host: 'Li Wei', test: false, note: '', answers: q('No', 'No', 'Yes') },
+      { id: 'v5', name: 'Wu Jun', company: 'Tong Feed Mill', dates: 'Thu 5 Nov', purpose: 'Feed delivery, bins outside the fence', host: 'Zhao Min', test: false, note: '', answers: q('No', 'No', 'Yes') }
+    ];
+  }
+
+  sows() {
+    return [
+      { tag: '204771', place: 'Gestation 1, Pen 8', why: 'In the treatment pen on the day' },
+      { tag: '204803', place: 'Gestation 2, Pen 3', why: 'Marked sick that morning; vet said wait' },
+      { tag: '204826', place: 'Gestation 2, Pen 14', why: "Moved rooms that morning; not on the team's list" }
+    ];
+  }
+
+  info() {
+    return {
+      booster: {
+        heading: 'Plan',
+        lead: 'The vaccine must be ordered by 10:00 today.',
+        rows: [['Based on', "Batch 30's plan"], ['Order the vaccine by', 'Today 10:00', true]],
+        hint: '',
+        primary: "Open Batch 34's plan to approve", icon: 'arrowUpRight'
+      },
+      move: {
+        heading: 'Nursery 2',
+        lead: "Batch 33 weans into Nursery 2 on Fri 4 Dec. Batch 31 is there until Sat 5 Dec.",
+        rows: [['Batch 31 leaves', 'Wed 2 Dec', true, 'Sat 5 Dec'], ['Days in nursery', '40', true, '42'], ['Nursery 2 ready', 'Fri 4 Dec 10:00', true]],
+        bar: '2 moves change · Riverbend pickup moves to Wed 2 Dec',
+        primary: 'Send Batch 31 out Wed 2 Dec',
+        approveStrip: 'Batch 31 leaves Nursery 2 on Wed 2 Dec. Nursery 2 is ready for Batch 33 on Fri 4 Dec.',
+                rejectStrip: 'Batch 31 stays until Sat 5 Dec. Nursery 2 still clashes.'
+      },
+      registry: {
+        heading: "October's key figures",
+        lead: 'Nothing is sent to the registry until you approve.',
+        bar: '1 report · Regional pig registry',
+        rows: [['Sows', '612'], ['Pigs on site', '7,140'], ['Deaths', '41'], ['Moves off site', '498']],
+        link: 'Open draft (PDF)',
+        note: "Files with the farm's saved sign-in; you'll get the registry's receipt.",
+        primary: "File October's report",
+        approveStrip: "October's herd report sent to the Regional pig registry. Their receipt will come to you.",
+                rejectStrip: "October's report was not filed."
+      },
+      weaning: {
+        heading: 'What you have done so far',
+        lead: 'From Batch 35 on, these tasks are created for you.',
+        bar: '1 rule · from Batch 35 on',
+        rows: [['Set up by hand', 'Batches 29 to 34'], ['Always at', 'Farrowing day + 28'], ['From Batch 35 on', 'Created by General Manager']],
+        primary: 'Create weaning tasks',
+        approveStrip: 'From Batch 35 on, weaning tasks are created on farrowing day + 28.',
+                rejectStrip: 'Weaning tasks stay a hand job.'
+      },
+      missed: {
+        lead: "Zhao Min's team vaccinated 48 of 51 sows on Tue 20 Oct.",
+        bar: '3 sows · Mon 2 Nov',
+        primary: 'Send catch-up task',
+        approveStrip: "Catch-up task for 3 sows sent to Zhao Min's team for Mon 2 Nov.",
+                rejectStrip: '3 sows skipped; they stay unvaccinated for this round.'
+      },
+      revax: {
+        lead: '6 of 10 samples are below the protective level. Batch 29 has 52 sows.',
+        bar: '52 sows · Thu 5 Nov',
+        primary: 'Start revaccination round',
+        approveStrip: 'Round “Batch 29 PRRS revaccination” created: 52 sows on Thu 5 Nov, sent to Zhao Min’s team.',
+                rejectStrip: 'Batch 29 will not be revaccinated.'
+      },
+      visitors: {
+        lead: 'Approve the visits you want. Each approved visitor gets an invite with arrival details.'
+      }
+    };
+  }
+
+  makeEntry(id, kind, s) {
+    const time = '08:24';
+    const ok = kind === 'approved';
+    const it = this.items().filter((x) => x.id === id)[0] || {};
+    const who = ok ? 'Approved by you' : 'Not approved by you';
+    const chip = who + ' · ' + time;
+    const head = chip + (it.told ? ' · ' + it.told : '');
+    const info = this.info();
+    if (id === 'visitors') {
+      const vs = this.visitors();
+      const yes = vs.filter((v) => s.ticks[v.id]);
+      const no = vs.filter((v) => !s.ticks[v.id]);
+      const vis = {};
+      vs.forEach((v) => {
+        const own = (s.vreasons[v.id] || '').trim();
+        if (ok) vis[v.id] = s.ticks[v.id] ? { st: 'approved', reason: '' } : { st: 'rejected', reason: own };
+        else vis[v.id] = { st: 'rejected', reason: '' };
+      });
+      if (ok) {
+        const parts = [yes.length + (yes.length === 1 ? ' visit' : ' visits') + ' approved; invites sent with arrival details.'];
+        no.forEach((v) => { parts.push(v.name + ' not approved.'); });
+        return { kind, time, chip, head, strip: parts.join(' '), vis };
+      }
+      return { kind, time, chip, head, strip: vs.length + ' visits rejected. The visitors are told.', vis };
+    }
+    return { kind, time, chip, head, strip: ok ? info[id].approveStrip : info[id].rejectStrip };
+  }
+
+  defaults(start) {
+    const base = {
+      startSeen: start, view: 'list', openId: '', filter: 'All', scope: 'all', waitOpen: false, done: {},
+      ticks: { v1: true, v2: true, v3: true, v4: true, v5: true },
+      vreasons: {}, vedited: {}, vopen: {},
+      handled: {}, order: [], handledOpen: false,
+      rejecting: false, reason: '', asked: false, opened: false
+    };
+    if (start === 'visitors' || start === 'missed' || start === 'revax') return Object.assign(base, { view: 'rec', openId: start });
+    if (start === 'cc') return Object.assign(base, { scope: 'cc' });
+    if (start === 'others') return Object.assign(base, { scope: 'others' });
+    if (start === 'todo') return Object.assign(base, { done: { form: '08:31' } });
+    if (start === 'receipt') {
+      const s = Object.assign(base, { view: 'rec', openId: 'visitors', ticks: { v1: false, v2: true, v3: true, v4: true, v5: true } });
+      s.handled = { visitors: this.makeEntry('visitors', 'approved', s) };
+      s.order = ['visitors'];
+      return s;
+    }
+    return base;
+  }
+
+  renderVals() {
+    const start = this.props.start || 'list';
+    const st = this.state || {};
+    const s = st.startSeen === start ? Object.assign(this.defaults(start), st) : this.defaults(start);
+    const set = (p) => this.setState(Object.assign({}, s, p, { startSeen: start }));
+    const I = this.icons();
+    const M = this.marks();
+    const T = this.tones();
+    const items = this.items();
+    const byId = {};
+    items.forEach((i) => { byId[i.id] = i; });
+    const info = this.info();
+    const vs = this.visitors();
+
+    const isList = s.view === 'list';
+    const isRec = s.view === 'rec';
+    const openId = s.openId;
+    const entry = isRec ? s.handled[openId] : null;
+    const done = !!entry;
+
+    // ---------- list ----------
+    const live = (i) => !s.handled[i.ref || i.id];
+    const inArea = (i) => s.filter === 'All' || i.area === s.filter;
+    const ofKind = (k) => items.filter((i) => i.kind === k && live(i));
+    const youOpen = ofKind('decide').length + ofKind('todo').filter((i) => !s.done[i.id]).length;
+    const ccN = ofKind('cc').length;
+    const waitN = ofKind('wait').length;
+    const scope = s.scope;
+    const seg = [{ label: youOpen === 0 ? 'Nothing for you' : youOpen + ' for you', scope: 'all' }];
+    if (ccN > 0) seg.push({ label: ccN + " cc'd", scope: 'cc' });
+    if (waitN > 0) seg.push({ label: waitN + ' waiting on others', scope: 'others' });
+    const counts = seg.map((c, n) => {
+      const on = scope === c.scope;
+      return { label: c.label, sep: n > 0, on, ink: on ? '#121815' : '#626C66', weight: on ? '600' : '400', deco: on ? 'underline' : 'none', pick: () => set({ scope: c.scope }) };
+    });
+    const chips = ['All', 'Production', 'Health', 'Biosecurity', 'Equipment', 'General'].map((a) => {
+      const on = s.filter === a;
+      return { label: a, on, bg: on ? '#121815' : '#FFFFFF', ink: on ? '#FFFFFF' : '#3B4540', edge: on ? '#121815' : '#DADED6', pick: () => set({ filter: a }) };
+    });
+
+    const decideVis = ofKind('decide').filter(inArea);
+    const todoVis = ofKind('todo').filter(inArea);
+    const ccVis = ofKind('cc').filter(inArea);
+    const waitVis = ofKind('wait').filter(inArea);
+    const HAIR = '1px solid #EFF1EC';
+    const NONE = '1px solid transparent';
+    const youAll = decideVis.concat(todoVis);
+    const lineOf = (n) => (n === 0 || youAll[n].hot || youAll[n - 1].hot ? NONE : HAIR);
+    const mark = (i) => ({ initials: i.by, markBg: M[i.by].bg, markInk: M[i.by].ink });
+    const dueTxt = (i) => (i.due ? ' · due ' + i.due : '');
+    const openRec = (id) => () => set({ view: 'rec', openId: id, rejecting: false, reason: '', asked: false, opened: false });
+    const decideRows = decideVis.map((i, n) => Object.assign({
+      id: i.id, title: i.title, meta: i.to + dueTxt(i), whyLabel: 'Why you:', why: i.why,
+      line: lineOf(n), bg: i.hot ? '#F5FAF2' : 'transparent', edge: i.hot ? '#D5E7CF' : 'transparent',
+      open: openRec(i.id)
+    }, mark(i)));
+    const todoRows = todoVis.map((i, n) => {
+      const at = s.done[i.id];
+      const flip = () => { const d = Object.assign({}, s.done); if (at) delete d[i.id]; else d[i.id] = '08:31'; set({ done: d }); };
+      return Object.assign({
+        id: i.id, cid: 'todo-' + i.id, title: i.title, meta: i.to + dueTxt(i), whyLabel: 'Why you:', why: i.why,
+        line: lineOf(decideVis.length + n), ticked: !!at, pending: !at, isDone: !!at, doneAt: at || '',
+        titleInk: at ? '#626C66' : '#121815', toggle: flip, undo: flip
+      }, mark(i));
+    });
+    const ccRows = ccVis.map((i, n) => Object.assign({
+      id: i.id, title: i.title, meta: i.to + dueTxt(i), whyLabel: 'Why you:', why: i.why,
+      line: n === 0 ? NONE : HAIR, open: openRec(i.id)
+    }, mark(i)));
+    const waitRows = waitVis.map((i, n) => Object.assign({
+      id: i.id, title: i.title, meta: 'With ' + i.who + dueTxt(i), whyLabel: 'Why them:', why: i.why,
+      line: n === 0 ? NONE : HAIR
+    }, mark(i)));
+    const waitWhoList = waitVis.map((i) => i.who).filter((w, n, a) => a.indexOf(w) === n);
+    const waitOpen = scope === 'others' || s.filter !== 'All' || !!s.waitOpen;
+
+    const handledRows = [];
+    s.order.forEach((id) => {
+      const e = s.handled[id];
+      const i = byId[id];
+      if (!inArea(i)) return;
+      const tone = T[e.kind === 'approved' ? 'ok' : 'neutral'];
+      handledRows.push(Object.assign({ title: i.title, chip: e.chip, bg: tone.bg, ink: tone.ink, dot: tone.dot, canOpen: true, fixed: false, anim: 'sentriRise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both', open: openRec(id) }, mark(i)));
+    });
+    this.seeds().filter(inArea).forEach((x) => {
+      const tone = T[x.tone];
+      handledRows.push(Object.assign({ title: x.title, chip: x.chip, bg: tone.bg, ink: tone.ink, dot: tone.dot, canOpen: false, fixed: true, anim: 'none', open: () => {} }, mark(x)));
+    });
+    handledRows.forEach((h, n) => { h.border = n === 0 ? '1px solid transparent' : HAIR; });
+
+    const showYou = scope === 'all' && youAll.length > 0;
+    const showCc = (scope === 'all' || scope === 'cc') && ccVis.length > 0;
+    const showWait = (scope === 'all' || scope === 'others') && waitVis.length > 0;
+    const showHandled = scope === 'all' && handledRows.length > 0;
+    const showNone = !showYou && !showCc && !showWait && !showHandled;
+
+    // ---------- record header ----------
+    const it = byId[openId] || items[0];
+    const dueTone = T[it.tone || 'neutral'];
+    const lead = openId === 'visitors' ? info.visitors.lead : (info[openId] ? info[openId].lead : '');
+    const rec = {
+      crumb: it.crumb, title: it.title, lead,
+      initials: it.by, byName: M[it.by].name, markBg: M[it.by].bg, markInk: M[it.by].ink,
+      meta: it.to, whyLabel: 'Why you:', why: it.why,
+      showDue: !!it.due && !done, due: it.due, dueBg: dueTone.bg, dueInk: dueTone.ink, dueDot: dueTone.dot,
+      showLead: !done
+    };
+    const rt = T[entry && entry.kind === 'approved' ? 'ok' : 'neutral'];
+    const receipt = entry ? { head: entry.head, text: entry.strip, bg: rt.bg, ink: rt.ink, dot: rt.dot, icon: entry.kind === 'approved' ? I.check : I.x } : { head: '', text: '', bg: '#E7F4EA', ink: '#1F5534', dot: '#2D7A4B', icon: I.check };
+
+    // ---------- visitors ----------
+    const nTicked = vs.filter((v) => s.ticks[v.id]).length;
+    const visitorRows = vs.map((v, n) => {
+      const ticked = !!s.ticks[v.id];
+      const own = s.vreasons[v.id] !== undefined ? s.vreasons[v.id] : '';
+      const filled = v.id === 'v1' && !s.vedited[v.id];
+      const res = entry && entry.vis ? entry.vis[v.id] : null;
+      const approved = res && res.st === 'approved';
+      const tone = T[approved ? 'ok' : 'neutral'];
+      let out = '';
+      if (res) out = approved ? 'Approved' : (res.reason ? 'Rejected · ' + res.reason : 'Not approved');
+      return {
+        cid: 'vis-' + v.id, rid: 'why-' + v.id, name: v.name, company: v.company, dates: v.dates, purpose: v.purpose, host: v.host,
+        firstName: v.name, hasNote: !!v.note, note: v.note,
+        test: v.test ? 'Test result attached' : 'No test (optional)', testBg: v.test ? T.ok.bg : T.neutral.bg, testInk: v.test ? T.ok.ink : T.neutral.ink, testDot: v.test ? T.ok.dot : T.neutral.dot,
+        border: n === 0 ? 'none' : '1px solid #EFF1EC',
+        editable: !done, ticked, toggle: () => set({ ticks: Object.assign({}, s.ticks, { [v.id]: !ticked }) }),
+        open: !!s.vopen[v.id], rot: s.vopen[v.id] ? 'rotate(180deg)' : 'none', fold: () => set({ vopen: Object.assign({}, s.vopen, { [v.id]: !s.vopen[v.id] }) }),
+        answers: v.answers,
+        done: !!res, out, outBg: tone.bg, outInk: tone.ink, outDot: tone.dot
+      };
+    });
+
+    // ---------- missed / revax / generic ----------
+    const sows = this.sows().map((p, n) => Object.assign({ border: n === 0 ? 'none' : '1px solid #EFF1EC' }, p));
+    const kv = (arr) => arr.map((r, n) => ({ k: r[0], v: r[1], font: r[2] ? "'Geist Mono', ui-monospace, monospace" : 'inherit', border: n === 0 ? 'none' : '1px solid #EFF1EC', plain: true, pair: false, dot: !!r[3], hasOld: !!r[3], old: r[3] || '' }));
+    const labRows = [
+      { k: 'Lab', v: 'Northern Animal Health Lab' }, { k: 'Sampled', v: 'Fri 23 Oct', m: true }, { k: 'Report date', v: 'Thu 29 Oct', m: true },
+      { k: 'Samples', v: '10' }, { k: 'Result', pair: true }, { k: 'Protective level', v: 'S/P ≥ 0.4', m: true }
+    ].map((r, n) => ({ k: r.k, v: r.v || '', font: r.m ? "'Geist Mono', ui-monospace, monospace" : 'inherit', border: n === 0 ? 'none' : '1px solid #EFF1EC', plain: !r.pair, pair: !!r.pair }));
+    const roundRows = kv([['Round', 'Batch 29 PRRS round'], ['Vaccinated', 'Mon 28 Sep', true], ['Sows', '52']]);
+    const gi = info[openId] && info[openId].rows ? info[openId] : null;
+    const generic = gi ? { heading: gi.heading, rows: kv(gi.rows), hasLink: !!gi.link, link: gi.link || '', hasNote: !!gi.note, note: gi.note || '' } : { heading: '', rows: [], hasLink: false, link: '', hasNote: false, note: '' };
+    const isVisitors = isRec && openId === 'visitors';
+    const isMissed = isRec && openId === 'missed';
+    const isRevax = isRec && openId === 'revax';
+    const isGeneric = isRec && !!gi;
+
+    // ---------- footer ----------
+    const decide = (kind) => {
+      const e = this.makeEntry(openId, kind, s);
+      set({ handled: Object.assign({}, s.handled, { [openId]: e }), order: [openId].concat(s.order.filter((x) => x !== openId)), rejecting: false, reason: '', asked: false });
+    };
+    const foot = { hint: '', hasSecond: true, off: false, opacity: '1', icon: I.check };
+    if (isVisitors) {
+      const n = nTicked;
+      foot.label = n === 0 ? 'Tick at least one visit' : 'Approve ' + n + (n === 1 ? ' visit' : ' visits');
+      foot.off = n === 0; foot.opacity = n === 0 ? '0.4' : '1';
+      foot.go = () => decide('approved');
+      foot.hint = n === 0 ? 'Tick the visits to approve' : n + ' of ' + vs.length + ' ticked';
+    } else if (info[openId] && info[openId].primary) {
+      const c = info[openId];
+      foot.label = c.primary;
+      foot.icon = c.icon ? I[c.icon] : I.check;
+      if (openId === 'booster') {
+        foot.hasSecond = false; foot.hint = s.opened ? 'Opened in Vaccination plans.' : '';
+        foot.go = () => set({ opened: true });
+      } else {
+        foot.go = () => decide('approved');
+        foot.hint = c.bar || '';
+      }
+    } else { foot.label = ''; foot.go = () => {}; foot.hasSecond = false; }
+    foot.second = () => decide('rejected');
+
+    const waitOpenNow = waitOpen;
+    return {
+      ic: I, isList, isRec,
+      counts, chips, showNone, noneText: s.filter === 'All' ? 'Nothing is waiting for you.' : 'Nothing in ' + s.filter + '.',
+      showYou, youCount: youAll.length - todoRows.filter((r) => r.isDone).length, decideRows, todoRows,
+      showCc, ccCount: ccVis.length, ccRows,
+      showWait, waitCount: waitVis.length, waitRows, waitOpen: waitOpenNow, waitFolded: !waitOpenNow, waitWho: waitWhoList.join(' and '),
+      waitRot: waitOpenNow ? 'rotate(90deg)' : 'none',
+      toggleWait: () => set({ waitOpen: !s.waitOpen }),
+      showHandled, handledOpen: !!s.handledOpen, handledCount: handledRows.length, handledRows,
+      handledRot: s.handledOpen ? 'rotate(90deg)' : 'none',
+      toggleHandled: () => set({ handledOpen: !s.handledOpen }),
+      back: () => set({ view: 'list', openId: '', rejecting: false, reason: '', asked: false, handledOpen: done ? true : s.handledOpen }),
+      done, receipt, rec, isVisitors, isMissed, isRevax, isGeneric,
+      visitorRows, sows, labRows, roundRows, generic,
+      openPdf: () => {},
+      showFoot: isRec && !done, foot,
+      undoEntry: () => set({ handled: Object.keys(s.handled).filter((k) => k !== openId).reduce((a, k) => Object.assign(a, { [k]: s.handled[k] }), {}), order: s.order.filter((x) => x !== openId) })
+    };
+  }
+}
+</script>
+</body>
+</html>

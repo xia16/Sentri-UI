@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pigs off site</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 900px; display: flex; flex-direction: column">
+<div style="flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+<!-- ================= LIST ================= -->
+<sc-if value="{{v.list}}" hint-placeholder-val="{{true}}">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Pigs off site</h1>
+  <div style="margin-top: 6px; font-size: 14px; color: #3B4540">{{lead}}</div>
+
+  <h2 style="margin: 26px 0 10px; font-size: 15px; font-weight: 600">Coming up</h2>
+  <div style="border: 1px solid {{plansBorder}}; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <sc-for list="{{plans}}" as="p" hint-placeholder-count="2">
+      <button type="button" onClick="{{p.open}}" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; padding: 13px 16px; border: 0; border-top: {{p.top}}; background: {{p.bg}}; font: inherit; text-align: left; color: inherit; cursor: pointer">
+        <span aria-hidden="true" style="width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0; background: #F6EBD3; color: #6E4500; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center">PR</span>
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+          <span style="font-size: 14px; font-weight: 500">{{p.title}}</span>
+          <span style="font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.why}}</span>
+        </span>
+        <sc-if value="{{p.hasChip}}" hint-placeholder-val="{{false}}">
+          <span style="display: inline-flex; align-items: center; gap: 6px; height: 22px; box-sizing: border-box; padding: 0 9px; border-radius: 999px; background: {{p.chipBg}}; color: {{p.chipInk}}; font-size: 12px; font-weight: 500; white-space: nowrap">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: {{p.chipDot}}"></span>{{p.chip}}
+          </span>
+        </sc-if>
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevRight}}"></path></svg>
+      </button>
+    </sc-for>
+  </div>
+
+  <h2 style="margin: 30px 0 12px; font-size: 15px; font-weight: 600">Left in October</h2>
+  <div style="display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; border: 1px solid #E8EBE5; border-radius: 12px">
+    <sc-for list="{{segs}}" as="g" hint-placeholder-count="6">
+      <button type="button" aria-pressed="{{g.on}}" onClick="{{g.pick}}" style="height: 32px; padding: 0 12px; border: 0; border-radius: 9px; background: {{g.bg}}; color: {{g.ink}}; font: inherit; font-size: 13.5px; font-weight: {{g.weight}}; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; white-space: nowrap">
+        {{g.label}}
+        <span style="font-size: 12.5px; font-weight: 500; color: {{g.countInk}}">{{g.count}}</span>
+      </button>
+    </sc-for>
+  </div>
+
+  <div style="margin-top: 14px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+      <button type="button" onClick="{{r.open}}" style="display: flex; align-items: center; gap: 14px; width: 100%; box-sizing: border-box; padding: 13px 18px; border: 0; border-top: {{r.top}}; background: transparent; font: inherit; text-align: left; color: inherit; cursor: pointer">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+          <span style="display: flex; align-items: baseline; gap: 6px; font-size: 14.5px; font-weight: 500">
+            <span>{{r.lead}}</span>
+            <sc-if value="{{r.hasTag}}" hint-placeholder-val="{{false}}">
+              <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; letter-spacing: 0.01em">{{r.tag}}</span>
+            </sc-if>
+            <sc-if value="{{r.hasRest}}" hint-placeholder-val="{{false}}">
+              <span>{{r.rest}}</span>
+            </sc-if>
+          </span>
+          <span style="font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.sub}}</span>
+        </span>
+        <sc-if value="{{r.hasFlag}}" hint-placeholder-val="{{false}}">
+          <span style="display: inline-flex; align-items: center; gap: 6px; height: 24px; box-sizing: border-box; padding: 0 10px; border-radius: 999px; background: #FFF0D1; color: #7A4A00; font-size: 12px; font-weight: 500; white-space: nowrap">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #D99A1E"></span>{{r.flag}}
+          </span>
+        </sc-if>
+        <span style="width: 62px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66; white-space: nowrap">{{r.when}}</span>
+      </button>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{hasMore}}" hint-placeholder-val="{{true}}">
+    <button type="button" onClick="{{toggleAll}}" style="display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; height: 36px; padding: 0 4px; border: 0; background: transparent; font: inherit; font-size: 13.5px; font-weight: 500; color: #3B4540; cursor: pointer">{{moreLabel}}</button>
+  </sc-if>
+
+  <sc-if value="{{showPiglets}}" hint-placeholder-val="{{true}}">
+    <div style="margin-top: 22px; padding-top: 16px; border-top: 1px solid #EFF1EC; display: flex; align-items: center; gap: 14px">
+      <div style="flex: 1; min-width: 0; font-size: 13px; color: #626C66">Piglets lost before weaning are counted on each batch, not here. Batch 32: 54 piglets, 9.8%, mostly crushing in days 1–4 during the heat-lamp fault.</div>
+    </div>
+  </sc-if>
+</sc-if>
+
+<!-- ================= RECORD ================= -->
+<sc-if value="{{v.record}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToList}}" style="display: inline-flex; align-items: center; gap: 3px; margin: 0 0 14px -4px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevLeft}}"></path></svg>
+    Pigs off site
+  </button>
+  <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">
+      <sc-if value="{{rec.hasTag}}" hint-placeholder-val="{{true}}">
+        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 500; letter-spacing: -0.02em">{{rec.tag}}</span>
+      </sc-if>
+      <sc-if value="{{rec.hasTitle}}" hint-placeholder-val="{{false}}">
+        <span>{{rec.title}}</span>
+      </sc-if>
+    </h1>
+    <span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: {{rec.chipBg}}; color: {{rec.chipInk}}">
+      <span style="width: 6px; height: 6px; border-radius: 999px; background: {{rec.chipDot}}"></span>
+      {{rec.chip}}
+    </span>
+  </div>
+  <div style="margin-top: 6px; font-size: 14px; color: #3B4540">{{rec.identity}}</div>
+
+  <sc-if value="{{rec.hasStrip}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: flex-start; gap: 10px; margin-top: 18px; padding: 12px 14px; border-radius: 12px; background: {{rec.stripBg}}; color: {{rec.stripInk}}; animation: sentriRise 0.4s ease-out both">
+      <span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: {{rec.stripDot}}; flex-shrink: 0; margin-top: 7px"></span>
+      <span style="flex: 1; min-width: 0; font-size: 14px; line-height: 1.5">{{rec.strip}}</span>
+      <sc-if value="{{rec.hasFound}}" hint-placeholder-val="{{false}}">
+        <button type="button" onClick="{{markFound}}" style="height: 32px; flex-shrink: 0; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; white-space: nowrap; cursor: pointer">She has been found</button>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 24px; margin-top: 26px">
+    <sc-for list="{{rec.facts}}" as="f" hint-placeholder-count="4">
+      <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+        <span style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</span>
+        <span style="font-size: 14.5px; font-weight: 500; color: {{f.ink}}">{{f.value}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{rec.hasTags}}" hint-placeholder-val="{{false}}">
+    <h2 style="margin: 28px 0 4px; font-size: 15px; font-weight: 600">{{rec.tagsTitle}}</h2>
+    <div>
+      <sc-for list="{{rec.tags}}" as="t" hint-placeholder-count="5">
+        <div style="display: flex; align-items: baseline; gap: 14px; padding: 10px 0; border-top: 1px solid #EFF1EC">
+          <span style="width: 70px; flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 0.01em">{{t.tag}}</span>
+          <span style="width: 28px; flex-shrink: 0; font-size: 12.5px; color: #626C66">{{t.parity}}</span>
+          <span style="flex: 1; min-width: 0; font-size: 14px; color: #1E2622">{{t.reason}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{rec.hasLink}}" hint-placeholder-val="{{false}}">
+    <button type="button" style="margin-top: 22px; display: inline-flex; align-items: center; gap: 8px; height: 36px; box-sizing: border-box; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.file}}"></path></svg>
+      {{rec.link}}
+    </button>
+  </sc-if>
+
+  <h2 style="margin: 28px 0 4px; font-size: 15px; font-weight: 600">What happened</h2>
+  <div>
+    <sc-for list="{{rec.events}}" as="e" hint-placeholder-count="3">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 10px 0; border-top: 1px solid #EFF1EC">
+        <span style="font-size: 14px; color: #1E2622">{{e.text}}</span>
+        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66; white-space: nowrap">{{e.date}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+</sc-if>
+
+<!-- ================= PLAN (draft and saved) ================= -->
+<sc-if value="{{v.plan}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToList}}" style="display: inline-flex; align-items: center; gap: 3px; margin: 0 0 14px -4px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevLeft}}"></path></svg>
+    Pigs off site
+  </button>
+
+  <sc-if value="{{plan.isDone}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding: 8px 8px 8px 14px; border-radius: 12px; background: #F0F2EE; color: #3B4540; font-size: 13.5px; font-weight: 500; animation: sentriRise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      <span style="flex: 1; min-width: 0">Saved <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px">{{plan.time}}</span> · {{plan.receipt1}}</span>
+      <button type="button" onClick="{{plan.undo}}" style="height: 32px; flex-shrink: 0; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Pigs › Pigs off site</span>
+    <h1 style="margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -0.025em; text-wrap: balance">{{plan.title}}</h1>
+    <div style="font-size: 14px; color: #3B4540; line-height: 1.5">{{plan.sentence}}</div>
+  </div>
+
+  <sc-if value="{{plan.isRejected}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 10px; background: #F0F2EE; color: #3B4540; border-radius: 12px; padding: 8px 8px 8px 14px; margin-top: 24px; font-size: 13.5px; font-weight: 500">
+      <span style="flex: 1; min-width: 0">{{plan.rejectedText}}</span>
+      <button type="button" onClick="{{plan.bringBack}}" style="height: 32px; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Bring it back</button>
+    </div>
+  </sc-if>
+
+  <!-- load-out: fields -->
+  <sc-if value="{{plan.showFields}}" hint-placeholder-val="{{true}}">
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 16px; margin-top: 24px">
+      <sc-for list="{{plan.fields1}}" as="f" hint-placeholder-count="2">
+        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+          <div style="display: flex; align-items: center; gap: 8px; min-height: 20px">
+            <label for="{{f.id}}" style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</label>
+            <sc-if value="{{f.changed}}" hint-placeholder-val="{{false}}">
+              <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #121815"></span>
+              <span style="font-size: 12px; color: #626C66; text-decoration: line-through">{{f.was}}</span>
+            </sc-if>
+          </div>
+          <input id="{{f.id}}" value="{{f.value}}" onChange="{{f.change}}" style="height: 42px; box-sizing: border-box; width: 100%; border: 1px solid #E2E5DF; background: #FFFFFF; border-radius: 11px; padding: 0 13px; font-family: {{f.font}}; font-size: 14px; color: #121815; outline: none">
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin-top: 10px; font-size: 13px">
+      <span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: {{plan.noteDot}}; flex-shrink: 0"></span>
+      <span style="color: #3B4540">{{plan.note}}</span>
+      <button type="button" onClick="{{plan.noteFix}}" style="height: 28px; padding: 0 10px; border: 1px solid #DADED6; border-radius: 9px; background: #FFFFFF; font: inherit; font-size: 12.5px; font-weight: 500; color: #121815; cursor: pointer">{{plan.noteFixLabel}}</button>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 16px; margin-top: 18px">
+      <sc-for list="{{plan.fields2}}" as="f" hint-placeholder-count="4">
+        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+          <div style="display: flex; align-items: center; gap: 8px; min-height: 20px">
+            <label for="{{f.id}}" style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</label>
+            <sc-if value="{{f.changed}}" hint-placeholder-val="{{false}}">
+              <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #121815"></span>
+              <span style="font-size: 12px; color: #626C66; text-decoration: line-through">{{f.was}}</span>
+            </sc-if>
+          </div>
+          <input id="{{f.id}}" value="{{f.value}}" onChange="{{f.change}}" style="height: 42px; box-sizing: border-box; width: 100%; border: 1px solid #E2E5DF; background: #FFFFFF; border-radius: 11px; padding: 0 13px; font-family: {{f.font}}; font-size: 14px; color: #121815; outline: none">
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px">
+      <button type="button" style="display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.file}}"></path></svg>
+        Movement record (PDF)
+      </button>
+      <button type="button" onClick="{{toggleMore}}" aria-expanded="{{plan.moreOpen}}" style="display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; padding: 6px 0 6px 8px; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+        More options
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{plan.moreRot}}"><path d="{{ic.chevDown}}"></path></svg>
+      </button>
+    </div>
+    <sc-if value="{{plan.moreOpen}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; flex-direction: column; margin-top: 2px; border-top: 1px solid #EFF1EC">
+        <sc-for list="{{plan.moreRows}}" as="m" hint-placeholder-count="3">
+          <div style="display: flex; gap: 16px; padding: 10px 0; border-bottom: 1px solid #EFF1EC; font-size: 14px">
+            <span style="width: 150px; flex-shrink: 0; font-size: 13px; color: #626C66">{{m.label}}</span>
+            <span style="flex: 1; min-width: 0; color: #1E2622">{{m.value}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- load-out: facts after saving -->
+  <sc-if value="{{plan.showFacts}}" hint-placeholder-val="{{false}}">
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 24px; margin-top: 26px">
+      <sc-for list="{{plan.facts}}" as="f" hint-placeholder-count="6">
+        <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+          <span style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</span>
+          <span style="font-size: 14.5px; font-weight: 500; font-family: {{f.font}}">{{f.value}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- cull: sows -->
+  <sc-if value="{{plan.showSows}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 24px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{plan.sows}}" as="r" hint-placeholder-count="6">
+        <div style="display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-top: {{r.top}}">
+          <sc-if value="{{r.editable}}" hint-placeholder-val="{{true}}">
+            <input id="{{r.cid}}" type="checkbox" checked="{{r.ticked}}" onChange="{{r.toggle}}" style="width: 18px; height: 18px; margin: 3px 0 0; flex-shrink: 0; accent-color: #121815">
+          </sc-if>
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+            <label for="{{r.cid}}" style="display: flex; flex-direction: column; gap: 1px; opacity: {{r.opacity}}">
+              <span style="display: flex; align-items: baseline; gap: 10px">
+                <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 0.01em">{{r.tag}}</span>
+                <span style="font-size: 12.5px; color: #626C66">{{r.meta}}</span>
+              </span>
+              <span style="font-size: 13.5px; color: #1E2622">{{r.reason}}</span>
+            </label>
+            <sc-if value="{{r.hasNote}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin-top: 6px; font-size: 13px">
+                <span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #D99A1E; flex-shrink: 0"></span>
+                <span style="color: #3B4540">{{r.note}}</span>
+                <sc-if value="{{r.hasFix}}" hint-placeholder-val="{{true}}">
+                  <button type="button" onClick="{{r.toggle}}" style="height: 28px; padding: 0 10px; border: 1px solid #DADED6; border-radius: 9px; background: #FFFFFF; font: inherit; font-size: 12.5px; font-weight: 500; color: #121815; cursor: pointer">{{r.fix}}</button>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+          <sc-if value="{{r.hasOff}}" hint-placeholder-val="{{false}}">
+            <span style="display: inline-flex; align-items: center; gap: 6px; margin-top: 2px; font-size: 12.5px; color: #626C66; white-space: nowrap">
+              <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #121815"></span>Off the list
+            </span>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- what this sets up (quiet, expandable) -->
+  <sc-if value="{{plan.showCreates}}" hint-placeholder-val="{{true}}">
+    <div style="margin-top: 22px">
+      <button type="button" onClick="{{plan.toggleCreates}}" aria-expanded="{{plan.createsOpen}}" style="display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; padding: 6px 0; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+        {{plan.createsTitle}}
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{plan.createsRot}}"><path d="{{ic.chevDown}}"></path></svg>
+      </button>
+      <sc-if value="{{plan.createsOpen}}" hint-placeholder-val="{{false}}">
+        <ol style="list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column">
+          <sc-for list="{{plan.creates}}" as="c" hint-placeholder-count="4">
+            <li style="display: flex; gap: 14px; align-items: stretch">
+              <div style="width: 12px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center">
+                <span aria-hidden="true" style="width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; margin-top: 6px; border: 2px solid {{c.dotBorder}}; background: {{c.dotBg}}"></span>
+                <sc-if value="{{c.hasLine}}" hint-placeholder-val="{{true}}">
+                  <span aria-hidden="true" style="flex: 1; width: 2px; margin: 3px 0 0; border-radius: 2px; background: #E2E5DF"></span>
+                </sc-if>
+              </div>
+              <div style="flex: 1; min-width: 0; display: flex; align-items: flex-start; gap: 14px; padding-bottom: {{c.pad}}px">
+                <span style="width: 88px; flex-shrink: 0; display: flex; flex-direction: column; line-height: 22px">
+                  <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66">{{c.date}}</span>
+                  <sc-if value="{{c.hasTime}}" hint-placeholder-val="{{false}}">
+                    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #121815; line-height: 18px">{{c.time}}</span>
+                  </sc-if>
+                </span>
+                <span style="flex: 1; min-width: 0; font-size: 14px; line-height: 22px; color: #121815">{{c.text}}</span>
+                <span style="font-size: 12.5px; line-height: 22px; color: #626C66; text-align: right; max-width: 110px">{{c.who}}</span>
+              </div>
+            </li>
+          </sc-for>
+        </ol>
+        <sc-if value="{{plan.noCreates}}" hint-placeholder-val="{{false}}">
+          <div style="font-size: 13.5px; color: #626C66">Nothing. No sow is ticked.</div>
+        </sc-if>
+      </sc-if>
+    </div>
+  </sc-if>
+</sc-if>
+
+</div>
+
+<!-- ================= SAVE BAR ================= -->
+<sc-if value="{{showFoot}}" hint-placeholder-val="{{false}}">
+  <div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+    <div style="max-width: 760px; margin: 0 auto; padding: 12px 32px 14px; box-sizing: border-box; display: flex; align-items: center; gap: 10px">
+      <span style="flex: 1; min-width: 0; font-size: 13px; color: #3B4540; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{foot.summary}}</span>
+      <button type="button" onClick="{{foot.discard}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer; white-space: nowrap">Discard</button>
+      <button type="button" onClick="{{foot.go}}" disabled="{{foot.off}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 14px; border: 0; border-radius: 10px; background: #121815; font: inherit; font-size: 14px; font-weight: 500; color: #FFFFFF; cursor: pointer; white-space: nowrap; opacity: {{foot.opacity}}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+        {{foot.label}}
+      </button>
+    </div>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["list","record","sold","load","loaded","cull","culled"],"default":"list"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      check: 'M20 6 9 17l-5-5',
+      x: 'M18 6 6 18 M6 6l12 12',
+      undo: 'M3 7v6h6 M21 17a9 9 0 0 0-15-6.7L3 13',
+      chevLeft: 'M15 18l-6-6 6-6',
+      chevRight: 'M9 18l6-6-6-6',
+      chevDown: 'M6 9l6 6 6-6',
+      chat: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+      file: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M8 13h8 M8 17h5',
+      alert: 'M12 6.5v6.5 M12 17.5h.01'
+    };
+  }
+
+  // ---- calendar helpers ----------------------------------------------------
+  MON() { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; }
+  WD() { return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; }
+  octDate(day) { return new Date(Date.UTC(2026, 9, day)); }
+  wdm(day) { const d = this.octDate(day); return this.WD()[d.getUTCDay()] + ' ' + d.getUTCDate() + ' Oct'; }
+  dm(day) { return day + ' Oct'; }
+
+  // ---- data: every exit event of October ---------------------------------
+  cullB31() {
+    return [
+      ['202148', 'P9', 'Old: parity 9, thin at weaning'],
+      ['203507', 'P7', 'Small litters: 8, 7 and 8 born alive'],
+      ['204012', 'P4', 'Lame twice this year, left front'],
+      ['202936', 'P8', 'Old: parity 8, weak milk'],
+      ['204377', 'P3', 'Weaned only 6 of 11 piglets'],
+      ['203661', 'P5', 'Came back empty after 2 matings'],
+      ['205119', 'P2', 'Poor feet, slow to stand']
+    ];
+  }
+  cullB30() {
+    return [
+      ['201877', 'P10', 'Old: parity 10'],
+      ['203244', 'P6', 'Small litters: 7, 8 and 7 born alive'],
+      ['202490', 'P8', 'Old: parity 8, lame'],
+      ['204586', 'P4', 'Aborted in August'],
+      ['203015', 'P5', 'Weaned only 7 piglets, twice']
+    ];
+  }
+
+  events() {
+    const self = this;
+    const stripOk = { bg: '#E7F4EA', ink: '#1F5534', dot: '#2D7A4B' };
+    const chipDied = { chip: 'Died', bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90' };
+    const group = (id, day, n, room, batch, pen, cause, time, by) => {
+      const noun = n === 1 ? 'weaner' : 'weaners';
+      return {
+        id: id, day: day, reason: 'died', n: n,
+        lead: n + ' ' + noun + ' died', sub: room + ' · Batch ' + batch + ' · ' + cause,
+        rec: Object.assign({
+          hasTitle: true, title: n + ' ' + noun + ' died', identity: self.wdm(day) + ' · ' + room + ', Pen ' + pen,
+          facts: [['Pigs', n + ' ' + noun], ['Where', room + ', Pen ' + pen], ['Cause', cause], ['Reported by', by + ' · ' + time]],
+          events: [[time + ' Reported dead on the phone by ' + by, self.dm(day)], ['Pen ' + pen + ' count lowered by ' + n, self.dm(day)], ['Cause chosen: ' + cause.toLowerCase(), self.dm(day)]]
+        }, chipDied)
+      };
+    };
+    const solo = (id, day, noun, tag, parity, room, pen, batch, cause, time, by, extra) => Object.assign({
+      id: id, day: day, reason: 'died', n: 1, lead: noun, tag: tag, rest: 'died', sub: room + ', Pen ' + pen + (batch ? ' · Batch ' + batch : '') + (cause ? ' · ' + cause : ''),
+      rec: Object.assign({
+        hasTag: true, tag: tag, identity: (parity ? noun + ' · parity ' + parity : noun) + (batch ? ' · Batch ' + batch : '') + ' · ' + room + ', Pen ' + pen,
+        facts: [['Date', self.wdm(day) + ' · ' + time], ['Found by', by], ['Where', room + ', Pen ' + pen], ['Cause', cause || 'Not recorded']],
+        events: [[time + ' Reported dead on the phone by ' + by, self.dm(day)], ['Pen ' + pen + ' count lowered by 1', self.dm(day)], ['Her open findings closed under the death record', self.dm(day)]]
+      }, chipDied)
+    }, extra || {});
+
+    const soldRec = {
+      hasTitle: true, title: '468 weaners sold', chip: 'Sold', bg: '#E7F4EA', ink: '#1F5534', dot: '#2D7A4B',
+      identity: 'Fri 16 Oct · Batch 29 · Nursery 2 to Riverbend Finishing',
+      facts: [['Pigs', '468 weaners'], ['Buyer', 'Riverbend Finishing'], ['Trucks', '2 · 06:30 and 08:30'], ['Withdrawal', 'None under withdrawal'], ['Count at loading', '468 of 468'], ['Movement record', 'Filed Fri 16 Oct · 11:20']],
+      link: 'Open movement record (PDF)',
+      events: [['08:52 Truck 2 left with 233 pigs', '16 Oct'], ['06:30 Truck 1 left with 235 pigs', '16 Oct'], ['Production booked the trucks', '9 Oct']]
+    };
+    const cullRec = (day, batch, list, truck) => ({
+      hasTitle: true, title: list.length + ' sows culled', chip: 'Culled', bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90',
+      identity: self.wdm(day) + ' · After Batch ' + batch + ' weaning · ' + truck,
+      facts: [['Sows', String(list.length)], ['Left', self.wdm(day)], ['Decided by', 'Adam, on a Production list'], ['Movement record', 'Filed ' + self.dm(day)]],
+      tagsTitle: 'The sows', tags: list.map((x) => ({ tag: x[0], parity: x[1], reason: x[2] })),
+      events: [['The sows left on the cull-sow pickup', self.dm(day)], ['Marked "cull" at weaning by Li Wei\'s team', self.dm(day - 3)]]
+    });
+
+    return [
+      group('d29', 29, 2, 'Nursery 1', 30, 14, 'Scours', '08:10', 'Wang Fang'),
+      solo('d28s', 28, 'Sow', '203811', 5, 'Gestation 1', 12, 34, '', '07:40', 'Zhao Min', {
+        flag: 'No cause recorded',
+        rec: Object.assign({
+          hasTag: true, tag: '203811', identity: 'Sow · parity 5 · Batch 34, day 84 · Gestation 1, Pen 12',
+          hasStrip: true, strip: 'No cause recorded. Zhao Min found her dead on the morning walk and did not pick one.', stripBg: '#FFF0D1', stripInk: '#7A4A00', stripDot: '#D99A1E',
+          facts: [['Date', 'Wed 28 Oct · 07:40'], ['Found by', 'Zhao Min'], ['Where', 'Gestation 1, Pen 12'], ['Cause', 'Not recorded']],
+          events: [['07:40 Reported dead on the phone by Zhao Min', '28 Oct'], ['Pen 12 count lowered by 1', '28 Oct'], ['Her finding "off feed" closed under the death record', '28 Oct'], ['Off feed since Monday, noted by Zhao Min', '26 Oct']]
+        }, chipDied)
+      }),
+      {
+        id: 'c28', day: 28, reason: 'culled', n: 7, lead: '7 sows culled', sub: 'After Batch 31 weaning · cull-sow pickup',
+        rec: cullRec(28, 31, this.cullB31(), 'cull-sow pickup')
+      },
+      group('d27', 27, 3, 'Nursery 2', 31, 11, 'Scours', '08:05', 'Wang Fang'),
+      group('d26', 26, 2, 'Nursery 1', 30, 22, 'Fighting injury', '09:30', 'Wang Fang'),
+      group('d23', 23, 4, 'Nursery 1', 30, 7, 'Respiratory', '08:15', 'Wang Fang'),
+      group('d22', 22, 3, 'Nursery 1', 30, 7, 'Respiratory', '08:20', 'Wang Fang'),
+      {
+        id: 'm20', day: 20, reason: 'missing', n: 1, lead: 'Sow', tag: '203918', rest: 'missing', sub: 'Gestation 1 · last seen in Pen 4 · Batch 33', flag: 'Missing',
+        rec: {
+          hasTag: true, tag: '203918', chip: 'Missing', bg: '#FFF0D1', ink: '#7A4A00', dot: '#D99A1E',
+          identity: 'Sow · parity 4 · Batch 33 · Gestation 1, Pen 4',
+          hasStrip: true, hasFound: true, strip: 'Missing since Tue 20 Oct. Zhao Min parked her after the count came up one short. Ten days, not found.', stripBg: '#FFF0D1', stripInk: '#7A4A00', stripDot: '#D99A1E',
+          facts: [['Parked', 'Tue 20 Oct · 16:10'], ['Reported by', 'Zhao Min'], ['Last seen', 'Gestation 1, Pen 4'], ['Counted off', 'Gestation 1 minus 1']],
+          events: [['16:10 Reported missing by Zhao Min', '20 Oct'], ['Pen 4 count lowered by 1, feed follows', '20 Oct'], ['Her records stay open', '20 Oct']]
+        }
+      },
+      solo('d20g', 20, 'Gilt', '205990', 0, 'Quarantine 1', 3, 0, 'Prolapse', '07:55', 'Zhao Min'),
+      group('d19', 19, 4, 'Nursery 1', 30, 7, 'Respiratory', '08:30', 'Wang Fang'),
+      {
+        id: 's16', day: 16, reason: 'sold', n: 468, lead: '468 weaners sold', sub: 'Riverbend Finishing · Batch 29 · 2 trucks',
+        rec: soldRec
+      },
+      group('d15', 15, 4, 'Nursery 2', 29, 18, 'Scours', '08:00', 'Wang Fang'),
+      solo('d13s', 13, 'Sow', '202950', 6, 'Gestation 2', 6, 33, 'Sudden death', '07:35', 'Zhao Min'),
+      group('d9', 9, 5, 'Nursery 2', 29, 18, 'Scours', '08:12', 'Wang Fang'),
+      {
+        id: 'mv6', day: 6, reason: 'moved', n: 18, lead: '18 gilts moved', sub: 'To Brookfield Farm, our sister site · Quarantine 1',
+        rec: {
+          hasTitle: true, title: '18 gilts moved', chip: 'Moved', bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90',
+          identity: 'Tue 6 Oct · Quarantine 1 to Brookfield Farm',
+          facts: [['Pigs', '18 gilts'], ['To', 'Brookfield Farm'], ['Truck', '1 · 07:15'], ['Movement record', 'Filed Tue 6 Oct · 10:05']],
+          link: 'Open movement record (PDF)',
+          events: [['07:15 Truck left with 18 gilts', '6 Oct'], ['Quarantine 1 count lowered by 18', '6 Oct'], ['Production booked the truck', '1 Oct']]
+        }
+      },
+      {
+        id: 'c6', day: 6, reason: 'culled', n: 5, lead: '5 sows culled', sub: 'After Batch 30 weaning · cull-sow pickup',
+        rec: cullRec(6, 30, this.cullB30(), 'cull-sow pickup')
+      },
+      group('d5', 5, 5, 'Nursery 2', 29, 9, 'Scours', '08:20', 'Wang Fang'),
+      group('d2', 2, 3, 'Nursery 2', 29, 9, 'Scours', '08:00', 'Wang Fang'),
+      group('d1', 1, 3, 'Nursery 2', 29, 4, 'Injury', '08:25', 'Wang Fang')
+    ].map((e) => Object.assign({ when: e.day + ' Oct' }, e));
+  }
+
+  cullSows() {
+    return [
+      { tag: '201455', parity: 8, crate: 14, reason: 'Li Wei flagged her. Litters shrinking: 13, 11, 8 born alive' },
+      { tag: '203122', parity: 5, crate: 31, reason: 'Lame twice this year, left hind', wd: true },
+      { tag: '202609', parity: 3, crate: 7, reason: 'Two weak litters: 7 and 8 born alive' },
+      { tag: '204208', parity: 2, crate: 22, reason: 'Weaned only 6 of 12 piglets, weak milk' },
+      { tag: '203890', parity: 7, crate: 40, reason: 'Lost 6 piglets to crushing in days 1–4' },
+      { tag: '205031', parity: 6, crate: 9, reason: 'Li Wei flagged her. Thin, off feed twice' }
+    ];
+  }
+
+  // ---- state -------------------------------------------------------------
+  defaults(start) {
+    const ticks = {};
+    this.cullSows().forEach((x) => { ticks[x.tag] = true; });
+    const base = {
+      view: 'list', filter: 'all', showAll: false, recId: 'd28s', found: false,
+      load: 'proposal', cull: 'proposal', loadVals: {}, loadEdited: {}, keepBack: false, moreOpen: false,
+      ticks: ticks, createsOpen: false
+    };
+    if (start === 'record') return Object.assign(base, { view: 'record', recId: 'd28s' });
+    if (start === 'sold') return Object.assign(base, { view: 'record', recId: 's16' });
+    if (start === 'load') return Object.assign(base, { view: 'plan', plan: 'load' });
+    if (start === 'loaded') return Object.assign(base, { view: 'plan', plan: 'load', load: 'done' });
+    if (start === 'cull') return Object.assign(base, { view: 'plan', plan: 'cull' });
+    if (start === 'culled') return Object.assign(base, { view: 'plan', plan: 'cull', cull: 'done' });
+    return base;
+  }
+
+  getS() {
+    const start = this.props.start || 'list';
+    const st = this.state || {};
+    const d = this.defaults(start);
+    return st.startSeen === start ? Object.assign(d, st) : d;
+  }
+
+  // ---- render --------------------------------------------------------------
+  renderVals() {
+    const start = this.props.start || 'list';
+    const s = this.getS();
+    const set = (p) => this.setState(Object.assign({}, s, p, { startSeen: start }));
+    const I = this.icons();
+    const view = s.view;
+    const TIMES = { load: '08:47', cull: '08:52' };
+    const plural = (n, one, many) => n + ' ' + (n === 1 ? one : many);
+
+    // ---- list ------------------------------------------------------------
+    const all = this.events().filter((e) => !(e.reason === 'missing' && s.found));
+    const sum = (arr) => arr.reduce((a, e) => a + e.n, 0);
+    const counts = { all: sum(all) };
+    ['sold', 'died', 'culled', 'moved', 'missing'].forEach((k) => { counts[k] = sum(all.filter((e) => e.reason === k)); });
+    const segDefs = [['all', 'All'], ['sold', 'Sold'], ['died', 'Died'], ['culled', 'Culled'], ['moved', 'Moved'], ['missing', 'Missing']].filter((g) => g[0] === 'all' || counts[g[0]] > 0);
+    const filter = counts[s.filter] > 0 ? s.filter : 'all';
+    const segs = segDefs.map((g) => {
+      const on = filter === g[0];
+      return {
+        label: g[1], count: String(counts[g[0]]), on: on,
+        bg: on ? '#F0F2EE' : 'transparent', ink: '#121815', weight: on ? 600 : 500, countInk: on ? '#3B4540' : '#626C66',
+        pick: () => set({ filter: g[0], showAll: false })
+      };
+    });
+    const shown = all.filter((e) => filter === 'all' || e.reason === filter);
+    const LIMIT = 8;
+    const visible = s.showAll ? shown : shown.slice(0, LIMIT);
+    const rows = visible.map((e, i) => ({
+      lead: e.lead, hasTag: !!e.tag, tag: e.tag || '', hasRest: !!e.rest, rest: e.rest || '',
+      sub: e.sub, hasFlag: !!e.flag, flag: e.flag || '', when: e.when,
+      top: i === 0 ? '0' : '1px solid #EFF1EC',
+      open: () => set({ view: 'record', recId: e.id })
+    }));
+    const hidden = shown.length - LIMIT;
+
+    const planDefs = [
+      { k: 'load', title: 'Load out Batch 30 · Wed 11 Nov', why: '470 weaners to Riverbend Finishing, 2 trucks. No pig under withdrawal.', whyDone: '2 trucks, ' + (s.keepBack ? 468 : 470) + ' weaners to Riverbend Finishing' },
+      { k: 'cull', title: 'Cull 6 sows at Batch 32 weaning', why: 'Weaning Fri 13 Nov · 6 of 50 sows · age, small litters, feet', whyDone: this.cullCount(s) + ' sows marked · pickup Mon 16 Nov' }
+    ];
+    let waiting = 0;
+    const plans = planDefs.map((p, i) => {
+      const st = s[p.k];
+      if (st === 'proposal') waiting += 1;
+      const chip = st === 'done' ? { l: 'Scheduled', bg: '#E7F4EA', ink: '#1F5534', dot: '#2D7A4B' } : st === 'rejected' ? { l: 'Discarded', bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90' } : null;
+      return {
+        title: p.title, why: st === 'done' ? p.whyDone : p.why,
+        hasChip: !!chip, chip: chip ? chip.l : '', chipBg: chip ? chip.bg : '', chipInk: chip ? chip.ink : '', chipDot: chip ? chip.dot : '',
+        bg: st === 'proposal' ? '#F5FAF2' : '#FFFFFF',
+        top: i === 0 ? '0' : (st === 'proposal' ? '1px solid #D5E7CF' : '1px solid #EFF1EC'),
+        open: () => set({ view: 'plan', plan: p.k, createsOpen: false })
+      };
+    });
+    const lead = counts.all + ' pigs left in October.' + (waiting === 0 ? '' : ' ' + plural(waiting, 'plan waits', 'plans wait') + ' for you.');
+
+    // ---- record ------------------------------------------------------------
+    const ev = this.events().filter((e) => e.id === s.recId)[0] || this.events()[1];
+    const r0 = ev.rec;
+    const isFoundNow = ev.reason === 'missing' && s.found;
+    const rec = {
+      hasTag: !!r0.hasTag, tag: r0.tag || '', hasTitle: !!r0.hasTitle, title: r0.title || '',
+      chip: isFoundNow ? 'Back on the farm' : r0.chip, chipBg: isFoundNow ? '#E7F4EA' : r0.bg, chipInk: isFoundNow ? '#1F5534' : r0.ink, chipDot: isFoundNow ? '#2D7A4B' : r0.dot,
+      identity: r0.identity,
+      hasStrip: !!r0.hasStrip || isFoundNow,
+      strip: isFoundNow ? '203918 is back in Gestation 1, Pen 4. The counts are right again.' : (r0.strip || ''),
+      stripBg: isFoundNow ? '#E7F4EA' : r0.stripBg, stripInk: isFoundNow ? '#1F5534' : r0.stripInk, stripDot: isFoundNow ? '#2D7A4B' : r0.stripDot,
+      hasFound: !!r0.hasFound && !isFoundNow,
+      facts: r0.facts.map((f) => ({ label: f[0], value: f[1], ink: (f[0] === 'Cause' && f[1] === 'Not recorded') ? '#7A4A00' : '#121815' })),
+      hasTags: !!r0.tags, tagsTitle: r0.tagsTitle || '', tags: r0.tags || [],
+      hasLink: !!r0.link, link: r0.link || '',
+      events: (isFoundNow ? [['Found by Zhao Min and put back in Pen 4', '30 Oct']] : []).concat(r0.events).slice(0, 4).map((e) => ({ text: e[0], date: e[1] }))
+    };
+
+    // ---- plans -------------------------------------------------------------
+    const plan = this.buildPlan(s, set, I, TIMES, plural);
+
+    // ---- save bar ------------------------------------------------------------
+    const planKey = s.plan || 'load';
+    const live = view === 'plan' && s[planKey] === 'proposal';
+    const foot = {
+      summary: plan.summary, label: plan.primary, off: plan.primaryOff, opacity: plan.primaryOff ? 0.45 : 1,
+      go: () => set({ [planKey]: 'done' }),
+      discard: () => set({ [planKey]: 'rejected' })
+    };
+
+    return {
+      ic: I,
+      v: { list: view === 'list', record: view === 'record', plan: view === 'plan' },
+      lead: lead, plans: plans, plansBorder: waiting > 0 ? '#D5E7CF' : '#E8EBE5',
+      segs: segs, rows: rows,
+      hasMore: shown.length > LIMIT, moreLabel: s.showAll ? 'Show fewer' : 'Show ' + hidden + ' earlier',
+      toggleAll: () => set({ showAll: !s.showAll }),
+      showPiglets: filter === 'all' || filter === 'died',
+      rec: rec, markFound: () => set({ found: true }),
+      backToList: () => set({ view: 'list' }),
+      plan: plan,
+      toggleMore: () => set({ moreOpen: !s.moreOpen }),
+      showFoot: live, foot: foot
+    };
+  }
+
+  cullCount(s) {
+    return this.cullSows().filter((x) => s.ticks[x.tag]).length;
+  }
+
+  buildPlan(s, set, I, TIMES, plural) {
+    const key = s.plan || 'load';
+    const st = s[key];
+    const common = {
+      isDone: st === 'done', isRejected: st === 'rejected', live: st === 'proposal',
+      time: TIMES[key],
+      rejectedText: 'Discarded. Nothing was ' + (key === 'load' ? 'booked.' : 'marked.'),
+      bringBack: () => set({ [key]: 'proposal' }),
+      undo: () => set({ [key]: 'proposal' }),
+      createsOpen: !!s.createsOpen, createsRot: s.createsOpen ? 'rotate(180deg)' : 'none',
+      toggleCreates: () => set({ createsOpen: !s.createsOpen })
+    };
+    return key === 'load' ? this.loadPlan(s, set, I, common, plural) : this.cullPlan(s, set, I, common, plural);
+  }
+
+  mkCreates(items) {
+    return items.map((c, i) => ({
+      date: c.date, time: c.time || '', hasTime: !!c.time, text: c.text, who: c.who || '',
+      hasLine: i < items.length - 1, pad: i < items.length - 1 ? 18 : 0,
+      dotBg: c.last ? '#FFFFFF' : '#121815', dotBorder: '#121815'
+    }));
+  }
+
+  loadPlan(s, set, I, common, plural) {
+    const keep = s.keepBack;
+    const total = keep ? 468 : 470;
+    const n2 = total - 235;
+    const MONO = "'Geist Mono', ui-monospace, monospace";
+    const defs = [
+      { k: 'pigs', label: 'Pigs', orig: 'Batch 30 · 470 weaners', def: 'Batch 30 · ' + total + ' weaners', font: 'inherit' },
+      { k: 'from', label: 'Leave from', orig: 'Nursery 1 · Pens 1–36', def: 'Nursery 1 · Pens 1–36', font: 'inherit' },
+      { k: 'buyer', label: 'Buyer', orig: 'Riverbend Finishing', def: 'Riverbend Finishing', font: 'inherit' },
+      { k: 'day', label: 'Day', orig: 'Wed 11 Nov', def: 'Wed 11 Nov', font: MONO },
+      { k: 't1', label: 'Truck 1 · 235 pigs', orig: '06:30', def: '06:30', font: MONO },
+      { k: 't2', label: 'Truck 2 · ' + n2 + ' pigs', orig: '08:30', def: '08:30', font: MONO }
+    ];
+    const cur = (d) => (s.loadEdited[d.k] ? s.loadVals[d.k] : d.def);
+    const val = (k) => cur(defs.filter((x) => x.k === k)[0]);
+    const mk = (d) => ({
+      id: 'ld-' + d.k, label: d.label, value: cur(d), font: d.font, changed: cur(d) !== d.orig, was: d.orig,
+      change: (e) => set({ loadVals: Object.assign({}, s.loadVals, { [d.k]: e.target.value }), loadEdited: Object.assign({}, s.loadEdited, { [d.k]: true }) })
+    });
+    const all = defs.map(mk);
+    const changes = all.filter((f) => f.changed).length;
+    const done = common.isDone;
+    const creates = this.mkCreates([
+      { date: 'Tue 10 Nov', time: '18:00', text: 'Feed stops in Nursery 1', who: "Wang Fang's team" },
+      { date: val('day'), time: val('t1'), text: 'Truck 1 loads 235 pigs from Pens 1–18', who: "Wang Fang's team" },
+      { date: val('day'), time: val('t2'), text: 'Truck 2 loads ' + n2 + ' pigs from Pens 19–36', who: "Wang Fang's team" },
+      { date: val('day'), text: 'Once loaded, the movement record for ' + total + ' pigs is filed', who: 'General Manager' },
+      { date: val('day'), text: 'Batch 30 ends. It goes in the report.', who: '', last: true }
+    ]);
+    return Object.assign({}, common, {
+      title: 'Load out Batch 30 · ' + val('day'),
+      sentence: 'Books 2 trucks and drafts the movement record. ' + total + ' weaners go to ' + val('buyer') + '.',
+      showFields: common.live, fields1: all.slice(0, 2), fields2: all.slice(2),
+      note: keep ? '2 weaners in Pen 22 stay behind. Wang Fang re-checks them Mon 16 Nov.' : '2 weaners in Pen 22 are watched for cough.',
+      noteDot: keep ? '#8E9C90' : '#D99A1E',
+      noteFixLabel: keep ? 'Load them' : 'Keep them back',
+      noteFix: () => set({ keepBack: !keep, loadEdited: Object.assign({}, s.loadEdited, { pigs: false }) }),
+      moreOpen: s.moreOpen, moreRot: s.moreOpen ? 'rotate(180deg)' : 'none',
+      moreRows: [{ label: 'Haulier', value: 'Dalton Livestock Transport' }, { label: 'Feed stop', value: 'Tue 10 Nov, 18:00, after the evening feed' }, { label: 'Team told', value: "Wang Fang's team, on their phones" }],
+      showFacts: done, facts: defs.map((d) => ({ label: d.label, value: cur(d), font: d.font })),
+      showSows: false, sows: [],
+      showCreates: !common.isRejected, createsTitle: done ? 'See what was set up' : 'See what this sets up', noCreates: false, creates: creates,
+      primary: 'Book 2 trucks for ' + val('day'), primaryOff: false,
+      summary: (changes ? changes + (changes === 1 ? ' change · ' : ' changes · ') : '') + total + ' pigs · 2 trucks',
+      receipt1: '2 trucks booked for ' + val('day') + ', ' + total + ' pigs'
+    });
+  }
+
+  cullPlan(s, set, I, common, plural) {
+    const sows = this.cullSows();
+    const n = this.cullCount(s);
+    const wdOn = !!s.ticks['203122'];
+    const nNow = n - (wdOn ? 1 : 0);
+    const off = sows.length - n;
+    const done = common.isDone;
+    const rows = sows.filter((x) => !done || s.ticks[x.tag]).map((x, i) => {
+      const on = !!s.ticks[x.tag];
+      const toggle = () => set({ ticks: Object.assign({}, s.ticks, { [x.tag]: !on }) });
+      return {
+        cid: 'cl-' + x.tag, tag: x.tag, meta: 'Sow · P' + x.parity + ' · Room 2, Crate ' + x.crate, reason: x.reason,
+        top: i === 0 ? '0' : '1px solid #EFF1EC', editable: common.live, ticked: on, opacity: on ? 1 : 0.55,
+        hasNote: !!x.wd, note: on ? 'Under withdrawal until Tue 17 Nov. She leaves Mon 30 Nov.' : 'Under withdrawal until Tue 17 Nov.',
+        hasFix: common.live, fix: on ? 'Take her off the list' : 'Cull her on Mon 30 Nov',
+        hasOff: !on && common.live,
+        toggle: toggle
+      };
+    });
+    const items = [];
+    if (n > 0) items.push({ date: 'Fri 13 Nov', text: n + ' sows marked "cull" on the weaning task', who: "Li Wei's team" });
+    if (nNow > 0) items.push({ date: 'Mon 16 Nov', text: plural(nNow, 'sow leaves', 'sows leave') + ' on the cull-sow pickup. Record drafted.', who: 'General Manager' });
+    if (wdOn) items.push({ date: 'Mon 30 Nov', text: '203122 leaves on the next pickup', who: 'General Manager' });
+    if (items.length) items[items.length - 1].last = true;
+    const parts = [];
+    if (nNow > 0) parts.push(nNow + (nNow === 1 ? ' leaves' : ' leave') + ' on the Mon 16 Nov pickup');
+    if (wdOn) parts.push('203122 leaves on Mon 30 Nov, after her withdrawal');
+    return Object.assign({}, common, {
+      title: 'Cull ' + plural(n, 'sow', 'sows') + ' at Batch 32 weaning',
+      sentence: n === 0 ? 'Nothing is ticked, so no sow is marked to cull.' : 'Marks ' + plural(n, 'sow', 'sows') + ' to cull at weaning on Fri 13 Nov. ' + parts.join('; ') + '.',
+      showFields: false, fields1: [], fields2: [], moreOpen: false, moreRot: 'none', moreRows: [],
+      showFacts: false, facts: [],
+      showSows: !common.isRejected, sows: rows,
+      showCreates: !common.isRejected, createsTitle: done ? 'See what was set up' : 'See what this sets up', noCreates: items.length === 0, creates: this.mkCreates(items),
+      primary: n === 0 ? 'Tick at least one sow' : 'Cull ' + plural(n, 'sow', 'sows') + ' at weaning', primaryOff: n === 0,
+      summary: (off ? off + (off === 1 ? ' change · ' : ' changes · ') : '') + plural(n, 'sow', 'sows') + (nNow > 0 ? ' · ' + nNow + ' leave Mon 16 Nov' : ''),
+      receipt1: plural(n, 'sow', 'sows') + ' marked to cull'
+    });
+  }
+}
+</script>
+</body>
+</html>

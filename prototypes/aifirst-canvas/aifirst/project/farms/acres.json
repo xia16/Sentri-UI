@@ -1,0 +1,410 @@
+{
+ "version": 1,
+ "types": [
+  {
+   "id": "crate",
+   "name": "Farrowing crate",
+   "uses": [
+    "Farrowing"
+   ],
+   "perPen": {
+    "Farrowing": 1
+   },
+   "w": 180,
+   "l": 260,
+   "color": 0
+  }
+ ],
+ "zones": [
+  {
+   "id": "island-acres",
+   "name": "Island Acres",
+   "code": "Z1"
+  }
+ ],
+ "sections": [
+  {
+   "id": "farrowing-house",
+   "name": "Farrowing house",
+   "code": "FAR",
+   "zone": "island-acres"
+  }
+ ],
+ "rooms": [
+  {
+   "id": "farrowing-1",
+   "name": "Farrowing 1",
+   "section": "farrowing-house",
+   "num": 1,
+   "at": {
+    "x": 0,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 222
+   }
+  },
+  {
+   "id": "farrowing-2",
+   "name": "Farrowing 2",
+   "section": "farrowing-house",
+   "num": 2,
+   "at": {
+    "x": 792,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 222
+   }
+  },
+  {
+   "id": "farrowing-3",
+   "name": "Farrowing 3",
+   "section": "farrowing-house",
+   "num": 3,
+   "at": {
+    "x": 1584,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 222
+   }
+  },
+  {
+   "id": "farrowing-4",
+   "name": "Farrowing 4",
+   "section": "farrowing-house",
+   "num": 4,
+   "at": {
+    "x": 2376,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 222
+   }
+  },
+  {
+   "id": "farrowing-5",
+   "name": "Farrowing 5",
+   "section": "farrowing-house",
+   "num": 5,
+   "at": {
+    "x": 3168,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 222
+   }
+  },
+  {
+   "id": "farrowing-6",
+   "name": "Farrowing 6",
+   "section": "farrowing-house",
+   "num": 6,
+   "at": {
+    "x": 3960,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 222
+   }
+  },
+  {
+   "id": "farrowing-7",
+   "name": "Farrowing 7",
+   "section": "farrowing-house",
+   "num": 7,
+   "at": {
+    "x": 4752,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 222
+   }
+  },
+  {
+   "id": "farrowing-8",
+   "name": "Farrowing 8",
+   "section": "farrowing-house",
+   "num": 8,
+   "at": {
+    "x": 5544,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 222
+   }
+  },
+  {
+   "id": "farrowing-9",
+   "name": "Farrowing 9",
+   "section": "farrowing-house",
+   "num": 9,
+   "at": {
+    "x": 6336,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 222
+   }
+  },
+  {
+   "id": "farrowing-10",
+   "name": "Farrowing 10",
+   "section": "farrowing-house",
+   "num": 10,
+   "at": {
+    "x": 7128,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 222
+   }
+  },
+  {
+   "id": "farrowing-11",
+   "name": "Farrowing 11",
+   "section": "farrowing-house",
+   "num": 11,
+   "at": {
+    "x": 7920,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "crate",
+       "n": 20
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 222
+   }
+  }
+ ],
+ "name": "Island Acres"
+}

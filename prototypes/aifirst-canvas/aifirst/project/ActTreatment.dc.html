@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Treatment orders</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 900px; display: flex; flex-direction: column">
+<div style="flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+<!-- ============================ LIST ============================ -->
+<sc-if value="{{v.list}}" hint-placeholder-val="{{true}}">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Treatment orders</h1>
+  <div style="margin-top: 6px; font-size: 14px; color: #3B4540">{{list.sentence}}</div>
+
+  <sc-if value="{{list.hasNeeds}}" hint-placeholder-val="{{true}}">
+    <div style="display: flex; align-items: baseline; gap: 8px; margin: 28px 0 10px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Needs an order</h2>
+      <span style="font-size: 12.5px; color: #626C66">{{list.needsCount}}</span>
+    </div>
+    <div style="border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{needs}}" as="r" hint-placeholder-count="3">
+        <div style="display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; align-items: center; gap: 14px; box-sizing: border-box; padding: 13px 18px; border-top: {{r.top}}">
+          <span style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 0.01em">
+            <span aria-hidden="true" style="width: 7px; height: 7px; border-radius: 999px; background: {{r.dot}}"></span>{{r.tag}}
+          </span>
+          <span style="display: flex; flex-direction: column; min-width: 0">
+            <span style="font-size: 14px; font-weight: 500; color: #121815">{{r.finding}}</span>
+            <span style="font-size: 12.5px; color: #626C66">{{r.where}}</span>
+          </span>
+          <button type="button" onClick="{{r.open}}" style="height: 32px; padding: 0 13px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer; white-space: nowrap">New order</button>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{list.hasRuns}}" hint-placeholder-val="{{true}}">
+    <div style="display: flex; align-items: baseline; gap: 8px; margin: 28px 0 10px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Running</h2>
+      <span style="font-size: 12.5px; color: #626C66">{{list.runsCount}}</span>
+    </div>
+    <div style="border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{runs}}" as="r" hint-placeholder-count="2">
+        <button type="button" onClick="{{r.open}}" style="display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; align-items: center; gap: 14px; width: 100%; box-sizing: border-box; padding: 13px 18px; border: 0; border-top: {{r.top}}; background: transparent; text-align: left; font: inherit; color: inherit; cursor: pointer">
+          <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 0.01em">{{r.tag}}</span>
+          <span style="display: flex; flex-direction: column; min-width: 0">
+            <span style="font-size: 14px; font-weight: 500; color: #121815">{{r.meds}}</span>
+            <span style="font-size: 12.5px; color: #626C66">{{r.sub}}</span>
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 500; white-space: nowrap; background: {{r.chipBg}}; color: {{r.chipInk}}">
+            <sc-if value="{{r.hasDot}}" hint-placeholder-val="{{true}}">
+              <span style="width: 6px; height: 6px; border-radius: 999px; background: {{r.chipDot}}"></span>
+            </sc-if>
+            {{r.chip}}
+          </span>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{list.hasEnded}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: baseline; gap: 8px; margin: 28px 0 10px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Ended today</h2>
+      <span style="font-size: 12.5px; color: #626C66">{{list.endedCount}}</span>
+    </div>
+    <div style="border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{endedRows}}" as="r" hint-placeholder-count="1">
+        <button type="button" onClick="{{r.open}}" style="display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; align-items: center; gap: 14px; width: 100%; box-sizing: border-box; padding: 13px 18px; border: 0; border-top: {{r.top}}; background: transparent; text-align: left; font: inherit; color: inherit; cursor: pointer">
+          <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 0.01em; color: #626C66">{{r.tag}}</span>
+          <span style="display: flex; flex-direction: column; min-width: 0">
+            <span style="font-size: 14px; font-weight: 500; color: #3B4540">{{r.meds}}</span>
+            <span style="font-size: 12.5px; color: #626C66">{{r.sub}}</span>
+          </span>
+          <span style="display: inline-flex; align-items: center; height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 500; white-space: nowrap; background: #F0F2EE; color: #3B4540">Ended early</span>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <div style="margin-top: 22px; border-top: 1px solid #EFF1EC">
+    <button type="button" aria-expanded="{{monOpen}}" onClick="{{toggleMon}}" style="display: flex; align-items: center; gap: 10px; width: 100%; min-height: 52px; padding: 0; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer">
+      <span style="font-size: 15px; font-weight: 600; color: #121815">Monitoring</span>
+      <span style="font-size: 12.5px; color: #626C66">12 pigs, none need an order today</span>
+      <span style="flex: 1"></span>
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{monRot}}"><path d="{{ic.chevDown}}"></path></svg>
+    </button>
+    <sc-if value="{{monOpen}}" hint-placeholder-val="{{false}}">
+      <div style="border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF">
+        <sc-for list="{{mons}}" as="m" hint-placeholder-count="4">
+          <div style="display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 11px 18px; border-top: {{m.top}}">
+            <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 0.01em">{{m.tag}}</span>
+            <span style="font-size: 13.5px; color: #3B4540">{{m.where}}</span>
+            <span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 500; white-space: nowrap; background: #FFF0D1; color: #7A4A00">
+              <span style="width: 6px; height: 6px; border-radius: 999px; background: #D99A1E"></span>{{m.chip}}
+            </span>
+          </div>
+        </sc-for>
+      </div>
+      <button type="button" style="display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; height: 32px; padding: 0 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+        8 more in Pigs
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.arrowRight}}"></path></svg>
+      </button>
+    </sc-if>
+  </div>
+
+</sc-if>
+
+<!-- ============================ ORDER RECORD ============================ -->
+<sc-if value="{{v.order}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToList}}" style="display: inline-flex; align-items: center; gap: 3px; margin: 0 0 14px -4px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevLeft}}"></path></svg>
+    Treatment orders
+  </button>
+
+  <sc-if value="{{rec.hasReceipt}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 20px; padding: 12px 10px 12px 16px; border-radius: 14px; background: #E7F4EA; border: 1px solid #CFE8D6; color: #1F5534; animation: sentriRise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both">
+      <span style="width: 20px; height: 20px; margin-top: 2px; border-radius: 999px; background: #2D7A4B; color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      </span>
+      <span style="flex: 1; min-width: 0; font-size: 14px; font-weight: 600">Saved <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px">{{rec.receiptTime}}</span> · {{rec.receiptLine}}</span>
+      <button type="button" onClick="{{undoReceipt}}" style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 11px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.75); font: inherit; font-size: 13px; font-weight: 500; color: #1F5534; cursor: pointer; flex-shrink: 0">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.undo}}"></path></svg>
+        Undo
+      </button>
+    </div>
+  </sc-if>
+
+  <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+    <h1 style="margin: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 26px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.2">{{rec.tag}}</h1>
+    <span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: {{rec.chipBg}}; color: {{rec.chipInk}}">
+      <span style="width: 6px; height: 6px; border-radius: 999px; background: {{rec.chipDot}}"></span>
+      {{rec.chip}}
+    </span>
+  </div>
+  <div style="margin-top: 6px; font-size: 14px; color: #3B4540">{{rec.identity}}</div>
+  <sc-if value="{{rec.isEnded}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 2px; font-size: 13px; color: #626C66">{{rec.endedLine}}</div>
+  </sc-if>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 32px; margin-top: 26px">
+    <sc-for list="{{rec.facts}}" as="f" hint-placeholder-count="4">
+      <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+        <span style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</span>
+        <span style="font-size: 14.5px; font-weight: 500; color: #121815">{{f.value}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <h2 style="margin: 30px 0 4px; font-size: 15px; font-weight: 600">What is given</h2>
+  <div>
+    <sc-for list="{{rec.lines}}" as="l" hint-placeholder-count="2">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid #EFF1EC">
+        <div style="display: flex; flex-direction: column; min-width: 0">
+          <span style="font-size: 14.5px; font-weight: 500">{{l.med}}</span>
+          <span style="font-size: 13px; color: #626C66">{{l.dose}}</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0">
+          <span style="font-size: 14px; color: #1E2622">{{l.days}}</span>
+          <span style="font-size: 12.5px; color: #626C66">{{l.wd}}</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 26px 0 4px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">Doses</h2>
+    <span style="font-size: 13px; color: #3B4540">{{rec.doseHead}}</span>
+  </div>
+  <div style="font-size: 12.5px; color: #626C66; margin-bottom: 4px">{{rec.doseSub}}</div>
+  <div>
+    <sc-for list="{{rec.doses}}" as="d" hint-placeholder-count="5">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #EFF1EC">
+        <span style="width: 20px; flex-shrink: 0; display: flex; justify-content: center">
+          <sc-if value="{{d.isGiven}}" hint-placeholder-val="{{true}}">
+            <span style="width: 18px; height: 18px; border-radius: 999px; background: #2D7A4B; display: flex; align-items: center; justify-content: center">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 11px; height: 11px; fill: none; stroke: #FFFFFF; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+            </span>
+          </sc-if>
+          <sc-if value="{{d.isToday}}" hint-placeholder-val="{{false}}">
+            <span style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 999px; border: 2px solid #121815; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><span style="width: 6px; height: 6px; border-radius: 999px; background: #121815"></span></span>
+          </sc-if>
+          <sc-if value="{{d.isMissing}}" hint-placeholder-val="{{false}}">
+            <span style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 999px; border: 2px solid #D99A1E; background: #FFF0D1; display: flex; align-items: center; justify-content: center"><span style="width: 6px; height: 6px; border-radius: 999px; background: #D99A1E"></span></span>
+          </sc-if>
+          <sc-if value="{{d.isLater}}" hint-placeholder-val="{{false}}">
+            <span style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 999px; border: 2px solid #DADED6; background: #FFFFFF"></span>
+          </sc-if>
+          <sc-if value="{{d.isRemoved}}" hint-placeholder-val="{{false}}">
+            <span style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 999px; border: 2px solid #E2E5DF; background: #F6F7F4; display: flex; align-items: center; justify-content: center">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 9px; height: 9px; fill: none; stroke: #8E9C90; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.x}}"></path></svg>
+            </span>
+          </sc-if>
+        </span>
+        <span style="width: 88px; flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: {{d.dateInk}}">{{d.date}}</span>
+        <span style="flex: 1; min-width: 0; font-size: 14px; color: {{d.textInk}}">{{d.text}}</span>
+        <span style="font-size: 12.5px; font-weight: {{d.statusWeight}}; color: {{d.statusInk}}; white-space: nowrap">{{d.status}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{rec.canEnd}}" hint-placeholder-val="{{true}}">
+    <div style="margin-top: 26px; padding-top: 18px; border-top: 1px solid #EFF1EC; display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+      <button type="button" onClick="{{goEnd}}" style="height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; color: #9A2C17; cursor: pointer">End order early…</button>
+      <span style="flex: 1; min-width: 0; font-size: 12.5px; color: #626C66">{{rec.endEffect}}</span>
+    </div>
+  </sc-if>
+</sc-if>
+
+<!-- ============================ PROPOSAL ============================ -->
+<sc-if value="{{v.proposal}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToList}}" style="display: inline-flex; align-items: center; gap: 3px; margin: 0 0 14px -4px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevLeft}}"></path></svg>
+    Treatment orders
+  </button>
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Health › Treatment orders</span>
+    <h1 style="margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -0.025em">Treatment for <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 500; letter-spacing: -0.02em">{{pr.tag}}</span></h1>
+    <div style="font-size: 14px; color: #3B4540">{{pr.identity}}</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 16px; margin-top: 24px">
+    <sc-for list="{{pr.fields}}" as="f" hint-placeholder-count="4">
+      <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+        <div style="display: flex; align-items: center; gap: 8px; min-height: 20px">
+          <label for="{{f.id}}" style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</label>
+          <sc-if value="{{f.changed}}" hint-placeholder-val="{{false}}">
+            <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #121815"></span>
+            <span style="font-size: 12px; color: #626C66; text-decoration: line-through">{{f.old}}</span>
+          </sc-if>
+        </div>
+        <sc-if value="{{f.isInput}}" hint-placeholder-val="{{true}}">
+          <input id="{{f.id}}" value="{{f.value}}" onChange="{{f.change}}" placeholder="{{f.ph}}" style="height: 42px; box-sizing: border-box; width: 100%; border: 1px solid #E2E5DF; background: #FFFFFF; border-radius: 11px; padding: 0 13px; font: inherit; font-size: 14px; color: #121815; outline: none">
+        </sc-if>
+        <sc-if value="{{f.isStatic}}" hint-placeholder-val="{{false}}">
+          <span style="display: flex; align-items: center; height: 42px; box-sizing: border-box; width: 100%; border: 1px solid #EFF1EC; background: #F6F7F4; border-radius: 11px; padding: 0 13px; font-size: 14px; color: #3B4540">{{f.value}}</span>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="margin-top: 26px">
+    <div style="font-size: 12px; font-weight: 500; color: #626C66; margin-bottom: 8px">What is given</div>
+    <div style="display: grid; grid-template-columns: 142px minmax(0, 1fr) 74px; gap: 4px 10px; margin-bottom: 4px">
+      <span style="font-size: 12px; color: #626C66">Medicine</span>
+      <span style="font-size: 12px; color: #626C66">Dose</span>
+      <span style="font-size: 12px; color: #626C66">Days</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 18px">
+      <sc-for list="{{pr.lineRows}}" as="l" hint-placeholder-count="2">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="display: grid; grid-template-columns: 142px minmax(0, 1fr) 74px; gap: 10px">
+            <input aria-label="{{l.aMed}}" value="{{l.med}}" onChange="{{l.changeMed}}" placeholder="Medicine" style="height: 42px; box-sizing: border-box; width: 100%; border: 1px solid #E2E5DF; background: #FFFFFF; border-radius: 11px; padding: 0 13px; font: inherit; font-size: 14px; color: #121815; outline: none">
+            <input aria-label="{{l.aDose}}" value="{{l.dose}}" onChange="{{l.changeDose}}" placeholder="Dose, for example 5 ml, once a day" style="height: 42px; box-sizing: border-box; width: 100%; border: 1px solid #E2E5DF; background: #FFFFFF; border-radius: 11px; padding: 0 13px; font: inherit; font-size: 14px; color: #121815; outline: none">
+            <input aria-label="{{l.aDays}}" value="{{l.days}}" onChange="{{l.changeDays}}" placeholder="0" style="height: 42px; box-sizing: border-box; width: 100%; border: 1px solid #E2E5DF; background: #FFFFFF; border-radius: 11px; padding: 0 13px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; color: #121815; outline: none">
+          </div>
+          <sc-if value="{{l.hasChanges}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; flex-wrap: wrap; gap: 4px 16px; padding-left: 2px">
+              <sc-for list="{{l.changes}}" as="ch" hint-placeholder-count="1">
+                <span style="display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: #3B4540">
+                  <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #121815"></span>
+                  {{ch.label}} <span style="color: #626C66; text-decoration: line-through">{{ch.old}}</span> {{ch.now}}
+                </span>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{l.hasChecks}}" hint-placeholder-val="{{true}}">
+            <div style="display: flex; flex-direction: column; gap: 5px; padding-left: 2px">
+              <sc-for list="{{l.checks}}" as="c" hint-placeholder-count="3">
+                <div style="display: flex; align-items: center; gap: 9px; min-height: 28px; font-size: 13px; color: {{c.ink}}">
+                  <span aria-hidden="true" style="width: 16px; height: 16px; border-radius: 50%; background: {{c.iconBg}}; color: {{c.iconInk}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; font-weight: 700">
+                    <sc-if value="{{c.ok}}" hint-placeholder-val="{{true}}">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+                    </sc-if>
+                    <sc-if value="{{c.warn}}" hint-placeholder-val="{{false}}">!</sc-if>
+                  </span>
+                  <span style="flex: 1; min-width: 0">{{c.text}}</span>
+                  <sc-if value="{{c.hasFix}}" hint-placeholder-val="{{false}}">
+                    <button type="button" onClick="{{c.fix}}" style="height: 28px; padding: 0 11px; border: 1px solid #DADED6; border-radius: 9px; background: #FFFFFF; font: inherit; font-size: 12.5px; font-weight: 500; color: #121815; cursor: pointer; white-space: nowrap; flex-shrink: 0">{{c.fixLabel}}</button>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; padding-top: 6px; border-top: 1px solid #EFF1EC">
+    <button type="button" onClick="{{toggleSee}}" aria-expanded="{{pr.see}}" style="display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; padding: 8px 0; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+      {{pr.seeLabel}}
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{pr.seeRot}}"><path d="{{ic.chevDown}}"></path></svg>
+    </button>
+    <button type="button" onClick="{{toggleMore}}" aria-expanded="{{pr.more}}" style="display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; padding: 8px 0 8px 8px; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+      More options
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{pr.moreRot}}"><path d="{{ic.chevDown}}"></path></svg>
+    </button>
+  </div>
+  <sc-if value="{{pr.see}}" hint-placeholder-val="{{false}}">
+    <ol style="list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column">
+      <sc-for list="{{pr.created}}" as="c" hint-placeholder-count="4">
+        <li style="display: flex; gap: 14px; align-items: stretch">
+          <div style="width: 12px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center">
+            <span aria-hidden="true" style="width: 10px; height: 10px; box-sizing: border-box; border-radius: 50%; margin-top: 6px; border: 2px solid #121815; background: {{c.dotBg}}"></span>
+            <sc-if value="{{c.hasLine}}" hint-placeholder-val="{{true}}">
+              <span aria-hidden="true" style="flex: 1; width: 2px; margin: 3px 0 0; border-radius: 2px; background: #E2E5DF"></span>
+            </sc-if>
+          </div>
+          <div style="flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 14px; padding-bottom: {{c.pad}}px; line-height: 22px">
+            <span style="width: 112px; flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66">{{c.date}}</span>
+            <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">{{c.text}}</span>
+            <span style="font-size: 12.5px; color: #626C66; text-align: right">{{c.who}}</span>
+          </div>
+        </li>
+      </sc-for>
+    </ol>
+  </sc-if>
+  <sc-if value="{{pr.more}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; flex-direction: column; margin-top: 4px; border-top: 1px solid #EFF1EC">
+      <sc-for list="{{pr.moreRows}}" as="m" hint-placeholder-count="3">
+        <div style="display: flex; gap: 16px; padding: 10px 0; border-bottom: 1px solid #EFF1EC; font-size: 14px">
+          <span style="width: 170px; flex-shrink: 0; font-size: 13px; color: #626C66">{{m.label}}</span>
+          <span style="flex: 1; min-width: 0; color: #1E2622">{{m.value}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+</sc-if>
+
+<!-- ============================ END EARLY ============================ -->
+<sc-if value="{{v.end}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToOrder}}" style="display: inline-flex; align-items: center; gap: 3px; margin: 0 0 14px -4px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevLeft}}"></path></svg>
+    <span style="font-family: 'Geist Mono', ui-monospace, monospace">{{en.tag}}</span>
+  </button>
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Health › Treatment orders</span>
+    <h1 style="margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -0.025em">End order early</h1>
+    <div style="font-size: 14px; color: #3B4540">{{en.identity}}</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 26px">
+    <div style="display: flex; align-items: center; gap: 8px">
+      <span style="font-size: 12px; font-weight: 500; color: #626C66">Why end it?</span>
+      <span style="font-size: 12px; color: #626C66">Required</span>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <sc-for list="{{en.reasons}}" as="c" hint-placeholder-count="4">
+        <button type="button" aria-pressed="{{c.on}}" onClick="{{c.pick}}" style="height: 40px; padding: 0 16px; border-radius: 10px; font: inherit; font-size: 13.5px; cursor: pointer; border: 1px solid {{c.border}}; background: {{c.bg}}; color: #121815; font-weight: {{c.weight}}">{{c.label}}</button>
+      </sc-for>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 16px">
+    <label for="end-note" style="font-size: 12px; font-weight: 500; color: #626C66">Short note</label>
+    <input id="end-note" value="{{en.note}}" onChange="{{onNote}}" placeholder="Optional, for the next person" style="width: 100%; box-sizing: border-box; height: 44px; border: 1px solid #E2E5DF; border-radius: 11px; padding: 0 13px; font: inherit; font-size: 14px; color: #121815; background: #FFFFFF; outline: none">
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 9px; margin-top: 18px; font-size: 13px; color: #3B4540">
+    <span aria-hidden="true" style="width: 16px; height: 16px; border-radius: 50%; background: #E7F4EA; color: #2D7A4B; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+    </span>
+    {{en.wdLine}}
+  </div>
+
+  <div style="margin-top: 20px; padding-top: 6px; border-top: 1px solid #EFF1EC">
+    <button type="button" onClick="{{toggleEndSee}}" aria-expanded="{{en.see}}" style="display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; padding: 8px 0; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+      {{en.seeLabel}}
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{en.seeRot}}"><path d="{{ic.chevDown}}"></path></svg>
+    </button>
+    <sc-if value="{{en.see}}" hint-placeholder-val="{{false}}">
+      <div>
+        <sc-for list="{{en.changes}}" as="m" hint-placeholder-count="3">
+          <div style="display: flex; gap: 16px; padding: 12px 0; border-top: 1px solid #EFF1EC">
+            <span style="width: 140px; flex-shrink: 0; font-size: 13px; color: #626C66; padding-top: 1px">{{m.label}}</span>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+              <span style="font-size: 14px; font-weight: 500; color: #121815">{{m.value}}</span>
+              <span style="font-size: 13px; color: #626C66">{{m.note}}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+</div>
+
+<!-- ============================ SAVE BARS ============================ -->
+<sc-if value="{{v.proposal}}" hint-placeholder-val="{{false}}">
+  <div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #EFF1EC; padding: 12px 0">
+    <div style="max-width: 760px; margin: 0 auto; padding: 0 32px; box-sizing: border-box; display: flex; align-items: center; gap: 10px">
+      <span style="flex: 1; min-width: 0; font-size: 13px; color: #3B4540">{{pr.barText}}</span>
+      <button type="button" onClick="{{discardDraft}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer; white-space: nowrap">Discard</button>
+      <button type="button" onClick="{{approve}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 14px; border: 0; border-radius: 10px; background: #121815; font: inherit; font-size: 14px; font-weight: 500; color: #FFFFFF; cursor: pointer; white-space: nowrap; opacity: {{pr.saveOpacity}}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+        {{pr.primary}}
+      </button>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{v.end}}" hint-placeholder-val="{{false}}">
+  <div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #EFF1EC; padding: 12px 0">
+    <div style="max-width: 760px; margin: 0 auto; padding: 0 32px; box-sizing: border-box; display: flex; align-items: center; gap: 10px">
+      <span style="flex: 1; min-width: 0; font-size: 13px; color: #3B4540">{{en.barText}}</span>
+      <button type="button" onClick="{{backToOrder}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer; white-space: nowrap">Discard</button>
+      <button type="button" onClick="{{doEnd}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #9A2C17; cursor: pointer; white-space: nowrap; opacity: {{en.endOpacity}}">{{en.primary}}</button>
+    </div>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["list","order","proposal","receipt","end","ended"],"default":"list"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      check: 'M20 6 9 17l-5-5',
+      x: 'M18 6 6 18 M6 6l12 12',
+      undo: 'M3 7v6h6 M21 17a9 9 0 0 0-15-6.7L3 13',
+      chevDown: 'M6 9l6 6 6-6',
+      chevLeft: 'M15 18l-6-6 6-6',
+      arrowRight: 'M5 12h14 M13 6l6 6-6 6'
+    };
+  }
+
+  // ---- dates (today is Fri 30 Oct 2026) ---------------------------------
+  MON() { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; }
+  WD() { return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; }
+  addDays(n) { return new Date(Date.UTC(2026, 9, 30) + n * 86400000); }
+  dm(n) { const d = this.addDays(n); return d.getUTCDate() + ' ' + this.MON()[d.getUTCMonth()]; }
+  wdm(n) { const d = this.addDays(n); return this.WD()[d.getUTCDay()] + ' ' + this.dm(n); }
+
+  // ---- data -------------------------------------------------------------
+  PIGS() {
+    const blank = [['', '', ''], ['', '', '']];
+    return {
+      '204518': { where: 'Gestation 2, Pen 14', identity: 'Sow · parity 4 · Batch 34 · Gestation 2, Pen 14', for: 'Lame, left hind · 39.8 °C', team: "Zhao Min's team", recheck: 'Mon 2 Nov', farrowOff: 28, farrowTxt: 'Fri 27 Nov',
+        lines: [['Meloxicam', '5 ml, neck muscle, once a day', '3'], ['Amoxicillin', '24 ml, neck muscle, once a day', '5']] },
+      '205102': { where: 'Gestation 2, Pen 17', identity: 'Sow · parity 6 · Batch 33 · Gestation 2, Pen 17', for: 'Lame, right front', team: "Zhao Min's team", recheck: 'Mon 2 Nov', lines: blank },
+      '205290': { where: 'Farrowing Room 2, Crate 31', identity: 'Sow · Batch 32 · Farrowing Room 2, Crate 31', for: 'Fever 40.3 °C', team: "Li Wei's team", recheck: 'Mon 2 Nov', lines: blank }
+    };
+  }
+  defaultsFor(pig) {
+    const P = this.PIGS()[pig] || this.PIGS()['204518'];
+    return {
+      for: P.for, team: P.team, starts: 'Today, Fri 30 Oct', recheck: P.recheck,
+      l0med: P.lines[0][0], l0dose: P.lines[0][1], l0days: P.lines[0][2],
+      l1med: P.lines[1][0], l1dose: P.lines[1][1], l1days: P.lines[1][2]
+    };
+  }
+  wdDays(med) { return /meloxicam/i.test(med) ? 5 : /amoxicillin/i.test(med) ? 14 : 7; }
+  mlOf(dose) { const m = String(dose).match(/(\d+(?:\.\d+)?)\s*ml/i); return m ? parseFloat(m[1]) : 0; }
+  shortDose(dose) { const m = String(dose).match(/(\d+(?:\.\d+)?)\s*ml/i); return m ? m[1] + ' ml' : String(dose); }
+  clampDays(v) { const n = parseInt(v, 10); return isNaN(n) ? 0 : Math.max(0, Math.min(14, n)); }
+  plural(n) { return n === 1 ? '1 dose' : n + ' doses'; }
+
+  getOrder(id, s) {
+    if (id === 'o771') {
+      return { id: id, tag: '204771', identity: 'Sow · Batch 34 · Gestation 1, Pen 8', where: 'Gestation 1, Pen 8', forText: 'Cough, fever 40.1 °C', team: "Zhao Min's team", recheck: 'Mon 2 Nov', startOff: -2,
+        lines: [{ med: 'Amoxicillin', dose: '22 ml, neck muscle, once a day', days: 5, wd: 14 }],
+        given: { '0:-2': '07:52', '0:-1': '07:48' } };
+    }
+    if (id === 'o802') {
+      return { id: id, tag: '204802', identity: 'Sow · Batch 34 · Gestation 1, Pen 11', where: 'Gestation 1, Pen 11', forText: 'Swollen hock', team: "Zhao Min's team", recheck: 'Mon 2 Nov', startOff: -2,
+        lines: [{ med: 'Meloxicam', dose: '5 ml, neck muscle, once a day', days: 3, wd: 5 }],
+        given: { '0:-2': '07:55' } };
+    }
+    const D = this.defaultsFor(s.pig);
+    const P = (k) => (s.vals[k] !== undefined ? s.vals[k] : D[k]);
+    const info = this.PIGS()[s.pig] || this.PIGS()['204518'];
+    const lines = [0, 1].map((i) => ({ med: P('l' + i + 'med'), dose: P('l' + i + 'dose'), days: this.clampDays(P('l' + i + 'days')), wd: this.wdDays(P('l' + i + 'med')) })).filter((l) => l.days > 0 && String(l.med).trim() !== '');
+    return { id: 'onew', tag: s.pig, identity: info.identity, where: info.where, forText: P('for'), team: P('team'), recheck: P('recheck'), startOff: 0, lines: lines, given: {} };
+  }
+
+  // doses, counts and withdrawal for one order; ended = the early end is applied
+  calc(o, ended) {
+    const maxDays = o.lines.length ? Math.max.apply(null, o.lines.map((l) => l.days)) : 0;
+    const rows = [];
+    const lastGiven = o.lines.map(() => null);
+    let given = 0, expected = 0, missing = 0, removed = 0, total = 0;
+    const removedDates = [], givenDates = [];
+    for (let k = 0; k < maxDays; k++) {
+      const off = o.startOff + k;
+      const its = [];
+      o.lines.forEach((l, li) => { if (l.days > k) its.push({ li: li, l: l }); });
+      const sts = its.map((it) => {
+        total++;
+        const key = it.li + ':' + off;
+        if (o.given[key]) { given++; expected++; lastGiven[it.li] = lastGiven[it.li] === null ? off : Math.max(lastGiven[it.li], off); return 'given'; }
+        if (ended && off >= 0) { removed++; return 'removed'; }
+        if (off < 0) { missing++; expected++; return 'missing'; }
+        if (off === 0) { expected++; return 'today'; }
+        return 'later';
+      });
+      let st = sts[0];
+      sts.forEach((x) => { if (x !== st) { st = sts.indexOf('missing') >= 0 ? 'missing' : sts[0]; } });
+      if (st === 'removed') removedDates.push(this.wdm(off));
+      if (st === 'given') givenDates.push(this.wdm(off));
+      rows.push({
+        off: off, st: st, date: this.wdm(off),
+        text: its.map((it) => it.l.med + ' ' + this.shortDose(it.l.dose)).join(' + '),
+        time: o.given[its[0].li + ':' + off] || ''
+      });
+    }
+    let wdOff = null;
+    o.lines.forEach((l, li) => {
+      const last = ended ? lastGiven[li] : o.startOff + l.days - 1;
+      if (last === null) return;
+      const w = last + l.wd;
+      wdOff = wdOff === null ? w : Math.max(wdOff, w);
+    });
+    let lastGivenOff = null;
+    lastGiven.forEach((x) => { if (x !== null) lastGivenOff = lastGivenOff === null ? x : Math.max(lastGivenOff, x); });
+    return {
+      rows: rows, given: given, expected: expected, missing: missing, removed: removed, total: total,
+      lastOff: o.startOff + maxDays - 1, wdOff: wdOff, lastGivenOff: lastGivenOff,
+      removedDates: removedDates, givenDates: givenDates, maxDays: maxDays
+    };
+  }
+
+  // ---- state ------------------------------------------------------------
+  defaults(start) {
+    const base = {
+      startSeen: start, view: 'list', order: 'o771', pig: '204518', started: false, ended: {}, receipt: null,
+      vals: {}, restock: false, more: false, see: false, endSee: false, monOpen: false, endReason: '', endNote: ''
+    };
+    if (start === 'order') return Object.assign(base, { view: 'order', order: 'o771' });
+    if (start === 'proposal') return Object.assign(base, { view: 'proposal' });
+    if (start === 'receipt') return Object.assign(base, { view: 'order', order: 'onew', started: true, receipt: 'start' });
+    if (start === 'end') return Object.assign(base, { view: 'end', order: 'o771' });
+    if (start === 'ended') return Object.assign(base, { view: 'order', order: 'o771', ended: { o771: { reason: 'Recovered early', time: '08:47' } }, receipt: 'end' });
+    return base;
+  }
+
+  chipPal(kind) {
+    if (kind === 'amber') return { bg: '#FFF0D1', ink: '#7A4A00', dot: '#D99A1E', hasDot: true };
+    return { bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90', hasDot: false };
+  }
+
+  // ---- render -----------------------------------------------------------
+  renderVals() {
+    const start = this.props.start || 'list';
+    let s = Object.assign({}, this.defaults(start), this.state || {});
+    if (s.startSeen !== start) s = this.defaults(start);
+    const set = (p) => this.setState(Object.assign({}, s, p, { startSeen: start }));
+    const I = this.icons();
+    const view = s.view;
+    const ordinary = (n) => this.plural(n);
+
+    // ---- proposal model -------------------------------------------------
+    const pigInfo = this.PIGS()[s.pig] || this.PIGS()['204518'];
+    const D = this.defaultsFor(s.pig);
+    const val = (k) => (s.vals[k] !== undefined ? s.vals[k] : D[k]);
+    const changedKey = (k) => String(D[k]).trim() !== '' && String(val(k)).trim() !== String(D[k]).trim();
+    const setVal = (k) => (e) => {
+      const v = e && e.target ? e.target.value : '';
+      set({ vals: Object.assign({}, s.vals, { [k]: v }) });
+    };
+    const propOrder = this.getOrder('onew', s);
+    const propCalc = this.calc(propOrder, false);
+    const fieldDefs = [
+      { k: 'for', label: 'For', ph: 'What it is for' }, { k: 'team', label: 'Given by', ph: 'Team' },
+      { k: 'starts', label: 'Starts', ro: true }, { k: 'recheck', label: 'Re-check', ph: 'Date' }
+    ];
+    const fields = fieldDefs.map((f) => ({
+      id: 'tr-' + f.k, label: f.label, value: val(f.k), ph: f.ph || '', isInput: !f.ro, isStatic: !!f.ro,
+      changed: !f.ro && changedKey(f.k), old: D[f.k], change: setVal(f.k)
+    }));
+    const STOCK = 300, USE = 70;
+    const restock = s.restock;
+    let amoxMlDay = 0;
+    const lineRows = [0, 1].map((i) => {
+      const med = String(val('l' + i + 'med')).trim();
+      const dose = val('l' + i + 'dose');
+      const days = this.clampDays(val('l' + i + 'days'));
+      const isAmox = /amoxicillin/i.test(med);
+      const checks = [];
+      if (isAmox && days > 0) {
+        const ml = this.mlOf(dose);
+        amoxMlDay = ml;
+        const daysNew = Math.round(STOCK / (USE + ml));
+        checks.push(restock
+          ? { text: 'Stock: 10 × 100 ml will be ordered. Delivery: 2 days.', ok: true, warn: false, hasFix: true, fixLabel: 'Remove', fix: () => set({ restock: false }) }
+          : { text: 'Stock: 3 bottles last about ' + daysNew + ' days with this order. Delivery: 2 days.', ok: false, warn: true, hasFix: true, fixLabel: 'Order 10 × 100 ml', fix: () => set({ restock: true }) });
+        if (ml > 0) {
+          const mgKg = Math.round(ml * 150 / 240);
+          const okDose = mgKg >= 10 && mgKg <= 20;
+          const fixed = /ml/i.test(dose) ? String(dose).replace(/(\d+(?:\.\d+)?)\s*ml/i, '24 ml') : '24 ml, neck muscle, once a day';
+          checks.push({ text: 'Dose: ' + mgKg + ' mg/kg for a 240 kg sow' + (okDose ? '' : '. Usual is 15.'), ok: okDose, warn: !okDose, hasFix: !okDose, fixLabel: 'Set 24 ml', fix: () => set({ vals: Object.assign({}, s.vals, { ['l' + i + 'dose']: fixed }) }) });
+        }
+      }
+      if (med !== '' && days > 0) {
+        const wdd = this.wdDays(med);
+        const wo = days - 1 + wdd;
+        const late = pigInfo.farrowOff !== undefined && wo >= pigInfo.farrowOff;
+        checks.push({ text: 'Withdrawal ' + wdd + ' days: until ' + this.wdm(wo) + (late ? ', after her farrowing on ' + pigInfo.farrowTxt : ''), ok: !late, warn: late, hasFix: false, fixLabel: '', fix: () => {} });
+      }
+      checks.forEach((c) => { c.iconBg = c.ok ? '#E7F4EA' : '#FFF0D1'; c.iconInk = c.ok ? '#2D7A4B' : '#7A4A00'; c.ink = c.ok ? '#3B4540' : '#7A4A00'; });
+      const changes = [];
+      [['med', 'Medicine'], ['dose', 'Dose'], ['days', 'Days']].forEach((p) => {
+        const k = 'l' + i + p[0];
+        if (changedKey(k)) changes.push({ label: p[1], old: p[0] === 'dose' ? this.shortDose(D[k]) : D[k], now: p[0] === 'dose' ? this.shortDose(val(k)) : val(k) });
+      });
+      return {
+        med: val('l' + i + 'med'), dose: dose, days: val('l' + i + 'days'),
+        aMed: 'Medicine ' + (i + 1), aDose: 'Dose ' + (i + 1), aDays: 'Days ' + (i + 1),
+        changeMed: setVal('l' + i + 'med'), changeDose: setVal('l' + i + 'dose'), changeDays: setVal('l' + i + 'days'),
+        checks: checks, hasChecks: checks.length > 0, changes: changes, hasChanges: changes.length > 0
+      };
+    });
+    const editedCount = Object.keys(s.vals).filter((k) => k !== 'starts' && changedKey(k)).length;
+    const totalDoses = propCalc.total;
+    const amox = propOrder.lines.some((l) => /amoxicillin/i.test(l.med));
+    const teamName = val('team').replace(/'s team$/, '');
+
+    const firstLines = propOrder.lines.filter((l) => l.days >= 1);
+    const restDoses = Math.max(0, totalDoses - firstLines.length);
+    const created = [];
+    if (totalDoses > 0) {
+      created.push({ date: 'Fri 30 Oct', text: ordinary(firstLines.length) + ' today: ' + firstLines.map((l) => l.med + ' ' + this.shortDose(l.dose)).join(', '), who: teamName, dotBg: '#121815' });
+      if (restock && amox) created.push({ date: 'Fri 30 Oct', text: 'Order 10 × 100 ml Amoxicillin', who: 'Supplier', dotBg: '#FFFFFF' });
+      if (restDoses > 0) created.push({ date: '31 Oct – ' + this.dm(propCalc.lastOff), text: ordinary(restDoses) + ', once a day', who: teamName, dotBg: '#FFFFFF' });
+      created.push({ date: val('recheck'), text: 'Re-check ' + s.pig, who: teamName, dotBg: '#FFFFFF' });
+    }
+    created.forEach((c, i) => { c.hasLine = i < created.length - 1; c.pad = i < created.length - 1 ? 12 : 0; });
+    const savePrimary = totalDoses > 0 ? 'Start ' + ordinary(totalDoses) + (restock && amox ? ' and order 10 bottles' : '') : 'Start order';
+    const pr = {
+      tag: s.pig, identity: pigInfo.identity, fields: fields, lineRows: lineRows,
+      more: s.more, moreRot: s.more ? 'rotate(180deg)' : 'none',
+      see: s.see, seeRot: s.see ? 'rotate(180deg)' : 'none', seeLabel: totalDoses > 0 ? 'See the ' + created.length + ' tasks it creates' : 'See what it creates',
+      moreRows: [
+        { label: 'Send doses at', value: '06:30, with the morning round' },
+        { label: 'A dose is not reported', value: 'Flagged to you; no late state' },
+        { label: 'After the last dose', value: 'The order closes itself; news goes in the report' }
+      ],
+      created: created,
+      barText: totalDoses > 0 ? 'New order · ' + ordinary(totalDoses) + (editedCount ? ' · ' + editedCount + ' edited' : '') : 'Add a medicine, dose and days',
+      primary: savePrimary, saveOpacity: totalDoses > 0 ? 1 : 0.45
+    };
+
+    // ---- orders in the list ---------------------------------------------
+    const orderIds = ['o802', 'o771'].concat(s.started ? ['onew'] : []);
+    const info = {};
+    orderIds.forEach((id) => {
+      const o = this.getOrder(id, s);
+      const isEnded = !!s.ended[id];
+      info[id] = { o: o, c: this.calc(o, isEnded), ended: isEnded };
+    });
+    const openOrder = (id) => () => set({ view: 'order', order: id, receipt: null });
+    const needs = [
+      { tag: '204518', finding: 'Lame, left hind', where: 'Urgent · Gestation 2, Pen 14', urgent: true },
+      { tag: '205102', finding: 'Lame, right front', where: 'Urgent · Gestation 2, Pen 17', urgent: true },
+      { tag: '205290', finding: 'Fever 40.3 °C', where: 'Farrowing Room 2, Crate 31', urgent: false }
+    ].filter((n) => !(n.tag === s.pig && s.started)).map((n, i) => ({
+      tag: n.tag, finding: n.finding, where: n.where, dot: n.urgent ? '#D9583B' : 'transparent',
+      top: i === 0 ? '0' : '1px solid #EFF1EC',
+      open: () => set({ view: 'proposal', pig: n.tag, vals: {}, restock: false, more: false, see: false, started: false, receipt: null })
+    }));
+
+    const runIds = orderIds.filter((id) => !info[id].ended);
+    runIds.sort((a, b) => (info[b].c.missing > 0 ? 1 : 0) - (info[a].c.missing > 0 ? 1 : 0));
+    const runs = runIds.map((id, i) => {
+      const x = info[id];
+      const y = x.c.maxDays;
+      const dayX = Math.min(y, 1 - x.o.startOff);
+      const flagged = x.c.missing > 0;
+      const pal = flagged ? this.chipPal('amber') : this.chipPal('neutral');
+      const endsTxt = x.c.lastOff === 0 ? 'Ends today' : 'Ends ' + this.wdm(x.c.lastOff);
+      return {
+        tag: x.o.tag, meds: x.o.lines.map((l) => l.med).join(' + '),
+        sub: (id === 'onew' ? 'Starts today' : 'Day ' + dayX + ' of ' + y) + ' · ' + x.o.where,
+        chip: flagged ? (x.c.missing === 1 ? '1 dose not reported' : x.c.missing + ' doses not reported') : endsTxt,
+        chipBg: pal.bg, chipInk: pal.ink, chipDot: pal.dot, hasDot: pal.hasDot,
+        top: i === 0 ? '0' : '1px solid #EFF1EC', open: openOrder(id)
+      };
+    });
+    const endedRows = orderIds.filter((id) => info[id].ended).map((id, i) => {
+      const x = info[id];
+      return { tag: x.o.tag, meds: x.o.lines.map((l) => l.med).join(' + '), sub: (s.ended[id].reason || '') + ' · ' + x.o.where, top: i === 0 ? '0' : '1px solid #EFF1EC', open: openOrder(id) };
+    });
+    const notRep = runIds.reduce((a, id) => a + info[id].c.missing, 0);
+    const list = {
+      sentence: (needs.length === 0 ? 'No pig needs an order.' : needs.length + (needs.length === 1 ? ' pig needs an order.' : ' pigs need an order.')) + ' ' +
+        runs.length + (runs.length === 1 ? ' order running' : ' orders running') + (notRep ? ', ' + notRep + (notRep === 1 ? ' dose' : ' doses') + ' not reported.' : '.'),
+      hasNeeds: needs.length > 0, needsCount: String(needs.length),
+      hasRuns: runs.length > 0, runsCount: String(runs.length),
+      hasEnded: endedRows.length > 0, endedCount: String(endedRows.length)
+    };
+    const mons = [
+      { tag: '205240', where: 'Gestation 2, Pen 11', chip: 'Watch · lame' },
+      { tag: '203377', where: 'Gestation 2, Pen 9', chip: 'Watch · lame' },
+      { tag: '203155', where: 'Gestation 1, Pen 5', chip: 'Watch · lame' },
+      { tag: '204093', where: 'Gestation 2, Pen 3', chip: 'Watch · off feed' }
+    ].map((m, i) => Object.assign({}, m, { top: i === 0 ? '0' : '1px solid #EFF1EC' }));
+
+    // ---- one order record -----------------------------------------------
+    const oid = s.order;
+    const o = this.getOrder(oid, s);
+    const ended = !!s.ended[oid];
+    const c = this.calc(o, ended);
+    const cFull = this.calc(o, false);
+    const cEnd = this.calc(o, true);
+    const x = ended ? s.ended[oid] : null;
+    const y = c.maxDays;
+    const dayX = Math.min(y, 1 - o.startOff);
+    const chipKind = this.chipPal('neutral');
+    const stMap = {
+      given: { ink: '#1F5534', w: 500 }, today: { ink: '#121815', w: 500 }, missing: { ink: '#7A4A00', w: 600 },
+      later: { ink: '#626C66', w: 400 }, removed: { ink: '#626C66', w: 400 }
+    };
+    const doseRows = c.rows.map((r) => {
+      const m = stMap[r.st];
+      const t = r.st === 'given' ? 'Given ' + r.time + ' · Zhao Min' : r.st === 'today' ? 'Expected today' : r.st === 'missing' ? 'Not reported' : r.st === 'removed' ? 'Removed' : '';
+      const quiet = r.st === 'later' || r.st === 'removed';
+      return {
+        isGiven: r.st === 'given', isToday: r.st === 'today', isMissing: r.st === 'missing', isLater: r.st === 'later', isRemoved: r.st === 'removed',
+        date: r.date, text: r.text, status: t, statusInk: m.ink, statusWeight: m.w,
+        dateInk: quiet ? '#8A938D' : '#3B4540', textInk: quiet ? '#626C66' : '#1E2622'
+      };
+    });
+    const doseHead = ended ? (c.given + (c.given === 1 ? ' dose given' : ' doses given')) : (c.given + ' of ' + c.expected + ' expected doses given');
+    const doseSub = ended ? (c.removed + (c.removed === 1 ? ' dose' : ' doses') + ' taken off the list') : (c.total + ' doses in all, the last on ' + this.wdm(c.lastOff));
+    const wdText = c.wdOff === null ? 'None, no dose given' : 'Until ' + this.wdm(c.wdOff);
+    const hasReceipt = !!s.receipt && ((s.receipt === 'start' && oid === 'onew') || (s.receipt === 'end' && ended));
+    let receiptLine = '', receiptTime = '08:41';
+    if (hasReceipt && s.receipt === 'start') {
+      receiptTime = '08:41';
+      receiptLine = ordinary(cFull.total) + ' sent to ' + o.team + (s.restock && o.lines.some((l) => /amoxicillin/i.test(l.med)) ? ', 10 bottles ordered' : '');
+    }
+    if (hasReceipt && s.receipt === 'end') {
+      receiptTime = x ? x.time : '08:47';
+      receiptLine = 'Order ended, ' + ordinary(c.removed) + ' removed';
+    }
+    const rec = {
+      tag: o.tag, identity: o.identity,
+      chip: ended ? 'Ended early' : (oid === 'onew' ? 'Starts today' : 'Running · day ' + dayX + ' of ' + y),
+      chipBg: chipKind.bg, chipInk: chipKind.ink, chipDot: ended ? '#8E9C90' : '#2FA36B',
+      isEnded: ended, endedLine: x ? 'Ended Fri 30 Oct ' + x.time + ' · ' + x.reason : '',
+      facts: [
+        { label: 'For', value: o.forText }, { label: 'Given by', value: o.team },
+        { label: 'Withdrawal', value: wdText }, { label: 'Re-check', value: o.recheck }
+      ],
+      lines: o.lines.map((l, li) => ({
+        med: l.med, dose: l.dose,
+        days: ended ? 'Stopped after ' + Object.keys(o.given).filter((k) => k.indexOf(li + ':') === 0).length + ' of ' + l.days + ' days' : l.days + (l.days === 1 ? ' day' : ' days') + ' · ' + this.dm(o.startOff) + ' – ' + this.dm(o.startOff + l.days - 1),
+        wd: 'withdrawal ' + l.wd + ' days'
+      })),
+      doses: doseRows, doseHead: doseHead, doseSub: doseSub,
+      canEnd: !ended && cEnd.removed > 0, cannotEnd: !(!ended && cEnd.removed > 0),
+      endEffect: 'Takes the ' + cEnd.removed + ' doses not given yet off the list.',
+      hasReceipt: hasReceipt, receiptLine: receiptLine, receiptTime: receiptTime
+    };
+
+    // ---- end early --------------------------------------------------------
+    const reasonList = ['Recovered early', 'Reaction to the medicine', 'Vet changed the plan', 'Other'];
+    const amoxFreed = o.lines.reduce((a, l, li) => {
+      if (!/amoxicillin/i.test(l.med)) return a;
+      let n = 0;
+      for (let k = 0; k < l.days; k++) { const off = o.startOff + k; if (off >= 0 && !o.given[li + ':' + off]) n++; }
+      return a + n * this.mlOf(l.dose);
+    }, 0);
+    const wasTxt = cFull.wdOff === null ? 'none' : this.wdm(cFull.wdOff);
+    const changes = [
+      { label: 'Taken off the list', value: ordinary(cEnd.removed), note: cEnd.removedDates.join(', ') },
+      { label: 'Stay in the record', value: cEnd.given === 0 ? 'No doses given yet' : ordinary(cEnd.given) + ' given', note: cEnd.givenDates.join(', ') }
+    ];
+    if (amoxFreed > 0) changes.push({ label: 'Stock', value: amoxFreed + ' ml Amoxicillin freed', note: '' });
+    const reasonOk = !!s.endReason;
+    const en = {
+      tag: o.tag, identity: o.identity,
+      reasons: reasonList.map((r) => ({
+        label: r, on: s.endReason === r,
+        border: s.endReason === r ? '#121815' : '#E2E5DF', bg: s.endReason === r ? '#F0F2EE' : '#FFFFFF', weight: s.endReason === r ? 600 : 500,
+        pick: () => set({ endReason: r })
+      })),
+      note: s.endNote,
+      wdLine: cEnd.wdOff === null ? 'No withdrawal, no dose was given.' : 'Withdrawal ends ' + this.wdm(cEnd.wdOff) + ', counted from the last dose given (was ' + wasTxt + ').',
+      see: s.endSee, seeRot: s.endSee ? 'rotate(180deg)' : 'none', seeLabel: 'See what changes', changes: changes,
+      barText: reasonOk ? ordinary(cEnd.removed) + ' removed from the list' : 'Choose a reason to end the order',
+      primary: 'End order and remove ' + ordinary(cEnd.removed), endOpacity: reasonOk ? 1 : 0.45
+    };
+
+    return {
+      ic: I,
+      v: { list: view === 'list', order: view === 'order', proposal: view === 'proposal', end: view === 'end' },
+      list: list, needs: needs, runs: runs, endedRows: endedRows, mons: mons,
+      monOpen: s.monOpen, monRot: s.monOpen ? 'rotate(180deg)' : 'none',
+      toggleMon: () => set({ monOpen: !s.monOpen }),
+      rec: rec,
+      backToList: () => set({ view: 'list', receipt: null }),
+      backToOrder: () => set({ view: 'order', receipt: null }),
+      goEnd: () => set({ view: 'end', receipt: null, endReason: '', endNote: '', endSee: false }),
+      undoReceipt: () => {
+        if (s.receipt === 'start') set({ started: false, receipt: null, view: 'proposal' });
+        else { const e2 = Object.assign({}, s.ended); delete e2[oid]; set({ ended: e2, receipt: null }); }
+      },
+      pr: pr,
+      toggleMore: () => set({ more: !s.more }),
+      toggleSee: () => set({ see: !s.see }),
+      discardDraft: () => set({ view: 'list', vals: {}, restock: false, more: false, see: false }),
+      approve: () => { if (totalDoses > 0) set({ view: 'order', order: 'onew', started: true, receipt: 'start' }); },
+      en: en,
+      onNote: (e) => set({ endNote: e && e.target ? e.target.value : '' }),
+      toggleEndSee: () => set({ endSee: !s.endSee }),
+      doEnd: () => {
+        if (!reasonOk) return;
+        set({ ended: Object.assign({}, s.ended, { [oid]: { reason: s.endReason, time: '08:47' } }), view: 'order', receipt: 'end' });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

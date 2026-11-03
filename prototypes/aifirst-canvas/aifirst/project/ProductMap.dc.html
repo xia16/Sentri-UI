@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Product map</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1440px; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.45; -webkit-font-smoothing: antialiased; padding: 56px 64px 64px">
+  <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Sentri console · AI-first · 31 Oct</span>
+  <h1 style="margin: 6px 0 8px; font-size: 34px; line-height: 1.1; font-weight: 600; letter-spacing: -0.025em">Every Action, and how you get to it</h1>
+  <p style="margin: 0 0 28px; max-width: 920px; font-size: 15px; color: #3B4540">Pages are tools: lists you scan, records you check, forms you change by hand. The AI teammates talk only in chat, and open a page with your request already loaded. Every page is reached three ways: the Actions grid on Home, typing <span style="font-family: 'Geist Mono', ui-monospace, monospace; background: #F0F2EE; border-radius: 5px; padding: 0 5px">/</span> in chat, or asking a teammate.</p>
+
+  <div style="display: grid; grid-template-columns: 200px 300px minmax(0, 1fr) 330px; gap: 0; border-top: 1px solid #DADED6; font-size: 12px; font-weight: 600; color: #626C66">
+    <span style="padding: 10px 12px 10px 0">Action</span>
+    <span style="padding: 10px 12px">What it is for</span>
+    <span style="padding: 10px 12px">Ways in besides the grid</span>
+    <span style="padding: 10px 0 10px 12px">Cut from today's console</span>
+  </div>
+  <sc-for list="{{groups}}" as="g" hint-placeholder-count="7">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 22px 0 8px; border-top: 1px solid #DADED6">
+      <span style="width: 9px; height: 9px; border-radius: 2px; background: {{g.dot}}"></span>
+      <span style="font-size: 16px; font-weight: 600">{{g.name}}</span>
+      <span style="font-size: 13px; color: #626C66">{{g.note}}</span>
+    </div>
+    <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="4">
+      <div style="display: grid; grid-template-columns: 200px 300px minmax(0, 1fr) 330px; gap: 0; border-top: 1px solid #EFF1EC; align-items: start">
+        <span style="padding: 10px 12px 10px 0; display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 14px; font-weight: 600">{{r.name}}</span>
+          <span style="font-size: 12px; color: #626C66">{{r.kind}}</span>
+        </span>
+        <span style="padding: 10px 12px; color: #1E2622">{{r.job}}</span>
+        <span style="padding: 10px 12px; color: #3B4540">{{r.ways}}</span>
+        <span style="padding: 10px 0 10px 12px; color: #626C66">{{r.cut}}</span>
+      </div>
+    </sc-for>
+  </sc-for>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; margin-top: 36px; padding-top: 22px; border-top: 1px solid #DADED6">
+    <div>
+      <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px">Not a page any more</div>
+      <sc-for list="{{gone}}" as="x" hint-placeholder-count="6">
+        <div style="display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 12px; padding: 7px 0; border-top: 1px solid #EFF1EC">
+          <span style="font-weight: 500">{{x.what}}</span><span style="color: #3B4540">{{x.now}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div>
+      <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px">Rules every page follows</div>
+      <sc-for list="{{rules}}" as="x" hint-placeholder-count="6">
+        <div style="display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 12px; padding: 7px 0; border-top: 1px solid #EFF1EC">
+          <span style="font-weight: 500">{{x.what}}</span><span style="color: #3B4540">{{x.now}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3140}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const G = (name, note, dot, rows) => ({ name, note, dot, rows: rows.map(([n, kind, job, ways, cut]) => ({ name: n, kind, job, ways, cut })) });
+    return {
+      groups: [
+        G('Home and you', 'what needs you, and your AI team', '#121815', [
+          ['Home', 'Standing page', 'Setup guide (first weeks), For you (decide and to-do, by due), Actions (recent five, then all), dashboards, what the team did this morning.', 'Always the first tab.', 'Charts, KPI tiles, calendar card, batch list, camera carousel, 3 pages of progress cards.'],
+          ['For you', 'List', 'What waits on you, by due: decisions sent to you or cc\'d (anyone on one may decide) and to-dos outside Sentri; each says why it came to you. Also what waits on others.', '"What needs me?" · Home · a teammate\'s message · "Let Li Wei know…"', 'Notification bell and tabs; per-type panels; batch-end approvals (now report news).'],
+          ['Automations', 'List · record · form', 'The standing jobs each teammate runs (06:00 report, Monday sampling tasks, Batch 32 check); pause, change, or approve a new one.', '"What do you do on your own?" · "Check it every morning" in chat.', '17 notification types: each became a report line, a decision, a chat message or a job.'],
+          ['Knowledge base', 'List', 'Farm notes, documents, sign-ins to other systems; passwords go to a vault the team never reads.', '"Remember that…" · Connect a system.', '—']
+        ]),
+        G('Setting up the farm', 'the four core steps first, then the teammates remind you of the rest', '#7A4A00', [
+          ['Setup progress', 'Record', 'The four core steps in order: layout, pigs, production line, your team.', 'Home\'s setup guide · first conversation.', 'Locked 4-card checklist, "3 minutes" promise, Enter Sentri gate.'],
+          ['Farm layout', 'Editor', 'A farm map: zones, buildings, rooms drawn with their pens. Click a room to change pen type, rows and pens.', 'First setup (the General Manager interviews you in chat) · "We added 4 stalls to Gestation 2".', 'Explainer page, dimmed tours, modal forms, monitor-count tables.'],
+          ['Import pigs', 'Form', 'Your herd sheet in; one fix per kind of problem, not per row.', 'Drop a file in chat.', 'Upload → error table → re-upload loop.'],
+          ['Production line', 'Editor', 'Five steps: what the line does, rhythm, rooms and moves (a strategy per stage, preferences, drying time), task timing, targets; live batch calendar.', '"Can we go to a 4-week rhythm?" · first setup, only once Farm layout is complete: Production proposes the plans your rooms can hold.', 'Template pickers, week pickers, 14-field KPI form, the move-plan template (when only, never where), "max 99999 sows".'],
+          ['Farm settings', 'Form', 'Working week, day start, teams and their rooms, reports, and Who decides: a few plain sentences the team reads to route every item.', '"Our day starts at 05:30 now" · "From now on, feed orders go to Gao Feng".', 'Separate settings pages per object.'],
+          ['People', 'List · record · form', 'Staff and visitors; invite someone (the form goes to them); leaving the farm.', '"Invite Dr. Chen for Wednesday".', 'Site permissions, door bindings, Face ID, permission types, entry tests (v1).']
+        ]),
+        G('Production', 'batches and the work they make', '#B7791F', [
+          ['Batches', 'List · record · form', 'Running and planned batches; each batch\'s plan, sows, rooms and changes; change one batch; new extra batch; calendar.', '"Which batches need a look?" · "Room 2 gets new floors".', 'Home batch list, 8 bar states, delayed/overdue, per-task drawers with charts.'],
+          ['Task schedule', 'List · record', 'What each team does today and this week; expected against done.', '"What is everyone doing today?"', 'Task calendar grid of 10 task types × 8 states.'],
+          ['Transfers', 'List · room plan · form', 'Every move Production planned, with the room\'s status; the room plan (rooms by week); a clash with its one-tap fixes. Moves are set 7 days ahead.', '"When does Batch 33 move into Room 3?" · Production raises a clash.', 'Move-plan editor, destination tree (phone), event log.'],
+          ['Feed plans', 'List · record · form', 'What each stage is fed; feed on hand with days left; order feed; change a stage\'s plan.', '"How much feed is left?" · "Order Sow Lactation".', 'Nutrient fields, brand codes, intake charts.'],
+          ['Pigs off site', 'List · record · form', 'Who left: sold, died, culled, moved, missing; book a load-out; a cull list.', '"Book the trucks for Batch 30" · "Which sows should I cull?"', 'Not-on-site table columns, cause charts.']
+        ]),
+        G('Pigs and places', 'find a pig, look at a room', '#9A2C17', [
+          ['Pig list and record', 'List · record', 'Any pig by tag, room or finding; one pig\'s findings and recent events.', '"Show me the lame sows in Gestation 2".', 'Herd donut, pig-type counts, four copies of the same table.'],
+          ['Rooms and pens', 'List · record', 'Rooms by building with one flag each; a room\'s pen map with the pens that need a look; one pen.', '"Which pens need a look in Gestation 2?"', 'Stock donut, hover cards, monitor counts.'],
+          ['Cameras', 'List · record', 'Live view by place, recordings by time, moments when people were detected.', '"Who was in Gestation 2 at 06:12?"', 'Loading states, 10-stream counter, environment readings.']
+        ]),
+        G('Health', 'treat, stock, vaccinate', '#0E5568', [
+          ['Treatment orders', 'List · record · form', 'Pigs that need an order, orders running with doses given against expected, new order, end early.', '"Treat 204518" · the Vet\'s message.', 'Triage donut, health tasks card, top-5 problems chart.'],
+          ['Medicines', 'List · record · form', 'Low or expiring first; one product\'s stock, batches and withdrawal; order; book in a delivery from a photo.', '"What are we low on?" · a delivery-note photo in chat.', 'Separate vaccine page, add/delete dialogs, stock ledger.'],
+          ['Vaccination plans and rounds', 'Form · record', 'A plan that follows a batch; a round: vaccinate, catch-up, sample, result.', '"Set up the booster for 34 like 30".', 'First-dose/follow-batch chooser, advanced filter builder, month calendar.'],
+          ['Review and apply', 'Full-width form', 'After planning in chat: everything that will be set up, in plain words, approved once.', '"This is the plan".', '—']
+        ]),
+        G('Biosecurity', 'what comes in, what is clean, what is tested', '#47309A', [
+          ['Sampling and results', 'List · record · form', 'What is sampled when; a lab result matched to its batch and filed.', 'A lab PDF in chat · "Next sampling?"', 'Pending-tests table, manual sample dialogs, sampling video viewer.'],
+          ['Disinfection', 'List · record · form', 'Supplies in, disinfecting, released; each room\'s cleaning status (needs cleaning, drying, ready), ticked as a to-do in the app; the routine.', '"Is Farrowing Room 3 ready for Batch 33?"', 'Area setup form, risk badges, broken countdowns, door events.'],
+          ['Visitors', 'Form · decision', 'Invite or send a form link; tests attachable, not required; approvals grouped into one decision.', '"Five visitors next week".', 'Entry/exit request inbox, test requirements, door access.']
+        ]),
+        G('Dashboards', 'the one standing exception: common figures and schedules', '#626C66', [
+          ['Production · Health · Biosecurity', 'Dashboard', 'The figures a manager checks every week. Redesigned separately.', 'Home.', 'To be decided in the dashboard redesign.']
+        ])
+      ],
+      gone: [
+        { what: 'Daily and past reports', now: 'The General Manager\'s 06:00 message to everyone; old ones are that chat\'s history.' },
+        { what: 'Notifications panel', now: 'News in the report, asks in Decisions, "tell me when…" as an automation.' },
+        { what: 'Herd overview, PSY forecast, charts', now: 'Asked in chat; drawn for the question.' },
+        { what: 'Task drawers (11)', now: 'Asked in chat; the batch record shows expected against done.' },
+        { what: 'Access control, doors, Face ID', now: 'Not in v1; everyone on the console has full access.' },
+        { what: 'Late and overdue states', now: 'Expected against done; the AI flags what slipped.' }
+      ],
+      rules: [
+        { what: 'Pages are tools', now: 'No AI banners, chips or "Ask" buttons on a page; the chat is beside it.' },
+        { what: 'Change by hand', now: 'Every value you see can be edited where it makes sense; a changed value shows its old one.' },
+        { what: 'One save bar', now: 'Appears only on a change and says what moves: "46 future tasks".' },
+        { what: 'Rules at the field', now: '"60 sows need 60 crates; your rooms hold 52 [Use 52]" sits under the field.' },
+        { what: 'Reasoning in chat', now: 'Why, what to check and what I\'d do: the teammate says it once in chat.' },
+        { what: 'Interview once', now: 'Only at first setup the teammate asks questions and the page fills live.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

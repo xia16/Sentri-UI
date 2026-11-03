@@ -1,0 +1,10 @@
+[
+  {"op":"set_farm","name":"The owner's sketch"},
+  {"op":"add_pen_type","id":"sick","name":"Sick pen","uses":["Sick"],"per":2,"w":250,"l":400},
+  {"op":"add_pen_type","id":"large","name":"Sick pen, large","uses":["Sick"],"per":8,"w":900,"l":400},
+  {"op":"add_zone","name":"Sketch farm"},
+  {"op":"add_section","name":"Isolation","code":"ISO","zone":"Sketch farm"},
+  {"op":"add_room","name":"Sketch room","section":"Isolation","at":{"x":0,"z":0},"door":{"wall":"south"},"lanes":[{"runs":[{"type":"sick","n":2}]},{"runs":[{"type":"sick","n":2}]}]},
+  {"op":"set_outline","room":"Sketch room","outline":[[0,0],[1160,0],[1160,220],[1340,360],[1460,610],[1460,860],[1340,1080],[1160,1215],[0,1215]]},
+  {"op":"add_end_row","room":"Sketch room","at":"far","runs":[{"type":"large","n":1}]}
+]

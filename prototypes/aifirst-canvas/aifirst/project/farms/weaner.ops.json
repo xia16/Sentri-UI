@@ -1,0 +1,8 @@
+[
+  {"op": "set_farm", "name": "Spanish weaner unit"},
+  {"op": "add_pen_type", "id": "weaner", "name": "Weaner pen", "uses": ["Nursery"], "per": 25, "w": 545, "l": 300},
+  {"op": "add_zone", "name": "Weaner unit"},
+  {"op": "add_section", "name": "Weaners", "code": "WEA", "zone": "Weaner unit"},
+  {"op": "add_room", "name": "Weaner 1", "section": "Weaners", "at": {"x": 0, "z": 0}, "door": {"wall": "south"}, "aisle": {"wall": 0, "between": 80}, "lanes": [{"runs": [{"type": "weaner", "n": 4}]}, {"runs": [{"type": "weaner", "n": 4}]}]},
+  {"op": "copy_room", "room": "Weaner 1", "times": 5, "side": "east", "gap": 0}
+]

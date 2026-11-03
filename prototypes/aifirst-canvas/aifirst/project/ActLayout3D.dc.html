@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Farm model</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+<div style="max-width: 1320px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+  <!-- header -->
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+    <div style="min-width: 0">
+      <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; color: #626C66; text-transform: uppercase">Farm setup &#8250; Farm layout</div>
+      <h1 style="margin: 6px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{title}}</h1>
+      <p style="margin: 6px 0 0; font-size: 14px; color: #3B4540">{{lead}}</p>
+    </div>
+    <sc-if value="{{showSaved}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; align-items: center; gap: 8px; background: #F6F7F4; border-radius: 10px; padding: 4px 6px 4px 12px; font-size: 13px; color: #3B4540; animation: sentriRise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+        <span><span style="font-weight: 600; color: #121815">Saved</span> <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">09:12</span></span>
+        <button type="button" onClick="{{undoSave}}" style="height: 30px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+
+    <!-- ============ STAGE ============ -->
+    <div style="flex: 999 1 560px; min-width: 0">
+      <div ref="{{stageRef}}" onPointerDown="{{stageDown}}" style="{{stageStyle}}">
+
+        <!-- the model -->
+        <div style="{{worldStyle}}">
+          <sc-for list="{{faces}}" as="f" hint-placeholder-count="0">
+            <div key="{{f.k}}" style="{{f.s}}"></div>
+          </sc-for>
+          <sc-for list="{{tops}}" as="t" hint-placeholder-count="0">
+            <div key="{{t.k}}" style="{{t.s}}">
+              <sc-for list="{{t.cells}}" as="c" hint-placeholder-count="0">
+                <button type="button" tabIndex="{{c.tab}}" aria-label="{{c.aria}}" onClick="{{c.pick}}" style="{{c.s}}"></button>
+              </sc-for>
+            </div>
+          </sc-for>
+          <sc-for list="{{solo}}" as="b" hint-placeholder-count="0">
+            <button type="button" key="{{b.k}}" tabIndex="{{b.tab}}" aria-label="{{b.aria}}" onClick="{{b.pick}}" style="{{b.s}}"></button>
+          </sc-for>
+          <sc-for list="{{hits}}" as="h" hint-placeholder-count="0">
+            <button type="button" key="{{h.k}}" tabIndex="{{h.tab}}" aria-label="{{h.aria}}" onPointerDown="{{h.down}}" onDoubleClick="{{h.open}}" style="{{h.s}}"></button>
+          </sc-for>
+        </div>
+
+        <!-- labels, drawn flat over the model -->
+        <div style="{{labelLayer}}">
+          <sc-for list="{{groupLabels}}" as="gl" hint-placeholder-count="0">
+            <button type="button" onPointerDown="{{gl.down}}" style="{{gl.s}}"><span style="{{gl.nameS}}">{{gl.name}}</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; color: #626C66; letter-spacing: 0.02em">{{gl.code}}</span></button>
+          </sc-for>
+          <sc-for list="{{roomLabels}}" as="rl" hint-placeholder-count="0">
+            <div style="{{rl.wrap}}">
+              <button type="button" onPointerDown="{{rl.down}}" onDoubleClick="{{rl.open}}" style="{{rl.s}}">{{rl.name}}<sc-if value="{{rl.isNew}}" hint-placeholder-val="{{false}}"><span style="margin-left: 6px; padding: 0 5px; border-radius: 5px; background: #E4F2E8; color: #1F5E37; font-size: 11px; font-weight: 600; line-height: 16px">New</span></sc-if></button>
+              <span style="{{rl.stem}}"></span>
+            </div>
+          </sc-for>
+          <sc-for list="{{marks}}" as="m" hint-placeholder-count="0">
+            <span style="{{m.s}}">{{m.text}}</span>
+          </sc-for>
+          <sc-for list="{{ghosts}}" as="g" hint-placeholder-count="0">
+            <button type="button" aria-label="{{g.aria}}" onClick="{{g.add}}" style="{{g.s}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="{{g.icon}}"><path d="{{ic.plus}}"></path></svg></button>
+          </sc-for>
+        </div>
+
+        <!-- marquee -->
+        <sc-if value="{{hasBox}}" hint-placeholder-val="{{false}}">
+          <div style="{{boxStyle}}"></div>
+        </sc-if>
+
+        <!-- floating action bar -->
+        <sc-if value="{{bar.show}}" hint-placeholder-val="{{false}}">
+          <div style="{{bar.style}}">
+            <sc-if value="{{bar.naming}}" hint-placeholder-val="{{false}}">
+              <label for="grp-name" style="font-size: 12.5px; color: #626C66; padding-left: 6px; white-space: nowrap">{{bar.nameLabel}}</label>
+              <input id="grp-name" type="text" value="{{bar.name}}" onChange="{{bar.typeName}}" autofocus="{{true}}" style="width: 132px; height: 34px; box-sizing: border-box; padding: 0 10px; border: 1.5px solid #121815; border-radius: 8px; font: inherit; font-size: 14px; font-weight: 500; color: #121815; outline: none; background: #FFFFFF">
+              <label for="grp-code" style="font-size: 12.5px; color: #626C66; white-space: nowrap">Code</label>
+              <input id="grp-code" type="text" value="{{bar.code}}" onChange="{{bar.typeCode}}" style="width: 58px; height: 34px; box-sizing: border-box; padding: 0 8px; border: 1px solid #D5DAD3; border-radius: 8px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #121815; outline: none; background: #FFFFFF; text-transform: uppercase">
+              <button type="button" onClick="{{bar.done}}" style="height: 34px; padding: 0 14px; border: 0; border-radius: 8px; background: #121815; color: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer">Done</button>
+            </sc-if>
+            <sc-if value="{{bar.acting}}" hint-placeholder-val="{{false}}">
+              <sc-for list="{{bar.actions}}" as="a" hint-placeholder-count="3">
+                <button type="button" onClick="{{a.go}}" title="{{a.keys}}" style="{{a.s}}">{{a.label}}<sc-if value="{{a.hasKeys}}" hint-placeholder-val="{{false}}"><span style="margin-left: 6px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #8A938C">{{a.keys}}</span></sc-if></button>
+              </sc-for>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- pen card -->
+        <sc-if value="{{card.show}}" hint-placeholder-val="{{false}}">
+          <div style="{{card.style}}">
+            <div style="display: flex; align-items: center; gap: 10px">
+              <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 20px; font-weight: 500; letter-spacing: -0.01em">{{card.code}}</span>
+              <span style="{{card.sw}}"></span>
+              <span style="flex: 1; font-size: 13.5px; font-weight: 600">{{card.type}}</span>
+              <button type="button" aria-label="Close pen" onClick="{{card.close}}" style="width: 32px; height: 32px; margin: -6px -8px -6px 0; border: 0; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round"><path d="{{ic.x}}"></path></svg></button>
+            </div>
+            <div style="margin-top: 4px; font-size: 13px; color: #3B4540">{{card.line1}}</div>
+            <div style="font-size: 12.5px; color: #626C66">{{card.line2}}</div>
+          </div>
+          <span style="{{card.stem}}"></span>
+          <span style="{{card.dot}}"></span>
+        </sc-if>
+
+        <!-- top-left: back / add -->
+        <div style="position: absolute; left: 14px; top: 14px; display: flex; gap: 8px; z-index: 3">
+          <sc-if value="{{inRoom}}" hint-placeholder-val="{{false}}">
+            <button type="button" onClick="{{back}}" style="display: flex; align-items: center; gap: 4px; height: 36px; padding: 0 12px 0 8px; border: 1px solid #E3E6E1; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer; box-shadow: 0 1px 2px rgba(18,24,21,0.05)"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #121815; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevL}}"></path></svg>Site</button>
+          </sc-if>
+          <sc-if value="{{onSite}}" hint-placeholder-val="{{true}}">
+            <div style="position: relative">
+              <button type="button" aria-expanded="{{addOpen}}" onClick="{{toggleAdd}}" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px 0 10px; border: 1px solid #E3E6E1; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer; box-shadow: 0 1px 2px rgba(18,24,21,0.05)"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #121815; stroke-width: 2; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg>Add</button>
+              <sc-if value="{{addOpen}}" hint-placeholder-val="{{false}}">
+                <div style="position: absolute; left: 0; top: 42px; width: 220px; padding: 6px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 12px; box-shadow: 0 8px 24px rgba(18,24,21,0.10); animation: sentriRise 0.2s ease both">
+                  <sc-for list="{{addItems}}" as="ai" hint-placeholder-count="3">
+                    <button type="button" onClick="{{ai.go}}" style="display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; font: inherit; text-align: left; cursor: pointer"><span style="font-size: 13.5px; font-weight: 600; color: #121815">{{ai.label}}</span><span style="font-size: 12px; color: #626C66">{{ai.sub}}</span></button>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- top-right: view -->
+        <div style="position: absolute; right: 14px; top: 14px; display: flex; gap: 8px; z-index: 3">
+          <div style="display: flex; padding: 3px; gap: 2px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 10px; box-shadow: 0 1px 2px rgba(18,24,21,0.05)">
+            <sc-for list="{{viewSeg}}" as="v" hint-placeholder-count="2">
+              <button type="button" aria-pressed="{{v.on}}" onClick="{{v.go}}" style="{{v.s}}">{{v.label}}</button>
+            </sc-for>
+          </div>
+          <div style="display: flex; padding: 3px; gap: 2px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 10px; box-shadow: 0 1px 2px rgba(18,24,21,0.05)">
+            <button type="button" aria-label="Turn left" onClick="{{turnL}}" style="width: 32px; height: 28px; border: 0; border-radius: 7px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #121815; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.rotL}}"></path></svg></button>
+            <button type="button" aria-label="Turn right" onClick="{{turnR}}" style="width: 32px; height: 28px; border: 0; border-radius: 7px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #121815; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.rotR}}"></path></svg></button>
+          </div>
+          <sc-if value="{{onSite}}" hint-placeholder-val="{{true}}">
+            <button type="button" aria-pressed="{{roofs}}" onClick="{{toggleRoofs}}" style="{{roofStyle}}">Roofs</button>
+          </sc-if>
+        </div>
+
+        <!-- bottom: compass + keys -->
+        <div style="position: absolute; left: 14px; bottom: 12px; display: flex; align-items: center; gap: 10px; z-index: 3; pointer-events: none">
+          <div aria-hidden="true" style="width: 30px; height: 30px; border-radius: 50%; background: #FFFFFF; border: 1px solid #E3E6E1; display: flex; align-items: center; justify-content: center">
+            <svg viewBox="0 0 24 24" style="{{compass}}"><path d="M12 2.5l3.2 7h-6.4z" style="fill: #121815; stroke: none"></path><path d="M9.6 20.5v-8l4.8 8v-8" style="fill: none; stroke: #121815; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round"></path></svg>
+          </div>
+          <span style="font-size: 12px; color: #626C66">{{keysHint}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ INSPECTOR ============ -->
+    <div style="flex: 1 1 300px; max-width: 100%; min-width: 0; box-sizing: border-box">
+      <div style="{{inspStyle}}">
+
+        <!-- site, nothing picked -->
+        <sc-if value="{{insp.farm}}" hint-placeholder-val="{{true}}">
+          <div style="font-size: 16px; font-weight: 600">Hillside</div>
+          <div style="font-size: 13px; color: #626C66">{{insp.farmLine}}</div>
+          <div style="margin-top: 18px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: #626C66"><span>Pen types</span><span>Places</span></div>
+          <div style="margin-top: 4px; display: flex; flex-direction: column">
+            <sc-for list="{{legend}}" as="lg" hint-placeholder-count="6">
+              <button type="button" aria-pressed="{{lg.on}}" onClick="{{lg.pick}}" style="{{lg.s}}">
+                <span style="{{lg.sw}}"></span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; text-align: left"><span style="font-size: 13.5px; font-weight: 500; color: #121815">{{lg.name}}</span><span style="font-size: 12px; color: #626C66">{{lg.sub}}</span></span>
+                <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #121815">{{lg.places}}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="margin-top: 8px; padding-top: 10px; border-top: 1px solid #ECEEEA; display: flex; justify-content: space-between; font-size: 13.5px"><span style="font-weight: 600">All places</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 500">{{insp.total}}</span></div>
+        </sc-if>
+
+        <!-- one room picked -->
+        <sc-if value="{{insp.room}}" hint-placeholder-val="{{false}}">
+          <div style="font-size: 12.5px; color: #626C66">{{insp.where}}</div>
+          <div style="margin-top: 2px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap"><span style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em">{{insp.name}}</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #626C66">{{insp.code}}</span></div>
+          <div style="margin-top: 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+            <sc-for list="{{insp.facts}}" as="fa" hint-placeholder-count="3">
+              <div><div style="font-size: 12px; color: #626C66">{{fa.k}}</div><div style="font-size: 14px; font-weight: 600; font-family: {{fa.font}}">{{fa.v}}</div></div>
+            </sc-for>
+          </div>
+          <div style="margin-top: 14px; font-size: 13px; color: #3B4540">{{insp.summary}}</div>
+          <button type="button" onClick="{{openSel}}" style="margin-top: 16px; width: 100%; height: 40px; display: flex; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">Open room<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #FFFFFF; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg></button>
+        </sc-if>
+
+        <!-- several rooms, or a group -->
+        <sc-if value="{{insp.group}}" hint-placeholder-val="{{false}}">
+          <div style="font-size: 12.5px; color: #626C66">{{insp.where}}</div>
+          <div style="margin-top: 2px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap"><span style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em">{{insp.name}}</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #626C66">{{insp.code}}</span></div>
+          <div style="margin-top: 14px; display: flex; flex-direction: column">
+            <sc-for list="{{insp.rows}}" as="ro" hint-placeholder-count="4">
+              <div style="display: flex; align-items: center; gap: 10px; min-height: 34px; border-bottom: 1px solid #F0F2EE; font-size: 13.5px"><span style="flex: 1; min-width: 0">{{ro.name}}</span><span style="font-size: 12px; color: #626C66">{{ro.sub}}</span><span style="width: 48px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px">{{ro.v}}</span></div>
+            </sc-for>
+          </div>
+          <div style="margin-top: 10px; display: flex; justify-content: space-between; font-size: 13.5px"><span style="font-weight: 600">Places</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-weight: 500">{{insp.total}}</span></div>
+        </sc-if>
+
+        <!-- room editor -->
+        <sc-if value="{{insp.editor}}" hint-placeholder-val="{{false}}">
+          <div style="font-size: 12.5px; color: #626C66">{{insp.where}}</div>
+          <div style="margin-top: 2px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap"><span style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em">{{insp.name}}</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #626C66">{{insp.code}}</span></div>
+          <div style="margin-top: 2px; font-size: 13px; color: #3B4540">{{insp.summary}}</div>
+
+          <div style="margin-top: 16px; font-size: 12px; font-weight: 600; color: #626C66">Door on the</div>
+          <div style="margin-top: 6px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 3px; background: #F2F4F0; border-radius: 10px">
+            <sc-for list="{{doors}}" as="d" hint-placeholder-count="4">
+              <button type="button" aria-pressed="{{d.on}}" onClick="{{d.go}}" style="{{d.s}}">{{d.label}}</button>
+            </sc-for>
+          </div>
+          <div style="margin-top: 12px; font-size: 12px; font-weight: 600; color: #626C66">Lane A, as you walk in</div>
+          <div style="margin-top: 6px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; padding: 3px; background: #F2F4F0; border-radius: 10px">
+            <sc-for list="{{sides}}" as="d" hint-placeholder-count="2">
+              <button type="button" aria-pressed="{{d.on}}" onClick="{{d.go}}" style="{{d.s}}">{{d.label}}</button>
+            </sc-for>
+          </div>
+
+          <div style="margin-top: 18px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: #626C66"><span>Lanes</span><span>Pens</span></div>
+          <div style="margin-top: 4px; display: flex; flex-direction: column; gap: 2px">
+            <sc-for list="{{lanes}}" as="l" hint-placeholder-count="3">
+              <div style="{{l.row}}">
+                <button type="button" aria-pressed="{{l.on}}" onClick="{{l.pick}}" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 0 0 6px; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer">
+                  <span style="{{l.badge}}">{{l.letter}}</span>
+                  <span style="{{l.sw}}"></span>
+                  <span style="flex: 1; min-width: 0; font-size: 13.5px; color: #121815; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{l.type}}</span>
+                </button>
+                <button type="button" aria-label="{{l.decLabel}}" onClick="{{l.dec}}" style="width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #3B4540; stroke-width: 2; stroke-linecap: round"><path d="{{ic.minus}}"></path></svg></button>
+                <span style="width: 30px; text-align: center; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13.5px; font-weight: 500">{{l.n}}</span>
+                <button type="button" aria-label="{{l.incLabel}}" onClick="{{l.inc}}" style="width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #3B4540; stroke-width: 2; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg></button>
+              </div>
+            </sc-for>
+            <sc-for list="{{endRows}}" as="e" hint-placeholder-count="0">
+              <div style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 10px 0 6px; border-radius: 10px; font-size: 13.5px">
+                <span style="{{e.badge}}">{{e.letter}}</span>
+                <span style="{{e.sw}}"></span>
+                <span style="flex: 1; min-width: 0">{{e.text}}</span>
+                <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13.5px; font-weight: 500">1</span>
+              </div>
+            </sc-for>
+          </div>
+          <button type="button" onClick="{{addLane}}" style="margin-top: 6px; display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 10px 0 8px; border: 1px dashed #C4CBC3; border-radius: 10px; background: transparent; color: #121815; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #121815; stroke-width: 2; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg>Lane</button>
+
+          <sc-if value="{{hasLane}}" hint-placeholder-val="{{false}}">
+            <div style="margin-top: 18px; font-size: 12px; font-weight: 600; color: #626C66">{{chipsTitle}}</div>
+            <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px">
+              <sc-for list="{{chips}}" as="c" hint-placeholder-count="6">
+                <button type="button" aria-pressed="{{c.on}}" onClick="{{c.pick}}" style="{{c.s}}"><span style="{{c.sw}}"></span>{{c.name}}</button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <!-- save bar -->
+  <sc-if value="{{dirty}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 20px; display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 16px; border: 1px solid #E3E6E1; border-radius: 14px; background: #FFFFFF; flex-wrap: wrap">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex-shrink: 0; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.file}}"></path></svg>
+      <span style="flex: 1; min-width: 200px; font-size: 13.5px; color: #3B4540"><span style="font-weight: 600; color: #121815">Draft</span> · {{dirtyText}}</span>
+      <button type="button" onClick="{{discard}}" style="height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: transparent; color: #121815; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer">Discard</button>
+      <button type="button" onClick="{{save}}" style="height: 40px; padding: 0 18px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">Save layout</button>
+    </div>
+  </sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["site","plan","select","grouped","dup","room","sick","grow"],"default":"site"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      check: 'M20 6 9 17l-5-5', plus: 'M12 5v14 M5 12h14', minus: 'M5 12h14', x: 'M18 6 6 18 M6 6l12 12',
+      chevR: 'M9 6l6 6-6 6', chevL: 'M15 6l-6 6 6 6',
+      rotL: 'M4 12a8 8 0 1 0 2.3-5.6 M4 4v4h4', rotR: 'M20 12a8 8 0 1 1-2.3-5.6 M20 4v4h-4',
+      file: 'M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z M14 3v5h5'
+    };
+  }
+  clone(o) { return JSON.parse(JSON.stringify(o)); }
+  letter(i) { return String.fromCharCode(65 + i); }
+  fmt(n) { return Number(n).toLocaleString('en-US'); }
+  // muted pen-type colours: sage, slate, amber, blue, lilac, rose
+  colors() {
+    return [
+      { fill: '#E1EBD9', mid: '#A9C69A', line: '#C3D5B7', ink: '#2C4A27' },
+      { fill: '#E1E6EC', mid: '#A3B1C2', line: '#C6CFD9', ink: '#2F3D4C' },
+      { fill: '#F6E6C6', mid: '#E2BC74', line: '#E8CD98', ink: '#664510' },
+      { fill: '#DAE8F5', mid: '#93B8DE', line: '#B7CFE8', ink: '#21466A' },
+      { fill: '#E9E2F4', mid: '#B7A6DB', line: '#D2C6E7', ink: '#46336B' },
+      { fill: '#F5E0E0', mid: '#DCA2A2', line: '#E7C2C2', ink: '#7A2C2C' }
+    ];
+  }
+  kit() {
+    return [
+      { id: 'gest', name: 'Gestation stall', per: 1, use: 'Gestation', u1: 'sow', uN: 'sows', s1: 'stall', s2: 'stalls', c: 0, a: 3.4, w: 12 },
+      { id: 'boar', name: 'Boar pen', per: 1, use: 'Boars', u1: 'boar', uN: 'boars', s1: 'boar pen', s2: 'boar pens', c: 1, a: 7, w: 12 },
+      { id: 'crate', name: 'Farrowing crate', per: 1, use: 'Farrowing', u1: 'sow + litter', uN: 'sows + litters', s1: 'crate', s2: 'crates', c: 2, a: 6.5, w: 13 },
+      { id: 'nurs', name: 'Nursery pen', per: 10, use: 'Nursery', u1: 'pig', uN: 'pigs', s1: 'nursery pen', s2: 'nursery pens', c: 3, a: 7, w: 16 },
+      { id: 'gilt', name: 'Gilt pen', per: 10, use: 'Quarantine', u1: 'gilt', uN: 'gilts', s1: 'gilt pen', s2: 'gilt pens', c: 4, a: 11, w: 16 },
+      { id: 'sick', name: 'Sick pen', per: 2, use: 'Sick', u1: 'sow', uN: 'sows', s1: 'sick pen', s2: 'sick pens', c: 5, a: 9, w: 12 }
+    ];
+  }
+  ln(t, n, each) { return { t: t, n: n, each: each == null ? null : each }; }
+  rep(k, t, n) { const a = []; for (let i = 0; i < k; i++) a.push(this.ln(t, n)); return a; }
+  room(id, name, sec, x, y, lanes, extra) { return Object.assign({ id: id, name: name, sec: sec, x: x, y: y, lanes: lanes, ends: [], door: 'bottom', aLeft: true }, extra || {}); }
+
+  // Hillside, as it stands on its site plan. o.loose: the farrowing rooms are not grouped yet.
+  farm(o) {
+    o = o || {};
+    const far = o.loose ? null : 's-far';
+    const rooms = [
+      this.room('g1', 'Gestation 1', 's-gest', 0, 0, this.rep(4, 'gest', 50).concat([this.ln('boar', 6)])),
+      this.room('g2', 'Gestation 2', 's-gest', 96, 0, this.rep(4, 'gest', 50)),
+      this.room('sick', 'Sick room', 's-gest', 174, 0, [this.ln('sick', 2), this.ln('sick', 2)], { door: 'top', ends: [{ t: 'sick', each: 12, lanes: [0, 1] }] })
+    ];
+    [1, 2, 3, 4].forEach((k) => rooms.push(this.room('fr' + k, 'Farrowing Room ' + k, far, (k - 1) * 48, 222, this.rep(2, 'crate', 26), { door: 'top' })));
+    rooms.push(this.room('n1', 'Nursery 1', 's-nur', 252, 222, this.rep(2, 'nurs', 26), { door: 'top' }));
+    rooms.push(this.room('n2', 'Nursery 2', 's-nur', 306, 222, this.rep(2, 'nurs', 26), { door: 'top' }));
+    rooms.push(this.room('q1', 'Quarantine 1', 's-q', 444, 30, [this.ln('gilt', 6)]));
+    const sections = [
+      { id: 's-gest', name: 'Gestation', code: 'GES', zone: 'z1' },
+      { id: 's-nur', name: 'Nursery', code: 'NUR', zone: 'z1' },
+      { id: 's-q', name: 'Quarantine', code: 'QUA', zone: 'z2' }
+    ];
+    if (!o.loose) sections.splice(1, 0, { id: 's-far', name: 'Farrowing', code: 'FAR', zone: 'z1' });
+    return {
+      types: this.kit(), rooms: rooms, sections: sections,
+      zones: [{ id: 'z1', name: 'Production Zone 1', code: 'Z1' }, { id: 'z2', name: 'Isolation Zone', code: 'Z2' }]
+    };
+  }
+
+  defaults(start) {
+    const f = this.farm();
+    const base = { startSeen: start, view: 'site', plan: false, turn: 0, roofs: false, farm: f, base: this.clone(f), sel: { kind: '', ids: [] }, naming: false, roomId: '', lane: 0, pen: null, drag: null, box: null, hl: '', addOpen: false, fresh: null, seq: 1, saved: false, anim: false, newIds: [] };
+    const S = (x) => Object.assign(base, x || {});
+    if (start === 'plan') return S({ plan: true });
+    if (start === 'select') { const g = this.farm({ loose: true }); return S({ farm: g, base: this.clone(g), sel: { kind: 'room', ids: ['fr1', 'fr2', 'fr3', 'fr4'] } }); }
+    if (start === 'grouped') {
+      const g = this.farm({ loose: true }); const b = this.clone(g);
+      g.sections.splice(1, 0, { id: 's-far', name: 'Farrowing', code: 'FAR', zone: 'z1' });
+      g.rooms.forEach((r) => { if (/^fr/.test(r.id)) r.sec = 's-far'; });
+      return S({ farm: g, base: b, sel: { kind: 'section', ids: ['s-far'] }, naming: true });
+    }
+    if (start === 'dup') {
+      const b = this.clone(f);
+      const c = this.clone(f.rooms.find((r) => r.id === 'fr4'));
+      c.id = 'fr5'; c.name = 'Farrowing Room 5'; c.x = 192; c.y = 222;
+      f.rooms.splice(7, 0, c);
+      return S({ farm: f, base: b, sel: { kind: 'room', ids: ['fr5'] }, newIds: ['fr5'], drag: { id: 'fr5', x: 194.5, y: 224.5, x0: 192, y0: 222, held: true } });
+    }
+    if (start === 'room') return S({ view: 'room', roomId: 'g1', lane: 0 });
+    if (start === 'sick') return S({ view: 'room', roomId: 'sick', lane: 0, pen: { end: 0 } });
+    if (start === 'grow') {
+      const b = this.clone(f);
+      const r = this.room('g3', 'Gestation 3', 's-gest', 226, 0, [this.ln('gest', 24), this.ln('gest', 11)]);
+      f.rooms.splice(3, 0, r);
+      return S({ farm: f, base: b, view: 'room', roomId: 'g3', lane: 1, fresh: { room: 'g3', lane: 1, k: 11, up: true, slot: 0 }, newIds: ['g3'] });
+    }
+    return S();
+  }
+
+  // ---------- geometry ----------
+  typeOf(f, id) { return f.types.find((t) => t.id === id) || null; }
+  colorOf(f, id) { const t = this.typeOf(f, id); return t ? this.colors()[t.c % 6] : { fill: '#F6F7F4', mid: '#D3D8D1', line: '#CDD3CA', ink: '#626C66' }; }
+  dimsOf(f, id) { const t = this.typeOf(f, id); return t ? { a: t.a, w: t.w } : { a: 5, w: 12 }; }
+  per(f, l) { if (l.each != null) return l.each; const t = this.typeOf(f, l.t); return t ? t.per : 0; }
+  places(f, r) { return r.lanes.reduce((a, l) => a + Math.max(0, l.n || 0) * this.per(f, l), 0) + (r.ends || []).reduce((a, e) => a + this.per(f, e), 0); }
+  pens(r) { return r.lanes.reduce((a, l) => a + Math.max(0, l.n || 0), 0) + (r.ends || []).length; }
+
+  // the room in its own frame: door at the bottom, lanes run up, then turned to its door wall
+  geo(f, r) {
+    const WP = 6, DP = 10, FP = 12, LG = 5, PG = 0.8;
+    let x = WP;
+    const lanes = r.lanes.map((l, i) => { const d = this.dimsOf(f, l.t); const o = { i: i, x: x, w: d.w, a: d.a, n: Math.max(0, l.n || 0), t: l.t }; x += d.w + LG; return o; });
+    const lw = lanes.length ? x - LG + WP : 40;
+    const ends = (r.ends || []).map((e, j) => {
+      const ls = e.lanes.filter((i) => i < lanes.length); if (!ls.length) return null;
+      const x0 = Math.min(...ls.map((i) => lanes[i].x)), x1 = Math.max(...ls.map((i) => lanes[i].x + lanes[i].w));
+      const s0 = Math.max(...ls.map((i) => lanes[i].n * lanes[i].a)) + 3;
+      return { j: j, e: e, ls: ls, x: x0, w: x1 - x0, s0: s0, len: (e.each != null && e.each >= 6) ? 14 : this.dimsOf(f, e.t).a };
+    }).filter((v) => v);
+    const maxA = Math.max(30, ...lanes.map((l) => l.n * l.a), ...ends.map((e) => e.s0 + e.len));
+    const w = Math.max(30, lw), d = DP + maxA + FP;
+    const covered = {}; ends.forEach((e) => e.ls.forEach((i) => { covered[i] = 1; }));
+    const mir = (rc) => r.aLeft ? rc : { x: w - rc.x - rc.w, y: rc.y, w: rc.w, h: rc.h };
+    const loc = (lx, lwid, s0, len) => mir({ x: lx, y: d - DP - s0 - len, w: lwid, h: len });
+    const door = r.door || 'bottom';
+    const W = (door === 'left' || door === 'right') ? d : w, D = (door === 'left' || door === 'right') ? w : d;
+    const T = (rc) => {
+      if (door === 'top') return { x: w - rc.x - rc.w, y: d - rc.y - rc.h, w: rc.w, h: rc.h };
+      if (door === 'left') return { x: d - rc.y - rc.h, y: rc.x, w: rc.h, h: rc.w };
+      if (door === 'right') return { x: rc.y, y: w - rc.x - rc.w, w: rc.h, h: rc.w };
+      return rc;
+    };
+    const dir = { bottom: 'column-reverse', top: 'column', left: 'row', right: 'row-reverse' }[door];
+    return {
+      W: W, D: D, door: door, dir: dir, PG: PG,
+      lanes: lanes.map((l) => ({
+        i: l.i, t: l.t, n: l.n, a: l.a, covered: !!covered[l.i],
+        rect: (k0, k1) => T(loc(l.x, l.w, (k0 - 1) * l.a, (k1 - k0 + 1) * l.a - PG)),
+        mouth: T(loc(l.x, l.w, -DP + 2, DP - 4))
+      })),
+      ends: ends.map((e) => ({ j: e.j, e: e.e, ls: e.ls, rect: T(loc(e.x, e.w, e.s0, e.len)) })),
+      doorSide: door
+    };
+  }
+
+  shade(hex, k) {
+    const n = parseInt(hex.slice(1), 16); const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => Math.max(0, Math.min(255, Math.round(v * k))));
+    return '#' + c.map((v) => v.toString(16).padStart(2, '0')).join('');
+  }
+
+  // ---------- state helpers ----------
+  st() {
+    const start = this.props.start || 'site';
+    const s = this.state || {};
+    if (s.startSeen !== start) { const d = this.defaults(start); return Object.assign({}, d, { sw: s.sw }); }
+    return s;
+  }
+  put(patch) {
+    const s = this.st();
+    this.setState(Object.assign({}, s, typeof patch === 'function' ? patch(s) : patch));
+  }
+  componentDidMount() {
+    this._key = (e) => {
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') { if (e.key === 'Enter') this.put({ naming: false }); return; }
+      const s = this.st();
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'd' || e.key === 'D')) { e.preventDefault(); this.duplicate(); }
+      else if (e.key === 'Escape') { if (s.view === 'room') this.back(); else this.put({ sel: { kind: '', ids: [] }, naming: false, addOpen: false }); }
+      else if ((e.key === 'Delete' || e.key === 'Backspace') && s.view === 'site' && s.sel.kind === 'room') this.remove();
+    };
+    window.addEventListener('keydown', this._key);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this._key); if (this._ro) this._ro.disconnect(); }
+
+  // ---------- camera ----------
+  cam(s, sw, sh, f) {
+    const t = s.plan ? 0 : 56, r = (s.plan ? 0 : -34) + 90 * s.turn;
+    const tr = t * Math.PI / 180, rr = r * Math.PI / 180;
+    let b;
+    if (s.view === 'room') {
+      const rm = f.rooms.find((x) => x.id === s.roomId); const g = this.geo(f, rm);
+      b = { x0: rm.x - 6, y0: rm.y - 6, x1: rm.x + g.W + 6, y1: rm.y + g.D + 6, z: 16 };
+    } else b = Object.assign({}, this.bounds(f, s), { z: 22 });
+    const fx = (b.x0 + b.x1) / 2, fy = (b.y0 + b.y1) / 2;
+    const P = (x, y, z) => { const dx = x - fx, dy = y - fy; const rx = dx * Math.cos(rr) - dy * Math.sin(rr); const ry = dx * Math.sin(rr) + dy * Math.cos(rr); return [rx, ry * Math.cos(tr) - z * Math.sin(tr)]; };
+    const pts = [];
+    [b.x0, b.x1].forEach((x) => [b.y0, b.y1].forEach((y) => { pts.push(P(x, y, -6)); pts.push(P(x, y, b.z)); }));
+    const mnx = Math.min(...pts.map((p) => p[0])), mxx = Math.max(...pts.map((p) => p[0]));
+    const mny = Math.min(...pts.map((p) => p[1])), mxy = Math.max(...pts.map((p) => p[1]));
+    const room = s.view === 'room';
+    const padX = room ? 70 : 40, padT = room ? 110 : 70, padB = room ? 60 : 50;
+    let sc = Math.min((sw - padX * 2) / (mxx - mnx), (sh - padT - padB) / (mxy - mny));
+    if (room) sc = Math.min(sc, 5.2);
+    const X = sw / 2 - sc * (mnx + mxx) / 2;
+    const Y = padT + (sh - padT - padB) / 2 - sc * (mny + mxy) / 2;
+    return { t: t, r: r, tr: tr, rr: rr, s: sc, X: X, Y: Y, fx: fx, fy: fy,
+      P: (x, y, z) => { const p = P(x, y, z); return [X + sc * p[0], Y + sc * p[1]]; },
+      inv: (dx, dy) => { const ux = dx / sc, uy = dy / (sc * Math.max(0.2, Math.cos(tr))); return [ux * Math.cos(rr) + uy * Math.sin(rr), -ux * Math.sin(rr) + uy * Math.cos(rr)]; },
+      css: 'translate(' + X.toFixed(2) + 'px, ' + Y.toFixed(2) + 'px) scale3d(' + sc.toFixed(4) + ', ' + sc.toFixed(4) + ', ' + sc.toFixed(4) + ') rotateX(' + t + 'deg) rotateZ(' + r + 'deg) translate3d(' + (-fx).toFixed(2) + 'px, ' + (-fy).toFixed(2) + 'px, 0px)' };
+  }
+
+  // where each room stands (a room being dragged floats at the pointer)
+  pos(s, r) { return s.drag && s.drag.id === r.id ? { x: s.drag.x, y: s.drag.y, lift: 24 } : { x: r.x, y: r.y, lift: 0 }; }
+  snap(v) { return Math.round(v / 6) * 6 + (v < 0 ? 0 : 0); }
+
+  pads(f, s) {
+    const rb = {};
+    f.rooms.forEach((r) => { if (s.drag && s.drag.id === r.id && !s.drag.held) return; if (s.drag && s.drag.id === r.id && s.drag.held) return; const g = this.geo(f, r); rb[r.id] = { x0: r.x, y0: r.y, x1: r.x + g.W, y1: r.y + g.D }; });
+    const U = (bs) => bs.length ? { x0: Math.min(...bs.map((b) => b.x0)), y0: Math.min(...bs.map((b) => b.y0)), x1: Math.max(...bs.map((b) => b.x1)), y1: Math.max(...bs.map((b) => b.y1)) } : null;
+    const sec = f.sections.map((x) => {
+      const b = U(f.rooms.filter((r) => r.sec === x.id && rb[r.id]).map((r) => rb[r.id])) || (x.box ? { x0: x.box.x, y0: x.box.y, x1: x.box.x + x.box.w, y1: x.box.y + x.box.h } : null);
+      return b ? Object.assign({ id: x.id, sec: x }, { x0: b.x0 - 9, y0: b.y0 - 9, x1: b.x1 + 9, y1: b.y1 + 9 }) : null;
+    }).filter((v) => v);
+    const zon = f.zones.map((z) => {
+      const b = U(sec.filter((p) => p.sec.zone === z.id)) || (z.box ? { x0: z.box.x, y0: z.box.y, x1: z.box.x + z.box.w, y1: z.box.y + z.box.h } : null);
+      return b ? { id: z.id, zone: z, x0: b.x0 - 12, y0: b.y0 - 12, x1: b.x1 + 12, y1: b.y1 + 12 } : null;
+    }).filter((v) => v);
+    return { sec: sec, zon: zon };
+  }
+  bounds(f, s) {
+    const p = this.pads(f, s); const bs = p.zon.concat(p.sec);
+    f.rooms.forEach((r) => { const g = this.geo(f, r); bs.push({ x0: r.x, y0: r.y, x1: r.x + g.W, y1: r.y + g.D }); });
+    if (!bs.length) return { x0: -60, y0: -60, x1: 60, y1: 60 };
+    return { x0: Math.min(...bs.map((b) => b.x0)) - 16, y0: Math.min(...bs.map((b) => b.y0)) - 16, x1: Math.max(...bs.map((b) => b.x1)) + 16, y1: Math.max(...bs.map((b) => b.y1)) + 30 };
+  }
+
+  // ---------- actions ----------
+  findRoom(f, id) { return f.rooms.find((r) => r.id === id); }
+  nextName(f, name) {
+    const m = /^(.*?)(\d+)$/.exec(name); if (!m) return name + ' copy';
+    const nums = f.rooms.map((r) => { const k = /^(.*?)(\d+)$/.exec(r.name); return k && k[1] === m[1] ? +k[2] : 0; });
+    return m[1] + (Math.max(...nums) + 1);
+  }
+  overlaps(f, id, x, y, W, D) {
+    return f.rooms.some((r) => { if (r.id === id) return false; const g = this.geo(f, r); return x < r.x + g.W + 2 && x + W > r.x - 2 && y < r.y + g.D + 2 && y + D > r.y - 2; });
+  }
+  freeSpot(f, r) {
+    const g = this.geo(f, r);
+    for (let k = 1; k < 40; k++) {
+      const x = r.x + k * (g.W + 6);
+      if (!this.overlaps(f, null, x, r.y, g.W, g.D)) return { x: x, y: r.y };
+    }
+    return { x: r.x, y: r.y + g.D + 30 };
+  }
+  duplicate() {
+    const s = this.st(); if (s.view !== 'site' || s.sel.kind !== 'room' || !s.sel.ids.length) return;
+    const f = this.clone(s.farm); const ids = []; let seq = s.seq;
+    s.sel.ids.forEach((id) => {
+      const o = this.findRoom(f, id); const c = this.clone(o);
+      c.id = 'c' + (seq++); c.name = this.nextName(f, o.name);
+      const p = this.freeSpot(f, o); c.x = p.x; c.y = p.y;
+      f.rooms.splice(f.rooms.indexOf(o) + 1, 0, c); ids.push(c.id);
+    });
+    this.put({ farm: f, seq: seq, sel: { kind: 'room', ids: ids }, newIds: s.newIds.concat(ids), saved: false });
+  }
+  remove() {
+    const s = this.st(); if (s.sel.kind !== 'room') return;
+    const f = this.clone(s.farm); f.rooms = f.rooms.filter((r) => s.sel.ids.indexOf(r.id) < 0);
+    this.put({ farm: f, sel: { kind: '', ids: [] } });
+  }
+  suggest(names, fallback) {
+    if (!names.length) return fallback;
+    let p = names[0]; names.forEach((n) => { while (n.indexOf(p) !== 0) p = p.slice(0, -1); });
+    p = p.replace(/\s*(Room)?\s*\d*\s*$/i, '').trim();
+    return p.length >= 3 ? p : fallback;
+  }
+  groupSection() {
+    const s = this.st(); const f = this.clone(s.farm);
+    const rooms = f.rooms.filter((r) => s.sel.ids.indexOf(r.id) >= 0); if (!rooms.length) return;
+    const name = this.suggest(rooms.map((r) => r.name), 'New section');
+    const p = this.pads(f, s);
+    const cx = rooms.reduce((a, r) => a + r.x, 0) / rooms.length, cy = rooms.reduce((a, r) => a + r.y, 0) / rooms.length;
+    const zp = p.zon.find((z) => cx > z.x0 && cx < z.x1 && cy > z.y0 && cy < z.y1);
+    const id = 's' + s.seq;
+    f.sections.push({ id: id, name: name, code: name.replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase(), zone: zp ? zp.id : null });
+    rooms.forEach((r) => { r.sec = id; });
+    f.sections = f.sections.filter((x) => f.rooms.some((r) => r.sec === x.id) || x.box);
+    this.put({ farm: f, seq: s.seq + 1, sel: { kind: 'section', ids: [id] }, naming: true });
+  }
+  groupZone() {
+    const s = this.st(); const f = this.clone(s.farm); const id = 'z' + s.seq;
+    const n = f.zones.length + 1;
+    f.zones.push({ id: id, name: 'Zone ' + n, code: 'Z' + n });
+    f.sections.forEach((x) => { if (s.sel.ids.indexOf(x.id) >= 0) x.zone = id; });
+    f.zones = f.zones.filter((z) => f.sections.some((x) => x.zone === z.id) || z.box);
+    this.put({ farm: f, seq: s.seq + 1, sel: { kind: 'zone', ids: [id] }, naming: true });
+  }
+  ungroup() {
+    const s = this.st(); const f = this.clone(s.farm); let ids = [];
+    if (s.sel.kind === 'section') { f.rooms.forEach((r) => { if (s.sel.ids.indexOf(r.sec) >= 0) { r.sec = null; ids.push(r.id); } }); f.sections = f.sections.filter((x) => s.sel.ids.indexOf(x.id) < 0); this.put({ farm: f, sel: { kind: 'room', ids: ids }, naming: false }); }
+    if (s.sel.kind === 'zone') { f.sections.forEach((x) => { if (s.sel.ids.indexOf(x.zone) >= 0) { x.zone = null; ids.push(x.id); } }); f.zones = f.zones.filter((z) => s.sel.ids.indexOf(z.id) < 0); this.put({ farm: f, sel: { kind: 'section', ids: ids }, naming: false }); }
+  }
+  open(id) { this.put({ view: 'room', roomId: id, lane: 0, pen: null, sel: { kind: '', ids: [] }, naming: false, addOpen: false, anim: true }); this.settle(); }
+  back() { const s = this.st(); this.put({ view: 'site', sel: { kind: 'room', ids: [s.roomId] }, pen: null, fresh: null, anim: true }); this.settle(); }
+  settle() { clearTimeout(this._t); this._t = setTimeout(() => this.put({ anim: false }), 820); }
+  editRoom(fn) {
+    const s = this.st(); const f = this.clone(s.farm); const r = this.findRoom(f, s.roomId); const extra = fn(r, f) || {};
+    this.put(Object.assign({ farm: f, saved: false }, extra));
+  }
+  addPen(i) {
+    const s = this.st(); const slot = s.fresh ? 1 - s.fresh.slot : 0;
+    this.editRoom((r) => { r.lanes[i].n = (r.lanes[i].n || 0) + 1; return { lane: i, pen: null, fresh: { room: r.id, lane: i, k: r.lanes[i].n, up: false, slot: slot } }; });
+    clearTimeout(this._g); this._g = setTimeout(() => { const t = this.st(); if (t.fresh) this.put({ fresh: Object.assign({}, t.fresh, { up: true }) }); }, 40);
+  }
+  addRoomTo(kind) {
+    const s = this.st(); const f = this.clone(s.farm); const b = this.bounds(f, s); const seq = s.seq;
+    if (kind === 'room') {
+      const sec = s.sel.kind === 'section' ? s.sel.ids[0] : null;
+      const r = this.room('c' + seq, 'Room ' + (f.rooms.length + 1), sec, 0, 0, [this.ln(f.types[0].id, 0)]);
+      const sp = sec ? this.pads(f, s).sec.find((p) => p.id === sec) : null;
+      r.x = sp ? this.snap(sp.x1 + 2) : this.snap(b.x0 + 26); r.y = sp ? this.snap(sp.y0 + 9) : this.snap(b.y1 + 10);
+      f.rooms.push(r); this.put({ farm: f, seq: seq + 1, addOpen: false, newIds: s.newIds.concat([r.id]) }); this.open(r.id); return;
+    }
+    if (kind === 'section') { f.sections.push({ id: 's' + seq, name: 'New section', code: 'NEW', zone: null, box: { x: this.snap(b.x0 + 26), y: this.snap(b.y1 + 10), w: 120, h: 80 } }); this.put({ farm: f, seq: seq + 1, addOpen: false, sel: { kind: 'section', ids: ['s' + seq] }, naming: true }); return; }
+    f.zones.push({ id: 'z' + seq, name: 'New zone', code: 'Z' + (f.zones.length + 1), box: { x: this.snap(b.x0 + 26), y: this.snap(b.y1 + 10), w: 200, h: 120 } });
+    this.put({ farm: f, seq: seq + 1, addOpen: false, sel: { kind: 'zone', ids: ['z' + seq] }, naming: true });
+  }
+
+  // pointer: pick, shift-pick, drag a room, or drag a box
+  roomDown(id, e) {
+    const s = this.st(); if (s.view !== 'site') return;
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (e && e.button && e.button !== 0) return;
+    const f = s.farm; const r = this.findRoom(f, id); const shift = e && (e.shiftKey || e.metaKey);
+    let ids = s.sel.kind === 'room' ? s.sel.ids.slice() : [];
+    if (shift) { ids = ids.indexOf(id) >= 0 ? ids.filter((x) => x !== id) : ids.concat([id]); this.put({ sel: { kind: ids.length ? 'room' : '', ids: ids }, naming: false, addOpen: false }); return; }
+    if (ids.indexOf(id) < 0) ids = [id];
+    this.put({ sel: { kind: 'room', ids: ids }, naming: false, addOpen: false });
+    const x0 = e ? e.clientX : 0, y0 = e ? e.clientY : 0; let moved = false;
+    const mv = (ev) => {
+      const dx = ev.clientX - x0, dy = ev.clientY - y0;
+      if (!moved && Math.abs(dx) + Math.abs(dy) < 5) return; moved = true;
+      const t = this.st(); const c = this.cam(t, t.sw || 616, this.stageH(t), t.farm); const w = c.inv(dx, dy);
+      this.put({ drag: { id: id, x: r.x + w[0], y: r.y + w[1], x0: r.x, y0: r.y } });
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up);
+      if (!moved) return;
+      const t = this.st(); if (!t.drag) return;
+      const g2 = this.clone(t.farm); const rr = this.findRoom(g2, id); const g = this.geo(g2, rr);
+      const nx = this.snap(t.drag.x), ny = this.snap(t.drag.y);
+      if (!this.overlaps(g2, id, nx, ny, g.W, g.D)) { rr.x = nx; rr.y = ny; }
+      this.put({ farm: g2, drag: null, saved: false });
+    };
+    window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up);
+  }
+  groupDown(kind, id, e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const s = this.st(); const shift = e && (e.shiftKey || e.metaKey);
+    let ids = s.sel.kind === kind ? s.sel.ids.slice() : [];
+    ids = shift ? (ids.indexOf(id) >= 0 ? ids.filter((x) => x !== id) : ids.concat([id])) : [id];
+    this.put({ sel: { kind: ids.length ? kind : '', ids: ids }, naming: false, addOpen: false });
+  }
+  stageDown(e) {
+    const s = this.st(); if (s.view !== 'site' || !this._stage) return;
+    const tg = e && e.target; if (tg && tg !== this._stage && tg.closest && tg.closest('button, input, label')) return;
+    const rc = this._stage.getBoundingClientRect(); const x0 = e.clientX - rc.left, y0 = e.clientY - rc.top; const shift = e.shiftKey;
+    const prev = shift && s.sel.kind === 'room' ? s.sel.ids.slice() : [];
+    let moved = false;
+    const mv = (ev) => {
+      const x1 = ev.clientX - rc.left, y1 = ev.clientY - rc.top;
+      if (!moved && Math.abs(x1 - x0) + Math.abs(y1 - y0) < 5) return; moved = true;
+      const t = this.st(); const c = this.cam(t, t.sw || 616, this.stageH(t), t.farm);
+      const bx = { x: Math.min(x0, x1), y: Math.min(y0, y1), w: Math.abs(x1 - x0), h: Math.abs(y1 - y0) };
+      const ids = prev.slice();
+      t.farm.rooms.forEach((r) => { const g = this.geo(t.farm, r); const p = c.P(r.x + g.W / 2, r.y + g.D / 2, 10); if (p[0] > bx.x && p[0] < bx.x + bx.w && p[1] > bx.y && p[1] < bx.y + bx.h && ids.indexOf(r.id) < 0) ids.push(r.id); });
+      this.put({ box: bx, sel: { kind: ids.length ? 'room' : '', ids: ids }, naming: false, addOpen: false });
+    };
+    const up = () => { window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); if (!moved) this.put({ sel: { kind: '', ids: [] }, naming: false, addOpen: false, hl: '' }); else this.put({ box: null }); };
+    window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up);
+  }
+  stageH(s) { return (s.sw || 616) > 760 ? 620 : 470; }
+
+  // ---------- render ----------
+  renderVals() {
+    const s = this.st(); const f = s.farm; const ic = this.icons();
+    const sw = s.sw || 616, sh = this.stageH(s);
+    const c = this.cam(s, sw, sh, f);
+    const inRoom = s.view === 'room';
+    const focus = inRoom ? this.findRoom(f, s.roomId) : null;
+    const pads = this.pads(f, s);
+    const mono = "font-family: 'Geist Mono', ui-monospace, monospace;";
+    const px = (v) => v.toFixed(2) + 'px';
+    const TRN = 'transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), width 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), height 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), background-color 0.45s ease, opacity 0.35s ease, border-color 0.3s ease;';
+    const BASE = 'position: absolute; left: 0; top: 0; transform-origin: 0 0; box-sizing: border-box; pointer-events: none;';
+    // screen-facing direction tests for the current turn
+    const nScr = (nx, ny) => [nx * Math.cos(c.rr) - ny * Math.sin(c.rr), nx * Math.sin(c.rr) + ny * Math.cos(c.rr)];
+    const lum = (nx, ny) => { const v = nScr(nx, ny); const facing = v[1] > 0; const vx = facing ? v[0] : -v[0]; return { facing: facing, k: 0.955 - 0.06 * vx - (facing ? 0.02 : 0) }; };
+    const faces = [];
+    const F = (k, st) => faces.push({ k: k, s: BASE + st });
+    // a slab: top face plus four sides
+    const slab = (k, x, y, w, d, z0, z1, top, side, extra, noTr) => {
+      const tr = noTr ? '' : TRN; const h = z1 - z0;
+      F(k + 't', 'width: ' + px(w) + '; height: ' + px(d) + '; transform: translate3d(' + px(x) + ', ' + px(y) + ', ' + px(z1) + '); background: ' + top + '; ' + (extra || '') + tr);
+      if (h <= 0.05) return;
+      [['n', x, y, w, 0, -1], ['s', x, y + d, w, 0, 1]].forEach((q) => { const L = lum(q[4], q[5]); F(k + q[0], 'width: ' + px(q[3]) + '; height: ' + px(h) + '; transform: translate3d(' + px(q[1]) + ', ' + px(q[2]) + ', ' + px(z0) + ') rotateX(90deg); background: ' + this.shade(side, L.k) + '; ' + tr); });
+      [['w', x, y, d, -1, 0], ['e', x + w, y, d, 1, 0]].forEach((q) => { const L = lum(q[4], q[5]); F(k + q[0], 'width: ' + px(h) + '; height: ' + px(q[3]) + '; transform: translate3d(' + px(q[1]) + ', ' + px(q[2]) + ', ' + px(z0) + ') rotateY(-90deg); background: ' + this.shade(side, L.k) + '; ' + tr); });
+    };
+    const lsx = 7, lsy = 6; // shadow vector on screen
+    const shadowOff = (h) => { const ux = lsx * h / 11, uy = lsy * h / 11; return [ux * Math.cos(c.rr) + uy * Math.sin(c.rr), -ux * Math.sin(c.rr) + uy * Math.cos(c.rr)]; };
+
+    // site board
+    const B = this.bounds(f, s);
+    const showGrid = !!s.drag;
+    slab('board', B.x0, B.y0, B.x1 - B.x0, B.y1 - B.y0, -6, 0, '#FBFBF9', '#E6E8E3', showGrid ? 'background-image: linear-gradient(rgba(18,24,21,0.07) 0.5px, transparent 0.5px), linear-gradient(90deg, rgba(18,24,21,0.07) 0.5px, transparent 0.5px); background-size: 6px 6px; background-position: ' + px(-B.x0 % 6) + ' ' + px(-B.y0 % 6) + ';' : '');
+    // zones and sections as ground pads
+    const selOn = (kind, id) => s.sel.kind === kind && s.sel.ids.indexOf(id) >= 0;
+    const ztint = ['#E9EFE4', '#F0EBE1', '#E6ECF0', '#EEE8F0'];
+    pads.zon.forEach((z, i) => slab('z' + z.id, z.x0, z.y0, z.x1 - z.x0, z.y1 - z.y0, 0, 2, ztint[f.zones.indexOf(z.zone) % 4], '#DDE2D8', 'border-radius: 6px;' + (selOn('zone', z.id) ? ' box-shadow: inset 0 0 0 ' + px(2 / c.s) + ' #121815;' : '')));
+    pads.sec.forEach((p) => {
+      const inZ = !!p.sec.zone && pads.zon.some((z) => z.id === p.sec.zone);
+      const sOn = selOn('section', p.id);
+      const empty = !f.rooms.some((r) => r.sec === p.id);
+      slab('s' + p.id, p.x0, p.y0, p.x1 - p.x0, p.y1 - p.y0, inZ ? 2 : 0, inZ ? 3.4 : 1.4, empty ? 'rgba(255,255,255,0.6)' : '#FAFBF8', '#E4E7E1', 'border-radius: 4px;' + (sOn ? ' box-shadow: inset 0 0 0 ' + px(2 / c.s) + ' #121815;' : (empty ? ' border: ' + px(1.4 / c.s) + ' dashed #AEB6AD;' : '')));
+    });
+
+    // rooms
+    const tops = [], solo = [], ghosts = [], hits = [], roomLabels = [], marks = [];
+    let selBox = null;
+    const roomPts = [];
+    const ZF = 4.4, WH = 11, CUT = 3.2, PH = 3.6;
+    f.rooms.forEach((r) => {
+      const g = this.geo(f, r); const p = this.pos(s, r); const L = p.lift; const id = r.id;
+      const isF = focus && focus.id === id; const dim = inRoom && !isF;
+      const dragging = s.drag && s.drag.id === id;
+      const noTr = dragging && !s.drag.held;
+      const op = dim ? ' opacity: 0.35;' : '';
+      const z0 = L, zf = ZF + L;
+      const isSel = selOn('room', id);
+      // cast shadow
+      const so = shadowOff(WH + L * 0.9);
+      F(id + 'sh', 'width: ' + px(g.W) + '; height: ' + px(g.D) + '; transform: translate3d(' + px(p.x + so[0]) + ', ' + px(p.y + so[1]) + ', ' + px(L ? 0.3 : 3.6) + '); background: rgba(40,52,44,' + (L ? 0.13 : 0.07) + '); box-shadow: 0 0 ' + px(L ? 12 : 5) + ' ' + px(L ? 6 : 3) + ' rgba(40,52,44,' + (L ? 0.12 : 0.07) + '); border-radius: 3px;' + op + (noTr ? '' : TRN));
+      if (dragging) {
+        const nx = this.snap(s.drag.x), ny = this.snap(s.drag.y); const bad = this.overlaps(f, id, nx, ny, g.W, g.D);
+        F(id + 'snap', 'width: ' + px(g.W + 4) + '; height: ' + px(g.D + 4) + '; transform: translate3d(' + px(nx - 2) + ', ' + px(ny - 2) + ', 3.8px); border: ' + px(1.6 / c.s) + ' dashed ' + (bad ? '#B4532A' : '#121815') + '; border-radius: 3px; background: ' + (bad ? 'rgba(180,83,42,0.06)' : 'rgba(18,24,21,0.03)') + ';');
+      }
+      if (isSel) F(id + 'ring', 'width: ' + px(g.W + 7) + '; height: ' + px(g.D + 7) + '; transform: translate3d(' + px(p.x - 3.5) + ', ' + px(p.y - 3.5) + ', ' + px(z0 + 3.7) + '); border: ' + px(2 / c.s) + ' solid #121815; border-radius: 4px;' + (noTr ? '' : TRN));
+      // plinth + floor
+      slab(id + 'fl', p.x, p.y, g.W, g.D, z0, zf, inRoom && isF ? '#EFF1EC' : '#EEF0EB', '#DADED7', op, noTr);
+      // walls: door wall split around the door; walls facing us are cut low
+      const dw = Math.min(12, (g.door === 'left' || g.door === 'right' ? g.D : g.W) - 10);
+      const walls = [];
+      const hz = (k, y, x0, x1, ny) => walls.push({ k: k, hor: true, y: y, a0: x0, a1: x1, nx: 0, ny: ny });
+      const vt = (k, x, y0, y1, nx) => walls.push({ k: k, hor: false, x: x, a0: y0, a1: y1, nx: nx, ny: 0 });
+      const mx = p.x + g.W / 2, my = p.y + g.D / 2;
+      if (g.door === 'top') { hz('n1', p.y, p.x, mx - dw / 2, -1); hz('n2', p.y, mx + dw / 2, p.x + g.W, -1); } else hz('n', p.y, p.x, p.x + g.W, -1);
+      if (g.door === 'bottom') { hz('s1', p.y + g.D, p.x, mx - dw / 2, 1); hz('s2', p.y + g.D, mx + dw / 2, p.x + g.W, 1); } else hz('s', p.y + g.D, p.x, p.x + g.W, 1);
+      if (g.door === 'left') { vt('w1', p.x, p.y, my - dw / 2, -1); vt('w2', p.x, my + dw / 2, p.y + g.D, -1); } else vt('w', p.x, p.y, p.y + g.D, -1);
+      if (g.door === 'right') { vt('e1', p.x + g.W, p.y, my - dw / 2, 1); vt('e2', p.x + g.W, my + dw / 2, p.y + g.D, 1); } else vt('e', p.x + g.W, p.y, p.y + g.D, 1);
+      const roofOn = s.roofs && !inRoom;
+      walls.forEach((w) => {
+        const Lm = lum(w.nx, w.ny); const h = roofOn ? WH : (Lm.facing ? CUT : WH); const len = w.a1 - w.a0; const T = 1.4;
+        const col = this.shade('#FFFFFF', Lm.k);
+        const tr = noTr ? '' : TRN;
+        if (w.hor) {
+          F(id + w.k, 'width: ' + px(len) + '; height: ' + px(h) + '; transform: translate3d(' + px(w.a0) + ', ' + px(w.y) + ', ' + px(zf) + ') rotateX(90deg); background: ' + col + ';' + op + tr);
+          F(id + w.k + 'c', 'width: ' + px(len) + '; height: ' + px(T) + '; transform: translate3d(' + px(w.a0) + ', ' + px(w.y - T / 2) + ', ' + px(zf + h) + '); background: ' + (s.plan ? '#7E8780' : '#D3D8D0') + ';' + op + tr);
+        } else {
+          F(id + w.k, 'width: ' + px(h) + '; height: ' + px(len) + '; transform: translate3d(' + px(w.x) + ', ' + px(w.a0) + ', ' + px(zf) + ') rotateY(-90deg); background: ' + col + ';' + op + tr);
+          F(id + w.k + 'c', 'width: ' + px(T) + '; height: ' + px(len) + '; transform: translate3d(' + px(w.x - T / 2) + ', ' + px(w.a0) + ', ' + px(zf + h) + '); background: ' + (s.plan ? '#7E8780' : '#D3D8D0') + ';' + op + tr);
+        }
+      });
+      if (roofOn) F(id + 'roof', 'width: ' + px(g.W + 1.4) + '; height: ' + px(g.D + 1.4) + '; transform: translate3d(' + px(p.x - 0.7) + ', ' + px(p.y - 0.7) + ', ' + px(zf + WH + 0.1) + '); background: #FFFFFF; border: ' + px(1 / c.s) + ' solid #D3D8D0;' + (noTr ? '' : TRN));
+      // the door: an arrow on the ground, pointing in
+      const dv = { bottom: [0, 1], top: [0, -1], left: [-1, 0], right: [1, 0] }[g.door];
+      const dx = g.door === 'left' ? p.x : g.door === 'right' ? p.x + g.W : mx, dy = g.door === 'top' ? p.y : g.door === 'bottom' ? p.y + g.D : my;
+      const ang = { bottom: 0, top: 180, left: 90, right: -90 }[g.door];
+      const aw = Math.min(8, 13 / c.s), ah = aw * 0.75, ao = 2 + aw * 0.6;
+      if (isF) { const q = c.P(dx + dv[0] * (ao + 20 / c.s), dy + dv[1] * (ao + 20 / c.s), z0 + 3.9); marks.push({ text: 'Door', s0: 1, s: 'position: absolute; left: ' + px(q[0]) + '; top: ' + px(q[1]) + '; transform: translate(-50%, -50%); font-size: 12px; font-weight: 600; color: #3B4540; pointer-events: none; opacity: ' + (s.anim ? 0 : 1) + '; transition: opacity 0.3s ease' }); }
+      if (!roofOn) F(id + 'door', 'width: ' + px(aw) + '; height: ' + px(ah) + '; transform: translate3d(' + px(dx + dv[0] * ao - aw / 2) + ', ' + px(dy + dv[1] * ao - ah / 2) + ', ' + px(z0 + 3.9) + ') rotateZ(' + ang + 'deg); transform-origin: ' + px(aw / 2) + ' ' + px(ah / 2) + '; clip-path: polygon(50% 0, 100% 100%, 50% 72%, 0 100%); background: ' + (isF ? '#121815' : '#9AA39C') + ';' + op + (noTr ? '' : TRN));
+      // pens: one raised strip per lane (pens as cells on top), plus single blocks for the end pen and a pen just added
+      if (!roofOn) {
+        const pz = zf + PH;
+        g.lanes.forEach((l) => {
+          const fr = s.fresh && s.fresh.room === id && s.fresh.lane === l.i && s.fresh.k === l.n;
+          const nn = fr ? l.n - 1 : l.n;
+          const col = this.colorOf(f, l.t);
+          const hlDim = s.hl && l.t !== s.hl ? ' opacity: 0.22;' : op;
+          if (nn > 0) {
+            const rc = l.rect(1, nn); const rx = p.x + rc.x, ry = p.y + rc.y;
+            [['n', rx, ry, rc.w, 0, -1], ['s', rx, ry + rc.h, rc.w, 0, 1]].forEach((q) => { const Lm = lum(q[4], q[5]); if (!Lm.facing) return; F(id + 'L' + l.i + q[0], 'width: ' + px(q[3]) + '; height: ' + px(PH) + '; transform: translate3d(' + px(q[1]) + ', ' + px(q[2]) + ', ' + px(zf) + ') rotateX(90deg); background: ' + this.shade(col.mid, Lm.k * 0.86) + ';' + hlDim + (noTr ? '' : TRN)); });
+            [['w', rx, ry, rc.h, -1, 0], ['e', rx + rc.w, ry, rc.h, 1, 0]].forEach((q) => { const Lm = lum(q[4], q[5]); if (!Lm.facing) return; F(id + 'L' + l.i + q[0], 'width: ' + px(PH) + '; height: ' + px(q[3]) + '; transform: translate3d(' + px(q[1]) + ', ' + px(q[2]) + ', ' + px(zf) + ') rotateY(-90deg); background: ' + this.shade(col.mid, Lm.k * 0.86) + ';' + hlDim + (noTr ? '' : TRN)); });
+            const cells = [];
+            for (let k = 1; k <= nn; k++) {
+              const on = isF && s.pen && s.pen.lane === l.i && s.pen.k === k;
+              const code = this.letter(l.i) + k;
+              cells.push({
+                tab: isF ? '0' : '-1', aria: 'Pen ' + code,
+                pick: () => this.put({ pen: { lane: l.i, k: k }, lane: l.i }),
+                s: 'display: block; flex: 1 1 0; min-width: 0; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: ' + px(Math.min(1.2, l.a * 0.2)) + '; background: ' + (on ? this.shade(col.mid, 0.8) : col.mid) + '; cursor: pointer; transition: background-color 0.45s ease;' + (on ? ' box-shadow: 0 0 0 ' + px(2 / c.s) + ' #121815;' : '') + (isF ? '' : ' pointer-events: none;')
+              });
+            }
+            tops.push({ k: id + 'T' + l.i, cells: cells, s: BASE + 'width: ' + px(rc.w) + '; height: ' + px(rc.h) + '; transform: translate3d(' + px(rx) + ', ' + px(ry) + ', ' + px(pz) + '); display: flex; flex-direction: ' + g.dir + '; gap: ' + px(g.PG) + ';' + hlDim + (isF ? ' pointer-events: auto;' : '') + (noTr ? '' : TRN) });
+          }
+          if (fr) {
+            const rc = l.rect(l.n, l.n); const rx = p.x + rc.x, ry = p.y + rc.y; const up = s.fresh.up; const zz = up ? 0 : -PH - 0.6;
+            const kk = id + 'F' + s.fresh.slot;
+            const ftr = 'transition: transform 0.55s cubic-bezier(0.3, 1.5, 0.5, 1);';
+            [['n', rx, ry, rc.w, 0, -1], ['s', rx, ry + rc.h, rc.w, 0, 1]].forEach((q) => { const Lm = lum(q[4], q[5]); F(kk + q[0], 'width: ' + px(q[3]) + '; height: ' + px(PH) + '; transform: translate3d(' + px(q[1]) + ', ' + px(q[2]) + ', ' + px(zf + zz) + ') rotateX(90deg); background: ' + this.shade(col.mid, Lm.k * 0.86) + ';' + ftr); });
+            [['w', rx, ry, rc.h, -1, 0], ['e', rx + rc.w, ry, rc.h, 1, 0]].forEach((q) => { const Lm = lum(q[4], q[5]); F(kk + q[0], 'width: ' + px(PH) + '; height: ' + px(q[3]) + '; transform: translate3d(' + px(q[1]) + ', ' + px(q[2]) + ', ' + px(zf + zz) + ') rotateY(-90deg); background: ' + this.shade(col.mid, Lm.k * 0.86) + ';' + ftr); });
+            solo.push({ k: kk + 't', tab: '0', aria: 'Pen ' + this.letter(l.i) + l.n + ', just added', pick: () => this.put({ pen: { lane: l.i, k: l.n } }),
+              s: BASE + 'pointer-events: auto; padding: 0; border: 0; cursor: pointer; width: ' + px(rc.w) + '; height: ' + px(rc.h) + '; transform: translate3d(' + px(rx) + ', ' + px(ry) + ', ' + px(pz + zz) + '); background: ' + col.mid + '; border-radius: ' + px(Math.min(1.2, l.a * 0.2)) + '; box-shadow: 0 0 0 ' + px(1.6 / c.s) + ' #2FA36B;' + ftr });
+          }
+          // + pen, at the lane's far end
+          if (isF && !l.covered && (17 * c.s >= 36 || l.i === s.lane)) {
+            const rc = l.rect(l.n + 1, l.n + 1);
+            F(id + 'G' + l.i, 'width: ' + px(rc.w) + '; height: ' + px(rc.h) + '; transform: translate3d(' + px(p.x + rc.x) + ', ' + px(p.y + rc.y) + ', ' + px(zf + 0.3) + '); border: ' + px(1.2 / c.s) + ' dashed ' + (l.i === s.lane ? '#5E6862' : '#AEB6AD') + '; border-radius: ' + px(Math.min(1.2, Math.min(rc.w, rc.h) * 0.2)) + ';' + TRN);
+            const r1 = l.rect(1, 1), r2 = l.rect(2, 2); const ux = (r2.x - r1.x) / l.a, uy = (r2.y - r1.y) / l.a;
+            const k0 = rc.x + rc.w / 2 + ux * (l.a / 2 + 16 / c.s), k1 = rc.y + rc.h / 2 + uy * (l.a / 2 + 16 / c.s);
+            const q = c.P(p.x + k0, p.y + k1, zf + PH);
+            ghosts.push({ aria: 'Add a pen to lane ' + this.letter(l.i), add: () => this.addPen(l.i),
+              s: 'position: absolute; left: ' + px(q[0]) + '; top: ' + px(q[1]) + '; transform: translate(-50%, -50%); width: 30px; height: 30px; padding: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto; ' + (l.i === s.lane ? 'background: #121815; border: 1px solid #121815;' : 'background: #FFFFFF; border: 1px solid #D5DAD3;') + ' box-shadow: 0 1px 3px rgba(18,24,21,0.10); opacity: ' + (s.anim ? 0 : 1) + '; transition: opacity 0.3s ease',
+              icon: 'width: 15px; height: 15px; fill: none; stroke: ' + (l.i === s.lane ? '#FFFFFF' : '#121815') + '; stroke-width: 2.2; stroke-linecap: round; pointer-events: none' });
+          }
+          // lane letter at the door end
+          if (isF) { const m = l.mouth; const q = c.P(p.x + m.x + m.w / 2, p.y + m.y + m.h / 2, zf); marks.push({ text: this.letter(l.i), s: 'position: absolute; left: ' + px(q[0]) + '; top: ' + px(q[1]) + '; transform: translate(-50%, -50%); width: 22px; height: 22px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 600; ' + (l.i === s.lane ? 'background: #121815; color: #FFFFFF;' : 'background: #FFFFFF; color: #121815; box-shadow: 0 0 0 1px #DADFD8;') + ' opacity: ' + (s.anim ? 0 : 1) + '; transition: opacity 0.3s ease' }); }
+        });
+        g.ends.forEach((e) => {
+          const col = this.colorOf(f, e.e.t); const rc = e.rect; const rx = p.x + rc.x, ry = p.y + rc.y;
+          const on = isF && s.pen && s.pen.end === e.j; const zz = on ? 1.6 : 0;
+          const hlDim = s.hl && e.e.t !== s.hl ? ' opacity: 0.22;' : op;
+          [['n', rx, ry, rc.w, 0, -1], ['s', rx, ry + rc.h, rc.w, 0, 1]].forEach((q) => { const Lm = lum(q[4], q[5]); F(id + 'E' + e.j + q[0], 'width: ' + px(q[3]) + '; height: ' + px(PH + zz) + '; transform: translate3d(' + px(q[1]) + ', ' + px(q[2]) + ', ' + px(zf) + ') rotateX(90deg); background: ' + this.shade(col.mid, Lm.k * 0.86) + ';' + hlDim + TRN); });
+          [['w', rx, ry, rc.h, -1, 0], ['e', rx + rc.w, ry, rc.h, 1, 0]].forEach((q) => { const Lm = lum(q[4], q[5]); F(id + 'E' + e.j + q[0], 'width: ' + px(PH + zz) + '; height: ' + px(q[3]) + '; transform: translate3d(' + px(q[1]) + ', ' + px(q[2]) + ', ' + px(zf) + ') rotateY(-90deg); background: ' + this.shade(col.mid, Lm.k * 0.86) + ';' + hlDim + TRN); });
+          solo.push({ k: id + 'E' + e.j + 't', tab: isF ? '0' : '-1', aria: 'Pen ' + this.letter(g.lanes.length + e.j) + '1', pick: () => this.put({ pen: { end: e.j } }),
+            s: BASE + (isF ? 'pointer-events: auto; cursor: pointer;' : '') + ' padding: 0; border: 0; width: ' + px(rc.w) + '; height: ' + px(rc.h) + '; transform: translate3d(' + px(rx) + ', ' + px(ry) + ', ' + px(zf + PH + zz) + '); background: ' + (on ? this.shade(col.mid, 0.92) : col.mid) + '; border-radius: 1.2px;' + (on ? ' box-shadow: 0 0 0 ' + px(2 / c.s) + ' #121815;' : '') + hlDim + TRN });
+        });
+        // pen codes, where the pens are big enough to carry them
+        if (isF) {
+          const codeAt = (rc, code, z) => { if (Math.min(rc.w, rc.h) * c.s < 26) return; const q = c.P(p.x + rc.x + rc.w / 2, p.y + rc.y + rc.h / 2, z); marks.push({ text: code, s: 'position: absolute; left: ' + px(q[0]) + '; top: ' + px(q[1]) + '; transform: translate(-50%, -50%); ' + mono + ' font-size: 11.5px; font-weight: 500; color: #2A332E; pointer-events: none; opacity: ' + (s.anim ? 0 : 1) + '; transition: opacity 0.3s ease' }); };
+          g.lanes.forEach((l) => { for (let k = 1; k <= l.n; k++) codeAt(l.rect(k, k), this.letter(l.i) + k, zf + PH); });
+          g.ends.forEach((e) => codeAt(e.rect, this.letter(g.lanes.length + e.j) + '1', zf + PH + (s.pen && s.pen.end === e.j ? 1.6 : 0)));
+        }
+      }
+      // hit target over the whole building
+      if (!inRoom) hits.push({ k: id + 'H', tab: '0', aria: r.name, down: (e) => this.roomDown(id, e), open: () => this.open(id),
+        s: BASE + 'pointer-events: auto; padding: 0; border: 0; background: transparent; cursor: ' + (dragging ? 'grabbing' : 'grab') + '; width: ' + px(g.W) + '; height: ' + px(g.D) + '; transform: translate3d(' + px(p.x) + ', ' + px(p.y) + ', ' + px(zf + WH + 0.4) + ');' + (noTr ? '' : TRN) });
+      // label over the room
+      const lp = c.P(p.x + g.W / 2, p.y + g.D / 2, zf + WH);
+      roomPts.push({ r: r, q: lp, isSel: isSel, dragging: dragging, g: g, p: p });
+      if (isSel) { const cs = [[0, 0], [g.W, 0], [0, g.D], [g.W, g.D]].map((v) => c.P(p.x + v[0], p.y + v[1], zf + WH)); const xs = cs.map((v) => v[0]), ys = cs.map((v) => v[1]); const b0 = { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) }; selBox = selBox ? { x0: Math.min(selBox.x0, b0.x0), x1: Math.max(selBox.x1, b0.x1), y0: Math.min(selBox.y0, b0.y0), y1: Math.max(selBox.y1, b0.y1) } : b0; }
+    });
+
+    // room labels: inside a section a room reads by what is left of its name ("Room 3", "1"); the picked room shows its full name
+    const placed = [];
+    const shortOf = (r) => {
+      const sc = f.sections.find((x) => x.id === r.sec);
+      let t = r.name;
+      if (sc && t.toLowerCase().indexOf(sc.name.toLowerCase() + ' ') === 0) t = t.slice(sc.name.length + 1);
+      t = t.replace(/^Room\s+(?=\d)/i, '');
+      return t;
+    };
+    roomPts.sort((a, b) => a.q[1] - b.q[1]).forEach((o) => {
+      if (inRoom) return;
+      const isNew = s.newIds.indexOf(o.r.id) >= 0;
+      const one = s.sel.kind === 'room' && s.sel.ids.length === 1;
+      const full = (o.isSel && one) || o.dragging;
+      let text = full ? o.r.name : shortOf(o.r);
+      if (o.isSel && !one) { const m = /(\d+)$/.exec(text); if (m) text = m[1]; }
+      const chip = /^\d+$/.test(text);
+      const w = chip ? 26 : text.length * 7 + 20 + (isNew ? 40 : 0);
+      const hitAt = (L) => placed.some((b) => Math.abs(b.x - o.q[0]) < (b.w + w) / 2 + 4 && Math.abs((b.y - b.l * 24) - (o.q[1] - L * 24)) < 26);
+      let lvl = 0; while (lvl < 2 && hitAt(lvl)) lvl++;
+      placed.push({ x: o.q[0], y: o.q[1], w: w, l: lvl });
+      const stemH = 8 + lvl * 24;
+      const on = o.isSel;
+      roomLabels.push({
+        name: text, isNew: isNew && !chip,
+        down: (e) => this.roomDown(o.r.id, e), open: () => this.open(o.r.id),
+        wrap: 'position: absolute; left: ' + px(o.q[0]) + '; top: ' + px(o.q[1]) + '; width: 0; height: 0; z-index: ' + (on ? 2 : 1) + '; opacity: ' + (s.anim ? 0 : 1) + '; transition: opacity 0.3s ease',
+        s: 'position: absolute; left: 0; bottom: ' + stemH + 'px; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; height: 26px; ' + (chip ? 'min-width: 26px; padding: 0 7px; border-radius: 13px; ' + mono + ' font-size: 12.5px; font-weight: 500;' : 'padding: 0 9px; border-radius: 8px; font: inherit; font-size: 12.5px; font-weight: 600;') + ' box-sizing: border-box; white-space: nowrap; cursor: pointer; ' + (on ? 'background: #121815; color: #FFFFFF; border: 1px solid #121815;' : (isNew ? 'background: #FFFFFF; color: #121815; border: 1px solid #8CC7A1;' : 'background: #FFFFFF; color: #121815; border: 1px solid #E1E4DF;')) + ' box-shadow: 0 1px 3px rgba(18,24,21,' + (o.dragging ? 0.18 : 0.06) + ')',
+        stem: 'position: absolute; left: -0.5px; bottom: 0; width: 1px; height: ' + stemH + 'px; background: ' + (on ? '#121815' : '#BFC5BE')
+      });
+    });
+
+    // zone and section names: a plaque under each pad's front corner
+    const groupLabels = [];
+    if (!inRoom) {
+      const quad = (b, z) => [[b.x0, b.y0], [b.x1, b.y0], [b.x1, b.y1], [b.x0, b.y1]].map((v) => c.P(v[0], v[1], z));
+      const inside = (pt, poly) => { let o = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b2 = poly[j]; if ((a[1] > pt[1]) !== (b2[1] > pt[1]) && pt[0] < (b2[0] - a[0]) * (pt[1] - a[1]) / (b2[1] - a[1]) + a[0]) o = !o; } return o; };
+      const others = pads.sec.map((p) => ({ id: p.id, poly: quad(p, 3.4) }));
+      const roomPolys = roomPts.map((o) => ({ id: o.r.id, poly: quad({ x0: o.p.x, y0: o.p.y, x1: o.p.x + o.g.W, y1: o.p.y + o.g.D }, 4.4) }));
+      const taken = placed.map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - 8 - b.l * 24 - 26, y1: b.y - 8 - b.l * 24 }));
+      taken.push({ x0: 0, x1: sw > 760 ? 560 : 330, y0: sh - 48, y1: sh });
+      const clash = (r) => taken.some((t) => r.x0 < t.x1 + 4 && r.x1 > t.x0 - 4 && r.y0 < t.y1 + 2 && r.y1 > t.y0 - 2);
+      const plaque = (kind, p, name, code, z, big) => {
+        const cs = quad(p, z).slice().sort((a, b2) => (b2[1] - a[1]) || (a[0] - b2[0]));
+        const w = (name.length + code.length) * 7.4 + 22, h = big ? 28 : 24, dy = big ? 8 : 5;
+        const cands = [];
+        const al = (v, top, pref) => [[0, 0], [w / 2 - 10, 12], [-w / 2 + 10, 12]].forEach((o) => cands.push({ x: v[0] + o[0], top: top, pref: pref + o[1] }));
+        cs.forEach((v, i) => al(v, i < 2 ? v[1] + dy : v[1] - dy - h, i * 30));
+        al(cs[0], cs[0][1] + dy + 22, 45);
+        cs.forEach((v, i) => al(v, i < 2 ? v[1] - dy - h : v[1] + dy, 160 + i * 30));
+        const cost = (cd) => {
+          const r = { x0: cd.x - w / 2, x1: cd.x + w / 2, y0: cd.top, y1: cd.top + h }; let a = cd.pref;
+          taken.forEach((t) => { const ox = Math.min(r.x1, t.x1 + 4) - Math.max(r.x0, t.x0 - 4), oy = Math.min(r.y1, t.y1 + 2) - Math.max(r.y0, t.y0 - 2); if (ox > 0 && oy > 0) a += 2000 + ox * oy; });
+          if (r.x0 < 4 || r.x1 > sw - 4 || r.y0 < 54 || r.y1 > sh - 6) a += 8000;
+          [-0.45, -0.2, 0, 0.2, 0.45].forEach((k) => { const pt = [cd.x + k * w, cd.top + h / 2];
+            if (roomPolys.some((o) => inside(pt, o.poly))) a += 260;
+            if (kind === 'section' && others.some((o) => o.id !== p.id && inside(pt, o.poly))) a += 120; });
+          return a;
+        };
+        const cd = cands.slice().sort((a, b2) => cost(a) - cost(b2))[0];
+        taken.push({ x0: cd.x - w / 2, x1: cd.x + w / 2, y0: cd.top, y1: cd.top + h });
+        const on = selOn(kind, p.id);
+        groupLabels.push({ name: name, code: code, down: (e) => this.groupDown(kind, p.id, e),
+          nameS: 'font-size: ' + (big ? 13.5 : 12.5) + 'px; font-weight: 600; color: ' + (on ? '#FFFFFF' : (big ? '#121815' : '#3B4540')),
+          s: 'position: absolute; left: ' + px(cd.x) + '; top: ' + px(cd.top) + '; transform: translateX(-50%); display: flex; align-items: baseline; gap: 6px; height: ' + h + 'px; line-height: ' + h + 'px; padding: 0 8px; border: 0; border-radius: 8px; font: inherit; white-space: nowrap; cursor: pointer; ' + (on ? 'background: #121815;' : 'background: transparent;') + ' opacity: ' + (s.anim || s.drag ? 0 : 1) + '; transition: opacity 0.3s ease' });
+      };
+      pads.sec.forEach((p) => plaque('section', p, p.sec.name, p.sec.code, 2, false));
+      pads.zon.forEach((z) => plaque('zone', z, z.zone.name, z.zone.code, 0, true));
+    }
+
+    // selection box for the action bar (rooms, or a group pad)
+    if (!selBox && (s.sel.kind === 'section' || s.sel.kind === 'zone')) {
+      const list = s.sel.kind === 'section' ? pads.sec : pads.zon;
+      list.filter((p) => s.sel.ids.indexOf(p.id) >= 0).forEach((p) => { const cs = [[p.x0, p.y0], [p.x1, p.y0], [p.x0, p.y1], [p.x1, p.y1]].map((v) => c.P(v[0], v[1], 3)); const xs = cs.map((v) => v[0]), ys = cs.map((v) => v[1]); const b0 = { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) }; selBox = selBox ? { x0: Math.min(selBox.x0, b0.x0), x1: Math.max(selBox.x1, b0.x1), y0: Math.min(selBox.y0, b0.y0), y1: Math.max(selBox.y1, b0.y1) } : b0; });
+    }
+
+    // ---------- action bar ----------
+    const kind = s.sel.kind, n = s.sel.ids.length;
+    const act = (label, go, keys, primary) => ({ label: label, go: go, keys: keys || '', hasKeys: !!keys, s: 'display: flex; align-items: center; height: 34px; padding: 0 11px; border: 0; border-radius: 8px; font: inherit; font-size: 13.5px; font-weight: ' + (primary ? 600 : 500) + '; white-space: nowrap; cursor: pointer; ' + (primary ? 'background: #121815; color: #FFFFFF' : 'background: transparent; color: #121815') });
+    let actions = [], count = '';
+    if (kind === 'room' && n === 1) { count = '1 room'; actions = [act('Open', () => this.open(s.sel.ids[0]), '', true), act('Duplicate', () => this.duplicate(), '⌘D'), act('Delete', () => this.remove())]; }
+    if (kind === 'room' && n > 1) { count = n + ' rooms'; actions = [act('Group into section', () => this.groupSection(), '', true), act('Duplicate', () => this.duplicate(), '⌘D'), act('Delete', () => this.remove())]; }
+    if (kind === 'section') { count = n === 1 ? (f.sections.find((x) => x.id === s.sel.ids[0]) || {}).name || 'Section' : n + ' sections'; actions = [act('Group into zone', () => this.groupZone(), '', true), act('Rename', () => this.put({ naming: true })), act('Ungroup', () => this.ungroup())]; if (n === 1) actions.push(act('+ Room', () => this.addRoomTo('room'))); }
+    if (kind === 'zone') { count = n === 1 ? (f.zones.find((x) => x.id === s.sel.ids[0]) || {}).name || 'Zone' : n + ' zones'; actions = [act('Rename', () => this.put({ naming: true })), act('Ungroup', () => this.ungroup())]; }
+    const naming = s.naming && (kind === 'section' || kind === 'zone') && n === 1;
+    const grp = naming ? (kind === 'section' ? f.sections.find((x) => x.id === s.sel.ids[0]) : f.zones.find((x) => x.id === s.sel.ids[0])) : null;
+    const showBar = !inRoom && !s.box && !s.drag && !!selBox && (actions.length > 0 || naming) && !s.anim;
+    let barStyle = '';
+    if (showBar) {
+      const bw = naming ? 400 : 330; const cx = Math.max(bw / 2 + 12, Math.min(sw - bw / 2 - 12, (selBox.x0 + selBox.x1) / 2));
+      let top = selBox.y0 - 62; if (s.sel.kind === 'room') top -= 28; if (top < 60) top = Math.min(sh - 60, selBox.y1 + 14);
+      barStyle = 'position: absolute; left: ' + px(cx) + '; top: ' + px(top) + '; transform: translateX(-50%); z-index: 4; display: flex; align-items: center; gap: 4px; padding: 5px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 12px; box-shadow: 0 8px 24px rgba(18,24,21,0.10), 0 1px 2px rgba(18,24,21,0.06); white-space: nowrap; animation: sentriRise 0.25s cubic-bezier(0.2, 0.7, 0.2, 1) both';
+    }
+    const setGrp = (field, v) => { const t = this.st(); const g2 = this.clone(t.farm); const list = t.sel.kind === 'section' ? g2.sections : g2.zones; const it = list.find((x) => x.id === t.sel.ids[0]); if (!it) return; it[field] = v; if (field === 'name' && t.sel.kind === 'section' && !it.codeSet) it.code = v.replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase(); if (field === 'code') it.codeSet = true; this.put({ farm: g2 }); };
+    const bar = {
+      show: showBar, style: barStyle, naming: naming, acting: !naming, count: count, actions: actions,
+      nameLabel: kind === 'zone' ? 'Zone' : 'Section', name: grp ? grp.name : '', code: grp ? grp.code : '',
+      typeName: (e) => setGrp('name', e.target.value), typeCode: (e) => setGrp('code', e.target.value.toUpperCase().slice(0, kind === 'zone' ? 3 : 4)),
+      done: () => this.put({ naming: false })
+    };
+
+    // ---------- pen card ----------
+    let card = { show: false };
+    if (inRoom && s.pen && !s.anim) {
+      const g = this.geo(f, focus); const rc0 = g; let rc = null, code = '', type = null, l1 = '', l2 = '', z = ZF + PH;
+      if (s.pen.end != null) {
+        const e = g.ends.find((x) => x.j === s.pen.end);
+        if (e) { rc = e.rect; code = this.letter(g.lanes.length + e.j) + '1'; type = this.typeOf(f, e.e.t); const each = this.per(f, e.e); l1 = each + ' ' + (each === 1 ? type.u1 : type.uN) + ' in one pen'; l2 = 'Across lanes ' + e.ls.map((i) => this.letter(i)).join(' and ') + ', at the far end'; z += 1.6; }
+      } else {
+        const l = g.lanes[s.pen.lane];
+        if (l && s.pen.k <= l.n) { rc = l.rect(s.pen.k, s.pen.k); code = this.letter(l.i) + s.pen.k; type = this.typeOf(f, l.t); const each = this.per(f, focus.lanes[l.i]); l1 = each + ' ' + (each === 1 ? type.u1 : type.uN); l2 = 'Lane ' + this.letter(l.i) + ', pen ' + s.pen.k + ' of ' + l.n + (s.pen.k === 1 ? ' · nearest the door' : ''); }
+      }
+      if (rc && type) {
+        const q = c.P(focus.x + rc.x + rc.w / 2, focus.y + rc.y + rc.h / 2, z);
+        const col = this.colors()[type.c % 6];
+        const cw = 236; const ch = 96;
+        const rb = [[0, 0], [rc0.W, 0], [0, rc0.D], [rc0.W, rc0.D]].map((v) => c.P(focus.x + v[0], focus.y + v[1], ZF + 11));
+        const rx1 = Math.max(...rb.map((v) => v[0])), rx0 = Math.min(...rb.map((v) => v[0]));
+        const ry0 = Math.min(...rb.map((v) => v[1])), ry1 = Math.max(...rb.map((v) => v[1]));
+        let left, top, ex, ey;
+        const midT = Math.max(64, Math.min(sh - ch - 50, q[1] - ch / 2));
+        if (rx1 + 28 + cw < sw - 12) { left = rx1 + 28; top = midT; ex = left; ey = top + ch / 2; }
+        else if (rx0 - 28 - cw > 12) { left = rx0 - 28 - cw; top = midT; ex = left + cw; ey = top + ch / 2; }
+        else if (ry0 - 24 - ch > 60) { left = Math.max(12, Math.min(sw - cw - 12, q[0] - cw / 2)); top = ry0 - 24 - ch; ex = Math.max(left + 16, Math.min(left + cw - 16, q[0])); ey = top + ch; }
+        else { left = Math.max(12, Math.min(sw - cw - 12, q[0] - cw / 2)); top = Math.min(sh - ch - 50, ry1 + 24); ex = Math.max(left + 16, Math.min(left + cw - 16, q[0])); ey = top; }
+        const len = Math.hypot(ex - q[0], ey - q[1]), angL = Math.atan2(ey - q[1], ex - q[0]) * 180 / Math.PI;
+        card = { show: true, code: code, type: type.name, line1: l1, line2: l2, close: () => this.put({ pen: null }),
+          sw: 'width: 12px; height: 12px; border-radius: 3px; background: ' + col.mid + '; flex-shrink: 0',
+          style: 'position: absolute; left: ' + px(left) + '; top: ' + px(top) + '; width: ' + cw + 'px; min-height: ' + ch + 'px; box-sizing: border-box; z-index: 4; padding: 12px 14px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 12px; box-shadow: 0 10px 28px rgba(18,24,21,0.12), 0 1px 2px rgba(18,24,21,0.06); animation: sentriRise 0.25s cubic-bezier(0.2, 0.7, 0.2, 1) both',
+          stem: 'position: absolute; z-index: 3; left: ' + px(q[0]) + '; top: ' + px(q[1]) + '; width: ' + px(len) + '; height: 1px; background: #121815; transform-origin: 0 50%; transform: rotate(' + angL.toFixed(2) + 'deg)',
+          dot: 'position: absolute; z-index: 3; left: ' + px(q[0] - 4) + '; top: ' + px(q[1] - 4) + '; width: 8px; height: 8px; border-radius: 50%; background: #121815; box-shadow: 0 0 0 2px #FFFFFF' };
+      }
+    }
+
+    // ---------- inspector ----------
+    const totalsBy = {}; let all = 0;
+    f.rooms.forEach((r) => { r.lanes.forEach((l) => { const k = l.t; totalsBy[k] = (totalsBy[k] || 0) + Math.max(0, l.n || 0) * this.per(f, l); }); (r.ends || []).forEach((e) => { totalsBy[e.t] = (totalsBy[e.t] || 0) + this.per(f, e); }); all += this.places(f, r); });
+    const legend = f.types.filter((t) => totalsBy[t.id]).map((t) => {
+      const col = this.colors()[t.c % 6]; const on = s.hl === t.id;
+      return { name: t.name, sub: t.use + ' · ' + t.per + ' per pen', places: this.fmt(totalsBy[t.id]), on: on,
+        pick: () => this.put({ hl: s.hl === t.id ? '' : t.id }),
+        sw: 'width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; background: ' + col.mid + '; box-shadow: inset 0 -2px 0 ' + this.shade(col.mid, 0.82),
+        s: 'display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 4px 8px; margin: 0 -8px; border: 0; border-radius: 10px; font: inherit; cursor: pointer; background: ' + (on ? '#F0F2EE' : 'transparent') + (s.hl && !on ? '; opacity: 0.55' : '') };
+    });
+    const secOf = (r) => f.sections.find((x) => x.id === r.sec) || null;
+    const zoneOf = (x) => x ? f.zones.find((z) => z.id === x.zone) || null : null;
+    const numOf = (r) => { const m = /(\d+)$/.exec(r.name); return m ? m[1] : String(f.rooms.filter((q) => q.sec === r.sec).indexOf(r) + 1); };
+    const codeOf = (r) => { const sc = secOf(r), z = zoneOf(sc); return [(z ? z.code : 'Z?'), (sc ? sc.code : '—'), numOf(r)].join('-'); };
+    const whereOf = (r) => { const sc = secOf(r), z = zoneOf(sc); return sc ? (z ? z.name + ' · ' : '') + sc.name : 'Not in a section yet'; };
+    const usesOf = (r) => { const u = []; r.lanes.concat(r.ends || []).forEach((l) => { const t = this.typeOf(f, l.t); if (t && u.indexOf(t.use) < 0) u.push(t.use); }); return u.join(', ') || '—'; };
+    const sumOf = (r) => { const order = [], cnt = {}; r.lanes.forEach((l) => { if (!(l.t in cnt)) { order.push(l.t); cnt[l.t] = 0; } cnt[l.t] += Math.max(0, l.n || 0); }); (r.ends || []).forEach((e) => { if (!(e.t in cnt)) { order.push(e.t); cnt[e.t] = 0; } cnt[e.t] += 1; }); return order.map((k) => { const t = this.typeOf(f, k); const v = cnt[k]; return t ? this.fmt(v) + ' ' + (v === 1 ? t.s1 : t.s2) : v + ' pens'; }).join(' · ') || 'No pens yet'; };
+    let insp = { farm: false, room: false, group: false, editor: false };
+    if (inRoom) {
+      insp = { editor: true, where: whereOf(focus), name: focus.name, code: codeOf(focus), summary: this.fmt(this.places(f, focus)) + ' places · ' + sumOf(focus) };
+    } else if (kind === 'room' && n === 1) {
+      const r = this.findRoom(f, s.sel.ids[0]);
+      insp = { room: true, where: whereOf(r), name: r.name, code: codeOf(r), summary: sumOf(r),
+        facts: [{ k: 'Places', v: this.fmt(this.places(f, r)), font: "'Geist Mono', ui-monospace, monospace" }, { k: 'Lanes', v: String(r.lanes.length), font: "'Geist Mono', ui-monospace, monospace" }, { k: 'Used for', v: usesOf(r), font: 'inherit' }] };
+    } else if (kind === 'room' && n > 1) {
+      const rs = f.rooms.filter((r) => s.sel.ids.indexOf(r.id) >= 0);
+      insp = { group: true, where: 'Picked on the site', name: n + ' rooms', code: '', rows: rs.map((r) => ({ name: r.name, sub: usesOf(r), v: this.fmt(this.places(f, r)) })), total: this.fmt(rs.reduce((a, r) => a + this.places(f, r), 0)) };
+    } else if (kind === 'section' || kind === 'zone') {
+      const id = s.sel.ids[0];
+      if (kind === 'section') { const x = f.sections.find((q) => q.id === id) || { name: '', code: '' }; const rs = f.rooms.filter((r) => s.sel.ids.indexOf(r.sec) >= 0); const z = zoneOf(x); insp = { group: true, where: n === 1 ? (z ? z.name : 'Not in a zone yet') : 'Sections', name: n === 1 ? x.name : n + ' sections', code: n === 1 ? (z ? z.code + '-' : '') + x.code : '', rows: rs.map((r) => ({ name: r.name, sub: usesOf(r), v: this.fmt(this.places(f, r)) })), total: this.fmt(rs.reduce((a, r) => a + this.places(f, r), 0)) }; }
+      else { const z = f.zones.find((q) => q.id === id) || { name: '', code: '' }; const ss = f.sections.filter((x) => x.zone === id); insp = { group: true, where: 'Zone', name: z.name, code: z.code, rows: ss.map((x) => { const rs = f.rooms.filter((r) => r.sec === x.id); return { name: x.name, sub: rs.length + (rs.length === 1 ? ' room' : ' rooms'), v: this.fmt(rs.reduce((a, r) => a + this.places(f, r), 0)) }; }), total: this.fmt(f.rooms.filter((r) => ss.some((x) => x.id === r.sec)).reduce((a, r) => a + this.places(f, r), 0)) }; }
+    } else {
+      insp = { farm: true, farmLine: f.zones.length + ' zones · ' + f.sections.length + ' sections · ' + f.rooms.length + ' rooms', total: this.fmt(all) };
+    }
+    // editor parts
+    const seg = (on) => 'height: 32px; padding: 0 6px; border: 0; border-radius: 8px; font: inherit; font-size: 13px; font-weight: ' + (on ? 600 : 500) + '; cursor: pointer; white-space: nowrap; ' + (on ? 'background: #FFFFFF; color: #121815; box-shadow: 0 1px 2px rgba(18,24,21,0.10)' : 'background: transparent; color: #3B4540');
+    const doors = inRoom ? ['top', 'right', 'bottom', 'left'].map((d) => ({ label: d.charAt(0).toUpperCase() + d.slice(1), on: focus.door === d, s: seg(focus.door === d), go: () => this.editRoom((r) => { r.door = d; return { pen: null }; }) })) : [];
+    const sides = inRoom ? [true, false].map((v) => ({ label: v ? 'Left' : 'Right', on: focus.aLeft === v, s: seg(focus.aLeft === v), go: () => this.editRoom((r) => { r.aLeft = v; }) })) : [];
+    const lanes = inRoom ? focus.lanes.map((l, i) => {
+      const t = this.typeOf(f, l.t); const col = this.colorOf(f, l.t); const on = s.lane === i;
+      return { letter: this.letter(i), type: t ? t.name : 'No pen type', n: String(l.n || 0), on: on,
+        pick: () => this.put({ lane: i, pen: null }),
+        dec: () => this.editRoom((r) => { r.lanes[i].n = Math.max(0, (r.lanes[i].n || 0) - 1); return { lane: i, pen: null, fresh: null }; }),
+        inc: () => this.addPen(i),
+        decLabel: 'One pen fewer in lane ' + this.letter(i), incLabel: 'One pen more in lane ' + this.letter(i),
+        row: 'display: flex; align-items: center; gap: 2px; padding-right: 4px; border-radius: 10px; background: ' + (on ? '#F0F2EE' : 'transparent'),
+        badge: 'width: 24px; height: 24px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12.5px; font-weight: 600; ' + (on ? 'background: #121815; color: #FFFFFF' : 'background: #FFFFFF; color: #121815; box-shadow: inset 0 0 0 1px #DADFD8'),
+        sw: 'width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; background: ' + col.mid };
+    }) : [];
+    const endRows = inRoom ? (focus.ends || []).map((e, j) => { const t = this.typeOf(f, e.t); const col = this.colorOf(f, e.t); return { letter: this.letter(focus.lanes.length + j), text: (t ? t.name : 'Pen') + ', across ' + e.lanes.map((i) => this.letter(i)).join(' and '), sw: 'width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; background: ' + col.mid, badge: 'width: 24px; height: 24px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12.5px; font-weight: 600; background: #FFFFFF; color: #121815; box-shadow: inset 0 0 0 1px #DADFD8' }; }) : [];
+    const curLane = inRoom ? focus.lanes[s.lane] : null;
+    const chips = curLane ? f.types.map((t) => { const col = this.colors()[t.c % 6]; const on = curLane.t === t.id; return { name: t.name, on: on, pick: () => this.editRoom((r) => { r.lanes[s.lane].t = t.id; return { pen: null }; }), sw: 'width: 10px; height: 10px; border-radius: 3px; background: ' + col.mid + '; flex-shrink: 0', s: 'display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 11px; border-radius: 9px; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; ' + (on ? 'background: #121815; color: #FFFFFF; border: 1px solid #121815' : 'background: #FFFFFF; color: #121815; border: 1px solid #DADFD8') }; }) : [];
+
+    const dirty = JSON.stringify(f) !== JSON.stringify(s.base);
+    const nRooms = f.rooms.length;
+    const keysHint = inRoom ? 'Click a pen to see it · + at a lane’s end adds a pen' : (sw > 760 ? 'Drag a room to move it · Shift-click or drag a box to pick several · ⌘D duplicates' : 'Drag to move · Shift-click to pick several');
+    const viewSeg = [{ label: '3D', on: !s.plan }, { label: 'Plan', on: s.plan }].map((v) => ({ label: v.label, on: v.on, go: () => { this.put({ plan: v.label === 'Plan', anim: true, pen: s.pen }); this.settle(); }, s: 'height: 28px; padding: 0 11px; border: 0; border-radius: 7px; font: inherit; font-size: 13px; font-weight: ' + (v.on ? 600 : 500) + '; cursor: pointer; ' + (v.on ? 'background: #121815; color: #FFFFFF' : 'background: transparent; color: #3B4540') }));
+
+    return {
+      ic: ic,
+      title: inRoom ? focus.name : 'Farm layout',
+      lead: inRoom ? whereOf(focus) + ' · ' + this.fmt(this.places(f, focus)) + ' places' : 'Hillside, as it stands on the site · ' + nRooms + ' rooms · ' + this.fmt(all) + ' places',
+      showSaved: s.saved && !dirty, undoSave: () => this.put({ saved: false }),
+      stageRef: (el) => { if (!el || this._stage === el) return; this._stage = el; if (this._ro) this._ro.disconnect(); this._ro = new ResizeObserver(() => { const w = Math.round(el.getBoundingClientRect().width); if (w && w !== this.st().sw) this.put({ sw: w }); }); this._ro.observe(el); },
+      stageDown: (e) => this.stageDown(e),
+      stageStyle: 'position: relative; height: ' + sh + 'px; border-radius: 16px; background: #F2F3EF; overflow: clip; touch-action: none; user-select: none; -webkit-user-select: none',
+      worldStyle: 'position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; transform-origin: 0 0; transform: ' + c.css + '; transition: transform 0.8s cubic-bezier(0.32, 0.72, 0.2, 1)',
+      labelLayer: 'position: absolute; inset: 0; z-index: 2; pointer-events: none',
+      faces: faces, tops: tops, solo: solo, ghosts: ghosts, hits: hits,
+      groupLabels: groupLabels.map((g) => Object.assign(g, { s: g.s + '; pointer-events: auto' })),
+      roomLabels: roomLabels.map((r) => Object.assign(r, { s: r.s + '; pointer-events: auto' })),
+      marks: marks,
+      hasBox: !!s.box, boxStyle: s.box ? 'position: absolute; z-index: 3; left: ' + px(s.box.x) + '; top: ' + px(s.box.y) + '; width: ' + px(s.box.w) + '; height: ' + px(s.box.h) + '; border: 1.5px dashed #121815; border-radius: 6px; background: rgba(18,24,21,0.04); pointer-events: none' : '',
+      bar: bar, card: card,
+      inRoom: inRoom, onSite: !inRoom, back: () => this.back(),
+      addOpen: s.addOpen, toggleAdd: () => this.put({ addOpen: !s.addOpen }),
+      addItems: [
+        { label: 'Room', sub: s.sel.kind === 'section' ? 'In the picked section' : 'On its own, group it later', go: () => this.addRoomTo('room') },
+        { label: 'Section', sub: 'An empty pad to put rooms on', go: () => this.addRoomTo('section') },
+        { label: 'Zone', sub: 'A separate part of the site', go: () => this.addRoomTo('zone') }
+      ],
+      viewSeg: viewSeg,
+      turnL: () => { this.put({ turn: s.turn - 1, anim: true }); this.settle(); },
+      turnR: () => { this.put({ turn: s.turn + 1, anim: true }); this.settle(); },
+      roofs: s.roofs, toggleRoofs: () => this.put({ roofs: !s.roofs }),
+      roofStyle: 'height: 36px; padding: 0 12px; border: 1px solid ' + (s.roofs ? '#121815' : '#E3E6E1') + '; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; box-shadow: 0 1px 2px rgba(18,24,21,0.05); ' + (s.roofs ? 'background: #121815; color: #FFFFFF' : 'background: #FFFFFF; color: #121815'),
+      compass: 'width: 18px; height: 18px; transform: rotate(' + c.r + 'deg); transition: transform 0.8s cubic-bezier(0.32, 0.72, 0.2, 1)',
+      keysHint: keysHint,
+      inspStyle: 'box-sizing: border-box; padding: 4px 0 0',
+      insp: insp, legend: legend, openSel: () => this.open(s.sel.ids[0]),
+      doors: doors, sides: sides, lanes: lanes, endRows: endRows,
+      addLane: () => this.editRoom((r) => { const last = r.lanes[r.lanes.length - 1]; r.lanes.push(this.ln(last ? last.t : f.types[0].id, last ? last.n : 6)); return { lane: r.lanes.length - 1, pen: null, fresh: null }; }),
+      hasLane: !!curLane, chipsTitle: curLane ? 'Pen type for lane ' + this.letter(s.lane) : '', chips: chips,
+      dirty: dirty && !inRoom || (dirty && inRoom), dirtyText: 'not saved yet', discard: () => this.put({ farm: this.clone(s.base), sel: { kind: '', ids: [] }, naming: false, view: 'site', fresh: null, newIds: [] }),
+      save: () => this.put({ base: this.clone(f), saved: true, newIds: [], fresh: null })
+    };
+  }
+}
+</script>
+</body>
+</html>

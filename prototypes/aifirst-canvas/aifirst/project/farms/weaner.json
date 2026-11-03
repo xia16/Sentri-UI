@@ -1,0 +1,240 @@
+{
+ "version": 1,
+ "types": [
+  {
+   "id": "weaner",
+   "name": "Weaner pen",
+   "uses": [
+    "Nursery"
+   ],
+   "perPen": {
+    "Nursery": 25
+   },
+   "w": 545,
+   "l": 300,
+   "color": 0
+  }
+ ],
+ "zones": [
+  {
+   "id": "weaner-unit",
+   "name": "Weaner unit",
+   "code": "Z1"
+  }
+ ],
+ "sections": [
+  {
+   "id": "weaners",
+   "name": "Weaners",
+   "code": "WEA",
+   "zone": "weaner-unit"
+  }
+ ],
+ "rooms": [
+  {
+   "id": "weaner-1",
+   "name": "Weaner 1",
+   "section": "weaners",
+   "num": 1,
+   "at": {
+    "x": 0,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "weaner",
+       "n": 4
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "weaner",
+       "n": 4
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 80
+   }
+  },
+  {
+   "id": "weaner-2",
+   "name": "Weaner 2",
+   "section": "weaners",
+   "num": 2,
+   "at": {
+    "x": 730,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "weaner",
+       "n": 4
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "weaner",
+       "n": 4
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 80
+   }
+  },
+  {
+   "id": "weaner-3",
+   "name": "Weaner 3",
+   "section": "weaners",
+   "num": 3,
+   "at": {
+    "x": 1460,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "weaner",
+       "n": 4
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "weaner",
+       "n": 4
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 80
+   }
+  },
+  {
+   "id": "weaner-4",
+   "name": "Weaner 4",
+   "section": "weaners",
+   "num": 4,
+   "at": {
+    "x": 2190,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "weaner",
+       "n": 4
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "weaner",
+       "n": 4
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 80
+   }
+  },
+  {
+   "id": "weaner-5",
+   "name": "Weaner 5",
+   "section": "weaners",
+   "num": 5,
+   "at": {
+    "x": 2920,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "weaner",
+       "n": 4
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "weaner",
+       "n": 4
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 80
+   }
+  },
+  {
+   "id": "weaner-6",
+   "name": "Weaner 6",
+   "section": "weaners",
+   "num": 6,
+   "at": {
+    "x": 3650,
+    "z": 0
+   },
+   "rot": 0,
+   "aLeft": true,
+   "lanes": [
+    {
+     "runs": [
+      {
+       "type": "weaner",
+       "n": 4
+      }
+     ]
+    },
+    {
+     "runs": [
+      {
+       "type": "weaner",
+       "n": 4
+      }
+     ]
+    }
+   ],
+   "aisle": {
+    "wall": 0,
+    "between": 80
+   }
+  }
+ ],
+ "name": "Spanish weaner unit"
+}
