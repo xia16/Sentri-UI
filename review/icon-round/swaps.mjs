@@ -17,6 +17,7 @@ export function patchFile(rel, text) {
   let n = 0;
   for (const s of swaps.filter((x) => x.file === rel)) {
     const find = [].concat(s.find).find((f) => text.includes(f));
+    if (text.includes(s.replace)) continue; // already applied (an insert keeps its find, so test the replacement first)
     if (!find) throw new Error(`${rel}: not found: ${[].concat(s.find)[0]}`);
     text = s.all ? text.split(find).join(s.replace) : text.replace(find, s.replace);
     n++;

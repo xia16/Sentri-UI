@@ -4,7 +4,7 @@
     [
       "Animals",
       [
-        ["pig", "redrawn", "A pig of any kind or age: sow, gilt, boar, piglet. The word says which", "Parity facet; Report death: The sow; actions: Piglet processing, Foster piglets; + born chip; Pig profile: General details, Basic information; Home: Piglet processing task, Nursery section"],
+        ["pig", "redrawn", "A pig of any kind or age: sow, gilt, boar, piglet. The word says which", "Parity facet; Report death: The sow; actions: Piglet processing, Foster piglets; + born chip; Pig profile: General details, Basic information; Home: Piglet processing task, Nursery section; Foster piglets row; condition picker: On these pigs"],
         [
           "batch",
           "new",
@@ -35,10 +35,10 @@
       [
         ["record", "redrawn", "A record or summary of what was done", "Litter summary, Task outcomes, Other outcomes, Pig record, Batches, Task overview"],
         ["note", "redrawn", "A note someone wrote", "Pen note, sow note, Add a note, Details (other cause)"],
-        ["history", "new", "Past records, the log", "Home: Records; Pig profile: Log"],
+        ["history", "new", "Past records, the log", "Home: Records; Pig profile: Log; Pen log; walk Log; Past uploads"],
         ["tasks", "new", "A list of tasks", "Pig profile: Current tasks"],
         ["chart", "redrawn", "Performance over time", "Performance metrics, Averages, Base curve, Production totals & averages, Production stats"],
-        ["edit", "kept", "Edit", "Edit conditions, correction banner"],
+        ["edit", "kept", "Edit", "Edit conditions, Edit finding, correction banner"],
         ["undo", "new", "Undo the last save (was return)", "Farrowing: Undo"],
         ["camera", "kept", "Photos", "Photos field"],
         ["calendar", "kept", "A date", "Expected farrowing; first-litter placeholder"],
@@ -51,9 +51,9 @@
       "Places",
       [
         ["barn", "kept", "A building on the farm", "Sections"],
-        ["pen", "new", "A pen", "Inspection: fault pen rows"],
+        ["pen", "new", "A pen", "Pen page: Now; fault pen rows; Pen information"],
         ["grid", "kept", "The pen map, and a unit", "Dock map; Choose a unit; unit rows"],
-        ["place", "kept", "Where something is (location pin)", "Scope label, Origin & dates"],
+        ["place", "kept", "Where something is (location pin)", "Scope label, Origin & dates, task-card scope"],
         ["home", "kept", "Home tab", "Bottom navigation"],
         ["hospital", "kept", "Hospital pen", "Care instructions: Move to hospital pen"]
       ]
@@ -61,10 +61,10 @@
     [
       "Health",
       [
-        ["health", "kept", "Health", "Home: Health heading and signals"],
-        ["care", "kept", "Care instructions", "Inspection care"],
-        ["treat", "kept", "Treatment, vaccines", "Treat tiles, To treat"],
-        ["pill", "kept", "Medicine: antibiotics, pain relief", "Medicine categories"],
+        ["health", "kept", "Health", "Home: Health heading and signals; Actions page: Health"],
+        ["care", "kept", "Care instructions", "Care instructions (actions, batch tiles); To-treat filter: Care"],
+        ["treat", "kept", "Treatment, vaccines", "Treat tiles, To treat, Record treatment"],
+        ["pill", "kept", "Medicine: antibiotics, pain relief", "Medicine categories (antibiotics, pain relief); medicine picker groups; no-brand state"],
         ["bug", "kept", "Parasites", "Medicine categories"],
         ["drop", "kept", "Vitamins; udder", "Medicine categories, udder area"],
         ["monitor", "kept", "Monitoring", "Monitoring list, Observe"],
@@ -85,7 +85,7 @@
       [
         ["feed", "kept", "Feed", "Feed tiles, Feeding"],
         ["weight", "kept", "Weight", "Weight measure"],
-        ["measure", "kept", "Measurements", "Measurements & condition"],
+        ["measure", "kept", "Measurements", "Measurements & condition, Record body condition, Record backfat"],
         ["temperature", "kept", "Temperature", "Sensors, measure"],
         ["humidity", "kept", "Air humidity", "Sensors"],
         ["air", "kept", "Ventilation reading", "Sensors"],

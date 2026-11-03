@@ -68,12 +68,14 @@ Five pairs are the same shape under two names:
 
 ## The usage swaps
 
+After the build, a cheaper model (Sonnet) swept every icon use against the meaning table. Its clear findings are in swaps.json marked "icon pass": pen-page Now and Pen log, Care instructions, Edit, Record treatment, body condition, the medicine picker, Past uploads, and a task-card scope icon that named a glyph the registry never had. The finished-sow Details and the Task overview headings are left to the Farrowing session.
+
 **Actions is ··· everywhere** (owner asked, 2026-11-03). The ellipsis is the platform's "more actions" mark, the shared scan footer and Farrowing already use it, and the blind test read it as "more / overflow" with high confidence. Inspection's three Actions buttons move from `grid` to `more`. `grid` keeps the pen map and units; the testers read it as "apps".
 
 Farrowing Details is the Farrowing session's page. Its section icons (This litter, Against her batch, Against herself) are chosen there, from this set. This round only supplies the icons.
 
 
-50 swaps in five files are listed in [swaps.json](swaps.json), each with its reason. The mock applies them in memory, and `node review/icon-round/swaps.mjs --write` applies them for the build.
+76 swaps in eleven files are listed in [swaps.json](swaps.json), each with its reason. The mock applies them in memory, and `node review/icon-round/swaps.mjs --write` applies them for the build.
 - **Inspection:** icon names only (`'clock'` → `'sow'`, and so on). No logic changes.
 - **Farrowing:** two action entries that had no icon get one (`Record abortion` and `Record sow death`). Everything else is a name change.
 - **Fallbacks for cut icons:**
