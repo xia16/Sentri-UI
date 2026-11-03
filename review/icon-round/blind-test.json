@@ -1,0 +1,273 @@
+{
+ "kept": [
+  {
+   "name": "pig",
+   "read": "\"Plain pig\", medium; \"pig, side view\", high in the second test"
+  },
+  {
+   "name": "service",
+   "read": "\"Male and female symbols\", high"
+  },
+  {
+   "name": "return-heat",
+   "read": "\"Flame inside a circular arrow\", medium"
+  },
+  {
+   "name": "farrow",
+   "read": "Borderline: \"sow with a piglet\", matched to farrowing in rounds 2 and 3; \"teapot\" at 16 px in round 3"
+  },
+  {
+   "name": "death",
+   "read": "\"Gravestone\", medium"
+  },
+  {
+   "name": "truck",
+   "read": "\"Truck\", high"
+  },
+  {
+   "name": "sample",
+   "read": "\"Test tube\", high"
+  },
+  {
+   "name": "count",
+   "read": "\"Tally marks\", high"
+  },
+  {
+   "name": "history",
+   "read": "\"Clock with counter-clockwise arrow\", high"
+  },
+  {
+   "name": "tasks",
+   "read": "\"Checklist\", high"
+  },
+  {
+   "name": "undo",
+   "read": "\"Back / undo arrow\", high"
+  },
+  {
+   "name": "pen",
+   "read": "\"Picket fence\", medium"
+  },
+  {
+   "name": "note",
+   "read": "\"Note / sticky note\", high"
+  },
+  {
+   "name": "record",
+   "read": "\"Clipboard with lines\", medium"
+  },
+  {
+   "name": "chart",
+   "read": "\"Line chart\", high"
+  },
+  {
+   "name": "fan",
+   "read": "\"Three-blade propeller\", medium"
+  },
+  {
+   "name": "missing",
+   "read": "\"Dashed circle with a question mark: unknown or absent\", medium (round 3)"
+  },
+  {
+   "name": "batch",
+   "read": "Borderline: \"stacked cards, a collection of items\", matched to batch in rounds 3 and 4; reads as copy or layers alone. The minus bar it was tested with is removed"
+  }
+ ],
+ "cut": [
+  {
+   "name": "sow",
+   "read": "Same blob as pig at 16 px; the teats vanish",
+   "instead": "pig"
+  },
+  {
+   "name": "boar",
+   "read": "Same blob as pig; the tusk reads as a hook only at 28 px",
+   "instead": "pig"
+  },
+  {
+   "name": "gilt",
+   "read": "\"New pig\" at best; the spark is tiny",
+   "instead": "pig"
+  },
+  {
+   "name": "litter",
+   "read": "A duplicate of the two-pig group",
+   "instead": "piglet"
+  },
+  {
+   "name": "foster",
+   "read": "A refresh arrow over a blob",
+   "instead": "piglet"
+  },
+  {
+   "name": "wean",
+   "read": "\"Arrow pointing into a pig\"",
+   "instead": "no screen yet"
+  },
+  {
+   "name": "notch",
+   "read": "A cone or shark fin",
+   "instead": "tag"
+  },
+  {
+   "name": "pain",
+   "read": "\"Power / electric\"",
+   "instead": "pill"
+  },
+  {
+   "name": "room",
+   "read": "A notched square or doorway; failed twice",
+   "instead": "grid (unchanged)"
+  },
+  {
+   "name": "production",
+   "read": "Snout in circular arrows reads as refresh or undo",
+   "instead": "production (current bars; chart no longer shares them)"
+  },
+  {
+   "name": "pregnancy",
+   "read": "Ring in the belly reads as an eye",
+   "instead": "pregnancy (current glyph; farrow no longer shares it)"
+  },
+  {
+   "name": "pregnancy-belly",
+   "read": "A round belly reads as just \"pig\" (second test)",
+   "instead": "pregnancy (current)"
+  },
+  {
+   "name": "pregnancy-heart",
+   "read": "A heart reads as \"favourite pig\" or health (second test)",
+   "instead": "pregnancy (current)"
+  },
+  {
+   "name": "not-pregnant",
+   "read": "\"Eye-slash / hidden\"",
+   "instead": "pregnancy (current)"
+  },
+  {
+   "name": "ear-tag",
+   "read": "A clipboard or battery; the existing tag is far clearer",
+   "instead": "tag (current)"
+  },
+  {
+   "name": "pig-face",
+   "read": "Reads as \"pig\", which we already have",
+   "instead": "pig"
+  },
+  {
+   "name": "backfat",
+   "read": "A bell, lamp or protractor",
+   "instead": "no icon"
+  },
+  {
+   "name": "body-condition",
+   "read": "\"Move pigs\" (a pig over a double arrow)",
+   "instead": "no icon"
+  },
+  {
+   "name": "service-ai",
+   "read": "A key or lollipop at 16 px",
+   "instead": "service (♀♂)"
+  },
+  {
+   "name": "ultrasound",
+   "read": "A pen with wireless waves",
+   "instead": "pregnancy (current)"
+  },
+  {
+   "name": "move-pens",
+   "read": "An abstract bracket-arrow-bracket (second test)",
+   "instead": "transfer (current)"
+  },
+  {
+   "name": "piglet",
+   "read": "Owner: \"just a small pig, hard to tell\"; round 3: size alone can't carry it",
+   "instead": "pig"
+  },
+  {
+   "name": "piglet-chubby",
+   "read": "\"Piggy bank\" (round 3)",
+   "instead": "pig"
+  },
+  {
+   "name": "piglet-bottle",
+   "read": "\"Bottle-feed or medicate\" (round 3)",
+   "instead": "pig"
+  },
+  {
+   "name": "pigs",
+   "read": "Owner: a batch is not several pigs",
+   "instead": "batch"
+  },
+  {
+   "name": "batch-layers",
+   "read": "\"Layers\" (round 3)",
+   "instead": "batch (card stack)"
+  },
+  {
+   "name": "batch-dots",
+   "read": "\"Dice\" (round 3)",
+   "instead": "batch (card stack)"
+  },
+  {
+   "name": "batch-crate",
+   "read": "\"Cabinet\" (round 3)",
+   "instead": "batch (card stack)"
+  },
+  {
+   "name": "batch-hash",
+   "read": "\"Number / hashtag\" (round 4)",
+   "instead": "batch (card stack)"
+  },
+  {
+   "name": "batch-week",
+   "read": "Too close to the date icon (round 4)",
+   "instead": "batch (card stack)"
+  },
+  {
+   "name": "batch-ring",
+   "read": "\"Chat bubble\" (round 4)",
+   "instead": "batch (card stack)"
+  },
+  {
+   "name": "move-fence",
+   "read": "Owner: needs more work; round 3: \"log in\"",
+   "instead": "transfer (current)"
+  },
+  {
+   "name": "move-over",
+   "read": "\"Redo\" (round 3)",
+   "instead": "transfer (current)"
+  },
+  {
+   "name": "move-curve",
+   "read": "\"Jump / hop\" (round 3)",
+   "instead": "transfer (current)"
+  },
+  {
+   "name": "missing-pig",
+   "read": "Owner: missing needs no pig",
+   "instead": "missing (dashed circle)"
+  },
+  {
+   "name": "missing-pin",
+   "read": "\"Help / unknown place\" (round 3)",
+   "instead": "missing (dashed circle)"
+  },
+  {
+   "name": "missing-search",
+   "read": "\"Help / search\" (round 3)",
+   "instead": "missing (dashed circle)"
+  },
+  {
+   "name": "breeder",
+   "read": "Owner: use the generic mark",
+   "instead": "bookmark"
+  },
+  {
+   "name": "move-pig",
+   "read": "Passed round 3 (\"move a pig\"), but owner: a farm app can use the generic transfer arrows",
+   "instead": "transfer (current)"
+  }
+ ]
+}
