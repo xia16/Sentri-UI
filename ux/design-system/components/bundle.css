@@ -1553,11 +1553,9 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone :is(.finished-card-head,.finished-card-body){width:100%;margin:0;border:0;color:inherit;text-align:left;font:inherit}
 .farrowing-phone .finished-card-body{background:var(--paper)}
 .farrowing-phone :is(button.finished-card-head,.finished-card-body):active{background:var(--press)}
-.farrowing-phone .finished-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--app-background);font:500 14px/1.4 var(--font-sans);color:var(--ink-2)}
+.farrowing-phone .finished-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--app-background);font:500 14px/1.4 var(--font-sans);color:var(--ink-2)}
 .farrowing-phone .finished-card-go{display:inline-flex;align-items:center;gap:2px;flex:none;font-weight:600;color:var(--ink)}
 .farrowing-phone .finished-card-go svg{width:15px;height:15px}
-.farrowing-phone .finished-card-head .finished-undo{flex:none;min-height:44px;margin:-12px -4px -12px 0;padding:0 8px;gap:5px;font:600 14px/1 var(--font-sans);color:var(--ink)}
-.farrowing-phone .finished-card-head .finished-undo svg{width:16px;height:16px}
 .farrowing-phone .finished-card-body{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:center;padding:18px}
 .farrowing-phone .finished-ring{position:relative;display:block;width:150px;height:150px}
 .farrowing-phone .finished-ring svg{display:block;width:150px;height:150px}
