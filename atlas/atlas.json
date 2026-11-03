@@ -16252,40 +16252,34 @@
           "elements": [
            {
             "name": "Note screen",
-            "shows": "Reading, editing or closed view",
+            "shows": "Reading or writing",
             "states": [
              {
               "state": "Reading",
               "when": "A note exists",
-              "shows": "Text, author line, Edit note, Close note"
+              "shows": "One card like a message: G. Hansen · today 06:40 on top, the note at 17px, \"Shows until Sat 19 Sep\" with a clock at its foot, the pencil top right; Close note in the footer"
              },
              {
-              "state": "Editing",
-              "when": "Edit note or Add pen note",
-              "shows": "One text area; Save note disabled while empty or blank"
-             },
-             {
-              "state": "Closed",
-              "when": "Just after Close note",
-              "shows": "\"Closed · Kept in pen log\", closer and time, Undo close (disabled when a new note was written meanwhile)"
+              "state": "Writing",
+              "when": "The pencil, or Note on the pen page",
+              "shows": "A five-line box that grows, then a white Show for card: a days stepper, 7 by default (1 to 60), and the end date; Save note disabled while empty"
              }
             ],
-            "rule": "One note per pen. Saving replaces the text and overwrites the author with the editor and \"today · 09:41\"; the old text survives only in the log. Close note moves the note to the pen log (\"Pen note closed\", original author) and clears the pen; Undo close restores it and logs \"Pen note reopened\".",
-            "at": "Edit note"
+            "rule": "One note per pen. Saving replaces the text, the author and its days. Close note moves the note to the pen log (\"Pen note closed\") and goes back to the pen page; there is no Undo (owner, 2026-11-03). When its days run out the note leaves the pen page and stays in the pen log.",
+            "at": "Close note"
            }
           ],
           "controls": [],
           "copy": [
            "Pen note (raw)",
            "Close note (raw)",
-           "Undo close (raw)"
+           "Show for (raw)"
           ],
           "edge": [
            "A pen note is written from its pen page only: Actions holds pig actions (owner, 2026-10-18). The pen page also has How the pen looks (a pen observation)."
           ],
           "issues": [
-           "Close note and Edit note overlap (edit replaces, close archives); two notes cannot coexist.",
-           "Author is overwritten on edit, so the original author is lost from the card."
+           "Close note and Edit note overlap (edit replaces, close archives); two notes cannot coexist."
           ]
          }
         },

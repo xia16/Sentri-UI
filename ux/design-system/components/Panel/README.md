@@ -17,8 +17,10 @@ Context fill, hairline border, rounded corners and content slot. Padding belongs
 ## Variants
 
 - **Page:** use on the app canvas; paper on app-background.
-- **Drawer:** use inside a drawer; inset on paper.
+- **Drawer:** use inside a drawer; paper on the tint, as every drawer since 2026-11-03 (`skeleton`, the screens not designed yet, keeps inset on paper).
 - **Menu:** use inside a menu drawer, one where every row is an option or a verb (`Sheet({ surface: 'menu' })`, see [SURFACES](../../SURFACES.md)); paper on the tint, like the page.
+
+- **Note** (`st-panel st-note`): a note read in full, like a message: who and when on top (`st-note-by`), the note at 17px (`st-note-text`), how long it shows at the foot under a rule (`st-note-foot`, a clock), and the pencil (IconButton · plain) top right. Writing a note: a five-line box that grows (`textarea.st-note-input`) and a white Show for card (`st-note-days`) holding a row Stepper of days, 7 by default. Used by pen notes (Inspection, Farrowing) and pig notes.
 
 The enclosing `data-st-context="page|drawer|menu"` chooses the variant. The default outside a context is page.
 
@@ -61,6 +63,8 @@ Do show one Facts block or one Row group per surface. Don't wrap Facts or Log in
 Component; page and drawer are context variants. Consumer compositions retain their own component APIs. See variants.json for screen usage and variants/ for isolated states.
 
 ## Changelog
+
+2026-11-03: every drawer card is paper on the tint (SURFACES rule 1); the Note variant for pen and pig notes.
 
 2026-10-20 (workbench): `empty` option: a panel whose host keeps its place says what is missing in one quiet line with a tick, instead of being absent (Home's Overview sections).
 
