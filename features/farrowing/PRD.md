@@ -55,11 +55,12 @@ In:
 - Death entry (piglets and the sow), Undo of the last save (during and after Finish), the Farrowing log.
 - Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.
 - Farrowing's rows on the pig's Actions sheet (Record abortion, Mark not in pig).
-- When a sow dies: the allocation sheet (move her piglets to other sows, hand-rear them in her crate, or move them to a rearing pen), the Move page it opens (`farrowing.foster`), and her row's life on the list until every piglet has a place.
+- When a sow dies: her record (the finished record, its head band saying she died) and her piglets, Inspection's pen list for one litter, with Foster (the sow picker, then a confirm) and Move (Move's pen picker) on the ticked ones; her row's life after (see Decisions, 2026-11-03).
+- Fostering from a living sow: Foster piglets (Send piglets · Receive piglets, the sow picker, Filter sows) and her piglet list from her record.
 
 Out:
 
-- Fostering outside the sow-died case (parked until the owner reopens it; see Decisions, 2026-10-10).
+- ~~Fostering outside the sow-died case~~ In scope since 2026-11-03 (Decisions).
 - Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision "Piglet processing is drawn in Farrowing and as its own feature".
 - The sow page itself and the rest of the Actions sheet (pig-profile).
 - The pen page and its tools (Note, Feed guidance, equipment fault, pen log): Inspection's (owner, 2026-10-22). Farrowing's pen header `›` is the door; the pages Farrowing's prototype draws are mapped under Inspection, in its band "Pen in Farrowing".
@@ -85,7 +86,7 @@ Out:
 - Farrowing starts at the first record; no started mark — RULINGS *Starting and ending a session*.
 - The sow's death is a hold-to-commit mode of the drawer; she stays in the room — RULINGS *Starting and ending a session*.
 - Merge contract: signed deltas, flag instead of silently applying a breach — RULINGS *Starting and ending a session*.
-- Fostering parked — RULINGS *After the lock*.
+- Fostering parked — RULINGS *After the lock*. Reopened by the owner, 2026-11-03: fostering is in scope (Decisions, 2026-11-03).
 - The locked record is designed as a record, with one ledger page — RULINGS *After the lock*.
 - ~~Anyone may amend Born after the lock — RULINGS *After the lock*.~~ Superseded 2026-11-02: Born never moves after Finish.
 - Words for actions, icons for objects — RULINGS *Names and glyphs*.
@@ -98,14 +99,14 @@ Out:
 
 - **Room rows** (the room, Find a sow, Scan results, the task's sow list) are one row, owner-approved 2026-10-12 (the design system's Row · animal, state side). Left, two lines: the ear tag exactly as stored (16px/600 mono, always ink, even for a sow that died) over 13px muted context (`Parity 5` on a waiting sow; `when · who` on a recorded one, such as `05:58 · G.H`, `1h ago · G.H`, `yesterday · L.M`; `Pen B3 · …` in a flat result; `Unit 6 · Pen A2` for a sow in another unit in Scan; Find a sow's rows carry her place on the right, `Pen B4` or `Unit 6` over `Pen A2`, instead of her state). Right, two lines, right-aligned: the figure over the state word. Farrowing: `9 alive · 5 dead` / Farrowing. Due: `Tomorrow`, `Today` or `In 2 days` / Due. Overdue: `3 days` / Overdue. Done: `11 alive · 2 dead` / Done. Sow died: `7 to allocate` / Sow died, or `2 hand-reared` / Sow died. Aborted: `1 alive` / Aborted. Levels set weight and colour: act now (overdue; a sow died with piglets to allocate) is red with the one "!" icon in a row; live (farrowing) is bold; coming up (due today or tomorrow) has an ink figure and a muted word; settled (done, due in 2+ days, aborted) is muted (the 16px figure in ink-2, so it keeps 7:1 contrast). Only recorded counts show: alive, and `· N dead` only above zero; never *born*, never an expected or carried count. One quiet chevron, no pencil and no chip: tapping the row opens the record, and Edit is inside it. Pen headers say the pen and the count only: no need counts or dots.
 - **Statuses.** In progress: **Awaiting**, **Active**. Finished: **Done** (green), **Sow died** (red), **Aborted** (red; 流产).
-- **Sow died.** Right after the hold records her death the sheet becomes `N piglets to allocate` (subtitle `<ID> · <pen> · sow died <time>`) with three options: **Move to other sows** (opens the move page, sending out of this litter with her piglets pre-selected; several receiving sows may split them), **Hand-rear here** (the piglets stay on her record and piglet care continues) and **Move to a rearing pen** (shown only when the farm config says the farm has one; the prototype flag is on for the demo, `?rearing=off` turns it off). Footer **Back** means later: no ✕, no extra question line.
-- **Her row while piglets remain.** A red tile `N / to allocate`, facts `Sow died · yesterday · L.M`; tapping it opens the same sheet. After Hand-rear: a neutral tile `N / hand-reared`, facts `Sow died · 09:40 · L.M`; the row stays while hand-reared piglets remain. A partial allocation keeps the remaining count; her row never says `5 moved`. A piglet that dies or is put down is recorded through Record dead and the count drops. She **leaves the room list** once every piglet is on another sow, in a rearing pen, or recorded dead.
+- ~~**Sow died.** The allocation sheet~~ Superseded 2026-11-03: no Allocate step; her record leads to her piglets (Decisions, 2026-11-03).
+- **Her row while piglets remain.** *Superseded 2026-11-03:* the row reads `7 piglets` over Sow died, settled, and opens her record. Still in force: a piglet that dies or is put down is recorded through Record dead and the count drops; she **leaves the room list** once every piglet is on another sow, in another pen, or recorded dead.
 - **Aborted.** *Abortion* is the one word (never *miscarriage*). No live piglet: she leaves the room list at once. Any live piglet: the row stays with the tile `1 / alive` and the facts `Aborted · 08:10 · G.H` (recorded counts only).
 - **Task overview** counts the sows that left the list: `Left the task · n aborted · n sow died`. She is then outside Done · Active · Awaiting, so every total still adds up (7 / 18 farrowed once one of 19 has left).
 - **Sheet titles name the job; subtitles name the animal and context.** Record dead is titled `Record dead` (it was `Dead 6` / `The sow`); the pen sheet no longer repeats `Pen` as its only heading.
-- **Fostering is in scope for the sow-died case** (and only there; elsewhere it stays parked).
+- ~~**Fostering is in scope for the sow-died case** (and only there)~~ Fostering is in scope everywhere since 2026-11-03.
 - **An orphan litter can stay in the task, hand-reared** on her record.
-- **A rearing pen is a farm-level option.** Its configuration is still open: filed as the To confirm item `farrowing-room-list-1` in `review/farrowing-room-list.json`.
+- ~~**A rearing pen is a farm-level option.**~~ Retired 2026-11-03: no rescue deck or rearing pen option; moving piglets to any pen is Move.
 - **Abortion rule.** No live piglets: she leaves the list. Any live piglet: an Aborted row stays.
 - The glossary words (*abortion / aborted*, *to allocate*, *hand-reared*, *left the task*) are in `ux/laws/glossary.md` and `ux/laws/strings.json`; "Abortion vs miscarriage" (`events-1`) is closed by this decision.
 
@@ -177,8 +178,20 @@ From the Edit record product round ([edit-record-round.md](edit-record-round.md)
 - **One Details page** while she farrows and after Finish (owner, 2026-11-03): the old Litter details grid is gone. While she farrows it shows the log row and This litter; the comparisons and Weak · Deformed · Assisted · Weight come at Finish.
 - **The finished card's head band** reads "Finished Aug 27 · Details ›" (owner, 2026-11-03); the time and who finished her sit under Farrowing log on Details.
 - **Drawers are the tint with white cards** (owner, 2026-11-03: no white background anymore): the record drawer, Finish, Record dead and Details, as the pages. The piglet condition rows are one white action card.
-- Applies to a sow that finished normally; a died or aborted sow keeps the earlier record face. Earlier litters are sample data here; the sow profile's production records hold the real ones.
+- Applies to a sow that finished normally and, since 2026-11-03, to a sow that died (her head band says Sow died); an aborted sow keeps the earlier record face. Earlier litters are sample data here; the sow profile's production records hold the real ones.
 - **Put down is a piglet death cause** (owner, 2026-11-03): a piglet that cannot recover and is put down by trained staff is recorded in Record dead / Report death under Died after birth, before Other (it used to fall under Other).
 - **Assisted is marked on Finish only** (owner, 2026-11-03): no Assisted farrowing in ···. Drug help (oxytocin) is a Treat with its time and dose; hands-on help is the required No / Yes for the whole litter at Finish. One place, so the two can never disagree.
 - **The undo question is a tint dialog with one ledger card** (owner, 2026-11-03): "Undo this entry?", a row per figure that changes, now → after; no entry line or note.
 - **Actions on the finished record is the black primary** (owner, 2026-11-03); optional rows on the tint are a quiet well until they hold something (Photos with photos is a white card).
+
+### Owner decisions, 2026-11-03 · Her piglets and fostering
+
+- **No Allocate step.** A sow at farrowing is her and her litter, so her record leads to her piglets. When she dies her record is the finished record: the ring card, its head band `Sow died Aug 25 · Prolapse` (Sow died in red, the one red), Details, then **Piglets · Foster or move ›**; Back · ··· Actions · Record dead. A finished sow's record has the same row, just **Piglets ›** (only a dead sow's says Foster or move). A sow still farrowing keeps her counting drawer; Foster is in her Actions.
+- **Her piglets are Inspection's pen list for one litter.** A row per piglet with an ID (the tag over its notch, a tick box; no sex or weight), then one row for those without (the struck tag, `1 piglet`, a count box typed on the phone's own keypad, no pad of ours). `7 alive` with Tick all; search with scan inside on top (typing filters, each read ticks); Back at the bottom, and `··· Actions · N` beside it once something is ticked.
+- **Actions on the ticked piglets: Foster or Move.** Foster opens the sow picker (Send piglets, no Send · Receive switch: the piglets are chosen), then a confirm (`To 000418 · Pen B1`, the IDs, Send N piglets; headers carry no counts). Move is Move's destination picker (her unit first, her own crate dimmed, search or scan a plate; a tap moves them). Each takes its piglets off the list into **Sent and moved**; tick the next ones for the next place.
+- **Piglets nobody moves stay with her.** A dead sow's are hand-reared in her crate: nothing to confirm, no Keep button. Her room row reads `7 piglets` over Sow died, settled (nothing to decide); she leaves the list once every piglet is fostered, moved or recorded dead.
+- **Who can take piglets.** A sow nursing a litter, or a nurse sow who has just weaned her own. Search and scan reach only those: never a gilt or a pregnant sow (`No sow that can take piglets matches “434”`); a read of one says `004305 can't take piglets` and opens nothing.
+- **Fostering's filter** is the farrowing filter plus Unit: Unit chips, **Farrowed** (piglets of a like age) and **Alive now** (room on her teats), each a range with its bars; a range every sow in view shares is left out. It opens tall enough to fit on one screen. The room's filter keeps Expected farrowing and Parity, Parity now a 0–6+ range.
+- **Foster piglets from a living sow** keeps **Send piglets · Receive piglets** first, then the sow, then the Send piglets page (With ID ticked by search or scan, three whole rows and a fade; Without ID counted).
+- **Put down** is a piglet death cause (in Record dead, PR 306): healthy orphans are fostered or hand-reared, never given up.
+- Canvas: https://claude.ai/artifact/FtdJokXX1Xhgywg34HC26q (agreed 2026-11-03, "PR it and merge").

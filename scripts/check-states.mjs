@@ -24,6 +24,8 @@ function audit(stateName) {
   const all = [st, ...st.querySelectorAll('*')].filter((e) => !['SCRIPT', 'STYLE'].includes(e.tagName));
   const vis = (e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && cs(e).visibility !== 'hidden'; };
   const scrolls = (e) => /auto|scroll/.test(cs(e).overflowY);
+  // the part of a box the eye sees: cut by every ancestor that clips (a scroller, an overflow:hidden frame); null when none is left
+  const seen = (e) => { const r = e.getBoundingClientRect(); let t = r.top, b = r.bottom, l = r.left, rt = r.right; for (let x = e.parentElement; x && x !== document.documentElement; x = x.parentElement) { const c = cs(x), q = x.getBoundingClientRect(); if (c.overflowY !== 'visible') { t = Math.max(t, q.top); b = Math.min(b, q.bottom); } if (c.overflowX !== 'visible') { l = Math.max(l, q.left); rt = Math.min(rt, q.right); } } return b - t > 0.5 && rt - l > 0.5 ? { top: t, bottom: b, left: l, right: rt, width: rt - l, height: b - t } : null; };
   // the text the eye sees: skip text a screen reader hears only (a visually-hidden span, or any box clipped to 1px), whose clipped rect would read as another line
   const unseen = (n, e) => { for (let x = n.parentElement; x && x !== e.parentElement; x = x.parentElement) { if (x.matches('.st-visually-hidden,.sr-only,[hidden]')) return true; const b = x.getBoundingClientRect(); if (b.width <= 1 && b.height <= 1 && /hidden|clip/.test(cs(x).overflow)) return true; } return false; };
   const textRects = (e) => { const w = document.createTreeWalker(e, NodeFilter.SHOW_TEXT), out = []; let n; while ((n = w.nextNode())) if (n.nodeValue.trim() && !unseen(n, e)) { const r = document.createRange(); r.selectNodeContents(n); const rs = [...r.getClientRects()].filter((x) => x.width > 0); if (rs.length) out.push(rs); } return out; };
@@ -115,11 +117,12 @@ function audit(stateName) {
   }
 
   // (i) touching controls
-  const ctl = all.filter((e) => vis(e) && e.matches('button,input,select,textarea,[role=button],[aria-haspopup],[class*=search]') && !e.matches('input[type=hidden],input[type=radio],input[type=checkbox]') && (surface(e) || bgOf(cs(e)) || e.matches('input,select,textarea')) && !e.closest('[data-ds="Segment"],[role=radiogroup],[role=tablist]') && !e.matches('.st-range-handle'));
+  const ctl = all.filter((e) => vis(e) && seen(e) && e.matches('button,input,select,textarea,[role=button],[aria-haspopup],[class*=search]') && !e.matches('input[type=hidden],input[type=radio],input[type=checkbox]') && (surface(e) || bgOf(cs(e)) || e.matches('input,select,textarea')) && !e.closest('[data-ds="Segment"],[role=radiogroup],[role=tablist]') && !e.matches('.st-range-handle'));
   const rect = (e) => e.getBoundingClientRect();
+  // what is scrolled out of view is not beside anything: compare the boxes as seen
   for (let i = 0; i < ctl.length; i++) for (let j = i + 1; j < ctl.length; j++) {
     const a = ctl[i], b = ctl[j]; if (a.contains(b) || b.contains(a)) continue;
-    const ra = rect(a), rb = rect(b);
+    const ra = seen(a), rb = seen(b);
     const ox = Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left), oy = Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top);
     const gapY = Math.max(rb.top - ra.bottom, ra.top - rb.bottom), gapX = Math.max(rb.left - ra.right, ra.left - rb.right);
     if ((ox > 4 && gapY < 8 && gapY > -1) || (oy > 4 && gapX < 8 && gapX > -1)) add('i', `${tag(a)} "${txt(a).slice(0, 14)}" and ${tag(b)} "${txt(b).slice(0, 14)}" are ${Math.round(ox > 4 && gapY < 8 ? gapY : gapX)}px apart`);
@@ -136,8 +139,8 @@ function audit(stateName) {
   if (trig.length && body.length) add('k', `closed trigger ${tag(trig[0])} stacked with sheet content ${tag(body[0])} outside a sheet or phone frame`);
   for (const sh of st.querySelectorAll('[data-ds="Sheet"],.st-sheet')) {
     const g = sh.querySelector('.grab,[class*=handle],[class*=grabber]'); if (!g || !vis(g)) continue;
-    const first = [...sh.querySelectorAll('*')].filter((e) => vis(e) && !e.contains(g) && e !== g && !g.contains(e)).sort((x, y) => rect(x).top - rect(y).top)[0];
-    if (first && rect(first).top < rect(g).top - 1) add('k', `sheet drag handle is not the first element (${tag(first)} sits above it)`);
+    const first = [...sh.querySelectorAll('*')].filter((e) => vis(e) && seen(e) && !e.contains(g) && e !== g && !g.contains(e)).sort((x, y) => seen(x).top - seen(y).top)[0];
+    if (first && seen(first).top < rect(g).top - 1) add('k', `sheet drag handle is not the first element (${tag(first)} sits above it)`);
   }
   return P;
 }
