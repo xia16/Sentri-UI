@@ -20,7 +20,20 @@ const shots = {
   'today': '/ux/system/home-astra-prototype.html?layout=focus&section=farrowing&screen=workbench.today',
 };
 // The proposal: a drawer takes the page's colours (tint base, white cards, press on white).
-const tint = () => { for (const e of document.querySelectorAll('[data-st-context="drawer"]')) e.setAttribute('data-st-context', 'menu'); };
+// Owner, 2026-11-03: nothing sits loose on the tint; every group is a white card (the Alive card, Report death's causes, each
+// filter's control, with its heading above the card on the tint).
+const tint = () => {
+  for (const e of document.querySelectorAll('[data-st-context="drawer"]')) e.setAttribute('data-st-context', 'menu');
+  const card = 'background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-panel)';
+  for (const e of document.querySelectorAll('.alive-surface')) e.style.background = 'var(--paper)';
+  for (const e of document.querySelectorAll('.death-causes')) e.style.cssText += `;${card};padding:0 16px`;
+  for (const r of document.querySelectorAll('.st-filter-section .st-range')) {
+    const title = r.querySelector('.st-range-title');
+    if (title) r.parentElement.insertBefore(title, r);
+    r.style.cssText += `;${card};padding:12px 16px`;
+  }
+  for (const s of document.querySelectorAll('.st-filter-section .st-selection')) s.style.cssText += `;${card};padding:12px`;
+};
 
 const browser = await chromium.launch();
 for (const [name, url] of Object.entries(shots)) {
