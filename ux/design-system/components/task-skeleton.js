@@ -253,8 +253,8 @@
   function scrim(o = {}) { return root.SentriUI.scrim(o); }
   /* sheet: the drawer without its scrim (the host places scrim() before it); drawer: scrim + sheet. height 'full' = Sheet's
      sizing 'full'. The ✕ is always drawn (close only renames its action); aside sits left of it. */
-  function sheet(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { variant: 'drawer', sizing: o.height === 'full' ? 'full' : 'content', scrim: false })); }
-  function drawer(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { variant: 'drawer', sizing: o.height === 'full' ? 'full' : 'content', scrim: Object.assign({ layer: o.layer || 0 }, o.scrim) })); }
+  function sheet(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { surface: o.surface || 'skeleton', variant: 'drawer', sizing: o.height === 'full' ? 'full' : 'content', scrim: false })); }
+  function drawer(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { surface: o.surface || 'skeleton', variant: 'drawer', sizing: o.height === 'full' ? 'full' : 'content', scrim: Object.assign({ layer: o.layer || 0 }, o.scrim) })); }
   /* page: the Sheet page (the page header: Back top left, title, optional line); bar draws the skeleton's status bar. */
   function page(o = {}) {
     const { bar = true, ...rest } = o;

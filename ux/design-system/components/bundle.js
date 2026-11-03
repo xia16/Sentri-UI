@@ -1208,9 +1208,9 @@
   const SHEET_SIZES=['compact','short','medium','long'];
   function sheet({variant='drawer',surface='',headClass='',title,line=null,pageAction=null,corner=null,cross=null,back=null,description,icon='',close={action:'dismiss'},holdRows=0,lead='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
     const v=oneOf('Sheet','variant',variant,['drawer','page','dialog'],'drawer'),sz=oneOf('Sheet','size',size,SHEET_SIZES,'medium');
-    /* surface (drawer only): '' is a content or input drawer (white, tinted cards). 'menu' is a drawer whose every row is an option or a verb
-       (Choose a unit, More actions, Go to pen): the tint with white cards, like a page. See SURFACES.md. */
-    const ctx=oneOf('Sheet','surface',surface||'drawer',['drawer','menu'],'drawer');
+    /* surface (drawer only): every drawer is the tint with white cards (SURFACES.md); 'menu' paints the same. 'skeleton' keeps the old white
+       drawer with tinted cards for the task skeletons nobody has designed yet (Piglet processing, the production task), until each is. */
+    const ctx=oneOf('Sheet','surface',surface||'drawer',['drawer','menu','skeleton'],'drawer');
     const foot=f===false?'':(f==null?sheetFooter({}):f),ex=safeAttr(attrs),cls=className?' '+esc(className):'',vw=view?` data-view="${esc(view)}"`:'';
     if(v==='dialog'){
       return `<div class="dialog-backdrop" data-ds="Sheet" data-variant="dialog"${sLayer(layer)}><div class="dialog${cls}" role="dialog" aria-modal="true" tabindex="-1"${id?` id="${esc(id)}"`:''}${vw}${inert?' inert':''}${sL(label??title)}${ex}><div class="dialog-body${bodyClass?' '+esc(bodyClass):''}"><h2 class="dialog-title">${icon?sGlyph(icon):''}${sT(title)}</h2>${description?`<p class="dialog-desc">${sParts(description)}</p>`:''}${body}</div>${foot}</div></div>`;

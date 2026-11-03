@@ -227,6 +227,9 @@ body{background:var(--ground);color:var(--ink)}
 [data-st-context="page"]{--st-panel-bg:var(--st-paper);--st-context-bg:var(--st-canvas);--st-press:var(--press)}
 :is([data-st-context="drawer"],[data-st-context="menu"]){--st-panel-bg:var(--st-paper);--st-context-bg:var(--st-canvas);--st-press:var(--press)}
 .sheet:is([data-st-context="drawer"],[data-st-context="menu"]),.dialog{background:var(--st-canvas)}
+/* Not designed yet (owner, 2026-11-03): the task skeletons (Piglet processing, the production task) keep the old white drawer with tinted
+   cards until each is designed. */
+[data-st-context="skeleton"]{--st-panel-bg:var(--st-inset);--st-context-bg:var(--st-paper);--st-press:var(--choice-press)}
 .dialog>.sheet-footer{background:transparent}
 .st-heading.st-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-12);margin:0 0 var(--space-heading);padding:0;min-height:0;border:0;background:transparent;color:var(--st-ink)}
 .st-heading .st-heading-main{min-width:0;flex:1}
@@ -730,12 +733,16 @@ input[type="checkbox"]:disabled:checked{border-color:var(--control-border);backg
 /* Segment and FilterChips: independent of phone/prototype scopes. */
 .st-selection{min-width:0;flex:none}
 .tk-lens-bar>.st-selection,.room-lensbar>.st-selection,.inspect-controls>.st-selection{flex:1}
-.st-segment{display:flex;gap:var(--space-3);padding:var(--space-3);border:1px solid var(--line);border-radius:var(--radius-segment);background:var(--well)}
+/* Segment (owner, 2026-11-03, option B): a grey track (line) with the chosen option a white thumb on the handle shadow, the iOS segmented
+   control. It stands alone on the tint, never in a card. Piglet processing (not designed yet) keeps its old well track. */
+.st-segment{display:flex;gap:var(--space-3);padding:var(--space-3);border:1px solid transparent;border-radius:var(--radius-segment);background:var(--line)}
+.tk-phone .st-segment{border-color:var(--line);background:var(--well)}
 .st-segment button,.st-filter-chips button{box-sizing:border-box;min-width:var(--tap-min);min-height:var(--tap-min);border:0;border-radius:var(--radius-8);padding:var(--space-4) var(--space-6);background:transparent;color:var(--ink);font:400 var(--type-row-title-size)/1.4 var(--font-sans);display:flex;align-items:center;justify-content:center;gap:var(--space-3);cursor:pointer}
 .st-segment button{flex:1 0 auto;min-width:var(--tap-min);flex-wrap:wrap}
 .st-selection-label{white-space:nowrap;min-width:0}
 .st-selection-count{font:500 var(--type-meta-size)/1.4 var(--font-mono);color:var(--muted)}
-.st-segment button[aria-pressed=true]{background:var(--paper);font-weight:var(--type-weight-strong)}
+.st-segment button[aria-pressed=true]{background:var(--paper);font-weight:var(--type-weight-strong);box-shadow:var(--shadow-handle)}
+.tk-phone .st-segment button[aria-pressed=true]{box-shadow:none}
 .st-segment[data-variant=two-line-lens] button{flex-direction:column}
 .st-segment[data-variant=two-line-lens] .st-selection-count:empty{min-height:1.4em}
 .st-segment button:not([aria-pressed=true]):not(:disabled):active,.st-filter-chips button:not([aria-checked=true]):not(:disabled):active,[data-state=Pressed].st-segment button:nth-child(2),[data-state=Pressed].st-filter-chips button:nth-child(2){background:var(--handle)}
@@ -834,10 +841,9 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 /* FilterSheet: a Sheet that narrows a list. Sections sit 28 apart; the last one has no gap before the footer. */
 .st-filter-section{margin:0 0 var(--space-28);padding:0}
 .st-filter-section:last-child{margin-bottom:0}
-/* On the tint every filter is a white card (owner, 2026-11-03): the title sits on the tint above it, and the Segment, the chips or a
-   range's histogram, rail and ends go inside. A picker field is its own white box already. The chips scroll inside their card. */
-.st-filter-section>:is(.st-selection,.st-filter-chips),.st-filter-section .st-range-body{border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--paper)}
-.st-filter-section>.st-selection{padding:var(--space-12)}
+/* On the tint every filter is a white card (owner, 2026-11-03): the title sits on the tint above it, and the chips or a
+   range's histogram, rail and ends go inside. A Segment and a picker field stand alone (their own faces). The chips scroll inside their card. */
+.st-filter-section>.st-filter-chips,.st-filter-section .st-range-body{border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--paper)}
 .st-filter-section>.st-filter-chips{padding:var(--space-8) 0;overflow:hidden}
 .st-filter-section .st-filter-chips-track{padding-inline:var(--space-12)}
 .st-filter-section .st-range-head{margin:0 0 var(--space-heading)}

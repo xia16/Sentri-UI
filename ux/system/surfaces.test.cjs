@@ -130,7 +130,10 @@ test('a ticked multi-select row stays white', () => {
 const CARD_OK = /^(var\(--(st-paper|paper)\)|transparent)$/;
 test('every card is white: no context or screen paints a card the tint', () => {
   const bad = [];
-  for (const r of all) for (const [k, v] of decls(r.body)) if (k === '--st-panel-bg' && !CARD_OK.test(v)) bad.push(`${r.file}: ${r.selector} { ${k}: ${v} }`);
+  for (const r of all) {
+    if (r.selector === '[data-st-context="skeleton"]') continue; // the task skeletons nobody has designed yet keep the old drawer (owner, 2026-11-03)
+    for (const [k, v] of decls(r.body)) if (k === '--st-panel-bg' && !CARD_OK.test(v)) bad.push(`${r.file}: ${r.selector} { ${k}: ${v} }`);
+  }
   assert.deepEqual([...new Set(bad)], [], 'a card is paper on the tint (SURFACES.md rule 2)');
 });
 test('drawers, menus and dialogs are the tint', () => {
