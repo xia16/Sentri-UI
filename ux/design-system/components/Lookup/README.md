@@ -55,7 +55,7 @@ Classification: **component**. It was lifted from Farrowing's Find a sow and Sca
 | Content | unit cards of results | unit cards of scanned animals |
 | None | "No pig matching “909” in any unit." | a tag no pig has (a new, empty tag, or not synced to this phone) is possible (owner, 2026-10-22). It is never ticked; the host says so: a list puts it in its own card ("No pig with this tag"), a single-action task's Scan a toast (Toast · Door and dismiss) to her pig profile |
 | Arrival | n/a | the row just read takes Row's Just scanned state (`data-arrival`, `progress-wash`) for 1.6 s, then fades; the row is brought into view |
-| Ticked | n/a | a multi-select host ticks each read; ticked rows take the selected tint; the footer becomes the count and Actions (or the task's own actions) |
+| Ticked | n/a | a multi-select host ticks each read; a ticked row shows the `select-mark` box and stays white; the footer becomes the count and Actions (or the task's own actions) |
 | Opens | n/a | a single-action task: each read opens her over Scan; her Back returns to Scan, still listening; while she is open the reader waits |
 | Waiting (scan bar) | n/a | the reader isn't connected yet: "Waiting for reader"; it turns to Scanning by itself when it connects |
 | Stopped | n/a | the list stays; Resume scanning is the primary |
