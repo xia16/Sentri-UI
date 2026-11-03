@@ -13,7 +13,8 @@ const card = '[data-card="0"] ';
 const shots = {
   'new-allocate': { preset: 'allocate' },
   'new-hand': { preset: 'allocate-hand' },
-  'new-rear': { preset: 'allocate', steps: [{ act: 'allocRearPage' }] },
+  'new-hand-pen': { preset: 'allocate-hand', steps: [{ act: 'handAddPen' }] },
+  'new-hand-split': { preset: 'allocate-hand-split' },
   'alloc-foster': { preset: 'allocate-foster' },
   'alloc-filter': { preset: 'allocate-filter' },
   'alloc-send': { preset: 'allocate-send' },
