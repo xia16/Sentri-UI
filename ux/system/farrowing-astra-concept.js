@@ -1130,10 +1130,11 @@ const fosterLayer=s=>s.fosterDraft.filtering?fosterFilterSheet(s):'';   // Filte
 // sow is chosen), then the sow picker (search, filter, scan), pinned over the list. A sow tapped (or read) pushes Foster off (or on).
 function fosterPage(s){
  const dead=s.featureReturn==='allocate',dir=SentriUI.segment({variant:'view-switch',options:[['out','Send piglets'],['in','Receive piglets']],active:s.fosterDraft.direction,action:'fosterDirection',ariaLabel:'Direction'});
- // A dead sow only sends: Receive stays in its place, disabled (owner, 2026-11-02), so the page reads the same from both doors.
- const seg=dead?dir.replace(/(<button[^>]*data-value="in")/,'$1 disabled'):dir;
+ // A dead sow can never receive, so from Allocate the switch is left out and the title says the job (Segment: prefer omission to a
+ // disabled option that never comes back; owner, 2026-11-03: the dashed disabled option read wrong).
+ const seg=dead?'':dir;
  const line=dead?{text:[{text:`${s.alive} piglet${s.alive===1?'':'s'}`},{text:' · '+s.tag}]}:null;
- const page=SentriUI.sheet({variant:'page',title:'Foster piglets',line,back:{action:'featureBack'},above:`<div class="foster-direction">${seg}</div>${fosterBar(s,'batch-bar')}`,body:`${dead?allocSentList(s):''}<div class="foster-list">${fosterPickList(s)}</div>`,footer:false,className:'room-utility batch-pick foster-pick',label:'Foster piglets',bar:status()});
+ const page=SentriUI.sheet({variant:'page',title:dead?'Send piglets':'Foster piglets',line,back:{action:'featureBack'},above:`${seg?`<div class="foster-direction">${seg}</div>`:''}${fosterBar(s,'batch-bar')}`,body:`${dead?allocSentList(s):''}<div class="foster-list">${fosterPickList(s)}</div>`,footer:false,className:'room-utility batch-pick foster-pick',label:'Foster piglets',bar:status()});
  const layer=fosterLayer(s);
  return layer?'<div class="page-background" inert aria-hidden="true">'+page+'</div>'+layer:page;
 }
@@ -1172,7 +1173,7 @@ const fosterShown=(s,g)=>fosterCandidates(s).filter(({r,unit})=>fosterMatch(g,r,
 function fosterIdRows(list,f){
  const q=f.idQ.trim().toLowerCase(),shown=list.filter(p=>!q||p.tag.toLowerCase().includes(q));
  if(!shown.length)return `<p class="st-find-hint foster-id-none">No piglet ID matching “${esc(f.idQ.trim())}”.</p>`;
- return shown.map(p=>{const html=SentriUI.rowSelect({code:p.tag,description:p.notch?'Notch '+p.notch:'',right:{kind:'state',figure:p.weight?p.weight+' kg':'',word:'',level:'settled'},checked:f.ids.includes(p.tag),action:'fosterId',value:p.tag,inputAttrs:{'data-value':p.tag,'aria-label':'Move '+p.tag}});const sex=p.sex==='Female'||p.sex==='Male'?`<span class="piglet-sex" role="img" aria-label="${p.sex}">${icon(p.sex.toLowerCase())}</span>`:'',out=html.replace(`<strong class="st-animal-id">${p.tag}</strong>`,`<strong class="st-animal-id">${p.tag}${sex}</strong>`);   // ♀ / ♂ beside the ID (owner, 2026-11-02)
+ return shown.map(p=>{const html=SentriUI.rowSelect({code:p.tag,description:p.notch?'Notch '+p.notch:'',right:{kind:'state',figure:p.weight?p.weight+' kg':'',word:'',level:'settled'},checked:f.ids.includes(p.tag),fill:false,action:'fosterId',value:p.tag,inputAttrs:{'data-value':p.tag,'aria-label':'Move '+p.tag}});const sex=p.sex==='Female'||p.sex==='Male'?`<span class="piglet-sex" role="img" aria-label="${p.sex}">${icon(p.sex.toLowerCase())}</span>`:'',out=html.replace(`<strong class="st-animal-id">${p.tag}</strong>`,`<strong class="st-animal-id">${p.tag}${sex}</strong>`);   // ♀ / ♂ beside the ID (owner, 2026-11-02)
   return p.tag===f.idRead?out.replace(/class="/,'data-read class="'):out;}).join('');
 }
 function fosterIdList(list,f){
