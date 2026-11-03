@@ -1063,6 +1063,13 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-optional-row[data-face="row"] .st-optional-act svg{box-sizing:content-box;width:var(--size-16);height:var(--size-16);padding:var(--space-6);border:var(--ring-width-fine) solid var(--muted);border-radius:50%;background:var(--paper)}
 .st-optional-row[data-face="row"][aria-disabled="true"] .st-optional-act{color:var(--disabled-ink)}
 .st-optional-row[data-face="row"][aria-disabled="true"] .st-optional-act svg{border-style:dashed}
+/* On the tint (owner, 2026-11-03): an empty optional row is a quiet well, not a white card, so it reads as extra; once it holds
+   something (Photos with photos) it becomes a white card with its contents inside, and the thumbnails say how many. */
+[data-st-context="menu"] .st-optional-row[data-face="row"]:not([data-filled="true"]){border-color:transparent;background:var(--well)}
+[data-st-context="menu"] .st-photos:has(.st-photos-items){border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--paper);overflow:hidden}
+[data-st-context="menu"] .st-photos:has(.st-photos-items) .st-optional-row{border:0;border-radius:0;background:transparent}
+[data-st-context="menu"] .st-photos:has(.st-photos-items) .st-photos-items{padding:0 var(--space-row-x) var(--space-row-x)}
+[data-st-context="menu"] .st-photos:has(.st-photos-items):not(:has([data-pending])) .st-optional-answer{display:none}
 /* Photos waiting (inactive): the floor-gray. The row stays, its camera dashed; the reason is the row's description for a
    screen reader and shows in the hint line only while a tap is answered (guard's data-answer), never as a standing line. */
 .st-photos[data-inactive]>.st-photos-hint:not([data-answer]){position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
