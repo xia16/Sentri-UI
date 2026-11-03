@@ -741,6 +741,8 @@ input[type="checkbox"]:disabled:checked{border-color:var(--control-border);backg
 .st-segment button{flex:1 0 auto;min-width:var(--tap-min);flex-wrap:wrap}
 .st-selection-label{white-space:nowrap;min-width:0}
 .st-selection-count{font:500 var(--type-meta-size)/1.4 var(--font-mono);color:var(--muted)}
+.st-segment .st-selection-count{color:var(--ink-2)}   /* muted on the grey track is 4.0:1; ink-2 is 6.4:1 */
+.tk-phone .st-segment .st-selection-count{color:var(--muted)}
 .st-segment button[aria-pressed=true]{background:var(--paper);font-weight:var(--type-weight-strong);box-shadow:var(--shadow-handle)}
 .tk-phone .st-segment button[aria-pressed=true]{box-shadow:none}
 .st-segment[data-variant=two-line-lens] button{flex-direction:column}
