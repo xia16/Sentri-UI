@@ -160,16 +160,16 @@ test('General appearance is not repeated in the breadcrumb', () => {
  model.handleRecordAction(c,'health-catalog-section','General appearance');
  assert.equal((model.healthList(c).match(/General appearance/g)||[]).length,1);
 });
-test('single and bulk nested choosers stay drawers and preserve draft values', () => {
+test('single and bulk nested choosers stay drawers (the tint with white cards, owner 2026-11-03) and preserve draft values', () => {
  for(const ids of [['000267'],['000254','000267']]){
   const c=model.seed();model.openBulkAction(c,'treatment',ids);c.form.dose='2';model.overlay(c);
   c.form.pickerKey='doseUnit';c.form.pickerReturn='treatment';c.view='picker';
   const chooser=model.overlay(c).split('<section class="sheet picker-step')[1];
-  assert.match(chooser,/data-st-context="drawer"/);
+  assert.match(chooser,/data-st-context="menu"/);
   assert.doesNotMatch(chooser,/data-presentation="page"|>Choose unit</);
   assert.match(chooser,/Dose unit/);assert.equal(c.form.dose,'2');
   c.view='medicine-picker';const medicine=model.overlay(c).split('<section class="sheet picker-step')[1];
-  assert.match(medicine,/data-st-context="drawer"/);assert.doesNotMatch(medicine,/data-presentation="page"/);
+  assert.match(medicine,/data-st-context="menu"/);assert.doesNotMatch(medicine,/data-presentation="page"/);
  }
 });
 test('health selections persist across categories and Done does not save the record', () => {

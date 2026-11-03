@@ -11,7 +11,7 @@ Owner ruling, 2026-10-12. **Read this before you build or change any screen, she
 5. **One tint.** `inset`, `surface` and `ground` are aliases of `app-background`; there is no second or third near-white. A stray hex tint (`#f6f7f2`, `#fbfcf8`, `#f8f9f3`, `#f8faf5`…) is a bug.
 6. **Tint is for reading, white is for tapping.** Inside a white content drawer, a card you only read (facts, evidence, a batch) is the tint. A card that holds items you tap (a day's checklist) keeps a **white body** with a 1px `line` border and a **tinted head band** for its title, so the label and the work sit on two levels (owner, 2026-10-12, after an all-tint Day card read as dull). Never make a card of tappable items all tint.
 
-Open question (owner to decide): lists of tappable rows in input drawers (Find a sow results, picker lists, the allocation choices) are a tinted card today. Rule 6 suggests white; both versions will be mocked before this changes.
+**Changing (owner, 2026-11-03):** every page and drawer becomes the tint with white cards, and nothing sits loose on the tint: every group is a white card ([canvas](https://claude.ai/artifact/BugjQscz9ZjPy9hm8kMggg)). Medicines is the reference. The pickers (Conditions, Medicines, Vaccines, a medicine's category, a short option list such as Outcome) are built that way first; the other drawers move in one pass, and this page is rewritten with it.
 
 Green means done, recorded or synced, and a ticked multi-select box; nothing else. Amber and red washes mean status and are never a card's resting colour.
 
