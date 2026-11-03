@@ -1339,12 +1339,12 @@
      gives its items, the count of pens at each coloured level, and a level with none is left out. `peek(code)` returns the
      HTML of the hold-to-peek card for a pen (see penPeek). penMapFooter({ back }): Back. The map opens scrolled so its
      current pen is in view; a map more than two screens tall adds Whole room beside Back (see penWhole). */
-  const PEN_LEVELS=['act','live','plain','hidden'],PEN_HOLD_MS=350,PEN_SLOP=12,PEN_GAP=8,PEN_TILE=56,PEN_CAP=1.8,PEN_STEPS=[2,5,10,25,50],penPeeks=new Map(),penRooms=new Map();
+  const PEN_LEVELS=['act','live','plain','hidden'],PEN_HOLD_MS=350,PEN_SLOP=12,PEN_GAP=8,PEN_TILE=56,PEN_CAP=1.68,PEN_STEPS=[2,5,10,25,50],penPeeks=new Map(),penRooms=new Map();
   let penHold=null,penSwallow=false;
   const penLabels=o=>Object.assign({map:'Pens',act:'needs you',live:'farrowing',plain:'has sows',empty:'empty',hidden:'no sows match',pen:c=>'Pen '+c,pens:r=>'Pens '+r,whole:'Whole room',byPen:'Pen by pen'},o);
   /* A pen's size says what it is: a tile is as tall as its pen is long along the lane, against the room's other pens. The
-     room's shortest pen is 56px and nothing is smaller; the longest is at most PEN_CAP times that (on a 390 × 844 phone, a
-     quarter of the map's height, so at least four of the biggest pens show in a lane). Within that the ratios are true;
+     room's shortest pen is 56px and nothing is smaller; the longest is at most PEN_CAP times that (94px: on a 390 × 844 phone,
+     four of the biggest pens fit in a lane under the letters). Within that the ratios are true;
      past it they are compressed together and keep their order (log of the ratio). One size, or none given: every tile 56px. */
   function penSizes(cms){
     const s=cms.filter(v=>v>0);if(!s.length)return()=>PEN_TILE;

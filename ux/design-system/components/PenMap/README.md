@@ -52,8 +52,8 @@ The host passes the room in pen-map terms, which the farm layout gives directly:
 A pen's size says what it is: on the floor a stall is a narrow slot and a group pen a room-wide box, and the map keeps that difference without a word (owner, 2026-11-03). Sizes are always against the other pens in the same room, never a fixed size per type.
 
 1. **The room's shortest pen is 56px**, the glove floor. Nothing is ever smaller, and a tile never grows to fill the screen: growing would only show fewer pens.
-2. **The longest is at most 1.8 × that** (101px). On a 390 × 844 phone that is a quarter of the map's height, so at least four of a room's biggest pens show in one lane on one screen.
-3. **Within that, the ratios are true** (crates 180 cm and sick pens 250 cm: 56px and 78px). Past it they are compressed together, keeping their order: height = 56 × (length ÷ shortest)^p, with p chosen so the longest lands on 1.8 × (stalls 65 cm, crates 180, group pens 483: 56, 76 and 101px).
+2. **The longest is at most 1.68 × that** (94px). On a 390 × 844 phone the map has 402px under the letters, so four of a room's biggest pens show whole in one lane on one screen.
+3. **Within that, the ratios are true** (crates 180 cm and sick pens 250 cm: 56px and 78px). Past it they are compressed together, keeping their order: height = 56 × (length ÷ shortest)^p, with p chosen so the longest lands on 1.68 × (stalls 65 cm, crates 180, group pens 483: 56, 73 and 94px).
 4. **One size, or none given:** every tile 56px, as before.
 
 Size tells small, medium or large at a glance; two types close in size (crates and sick pens) look alike, and the exact type is in the peek and on the pen's page. A map of one size keeps its row numbers; a map of mixed sizes stacks each lane on its own (rows would no longer line up), and the codes carry the numbers.
@@ -77,7 +77,7 @@ Strings: `ds.penmap.whole_room` (Whole room) and `ds.penmap.pen_by_pen` (Pen by 
 ## Variants
 
 - [Map](variants/map.html): the one map, in a menu drawer. Specimens: Unit 7 (4 × 6), 2 × 60, 2 × 100, 2 × 160, 8 × 20 (sideways scroll), a filtered map, an empty map, the peek (and a pen of 30 with `+26 more`), a pressed tile and the Chinese key; and the room shapes: lanes of different lengths, a mixed lane (the group gestation barn), mixed lanes that differ, a row at the far end (one pen; the gestation barn's 24 stalls), a row by the door, the sketch room, pens on their own, the doors, lane A on the right with a row, and a lane of 50 stalls.
-- [Whole room](variants/whole-room.html): the Whole room view: 2 × 50 stalls at ten to a tile, the gestation barn (group pens and the stall row, at five), four lanes of four types, the 8 × 20 nursery with the lane letters dropped, and pen by pen again after a tap on B31–40.
+- [Whole room](variants/whole-room.html): the Whole room view: 2 × 50 stalls at ten to a tile, the gestation barn (group pens and the stall row, at five), four lanes of four types, the 8 × 20 nursery with the lane letters dropped, and pen by pen again after a tap on B1–10.
 
 ## States
 
@@ -177,4 +177,4 @@ The cue is the component's, so every task lands the same way: the host marks the
 2026-10-22: Inspection's Go to pen moves onto it, with the framed Pen map button and the landing cue. The peek takes `more` (one muted line past the rows it shows); the colour rule settles that a task's progress (checked or not) is not a level.
 2026-11-02: room shapes from the console's Farm layout: lanes of any length made of runs of pen types (each run named where the type changes), pens across lanes, pens on their own, lane A on the right, the main door's place and a back door. Letter lanes draw exactly as before. Adds the string `ds.penmap.back_door`.
 2026-11-03: rows across the room (the layout's end rows) replace pens across lanes: a row stands before the lanes (by the door) or after them (far end), each run named, its tiles folded under the lanes by the row-grid rule and counted from lane A's side. The phone's room comes from the layout by one lossy step (order, codes, types, door side; never centimetres).
-2026-11-03: a pen's size says what it is (tile heights against the room's other pens, 56px to 1.8 ×; mixed sizes stack each lane), so run names are gone. Whole room replaces the range control: a map more than two screens tall gets one button that shows the room on one screen, neighbouring pens sharing a tile. Farrowing's and Inspection's maps are unchanged. Adds the strings `ds.penmap.whole_room` and `ds.penmap.pen_by_pen`.
+2026-11-03: a pen's size says what it is (tile heights against the room's other pens, 56px to 1.68 ×; mixed sizes stack each lane), so run names are gone. Whole room replaces the range control: a map more than two screens tall gets one button that shows the room on one screen, neighbouring pens sharing a tile. Farrowing's and Inspection's maps are unchanged. Adds the strings `ds.penmap.whole_room` and `ds.penmap.pen_by_pen`.
