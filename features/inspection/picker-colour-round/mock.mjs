@@ -86,7 +86,10 @@ const badge = (where) => {
     else { b.style.marginLeft = 'auto'; r.insertBefore(b, r.querySelector('.st-row-chevron')); }
   }
 };
-const options = { now: [], a: [white], b: [white, counts], b2: [[badge, 'name']], b3: [[badge, 'right']], c: [white, counts, consequence], d: [white, counts, consequence, hues] };
+// old = before the surface convention (main before PR 304, served from git); built = main now (tint, white cards, PR 304).
+// B2, C and D are laid over the built page, each adding to the last.
+const OLD = 'cb8dde21';
+const options = { old: [], built: [], b: [counts], b2: [[badge, 'name']], b3: [[badge, 'right']], c: [[badge, 'name'], consequence], d: [[badge, 'name'], consequence, hues] };
 // ONLY=screen:opt,opt renders just those (e.g. ONLY=conditions:now,b,b2,b3).
 const only = process.env.ONLY && Object.fromEntries([process.env.ONLY.split(':')].map(([k, v]) => [k, v.split(',')]));
 
@@ -96,7 +99,7 @@ for (const [name, shot] of Object.entries(screens)) {
   for (const [opt, steps] of Object.entries(options)) {
     if (only && !only[name].includes(opt)) continue;
     const p = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
-    await p.goto(base + shot.url);
+    await p.goto(base + (opt === 'old' ? `/@${OLD}` : '') + shot.url);
     await p.waitForTimeout(1500);
     for (const t of shot.taps || []) { const el = p.locator(t).first(); if (await el.count()) { await el.click(); await p.waitForTimeout(400); } else console.warn(`${name}: no ${t}`); }
     for (const f of steps) await (Array.isArray(f) ? p.evaluate(f[0], f[1]) : p.evaluate(f, days));
