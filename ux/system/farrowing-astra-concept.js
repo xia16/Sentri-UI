@@ -1232,7 +1232,7 @@ function fosterFilterSheet(s){
  const chips=SentriUI.filterChips({items:[{value:'all',label:'All',checked:d.unit==='all'},...units.map(u=>({value:u.id,label:u.name,count:list.filter(x=>x.unit===u).length,checked:d.unit===u.id}))],action:'fosterUnit',key:'fosterUnit',label:'Unit'});
  const sections=[{title:'Unit',icon:icon('grid'),content:chips},
   ...fosterRangeSections(list.filter(({unit})=>d.unit==='all'||unit.id===d.unit).map(x=>x.r),d)];
- return SentriUI.filterSheet({title:'Filter sows',sections,apply:{label:`Show ${n} ${n===1?'sow':'sows'}`,action:'fosterFilterApply'},reset:fosterFilterCount(s,d)?{label:'Reset',action:'fosterFilterReset'}:false,backAction:'fosterFilterBack',className:'room-utility room-filter-sheet foster-filter-sheet'});
+ return SentriUI.filterSheet({title:'Filter sows',sections,apply:{label:`Show ${n} ${n===1?'sow':'sows'}`,action:'fosterFilterApply'},reset:fosterFilterCount(s,d)?{label:'Reset',action:'fosterFilterReset'}:false,backAction:'fosterFilterBack',size:'long',className:'room-utility room-filter-sheet foster-filter-sheet'})   // long: Unit and both ranges open on one screen, nothing under the footer;
 }
 const fosterActive=g=>Number(g.unit!=='all')+fosterRangeCount(g);   // the badge: filters narrowing the list (her unit counts)
 const fosterShown=(s,g)=>fosterCandidates(s).filter(({r,unit})=>fosterMatch(g,r,unit)).length;
