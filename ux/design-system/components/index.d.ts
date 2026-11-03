@@ -804,16 +804,19 @@ export interface SentriUI { rangeSlider(props?:RangeSliderProps):string; filterS
 
 /** A pen's status on the map. act: needs the worker. live: farrowing. plain: has sows the list shows. hidden: has sows the current tab or filter hides. A pen missing from pens is empty. */
 export type PenLevel = 'act' | 'live' | 'plain' | 'hidden';
-export interface PenMapLabels { map?: string; act?: string; live?: string; plain?: string; empty?: string; hidden?: string; pen?: (code: string) => string }
+/** whole / byPen: the footer button's two words (Whole room, Pen by pen); pens: a shared tile's name ('Pens A11–20'). */
+export interface PenMapLabels { map?: string; act?: string; live?: string; plain?: string; empty?: string; hidden?: string; pen?: (code: string) => string; pens?: (range: string) => string; whole?: string; byPen?: string }
 /** A lane of the room as the farm layout describes it: runs of one pen type each, in order from the main door. */
-export interface PenMapLane { letter?: string; n?: number; runs?: Array<{ n: number; type?: string }> }
+/** size: the pen type's length along the lane in cm (the layout type's w); tiles are as tall as their pens are long against the room's other pens. */
+export interface PenMapRun { n: number; type?: string; size?: number }
+export interface PenMapLane { letter?: string; n?: number; runs?: PenMapRun[] }
 export interface PenMapProps {
   /** Column letters, in order (every lane `depth` pens), or the lanes with their runs (lanes of any length, runs of pen types). */
   lanes?: Array<string | PenMapLane>;
   /** Rows (pens per lane) for letter lanes. Pen codes are the lane then the row: B3, A120. */
   depth?: number;
-  /** Rows of pens across the room (the layout's end rows): before the lanes (`door`) or after them (`far`, default), each run named and folded under the lanes, four across at most, counted from lane A's side. */
-  rows?: Array<{ letter?: string; at?: 'far' | 'door'; runs: Array<{ n: number; type?: string }> }>;
+  /** Rows of pens across the room (the layout's end rows): before the lanes (`door`) or after them (`far`, default), folded under the lanes, four across at most, counted from lane A's side. */
+  rows?: Array<{ letter?: string; at?: 'far' | 'door'; runs: PenMapRun[] }>;
   /** Pens on their own (drawn, any shape): a column each beyond the last lane, at `row` or at the end. */
   apart?: Array<{ code: string; row?: number }>;
   /** Which side lane A is on as you walk in at the main door (default left). */
@@ -829,8 +832,6 @@ export interface PenMapProps {
   action?: string;
   /** Names this map for the peek registry; give each map on a page its own. */
   key?: string;
-  /** Pens per range in the footer control (default 20). */
-  rangeSize?: number;
   entrance?: string;
   labels?: PenMapLabels;
   /** The hold-to-peek card for a pen, as HTML (see penPeek). Without it a hold does nothing. */
@@ -839,13 +840,14 @@ export interface PenMapProps {
 }
 /** more: one quiet line after the rows when a pen has more than the card shows ("+12 more"). */
 export interface PenPeekProps { title?: string; meta?: string; rows?: RowProps[]; more?: string }
+/** depth, rangeSize and label are no longer read (the range control is gone, 2026-11-03). */
 export interface PenMapFooterProps { back?: { action?: string; value?: string; label?: SheetText }; depth?: number; rangeSize?: number; label?: string }
 export interface SentriUI {
   penMap(props?: PenMapProps): string;
   /** The items of the sheet's key line (`sheet({ line: { key: penMapKey({ pens, words }) } })`): the count of pens at each coloured level; a level with none is left out. */
   penMapKey(props?: { pens?: Record<string, PenLevel>; words?: { act?: string; live?: string } }): Array<{ fill: string; count: number; label: string }>;
   penPeek(props?: PenPeekProps): string;
-  /** Back alone, or Back beside the range control when a row has more than rangeSize pens. */
+  /** Back. A map more than two screens tall adds Whole room beside it when it mounts. */
   penMapFooter(props?: PenMapFooterProps): string;
   /** Mounts the maps under a node; a map is also mounted by itself when it enters the document. */
   penMapMount(scope?: ParentNode): void;

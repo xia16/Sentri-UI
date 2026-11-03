@@ -31311,7 +31311,8 @@
      "files": {
       "variantsJson": true,
       "variants": [
-       "map"
+       "map",
+       "whole-room"
       ]
      }
     },
