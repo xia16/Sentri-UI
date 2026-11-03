@@ -324,7 +324,8 @@ for (const [name, title, figure, cls, rows, note] of DETAILS) {
 // 13–15. Receiving (owner, 2026-11-03), two parts. First the plan: where the pigs go and how many in each pen, drawn on the unit's
 //     pen map so the crew sees it at a glance; they put the pigs in by it, and it is only a guide. Then the count: once the pigs are in,
 //     they count the pens (the pen count, all pigs then ear tags), so what they counted is where the pigs are, whatever the plan said.
-//     Finish shows the balance against what was sent. Unit 9: lanes A–C, rows 1–4; batch 25 (120) planned 15 a pen into A1–B4.
+//     End task closes it. The plan picks pens, not numbers (owner, 2026-11-03): every pen shows its free places (capacity less the
+//     pigs already in it), the planned pens are outlined; pigs may go into any pen with room. Unit 9: lanes A–C, rows 1–4, 15 a pen.
 const PLAN_CSS = `
   .m-count .m-map{margin:0}
   .m-count .m-map .st-pen-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:64px}
@@ -333,54 +334,75 @@ const PLAN_CSS = `
   .m-count .m-map .st-pen-tile[data-level="empty"] .m-pc{font-weight:500}
   .m-count .m-map .st-pen-tile.m-done{background:var(--done-fill,#d5e8cc);border-color:transparent}
   .m-count .m-map .st-pen-tile.m-done .m-pc,.m-count .m-map .st-pen-tile.m-done .m-pn{color:var(--done-fill-ink,#1d4d2e)}
-  .m-count .m-map .st-pen-tile.m-todo .m-pn{color:var(--muted,#657060);font-weight:500}
+  .m-count .m-map .st-pen-tile.m-todo .m-pn,.m-count .m-map .st-pen-tile.m-free .m-pn{color:var(--muted,#657060);font-weight:500}
+  .m-count .m-map .st-pen-tile.m-plan{border:1.5px solid var(--ink,#20291f)}
+  .m-count .m-map .st-pen-tile .m-pw{font:500 12px/1 var(--font-sans,inherit);color:var(--muted,#657060)}
+  .m-count .m-plankey .m-k-plan{background:#fff;border:1.5px solid var(--ink,#20291f);box-sizing:border-box}
   .m-count .m-plankey{display:flex;gap:16px;font-size:13px;color:var(--ink,#20291f);margin:2px 0 14px}.m-count .m-plankey i{display:inline-block;width:12px;height:12px;border-radius:4px;vertical-align:-1px;margin-right:6px}
+  .m-count .m-over{margin:0 0 12px}.m-count .m-over > *{max-width:none;white-space:nowrap}
   .m-count .m-plankey b{font-family:var(--font-mono,'IBM Plex Mono',monospace)}`;
 async function receiveMap(name, opts) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
   await p.evaluate(({ UNIT_CSS, LEDGER_CSS, PLAN_CSS, o }) => {
     const { U, ic, page, footer, primary } = window.M;
-    const pens = {}; for (const c of Object.keys(o.tiles)) pens[c] = 'plain';
+    const pens = {}; for (const [c, v] of Object.entries(o.tiles)) if (v[1] !== 'm-word') pens[c] = 'plain';
     let map = U.penMap({ lanes: o.lanes, depth: o.depth, pens, entrance: 'Entrance', key: 'recv' });
     const host = document.createElement('div'); host.innerHTML = map;
     host.querySelectorAll('.st-pen-tile').forEach((t) => {
       const c = t.dataset.pen, v = o.tiles[c];
-      t.innerHTML = '<span class="m-pc">' + c + '</span>' + (v ? '<span class="m-pn">' + v[0] + '</span>' : '');
-      if (v && v[1]) t.classList.add(v[1]);
+      t.innerHTML = '<span class="m-pc">' + c + '</span>' + (!v ? '' : v[1] === 'm-word' ? '<span class="m-pw">' + v[0] + '</span>' : '<span class="m-pn">' + v[0] + '</span>');
+      if (v && v[1] && v[1] !== 'm-word') t.classList.add(...v[1].split(' '));
     });
     map = '<div class="m-map">' + host.innerHTML + '</div>';
     const top = o.facts ? '<section class="feature-section">' + U.facts(o.facts.map(([label, value]) => ({ label, value })), { columns: o.facts.length }) + '</section>' : o.top;
-    page(o.title, o.line, top + o.key + map, footer(o.left, primary(o.cta)));
+    const note = o.chip ? '<p class="m-over">' + U.status({ variant: 'chip', kind: 'late', icon: '', text: o.chip }) + '</p>' : '';
+    page(o.title, o.line, top + note + o.key + map, footer(o.left, primary(o.cta)));
     const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS + PLAN_CSS; document.head.append(st);
   }, { UNIT_CSS, LEDGER_CSS, PLAN_CSS, o: opts });
   await shoot(p, name);
 }
 const bar = (n, of, word, segs) => `<div class="m-recv-bar"><div class="m-recv-figs"><strong>${n}</strong><span>${word}</span></div><div class="m-recv-track" data-status-part="bar">${segs}</div><small>${of}</small></div>`;
+const ROOM_KEY = '<p class="m-plankey"><span><i class="m-k-plan"></i>Planned</span><span><b>15</b> Free places</span></p>';
+const roomTiles = (planned) => {
+  const t = { C1: ['Full', 'm-word'], C2: ['6', 'm-free'], C3: ['15', 'm-free'], C4: ['15', 'm-free'] };
+  for (const [c, n] of Object.entries(planned)) t[c] = [n, 'm-plan'];
+  return t;
+};
 if (want('13-')) {
-  const tiles = {}; for (const c of ['A1', 'A2', 'A3', 'A4', 'B1', 'B2', 'B3', 'B4']) tiles[c] = ['15'];
+  const tiles = roomTiles({ A1: '15', A2: '15', A3: '15', A4: '15', B1: '15', B2: '15', B3: '15', B4: '15' });
   await receiveMap('mock-13-receive-plan.png', {
     title: 'Receive pigs', line: 'Batch 25 · from Farrowing room 3', lanes: ['A', 'B', 'C'], depth: 4, tiles,
-    facts: [['Arriving', '120'], ['Pens', '8'], ['Each pen', '15']],
-    key: '', left: '<div class="m-left"><strong>Pigs in?</strong><small>Count each pen</small></div>', cta: 'Count pens',
+    facts: [['Arriving', '120'], ['Planned room', '120'], ['Other room', '36']],
+    key: ROOM_KEY, left: '<div class="m-left"><strong>Pigs in?</strong><small>Count each pen</small></div>', cta: 'Count pens',
+  });
+}
+if (want('13b')) {
+  const tiles = roomTiles({ A1: '15', A2: '15', A3: '15', A4: '15', B1: '15', B2: '15', B3: '15', B4: '12' });
+  await receiveMap('mock-13b-receive-short.png', {
+    title: 'Receive pigs', line: 'Batch 25 · from Farrowing room 3', lanes: ['A', 'B', 'C'], depth: 4, tiles,
+    facts: [['Arriving', '120'], ['Planned room', '117'], ['Other room', '36']],
+    chip: '3 more than the planned pens hold',
+    key: ROOM_KEY, left: '<div class="m-left"><strong>Pigs in?</strong><small>Count each pen</small></div>', cta: 'Count pens',
   });
 }
 if (want('14-')) {
-  const tiles = { A1: ['15', 'm-done'], A2: ['16', 'm-done'], A3: ['14', 'm-done'], B1: ['15', 'm-done'], A4: ['15', 'm-todo'], B2: ['15', 'm-todo'], B3: ['15', 'm-todo'], B4: ['15', 'm-todo'] };
+  const tiles = { ...roomTiles({ A4: '15', B2: '15', B3: '15', B4: '15' }), A1: ['15', 'm-done'], A2: ['16', 'm-done'], A3: ['14', 'm-done'], B1: ['15', 'm-done'], C3: ['3', 'm-done'] };
   await receiveMap('mock-14-receive-count.png', {
     title: 'Receive pigs', line: 'Batch 25 · into Unit 9', lanes: ['A', 'B', 'C'], depth: 4, tiles,
-    top: bar('4', '60 counted of 120 sent', 'of 8 pens counted', '<i class="done" style="flex:1"></i>'.repeat(4) + '<i style="flex:1"></i>'.repeat(4)),
-    key: '<p class="m-plankey"><span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span><span><i style="background:#fff;border:1px solid var(--line,#dfe4d8);box-sizing:border-box"></i>Plan, not counted</span></p>',
-    left: '<div class="m-left"><strong>4 pens to count</strong><small>Tap a pen to count it</small></div>', cta: 'End task',
+    top: bar('63', 'In 5 pens · C3 off the plan', 'of 120 pigs counted', '<i class="done" style="flex:63"></i><i style="flex:57"></i>'),
+    key: '<p class="m-plankey"><span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span><span><i class="m-k-plan"></i>Planned</span><span><b>15</b> Free</span></p>',
+    left: '<div class="m-left"><strong>57 still to count</strong><small>Tap a pen to count</small></div>', cta: 'End task',
   });
 }
 if (want('10')) {
   const tiles = { C1: ['3', 'm-done'], C2: ['2', 'm-done'], D4: ['16', 'm-done'], D5: ['38', 'm-todo'] };
+  for (const c of ['C3', 'C4', 'C5', 'D1', 'D2', 'D3']) tiles[c] = ['Empty', 'm-word'];
   await receiveMap('mock-10-unit-recount.png', {
     title: 'Recount', line: 'Unit 7', lanes: ['C', 'D'], depth: 5, tiles,
-    top: bar('3', 'Started 09:05 · L.M', 'of 4 pens counted', '<i class="done" style="flex:1"></i>'.repeat(3) + '<i style="flex:1"></i>'),
-    key: '<p class="m-plankey"><span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span><span><i style="background:#fff;border:1px solid var(--line,#dfe4d8);box-sizing:border-box"></i>To count · on record</span></p>',
-    left: '<div class="m-left"><strong>D5 still to count</strong><small>Pens you skip stay as recorded</small></div>', cta: 'Finish recount',
+    top: bar('3', 'Started 09:05 · L.M', 'of 4 pens with pigs counted', '<i class="done" style="flex:1"></i>'.repeat(3) + '<i style="flex:1"></i>'),
+    key: '<p class="m-plankey"><span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span><span><b>38</b> On record</span></p>',
+    left: '<div class="m-left"><strong>D5 not counted</strong><small>Keeps 38 if you finish</small></div>', cta: 'Finish recount',
   });
 }
 
@@ -395,7 +417,7 @@ if (want('12')) {
     const search = U.choiceSearch({ label: 'Search ear tag', placeholder: 'Ear tag', value: '', clear: { action: 'x' }, scan: { action: 'x', label: 'Scan ear tags' } });
     const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Which tagged pigs are here?', meta: '1 found', icon: ic('tag'), kind: 'section', level: 3 })
       + '<div class="m-inline-bar">' + search + '</div>' + U.rowGroup(pig('000904', 'Gilt')) + '</section>';
-    const left = '<div class="m-left"><strong>13 without ear tags</strong><small>Plan 15 · batch 25</small></div>';
+    const left = '<div class="m-left"><strong>13 without ear tags</strong><small>Batch 25</small></div>';
     page('Count A3', 'Receive · Unit 9', count + tags, footer(left, primary('Done')));
     const st = document.createElement('style'); st.textContent = UNIT_CSS + '.st-choice-trail input[type="checkbox"]{accent-color:#276640!important}.inspect-pig.selected,.roster-pig.selected{background:var(--paper,#fff)!important}'; document.head.append(st);
   }, UNIT_CSS);
@@ -445,8 +467,8 @@ for (const [name, view] of [['mock-9b-pen-move.png', 'move'], ['mock-9c-pen-stay
 
 // 16. End the transfer (owner, 2026-11-03: "look at how we do it for the farrowing end task"): Farrowing's End task, its own parts.
 //     The heading answers whether the task can close; one bar over the batch's pigs, then a row per part (Received, Still to count,
-//     Not arrived, which leaves the batch on the balancing sheet with the amber "!"); a count card (sent against counted); what
-//     ending does; the hold. These need Farrowing's End task (PR 294): run from a checkout that has it.
+//     Not arrived, which goes on the balancing sheet with the amber "!"; the row says what ending does); the hold. No second
+//     count card and no "When you end" (owner, 2026-11-03: confusing; the part rows already say it). These need Farrowing's End task (PR 294): run from a checkout that has it.
 const FARROW = `http://localhost:${port}/ux/system/farrowing-astra-concept.html?layout=focus`;
 const END = [
   ['mock-16-end-blocked.png', 'task-blocked', {
@@ -458,14 +480,14 @@ const END = [
   }],
   ['mock-16b-end-early.png', 'task-ready', {
     heading: 'Ready to end early', meta: '120 pigs', segs: [['farrowed', 119], ['awaiting', 1]],
-    parts: [['done', 119, 'Received', 'Counted into 8 pens in Unit 9', false], ['awaiting', 1, 'Not arrived', 'Goes on the balancing sheet at the end', true, true]],
+    parts: [['done', 119, 'Received', 'Counted into 9 pens in Unit 9', false], ['awaiting', 1, 'Not arrived', 'Goes on the balancing sheet', true, true]],
     sent: 120, counted: 119, countedNote: '1 not arrived', tagged: 2,
     ends: [['Recorded in Unit 9', '119'], ['Left in Farrowing room 3', '0']], owe: ['To the balancing sheet', '1', 'A loss if not found by batch end'],
     hold: ['End task early', 'HOLD TO END EARLY', false, true],
   }],
   ['mock-16c-end-ready.png', 'task-complete', {
     heading: 'Ready to end', meta: '120 pigs', segs: [['farrowed', 120]],
-    parts: [['done', 120, 'Received', 'Counted into 8 pens in Unit 9', false]],
+    parts: [['done', 120, 'Received', 'Counted into 9 pens in Unit 9', false]],
     sent: 120, counted: 120, countedNote: 'All arrived', tagged: 2,
     ends: [['Recorded in Unit 9', '120'], ['Left in Farrowing room 3', '0']], owe: null,
     hold: ['End task', 'HOLD TO END', false],
@@ -494,7 +516,7 @@ for (const [name, screen, d] of END) {
     const rows = d.ends.map(([title, n]) => U.row({ title, variant: 'summary-count', trailing: { text: n } })).join('')
       + (d.owe ? U.row({ title: d.owe[0], description: d.owe[2], variant: 'summary-count', trailing: { text: d.owe[1] }, action: 'x', trail: 'chevron' }) : '');
     const ends = '<section class="task-other-outcomes">' + U.heading({ title: 'When you end', icon: ic('record'), kind: 'section', level: 4 }) + '<div class="task-other-surface st-panel st-row-group">' + rows + '</div></section>';
-    sheet.querySelector('.sheet-body').innerHTML = closure + ends + count;
+    sheet.querySelector('.sheet-body').innerHTML = closure;
     const [label, caption, waiting, danger] = d.hold;
     sheet.querySelector('.sheet-footer').innerHTML = U.holdButton({ action: 'x', label, tone: danger || waiting ? 'danger' : 'primary', waiting, caption, className: label === 'End task' ? 'task-complete' : 'task-end-confirm' });
     sheet.querySelector('.st-page-title').textContent = 'End task';
