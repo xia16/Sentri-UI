@@ -140,9 +140,9 @@ for (const [name, fewer, tick] of [['mock-3-count-pen.png', true, 'B'], ['mock-3
       const html = U.rowSelectDoor({ code: id, description: ctx, right: { kind: 'tags', tags: [] }, checked: !off, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig' + (off ? '' : ' selected'), label: id });
       return away ? html.replace('</span><span class="st-row-chevron">', chip(away) + '</span><span class="st-row-chevron">') : html;
     };
-    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs in D4', value: all, min: kept.length, max: 80, action: 'x', reserveHint: false }) + '</section>';
+    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'How many pigs are in D4?', value: all, min: kept.length, max: 80, action: 'x', reserveHint: false }) + '</section>';
     const search = U.choiceSearch({ label: 'Search ear tag', placeholder: 'Ear tag', value: '', clear: { action: 'x' }, scan: { action: 'x', label: 'Scan ear tags' } });
-    const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Ear tags · ' + kept.length, icon: ic('tag'), kind: 'section', level: 3 })
+    const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Which tagged pigs are here?', meta: kept.length + ' found', icon: ic('tag'), kind: 'section', level: 3 })
       + '<div class="m-inline-bar">' + search + '</div>'
       + U.rowGroup(added.map(row).join(''))
       + (notAdded.length ? '<p class="m-hint">Recorded here, not scanned yet: <b>' + notAdded.join(', ') + '</b></p>' : '')
@@ -292,7 +292,8 @@ const LEDGER_CSS = `
   .m-stmt .m-n{font:600 17px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f);text-align:right}
   .m-stmt .m-c{color:var(--muted,#657060)}.m-stmt .m-c svg{width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:1.8}
   .m-stmt .m-l.m-total{border-top:1.5px solid var(--ink,#20291f)}.m-stmt .m-l.m-total .m-t,.m-stmt .m-l.m-total .m-n{font-weight:600}.m-stmt .m-l.m-total .m-n{font-size:22px}
-  .m-stmt .m-l.m-owe .m-n{color:var(--amber,#896017)}`;
+  .m-stmt .m-l.m-owe .m-n{color:var(--amber,#896017)}
+  .m-stmt-aside{margin-top:12px}`;
 const ARROW = '<svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg>';
 const CHEV = '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>';
 const hero = (fromLabel, from, toLabel, to, net) => `<div class="m-hero"><div class="m-k m-from"><small>${fromLabel}</small><strong>${from}</strong></div><span class="m-arrow">${ARROW}</span><div class="m-k m-to"><small>${toLabel}</small><strong>${to}</strong></div>${net ? `<span class="m-net">${net}</span>` : ''}</div>`;
@@ -304,11 +305,10 @@ if (want('11-')) {
     const { U, ic, page } = window.M;
     const fig = (n, cls = '') => '<span class="m-fig ' + cls + '">' + n + '</span>';
     const change = (icon, title, description, n, cls) => U.row({ variant: 'navigation', icon: ic(icon), title, description, trail: 'chevron', action: 'x' })
-      .replace('<span class="st-row-chevron">', fig(n, cls) + '<span class="st-row-chevron">');
+      .replace('<span class="st-row-chevron">', (n ? fig(n, cls) : '') + '<span class="st-row-chevron">');
     const body = top + '<section class="feature-section">' + U.heading({ title: 'What changed', kind: 'section', level: 3 })
       + U.rowGroup(change('transfer', 'Found from other units', '000512 · 000733', '+2')
-        + change('alert', 'Not found', '000803 · balancing sheet', '−1', 'm-owe')
-        + change('tag-off', 'Without ear tags', 'D4 −1 · D5 +1', '0', 'm-zero')) + '</section>';
+        + change('alert', 'Not found', '000803 · balancing sheet', '−1', 'm-owe')) + '</section>';
     page('Unit 7 balance sheet', 'Recount · 09:40 · L.M', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save recount', register: 'primary', action: 'x' }) + '</div>');
     const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS; document.head.append(st);
   }, { UNIT_CSS, LEDGER_CSS, top: hero('On record', '59', 'Counted', '60', '') });
@@ -321,7 +321,7 @@ if (want('11-')) {
     const { U, page } = window.M;
     const l = (s, t, sub, n, cls = '', door = true) => `<div class="m-l ${cls}"><span class="m-s">${s}</span><span class="m-t">${t}${sub ? `<small>${sub}</small>` : ''}</span><span class="m-n">${n}</span><span class="m-c">${door ? CHEV : ''}</span></div>`;
     const body = '<div class="m-stmt">' + l('', 'On record', '', '59', '', false) + l('+', 'Found from other units', '000512 · 000733', '2')
-      + l('−', 'Not found', '000803 · to the balancing sheet', '1', 'm-owe') + l('±', 'Without ear tags', 'D4 −1 · D5 +1', '0')
+      + l('−', 'Not found', '000803 · to the balancing sheet', '1', 'm-owe') 
       + l('=', 'Counted', '', '60', 'm-total', false) + '</div>';
     page('Unit 7 balance sheet', 'Recount · 09:40 · L.M', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save recount', register: 'primary', action: 'x' }) + '</div>');
     const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS; document.head.append(st);
@@ -329,11 +329,27 @@ if (want('11-')) {
   await shoot(p, 'mock-11-unit-balance-b.png');
 }
 
+// 11m. The usual outcome (owner, 2026-11-03): the count matches the record, so the sheet says nothing changed. Pigs without ear tags
+//     counted in a different pen of the unit than recorded are normal work: the pens are updated and nothing is said.
+if (want('11m')) {
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate(({ UNIT_CSS, LEDGER_CSS, top }) => {
+    const { U, ic, page } = window.M;
+    const ok = '<div class="m-ok"><span class="m-ok-mark">' + ic('check') + '</span><div><strong>Nothing changed</strong><small>Every pig is where the record says</small></div></div>';
+    page('Unit 7 balance sheet', 'Recount · 09:40 · L.M', top + ok, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save recount', register: 'primary', action: 'x' }) + '</div>');
+    const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS + `.m-ok{display:flex;align-items:center;gap:14px;padding:4px 2px}
+      .m-ok-mark{flex:0 0 auto;width:40px;height:40px;border-radius:12px;background:var(--done-fill,#d5e8cc);color:var(--done-fill-ink,#1d4d2e);display:grid;place-items:center}.m-ok-mark svg{width:22px;height:22px}
+      .m-ok strong{display:block;font:500 16px var(--font-sans,'Plus Jakarta Sans',sans-serif);color:var(--ink,#20291f)}.m-ok small{display:block;font-size:13px;color:var(--muted,#657060);margin-top:3px}`;
+    document.head.append(st);
+  }, { UNIT_CSS, LEDGER_CSS, top: hero('On record', '59', 'Counted', '59', '') });
+  await shoot(p, 'mock-11m-nothing-changed.png');
+}
+
 // 11b–d. A line opened: its pigs, under the same figure.
 const DETAILS = [
   ['mock-11b-found.png', 'Found from other units', '+2', '', [['000512', 'Was Unit 9 · C3', '→ D4'], ['000733', 'Was Unit 6 · D2', '→ D4']], 'Saved, they move into D4 and leave their old units.'],
   ['mock-11c-not-found.png', 'Not found', '−1', 'm-owe', [['000803', 'Recorded in D4', '']], 'She goes on batch 25 balancing sheet. A later count, transfer or death closes it; still open when the batch ends, she is an unaccounted loss.'],
-  ['mock-11d-without-tags.png', 'Without ear tags', '0', 'm-zero', [['D4', 'Recorded 13 · counted 12', '−1'], ['D5', 'Recorded 37 · counted 38', '+1']], 'Pigs moved between pens and not recorded balance out inside the unit.'],
 ];
 for (const [name, title, figure, cls, rows, note] of DETAILS) {
   if (!want(name.slice(5, 8))) continue;
@@ -341,7 +357,7 @@ for (const [name, title, figure, cls, rows, note] of DETAILS) {
   await prep(p);
   await p.evaluate(({ UNIT_CSS, LEDGER_CSS, title, figure, cls, rows, note }) => {
     const { U, page } = window.M;
-    const body = '<section class="feature-section">' + U.rowGroup(U.row({ title: 'Unit 7', className: 'm-sum', trailing: 'X' }).replace('<span class="st-row-trailing">X</span>', '<span class="m-fig ' + cls + '">' + figure + '</span>') + rows.map(([code, description, trailing]) => U.row({ code, description, trailing, className: 'm-line' })).join(''))
+    const body = '<section class="feature-section">' + U.rowGroup((figure ? U.row({ title: 'Unit 7', className: 'm-sum', trailing: 'X' }) : U.row({ title: 'Unit 7 total', className: 'm-sum', trailing: 'Unchanged' })).replace('<span class="st-row-trailing">X</span>', '<span class="m-fig ' + cls + '">' + figure + '</span>') + rows.map(([code, description, trailing]) => U.row({ code, description, trailing, className: 'm-line' })).join(''))
       + '<p class="m-hint m-explain">' + note + '</p></section>';
     page(title, 'Unit 7 balance sheet', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + '</div>');
     const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS + '.m-count .st-sheet-line .m-fig,.m-count .sheet-line .m-fig{padding:2px 6px;font-size:13px;min-width:0}'; document.head.append(st);
@@ -410,7 +426,7 @@ if (want('15-')) {
     const { U, ic, page } = window.M;
     const fig = (n, cls = '') => '<span class="m-fig ' + cls + '">' + n + '</span>';
     const change = (icon, title, description, n, cls) => U.row({ variant: 'navigation', icon: ic(icon), title, description, trail: 'chevron', action: 'x' })
-      .replace('<span class="st-row-chevron">', fig(n, cls) + '<span class="st-row-chevron">');
+      .replace('<span class="st-row-chevron">', (n ? fig(n, cls) : '') + '<span class="st-row-chevron">');
     const body = top + '<section class="feature-section">' + U.heading({ title: 'What changed', kind: 'section', level: 3 })
       + U.rowGroup(change('tag-off', 'Not arrived', 'Without an ear tag · balancing sheet', '−1', 'm-owe')) + '</section>';
     page('Unit 9 balance sheet', 'Receive · batch 25 · 11:20 · L.M', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save receiving', register: 'primary', action: 'x' }) + '</div>');
@@ -426,9 +442,9 @@ if (want('12')) {
   await p.evaluate((UNIT_CSS) => {
     const { U, ic, page, footer, primary } = window.M;
     const pig = (id, ctx) => U.rowSelectDoor({ code: id, description: ctx, right: { kind: 'tags', tags: [] }, checked: true, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig selected', label: id });
-    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs in A3', value: 14, min: 1, max: 80, action: 'x', reserveHint: false }) + '</section>';
+    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'How many pigs are in A3?', value: 14, min: 1, max: 80, action: 'x', reserveHint: false }) + '</section>';
     const search = U.choiceSearch({ label: 'Search ear tag', placeholder: 'Ear tag', value: '', clear: { action: 'x' }, scan: { action: 'x', label: 'Scan ear tags' } });
-    const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Ear tags · 1', icon: ic('tag'), kind: 'section', level: 3 })
+    const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Which tagged pigs are here?', meta: '1 found', icon: ic('tag'), kind: 'section', level: 3 })
       + '<div class="m-inline-bar">' + search + '</div>' + U.rowGroup(pig('000904', 'Gilt')) + '</section>';
     const left = '<div class="m-left"><strong>13 without ear tags</strong><small>Plan 15 · batch 25</small></div>';
     page('Count A3', 'Receive · Unit 9', count + tags, footer(left, primary('Done')));
