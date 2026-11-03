@@ -1179,7 +1179,7 @@
           {
             "name": "Question",
             "at": "Undo this entry?",
-            "shows": "The shared dialog: \"Undo this entry?\"; the entry in the log's words (+3 born alive) over when · who; one quiet panel with each figure Undo changes as label over now → after (12 → 9, the after figure 28px in ink), up to three across, four as 2 + 2; a muted line \"The log keeps it, marked Withdrawn.\"; Back · Undo.",
+            "shows": "A tint dialog (no white background, owner 2026-11-03): \"Undo this entry?\", then one white ledger card, a row per figure Undo changes: the label left, now → after right (9 → 7), the after figure in ink; Back · Undo. No entry line, no note: the entry is the log line just tapped.",
             "logic": "The title names the action in the log's own words. Undo withdraws it: counts go back, the line stays marked Withdrawn <time> · <who>; Undo moves to the next action down. The rows show what Undo does (owner, 2026-11-03): from Alive now, Died after birth, Born dead and Born, only the figures it changes; after Finish Born never changes.",
             "source": "farrowing-astra-concept.js popup(), undoChange(), undone()"
           }
@@ -1196,10 +1196,8 @@
         ],
         "copy": [
           "(raw) Undo this entry?",
-          "(raw) <entry> · <when> · <who>",
           "(raw) Alive now · Died after birth · Born dead · Born",
           "(raw) <now> → <after>",
-          "(raw) The log keeps it, marked Withdrawn.",
           "(raw) Back · Undo"
         ],
         "edge": [

@@ -1640,16 +1640,15 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .st-log-entry:has(.log-withdrawn) .st-log-title{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
 .farrowing-phone .st-log-entry:has(.log-withdrawn):before{background:var(--line)}
 .farrowing-phone .st-log-extra:has(>.log-withdrawn:only-child){display:none}
-.farrowing-phone .undo-note{margin:var(--space-12) 0 0;font:400 13px/1.5 var(--font-sans);color:var(--muted)}
-/* Undo shows what it does (owner, 2026-11-03): the entry, then each figure it changes as now → after in one quiet panel. */
-.farrowing-phone .undo-what{margin:0 0 var(--space-16);font:500 17px/1.4 var(--font-sans);color:var(--ink)}
-.farrowing-phone .undo-what small{display:block;margin-top:2px;font:400 13px/1.5 var(--font-sans);color:var(--muted)}
-.farrowing-phone .undo-change{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:var(--space-12);padding:var(--space-16);border-radius:var(--radius-panel);background:var(--well)}
-.farrowing-phone .undo-change span{display:block;font:400 13px/1.4 var(--font-sans);color:var(--muted);white-space:nowrap}
-.farrowing-phone .undo-change p{display:flex;align-items:baseline;gap:6px;margin:var(--space-8) 0 0;white-space:nowrap;font-variant-numeric:tabular-nums}
-.farrowing-phone .undo-change s{font:500 17px/1 var(--font-sans);color:var(--muted);text-decoration:none}
-.farrowing-phone .undo-change i{font:400 15px/1 var(--font-sans);font-style:normal;color:var(--muted)}
-.farrowing-phone .undo-change b{font:600 28px/1 var(--font-sans);color:var(--ink)}
-.farrowing-phone .undo-change:has(>div:nth-child(4)){grid-auto-flow:row;grid-template-columns:1fr 1fr;row-gap:var(--space-16)}
+/* Undo (owner, 2026-11-03): a tint dialog with one white ledger card: each figure Undo changes, now → after. */
+.farrowing-phone .dialog.undo-dialog{background:var(--app-background)}
+.farrowing-phone .undo-dialog>.sheet-footer{background:transparent}
+.farrowing-phone .undo-dialog .dialog-title{margin-bottom:var(--space-16)}
+.farrowing-phone .undo-ledger{list-style:none;margin:0;padding:0 var(--space-16);border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper)}
+.farrowing-phone .undo-ledger li{display:grid;grid-template-columns:1fr auto auto 2ch;align-items:center;gap:var(--space-8);min-height:52px;border-bottom:1px solid var(--rule);font:400 15px/1.4 var(--font-sans);color:var(--ink);font-variant-numeric:tabular-nums}
+.farrowing-phone .undo-ledger li:last-child{border-bottom:0}
+.farrowing-phone .undo-ledger s{text-decoration:none;color:var(--muted);text-align:right}
+.farrowing-phone .undo-ledger i{font-style:normal;color:var(--muted);text-align:center}
+.farrowing-phone .undo-ledger b{font:600 17px/1.4 var(--font-sans);color:var(--ink);text-align:right}
 /* On the tint drawer the card is white and its head band is white too, set off by its divider. */
 .farrowing-phone .sheet[data-st-context="menu"] .finished-card-head{background:var(--paper)}
