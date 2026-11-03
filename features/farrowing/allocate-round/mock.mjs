@@ -14,6 +14,9 @@ const shots = {
   'now-ended': { preset: 'ended' },
   'now-count': { preset: 'count' },
   'now-locked': { preset: 'locked' },
+  'd-dead': { preset: 'allocate' },
+  'd-finished': { preset: 'locked' },
+  'd-room': { preset: 'allocate', steps: [{ act: 'close' }, { js: "(()=>{const r=[...document.querySelectorAll('[data-card=\"0\"] .room-scroll .st-row')].find(e=>e.textContent.includes('000399'));const sc=r.closest('.room-scroll');sc.scrollTop+=r.getBoundingClientRect().top-sc.getBoundingClientRect().top-160;})()" }] },
   'p-list': { preset: 'piglets-dead' },
   'p-ticked': { preset: 'piglets-ticked' },
   
@@ -45,7 +48,8 @@ for (const [name, shot] of Object.entries(shots)) {
   await page.evaluate((v) => { const s = document.querySelector('select.scenario'); s.value = v; s.dispatchEvent(new Event('change', { bubbles: true })); }, shot.preset);
   await page.waitForTimeout(600);
   for (const st of shot.steps || []) {
-    if (st.fill) { await page.fill(card + st.fill[0], st.fill[1]); await page.locator(card + st.fill[0]).dispatchEvent('change'); }
+    if (st.js) await page.evaluate(st.js);
+    else if (st.fill) { await page.fill(card + st.fill[0], st.fill[1]); await page.locator(card + st.fill[0]).dispatchEvent('change'); }
     else if (st.type != null) await page.fill(card + '[data-foster-search]', st.type);
     else if (st.range) await page.locator(card + '.st-range input[type=range]').nth(st.range[0]).evaluate((e, v) => { e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); }, st.range[1]);
     else if (st.read) for (let k = 0; k < st.read; k++) { await page.click('[data-demo-scan]'); await page.waitForTimeout(250); }
