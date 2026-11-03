@@ -926,7 +926,7 @@ function litterPage(s){
  const bar=f.idScan?SentriUI.scanBar({state:f.idScan==='waiting'?'waiting':'scanning',device:'Reader 1',text:f.idScan==='waiting'?'':'Scan piglet tags',stop:{action:'fosterIdScanStop'}})
   :SentriUI.choiceSearch({label:'Search piglet ID',placeholder:'Piglet ID',value:f.idQ,attrs:{'data-litter-search':''},clear:{action:'fosterIdClear'},scan:{action:'fosterIdScan',label:'Scan piglet tags'}});
  const list=n?`<section class="litter-list"><div class="litter-head">${SentriUI.heading({title:`${n} alive`,kind:'section',level:4})}${SentriUI.button({label:all?'Clear':'Tick all',register:'text',action:'litterAll'})}</div><div class="litter-bar">${bar}</div><div class="litter-rows">${litterRows(s)}</div></section>`:`<p class="st-find-hint">No piglets left with her.</p>`;
- const foot=footer(SentriUI.backButton({action:'featureBack'}),k?btn('litterActions',`${icon('grid')}<span>Actions · ${k}</span>`,'button primary'):'');
+ const foot=footer(SentriUI.backButton({action:'featureBack'}),k?btn('litterActions',`${icon('more')}<span>Actions · ${k}</span>`,'button primary'):'');
  const page=SentriUI.sheet({variant:'page',title:'Piglets',line:`${s.ended?'Sow died':'Sow'} · ${s.tag} · ${sowPlace(s)}`,back:{action:'featureBack'},body:list+allocSentList(s),bodyClass:'litter-body',footer:foot,className:'feature-page litter-page',label:'Piglets',bar:status()});
  if(s.view==='allocConfirm')return '<div class="page-background" inert aria-hidden="true">'+fosterPage(s)+'</div>'+allocConfirm(s);   // over the sows
  const layer=s.view==='allocPen'?allocPenPage(s):s.view==='litterActions'?litterActionsSheet(s):'';
