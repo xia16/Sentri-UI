@@ -252,27 +252,9 @@ const UNIT_CSS = `.m-count .m-line .st-row-trailing{font:600 17px var(--font-mon
   .m-recv-bar small{display:block;font-size:12px;color:var(--muted,#657060)}
   .m-done .st-row-chevron{color:#276640}`;
 
-// 10. Recount · Unit 7, part-way: each pen a row with what was found; a pen not counted yet says so; tap any pen to count it.
-if (want('10')) {
-  const p = await open(INSPECT, 'inspection.walk');
-  await prep(p);
-  await p.evaluate((UNIT_CSS) => {
-    const { U, ic, page, footer, primary } = window.M;
-    const pen = (code, figure, done) => U.row({ variant: 'navigation', code, chip: { text: done ? 'Counted' : 'To do', kind: done ? 'done' : 'awaiting' }, trail: 'chevron', action: 'x', className: 'm-line' })
-      .replace('<span class="st-row-chevron">', (figure ? '<span class="st-row-trailing">' + figure + '</span>' : '') + '<span class="st-row-chevron">');
-    const bar = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>3</strong><span>of 4 pens counted</span></div><div class="m-recv-track" data-status-part="bar"><i class="done" style="flex:1"></i><i class="done" style="flex:1"></i><i class="done" style="flex:1"></i><i style="flex:1"></i></div><small>Started 09:05 · L.M</small></div>';
-    const list = U.heading({ title: 'Pens', icon: ic('grid'), kind: 'section', level: 3 })
-      + U.rowGroup(pen('C1', '3', true) + pen('C2', '2', true) + pen('D4', '16', true) + pen('D5', '', false));
-    const left = '<div class="m-left"><strong>D5 still to count</strong><small>Pens you skip stay as recorded</small></div>';
-    page('Recount', 'Unit 7', bar + list, footer(left, primary('Finish recount')));
-    const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
-  }, UNIT_CSS);
-  await shoot(p, 'mock-10-unit-recount.png');
-}
-
-// 11. Finish recount: the unit's balance sheet (owner, 2026-11-03: "like a ledger", each line opens its detail). A, recommended: the
-//     result first (59 → 60), then what changed, each line a door with its signed figure in a tonal tile; the one needing follow-up
-//     (not found, to the batch's balancing sheet) is the only amber. B: the same as a statement (sign column, lines, rule, total).
+// 11. Finish recount. A count that matches the record saves at once: no sheet (owner, 2026-11-03). Only when the unit's total changed
+//     does the balance sheet open, as one ledger card in the owner's order: Counted now at the top, each change a door with its
+//     signed figure in a tonal tile (not found, to the batch's balancing sheet, the only amber), On record at the bottom.
 //     Count: C1 3 · C2 2 · D4 16 (000801 000802 + 000512 from Unit 9, 000733 from Unit 6, 12 without; 000803 not found) · D5 39 (000915 + 38).
 const LEDGER_CSS = `
   .m-hero{background:var(--paper,#fff);border:1px solid var(--line,#dfe4d8);border-radius:18px;padding:16px 18px 18px;display:grid;grid-template-columns:auto auto 1fr;grid-template-rows:auto auto;column-gap:16px;align-items:baseline;margin:4px 0 24px}.m-hero .m-k{display:contents}.m-hero .m-from small{grid-area:1/1}.m-hero .m-from strong{grid-area:2/1}.m-hero .m-to small{grid-area:1/3}.m-hero .m-to strong{grid-area:2/3}.m-hero .m-arrow{grid-area:2/2;align-self:center}
@@ -293,7 +275,11 @@ const LEDGER_CSS = `
   .m-stmt .m-c{color:var(--muted,#657060)}.m-stmt .m-c svg{width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:1.8}
   .m-stmt .m-l.m-total{border-top:1.5px solid var(--ink,#20291f)}.m-stmt .m-l.m-total .m-t,.m-stmt .m-l.m-total .m-n{font-weight:600}.m-stmt .m-l.m-total .m-n{font-size:22px}
   .m-stmt .m-l.m-owe .m-n{color:var(--amber,#896017)}
-  .m-stmt-aside{margin-top:12px}`;
+  .m-stmt-aside{margin-top:12px}
+  .m-count .m-ledger .m-end .st-row-trailing{font-family:var(--font-mono,'IBM Plex Mono',monospace);min-width:44px;text-align:center;margin-right:26px}
+  .m-count .m-ledger .m-now .st-row-title,.m-count .m-ledger .m-now strong{font-weight:600}
+  .m-count .m-ledger .m-now .st-row-trailing{font-size:26px;font-weight:600;color:var(--ink,#20291f)}
+  .m-count .m-ledger .m-was .st-row-trailing{font-size:18px;font-weight:500;color:var(--ink-2,#5b625d)}`;
 const ARROW = '<svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg>';
 const CHEV = '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>';
 const hero = (fromLabel, from, toLabel, to, net) => `<div class="m-hero"><div class="m-k m-from"><small>${fromLabel}</small><strong>${from}</strong></div><span class="m-arrow">${ARROW}</span><div class="m-k m-to"><small>${toLabel}</small><strong>${to}</strong></div>${net ? `<span class="m-net">${net}</span>` : ''}</div>`;
@@ -301,51 +287,21 @@ const hero = (fromLabel, from, toLabel, to, net) => `<div class="m-hero"><div cl
 if (want('11-')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
-  await p.evaluate(({ UNIT_CSS, LEDGER_CSS, top }) => {
+  await p.evaluate(({ UNIT_CSS, LEDGER_CSS }) => {
     const { U, ic, page } = window.M;
     const fig = (n, cls = '') => '<span class="m-fig ' + cls + '">' + n + '</span>';
     const change = (icon, title, description, n, cls) => U.row({ variant: 'navigation', icon: ic(icon), title, description, trail: 'chevron', action: 'x' })
       .replace('<span class="st-row-chevron">', (n ? fig(n, cls) : '') + '<span class="st-row-chevron">');
-    const body = top + '<section class="feature-section">' + U.heading({ title: 'What changed', kind: 'section', level: 3 })
-      + U.rowGroup(change('transfer', 'Found from other units', '000512 · 000733', '+2')
-        + change('alert', 'Not found', '000803 · balancing sheet', '−1', 'm-owe')) + '</section>';
+    const end = (title, description, n, cls) => U.row({ title, description, trailing: n, className: 'm-end ' + cls });
+    const body = '<section class="feature-section m-ledger">' + U.rowGroup(end('Counted', 'This recount', '60', 'm-now')
+      + change('transfer', 'Found from other units', '000512 · 000733', '+2')
+      + change('alert', 'Not found', '000803 · balancing sheet', '−1', 'm-owe')
+      + end('On record', 'Before the recount', '59', 'm-was')) + '</section>';
     page('Unit 7 balance sheet', 'Recount · 09:40 · L.M', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save recount', register: 'primary', action: 'x' }) + '</div>');
     const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS; document.head.append(st);
-  }, { UNIT_CSS, LEDGER_CSS, top: hero('On record', '59', 'Counted', '60', '') });
+  }, { UNIT_CSS, LEDGER_CSS });
   await shoot(p, 'mock-11-unit-balance.png');
 }
-if (want('11-')) {
-  const p = await open(INSPECT, 'inspection.walk');
-  await prep(p);
-  await p.evaluate(({ UNIT_CSS, LEDGER_CSS, CHEV }) => {
-    const { U, page } = window.M;
-    const l = (s, t, sub, n, cls = '', door = true) => `<div class="m-l ${cls}"><span class="m-s">${s}</span><span class="m-t">${t}${sub ? `<small>${sub}</small>` : ''}</span><span class="m-n">${n}</span><span class="m-c">${door ? CHEV : ''}</span></div>`;
-    const body = '<div class="m-stmt">' + l('', 'On record', '', '59', '', false) + l('+', 'Found from other units', '000512 · 000733', '2')
-      + l('−', 'Not found', '000803 · to the balancing sheet', '1', 'm-owe') 
-      + l('=', 'Counted', '', '60', 'm-total', false) + '</div>';
-    page('Unit 7 balance sheet', 'Recount · 09:40 · L.M', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save recount', register: 'primary', action: 'x' }) + '</div>');
-    const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS; document.head.append(st);
-  }, { UNIT_CSS, LEDGER_CSS, CHEV });
-  await shoot(p, 'mock-11-unit-balance-b.png');
-}
-
-// 11m. The usual outcome (owner, 2026-11-03): the count matches the record, so the sheet says nothing changed. Pigs without ear tags
-//     counted in a different pen of the unit than recorded are normal work: the pens are updated and nothing is said.
-if (want('11m')) {
-  const p = await open(INSPECT, 'inspection.walk');
-  await prep(p);
-  await p.evaluate(({ UNIT_CSS, LEDGER_CSS, top }) => {
-    const { U, ic, page } = window.M;
-    const ok = '<div class="m-ok"><span class="m-ok-mark">' + ic('check') + '</span><div><strong>Nothing changed</strong><small>Every pig is where the record says</small></div></div>';
-    page('Unit 7 balance sheet', 'Recount · 09:40 · L.M', top + ok, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save recount', register: 'primary', action: 'x' }) + '</div>');
-    const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS + `.m-ok{display:flex;align-items:center;gap:14px;padding:4px 2px}
-      .m-ok-mark{flex:0 0 auto;width:40px;height:40px;border-radius:12px;background:var(--done-fill,#d5e8cc);color:var(--done-fill-ink,#1d4d2e);display:grid;place-items:center}.m-ok-mark svg{width:22px;height:22px}
-      .m-ok strong{display:block;font:500 16px var(--font-sans,'Plus Jakarta Sans',sans-serif);color:var(--ink,#20291f)}.m-ok small{display:block;font-size:13px;color:var(--muted,#657060);margin-top:3px}`;
-    document.head.append(st);
-  }, { UNIT_CSS, LEDGER_CSS, top: hero('On record', '59', 'Counted', '59', '') });
-  await shoot(p, 'mock-11m-nothing-changed.png');
-}
-
 // 11b–d. A line opened: its pigs, under the same figure.
 const DETAILS = [
   ['mock-11b-found.png', 'Found from other units', '+2', '', [['000512', 'Was Unit 9 · C3', '→ D4'], ['000733', 'Was Unit 6 · D2', '→ D4']], 'Saved, they move into D4 and leave their old units.'],
@@ -415,24 +371,17 @@ if (want('14-')) {
     title: 'Receive pigs', line: 'Batch 25 · into Unit 9', lanes: ['A', 'B', 'C'], depth: 4, tiles,
     top: bar('4', '60 counted of 120 sent', 'of 8 pens counted', '<i class="done" style="flex:1"></i>'.repeat(4) + '<i style="flex:1"></i>'.repeat(4)),
     key: '<p class="m-plankey"><span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span><span><i style="background:#fff;border:1px solid var(--line,#dfe4d8);box-sizing:border-box"></i>Plan, not counted</span></p>',
-    left: '<div class="m-left"><strong>4 pens to count</strong><small>Tap a pen to count it</small></div>', cta: 'Finish receiving',
+    left: '<div class="m-left"><strong>4 pens to count</strong><small>Tap a pen to count it</small></div>', cta: 'End task',
   });
 }
-// 15. Finish receiving: sent against counted, and what's off. The plan is not a line: where they were counted is where they are.
-if (want('15-')) {
-  const p = await open(INSPECT, 'inspection.walk');
-  await prep(p);
-  await p.evaluate(({ UNIT_CSS, LEDGER_CSS, top }) => {
-    const { U, ic, page } = window.M;
-    const fig = (n, cls = '') => '<span class="m-fig ' + cls + '">' + n + '</span>';
-    const change = (icon, title, description, n, cls) => U.row({ variant: 'navigation', icon: ic(icon), title, description, trail: 'chevron', action: 'x' })
-      .replace('<span class="st-row-chevron">', (n ? fig(n, cls) : '') + '<span class="st-row-chevron">');
-    const body = top + '<section class="feature-section">' + U.heading({ title: 'What changed', kind: 'section', level: 3 })
-      + U.rowGroup(change('tag-off', 'Not arrived', 'Without an ear tag · balancing sheet', '−1', 'm-owe')) + '</section>';
-    page('Unit 9 balance sheet', 'Receive · batch 25 · 11:20 · L.M', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save receiving', register: 'primary', action: 'x' }) + '</div>');
-    const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS; document.head.append(st);
-  }, { UNIT_CSS, LEDGER_CSS, top: hero('Sent', '120', 'Counted', '119', '') });
-  await shoot(p, 'mock-15-receive-balance.png');
+if (want('10')) {
+  const tiles = { C1: ['3', 'm-done'], C2: ['2', 'm-done'], D4: ['16', 'm-done'], D5: ['38', 'm-todo'] };
+  await receiveMap('mock-10-unit-recount.png', {
+    title: 'Recount', line: 'Unit 7', lanes: ['C', 'D'], depth: 5, tiles,
+    top: bar('3', 'Started 09:05 · L.M', 'of 4 pens counted', '<i class="done" style="flex:1"></i>'.repeat(3) + '<i style="flex:1"></i>'),
+    key: '<p class="m-plankey"><span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span><span><i style="background:#fff;border:1px solid var(--line,#dfe4d8);box-sizing:border-box"></i>To count · on record</span></p>',
+    left: '<div class="m-left"><strong>D5 still to count</strong><small>Pens you skip stay as recorded</small></div>', cta: 'Finish recount',
+  });
 }
 
 // 12. Count one pen after putting pigs in: the same pen count, with the plan beside it.
