@@ -1663,13 +1663,9 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .alloc-done-body{padding-bottom:var(--space-24)}
 .farrowing-phone .allocate-body{padding-bottom:var(--space-24)}   /* the question's card keeps the section space above the footer */
 .farrowing-phone .allocate-question{margin:0 0 var(--space-12)}
-/* Hand-rear (owner, 2026-11-03): a pen moved to is a count row inside the white card, between her crate and Move some to another pen. */
-.farrowing-phone .hand-move{padding:var(--space-4) var(--space-row-x);border-top:var(--border-width) solid var(--rule)}
-.farrowing-phone .hand-move .st-stepper{margin:0}
-.farrowing-phone .alloc-done-body .hand-add{width:100%;margin-top:var(--space-12)}
-/* Hand-rear's default said in one line: her crate's glyph, then the sentence (owner, 2026-11-03: staying is the default, nothing to tap). */
-.farrowing-phone .hand-note{display:flex;align-items:flex-start;gap:var(--space-12)}
-.farrowing-phone .hand-note>svg{flex:none;width:var(--size-20);height:var(--size-20);margin-top:2px;color:var(--row-icon-ink)}
-.farrowing-phone .hand-note p{margin:0;font:500 var(--type-row-title-size)/1.45 var(--font-sans);color:var(--ink)}
 .farrowing-phone .hand-pen-bar{margin-bottom:var(--space-12)}
 .farrowing-phone .hand-pen-bar .st-choice-search{margin:0}
+/* Allocate piglets (owner, 2026-11-03): with piglets ticked the footer holds the two acts, Move to a pen and Send to a sow, side by side;
+   Select all / Clear sits at the end of the With ID line, a quiet text action. */
+.farrowing-phone .alloc-split .alloc-pen{flex:1;width:auto}
+.farrowing-phone .foster-ids-all{min-height:0;padding:0;font:inherit;color:var(--ink);text-decoration:underline}
