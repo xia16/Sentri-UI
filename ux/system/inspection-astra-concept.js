@@ -95,14 +95,14 @@ function noteMeta(pe){return [pe.noteBy,noteUntilShort(pe.noteUntil)].filter(Boo
 function noteLifeField(f){return '<div class="field st-note-life"><span>Show for</span>'+SentriUI.segment({variant:'view-switch',options:NOTE_LIFE,active:f.until||'1w',action:'note-until',ariaLabel:'Show for'})+'<p class="st-note-life-hint">'+esc(noteUntil(f.until||'1w'))+'</p></div>';}
 function closePenNote(c,id){
  const pe=pen(c,id);if(!pe?.note)return false;
- const note={id:'note-'+Date.now()+'-'+(pe.closedNotes?.length||0),text:pe.note,by:pe.noteBy,until:pe.noteUntil,closedAt:'Today 09:41',closedBy:'G. Hansen'};
+ const note={id:'note-'+Date.now()+'-'+(pe.closedNotes?.length||0),text:pe.note,by:pe.noteBy,until:pe.noteUntil,closedAt:'today 09:41',closedBy:'G. Hansen'};
  (pe.closedNotes||=[]).push(note);pe.note='';pe.noteBy='';c.closedNoteId=note.id;
  addEvent(c,'Pen note closed',[id],note.text+' · Originally added by '+note.by,'Notes');return true;
 }
 function undoPenNoteClose(c,id){
  const pe=pen(c,id),note=pe?.closedNotes?.find(n=>n.id===c.closedNoteId);
  if(!note||note.reopenedAt||pe.note)return false;
- pe.note=note.text;pe.noteBy=note.by;pe.noteUntil=note.until;note.reopenedAt='Today 09:41';c.closedNoteId=null;
+ pe.note=note.text;pe.noteBy=note.by;pe.noteUntil=note.until;note.reopenedAt='today 09:41';c.closedNoteId=null;
  addEvent(c,'Pen note reopened',[id],note.text,'Notes');return true;
 }
 function applyRecord(c){const f=c.form,subjects=f.subjects||[],targets=subjects.map(id=>pig(c,id)).filter(Boolean);if(!targets.length)return false;
