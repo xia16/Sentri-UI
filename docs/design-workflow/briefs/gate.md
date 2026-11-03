@@ -118,7 +118,7 @@ Each of these was rejected by the owner. The gate must fail a change that shows 
 | R14 | A type pass that met the floors by enlarging everything: a history label and a sample/offline disclaimer kept prime space on the sensor card (2026-10-11) | hierarchy: the attention budget; cluttered fails even when every rule is met |
 | R15 | Calmer but flat: after the cuts, three segmented controls at one weight, the switcher outweighing the reading, and a section with its heading cut (2026-10-11) | hierarchy: cutting facts never cuts structure; one heavy control |
 | R16 | Information stacked on a page: no grouping, "Reading history" floating alone at the end with dead space under it (2026-10-11) | looks undesigned; the absolute bar is the approved screens, not the base |
-| R17 | A card the same colour as its base (white on white, tint on tint), a row list on a base with no card, or a current or selected state in green or an inset bar (2026-10-12), except the ticked multi-select box, which is `select-mark` green with a white tick on a white row (2026-11-03): an ink box or a tinted ticked row fails now. `ux/system/surfaces.test.cjs` guards the green, the box and the footer height | [SURFACES.md](../../../ux/design-system/SURFACES.md): a card is the opposite of its base; current is ink; the multi-select box is the one green choice |
+| R17 | A card the same colour as its base (white on white, tint on tint), a row list on a base with no card, or a current or selected state in green or an inset bar (2026-10-12; `ux/system/surfaces.test.cjs` guards the green and the footer height) | [SURFACES.md](../../../ux/design-system/SURFACES.md): a card is the opposite of its base; current is ink |
 
 ## Output
 
