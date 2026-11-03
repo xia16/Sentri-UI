@@ -732,11 +732,11 @@
        "type": "outcome",
        "id": "fa-c1-receipt-says-saved",
        "tree": "C-1",
-       "label": "The Alive card says when the record was last saved",
+       "label": "The Alive card names no last save; nothing waits to be saved",
        "gwt": {
         "given": "Sow 000418 is Farrowing with 9 alive and 5 dead, and 4 piglets were added in this visit.",
         "when": "The worker looks at the counting sheet.",
-        "then": "The Alive card shows 9 and, at its right, when the record was last saved (Saved Aug 26 08:20)."
+        "then": "The Alive card shows 9 and Details ›; the last save is on Details (Last action), not in the drawer."
        },
        "authority": [
         {
@@ -748,12 +748,20 @@
          "src": "PRD",
          "at": "Decisions · owner decisions 2026-10-23 (Counting)",
          "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
+        },
+        {
+         "src": "owner",
+         "at": "decision 2026-11-03",
+         "says": "Undo leaves the drawers: Details shows the last action on top; anyone can take back only the top one, again down the stack; the counts go back and the log keeps it as Withdrawn"
         }
        ],
        "visible": [
         {
          "text": "Saved Aug 26 08:20",
-         "in": "sheet"
+         "in": "sheet",
+         "absent": true,
+         "says": "no last save in the drawer",
+         "hard": "broken-ruling"
         },
         {
          "text": "Not saved yet",
@@ -908,7 +916,7 @@
              "hard": "lost-draft"
             },
             {
-             "expr": "s.dead.join() === '1,1,2,0,0,1'",
+             "expr": "s.dead.join() === '1,1,2,0,0,0,1'",
              "says": "posted deaths unchanged",
              "hard": "wrong-fact"
             }
@@ -961,7 +969,7 @@
                "hard": "lost-draft"
               },
               {
-               "expr": "s.dead.join() === '1,1,2,0,0,1'",
+               "expr": "s.dead.join() === '1,1,2,0,0,0,1'",
                "says": "posted deaths unchanged",
                "hard": "wrong-fact"
               }
@@ -1049,7 +1057,7 @@
                ],
                "record": [
                 {
-                 "expr": "sum(s.deathDraft) === 0 && s.dead.join() === '1,1,2,0,0,1'",
+                 "expr": "sum(s.deathDraft) === 0 && s.dead.join() === '1,1,2,0,0,0,1'",
                  "hard": "wrong-fact"
                 }
                ]
@@ -1637,7 +1645,7 @@
        "gwt": {
         "given": "A sow finished farrowing with 14 born, 8 alive now.",
         "when": "The worker opens her record.",
-        "then": "One card shows 8 alive now with where the litter went and Born alive 12 / 14, under a head band that reads Finished and Details. Back, Actions and Record dead sit in the bar; nothing else is stacked in the body."
+        "then": "One card shows 8 alive now with where the litter went and Born alive 12 / 14, under a head band that names her most recent change, −1 died · Aug 28 14:02 · L.M, with Details. Back, Actions and Record dead sit in the bar; nothing else is stacked in the body."
        },
        "authority": [
         {
@@ -1749,7 +1757,7 @@
     {
      "type": "state",
      "id": "finish.done-first",
-     "label": "Details for a sow's first litter",
+     "label": "Details for a sow with no earlier litter on record",
      "tree": "F",
      "reset": {
       "screen": "farrowing.details-first",
@@ -1760,11 +1768,11 @@
        "type": "outcome",
        "id": "fa-f15-first-litter-placeholder",
        "tree": "F-15",
-       "label": "A first litter keeps her history's place with a placeholder; the batch comparison still shows",
+       "label": "With no earlier litter on record, her history keeps its place with one placeholder; the batch comparison still shows",
        "gwt": {
         "given": "A parity 1 sow finished her first litter.",
         "when": "The worker opens Details.",
-        "then": "Against her batch shows as for any sow; Against herself reads First litter, her earlier litters showing from her second farrowing."
+        "then": "Against her batch shows as for any sow; Against herself reads No earlier litters on record, the same message whether this is her first litter or her earlier ones were never recorded."
        },
        "authority": [
         {
@@ -1779,7 +1787,7 @@
          "hard": "dead-end"
         },
         {
-         "text": "First litter",
+         "text": "No earlier litters on record",
          "in": "phone"
         },
         {
@@ -1802,7 +1810,7 @@
   {
    "type": "entry",
    "id": "edit",
-   "label": "Undo the last save → log",
+   "label": "Take back the last action in the Farrowing log",
    "children": [
     {
      "type": "state",
@@ -1824,24 +1832,32 @@
        "type": "outcome",
        "id": "fa-x9-changed-row-shows-was",
        "tree": "X-9",
-       "label": "After Save the Alive card names the last save, when and who, with Undo; no banner",
+       "label": "After Save the drawer names no last save and offers no Undo",
        "gwt": {
-        "given": "Sow 000418 is Farrowing with 9 alive; the worker G.H tapped + Born alive three times and saved.",
+        "given": "G.H saved three Born alive taps (a fat finger for two).",
         "when": "The worker looks at the drawer.",
-        "then": "Under a divider the Alive card says Saved 09:41 · G.H with +3 born, and a quiet Undo beside it. There is no banner and no Corrected tag."
+        "then": "The Alive card shows 12 and Details ›; no saved line, no Undo, no banner."
        },
        "authority": [
         {
          "src": "owner",
-         "at": "decision 2026-11-02",
-         "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
+         "at": "decision 2026-11-03",
+         "says": "Undo leaves the drawers: Details shows the last action on top; anyone can take back only the top one, again down the stack; the counts go back and the log keeps it as Withdrawn"
         }
        ],
        "visible": [
         {
-         "text": "Saved 09:41 · G.H",
+         "text": "Saved 09:41",
          "in": "sheet",
-         "says": "the last save, when and who",
+         "absent": true,
+         "says": "the drawer names no last save",
+         "hard": "broken-ruling"
+        },
+        {
+         "el": "[data-action='undoAsk']",
+         "in": "sheet",
+         "is": "absent",
+         "says": "no Undo in the drawer",
          "hard": "broken-ruling"
         },
         {
@@ -1850,227 +1866,267 @@
          "absent": true,
          "says": "no banner",
          "hard": "broken-ruling"
-        },
-        {
-         "text": "Corrected",
-         "in": "sheet",
-         "absent": true,
-         "says": "no Corrected tag"
-        },
-        {
-         "el": "[data-action='undoAsk']",
-         "is": "enabled",
-         "says": "Undo is offered to the worker who saved it"
         }
-       ]
+       ],
+       "record": [
+        {
+         "expr": "s.alive === 12",
+         "says": "the save is in",
+         "hard": "wrong-fact"
+        }
+       ],
+       "children": []
       },
       {
        "type": "action",
-       "id": "edit.during.undo-ask",
-       "label": "Undo",
+       "id": "edit.during.details",
+       "label": "Details",
        "taps": [
-        "[data-action='undoAsk']"
+        "[data-action='litter']"
        ],
        "children": [
         {
          "type": "outcome",
          "id": "fa-x10-back-with-change-asks-save",
          "tree": "X-10",
-         "label": "Undo asks \"Undo the 09:41 save?\" and changes nothing until answered",
+         "label": "Details opens with the Farrowing log, its last action under it",
          "gwt": {
-          "given": "The drawer shows the last save, +3 born at 09:41 by G.H.",
-          "when": "The worker taps Undo.",
-          "then": "A short question opens, Undo the 09:41 save?, with Back and Undo. Nothing changes until it is answered: Alive is still 12 and the log still has five lines."
+          "given": "G.H just saved +3 born alive.",
+          "when": "The worker opens Details from the Alive card.",
+          "then": "Details opens with Farrowing log on top, \"+3 born alive · 09:41 · G.H\" under it, then This litter; no Undo on Details, no comparisons while she farrows."
          },
          "authority": [
           {
            "src": "owner",
-           "at": "decision 2026-11-02",
-           "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
+           "at": "decision 2026-11-03",
+           "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
           }
          ],
          "visible": [
           {
-           "text": "Undo the 09:41 save?",
+           "text": "Farrowing log",
            "in": "sheet",
-           "says": "the question is open",
+           "hard": "dead-end"
+          },
+          {
+           "text": "+3 born alive · 09:41 · G.H",
+           "in": "sheet",
+           "says": "the last action under the log row",
+           "hard": "wrong-fact"
+          },
+          {
+           "el": "[data-action='undoAsk']",
+           "in": "sheet",
+           "is": "absent",
+           "says": "Undo is in the log, not on Details",
            "hard": "broken-ruling"
           },
           {
-           "el": "[data-action='undoLast']",
-           "is": "enabled",
-           "hard": "dead-end"
+           "text": "Total born",
+           "in": "sheet",
+           "absent": true,
+           "says": "the old Litter details grid is gone",
+           "hard": "broken-ruling"
           },
           {
-           "el": "[data-action='cancelPopup']",
-           "is": "enabled",
-           "hard": "dead-end"
+           "text": "Against her batch",
+           "in": "sheet",
+           "absent": true,
+           "says": "no comparisons while she farrows"
           }
          ],
-         "record": [
-          {
-           "expr": "s.popup?.kind === 'undo' && s.alive === 12 && s.events.length === 5",
-           "says": "asked, nothing changed yet",
-           "hard": "lost-draft"
-          }
-         ]
+         "children": []
         },
         {
          "type": "action",
-         "id": "edit.during.undo",
-         "label": "Undo (in the question)",
+         "id": "edit.during.undo-ask",
+         "label": "Farrowing log, Undo on the top line",
          "taps": [
-          "[data-action='undoLast']"
+          "[data-action='history']",
+          "[data-action='undoAsk']"
          ],
          "children": [
           {
            "type": "outcome",
            "id": "fa-x11-ask-discard-drops-change",
            "tree": "X-11",
-           "label": "Undo brings the save back as the unsaved visit; the record drops back",
+           "label": "In the log the top action carries Undo; the question is one ledger of what changes, and nothing changes until it is answered",
            "gwt": {
-            "given": "The Undo the 09:41 save? question is open over the drawer.",
+            "given": "The Farrowing log is open; +3 born alive is on top with Undo.",
             "when": "The worker taps Undo.",
-            "then": "The visit is back as it was, not saved yet: +3 born. The record reads 9 alive again and the log has its four earlier lines."
+            "then": "A tint dialog asks Undo this entry? over one white ledger card: Alive now 12 → 9, Born 17 → 14 (Back / Undo); nothing changes yet."
            },
            "authority": [
             {
              "src": "owner",
-             "at": "decision 2026-11-02",
-             "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
+             "at": "decision 2026-11-03",
+             "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
             }
            ],
            "visible": [
             {
-             "screen": "farrowing.count-draft",
+             "text": "Undo this entry?",
+             "in": "sheet",
+             "hard": "broken-ruling"
+            },
+            {
+             "el": ".undo-ledger li[aria-label=\"Alive now 12 becomes 9\"]",
+             "says": "what Undo changes, now → after",
+             "hard": "wrong-fact"
+            },
+            {
+             "el": ".undo-ledger li[aria-label=\"Born 17 becomes 14\"]",
+             "hard": "wrong-fact"
+            },
+            {
+             "el": "[data-action='undoLast']",
+             "is": "enabled",
+             "hard": "dead-end"
+            },
+            {
+             "el": "[data-action='cancelPopup']",
+             "is": "enabled",
              "hard": "dead-end"
             }
            ],
            "record": [
             {
-             "expr": "s.bornDraft === 3 && s.alive === 9 && !s.popup",
-             "says": "the save is the draft again; alive back to 9",
-             "hard": "wrong-fact"
-            },
-            {
-             "expr": "s.events.length === 4",
-             "says": "the undone save left the log (the four lines it had)",
-             "hard": "wrong-fact"
+             "expr": "s.popup?.kind === 'undo' && s.alive === 12 && s.events.length === 5",
+             "says": "asked, nothing changed yet",
+             "hard": "lost-draft"
             }
-           ]
+           ],
+           "children": []
           },
           {
            "type": "action",
-           "id": "edit.during.undo.fix",
-           "label": "− once, Save",
+           "id": "edit.during.undo",
+           "label": "Undo (in the question)",
            "taps": [
-            "[data-action='bornAlive'][data-value='-1']",
-            "[data-action='saveVisit']"
+            "[data-action='undoLast']"
            ],
            "children": [
             {
              "type": "outcome",
              "id": "fa-x12-ask-save-posts-correction",
              "tree": "X-12",
-             "label": "Fixed and saved: one log line marked Corrected, with what it was",
+             "label": "Undo takes it back: the counts go back, the line stays as Withdrawn, Undo moves to the next one down",
              "gwt": {
-              "given": "The 09:41 save (+3 born) was undone and is the unsaved visit.",
-              "when": "The worker takes one back with − and saves.",
-              "then": "The drawer shows 11 alive and the new last save, which G.H can still undo. The newest log line is +2 born alive, marked Corrected, with Was +3 born alive."
+              "given": "The question Undo +3 born alive? is open.",
+              "when": "The worker taps Undo.",
+              "then": "Alive is 9 and born 14 again; the line stays in the log marked Withdrawn 09:41 · G.H; Undo now sits on +3 born alive · 1 crushed (L.M)."
              },
              "authority": [
               {
                "src": "owner",
-               "at": "decision 2026-11-02",
-               "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
+               "at": "decision 2026-11-03",
+               "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
               }
              ],
              "visible": [
               {
-               "screen": "farrowing.count-saved",
+               "text": "Withdrawn 09:41 · G.H",
+               "in": "sheet",
+               "says": "who took it back and when",
+               "hard": "wrong-fact"
+              },
+              {
+               "el": "[aria-label='Undo +3 born alive · 1 crushed']",
+               "in": "sheet",
+               "is": "enabled",
+               "says": "Undo moved to the next one down",
                "hard": "dead-end"
               }
              ],
              "record": [
               {
-               "expr": "s.alive === 11 && s.events.length === 5 && s.events[0].kind === 'corrected' && s.events[0].text === '+2 born alive' && s.events[0].was === 'Was +3 born alive'",
-               "says": "one Corrected line, +2 born alive, was +3",
+               "expr": "s.alive === 9 && F.born(s) === 14 && !s.popup && s.events.length === 5 && s.events[0].kind === 'withdrawn' && s.events[0].withdrawn.who === 'G. Hansen'",
+               "says": "taken back, kept in the log as withdrawn by G.H",
                "hard": "wrong-fact"
               }
-             ]
-            }
-           ]
-          },
-          {
-           "type": "action",
-           "id": "edit.during.undo.save",
-           "label": "Save unchanged",
-           "taps": [
-            "[data-action='saveVisit']"
-           ],
-           "children": [
+             ],
+             "children": []
+            },
             {
-             "type": "outcome",
-             "id": "fa-x2-save-correction",
-             "tree": "X-2",
-             "label": "Saved again unchanged: the line as it was, not marked Corrected",
-             "gwt": {
-              "given": "The 09:41 save (+3 born) was undone and is the unsaved visit.",
-              "when": "The worker saves it again without changing it.",
-              "then": "Counting is shown with 12 alive and born 17. The newest log line is +3 born alive, not marked Corrected."
-             },
-             "authority": [
-              {
-               "src": "owner",
-               "at": "decision 2026-11-02",
-               "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
-              }
+             "type": "action",
+             "id": "edit.during.undo.again",
+             "label": "Undo on the top line, Undo",
+             "taps": [
+              "[data-action='undoAsk']",
+              "[data-action='undoLast']"
              ],
-             "visible": [
+             "children": [
               {
-               "screen": "farrowing.count-saved"
-              }
-             ],
-             "record": [
+               "type": "outcome",
+               "id": "fa-x2-save-correction",
+               "tree": "X-2",
+               "label": "Anyone can take back the next one down: L.M's save goes too",
+               "gwt": {
+                "given": "After one undo, Undo sits on L.M's save (+3 born alive · 1 crushed).",
+                "when": "G.H takes it back.",
+                "then": "Alive is 7 and born 11; both saves stay in the log marked Withdrawn; Undo sits on the next one down."
+               },
+               "authority": [
+                {
+                 "src": "owner",
+                 "at": "decision 2026-11-03",
+                 "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
+                }
+               ],
+               "visible": [
+                {
+                 "el": "[aria-label='Undo +4 born alive · 1 crushed · 1 other']",
+                 "in": "sheet",
+                 "is": "enabled",
+                 "says": "the stack goes on",
+                 "hard": "dead-end"
+                }
+               ],
+               "record": [
+                {
+                 "expr": "s.alive === 7 && F.born(s) === 11 && s.events.filter(e => e.kind === 'withdrawn').length === 2",
+                 "says": "two taken back, both kept",
+                 "hard": "wrong-fact"
+                }
+               ],
+               "children": []
+              },
               {
-               "expr": "s.alive === 12 && F.born(s) === 17 && s.events[0].text === '+3 born alive' && s.events[0].kind !== 'corrected'",
-               "says": "the line as it was",
-               "hard": "wrong-fact"
-              }
-             ]
-            }
-           ]
-          },
-          {
-           "type": "action",
-           "id": "edit.during.undo.clear",
-           "label": "Clear",
-           "taps": [
-            "[data-action='clearVisit']"
-           ],
-           "children": [
-            {
-             "type": "outcome",
-             "id": "fa-x4-edit-clear-discards",
-             "tree": "X-4",
-             "label": "Clear after Undo withdraws the save; the log keeps it as Withdrawn",
-             "gwt": {
-              "given": "The 09:41 save (+3 born) was undone and is the unsaved visit.",
-              "when": "The worker taps Clear.",
-              "then": "Nothing is waiting, alive is 9, and the newest log line is +3 born alive marked Withdrawn."
-             },
-             "authority": [
-              {
-               "src": "owner",
-               "at": "decision 2026-11-02",
-               "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
-              }
-             ],
-             "record": [
-              {
-               "expr": "s.alive === 9 && !s.bornDraft && s.events[0].kind === 'withdrawn' && s.events[0].text === '+3 born alive'",
-               "says": "withdrawn, kept in the log",
-               "hard": "wrong-fact"
+               "type": "action",
+               "id": "edit.during.undo.log",
+               "label": "Back",
+               "taps": [
+                "[data-action='back']"
+               ],
+               "children": [
+                {
+                 "type": "outcome",
+                 "id": "fa-x4-edit-clear-discards",
+                 "tree": "X-4",
+                 "label": "Back on Details the log row shows the newest line still standing",
+                 "gwt": {
+                  "given": "Two saves were taken back by G.H.",
+                  "when": "The worker goes back to Details.",
+                  "then": "Farrowing log reads \"+4 born alive · 1 crushed · 1 other · Aug 26 08:12 · G.H\": withdrawn lines are not the last action."
+                 },
+                 "authority": [
+                  {
+                   "src": "owner",
+                   "at": "decision 2026-11-03",
+                   "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
+                  }
+                 ],
+                 "visible": [
+                  {
+                   "text": "+4 born alive · 1 crushed · 1 other · Aug 26 08:12 · G.H",
+                   "in": "sheet",
+                   "says": "the newest standing line",
+                   "hard": "wrong-fact"
+                  }
+                 ],
+                 "children": []
+                }
+               ]
               }
              ]
             }
@@ -2100,8 +2156,10 @@
       {
        "type": "action",
        "id": "edit.locked.undo",
-       "label": "Undo, Undo",
+       "label": "Details, Farrowing log, Undo on the top line, Undo",
        "taps": [
+        ".finished-card-body",
+        "[data-action='history']",
         "[data-action='undoAsk']",
         "[data-action='undoLast']"
        ],
@@ -2110,28 +2168,34 @@
          "type": "outcome",
          "id": "fa-x5-correct-born-after-lock",
          "tree": "X-5",
-         "label": "After Finish the last Record dead can be undone; Born stays 14",
+         "label": "After Finish the last Record dead is taken back in the log; Born stays 14",
          "gwt": {
-          "given": "A sow's record is locked with born 14, and G.H has just recorded one crushed death.",
-          "when": "G.H undoes that save.",
-          "then": "Record dead opens again with the crushed death as its unsaved count. Born is still 14 and the original finish line is kept in the log."
+          "given": "A finished sow (born 14); two deaths were recorded after Finish, the newest one crushed.",
+          "when": "The worker opens Details, then Farrowing log, and takes back the top action.",
+          "then": "Born stays 14, that crushed death is gone (8 alive), and the finish line is kept."
          },
          "authority": [
           {
            "src": "owner",
-           "at": "decision 2026-11-02",
-           "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
+           "at": "decision 2026-11-03",
+           "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
           }
          ],
          "visible": [
           {
-           "screen": "farrowing.death"
+           "screen": "farrowing.history",
+           "hard": "dead-end"
+          },
+          {
+           "text": "Withdrawn 09:41 · G.H",
+           "in": "sheet",
+           "hard": "wrong-fact"
           }
          ],
          "record": [
           {
-           "expr": "s.frozen === 14 && s.deathDraft[2] === 1 && s.dead[2] === 3 && s.alive === 8",
-           "says": "born 14; the death is a draft again",
+           "expr": "s.frozen === 14 && s.dead[2] === 3 && s.alive === 8 && s.events[0].kind === 'withdrawn'",
+           "says": "born 14; the death taken back",
            "hard": "wrong-fact"
           },
           {
@@ -2139,40 +2203,33 @@
            "says": "the original finish line is kept",
            "hard": "wrong-fact"
           }
-         ]
+         ],
+         "children": []
         },
         {
          "type": "action",
          "id": "edit.locked.undo.scours",
-         "label": "Crushed − , Scours +, Record, Details, Farrowing log",
+         "label": "Undo on the top line, Undo",
          "taps": [
-          "[data-action='deadStep'][data-value='2,-1']",
-          "[data-action='deadStep'][data-value='3,1']",
-          "[data-action='saveDeath']",
-          "[data-action='litter']",
-          "[data-action='history']"
+          "[data-action='undoAsk']",
+          "[data-action='undoLast']"
          ],
          "children": [
           {
            "type": "outcome",
            "id": "fa-x6-log-shows-correction",
            "tree": "X-6",
-           "label": "The log shows the corrected death above the finish",
+           "label": "Finish is the floor: nothing above it left, no Undo in the log",
            "gwt": {
-            "given": "A crushed death recorded after Finish was undone and changed to scours.",
-            "when": "The worker records it and opens the log.",
-            "then": "The Farrowing log shows +1 scours marked Corrected, with Was +1 crushed, above the Farrowing finished line."
+            "given": "One death recorded after Finish is left, with Undo on it.",
+            "when": "The worker takes it back too.",
+            "then": "No line carries Undo any more: what was recorded before Finish cannot be taken back."
            },
            "authority": [
             {
              "src": "owner",
-             "at": "decision 2026-11-02",
-             "says": "No Edit record: what is saved is in. A fat finger is fixed by undoing the last save: only the last one, only for the worker who saved it; it comes back as the unsaved visit."
-            },
-            {
-             "src": "RUL",
-             "at": "After the lock",
-             "says": "One ledger surface, the Farrowing record page"
+             "at": "decision 2026-11-03",
+             "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
             }
            ],
            "visible": [
@@ -2182,14 +2239,25 @@
             },
             {
              "text": "Farrowing finished",
-             "in": "sheet"
+             "in": "sheet",
+             "says": "the finish line stays, the floor of the stack"
             },
             {
-             "text": "Was +1 crushed",
+             "el": ".log-undo",
              "in": "sheet",
-             "says": "what it was"
+             "is": "absent",
+             "says": "nothing left above the finish",
+             "hard": "broken-ruling"
             }
-           ]
+           ],
+           "record": [
+            {
+             "expr": "s.dead[2] === 2 && s.alive === 9 && s.events.some(e => /finished/i.test(e.text) && e.kind !== 'withdrawn')",
+             "says": "two taken back; the finish stays",
+             "hard": "wrong-fact"
+            }
+           ],
+           "children": []
           }
          ]
         }
