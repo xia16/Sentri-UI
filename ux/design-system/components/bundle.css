@@ -1421,7 +1421,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
    every state, so the drawer never jumps. Below it Born alive (Stepper count) and Report death; Report death is a level of the drawer. */
 /* The card is one surface (owner, 2026-11-02): the figure is the door to Litter details; under a divider the last save, with a quiet Undo
    beside it, never inside the door. The surface carries the border and fill so the door and the run share one box. */
-.farrowing-phone .alive-surface{margin:0 0 16px;border:1px solid var(--line);border-radius:20px;background:#f6f7f1;overflow:hidden}
+.farrowing-phone .alive-surface{margin:0 0 16px;border:1px solid var(--line);border-radius:20px;background:var(--paper);overflow:hidden}
 .farrowing-phone .alive-card{position:relative;display:block;width:100%;box-sizing:border-box;margin:0;padding:16px;border:0;border-radius:0;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
 .farrowing-phone .alive-card:active{background:#eef1e7}
 /* The last save as a run: "Saved 09:41 · G.H", its results on one line as quiet chips (no glyph: the word says it), Undo centred at the right. */
@@ -1618,3 +1618,15 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .finished-first svg{flex:none;width:22px;height:22px}
 .farrowing-phone .finished-first p{margin:0;font:500 14px/1.5 var(--font-sans)}
 .farrowing-phone .finished-first strong{display:block;color:var(--ink);font-weight:600}
+
+/* Farrowing drawers are the tint with white cards (owner, 2026-11-03: no white background anymore). Her chip sits on the tint, so it is
+   paper; the piglet condition rows and the death causes are each one white action card. */
+.farrowing-phone .sheet[data-st-context="menu"] .st-subject-chip{background:var(--paper);box-shadow:inset 0 0 0 1px var(--line)}
+.farrowing-phone :is(.finish-rows,.death-causes){padding:0 16px;border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper)}
+/* Last action (owner, 2026-11-03): the top of her stack, on top of Details, its own section. */
+.farrowing-phone .last-action{margin-bottom:var(--space-24)}
+.farrowing-phone .last-action>.st-heading{margin-bottom:10px}
+.farrowing-phone .undo-note{margin:0;font:500 15px/1.5 var(--font-sans);color:var(--ink-2)}
+.farrowing-phone .finished-details-body .last-action{margin-bottom:0}
+/* On the tint drawer the card is white and its head band is white too, set off by its divider. */
+.farrowing-phone .sheet[data-st-context="menu"] .finished-card-head{background:var(--paper)}
