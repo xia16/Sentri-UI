@@ -1520,13 +1520,13 @@
       "notes": {
         "purpose": "What happened this time, at a glance: where the litter went, and the door to Details.",
         "states": [
-          "After a Record dead: the last save sits under the card (\"Saved Aug 28 14:02 · L.M\", −1 died) with Undo for whoever saved it"
+          "After a Record dead: the head band says that change (\"−1 died · Aug 28 14:02 · L.M\"); for whoever saved it, Undo takes the place of Details ›, and the ring still opens Details"
         ],
         "elements": [
           {
             "name": "Litter card",
             "at": "alive now",
-            "shows": "A white card with a tinted head band (\"Finished Aug 27 at 08:12 by G.H\" · Details ›); a ring of alive now, died after birth and born dead with 8 alive now at its centre; the three counts beside it and Born alive 12 / 14 under a rule.",
+            "shows": "A white card with a tinted head band naming the most recent change (\"−1 died · Aug 28 14:02 · L.M\", or \"Finished Aug 27 08:12 · G.H\" when nothing changed since) · Details ›; a ring of alive now, died after birth and born dead with 8 alive now at its centre; the three counts beside it and Born alive 12 / 14 under a rule.",
             "logic": "Alive now = Born − dead recorded (± fostered). Died after birth = crushed + scours + starve-out + other; born dead = stillborn + mummified. The whole card opens Details.",
             "source": "farrowing-astra-concept.js finishedCard()"
           },
@@ -1540,7 +1540,7 @@
         ],
         "controls": [],
         "copy": [
-          "(raw) Finished <date> at <time> by <hand> · Details",
+          "(raw) <change> · <date> <time> · <hand> · Details", "(raw) Finished <date> <time> · <hand>", "(raw) Undo",
           "(raw) alive now · Alive now · Died after birth · Born dead · Born alive",
           "(raw) Back · Actions · Record dead"
         ],
@@ -1553,7 +1553,7 @@
           "SURFACES: a tappable card in a white drawer is a white body with a tinted head band (rule 6); Details is a page, the tint with white cards (rule 1)",
           "No stacking: the finished sow's actions sit in the bar (Back · Actions · Record dead)",
           "\"Born … locks at Finish\" (Model)",
-          "No Edit record (owner 2026-11-02): the last save is undone from the run under the card"
+          "No Edit record (owner 2026-11-02): the last save is undone from the head band; the band is the most recent change, the finish moves to Details (owner 2026-11-03)"
         ],
         "issues": [
           "A died or aborted sow keeps the earlier record face; the Death breakdown page is no longer opened from a finished sow (its causes are on Details)."
@@ -1596,7 +1596,7 @@
           {
             "name": "Farrowing log",
             "at": "Farrowing log",
-            "shows": "One row at the foot of the page.",
+            "shows": "One row at the foot of the page, with when she finished and by whom under it (\"Finished Aug 27 08:12 · G.H\").",
             "logic": "The log moved here from the record (View log is gone from the drawer).",
             "source": "farrowing-astra-concept.js finishedDetails()"
           }
@@ -1658,7 +1658,7 @@
           {
             "name": "Farrowing log",
             "at": "Farrowing log",
-            "shows": "One row at the foot of the page.",
+            "shows": "One row at the foot of the page, with when she finished and by whom under it (\"Finished Aug 27 08:12 · G.H\").",
             "logic": "The log moved here from the record (View log is gone from the drawer).",
             "source": "farrowing-astra-concept.js finishedDetails()"
           }

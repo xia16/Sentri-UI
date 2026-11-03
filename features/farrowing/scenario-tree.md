@@ -111,7 +111,7 @@ States: F0 the record with a visit waiting (from D1) · F1 *retired* (Finish wit
 | F-10 | F2 | litter weight outside 0.8–2.5 kg × alive | → soft words warning, never a gate | S — contract C5 (draft); review tasks-built-28 | — |
 | F-11 | F2 | tap Yes on Assisted | → No was chosen before (required No / Yes, no Clear); Yes is chosen and recorded | S — owner decision 2026-10-15 | `fa-f11-assisted-no-preselected` |
 | F-12 | F2 | type 12,6 in the Litter weight field (the system decimal keyboard) | → the weight reads 12.6 kg (the comma became a point); no Numpad; the sheet stays open | S — owner decision 2026-10-16 | `fa-f12-weight-on-the-keyboard` |
-| F-13 | F3 | open a finished sow | → one card: alive now, where the litter went, Born alive 12 / 14, head band Finished · Details ›; Back · Actions · Record dead in the bar | S — owner decision 2026-11-02 | `fa-f13-finished-at-a-glance` |
+| F-13 | F3 | open a finished sow | → one card: alive now, where the litter went, Born alive 12 / 14, head band = the most recent change (−1 died · Aug 28 14:02 · L.M) · Details ›; Back · Actions · Record dead in the bar | S — owner decisions 2026-11-02, 2026-11-03 | `fa-f13-finished-at-a-glance` |
 | F-14 | F3 | tap the litter card | → Details (a page): This litter with causes, Against her batch, Against herself, Farrowing log | S — owner decision 2026-11-02 | `fa-f14-details-compares` |
 | F-15 | F4 | open Details with no earlier litter on record | → Against herself reads No earlier litters on record (first litter or never recorded); the batch comparison still shows | S — owner decision 2026-11-02 | `fa-f15-first-litter-placeholder` |
 
