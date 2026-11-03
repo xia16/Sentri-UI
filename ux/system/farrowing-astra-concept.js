@@ -910,10 +910,11 @@ function litterDraft(s){if(!s.fosterDraft?.alloc)s.fosterDraft={...fosterStart(s
 const litterPicked=s=>s.fosterDraft?.alloc?s.fosterDraft.ids.length+s.fosterDraft.count:0;
 const pigletWord=n=>`${n} piglet${n===1?'':'s'}`;
 // Her record leads to her piglets (owner, 2026-11-03: "we show that sow has died, and then the piglet list"): a dead sow's right under
-// Sow died, a finished sow's under her card. A sow still farrowing keeps her counting drawer; Foster is in her Actions.
+// Sow died, a finished sow's under her card. Only a dead sow's says Foster or move (owner, 2026-11-03): a living sow's is just her piglet list.
+// A sow still farrowing keeps her counting drawer; Foster is in her Actions.
 function litterDoor(s){
  if(!s.alive)return '';
- return `<div class="litter-door">${SentriUI.rowGroup(SentriUI.row({variant:'navigation',icon:icon('pig'),title:'Piglets',description:'Foster or move',trail:'chevron',action:'pigletList'}))}</div>`;
+ return `<div class="litter-door">${SentriUI.rowGroup(SentriUI.row({variant:'navigation',icon:icon('pig'),title:'Piglets',description:s.ended?'Foster or move':'',trail:'chevron',action:'pigletList'}))}</div>`;
 }
 function litterRows(s){
  const f=litterDraft(s),noId=fosterNoId(s),q=(f.idQ||'').trim().toLowerCase();
