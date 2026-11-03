@@ -166,7 +166,8 @@ function act(s,a,v){
  if(a==='fosterIdScanStop'){s.fosterDraft.idScan=false;s.fosterDraft.idRead='';}
  if(a==='fosterIdClear')s.fosterDraft.idQ='';
  if(a==='fosterClose')s.fosterDraft.target='';
- if(a==='fosterScan'){s.fosterDraft.scanning=roomContext(s).scan.connected?true:'waiting';s.fosterDraft.q='';}
+ if(a==='fosterScan'){s.fosterDraft.scanning=roomContext(s).scan.connected?true:'waiting';s.fosterDraft.q='';s.fosterDraft.refused='';}
+ if(a==='fosterRead'){const f=s.fosterDraft;if(fosterSow(s,v)&&v!==s.tag){f.refused='';act(s,'fosterPick',v);}else f.refused=v;}   // a reader read: a sow who can take piglets opens; any other says why
  if(a==='fosterScanStop')s.fosterDraft.scanning=false;
  if(a==='fosterClear')s.fosterDraft.q='';
  if(a==='fosterCount'){const f=s.fosterDraft;f.count=Math.max(0,Math.min(fosterMax(s),f.count+Number(v)));}
@@ -1154,8 +1155,11 @@ function allocPreset(i,p){
  if(p==='piglets-pen')act(s,'allocToPen');
 }
 function fosterCandidates(s){const c=roomContext(s);return c.units.flatMap(unit=>unit.records.filter(r=>r!==s&&onList(r)&&!r.ended&&!r.productionOutcome&&born(r)>0).map(r=>({r,unit})));}
-const fosterSow=(s,tag)=>fosterCandidates(s).find(x=>x.r.tag===tag)?.r||(p=>p&&fosterFarmSow(roomContext(s),p))(farmPigs.find(p=>p.tag===tag&&!p.gone));
-// A pig outside Farrowing found by search (a weaned sow taken as nurse sow): a light record of her own, kept with the room, so a send lands.
+// Sows outside the task that can take piglets: nurse sows, who have just weaned their own litter (owner, 2026-11-03: "that just makes her
+// eligible"). Gilts and pregnant sows have no milk, so search and scan never reach them.
+const nurseSows=[{tag:'000377',unit:'3',pen:'A4',stage:'Weaned'},{tag:'000352',unit:'6',pen:'A3',stage:'Weaned'}];
+const fosterSow=(s,tag)=>fosterCandidates(s).find(x=>x.r.tag===tag)?.r||(p=>p&&fosterFarmSow(roomContext(s),p))(nurseSows.find(p=>p.tag===tag));
+// A nurse sow found by search or scan: a light record of her own, kept with the room, so a send lands.
 const fosterFarmSow=(c,p)=>(c.fosterFarm||={})[p.tag]||=({tag:p.tag,pen:p.pen,stage:p.stage,unit:p.unit,farm:true,locked:true,alive:0,moved:0,unidentified:0,dead:[0,0,0,0,0,0],events:[]});
 const homeUnit=s=>{const c=roomContext(s);return c.units.find(u=>u.records.includes(s))||c.unit;};
 // Fostering's filter is its own (owner, 2026-11-03): only sows that have farrowed can take piglets (the list holds no others), so it asks
@@ -1172,7 +1176,7 @@ const fosterMax=s=>{const src=fosterFrom(s);return src?fosterNoId(src):0;};   //
 // the list on the button (her unit counts: the list opens on it).
 function fosterBar(s,cls=''){
  const f=s.fosterDraft,n=fosterActive(f.filter);
- const bar=f.scanning?SentriUI.scanBar({state:f.scanning==='waiting'?'waiting':'scanning',device:'Reader 1',text:f.scanning==='waiting'?'':'Scan the other sow',stop:{action:'fosterScanStop'}})
+ const bar=f.scanning?SentriUI.scanBar({state:f.scanning==='waiting'?'waiting':'scanning',device:'Reader 1',text:f.scanning==='waiting'?'':f.refused?`${f.refused} can't take piglets`:'Scan the other sow',stop:{action:'fosterScanStop'}})
   :SentriUI.choiceSearch({label:'Search ear tag or pen',placeholder:'Ear tag or pen',value:f.q,attrs:{'data-foster-search':''},clear:{action:'fosterClear'},scan:{action:'fosterScan',label:'Scan ear tag'}});
  const filter=f.scanning?'':SentriUI.iconButton({action:'fosterFilter',icon:icon('filter'),label:'Filter sows'+(n?`, ${n} applied`:''),badge:n||'',className:'batch-filter foster-filter'});
  return `<div class="${cls?cls+' ':''}foster-bar">${bar}${filter}</div>`;
@@ -1198,11 +1202,11 @@ function fosterPage(s){
 function fosterPickList(s){
  const f=s.fosterDraft,g=f.filter,c=roomContext(s),q=f.q.trim().toLowerCase(),home=homeUnit(s),inFilter=(r,u)=>fosterMatch(g,r,u);
  const hit=(r,u)=>q?r.tag.includes(q)||inFilter(r,u)&&r.pen.toLowerCase().includes(q):inFilter(r,u);
- const items=[...fosterCandidates(s).filter(({r,unit})=>hit(r,unit)),...(q?farmPigs.filter(p=>!p.gone).map(p=>({p,unit:farmUnit(c,p.unit),r:fosterFarmSow(c,p)})).filter(({r,unit})=>hit(r,unit)):[])];
+ const items=[...fosterCandidates(s).filter(({r,unit})=>hit(r,unit)),...(q?nurseSows.map(p=>({p,unit:farmUnit(c,p.unit),r:fosterFarmSow(c,p)})).filter(({r,unit})=>hit(r,unit)):[])];
  const where=g.unit==='all'?'':` in ${farmUnit(c,g.unit).name}`;
- if(!items.length)return `<p class="st-find-hint">${q?`No pig matching “${esc(f.q.trim())}”${/^d+$/.test(q)?'':where}.`:`No other sow${fosterFilterCount(s,{...g,unit:home.id})?' matches the filter':' has a litter'}${where}.`}</p>`;
+ if(!items.length)return `<p class="st-find-hint">${q?`No sow that can take piglets matches “${esc(f.q.trim())}”${/^\d+$/.test(q)?'':where}.`:`No other sow${fosterFilterCount(s,{...g,unit:home.id})?' matches the filter':' has a litter'}${where}.`}</p>`;
  const inBatch=u=>c.units.some(x=>x.id===u.id),units=[...new Map(items.map(x=>[x.unit.id,x.unit])).values()].sort((a,b)=>(b.id===home.id)-(a.id===home.id)||inBatch(b)-inBatch(a)||String(a.id).localeCompare(String(b.id),undefined,{numeric:true}));
- const right=x=>{if(x.p)return x.p.cond?{kind:'tags',tags:[{name:x.p.cond,level:'ongoing'}]}:null;const sf=sowFacts(x.r);return {kind:'state',figure:sf.figure,word:sf.word,level:sf.level};};
+ const right=x=>{if(x.p)return {kind:'state',figure:'',word:'Nurse sow',level:'settled'};const sf=sowFacts(x.r);return {kind:'state',figure:sf.figure,word:sf.word,level:sf.level};};
  // Nothing typed: the plain Row · Animal, the tag in ink; typed: Lookup's find row, the typed part marked and the rest muted.
  const row=x=>{const p={code:x.r.tag,place:rowText.pen(x.r.pen),right:right(x),action:'fosterPick',value:x.r.tag};return (q?SentriUI.findRow({...p,query:q}):SentriUI.row({variant:'animal',code:p.code,description:p.place,right:p.right||{kind:'state',figure:'',word:'',level:'settled'},action:p.action,value:p.value})).replace('<button ',`<button data-scan-tag="${x.r.tag}" `);};
  return SentriUI.lookupGroups(units.map(u=>({title:u.name,rows:items.filter(x=>x.unit.id===u.id).sort((a,b)=>a.r.pen.localeCompare(b.r.pen,undefined,{numeric:true})||a.r.tag.localeCompare(b.r.tag)).map(row)})),{variant:'find'});
@@ -1298,7 +1302,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]
  // Foster, scanning: a read opens the count for the sow read (single-action), as tapping her does; the reader connecting starts it.
  if(s.view==='allocPen'&&s.fosterDraft?.penScan){const f=s.fosterDraft;if(f.penScan==='waiting'){c.scan.connected=true;f.penScan=true;render(i);return;}const o=allocPenOptions(s).find(o=>!o[4]);if(o)act(s,'allocPen',o[0]);render(i);return;}   // a plate read moves them there
  if(['fosterSend','pigletList'].includes(s.view)&&s.fosterDraft?.idScan){const f=s.fosterDraft;if(f.idScan==='waiting'){c.scan.connected=true;f.idScan=true;render(i);return;}const next=fosterIds(fosterFrom(s)).find(p=>!f.ids.includes(p.tag));if(next){f.ids.push(next.tag);f.idRead=next.tag;}render(i);return;}   // a read ticks that piglet
- if(fosterPicking(s)&&s.fosterDraft.scanning&&!s.fosterDraft.target){const f=s.fosterDraft;if(f.scanning==='waiting'){c.scan.connected=true;f.scanning=true;render(i);return;}const list=fosterCandidates(s),x=list[f.seq++%list.length];if(x)act(s,'fosterPick',x.r.tag);render(i);return;}
+ if(fosterPicking(s)&&s.fosterDraft.scanning&&!s.fosterDraft.target){const f=s.fosterDraft;if(f.scanning==='waiting'){c.scan.connected=true;f.scanning=true;render(i);return;}if(!f.seq++){act(s,'fosterRead',farmPigs.find(p=>p.stage==='Gestating')?.tag);render(i);return;}const list=fosterCandidates(s),x=list[(f.seq-2)%list.length];if(x)act(s,'fosterRead',x.r.tag);render(i);return;}   // the first read is a pregnant sow
  // Choosing pigs, scanning: a read ticks her and marks her row (a repeat read keeps her ticked); a pig from another unit isn't added (a toast says where she is).
  if(s.view==='roomBatchPick'&&c.batch.scanning){const b=c.batch,tag=b.scanning==='waiting'?'':batchScans[b.seq++%batchScans.length],p=unitPigs(c).find(x=>x.tag===tag);if(b.scanning==='waiting'){c.scan.connected=true;b.scanning=true;render(i);return;}   // the reader connects: scanning starts
   if(p){if(!b.picked.includes(tag))b.picked.push(tag);}else b.missed=[missOf(c,tag),...b.missed.filter(x=>x.tag!==tag)];
