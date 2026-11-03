@@ -1160,7 +1160,7 @@ function fosterCandidates(s){const c=roomContext(s);return c.units.flatMap(unit=
 const nurseSows=[{tag:'000377',unit:'3',pen:'A4',stage:'Weaned'},{tag:'000352',unit:'6',pen:'A3',stage:'Weaned'}];
 const fosterSow=(s,tag)=>fosterCandidates(s).find(x=>x.r.tag===tag)?.r||(p=>p&&fosterFarmSow(roomContext(s),p))(nurseSows.find(p=>p.tag===tag));
 // A nurse sow found by search or scan: a light record of her own, kept with the room, so a send lands.
-const fosterFarmSow=(c,p)=>(c.fosterFarm||={})[p.tag]||=({tag:p.tag,pen:p.pen,stage:p.stage,unit:p.unit,farm:true,locked:true,alive:0,moved:0,unidentified:0,dead:[0,0,0,0,0,0],events:[]});
+const fosterFarmSow=(c,p)=>(c.fosterFarm||={})[p.tag]||=({tag:p.tag,pen:p.pen,stage:p.stage,unit:p.unit,farm:true,locked:true,alive:0,moved:0,unidentified:0,dead:[0,0,0,0,0,0,0],events:[]});
 const homeUnit=s=>{const c=roomContext(s);return c.units.find(u=>u.records.includes(s))||c.unit;};
 // Fostering's filter is its own (owner, 2026-11-03): only sows that have farrowed can take piglets (the list holds no others), so it asks
 // what makes a nurse sow: her unit, how long ago she farrowed (piglets of a like age) and how many she has alive (room on the teats).
