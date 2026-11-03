@@ -16,6 +16,7 @@ const shots = {
   'now-locked': { preset: 'locked' },
   'd-dead': { preset: 'allocate' },
   'd-finished': { preset: 'locked' },
+  'd-details': { preset: 'allocate', steps: [{ act: 'litter' }] },
   'd-room': { preset: 'allocate', steps: [{ act: 'close' }, { js: "(()=>{const r=[...document.querySelectorAll('[data-card=\"0\"] .room-scroll .st-row')].find(e=>e.textContent.includes('000399'));const sc=r.closest('.room-scroll');sc.scrollTop+=r.getBoundingClientRect().top-sc.getBoundingClientRect().top-160;})()" }] },
   'p-list': { preset: 'piglets-dead' },
   'p-ticked': { preset: 'piglets-ticked' },
@@ -43,7 +44,7 @@ const shots = {
 
 const browser = await chromium.launch();
 for (const [name, shot] of Object.entries(shots)) {
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+  const page = await browser.newPage({ viewport: { width: 430, height: 900 }, deviceScaleFactor: 2 });   // the phone draws at its true 390 only in a window wider than it
   await page.goto(base + '/ux/system/farrowing-astra-concept.html?layout=focus');
   await page.evaluate((v) => { const s = document.querySelector('select.scenario'); s.value = v; s.dispatchEvent(new Event('change', { bubbles: true })); }, shot.preset);
   await page.waitForTimeout(600);

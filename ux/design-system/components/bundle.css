@@ -1591,7 +1591,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone :is(.finished-key,.finished-parts,.finished-bar) [data-part="after"]{background:var(--neutral-mark)}
 .farrowing-phone :is(.finished-key,.finished-parts,.finished-bar) [data-part="dead"]{background:var(--handle)}
 .farrowing-phone :is(.finished-key,.finished-parts) i[data-part="dead"]{box-shadow:inset 0 0 0 1px var(--control-border)}
-.farrowing-phone .finished-footer{display:grid;grid-template-columns:86px 1fr 1.3fr;gap:10px}
+.farrowing-phone .finished-footer{display:grid;grid-template-columns:auto 1fr auto;gap:10px}   /* Back and Record dead keep their labels whole; Actions takes the rest (fits a 375 phone) */
 .farrowing-phone .finished-footer .button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:var(--footer-height);padding:0 10px;white-space:nowrap}
 .farrowing-phone .finished-footer .button svg{width:16px;height:16px}
 /* Details, a page (SURFACES rule 1: the tint, white cards): the litter, against her batch, against herself. Labels in ink-2, not muted. */
@@ -1680,6 +1680,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .hand-pen-bar .st-choice-search{margin:0}
 /* Her piglets (owner, 2026-11-03): Inspection's pen list for one litter; search with scan inside above it, Tick all beside the heading. */
 .farrowing-phone .litter-list .litter-bar{margin:0 0 8px}
+.farrowing-phone .finished-card-head .finished-died{font-weight:600;color:var(--red)}   /* a dead sow's card: the one red, in its head band */
 .farrowing-phone .litter-door{margin:var(--space-12) 0 var(--space-18)}   /* her record's Piglets row: between Sow died (or her card) and what follows */
 .farrowing-phone .litter-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .farrowing-phone .litter-head .st-heading{flex:1;min-width:0;margin:0}

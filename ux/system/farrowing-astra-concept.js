@@ -975,7 +975,9 @@ function finishedCard(s){
  const seg=(n,off,part)=>n?`<circle cx="75" cy="75" r="58" data-part="${part}" stroke-dasharray="${Math.max(0,C*n/total-3).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-C*off/total).toFixed(1)}" transform="rotate(-90 75 75)"/>`:'';
  const key=(part,label,n)=>`<span class="finished-key-row"><span><i data-part="${part}"></i>${label}</span><b>${n}</b></span>`;
  const label=`${p.alive} alive now, ${p.after} died after birth, ${p.bornDead} born dead. Open details`;
- const head=`<button type="button" class="finished-card-head" data-action="litter" aria-label="${esc(label)}"><span>Finished ${esc(s.finished.replace(/^Today · /,'').split(' · ')[0])}</span><span class="finished-card-go">Details${icon('chevron')}</span></button>`;
+ const died=s.ended&&s.events.find(e=>e.text.startsWith('Sow died'));   // a dead sow's card says so once, in its head band (owner, 2026-11-03: her record looks like a finished one)
+ const when=died?`<b class="finished-died">Sow died</b> ${esc(died.day)} · ${esc(s.sowCause)}`:`Finished ${esc(s.finished.replace(/^Today · /,'').split(' · ')[0])}`;
+ const head=`<button type="button" class="finished-card-head" data-action="litter" aria-label="${esc(label)}"><span>${when}</span><span class="finished-card-go">Details${icon('chevron')}</span></button>`;
  return `<div class="finished-card">${head}<button type="button" class="finished-card-body" data-action="litter" aria-label="${esc(label)}"><span class="finished-ring"><svg viewBox="0 0 150 150" aria-hidden="true">${seg(p.alive,0,'alive')}${seg(p.after,p.alive,'after')}${seg(p.bornDead,p.alive+p.after,'dead')}</svg><span class="finished-ring-mid"><b>${p.alive}</b><small>alive now</small></span></span><span class="finished-key">${key('alive','Alive now',p.alive)}${key('after','Died after birth',p.after)}${key('dead','Born dead',p.bornDead)}<span class="finished-key-row finished-key-total"><span>Born alive</span><b>${p.born-p.bornDead}<small>/ ${p.born}</small></b></span></span></button></div>`;
 }
 // Her earlier litters by parity. Sample data: the sow profile's production records hold the real ones.
@@ -1008,7 +1010,7 @@ function finishedDetails(s){
 function locked(s){
  const e=s.events[0];
  const ab=s.productionOutcome==='abortion'?s.events.find(e=>e.text.startsWith('Abortion')):null;
- if(!ab&&!s.ended)return {cls:'completed-record-body finished-record-body',body:finishedCard(s)+litterDoor(s),footer:footer(SentriUI.backButton({action:'close'}),btn('sowActions',`${icon('more')}<span>Actions</span>`,'button primary').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)+btn('death',`${icon('death')}<span>Record dead</span>`,'button secondary'),'execution-completion finished-footer')};
+ if(!ab)return {cls:'completed-record-body finished-record-body',body:finishedCard(s)+litterDoor(s),footer:footer(SentriUI.backButton({action:'close'}),btn('sowActions',`${icon('more')}<span>Actions</span>`,'button primary').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)+btn('death',`${icon('death')}<span>Record dead</span>`,'button secondary'),'execution-completion finished-footer')};
  const body=ab?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Aborted',ab.text.replace(/^Abortion · ?/,''),[ab.day,ab.time].filter(Boolean).join(' '),initials(ab.who)].filter(Boolean).join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:s.ended?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Sow died',s.sowCause.toLowerCase(),...diedStamp(s)].join(' · ')})}${litterDoor(s)}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:'';
  return {cls:'completed-record-body',body:`${body}${recordActions(s)}`,footer:recordNavigation()};
 }
