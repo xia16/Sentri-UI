@@ -1618,6 +1618,184 @@
        ]
       }
      ]
+    },
+    {
+     "type": "state",
+     "id": "finish.done",
+     "label": "A finished sow's record (born 14, 8 alive)",
+     "tree": "F",
+     "reset": {
+      "screen": "farrowing.locked",
+      "preset": "locked"
+     },
+     "children": [
+      {
+       "type": "outcome",
+       "id": "fa-f13-finished-at-a-glance",
+       "tree": "F-13",
+       "label": "The finished record shows what happened this time; the actions sit in the bar",
+       "gwt": {
+        "given": "A sow finished farrowing with 14 born, 8 alive now.",
+        "when": "The worker opens her record.",
+        "then": "One card shows 8 alive now with where the litter went and Born alive 12 / 14, under a head band that reads Finished and Details. Back, Actions and Record dead sit in the bar; nothing else is stacked in the body."
+       },
+       "authority": [
+        {
+         "src": "owner",
+         "at": "decision 2026-11-02",
+         "says": "The finished sow's drawer gives a high-level view of what happened this time; users click into Details for the full litter and the comparisons across her batch and against herself; no stacking: Back · Actions · Record dead in the bar"
+        }
+       ],
+       "visible": [
+        {
+         "screen": "farrowing.locked",
+         "hard": "dead-end"
+        },
+        {
+         "text": "alive now",
+         "in": "sheet"
+        },
+        {
+         "el": ".finished-footer [data-action='sowActions']",
+         "in": "sheet",
+         "says": "Actions in the bar",
+         "hard": "unreachable-control"
+        },
+        {
+         "el": ".finished-footer [data-action='death']",
+         "in": "sheet",
+         "says": "Record dead in the bar",
+         "hard": "unreachable-control"
+        },
+        {
+         "el": ".record-inline-actions",
+         "in": "sheet",
+         "is": "absent",
+         "says": "no stacked actions in the body",
+         "hard": "broken-ruling"
+        }
+       ],
+       "record": [
+        {
+         "expr": "s.locked && !s.ended && s.alive === 8",
+         "says": "the finished litter, 8 alive",
+         "hard": "wrong-fact"
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "finish.done.details",
+       "label": "tap the litter card",
+       "taps": [
+        "[data-action='litter']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-f14-details-compares",
+         "tree": "F-14",
+         "label": "The card opens Details: the full litter, against her batch, against herself",
+         "gwt": {
+          "given": "A finished sow's record is open; she has two earlier litters.",
+          "when": "The worker taps the litter card.",
+          "then": "Details opens as a page: This litter with the causes, Against her batch with her dot on the batch's range and the batch average, and Against herself with her litters and the target. Farrowing log is at its foot."
+         },
+         "authority": [
+          {
+           "src": "owner",
+           "at": "decision 2026-11-02",
+           "says": "The finished sow's drawer gives a high-level view of what happened this time; users click into Details for the full litter and the comparisons across her batch and against herself; no stacking: Back · Actions · Record dead in the bar"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.details",
+           "hard": "dead-end"
+          },
+          {
+           "text": "Against her batch",
+           "in": "phone"
+          },
+          {
+           "text": "Against herself",
+           "in": "phone"
+          },
+          {
+           "text": "3 crushed · 1 other",
+           "in": "phone",
+           "says": "the causes of the deaths after birth",
+           "hard": "wrong-fact"
+          },
+          {
+           "text": "Farrowing log",
+           "in": "phone",
+           "says": "the log opens from here",
+           "hard": "dead-end"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.view === 'litter' && s.litterBack === 'locked'",
+           "says": "Details, one Back from the record",
+           "hard": "dead-end"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "finish.done-first",
+     "label": "Details for a sow's first litter",
+     "tree": "F",
+     "reset": {
+      "screen": "farrowing.details-first",
+      "preset": "details-first"
+     },
+     "children": [
+      {
+       "type": "outcome",
+       "id": "fa-f15-first-litter-placeholder",
+       "tree": "F-15",
+       "label": "A first litter keeps her history's place with a placeholder; the batch comparison still shows",
+       "gwt": {
+        "given": "A parity 1 sow finished her first litter.",
+        "when": "The worker opens Details.",
+        "then": "Against her batch shows as for any sow; Against herself reads First litter, her earlier litters showing from her second farrowing."
+       },
+       "authority": [
+        {
+         "src": "owner",
+         "at": "decision 2026-11-02",
+         "says": "The finished sow's drawer gives a high-level view of what happened this time; users click into Details for the full litter and the comparisons across her batch and against herself; no stacking: Back · Actions · Record dead in the bar"
+        }
+       ],
+       "visible": [
+        {
+         "screen": "farrowing.details-first",
+         "hard": "dead-end"
+        },
+        {
+         "text": "First litter",
+         "in": "phone"
+        },
+        {
+         "text": "Against her batch",
+         "in": "phone"
+        }
+       ],
+       "record": [
+        {
+         "expr": "s.parity === 1",
+         "says": "her first litter",
+         "hard": "wrong-fact"
+        }
+       ]
+      }
+     ]
     }
    ]
   },
@@ -1913,7 +2091,7 @@
       "screen": "farrowing.locked",
       "preset": "locked",
       "taps": [
-       ".record-inline-actions [data-action='death']",
+       ".finished-footer [data-action='death']",
        "[data-action='deadStep'][data-value='2,1']",
        "[data-action='saveDeath']"
       ]
@@ -1966,11 +2144,12 @@
         {
          "type": "action",
          "id": "edit.locked.undo.scours",
-         "label": "Crushed − , Scours +, Record, View log",
+         "label": "Crushed − , Scours +, Record, Details, Farrowing log",
          "taps": [
           "[data-action='deadStep'][data-value='2,-1']",
           "[data-action='deadStep'][data-value='3,1']",
           "[data-action='saveDeath']",
+          "[data-action='litter']",
           "[data-action='history']"
          ],
          "children": [

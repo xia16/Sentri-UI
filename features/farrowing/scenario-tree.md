@@ -95,7 +95,7 @@ States: D0 Report death open over C0 with 1 crushed entered · D1 C0 after Done,
 
 ## 5 · Finish and the lock (F)
 
-States: F0 the record with a visit waiting (from D1) · F1 *retired* (Finish with an Edit draft: an unsaved correction cannot reach Finish, see X-10) · F2 Finish, nothing waiting.
+States: F0 the record with a visit waiting (from D1) · F1 *retired* (Finish with an Edit draft: an unsaved correction cannot reach Finish, see X-10) · F2 Finish, nothing waiting · F3 a finished sow's record · F4 Details for a first litter.
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
@@ -111,6 +111,9 @@ States: F0 the record with a visit waiting (from D1) · F1 *retired* (Finish wit
 | F-10 | F2 | litter weight outside 0.8–2.5 kg × alive | → soft words warning, never a gate | S — contract C5 (draft); review tasks-built-28 | — |
 | F-11 | F2 | tap Yes on Assisted | → No was chosen before (required No / Yes, no Clear); Yes is chosen and recorded | S — owner decision 2026-10-15 | `fa-f11-assisted-no-preselected` |
 | F-12 | F2 | type 12,6 in the Litter weight field (the system decimal keyboard) | → the weight reads 12.6 kg (the comma became a point); no Numpad; the sheet stays open | S — owner decision 2026-10-16 | `fa-f12-weight-on-the-keyboard` |
+| F-13 | F3 | open a finished sow | → one card: alive now, where the litter went, Born alive 12 / 14, head band Finished · Details ›; Back · Actions · Record dead in the bar | S — owner decision 2026-11-02 | `fa-f13-finished-at-a-glance` |
+| F-14 | F3 | tap the litter card | → Details (a page): This litter with causes, Against her batch, Against herself, Farrowing log | S — owner decision 2026-11-02 | `fa-f14-details-compares` |
+| F-15 | F4 | open Details for a first litter | → Against herself reads First litter; the batch comparison still shows | S — owner decision 2026-11-02 | `fa-f15-first-litter-placeholder` |
 
 ## 6 · Undo the last save (X)
 
@@ -128,7 +131,7 @@ recorded by G.H.
 | X-3 | X0 + change | Back | *retired*: Back with unsaved changes now asks (X-10) instead of silently keeping the draft. Leaf `fa-x3-edit-back-keeps-draft` retired | owner decision 2026-10-10 | — |
 | X-4 | X0 › Undo › Undo | Clear | → the save is withdrawn: alive 9, nothing waiting; the log keeps +3 born alive marked Withdrawn | owner decision 2026-11-02 | `fa-x4-edit-clear-discards` |
 | X-5 | X1 | Undo › Undo | → Record dead opens with the crushed death as its unsaved count; born stays 14; the finish line is kept | owner decision 2026-11-02 | `fa-x5-correct-born-after-lock` |
-| X-6 | X1 after X-5 | Crushed −, Scours +, Record, View log | → the log shows +1 scours marked Corrected (Was +1 crushed) above Farrowing finished | owner decision 2026-11-02; RUL After the lock (one ledger surface) | `fa-x6-log-shows-correction` |
+| X-6 | X1 after X-5 | Crushed −, Scours +, Record, Details, Farrowing log | → the log shows +1 scours marked Corrected (Was +1 crushed) above Farrowing finished | owner decision 2026-11-02; RUL After the lock (one ledger surface) | `fa-x6-log-shows-correction` |
 | X-7 | X1 | a piglet dies after the lock | ? Q4 — which door owns post-lock deaths | S (open) — RUL After the lock vs review tasks-built-24 | blocker `fa-x7-post-lock-death-door` |
 | X-8 | — | *retired*: there is no Alive correction any more (owner, 2026-11-02); Q7 is answered | owner decision 2026-11-02 | — |
 | X-9 | X0 | look | → the Alive card names the last save under a divider (Saved 09:41 · G.H, +3 born) with a quiet Undo; no banner, no Corrected tag | owner decision 2026-11-02 | `fa-x9-changed-row-shows-was` |

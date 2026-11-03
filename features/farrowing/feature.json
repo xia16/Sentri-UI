@@ -39,6 +39,8 @@
         "name": "Finished",
         "screens": [
           "farrowing.locked",
+          "farrowing.details",
+          "farrowing.details-first",
           "farrowing.death-breakdown"
         ]
       }
@@ -235,11 +237,6 @@
       "farrowing.locked",
       "farrowing.room",
       "Back"
-    ],
-    [
-      "farrowing.locked",
-      "farrowing.history",
-      "View log"
     ],
     [
       "farrowing.locked",
@@ -592,11 +589,6 @@
       "tap a sow"
     ],
     [
-      "farrowing.locked",
-      "farrowing.death-breakdown",
-      "tap Death causes"
-    ],
-    [
       "farrowing.count",
       "farrowing.sow-actions",
       "Actions"
@@ -735,6 +727,26 @@
       "farrowing.undo",
       "farrowing.count-saved",
       "Back"
+    ],
+    [
+      "farrowing.locked",
+      "farrowing.details",
+      "tap the litter card"
+    ],
+    [
+      "farrowing.details",
+      "farrowing.locked",
+      "Back"
+    ],
+    [
+      "farrowing.details",
+      "farrowing.history",
+      "Farrowing log"
+    ],
+    [
+      "farrowing.history",
+      "farrowing.details",
+      "Back (opened from Details)"
     ]
   ],
   "screens": [
@@ -1506,71 +1518,168 @@
       "preset": "locked",
       "figma": "",
       "notes": {
-        "purpose": "Read the finished litter: the frozen Born and every fact captured at finish.",
+        "purpose": "What happened this time, at a glance: where the litter went, and the door to Details.",
         "states": [
-          "After a Record dead: the last save sits under the litter's figures (\"Saved Aug 28 14:02 · L.M\", −1 died) and the drawer opens at the long height; Undo for whoever saved it"
+          "After a Record dead: the last save sits under the card (\"Saved Aug 28 14:02 · L.M\", −1 died) with Undo for whoever saved it"
         ],
         "elements": [
           {
-            "name": "Header stamp",
-            "shows": "\"Finished Aug 27 at 08:12 by G.H\" in place of the status word.",
-            "logic": "Date, time and hand come from the \"Farrowing finished\" event. This is the only place the finish date appears.",
-            "source": "farrowing-astra-concept.js recordStamp()",
-            "at": "Finished"
+            "name": "Litter card",
+            "at": "alive now",
+            "shows": "A white card with a tinted head band (\"Finished Aug 27 at 08:12 by G.H\" · Details ›); a ring of alive now, died after birth and born dead with 8 alive now at its centre; the three counts beside it and Born alive 12 / 14 under a rule.",
+            "logic": "Alive now = Born − dead recorded (± fostered). Died after birth = crushed + scours + starve-out + other; born dead = stillborn + mummified. The whole card opens Details.",
+            "source": "farrowing-astra-concept.js finishedCard()"
           },
           {
-            "name": "Facts list",
-            "shows": "Born · Alive now · Dead · Weak · Deformed · Assisted · Litter weight.",
-            "states": [
-              {
-                "state": "Complete",
-                "when": "All finish facts given",
-                "shows": "Born 14 · Alive now 8 · Dead 6 · Weak 1 · Deformed 1 · Assisted Yes · Litter weight 12.6 kg"
-              },
-              {
-                "state": "Facts missing",
-                "when": "Assistance or weight not given",
-                "shows": "Assisted \"Not recorded\"; Litter weight a dash"
-              },
-              {
-                "state": "No deaths",
-                "when": "Dead is 0",
-                "shows": "\"Dead\" shows 0 and is not a link"
-              },
-              {
-                "state": "After later deaths",
-                "when": "Piglet deaths recorded after the lock",
-                "shows": "Alive now falls; Born never moves after Finish (no Correct born, owner 2026-11-02)"
-              }
-            ],
-            "logic": "Born is frozen at finish. Alive now = Born − dead recorded. Dead = all dead types. The three figures read (Facts never acts); with Dead above zero a Death causes row under the card opens the Death breakdown sheet (each type with a count and Total dead).",
-            "source": "farrowing-astra-concept.js finishFacts(), deathBreakdown()",
-            "at": "Alive now"
+            "name": "Bar",
+            "at": "Record dead",
+            "shows": "Back · Actions · Record dead, one row at 56px.",
+            "logic": "Nothing stacks in the body (owner, 2026-11-02). Record dead opens the post-lock death record; Actions the sow's actions.",
+            "source": "farrowing-astra-concept.js locked()"
           }
         ],
         "controls": [],
         "copy": [
-          "(raw) Finished <date> at <time> by <hand>",
-          "(raw) Litter summary · View log",
-          "(raw) Born · Alive now · Dead · Weak · Deformed · Assisted · Litter weight",
-          "(raw) Not recorded",
-          "(raw) Record dead · Actions"
+          "(raw) Finished <date> at <time> by <hand> · Details",
+          "(raw) alive now · Alive now · Died after birth · Born dead · Born alive",
+          "(raw) Back · Actions · Record dead"
         ],
         "edge": [
           "Post-lock events never reopen farrowing",
           "A missing piglet after the lock has no door here; it routes through the litter census elsewhere"
         ],
         "rules": [
+          "Owner pick 2026-11-02 (canvas https://claude.ai/artifact/FJiEYMkwPquPoY8VpXhkWk): the drawer says only what happened this time; Details holds the full litter and the comparisons",
+          "SURFACES: a tappable card in a white drawer is a white body with a tinted head band (rule 6); Details is a page, the tint with white cards (rule 1)",
+          "No stacking: the finished sow's actions sit in the bar (Back · Actions · Record dead)",
           "\"Born … locks at Finish\" (Model)",
-          "\"The record face IS the record\" — the ruled face is one summary card (14 born | 8 alive | 6 dead), rows At finish / Finished / Farrowing record, bar Record dead · Actions (Edit is gone, owner 2026-11-02)",
-          "\"Fostering is PARKED … the After bar was Edit · Record dead; Edit is gone (owner, 2026-11-02)\" (After the lock)",
-          "\"History is the chevron on the fact line\" (After the lock)"
+          "No Edit record (owner 2026-11-02): the last save is undone from the run under the card"
         ],
         "issues": [
-          "The face is a seven-row facts list, not the ruled record face (summary card + At finish + Finished + Farrowing record rows).",
-          "Dead is told three ways (fact, breakdown sheet, log); Born, Alive and Dead repeat on Finish and Counting.",
-          "Record dead and Actions sit in an action row (Edit is gone, owner 2026-11-02); View log is a title link, not the fact-line chevron."
+          "A died or aborted sow keeps the earlier record face; the Death breakdown page is no longer opened from a finished sow (its causes are on Details)."
         ]
+      }
+    },
+    {
+      "id": "farrowing.details",
+      "name": "Details · a finished sow",
+      "zh": "",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "details",
+      "figma": "",
+      "notes": {
+        "purpose": "The full litter, and how it compares: against her batch and against her own earlier litters.",
+        "states": [],
+        "elements": [
+          {
+            "name": "This litter",
+            "at": "This litter",
+            "shows": "One bar of where the litter went, then Alive now · Died after birth (with its causes) · Born dead (stillborn · mummified), then Weak · Deformed · Assisted · Weight.",
+            "logic": "The same counts as the record; causes listed only where above zero; Assisted reads Not recorded and Weight – when not given.",
+            "source": "farrowing-astra-concept.js finishedDetails()"
+          },
+          {
+            "name": "Against her batch",
+            "at": "Against her batch",
+            "shows": "Born alive, Born dead and Died after birth, each on the batch's range with her dot and the batch average line drawn above it; her figure and the batch average in words.",
+            "logic": "The batch = the task's finished litters (all units). Range = lowest to highest; the scale runs 2 past each end. With no other finished litter the card says so.",
+            "source": "farrowing-astra-concept.js finishedDetails(), taskClosureReview()"
+          },
+          {
+            "name": "Against herself",
+            "at": "Against herself",
+            "shows": "Born alive (filled) and weaned (outlined) per litter, this litter last in the deeper green with alive now as its outlined bar; the target line dashed.",
+            "logic": "Earlier litters come from her production records (sample data here). Target = the batch's born-alive target (12).",
+            "source": "farrowing-astra-concept.js finishedDetails(), pastLitters()"
+          },
+          {
+            "name": "Farrowing log",
+            "at": "Farrowing log",
+            "shows": "One row at the foot of the page.",
+            "logic": "The log moved here from the record (View log is gone from the drawer).",
+            "source": "farrowing-astra-concept.js finishedDetails()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw) Details",
+          "(raw) This litter · Against her batch · Against herself",
+          "(raw) This sow · Batch average · Batch range",
+          "(raw) Born alive · Weaned · this litter: alive now · Target 12",
+          "(raw) P1 · P2 · P3 · this"
+        ],
+        "edge": [],
+        "rules": [
+          "Owner pick 2026-11-02 (canvas https://claude.ai/artifact/FJiEYMkwPquPoY8VpXhkWk): the drawer says only what happened this time; Details holds the full litter and the comparisons",
+          "SURFACES: a tappable card in a white drawer is a white body with a tinted head band (rule 6); Details is a page, the tint with white cards (rule 1)",
+          "No stacking: the finished sow's actions sit in the bar (Back · Actions · Record dead)",
+          "Headers law: a page one Back away from the sow's drawer carries no header line",
+          "Comparisons keep signal only (owner, 2026-11-02): weak, deformed, weight, dates and sow weights stay out of the comparisons"
+        ],
+        "issues": [
+          "Earlier litters are sample data in this prototype; the sow profile's production records hold the real ones."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.details-first",
+      "name": "Details · first litter",
+      "zh": "",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "details-first",
+      "figma": "",
+      "notes": {
+        "purpose": "Details for a sow's first litter: the full litter and her batch; her own history starts from her second farrowing.",
+        "states": [],
+        "elements": [
+          {
+            "name": "This litter",
+            "at": "This litter",
+            "shows": "One bar of where the litter went, then Alive now · Died after birth (with its causes) · Born dead (stillborn · mummified), then Weak · Deformed · Assisted · Weight.",
+            "logic": "The same counts as the record; causes listed only where above zero; Assisted reads Not recorded and Weight – when not given.",
+            "source": "farrowing-astra-concept.js finishedDetails()"
+          },
+          {
+            "name": "Against her batch",
+            "at": "Against her batch",
+            "shows": "Born alive, Born dead and Died after birth, each on the batch's range with her dot and the batch average line drawn above it; her figure and the batch average in words.",
+            "logic": "The batch = the task's finished litters (all units). Range = lowest to highest; the scale runs 2 past each end. With no other finished litter the card says so.",
+            "source": "farrowing-astra-concept.js finishedDetails(), taskClosureReview()"
+          },
+          {
+            "name": "Against herself",
+            "at": "First litter",
+            "shows": "A dashed placeholder: \"First litter · Her earlier litters show here from her second farrowing.\"",
+            "logic": "No earlier litter on record.",
+            "source": "farrowing-astra-concept.js finishedDetails(), pastLitters()"
+          },
+          {
+            "name": "Farrowing log",
+            "at": "Farrowing log",
+            "shows": "One row at the foot of the page.",
+            "logic": "The log moved here from the record (View log is gone from the drawer).",
+            "source": "farrowing-astra-concept.js finishedDetails()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw) Details",
+          "(raw) This litter · Against her batch · Against herself",
+          "(raw) This sow · Batch average · Batch range",
+          "(raw) Born alive · Weaned · this litter: alive now · Target 12",
+          "(raw) First litter · Her earlier litters show here from her second farrowing."
+        ],
+        "edge": [],
+        "rules": [
+          "Owner pick 2026-11-02 (canvas https://claude.ai/artifact/FJiEYMkwPquPoY8VpXhkWk): the drawer says only what happened this time; Details holds the full litter and the comparisons",
+          "SURFACES: a tappable card in a white drawer is a white body with a tinted head band (rule 6); Details is a page, the tint with white cards (rule 1)",
+          "No stacking: the finished sow's actions sit in the bar (Back · Actions · Record dead)",
+          "Headers law: a page one Back away from the sow's drawer carries no header line",
+          "Comparisons keep signal only (owner, 2026-11-02): weak, deformed, weight, dates and sow weights stay out of the comparisons"
+        ],
+        "issues": []
       }
     },
     {
