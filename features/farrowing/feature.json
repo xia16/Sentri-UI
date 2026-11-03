@@ -1589,7 +1589,7 @@
           {
             "name": "Against herself",
             "at": "Against herself",
-            "shows": "One bar per litter: the whole bar is born alive (its figure above), the solid part weaned (its figure inside); for this litter the solid part is alive now. Labelled 1st litter · 2nd litter · This litter; the target line dashed; the legend one centred line: Weaned / alive · Born alive · Target 12.",
+            "shows": "One bar per litter: the whole bar is born alive (its figure above), the solid part weaned (its figure inside); for this litter the solid part is alive now. At most three bars, her two latest earlier litters and this one, named by number (1st litter · 2nd litter · This litter); with more the meta reads Last 3 of N litters; the target line dashed; the legend one centred line: Weaned / alive · Born alive · Target 12.",
             "logic": "Earlier litters come from her production records (sample data here). Target = the batch's born-alive target (12).",
             "source": "farrowing-astra-concept.js finishedDetails(), pastLitters()"
           },
