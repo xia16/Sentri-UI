@@ -27,7 +27,9 @@ is the only point where someone stops anyway, because the pigs have to be put so
 
 ## Questions
 
-1. The source records nothing; pigs leave its record when received. *Recommend: yes.*
-2. Sows and gilts are received by exception (*All here* per pen, scan only a difference), never counted. *Recommend: yes.*
-3. Moving into farrowing: its own Transfer task like every other move, with Farrowing starting once the sows are in; or the
-   first step of the Farrowing task. *Recommend: its own Transfer task, so every move works one way.*
+1. The source records nothing; pigs leave its record when received. **Ruled (owner, 2026-11-03): moving out is nothing, just a list
+   to show them.** Each pen says *Move all* or *Move 12* in words; no icon, no 12/13, no key, no list of pigs that stay.
+2. Sows and gilts are received by exception (*All here* per pen, scan only a difference), never counted. *Recommend: yes.* Open.
+3. Moving into farrowing is its own Transfer task. **Ruled (owner, 2026-11-03): yes; transfer tasks and their triggers are set up in
+   the Console.** How farms automate moves (where to and when, by date or by a change in a pig's status) gets its own doc later;
+   for now only the phone side is designed.

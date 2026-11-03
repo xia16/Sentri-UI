@@ -449,9 +449,10 @@ if (want('12')) {
 // 9. Pigs to move (owner, 2026-11-03): the source room's pen map. A pen whose pigs all go shows the move glyph; a pen sending some
 //    shows how many of how many (12/13). Tap a partial pen: its pigs, a toggle between those that move and those that stay (9b, 9c).
 //    A glance, not a tool (owner, 2026-11-03: the crew looks once, closes the phone, works): where to on top, the pigs that stay
-//    named under the map so nobody has to tap, and no button (the move out records nothing; receiving is the destination's).
+//    and no button (the move out records nothing; receiving is the destination's). Each pen says it in words, read at a glance
+//    (owner, 2026-11-03: no icon, no 12/13, no key, no list of who stays): Move all, or Move 12.
 //    Farrowing room 3: A1 12 · A2 11 · A3 12 of 13 · A4 10 · B1 13 · B2 11 · B3 12 · B4 9 of 10 · C1–C3 10 each = 120.
-const MOVE = { A1: 'all', A2: 'all', A3: '12/13', A4: 'all', B1: 'all', B2: 'all', B3: 'all', B4: '9/10', C1: 'all', C2: 'all', C3: 'all' };
+const MOVE = { A1: 'all', A2: 'all', A3: '12', A4: 'all', B1: 'all', B2: 'all', B3: 'all', B4: '9', C1: 'all', C2: 'all', C3: 'all' };
 if (want('9-')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
@@ -461,17 +462,15 @@ if (want('9-')) {
     const host = document.createElement('div'); host.innerHTML = U.penMap({ lanes: ['A', 'B', 'C'], depth: 4, pens, key: 'move' });
     host.querySelectorAll('.st-pen-tile').forEach((t) => {
       const c = t.dataset.pen, v = MOVE[c];
-      t.innerHTML = '<span class="m-pc">' + c + '</span>' + (!v ? '' : v === 'all' ? '<span class="m-pi">' + ic('transfer') + '</span>' : '<span class="m-pn m-part">' + v + '</span>');
+      t.innerHTML = '<span class="m-pc">' + c + '</span>' + (!v ? '' : '<span class="m-mv">Move ' + (v === 'all' ? 'all' : '<b>' + v + '</b>') + '</span>');
     });
     const head = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>120</strong><span>pigs to Unit 9</span></div><small>Today · into A1–A4, B1–B2</small></div>';
-    const key = '<p class="m-plankey"><span class="m-ki">' + ic('transfer') + 'All move</span><span><b>12/13</b> Some move</span></p>';
-    const stay = '<section class="feature-section m-stay">' + U.heading({ title: 'Stay behind', meta: '2', kind: 'section', level: 3 })
-      + U.rowGroup(U.row({ code: '000901', description: 'Gilt · A3' }) + U.row({ code: '000922', description: 'Gilt · B4' })) + '</section>';
-    page('Pigs to move', 'Transfer · batch 25 · from Farrowing room 3', head + key + '<div class="m-map">' + host.innerHTML + '</div>' + stay, '');
+    page('Pigs to move', 'Transfer · batch 25 · from Farrowing room 3', head + '<div class="m-map">' + host.innerHTML + '</div>', '');
     const st = document.createElement('style'); st.textContent = UNIT_CSS + PLAN_CSS + `.m-count .m-map .st-pen-tile .m-pi svg{width:22px;height:22px;display:block;color:var(--ink,#20291f)}
       .m-count .m-map .st-pen-tile .m-pn.m-part{font-size:17px}
       .m-count .m-plankey .m-ki{display:inline-flex;align-items:center;gap:6px}.m-count .m-plankey .m-ki svg{width:16px;height:16px}
-      .m-count .m-stay{margin-top:8px}`;
+      .m-count .m-map .st-pen-tile .m-mv{font:500 14px/1.2 var(--font-sans,inherit);color:var(--ink,#20291f)}
+      .m-count .m-map .st-pen-tile .m-mv b{font:600 18px/1 var(--font-mono,'IBM Plex Mono',monospace)}`;
     document.head.append(st);
   }, { UNIT_CSS, PLAN_CSS, MOVE });
   await shoot(p, 'mock-9-transfer-out.png');
