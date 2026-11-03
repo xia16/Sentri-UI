@@ -125,13 +125,18 @@ for (const [name, fewer, tick] of [['mock-3-count-pen.png', true, 'B'], ['mock-3
     const { U, ic, page, footer, primary } = window.M;
     const all = 16;
     const added = fewer
-      ? [['000801', 'Grower · 63d'], ['000802', 'Grower · 63d'], ['000512', 'Currently in Unit 9 · C3', true], ['000733', 'Currently in D2', true], ['000915', 'Currently in D5', true, true]]
+      ? [['000801', 'Grower · 63d'], ['000802', 'Grower · 63d'], ['000512', 'Grower · 63d', 'In Unit 9 · C3'], ['000733', 'Grower · 61d', 'In Unit 6 · D2'], ['000915', 'Grower · 63d', 'In D5', true]]
       : [['000801', 'Grower · 63d'], ['000802', 'Grower · 63d'], ['000803', 'Grower · 63d']];
     const notAdded = fewer ? ['000803'] : [];
     // Every pig added is a ticked row; untick one read by mistake (a pig in the next pen through the bars) and it leaves the count.
     const kept = added.filter((a) => !a[3]);
     const tagged = kept.length, untagged = all - tagged, expected = 16 + (fewer ? 2 : 0), diff = all - expected;
-    const row = ([id, ctx, away, off]) => U.rowSelectDoor({ code: id, description: ctx, contextWidth: '240px', right: { kind: 'tags', tags: [] }, checked: !off, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig' + (off ? '' : ' selected') + (away ? ' m-away' : ''), label: id });
+    // A pig the record places in another pen carries one quiet amber chip on the right (owner, 2026-11-03), where the row's state goes.
+    const chip = (text) => '<span class="st-animal-tags m-chip">' + U.status({ variant: 'chip', kind: 'late', icon: '', text }) + '</span>';
+    const row = ([id, ctx, away, off]) => {
+      const html = U.rowSelectDoor({ code: id, description: ctx, right: { kind: 'tags', tags: [] }, checked: !off, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig' + (off ? '' : ' selected'), label: id });
+      return away ? html.replace('</span><span class="st-row-chevron">', chip(away) + '</span><span class="st-row-chevron">') : html;
+    };
     const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs in D4', value: all, min: kept.length, max: 80, action: 'x', reserveHint: false }) + '</section>';
     const search = U.choiceSearch({ label: 'Search ear tag', placeholder: 'Ear tag', value: '', clear: { action: 'x' }, scan: { action: 'x', label: 'Scan ear tags' } });
     const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Ear tags · ' + kept.length, icon: ic('tag'), kind: 'section', level: 3 })
@@ -145,7 +150,7 @@ for (const [name, fewer, tick] of [['mock-3-count-pen.png', true, 'B'], ['mock-3
         + line('Moved to D6', 'Oct 30 · 14:20 · M.L', '−3')
         + line('Died', 'Yesterday · 07:05 · G.H', '−1')
         + line('Should be here now', '3 with ear tags · 13 without', '16', true), { className: 'm-evidence' });
-    const left = '<div class="m-left"><strong>' + untagged + ' without ear tags</strong><small>' + (diff === 0 ? 'Matches the record' : Math.abs(diff) + ' not accounted for') + '</small></div>';
+    const left = '<div class="m-left"><strong>' + untagged + ' without ear tags</strong><small>' + (notAdded.length ? notAdded.join(', ') + ' not found' : 'Matches the record') + '</small></div>';
     page('Count D4', 'Recount · Unit 7', count + tags + `<section class="feature-section">${evidence}</section>`, footer(left, primary('Done')));
   }, { fewer });
   if (TICK[tick]) await p.addStyleTag({ content: TICK[tick] });
@@ -235,7 +240,12 @@ const UNIT_CSS = `.m-count .m-line .st-row-trailing{font:600 17px var(--font-mon
   .m-count .m-explain{font-size:13px;line-height:1.5;margin-top:10px;color:var(--ink,#20291f)}
   .m-recv-bar{background:var(--paper,#fff);border:1px solid var(--line,#dfe4d8);border-radius:18px;padding:14px 16px;margin:4px 0 20px}
   .m-recv-figs{display:flex;align-items:baseline;gap:8px}.m-recv-figs strong{font:600 32px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}.m-recv-figs span{font-size:14px;color:var(--ink,#20291f)}
-  .m-recv-track{height:8px;border-radius:4px;background:#eef1e7;margin:12px 0 10px;overflow:hidden}.m-recv-track i{display:block;height:100%;background:#466888;border-radius:4px}
+  .m-recv-track{display:flex;gap:2px;height:8px;margin:12px 0 10px}.m-recv-track i{display:block;height:100%;border-radius:4px;background:var(--handle,#dce0d4)}.m-recv-track i.done{background:var(--done-mark,#5fae6e)}
+  .m-count .m-chip{flex:0 0 auto;margin-left:auto}.m-count .m-chip .st-status{white-space:nowrap}
+  .m-count .m-ledger .st-row-trailing{font:600 17px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}
+  .m-count .m-ledger .m-sum .st-row-title{font-weight:600}
+  .m-count .m-ledger .m-sum.m-end{border-top:2px solid var(--ink,#20291f)}
+  .m-count .m-ledger .m-owed .st-row-copy small{color:var(--amber,#896017)}
   .m-recv-bar small{display:block;font-size:12px;color:var(--muted,#657060)}
   .m-done .st-row-chevron{color:#276640}`;
 
@@ -245,10 +255,11 @@ if (want('10')) {
   await prep(p);
   await p.evaluate((UNIT_CSS) => {
     const { U, ic, page, footer, primary } = window.M;
-    const pen = (code, figure, what, cls = '') => U.row({ variant: 'navigation', code, description: what, trailing: figure, trail: 'chevron', action: 'x', className: 'm-line ' + cls });
-    const bar = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>3</strong><span>of 4 pens counted</span></div><div class="m-recv-track"><i style="width:75%"></i></div><small>Started 09:05 · L.M</small></div>';
+    const pen = (code, figure, done) => U.row({ variant: 'navigation', code, chip: { text: done ? 'Counted' : 'To do', kind: done ? 'done' : 'awaiting' }, trail: 'chevron', action: 'x', className: 'm-line' })
+      .replace('<span class="st-row-chevron">', (figure ? '<span class="st-row-trailing">' + figure + '</span>' : '') + '<span class="st-row-chevron">');
+    const bar = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>3</strong><span>of 4 pens counted</span></div><div class="m-recv-track" data-status-part="bar"><i class="done" style="flex:1"></i><i class="done" style="flex:1"></i><i class="done" style="flex:1"></i><i style="flex:1"></i></div><small>Started 09:05 · L.M</small></div>';
     const list = U.heading({ title: 'Pens', icon: ic('grid'), kind: 'section', level: 3 })
-      + U.rowGroup(pen('C1', '3', 'Counted · matches') + pen('C2', '3', 'Counted · 1 found here', 'm-off') + pen('D4', '15', 'Counted · 000803 not found', 'm-off') + pen('D5', '38', 'Not counted yet'));
+      + U.rowGroup(pen('C1', '3', true) + pen('C2', '2', true) + pen('D4', '16', true) + pen('D5', '', false));
     const left = '<div class="m-left"><strong>D5 still to count</strong><small>Pens you skip stay as recorded</small></div>';
     page('Recount', 'Unit 7', bar + list, footer(left, primary('Finish recount')));
     const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
@@ -256,28 +267,47 @@ if (want('10')) {
   await shoot(p, 'mock-10-unit-recount.png');
 }
 
-// 11. Finish recount: the unit's balance sheet. What changed, pen against pen: pigs found in another pen move; the pigs without ear
-//     tags net out across the unit (D4 −1, D5 +1 = balanced); only what is still missing goes on the batch's balancing sheet.
+// 11. Finish recount: the unit's balance sheet as a ledger (owner, 2026-11-03). On record, each change signed, Counted: the lines add
+//     up (59 + 2 − 1 + 0 = 60). Pigs found from another unit add; a pig not found subtracts and goes on the batch's balancing sheet; the
+//     pigs without ear tags net across the unit's pens. Each change line opens its detail (11b–d).
+//     Count: C1 3 · C2 2 · D4 16 (000801 000802 + 000512 from Unit 9, 000733 from Unit 6, 12 without; 000803 not found) · D5 39 (000915 + 38).
 if (want('11')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
   await p.evaluate((UNIT_CSS) => {
-    const { U, ic, page } = window.M;
-    const line = (o) => U.row({ ...o, className: 'm-line ' + (o.className || '') });
-    const totals = '<section class="feature-section">' + U.facts([{ label: 'On record', value: '59' }, { label: 'Counted', value: '60' }, { label: 'Pens', value: '4 of 4' }], { columns: 3 }) + '</section>';
-    const found = '<section class="feature-section">' + U.heading({ title: '2 pigs found in another pen', icon: ic('transfer'), kind: 'section', level: 3 })
-      + U.rowGroup(line({ code: '000512', description: 'Was Unit 9 · C3', trailing: '→ C2' }) + line({ code: '000733', description: 'Was Unit 6 · D2', trailing: '→ D4' })) + '</section>';
-    const heads = '<section class="feature-section">' + U.heading({ title: 'Without ear tags · balanced', icon: ic('tag-off'), kind: 'section', level: 3 })
-      + U.rowGroup(line({ code: 'D4', description: 'Recorded 13, now 12', trailing: '−1' }) + line({ code: 'D5', description: 'Recorded 38, now 39', trailing: '+1' }) + line({ title: 'Unit 7', description: 'They balance out', trailing: '0', className: 'm-total' })) + '</section>';
-    const lost = '<section class="feature-section">' + U.heading({ title: '1 pig not accounted for', icon: ic('alert'), kind: 'section', level: 3 })
-      + U.rowGroup(line({ code: '000803', description: 'Recorded in D4, not found in any pen', trailing: '−1', className: 'm-off' }))
-      + '<p class="m-hint m-explain">She goes on batch 25\'s balancing sheet. Found in a later count or transfer, she closes; still open when batch 25 ends, an unaccounted loss.</p></section>';
-    page('Unit 7 balance sheet', 'Recount · 09:40 · L.M', totals + found + heads + lost, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save recount', register: 'primary', action: 'x' }) + '</div>');
+    const { U, page } = window.M;
+    const sum = (title, figure, end) => U.row({ title, trailing: figure, className: 'm-sum' + (end ? ' m-end' : '') });
+    const change = (title, description, figure, cls = '') => U.row({ variant: 'navigation', title, description, trailing: figure, trail: 'chevron', action: 'x', className: cls });
+    const ledger = '<section class="feature-section m-ledger">' + U.rowGroup(sum('On record', '59')
+      + change('Found from other units', '000512, 000733', '+2')
+      + change('Not found', '000803 · to batch 25 balancing sheet', '−1', 'm-owed')
+      + change('Without ear tags', 'D4 −1 · D5 +1', '0')
+      + sum('Counted', '60', true)) + '</section>';
+    page('Unit 7 balance sheet', 'Recount · 09:40 · L.M', ledger, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save recount', register: 'primary', action: 'x' }) + '</div>');
     const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
   }, UNIT_CSS);
-  await p.waitForTimeout(400); await p.screenshot({ path: path.join(out, 'mock-11-unit-balance.png') });
-  await p.evaluate(() => { const s = document.querySelector('.phone .sheet-body'); if (s) s.scrollTop = 500; });
-  await shoot(p, 'mock-11b-unit-balance-scrolled.png');
+  await shoot(p, 'mock-11-unit-balance.png');
+}
+
+// 11b–d. A ledger line opened: the pigs behind it, with the same signed figure on top.
+const DETAILS = [
+  ['mock-11b-found.png', 'Found from other units', '+2', [['000512', 'Was Unit 9 · C3', '→ D4'], ['000733', 'Was Unit 6 · D2', '→ D4']], 'Saved, they move into D4 and leave their old units.'],
+  ['mock-11c-not-found.png', 'Not found', '−1', [['000803', 'Recorded in D4 · in no pen counted', '−1']], 'She goes on batch 25 balancing sheet. A later count, transfer or death closes it; still open when the batch ends, she is an unaccounted loss.'],
+  ['mock-11d-without-tags.png', 'Without ear tags', '0', [['D4', 'Recorded 13, counted 12', '−1'], ['D5', 'Recorded 37, counted 38', '+1']], 'Pigs moved between pens and not recorded balance out inside the unit.'],
+];
+for (const [name, title, figure, rows, note] of DETAILS) {
+  if (!want(name.slice(5, 8))) continue;
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate(({ UNIT_CSS, title, figure, rows, note }) => {
+    const { U, page } = window.M;
+    const body = '<section class="feature-section m-ledger">' + U.rowGroup(U.row({ title: 'Unit 7', trailing: figure, className: 'm-sum' })
+      + rows.map(([code, description, trailing]) => U.row({ code, description, trailing, className: 'm-line' })).join(''))
+      + '<p class="m-hint m-explain">' + note + '</p></section>';
+    page(title, 'Unit 7 balance sheet', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + '</div>');
+    const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
+  }, { UNIT_CSS, title, figure, rows, note });
+  await shoot(p, name);
 }
 
 // 12. Receive pigs into one pen: the same pen count. All pigs put in N3, then the ear tags, so each tagged pig is placed in its pen.
@@ -305,7 +335,7 @@ if (want('8-')) {
   await p.evaluate((UNIT_CSS) => {
     const { U, ic, page, footer, primary } = window.M;
     const pen = (code, figure, what) => U.row({ variant: 'navigation', code, description: what, trailing: figure, trail: 'chevron', action: 'x', className: 'm-line' });
-    const bar = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>112</strong><span>of 120 received</span></div><div class="m-recv-track"><i style="width:93%"></i></div><small>Batch 25 · from Farrowing room 3</small></div>';
+    const bar = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>112</strong><span>of 120 received</span></div><div class="m-recv-track" data-status-part="bar"><i class="done" style="flex:112"></i><i style="flex:8"></i></div><small>Batch 25 · from Farrowing room 3</small></div>';
     const list = U.heading({ title: 'Pens', icon: ic('grid'), kind: 'section', level: 3 })
       + U.rowGroup(pen('N1', '15', 'Put in') + pen('N2', '15', 'Put in') + pen('N3', '14', 'Put in · 1 with ear tag') + pen('N4', '16', 'Put in') + pen('N5', '15', 'Put in') + pen('N6', '15', 'Put in') + pen('N7', '12', 'Put in') + pen('N8', '10', 'Put in') + pen('N9', '', 'Empty'));
     const left = '<div class="m-left"><strong>8 still to come</strong><small>120 sent</small></div>';
