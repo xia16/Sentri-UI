@@ -49,99 +49,40 @@
       </button>
     </sc-if>
 
-    <!-- A pig met through a batch remains a sub-page on the right. -->
-    <sc-if value="{{showProf}}" hint-placeholder-val="{{false}}">
+    <!-- One pig component: the location card, or a sub-page of the batch on the right. -->
+    <sc-if value="{{showProf}}">
       <section aria-label="{{prof.aria}}" style="{{prof.style}}">
-        <div style="flex: none; display: flex; align-items: flex-start; gap: 4px; padding: 16px 8px 12px 16px">
-          <div style="flex: 1 1 auto; min-width: 0">
-            <sc-if value="{{prof.hasBack}}"><button type="button" onClick="{{prof.back}}" style="height: 44px; padding: 0; border: 0; background: transparent; color: #626C66; font: inherit; font-size: 14px; cursor: pointer">‹ {{prof.backLabel}}</button></sc-if>
-            <div style="display: flex; align-items: center; gap: 10px; min-width: 0">
-              <span style="{{prof.titleStyle}}">{{prof.title}}</span>
-              <sc-if value="{{prof.hasChip}}" hint-placeholder-val="{{false}}"><span style="{{prof.chipStyle}}">{{prof.chip}}</span></sc-if>
-            </div>
-            <div style="margin-top: 2px; font-size: 12.5px; line-height: 18px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{prof.sub}}</div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px; min-width: 0">
-              <sc-if value="{{prof.hasStage}}" hint-placeholder-val="{{true}}"><span style="min-width: 0; font-size: 14px; line-height: 20px; color: #121815; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{prof.stage}}</span></sc-if>
-              <sc-if value="{{prof.hasBatch}}" hint-placeholder-val="{{false}}">
-                <button type="button" onClick="{{prof.openBatch}}" aria-label="{{prof.batchAria}}" style="{{prof.batchStyle}}">{{prof.batch}}<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg></button>
-              </sc-if>
-            </div>
-            <sc-if value="{{prof.hasChip}}" hint-placeholder-val="{{false}}"><div style="{{prof.whyStyle}}">{{prof.why}}</div></sc-if>
+        <div style="flex: none; padding: 6px 16px 12px">
+          <button type="button" onClick="{{prof.back}}" style="{{prof.backStyle}}">‹ {{prof.backLabel}}</button>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span style="{{prof.titleStyle}}">{{prof.title}}</span>
+            <sc-if value="{{prof.left}}"><button type="button" onClick="{{P.toggle}}" aria-label="{{P.toggleAria}}" aria-expanded="{{P.cardOpen}}" style="{{P.toggleStyle}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="{{P.chevStyle}}"><path d="{{ic.chevD}}"></path></svg></button></sc-if>
           </div>
-          <button type="button" onClick="{{prof.close}}" aria-label="Close the pig profile" style="{{iconBtn}} flex: none; margin-top: -3px">
-            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M18 6 6 18 M6 6l12 12"></path></svg>
-          </button>
+          <sc-if value="{{prof.main}}">
+            <div style="font-size: 14px; line-height: 21px; margin-top: 4px; color: #4A544E">{{prof.identity}}</div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px; flex-wrap: wrap; font-size: 13px; color: #626C66"><span>{{prof.penLine}}</span><sc-if value="{{prof.hasBatch}}"><button type="button" onClick="{{prof.openBatch}}" aria-label="{{prof.batchAria}}" style="{{prof.batchStyle}}">{{prof.batch}} ›</button></sc-if></div>
+          </sc-if>
         </div>
-        <div style="flex: 1 1 auto; min-height: 0; overflow-y: auto; border-top: 1px solid #EEF0EC">
-          <sc-if value="{{prof.feedOn}}" hint-placeholder-val="{{false}}">
-            <div style="position: relative; margin: 12px 16px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px; background: #0E1411">
-              <canvas ref="{{setCamCv}}" width="640" height="360" role="img" aria-label="{{camAria}}" style="display: block; width: 100%; height: 100%; background: #0E1411"></canvas>
-              <div style="position: absolute; left: 8px; top: 8px; max-width: calc(100% - 64px); height: 28px; box-sizing: border-box; padding: 0 10px; border-radius: 8px; background: rgba(8, 12, 10, 0.55); color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; line-height: 28px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{camName}}</div>
-              <button type="button" onClick="{{closeCam}}" aria-label="Close the camera view" style="position: absolute; right: 4px; top: 4px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; background: rgba(8, 12, 10, 0.55); color: #FFFFFF; cursor: pointer">
-                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.x}}"></path></svg>
-              </button>
-              <div style="position: absolute; left: 8px; bottom: 8px; height: 28px; box-sizing: border-box; padding: 0 10px; border-radius: 8px; background: rgba(8, 12, 10, 0.55); display: flex; align-items: center; gap: 7px; color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; line-height: 16px">
-                <span style="width: 8px; height: 8px; border-radius: 4px; background: #E5483A"></span>
-                <span ref="{{setCamClock}}">{{camClock}}</span>
-              </div>
-            </div>
-          </sc-if>
-          <sc-if value="{{prof.canWatchBtn}}" hint-placeholder-val="{{false}}">
-            <div style="padding: 12px 16px">
-              <button type="button" onClick="{{prof.watch}}" style="{{prof.watchStyle}}">
-                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.cam}}"></path></svg>
-                Watch this pen
-              </button>
-            </div>
-          </sc-if>
-          <sc-if value="{{prof.empty}}" hint-placeholder-val="{{false}}">
-            <div style="padding: 16px; font-size: 14px; line-height: 21px; color: #4A544E">{{prof.emptyNote}}</div>
-          </sc-if>
-          <sc-for list="{{prof.sections}}" as="s" hint-placeholder-count="6">
-            <div style="border-top: 1px solid #EEF0EC; margin-top: -1px">
-              <button type="button" onClick="{{s.toggle}}" aria-expanded="{{s.open}}" style="width: 100%; min-height: 52px; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 0 16px; border: 0; background: transparent; font: inherit; color: #121815; text-align: left; cursor: pointer">
-                <span style="flex: none; font-size: 14px; font-weight: 600">{{s.title}}</span>
-                <span style="flex: 1 1 auto; min-width: 0; text-align: right; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{s.sum}}</span>
-                <sc-if value="{{s.hasSpark}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="flex: none; display: inline-flex; align-items: flex-end; gap: 2px; height: 12px"><sc-for list="{{s.spark}}" as="b" hint-placeholder-count="5"><span style="{{b}}"></span></sc-for></span></sc-if>
-                <svg viewBox="0 0 24 24" aria-hidden="true" style="{{s.chevStyle}}"><path d="{{ic.chevD}}"></path></svg>
-              </button>
-              <sc-if value="{{s.open}}" hint-placeholder-val="{{false}}">
-                <div style="padding: 0 16px 16px">
-                  <sc-if value="{{s.isWait}}" hint-placeholder-val="{{false}}">
-                    <sc-for list="{{s.waits}}" as="w" hint-placeholder-count="2">
-                      <div style="display: flex; align-items: baseline; gap: 12px; min-height: 28px; font-size: 13px; line-height: 20px">
-                        <span style="flex: none; min-width: 52px; color: #626C66; white-space: nowrap">{{w.w}}</span>
-                        <span style="min-width: 0">{{w.t}}</span>
-                      </div>
-                    </sc-for>
-                    <sc-if value="{{s.hasDec}}" hint-placeholder-val="{{false}}">
-                      <button type="button" onClick="{{s.openDec}}" style="width: 100%; min-height: 44px; margin-top: 6px; box-sizing: border-box; display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid #E3E6E1; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13.5px; color: #121815; text-align: left; cursor: pointer">
-                        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M9 11l3 3L22 4 M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                        <span style="flex: 1 1 auto; min-width: 0"><span style="color: #626C66">In a decision:</span> {{s.dec}}</span>
-                        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg>
-                      </button>
-                    </sc-if>
-                  </sc-if>
-                  <sc-if value="{{s.isRows}}" hint-placeholder-val="{{false}}">
-                    <sc-for list="{{s.rows}}" as="r" hint-placeholder-count="3">
-                      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; min-height: 28px; font-size: 13px; line-height: 20px">
-                        <span style="color: #626C66; flex: none">{{r.k}}</span>
-                        <span style="font-weight: 500; text-align: right; min-width: 0">{{r.v}}</span>
-                      </div>
-                    </sc-for>
-                  </sc-if>
-                  <sc-if value="{{s.isPigs}}" hint-placeholder-val="{{false}}">
-                    <sc-for list="{{s.pigs}}" as="g" hint-placeholder-count="6">
-                      <button type="button" onClick="{{g.toggle}}" aria-label="{{g.aria}}" style="{{g.style}}">
-                        <sc-if value="{{g.tick}}" hint-placeholder-val="{{false}}">
-                          <span style="{{g.boxStyle}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg></span>
-                        </sc-if>
-                        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600">{{g.tag}}</span>
-                        <span style="flex: 1 1 auto; min-width: 0; font-size: 12.5px; color: #8A5A12; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{g.note}}</span>
-                        <span style="flex: none; font-size: 13px; color: #4A544E">{{g.w}}</span>
-                      </button>
-                    </sc-for>
-                  </sc-if>
+        <sc-if value="{{prof.bodyOpen}}">
+          <div ref="{{setPigBody}}" style="flex: 0 1 auto; min-height: 0; overflow-y: auto; border-top: 1px solid #EEF0EC">
+            <sc-if value="{{prof.empty}}"><div style="padding: 16px; color: #626C66">{{prof.emptyNote}}</div></sc-if>
+            <sc-if value="{{prof.main}}">
+              <sc-if value="{{prof.group}}"><div style="padding: 10px 16px"><div style="{{loc.headStyle}}">Pigs here</div><sc-for list="{{prof.pigs}}" as="g"><button type="button" onClick="{{g.open}}" aria-label="{{g.aria}}" style="{{loc.readStyle}}"><span style="flex: 1; min-width: 0">{{g.label}}<span style="display: block; color: #626C66; font-size: 12.5px">{{g.status}}</span></span><span>›</span></button></sc-for></div></sc-if>
+              <sc-if value="{{prof.hasRunning}}"><div style="padding: 12px 16px"><div style="{{loc.headStyle}}">Running task</div><sc-for list="{{prof.running}}" as="t"><button type="button" onClick="{{t.open}}" aria-label="{{t.aria}}" style="{{prof.taskStyle}}"><span style="display: flex; align-items: center; gap: 8px; font-weight: 600"><span style="flex: 1">{{t.title}}</span><span style="color: #626C66">›</span></span><span style="display: flex; align-items: baseline; gap: 8px; margin-top: 8px"><span style="{{t.swatch}}"></span><span style="font-size: 13px; line-height: 20px; color: #4A544E">{{t.record}}</span></span></button></sc-for></div></sc-if>
+              <sc-if value="{{prof.hasWait}}"><div style="padding: 10px 16px 12px; border-top: 1px solid #EEF0EC"><div style="{{loc.headStyle}}">Waiting on someone</div><sc-for list="{{prof.waits}}" as="w"><div style="{{prof.taskStyle}}"><div style="font-size: 12.5px; color: #626C66">{{w.w}}</div><div>{{w.t}}</div></div></sc-for><sc-if value="{{prof.hasDec}}"><button type="button" onClick="{{prof.openDec}}" style="{{prof.taskStyle}}"><span style="color: #626C66">In a decision: </span>{{prof.decision}} ›</button></sc-if></div></sc-if>
+              <sc-if value="{{prof.hasHealth}}"><div style="padding: 10px 16px 14px; border-top: 1px solid #EEF0EC"><div style="{{loc.headStyle}}">Health</div><div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px"><sc-for list="{{prof.tags}}" as="t"><span style="padding: 3px 8px; border: 1px solid #DCE0DA; border-radius: 6px; font-size: 13px; color: #4A544E">{{t}}</span></sc-for></div><sc-if value="{{prof.hasTreatment}}"><div style="margin-top: 8px; font-size: 14px; line-height: 21px">{{prof.treatment}}</div></sc-if></div></sc-if>
+              <sc-if value="{{prof.hasNotes}}"><div style="padding: 10px 16px 12px; border-top: 1px solid #EEF0EC"><div style="{{loc.headStyle}}">Notes</div><sc-for list="{{prof.notes}}" as="n"><div style="padding: 5px 0; font-size: 14px; line-height: 21px">{{n.t}}</div></sc-for></div></sc-if>
+              <sc-if value="{{prof.hasMore}}"><div style="padding: 10px 16px 4px; border-top: 1px solid #EEF0EC"><div style="{{loc.headStyle}}">Read more</div><sc-for list="{{prof.more}}" as="r"><button type="button" onClick="{{r.open}}" aria-label="{{r.aria}}" style="{{loc.readStyle}}"><span style="flex: 1">{{r.title}}</span><span style="color: #626C66">›</span></button></sc-for></div></sc-if>
+              <sc-if value="{{prof.feedOn}}">
+                <div style="position: relative; margin: 12px 16px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px; background: #0E1411"><canvas ref="{{setCamCv}}" width="640" height="360" role="img" aria-label="{{camAria}}" style="display: block; width: 100%; height: 100%"></canvas><button type="button" onClick="{{closeCam}}" aria-label="Close the camera view" style="position: absolute; top: 4px; right: 4px; min-width: 44px; min-height: 44px; border: 0; border-radius: 8px; background: rgba(8,12,10,.65); color: white; font: inherit; cursor: pointer">‹ Back</button><span ref="{{setCamClock}}" style="position: absolute; bottom: 8px; left: 8px; color: white; font-size: 12px">{{camClock}}</span></div>
+              </sc-if>
+              <sc-if value="{{prof.canWatchBtn}}"><div style="padding: 4px 16px 12px"><button type="button" onClick="{{prof.watch}}" style="{{prof.watchStyle}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2"><path d="{{ic.cam}}"></path></svg>Watch this pen</button></div></sc-if>
+              <sc-if value="{{prof.left}}"><sc-if value="{{loc.hasEquipment}}"><div ref="{{setLocEquipment}}" style="padding: 10px 16px 12px; border-top: 1px solid #EEF0EC"><div style="{{loc.headStyle}}">Equipment</div><sc-for list="{{loc.equipment}}" as="d"><div style="min-height: 56px; display: flex; align-items: center; gap: 10px; padding: 4px 0"><span style="flex: 1; min-width: 0">{{d.name}}<span style="display: block; font-size: 12.5px; color: #626C66">{{d.state}}</span></span><span style="font-size: 12.5px; color: #626C66">Preview</span></div></sc-for></div></sc-if></sc-if>
+            </sc-if>
+            <sc-for list="{{prof.sections}}" as="s">
+              <div style="padding: 16px">
+                <sc-if value="{{s.hasEmpty}}"><div style="font-size: 14px; line-height: 21px; color: #626C66">{{s.empty}}</div></sc-if>
+                <sc-if value="{{s.isRows}}"><sc-for list="{{s.rows}}" as="r"><div style="padding: 8px 0; border-bottom: 1px solid #EEF0EC; font-size: 14px; line-height: 21px"><div style="font-weight: 500">{{r.k}}</div><div style="color: #626C66">{{r.v}}</div></div></sc-for></sc-if>
                   <sc-if value="{{s.isLit}}" hint-placeholder-val="{{false}}">
                     <div style="display: flex; align-items: flex-end; gap: 16px; padding-top: 6px; overflow-x: auto">
                       <sc-for list="{{s.bars}}" as="b" hint-placeholder-count="4">
@@ -157,22 +98,6 @@
                     <div style="display: flex; align-items: center; gap: 14px; margin-top: 8px; font-size: 12px; color: #4A544E">
                       <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #2E3832"></span>Born alive</span>
                       <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #A9B3AB"></span>Weaned</span>
-                    </div>
-                  </sc-if>
-                  <sc-if value="{{s.isHealth}}" hint-placeholder-val="{{false}}">
-                    <svg viewBox="0 0 388 32" aria-hidden="true" style="display: block; width: 100%; height: auto; overflow: visible">
-                      <path d="{{s.d1}}" style="fill: none; stroke: #D3D8D0; stroke-width: 2; stroke-linecap: round"></path>
-                      <path d="{{s.d2}}" style="fill: #2E3832; stroke: none"></path>
-                      <path d="{{s.d3}}" style="fill: #B3261E; stroke: none"></path>
-                    </svg>
-                    <div style="display: flex; justify-content: space-between; margin-top: 2px; font-size: 11.5px; color: #7C857F"><span>{{s.axisL}}</span><span>{{s.axisR}}</span></div>
-                    <div style="margin-top: 8px">
-                      <sc-for list="{{s.events}}" as="e" hint-placeholder-count="3">
-                        <div style="display: flex; align-items: baseline; gap: 12px; min-height: 28px; font-size: 13px; line-height: 20px">
-                          <span style="flex: none; width: 52px; color: #626C66">{{e.w}}</span>
-                          <span style="{{e.style}}">{{e.t}}</span>
-                        </div>
-                      </sc-for>
                     </div>
                   </sc-if>
                   <sc-if value="{{s.isWeight}}" hint-placeholder-val="{{false}}">
@@ -199,28 +124,12 @@
                       <sc-if value="{{s.hasLg2}}" hint-placeholder-val="{{false}}"><span style="color: #A33A2B; font-weight: 500">{{s.lg2}}</span></sc-if>
                     </div>
                   </sc-if>
-                  <sc-if value="{{s.isNotes}}" hint-placeholder-val="{{false}}">
-                    <sc-for list="{{s.notes}}" as="n" hint-placeholder-count="2">
-                      <div style="display: flex; align-items: baseline; gap: 12px; padding: 4px 0; font-size: 13px; line-height: 19px">
-                        <span style="flex: none; width: 52px; color: #626C66">{{n.w}}</span>
-                        <span style="{{n.style}}">{{n.t}}</span>
-                      </div>
-                    </sc-for>
-                    <sc-if value="{{s.hasEmpty}}" hint-placeholder-val="{{false}}"><div style="font-size: 13px; line-height: 19px; color: #626C66">{{s.empty}}</div></sc-if>
-                  </sc-if>
-                  <sc-if value="{{s.isMoves}}" hint-placeholder-val="{{false}}">
-                    <sc-for list="{{s.moves}}" as="mv" hint-placeholder-count="2">
-                      <div style="display: flex; align-items: baseline; gap: 12px; min-height: 28px; font-size: 13px; line-height: 20px">
-                        <span style="flex: none; width: 52px; color: #626C66">{{mv.w}}</span>
-                        <span>{{mv.t}}</span>
-                      </div>
-                    </sc-for>
-                  </sc-if>
-                </div>
-              </sc-if>
-            </div>
-          </sc-for>
-        </div>
+
+                <sc-if value="{{s.isLog}}"><sc-for list="{{s.events}}" as="e"><div style="padding: 10px 0; border-bottom: 1px solid #EEF0EC; font-size: 14px; line-height: 21px"><div>{{e.t}}</div><div style="font-size: 12.5px; color: #626C66">{{e.meta}}</div></div></sc-for></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
       </section>
     </sc-if>
 
@@ -505,166 +414,12 @@
             </sc-if>
             <sc-if value="{{loc.hasGroup}}">
               <div style="padding: 10px 16px; border-top: 1px solid #EEF0EC">
-                <div style="{{loc.headStyle}}">Pigs here · {{loc.groupCount}}</div>
+                <div style="font-size: 14px; line-height: 21px; color: #4A544E">{{prof.identity}}</div>
+                <sc-if value="{{prof.hasBatch}}"><button type="button" onClick="{{prof.openBatch}}" aria-label="{{prof.batchAria}}" style="{{prof.batchStyle}}">{{prof.batch}} ›</button></sc-if>
+                <div style="{{loc.headStyle}}; margin-top: 10px">Pigs here · {{loc.groupCount}}</div>
                 <sc-for list="{{loc.pigs}}" as="g"><button type="button" onClick="{{g.open}}" aria-label="{{g.aria}}" style="{{loc.readStyle}}"><span style="flex: 1; min-width: 0; text-align: left"><span style="display: block">{{g.label}}</span><span style="display: block; font-size: 12.5px; color: #626C66">{{g.status}}</span></span><sc-if value="{{g.flagged}}"><span aria-label="Flagged" style="width: 7px; height: 7px; border-radius: 50%; background: #C28A33"></span></sc-if><span style="color: #626C66">›</span></button></sc-for>
               </div>
             </sc-if>
-            <sc-if value="{{loc.hasProfile}}"><div style="padding: 0 16px 12px; font-size: 14px">
-  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span style="font-size: 16px; font-weight: 600">{{prof.title}}</span><sc-if value="{{prof.hasChip}}"><span style="{{prof.chipStyle}}">{{prof.chip}}</span></sc-if></div>
-  <div style="font-size: 12.5px; color: #626C66; margin-top: 4px">{{prof.sub}}</div>
-  <div style="margin-top: 6px">{{prof.stage}}</div>
-  <sc-if value="{{prof.hasBatch}}"><button type="button" onClick="{{prof.openBatch}}" aria-label="{{prof.batchAria}}" style="height: 44px; padding: 0; border: 0; background: transparent; color: #4A544E; font: inherit; cursor: pointer">{{prof.batch}} ›</button></sc-if>
-  <sc-if value="{{prof.hasChip}}"><div style="{{prof.whyStyle}}">{{prof.why}}</div></sc-if>
-</div>        <div style="min-height: 0; border-top: 1px solid #EEF0EC">
-          <sc-if value="{{prof.feedOn}}" hint-placeholder-val="{{false}}">
-            <div style="position: relative; margin: 12px 16px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px; background: #0E1411">
-              <canvas ref="{{setCamCv}}" width="640" height="360" role="img" aria-label="{{camAria}}" style="display: block; width: 100%; height: 100%; background: #0E1411"></canvas>
-              <div style="position: absolute; left: 8px; top: 8px; max-width: calc(100% - 64px); height: 28px; box-sizing: border-box; padding: 0 10px; border-radius: 8px; background: rgba(8, 12, 10, 0.55); color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; line-height: 28px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{camName}}</div>
-              <button type="button" onClick="{{closeCam}}" aria-label="Close the camera view" style="position: absolute; right: 4px; top: 4px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; background: rgba(8, 12, 10, 0.55); color: #FFFFFF; cursor: pointer">
-                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.x}}"></path></svg>
-              </button>
-              <div style="position: absolute; left: 8px; bottom: 8px; height: 28px; box-sizing: border-box; padding: 0 10px; border-radius: 8px; background: rgba(8, 12, 10, 0.55); display: flex; align-items: center; gap: 7px; color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; line-height: 16px">
-                <span style="width: 8px; height: 8px; border-radius: 4px; background: #E5483A"></span>
-                <span ref="{{setCamClock}}">{{camClock}}</span>
-              </div>
-            </div>
-          </sc-if>
-          <sc-if value="{{prof.canWatchBtn}}" hint-placeholder-val="{{false}}">
-            <div style="padding: 12px 16px">
-              <button type="button" onClick="{{prof.watch}}" style="width: 100%; min-height: 44px; display: flex; align-items: center; gap: 8px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 14px; color: #4A544E; cursor: pointer">
-                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.cam}}"></path></svg>
-                Watch this pen
-              </button>
-            </div>
-          </sc-if>
-          <sc-if value="{{prof.empty}}" hint-placeholder-val="{{false}}">
-            <div style="padding: 16px; font-size: 14px; line-height: 21px; color: #4A544E">{{prof.emptyNote}}</div>
-          </sc-if>
-          <sc-for list="{{prof.sections}}" as="s" hint-placeholder-count="6">
-            <div style="border-top: 1px solid #EEF0EC; margin-top: -1px">
-              <button type="button" onClick="{{s.toggle}}" aria-expanded="{{s.open}}" style="width: 100%; min-height: 52px; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 0 16px; border: 0; background: transparent; font: inherit; color: #121815; text-align: left; cursor: pointer">
-                <span style="flex: none; font-size: 12.5px; font-weight: 500; color: #626C66">{{s.title}}</span>
-                <span style="flex: 1 1 auto; min-width: 0; text-align: right; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{s.sum}}</span>
-                <sc-if value="{{s.hasSpark}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="flex: none; display: inline-flex; align-items: flex-end; gap: 2px; height: 12px"><sc-for list="{{s.spark}}" as="b" hint-placeholder-count="5"><span style="{{b}}"></span></sc-for></span></sc-if>
-                <svg viewBox="0 0 24 24" aria-hidden="true" style="{{s.chevStyle}}"><path d="{{ic.chevD}}"></path></svg>
-              </button>
-              <sc-if value="{{s.open}}" hint-placeholder-val="{{false}}">
-                <div style="padding: 0 16px 16px">
-                  <sc-if value="{{s.isWait}}" hint-placeholder-val="{{false}}">
-                    <sc-for list="{{s.waits}}" as="w" hint-placeholder-count="2">
-                      <div style="display: flex; align-items: baseline; gap: 12px; min-height: 28px; font-size: 14px; line-height: 20px">
-                        <span style="flex: none; min-width: 52px; color: #626C66; white-space: nowrap">{{w.w}}</span>
-                        <span style="min-width: 0">{{w.t}}</span>
-                      </div>
-                    </sc-for>
-                    <sc-if value="{{s.hasDec}}" hint-placeholder-val="{{false}}">
-                      <button type="button" onClick="{{s.openDec}}" style="width: 100%; min-height: 44px; margin-top: 6px; box-sizing: border-box; display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 14px; color: #121815; text-align: left; cursor: pointer">
-                        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M9 11l3 3L22 4 M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                        <span style="flex: 1 1 auto; min-width: 0"><span style="color: #626C66">In a decision:</span> {{s.dec}}</span>
-                        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg>
-                      </button>
-                    </sc-if>
-                  </sc-if>
-                  <sc-if value="{{s.isRows}}" hint-placeholder-val="{{false}}">
-                    <sc-for list="{{s.rows}}" as="r" hint-placeholder-count="3">
-                      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; min-height: 28px; font-size: 14px; line-height: 20px">
-                        <span style="color: #626C66; flex: none">{{r.k}}</span>
-                        <span style="font-weight: 500; text-align: right; min-width: 0">{{r.v}}</span>
-                      </div>
-                    </sc-for>
-                  </sc-if>
-                  <sc-if value="{{s.isPigs}}" hint-placeholder-val="{{false}}">
-                    <sc-for list="{{s.pigs}}" as="g" hint-placeholder-count="6">
-                      <button type="button" onClick="{{g.toggle}}" aria-label="{{g.aria}}" style="{{g.style}}">
-                        <sc-if value="{{g.tick}}" hint-placeholder-val="{{false}}">
-                          <span style="{{g.boxStyle}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg></span>
-                        </sc-if>
-                        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 600">{{g.tag}}</span>
-                        <span style="flex: 1 1 auto; min-width: 0; font-size: 12.5px; color: #8A5A12; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{g.note}}</span>
-                        <span style="flex: none; font-size: 14px; color: #4A544E">{{g.w}}</span>
-                      </button>
-                    </sc-for>
-                  </sc-if>
-                  <sc-if value="{{s.isLit}}" hint-placeholder-val="{{false}}">
-                    <div style="display: flex; align-items: flex-end; gap: 16px; padding-top: 6px; overflow-x: auto">
-                      <sc-for list="{{s.bars}}" as="b" hint-placeholder-count="4">
-                        <div style="flex: none; display: flex; flex-direction: column; align-items: center; gap: 5px">
-                          <div style="display: flex; align-items: flex-end; gap: 3px; height: 62px">
-                            <div style="{{b.s1}}"></div>
-                            <div style="{{b.s2}}"></div>
-                          </div>
-                          <span style="font-size: 11.5px; color: #626C66">{{b.label}}</span>
-                        </div>
-                      </sc-for>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 14px; margin-top: 8px; font-size: 12px; color: #4A544E">
-                      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #2E3832"></span>Born alive</span>
-                      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #A9B3AB"></span>Weaned</span>
-                    </div>
-                  </sc-if>
-                  <sc-if value="{{s.isHealth}}" hint-placeholder-val="{{false}}">
-                    <svg viewBox="0 0 388 32" aria-hidden="true" style="display: block; width: 100%; height: auto; overflow: visible">
-                      <path d="{{s.d1}}" style="fill: none; stroke: #D3D8D0; stroke-width: 2; stroke-linecap: round"></path>
-                      <path d="{{s.d2}}" style="fill: #2E3832; stroke: none"></path>
-                      <path d="{{s.d3}}" style="fill: #B3261E; stroke: none"></path>
-                    </svg>
-                    <div style="display: flex; justify-content: space-between; margin-top: 2px; font-size: 11.5px; color: #7C857F"><span>{{s.axisL}}</span><span>{{s.axisR}}</span></div>
-                    <div style="margin-top: 8px">
-                      <sc-for list="{{s.events}}" as="e" hint-placeholder-count="3">
-                        <div style="display: flex; align-items: baseline; gap: 12px; min-height: 28px; font-size: 14px; line-height: 20px">
-                          <span style="flex: none; width: 52px; color: #626C66">{{e.w}}</span>
-                          <span style="{{e.style}}">{{e.t}}</span>
-                        </div>
-                      </sc-for>
-                    </div>
-                  </sc-if>
-                  <sc-if value="{{s.isWeight}}" hint-placeholder-val="{{false}}">
-                    <svg viewBox="0 0 388 76" aria-hidden="true" style="display: block; width: 100%; height: auto; overflow: visible">
-                      <path d="{{s.d2}}" style="fill: none; stroke: #A9B3AB; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"></path>
-                      <path d="{{s.d1}}" style="fill: none; stroke: #121815; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path>
-                      <path d="{{s.d3}}" style="fill: #121815; stroke: none"></path>
-                    </svg>
-                    <div style="display: flex; justify-content: space-between; margin-top: 2px; font-size: 11.5px; color: #7C857F"><span>{{s.axisL}}</span><span>{{s.axisR}}</span></div>
-                    <div style="display: flex; align-items: center; gap: 14px; margin-top: 8px; font-size: 12.5px; color: #2E3832">
-                      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 14px; height: 2px; background: #121815"></span>{{s.lg1}}</span>
-                      <sc-if value="{{s.hasLg2}}" hint-placeholder-val="{{false}}"><span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 14px; height: 2px; background: #A9B3AB"></span>{{s.lg2}}</span></sc-if>
-                    </div>
-                  </sc-if>
-                  <sc-if value="{{s.isFeed}}" hint-placeholder-val="{{false}}">
-                    <svg viewBox="0 0 388 56" aria-hidden="true" style="display: block; width: 100%; height: auto; overflow: visible">
-                      <path d="{{s.d2}}" style="fill: #EEF0EC; stroke: none"></path>
-                      <path d="{{s.d1}}" style="fill: none; stroke: #121815; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path>
-                      <path d="{{s.d3}}" style="{{s.dotStyle}}"></path>
-                    </svg>
-                    <div style="display: flex; justify-content: space-between; margin-top: 2px; font-size: 11.5px; color: #7C857F"><span>{{s.axisL}}</span><span>{{s.axisR}}</span></div>
-                    <div style="display: flex; align-items: center; gap: 14px; margin-top: 8px; font-size: 12.5px; color: #2E3832">
-                      <span>{{s.lg1}}</span>
-                      <sc-if value="{{s.hasLg2}}" hint-placeholder-val="{{false}}"><span style="color: #A33A2B; font-weight: 500">{{s.lg2}}</span></sc-if>
-                    </div>
-                  </sc-if>
-                  <sc-if value="{{s.isNotes}}" hint-placeholder-val="{{false}}">
-                    <sc-for list="{{s.notes}}" as="n" hint-placeholder-count="2">
-                      <div style="display: flex; align-items: baseline; gap: 12px; padding: 4px 0; font-size: 14px; line-height: 19px">
-                        <span style="flex: none; width: 52px; color: #626C66">{{n.w}}</span>
-                        <span style="{{n.style}}">{{n.t}}</span>
-                      </div>
-                    </sc-for>
-                    <sc-if value="{{s.hasEmpty}}" hint-placeholder-val="{{false}}"><div style="font-size: 14px; line-height: 19px; color: #626C66">{{s.empty}}</div></sc-if>
-                  </sc-if>
-                  <sc-if value="{{s.isMoves}}" hint-placeholder-val="{{false}}">
-                    <sc-for list="{{s.moves}}" as="mv" hint-placeholder-count="2">
-                      <div style="display: flex; align-items: baseline; gap: 12px; min-height: 28px; font-size: 14px; line-height: 20px">
-                        <span style="flex: none; width: 52px; color: #626C66">{{mv.w}}</span>
-                        <span>{{mv.t}}</span>
-                      </div>
-                    </sc-for>
-                  </sc-if>
-                </div>
-              </sc-if>
-            </div>
-          </sc-for>
-        </div>
-</sc-if>
             <sc-if value="{{loc.hasEquipment}}">
               <div ref="{{setLocEquipment}}" style="padding: 10px 16px 12px; border-top: 1px solid #EEF0EC">
                 <div style="{{loc.headStyle}}">Equipment</div>
@@ -1400,7 +1155,7 @@
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["locroom","locpen","locgroup","locfilter","saved","view","batchlist","viewbatch","viewbatchtask","actionsmenu","pigwaiting","devicesetup","devicefeeder","devicepens","addpens","typepicker","newtypeinline","ungroupsel","viewroom","picked","addmenu","typemanager","device","devicenew","viewpen","viewcam","editfromview","doneask","endrow","sickview","doors","movezone","night","intronight","introroom","introgest","introlist","introcam","intropen","zone","section","room","lane","pentype","place","select","newsection","confirm","draw","drawn","drawing","roomsize","roomedit","repeat","shape","fit","removed","intro","start","draft","pens","ready","sickroom","grouped","dup","plan","edit","mixed","grouptype","farm-acres","farm-groupgest","farm-weaner","farm-sketch"],"default":"saved"},"$preview":{"width":1360,"height":830}}'>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["pigsow","piggilt","pigsub","pigbatch","locroom","locpen","locgroup","locfilter","saved","view","batchlist","viewbatch","viewbatchtask","actionsmenu","pigwaiting","devicesetup","devicefeeder","devicepens","addpens","typepicker","newtypeinline","ungroupsel","viewroom","picked","addmenu","typemanager","device","devicenew","viewpen","viewcam","editfromview","doneask","endrow","sickview","doors","movezone","night","intronight","introroom","introgest","introlist","introcam","intropen","zone","section","room","lane","pentype","place","select","newsection","confirm","draw","drawn","drawing","roomsize","roomedit","repeat","shape","fit","removed","intro","start","draft","pens","ready","sickroom","grouped","dup","plan","edit","mixed","grouptype","farm-acres","farm-groupgest","farm-weaner","farm-sketch"],"default":"saved"},"$preview":{"width":1360,"height":830}}'>
 // <inlined>
 const LAYOUT_ENGINE = (function () {
 // Layout engine: the farm as a plain document (JSON, centimetres) and every rule that turns it into geometry.
@@ -3579,7 +3334,7 @@ class Component extends DCLogic {
   snapshot() { const m = this.M(); return { zones: this.clone(m.zones), sections: this.clone(m.sections), rooms: this.clone(m.rooms), types: this.clone(m.types) }; }
   // ---------- states ----------
   eff(start) {
-    const alias = { locroom: 'saved', locpen: 'saved', locgroup: 'saved', locfilter: 'saved', addmenu: 'room', typemanager: 'room', device: 'room', devicenew: 'room', devicefeeder: 'room', devicepens: 'room', devicesetup: 'room', picked: 'saved', view: 'saved', viewroom: 'saved', viewpen: 'saved', viewcam: 'saved', editfromview: 'saved', doneask: 'saved', viewbatch: 'saved', viewbatchtask: 'saved', batchlist: 'saved', actionsmenu: 'saved', pigwaiting: 'saved', addpens: 'lane', typepicker: 'lane', newtypeinline: 'lane', ungroupsel: 'saved', draw: 'sickview', drawn: 'sickview', drawing: 'sickview', intronight: 'intro', introroom: 'intro', introgest: 'intro', introlist: 'intro', introcam: 'intro', intropen: 'intro', night: 'saved', farm: 'saved', record: 'saved', empty: 'intro', structure: 'draft', filling: 'draft', pentypes: 'pens', complete: 'ready', sick: 'sickroom', roomnew: 'pentype', paint: 'pentype', canvas: 'section', top: 'plan', mixed: 'lane', grouptype: 'pentype' };
+    const alias = { pigsow: 'saved', piggilt: 'saved', pigsub: 'saved', pigbatch: 'saved', locroom: 'saved', locpen: 'saved', locgroup: 'saved', locfilter: 'saved', addmenu: 'room', typemanager: 'room', device: 'room', devicenew: 'room', devicefeeder: 'room', devicepens: 'room', devicesetup: 'room', picked: 'saved', view: 'saved', viewroom: 'saved', viewpen: 'saved', viewcam: 'saved', editfromview: 'saved', doneask: 'saved', viewbatch: 'saved', viewbatchtask: 'saved', batchlist: 'saved', actionsmenu: 'saved', pigwaiting: 'saved', addpens: 'lane', typepicker: 'lane', newtypeinline: 'lane', ungroupsel: 'saved', draw: 'sickview', drawn: 'sickview', drawing: 'sickview', intronight: 'intro', introroom: 'intro', introgest: 'intro', introlist: 'intro', introcam: 'intro', intropen: 'intro', night: 'saved', farm: 'saved', record: 'saved', empty: 'intro', structure: 'draft', filling: 'draft', pentypes: 'pens', complete: 'ready', sick: 'sickroom', roomnew: 'pentype', paint: 'pentype', canvas: 'section', top: 'plan', mixed: 'lane', grouptype: 'pentype' };
     const ok = ['doors', 'movezone', 'saved', 'zone', 'section', 'room', 'lane', 'pentype', 'place', 'select', 'newsection', 'confirm', 'sickview', 'endrow', 'shape', 'fit', 'removed', 'roomsize', 'roomedit', 'repeat', 'intro', 'start', 'draft', 'pens', 'ready', 'sickroom', 'grouped', 'dup', 'plan', 'edit'];
     return ok.indexOf(start) >= 0 ? start : (alias[start] || 'saved');
   }
@@ -3593,7 +3348,7 @@ class Component extends DCLogic {
       nn: null, cf: null, dupT: null, mvT: false, chT: false, ptList: false, devT: null, ed: null, arT: null, fresh: null, hv: null, moreOpen: false,
       ah: '', lens: false, sz: null, hn: 0, cc: false, bh: 0, sw: 0, fold: '', night: false, reshape: false, cm: null, addDoor: false,
       ip: '', rec: false, lh: '', icam: null, lst: true,
-      vf: null, locPig: null, locUnit: false, vm: 'edit', psel: [], gsel: [], sm: false, vt: null, dn: false, dp: '', dvE: null, bv: null, bfold: {}, bl: false, bdone: false, bfig: '', nl: -1, ask: false, askIn: '', pfold: {}
+      vf: null, locPig: null, pigPage: '', locUnit: false, vm: 'edit', psel: [], gsel: [], sm: false, vt: null, dn: false, dp: '', dvE: null, bv: null, bfold: {}, bl: false, bdone: false, bfig: '', nl: -1, ask: false, askIn: '', pfold: {}
     };
     const o = {
       intro: { mode: 'intro' }, start: { mode: 'start' }, draft: { mode: 'draft' },
@@ -3621,7 +3376,7 @@ class Component extends DCLogic {
     // the finished farm, opened inside a room: pigs, the list, a pen card, a camera
     const ir = { introroom: { view: 'room', roomId: 'fr2', hl: '' }, introgest: { view: 'room', roomId: 'g2', hl: '' }, introlist: { view: 'room', roomId: 'g2', hl: '', ip: 'B14', psel: ['B14'], nl: 0 }, introcam: { view: 'room', roomId: 'fr2', hl: '', icam: { kind: 'room', i: 0 } }, intropen: { view: 'room', roomId: 'fr2', hl: '', ip: 'A3', psel: ['A3'] } }[start] || {};
     // the farm view: a saved farm opens in View; the editor is the other mode
-    const vw = { locroom: { view: 'room', roomId: 'g2' }, locpen: { view: 'room', roomId: 'fr2', ip: 'A3', psel: ['A3'] }, locgroup: { view: 'room', roomId: 'n1', ip: 'B7', psel: ['B7'] }, locfilter: { view: 'room', roomId: 'g2', vf: { kind: 'flag', id: 'urgent' } }, viewroom: { view: 'room', roomId: 'g2' }, viewpen: { view: 'room', roomId: 'fr2', ip: 'A3', psel: ['A3'] }, viewcam: { view: 'room', roomId: 'fr2', icam: { kind: 'room', i: 0 } }, doneask: { view: 'room', roomId: 'g2' }, viewbatch: { view: 'room', roomId: 'fr2', bv: { id: '32', task: '' } }, viewbatchtask: { view: 'room', roomId: 'g1', bv: { id: '34', task: 'breed' } }, batchlist: { bl: true }, actionsmenu: { view: 'room', roomId: 'g2', psel: ['B15', 'B20', 'D40'], moreOpen: 'act' }, pigwaiting: { view: 'room', roomId: 'fr2', ip: 'A3', psel: ['A3'] } }[start] || {};
+    const vw = { pigsow: { view: 'room', roomId: 'g2', ip: 'B14', psel: ['B14'] }, piggilt: { view: 'room', roomId: 'q1', ip: 'A1', psel: ['A1'], locPig: 0 }, pigsub: { view: 'room', roomId: 'fr2', ip: 'A3', psel: ['A3'], pigPage: 'performance' }, pigbatch: { view: 'room', roomId: 'fr2', bv: { id: '32', task: '' }, ip: 'A7', psel: ['A7'] }, locroom: { view: 'room', roomId: 'g2' }, locpen: { view: 'room', roomId: 'fr2', ip: 'A3', psel: ['A3'] }, locgroup: { view: 'room', roomId: 'n1', ip: 'B7', psel: ['B7'] }, locfilter: { view: 'room', roomId: 'g2', vf: { kind: 'flag', id: 'urgent' } }, viewroom: { view: 'room', roomId: 'g2' }, viewpen: { view: 'room', roomId: 'fr2', ip: 'A3', psel: ['A3'] }, viewcam: { view: 'room', roomId: 'fr2', icam: { kind: 'room', i: 0 } }, doneask: { view: 'room', roomId: 'g2' }, viewbatch: { view: 'room', roomId: 'fr2', bv: { id: '32', task: '' } }, viewbatchtask: { view: 'room', roomId: 'g1', bv: { id: '34', task: 'breed' } }, batchlist: { bl: true }, actionsmenu: { view: 'room', roomId: 'g2', psel: ['B15', 'B20', 'D40'], moreOpen: 'act' }, pigwaiting: { view: 'room', roomId: 'fr2', ip: 'A3', psel: ['A3'] } }[start] || {};
     // the side displays: the bar's Add menu, the pen type manager, a device, the pens picked
     const sd = { addmenu: { moreOpen: 'add' }, ungroupsel: { zoneId: 'z1', secId: 's-far', selKind: 'room', selIds: ['fr1', 'fr2', 'fr3', 'fr4'] }, typemanager: { ptList: true }, device: { sel: { kind: 'device', id: 'g2-nh3' } }, devicefeeder: { sel: { kind: 'device', id: 'g2-feed' } }, devicepens: { sel: { kind: 'device', id: 'g2-cam' }, dp: 'g2-cam' }, devicesetup: { sel: { kind: 'device', id: 'g2-clim' }, dvE: { id: 'g2-clim', isNew: true, code: '', model: '' } }, devicenew: { devT: { kind: 'nh3' } }, picked: { view: 'room', roomId: 'g2', psel: ['B15', 'B20', 'D40'], moreOpen: 'sel' } }[start] || {};
     const vm = e === 'saved' && start !== 'editfromview' && start !== 'doneask' && start !== 'ungroupsel' ? 'view' : 'edit';
@@ -5306,7 +5061,7 @@ class Component extends DCLogic {
       loc.hasProfile = !data.group || !!member;
       const status = (data.kind === 'weaners' ? 'Nursery day ' : 'Quarantine day ') + data.i.age;
       loc.groupCount = String(data.pigs.length);
-      loc.pigs = data.pigs.map((g, index) => ({ label: g.tag || 'Batch ' + data.i.batch + ' · ' + status, status: g.tag ? 'Batch ' + data.i.batch + ' · ' + status : '', flagged: !!g.note, aria: 'Open pig ' + (g.tag || index + 1), open: () => { this.put({ locPig: index, pfold: {} }); if (this.locBody) this.locBody.scrollTop = 0; } }));
+      loc.pigs = data.pigs.map((g, index) => ({ label: g.tag || 'Batch ' + data.i.batch + ' · ' + status, status: g.tag ? 'Batch ' + data.i.batch + ' · ' + status : '', flagged: !!g.note, aria: 'Open pig ' + (g.tag || index + 1), open: () => { this.put({ locPig: index, pigPage: '', pfold: {} }); if (this.locBody) this.locBody.scrollTop = 0; } }));
     }
     loc.equipment = this.locationDevices(u).map((d) => ({ name: d.name, icon: this.devPaths()[d.kind] || '', state: d.serves === 'pens' ? 'Serves ' + this.penRanges(d.pens) : d.kind === 'climate' || d.kind === 'fan' ? 'Auto' : d.where || 'Monitoring' }));
     loc.hasEquipment = loc.equipment.length > 0;
@@ -5572,7 +5327,8 @@ class Component extends DCLogic {
   goUp(hard) {
     const u = this.ui();
     if (u.view === 'room') {
-      if (this.IP && u.vm === 'view' && (u.psel || []).length) { if (u.locPig != null) this.put({ locPig: null }); else this.selClear(); return; }
+      if (this.IP && u.pigPage) { this.locationBack(); return; }
+      if (this.IP && u.vm === 'view' && (u.psel || []).length) { this.locationBack(); return; }
       if (this.IP && !hard) { if (u.icam) { this.closeCam(); return; } if ((u.psel || []).length) { this.selClear(); return; } if (u.sm) { this.setSm(false); return; } }
       if (u.corner != null && !hard) { this.updateSel(this.put({ corner: null })); return; }
       if (u.pen) { this.updateSel(this.put({ pen: '', sel: u.sel && u.sel.kind === 'lane' ? u.sel : null })); return; }
@@ -5591,6 +5347,7 @@ class Component extends DCLogic {
     if (u.cm) { this.put({ cm: null }); return true; }
     if (u.vt) { this.put({ vt: null }); return true; }
     if (u.moreOpen === 'act') { this.put({ moreOpen: false }); return true; }
+    if (u.vm === 'view' && u.pigPage) { this.locationBack(); return true; }
     if (u.vm === 'view' && u.locPig != null) { this.put({ locPig: null }); return true; }
     if (u.vm === 'view' && u.bv && (u.psel || []).length) { this.selClear(); return true; }
     if (u.bv && u.bv.task) { this.closeBatchTask(); return true; }
@@ -6656,7 +6413,7 @@ class Component extends DCLogic {
         cell.A17.flag = watch('Slow to get up');
         detail = '148 sows, 4 boars'; short = '148 sows';
       } else if (r.id === 'g2') {
-        const flag = { B14: urgent('Lame'), B17: urgent('Lame, not putting weight on it'), C3: watch('Slow to get up'), C22: watch('Eating less'), D40: watch('Off feed') };
+        const flag = { B14: urgent('Lame'), B17: urgent('Lame, not putting weight on it'), C3: watch('Slow to get up'), C22: watch('Off feed'), D40: watch('Off feed') };
         const empty = {};
         let k = 0;
         while (k < 14) { const c = lt(rng.i(0, 3)) + rng.i(1, 50); if (!empty[c] && !flag[c]) { empty[c] = true; k++; } }
@@ -6833,7 +6590,7 @@ class Component extends DCLogic {
     if (!this.IP || !this.batchData()[id]) return;
     if (!u.bv) this.bvFrom = { list: !!u.bl, view: u.view, roomId: u.roomId, zoneId: u.zoneId, secId: u.secId, psel: (u.psel || []).slice(), ip: u.ip };
     const rooms = [...new Set(this.bvMembers(id).map((x) => x.roomId))];
-    this.put({ bv: { id: String(id), task: '' }, bl: false, bdone: false, bfig: '', psel: [], gsel: [], ip: '', sm: false, vt: null, moreOpen: false, icam: null });
+    this.put({ bv: { id: String(id), task: '' }, bl: false, bdone: false, bfig: '', pigPage: '', locPig: null, psel: [], gsel: [], ip: '', sm: false, vt: null, moreOpen: false, icam: null });
     this.repaintBv();
     this.syncHl(); this.pendSync();
     if (rooms.length === 1 && !(u.view === 'room' && u.roomId === rooms[0])) this.goRoom(rooms[0]);
@@ -7332,7 +7089,7 @@ class Component extends DCLogic {
   // View: pigs, status, cameras, read only. Edit layout: the editor, no pigs. The intro preview is View on the example farm.
   vOn(u) { u = u || this.ui(); return u.mode === 'intro' || (u.mode === 'saved' && u.vm === 'view'); }
   cellOf(rm, code) { const P = this.IPfull || this.IP; return P ? (P.cell[rm.id] || {})[code] : undefined; }
-  viewClear() { return { vf: null, locPig: null, locUnit: false, ip: '', psel: [], gsel: [], sm: false, vt: null, dn: false, nl: -1, lh: '', icam: null, rec: false, ask: false, askIn: '' }; }
+  viewClear() { return { vf: null, locPig: null, pigPage: '', locUnit: false, ip: '', psel: [], gsel: [], sm: false, vt: null, dn: false, nl: -1, lh: '', icam: null, rec: false, ask: false, askIn: '' }; }
   setVm(to) {
     const u = this.ui();
     if (u.mode !== 'saved' || u.vm === to || !this.rooms) return;
@@ -7376,14 +7133,14 @@ class Component extends DCLogic {
     o = o || {};
     const u = this.ui(), cur = u.icam, ip = codes.length === 1 ? codes[0] : '';
     if (codes.length && u.bl && !u.bv) this.leaveBatch();
-    const n = { psel: codes, gsel: [], locPig: null, cc: codes.length === 1 && u.vm === 'view' ? false : u.cc, ip: ip, nl: o.nl != null ? o.nl : -1, vt: null, rec: false, ask: false, lh: '' };
+    const n = { psel: codes, gsel: [], locPig: null, pigPage: '', cc: codes.length === 1 && u.vm === 'view' ? false : u.cc, ip: ip, nl: o.nl != null ? o.nl : -1, vt: null, rec: false, ask: false, lh: '' };
     if (cur && cur.kind === 'pen' && cur.code !== ip) n.icam = null;
     this.put(n);
     this.syncHl(); this.syncCamVis(); this.pendSync();
     this.dirty = true;
   }
   selClear() { this.setSel([]); if (this.ui().vm === 'view') this.reframe(500); }
-  locationBack() { if (this.ui().locPig != null) this.put({ locPig: null }); else this.selClear(); }
+  locationBack() { const u = this.ui(); if (u.pigPage) this.put({ pigPage: '' }); else if (u.locPig != null) this.put({ locPig: null }); else this.selClear(); if (this.pigBody) this.pigBody.scrollTop = 0; }
   viewPick(code, multi) {
     const u = this.ui(), rm = this.rooms.find((x) => x.id === u.roomId);
     if (!rm || !this.penByCode(rm, code)) return;
@@ -7629,6 +7386,7 @@ class Component extends DCLogic {
     const P = PIGS_MODULE, i = this.pigInfo(rm, p), c = this.cellOf(rm, p.code) || {}, rng = P.makeRng(this.hs(key + ':profile'));
     const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const when = (d) => { const t = new Date(2026, 10, 2); t.setDate(t.getDate() - d); return t.getDate() + ' ' + MON[t.getMonth()]; };
+    if (rm.id === 'g2' && p.code === 'B14') { i.parity = 2; i.svc = 61; i.stage = 'In pig, day 61'; }
     const kind = c.kind || '', group = kind === 'weaners' || kind === 'gilts', flag = i.flag, parity = i.parity || 1;
     const D = { i: i, kind: kind, group: group, flag: flag, when: when, empty: !!i.empty, breed: [], lit: [], health: [], w: [], bf: [], feed: [], notes: [], moves: [], pigs: [], sumBreed: '', sumLit: '', sumHealth: '', sumW: '', sumFeed: '', sumNotes: '', sumMoves: '' };
     if (i.empty) { this.pcache[key] = D; return D; }
@@ -7677,7 +7435,7 @@ class Component extends DCLogic {
     // notes and moves
     D.notes = ((this.notesAdded && this.notesAdded[key]) || []).map((n) => ({ w: 'Today', t: n.t }));
     if (flag) D.notes.push({ w: when(urgent ? 1 : 2), t: flag.why + (urgent ? '. Keep an eye on it.' : '') });
-    else if (rng.chance(0.4)) D.notes.push({ w: when(rng.i(10, 60)), t: rng.pick(['Good milker, keep for the next round.', 'Calm with the crew.', 'Slow starter after weaning last time.']) });
+    else if (!group && rng.chance(0.4)) D.notes.push({ w: when(rng.i(10, 60)), t: rng.pick(['Good milker, keep for the next round.', 'Calm with the crew.', 'Slow starter after weaning last time.']) });
     if (kind === 'litter') D.moves = [[when(9), 'Farrowed, ' + c.litter + ' born alive'], [when(12), 'Moved in from Gestation 2']];
     else if (kind === 'dry') D.moves = [['2 Nov', 'Moved in from Gestation 1']];
     else if (kind === 'weaners') D.moves = [[when(i.age), 'Weaned from Farrowing Room 2'], [when(i.age), 'Moved in to ' + rm.r.name]];
@@ -7686,82 +7444,97 @@ class Component extends DCLogic {
     D.sumNotes = D.notes.length ? (D.notes.length === 1 ? '1 note' : D.notes.length + ' notes') : 'None';
     D.sumMoves = D.moves[D.moves.length - 1][1];
     if (group) for (let k = 0; k < (c.n || 0); k++) D.pigs.push({ tag: String(300000 + this.hs(key + ':' + k) % 600000), w: f1(D.w[7] * rng.n(0.92, 1.08)) + ' kg', note: flag && k < 2 ? flag.why.split(',')[0] : '' });
+    D.tags = flag ? [(/lame/i.test(flag.why) ? 'Lame' : /feed|eating/i.test(flag.why) ? 'Off feed' : flag.why.split(',')[0])] : [];
+    D.treatment = key === 'g2:B14' ? 'Meloxicam · dose 2 of 3 today' : kind === 'sick' ? 'Penicillin · dose 2 of 3 today' : '';
+    if (key === 'q1:A1' && D.pigs.length) { D.pigs[0].tag = 'G3501'; D.pigs[0].age = 65; D.pigs[0].unweighed = true; }
     this.pcache[key] = D;
     return D;
   }
-  // the panel's model: header, sections that open and close, charts, the Ask bar
+  // Shared pig model. Only the selected read-more page builds its history/chart.
   profView(rm, p, member) {
-    const u = this.ui(), base = this.profData(rm, p);
-    const D = member ? Object.assign({}, base, { group: false, pigs: [], i: Object.assign({}, base.i, { tag: member.tag || 'Untagged pig', who: member.tag || 'Untagged pig', stage: (base.kind === 'weaners' ? 'Nursery day ' : 'Quarantine day ') + base.i.age, flag: member.note ? base.i.flag : null }) }) : base;
+    const u = this.ui(), base = this.profData(rm, p), i = Object.assign({}, base.i);
+    const D = Object.assign({}, base, { i: i, group: base.group && !member });
     if (member) {
-      const ratio = parseFloat(member.w) / D.w[D.w.length - 1];
-      D.w = D.w.map((v) => v * ratio);
-      if (!member.note && base.i.flag) D.health = D.health.filter((e) => e.t !== base.i.flag.why);
+      i.tag = member.tag || 'Untagged pig';
+      i.flag = member.note ? base.i.flag : null;
+      const ratio = parseFloat(member.w) / (base.w[base.w.length - 1] || 1);
+      D.w = member.unweighed ? [] : base.w.map((v) => v * ratio);
+      D.bf = []; D.lit = []; D.breed = [];
+      D.tags = member.note ? [member.note] : [];
+      D.treatment = ''; D.notes = member.note ? base.notes : base.notes.filter((n) => !base.flag || n.t.indexOf(base.flag.why) < 0);
+      D.health = base.health.filter((e) => !base.flag || e.t !== base.flag.why || member.note);
     }
-    const i = D.i, key = rm.id + ':' + p.code;
-    const urgent = !!(i.flag && i.flag.lvl === 'urgent');
-    const pfold = u.pfold || {};
-    const W = 388;
-    const mk = (id, title, sum, rel, o) => {
-      const open = id in pfold ? !!pfold[id] : (id === rel || id === 'wait');
-      if (o && o.spark) o.hasSpark = o.spark.length > 0;
-      return Object.assign({ hasSpark: false,  id: id, title: title, sum: sum, open: open, toggle: () => this.put({ pfold: Object.assign({}, this.ui().pfold, { [id]: !open }) }),
-        chevStyle: 'width: 16px; height: 16px; flex: none; fill: none; stroke: #4A544E; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.18s; transform: rotate(' + (open ? '180' : '0') + 'deg)',
-        spark: [], isPigs: false, pigs: [], isWait: false, waits: [], hasDec: false, dec: '', openDec: () => {}, isRows: false, rows: [], isLit: false, bars: [], isHealth: false, d1: '', d2: '', d3: '', events: [], isWeight: false, isFeed: false, isNotes: false, notes: [], isMoves: false, moves: [],
-        hasLegend: false, lg1: '', lg2: '', hasLg2: false, axisL: '', axisR: '', empty: '', hasEmpty: false, dotStyle: '' }, o);
-    };
+    const sow = ['sow', 'sick', 'litter', 'dry'].indexOf(D.kind) >= 0;
+    const age = member ? member.age || (D.kind === 'weaners' ? 21 + i.age : 65 + u.locPig) : 2 + Math.floor((i.parity || 1) / 2) + ' y 2 m';
+    const stage = D.kind === 'sow' ? (i.batch === 34 ? i.stage.toLowerCase() : 'in pig, day ' + i.svc) : D.kind === 'litter' ? 'lactating, day 9' : D.kind === 'dry' ? 'due in ' + i.due + ' days' : D.kind === 'sick' ? 'treatment running' : 'heat checks';
+    const identity = D.empty ? i.type : D.group ? i.who + ' · Batch ' + i.batch + ' · ' + (D.kind === 'weaners' ? 'nursery day ' : 'quarantine day ') + i.age : member ? (D.kind === 'gilts' ? 'Gilt · ' + age + ' days · waiting to be served' : 'Weaner · ' + age + ' days · nursery day ' + i.age) : (sow ? 'Sow · parity ' + i.parity : 'Boar') + ' · ' + stage + ' · ' + age;
+    const batchId = i.batch != null && !D.empty && this.batchData()[String(i.batch)] ? String(i.batch) : '';
+    const batch = batchId ? this.batchData()[batchId] : null;
+    const belongs = batch && this.bvMembers(batchId).some((x) => x.roomId === rm.id && x.code === p.code);
+    const people = ['Zhao Min', 'Li Wei', 'Chen Yu', 'Wang Lin'];
+    const times = ['06:40', '07:10', '06:55', '08:15'];
+    const running = belongs && !D.group ? batch.tasks.map((t) => {
+      const st = this.bvState(batchId, rm.id, p.code, t.id), def = this.bvStateDef(batchId, st, t.id);
+      if (!def) return null;
+      const ix = t.states.findIndex((x) => x.id === st), mark = st === 'heat' ? 'In heat' : def.label;
+      return { title: t.title, state: mark, record: mark + ' · marked by ' + people[st === 'heat' ? 0 : ix % 4] + ', ' + times[st === 'heat' ? 0 : ix % 4] + ' today',
+        swatch: 'width: 12px; height: 12px; flex: none; border-radius: 3px; background: ' + def.col,
+        aria: 'Open ' + t.title + ' in ' + batch.name,
+        open: () => { this.openBatch(batchId); this.openBatchTask(t.id); } };
+    }).filter(Boolean) : [];
+    const wt = member ? { plan: [], dec: null } : this.waitingOf(rm.id, p.code);
+    const page = u.pigPage || '', W = 388;
     const line = (arr, h, pad, zero) => {
       const mn = zero ? 0 : Math.min.apply(null, arr), mx = Math.max.apply(null, arr) * (zero ? 1.1 : 1), sp = mx - mn || 1;
-      const pts = arr.map((v, k) => [6 + k * (W - 12) / (arr.length - 1), h - pad - (v - mn) / sp * (h - 2 * pad)]);
-      return { d: 'M' + pts.map((q) => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' L'), pts: pts, last: pts[pts.length - 1] };
+      const pts = arr.map((v, k) => [6 + k * (W - 12) / Math.max(1, arr.length - 1), h - pad - (v - mn) / sp * (h - 2 * pad)]);
+      return { d: 'M' + pts.map((q) => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' L'), last: pts[pts.length - 1] };
     };
     const dot = (q, r) => 'M' + (q[0] - r).toFixed(1) + ' ' + q[1].toFixed(1) + ' a' + r + ' ' + r + ' 0 1 0 ' + (2 * r) + ' 0 a' + r + ' ' + r + ' 0 1 0 ' + (-2 * r) + ' 0';
-    let rel = D.group ? 'pigs' : (D.kind === 'litter' ? 'litters' : 'breed');
-    if (i.flag) rel = /feed|eating/.test(i.flag.why.toLowerCase()) ? 'feed' : 'health';
-    const secs = [];
-    // an empty pen shows a line of text, not sections: nothing below is built for it
-    if (!D.empty) {
-    const spark = (vals) => { if (!vals || !vals.length) return []; const mx = Math.max.apply(null, vals), mn = Math.min(Math.min.apply(null, vals), mx * 0.6), sp = mx - mn || 1; return vals.map((v) => 'width: 3px; height: ' + Math.max(2, Math.round(2 + (v - mn) / sp * 10)) + 'px; border-radius: 1px; background: #8A938C'); };
-    { const wt = this.waitingOf(rm.id, p.code);
-      if (wt.plan.length || wt.dec) secs.push(mk('wait', 'Waiting on someone', [wt.plan.length ? wt.plan.length + (wt.plan.length === 1 ? ' task' : ' tasks') + ' on the phone' : '', wt.dec ? 'in a decision' : ''].filter(Boolean).join(' · '), 'wait', { isWait: true, waits: wt.plan.map((x) => ({ w: x[0], t: x[1] })), hasDec: !!wt.dec, dec: wt.dec ? wt.dec.title : '', openDec: () => { if (wt.dec) this.openDecision(wt.dec); } })); }
-    if (D.group) {
-      const gs = u.gsel || [];
-      secs.push(mk('pigs', 'Pigs', D.pigs.length + (D.pigs.length === 1 ? ' pig' : ' pigs'), rel, { isPigs: true, pigs: D.pigs.map((g) => ({ tag: g.tag, w: g.w, note: g.note, hasNote: !!g.note, tick: !!u.sm, on: gs.indexOf(g.tag) >= 0, toggle: () => { if (!this.ui().sm) return; const cur = (this.ui().gsel || []).slice(), k = cur.indexOf(g.tag); if (k >= 0) cur.splice(k, 1); else cur.push(g.tag); this.put({ gsel: cur }); }, aria: 'Tick pig ' + g.tag, style: 'width: 100%; min-height: 40px; box-sizing: border-box; display: flex; align-items: center; gap: 10px; padding: 0 4px; border: 0; border-top: 1px solid #F1F3EF; background: transparent; font: inherit; color: #121815; text-align: left; cursor: ' + (u.sm ? 'pointer' : 'default'), boxStyle: 'width: 18px; height: 18px; flex: none; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-radius: 5px; ' + (gs.indexOf(g.tag) >= 0 ? 'background: #121815; border: 1.5px solid #121815; color: #FFFFFF' : 'background: #FFFFFF; border: 1.5px solid #8A938D; color: transparent') })) }));
-    } else {
-      if (D.breed.length) secs.push(mk('breed', 'Breeding', D.sumBreed, rel, { isRows: true, rows: D.breed.map((r) => ({ k: r[0], v: r[1] })) }));
-      if (D.lit.length || D.kind === 'sow' || D.kind === 'litter' || D.kind === 'dry' || D.kind === 'sick') secs.push(mk('litters', 'Litters', D.lit.length ? String(D.lit.length) : 'None yet: her first litter starts the chart', rel, D.lit.length ? { spark: spark(D.lit.map((b) => b.born)), isLit: true, hasLegend: true, bars: D.lit.map((b) => ({ label: 'P' + b.k, s1: 'width: 12px; height: ' + Math.round(b.born / 16 * 60) + 'px; background: #2E3832; border-radius: 3px 3px 0 0', s2: b.now ? 'width: 12px; height: 0' : 'width: 12px; height: ' + Math.round(b.wean / 16 * 60) + 'px; background: #A9B3AB; border-radius: 3px 3px 0 0' })) } : { isRows: true, rows: [{ k: 'Litters', v: 'None yet' }] }));
+    const sections = [];
+    if (!D.empty && page === 'performance') {
+      if (member || D.group) {
+        sections.push({ isRows: true, rows: [{ k: 'Batch ' + i.batch + ' · Growth', v: (D.kind === 'weaners' ? 'Nursery day ' : 'Quarantine day ') + i.age }, { k: 'Average weight per pig', v: (Math.round(base.w[base.w.length - 1] * 10) / 10) + ' kg' }, { k: 'Weight gained per pig', v: (Math.round((base.w[base.w.length - 1] - base.w[0]) * 10) / 10) + ' kg since the first weighing' }, { k: 'Feed per pig today', v: (Math.round(base.feed[base.feed.length - 1] * 10) / 10) + ' kg' }] });
+      } else if (D.lit.length) sections.push({ isLit: true, isRows: true,
+        rows: D.lit.map((b) => ({ k: 'Parity ' + b.k + (b.now ? ' · current batch' : ''), v: b.born + ' born alive · ' + (b.now ? 'weaning pending · losses pending' : b.wean + ' weaned · ' + (b.born - b.wean) + ' pre-wean losses') })),
+        bars: D.lit.map((b) => ({ label: 'P' + b.k, s1: 'width: 12px; height: ' + Math.round(b.born / 16 * 60) + 'px; background: #2E3832; border-radius: 3px 3px 0 0', s2: 'width: 12px; height: ' + (b.now ? 0 : Math.round(b.wean / 16 * 60)) + 'px; background: #A9B3AB; border-radius: 3px 3px 0 0' })) });
+      else sections.push({ hasEmpty: true, empty: sow ? 'No past batches yet.' : 'No breeding performance recorded yet.' });
     }
-    // health: a timeline of the last 90 days, then the entries
-    { const tl = D.health.map((e) => [6 + (90 - Math.min(90, e.d)) / 90 * (W - 12), 16]);
-      const cool = D.health.map((e, k) => (e.hot ? null : tl[k])).filter(Boolean), hot = D.health.map((e, k) => (e.hot ? tl[k] : null)).filter(Boolean);
-      secs.push(mk('health', 'Health', (() => { if (!D.health.length) return 'Nothing recorded yet'; const n = D.health.filter((e) => /treat|vaccin|dewormed/i.test(e.t)).length; return (n ? n + (n === 1 ? ' treatment' : ' treatments') : D.health.length + (D.health.length === 1 ? ' entry' : ' entries')) + ' · last ' + (D.health[0].d === 0 ? 'today' : D.when(D.health[0].d)) + (i.flag ? ' · ' + i.flag.why : ''); })(), rel, { isHealth: true, d1: 'M6 16 H' + (W - 6), d2: cool.map((q) => dot(q, 4.5)).join(' '), d3: hot.map((q) => dot(q, 5.5)).join(' '), axisL: '90 days ago', axisR: 'Today', events: D.health.map((e) => ({ w: e.d === 0 ? 'Today' : D.when(e.d), t: e.t, style: 'min-width: 0; ' + (e.hot ? 'color: #9A1F17; font-weight: 500' : '') })) })); }
-    // weight, and backfat
-    { const a = line(D.w, 76, 10, false), b = D.bf.length ? line(D.bf, 76, 10, false) : null;
-      secs.push(mk('weight', D.group || member ? 'Weight' : 'Weight & backfat', D.w.length ? D.w.length + ' weighings' : 'No weighing yet. Weigh 10 pigs on the phone to see the line', rel, { spark: D.w.length ? spark(D.w) : [], isWeight: true, d1: a.d, d2: b ? b.d : '', d3: dot(a.last, 3.5), hasLegend: true, lg1: D.group ? 'Average ' + (Math.round(D.w[7] * 10) / 10) + ' kg' : 'Weight ' + Math.round(D.w[7]) + ' kg', lg2: b ? 'Backfat ' + Math.round(D.bf[7]) + ' mm' : '', hasLg2: !!b, axisL: '14 weeks ago', axisR: 'Now' })); }
-    // feed intake, 14 days
-    { const f = line(D.feed, 56, 8, true);
-      secs.push(mk('feed', 'Feed intake', D.sumFeed.replace('Today ', 'today '), rel, { spark: spark(D.feed.slice(-7)), isFeed: true, d1: f.d, d2: f.d + ' L' + (W - 6) + ' 52 L6 52 Z', d3: dot(f.last, 3.5), hasLegend: true, lg1: 'kg a day' + (D.group ? ', per pig' : ''), lg2: D.feedLow ? 'Eating less than usual' : '', hasLg2: D.feedLow, dotStyle: 'fill: ' + (D.feedLow ? '#B3261E' : '#121815') + '; stroke: none', axisL: '14 days ago', axisR: 'Today' })); }
-    // notes, with what is waiting for the phone
-    { const pend = ((this.pend || {})[rm.id] || {})[p.code] || [];
-      const nst = (q) => 'min-width: 0; ' + (q ? 'color: #626C66' : '');
-      const rows = pend.map((k) => ({ w: 'Sent', t: k + ', waiting for the phone', style: nst(true) })).concat(D.notes.map((n) => ({ w: n.w, t: n.t, style: nst(false) })));
-      secs.push(mk('notes', 'Notes', pend.length ? pend.length + ' waiting for the phone' : D.sumNotes, rel, { isNotes: true, notes: rows, empty: rows.length ? '' : 'No notes yet. Add one from the bar below.', hasEmpty: !rows.length })); }
-    secs.push(mk('moves', 'Moves', D.sumMoves, rel, { isMoves: true, moves: D.moves.map((m) => ({ w: m[0], t: m[1] })) }));
+    if (!D.empty && page === 'weight') {
+      if (!D.w.length) sections.push({ hasEmpty: true, empty: 'No weighing yet. Weigh her on the phone to start the line.' });
+      else { const a = line(D.w, 76, 10, false), b = D.bf.length ? line(D.bf, 76, 10, false) : null;
+        sections.push({ isWeight: true, d1: a.d, d2: b ? b.d : '', d3: dot(a.last, 3.5), lg1: 'Weight ' + Math.round(D.w[D.w.length - 1]) + ' kg', lg2: b ? 'Backfat ' + Math.round(D.bf[D.bf.length - 1]) + ' mm' : '', hasLg2: !!b, axisL: '14 weeks ago', axisR: 'Now' }); }
     }
-    const tagTitle = D.group ? i.who : i.tag;
-    const subBits = member ? [base.kind === 'weaners' ? 'Weaner' : 'Gilt', 'Pen ' + p.code, rm.r.name] : D.group ? [i.type, 'Pen ' + p.code, rm.r.name] : [({ sow: 'Sow', litter: 'Sow', dry: 'Sow', sick: 'Sow', boar: 'Boar' }[D.kind] || 'Pig') + (D.kind === 'boar' ? '' : ', parity ' + (i.parity || 1)), 'Pen ' + p.code, rm.r.name];
-    const canWatch = !!(rm.cams && rm.cams.some((s) => s.kind === 'pen' && s.code === p.code));
-    // the Ask bar at the foot: the same chat, looking at this pig
-    const log = ((this.askLog || {})[key]) || [];
-    const askName = D.group ? 'pen ' + p.code : i.tag;
-    return {
-      batchId: i.batch != null && !D.empty && this.batchData()[String(i.batch)] ? String(i.batch) : '',
-      code: p.code, empty: !!D.empty, title: D.empty ? 'Pen ' + p.code : tagTitle, titleMono: !D.group || D.empty, sub: D.empty ? i.type : subBits.join(' · '), stage: D.empty ? '' : i.stage,
-      hasChip: !!i.flag, chip: i.flag ? (urgent ? 'Urgent' : 'Watch') : '', why: i.flag ? i.flag.why : '', urgent: urgent,
-      emptyNote: i.lines && i.lines[0] ? i.lines[0] : '', sections: D.empty ? [] : secs, canWatch: canWatch, feedOn: !!(u.icam && u.icam.kind === 'pen' && u.icam.code === p.code),
-      ask: { name: askName, look: 'Looking at ' + askName, label: 'Ask about ' + askName, open: !!u.ask, toggle: () => this.put({ ask: !this.ui().ask }), log: log.map((m) => ({ you: m.you, text: m.text, style: 'align-self: ' + (m.you ? 'flex-end' : 'flex-start') + '; max-width: 86%; box-sizing: border-box; padding: 7px 11px; border-radius: 12px; font-size: 13px; line-height: 18px; background: ' + (m.you ? '#121815' : '#F1F3EE') + '; color: ' + (m.you ? '#FFFFFF' : '#121815') })), hasLog: log.length > 0, noLog: log.length === 0, off: !(u.askIn || '').trim(), sendStyle: 'flex: none; height: 40px; padding: 0 18px; border: 0; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; background: ' + ((u.askIn || '').trim() ? '#121815' : '#E7E9E4') + '; color: ' + ((u.askIn || '').trim() ? '#FFFFFF' : '#7C857F'), chevStyle: 'width: 16px; height: 16px; flex: none; fill: none; stroke: #4A544E; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.18s; transform: rotate(' + (u.ask ? '180' : '0') + 'deg)', input: u.askIn || '', onInput: (e) => this.put({ askIn: e.target.value }), onKey: (e) => { if (e.key === 'Enter') this.askSend(rm, p, this.ui().askIn); },
-        chips: ['What is wrong?', 'What did she eat this week?', 'Should I move her?'].map((q) => ({ q: D.group ? q.replace('she', 'they').replace('her', 'them') : q, pick: () => this.askSend(rm, p, q) })), send: () => this.askSend(rm, p, this.ui().askIn), canSend: !!(u.askIn || '').trim() }
-    };
+    if (!D.empty && page === 'feed' && D.feed.length) { const f = line(D.feed, 56, 8, true);
+      sections.push({ isFeed: true, d1: f.d, d2: f.d + ' L' + (W - 6) + ' 52 L6 52 Z', d3: dot(f.last, 3.5), lg1: 'kg a day', lg2: D.feedLow ? 'Eating less than usual' : '', hasLg2: D.feedLow, dotStyle: 'fill: ' + (D.feedLow ? '#B3261E' : '#121815') + '; stroke: none', axisL: '14 days ago', axisR: 'Today' });
+    }
+    if (!D.empty && page === 'log') {
+      const ago = (w) => { if (w === 'Today' || w === 'Sent') return 0; const dt = Date.parse(w + ' 2026'); return Number.isFinite(dt) ? Math.max(0, (new Date(2026, 10, 3) - dt) / 86400000) : 0; };
+      const events = [], add = (d, t, who, time, label) => events.push({ d: d, t: t, meta: (who || 'Li Wei') + ' · ' + (time || '07:10') + ', ' + (label || (d === 0 ? 'today' : D.when(d))) });
+      D.health.forEach((e, k) => add(e.d, e.t, people[k % 4], times[k % 4]));
+      D.notes.forEach((n) => add(ago(n.w), 'Note: ' + n.t, 'Chen Yu', '08:15', n.w.toLowerCase()));
+      D.moves.forEach((m) => add(ago(m[0]), m[1], 'Li Wei', '09:20', m[0]));
+      D.breed.filter((r) => ['Served', 'Farrowed', 'Moved in'].indexOf(r[0]) >= 0).forEach((r) => { if (!D.moves.some((m) => m[1].indexOf(r[0]) === 0)) add(ago(r[1].split(',')[0]), r[0] + ': ' + r[1]); });
+      D.lit.filter((b) => !b.now).forEach((b) => add((i.parity - b.k) * 150 + 140, 'Parity ' + b.k + ': ' + b.born + ' born alive, ' + b.wean + ' weaned, ' + (b.born - b.wean) + ' pre-wean losses'));
+      D.w.forEach((v, k) => add((D.w.length - 1 - k) * 14, 'Weighed ' + (Math.round(v * 10) / 10) + ' kg' + (D.bf[k] != null ? ' · backfat ' + (Math.round(D.bf[k] * 10) / 10) + ' mm' : ''), 'Chen Yu', '06:55'));
+      D.feed.forEach((v, k) => add(13 - k, 'Feed recorded: ' + (Math.round(v * 10) / 10) + ' kg', 'Wang Lin', '06:10'));
+      if (D.treatment) add(0, D.treatment, 'Zhao Min', '06:40');
+      running.forEach((t) => { const parts = t.record.split(' · marked by '); const rec = parts[1].split(', '); add(0, t.title + ': ' + parts[0], rec[0], rec[1].split(' ')[0]); });
+      sections.push({ isLog: true, events: events.sort((a, b) => a.d - b.d || b.meta.split(' · ')[1].localeCompare(a.meta.split(' · ')[1])) });
+    }
+    // A flag copied verbatim into the seed's notes is already shown in Health; keep its full record in Log.
+    const notes = D.notes.filter((n) => (D.tags || []).indexOf(n.t) < 0);
+    const titles = { performance: 'Performance', feed: 'Feed', weight: 'Weight & backfat', log: 'Log' };
+    const openPage = (id) => { this.put({ pigPage: id }); if (this.pigBody) this.pigBody.scrollTop = 0; };
+    const canWatch = !!(rm.cams && rm.cams.some((c) => c.kind === 'pen' && c.code === p.code));
+    return { batchId: batchId, code: p.code, empty: D.empty, emptyNote: i.lines && i.lines[0] || '',
+      title: page ? titles[page] : D.empty ? 'Pen ' + p.code : D.group ? i.who : i.tag, tag: i.tag, titleMono: !page && !D.group, identity: identity,
+      main: !page && (!u.cc || !!u.bv || u.mode === 'intro'), page: page, group: D.group, pigs: base.pigs.map((g, index) => ({ label: g.tag || 'Batch ' + i.batch, status: (D.kind === 'weaners' ? 'Nursery day ' : 'Quarantine day ') + i.age, aria: 'Open pig ' + (g.tag || index + 1), open: () => { this.put({ locPig: index, pigPage: '' }); if (this.pigBody) this.pigBody.scrollTop = 0; } })),
+      running: running, hasRunning: !!running.length, waits: wt.plan.map((x) => ({ w: x[0], t: x[1] })), hasWait: !!(wt.plan.length || wt.dec), hasDec: !!wt.dec, decision: wt.dec ? wt.dec.title : '', openDec: () => { if (wt.dec) this.openDecision(wt.dec); },
+      tags: D.tags || [], hasHealth: !!((D.tags || []).length || D.treatment || i.flag), treatment: D.treatment || '', hasTreatment: !!D.treatment,
+      notes: notes, hasNotes: !!notes.length, hasMore: !D.empty, more: Object.keys(titles).map((id) => ({ title: titles[id], aria: 'Open ' + titles[id], open: () => openPage(id) })), sections: sections,
+      penLine: 'Pen ' + p.code + ' · ' + rm.r.name,
+      backLabel: page ? (D.group ? i.who : i.tag) : member ? 'Pen ' + p.code : u.bv ? (this.batchData()[u.bv.id] || { name: 'Batch' }).name : rm.r.name,
+      back: () => this.locationBack(), canWatch: canWatch, feedOn: !!(u.icam && u.icam.kind === 'pen' && u.icam.code === p.code) };
   }
   askSend(rm, p, q) {
     q = String(q || '').trim();
@@ -9516,18 +9289,19 @@ class Component extends DCLogic {
     const wProf = u.narrow ? 380 : 420;
     const sideBottom = intro ? 80 : (u.bh || 70) + 32 + (camRoomOn ? 214 : 0);
     const profStyle = 'position: absolute; right: 16px; top: ' + (topY + 110) + 'px; bottom: ' + sideBottom + 'px; width: ' + wProf + 'px; max-width: calc(100% - 32px); z-index: 3; box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 10px 28px rgba(18, 24, 21, 0.09); animation: sentriRise 0.25s cubic-bezier(0.2, 0.7, 0.2, 1) both';
-    const askDef = { name: '', look: '', label: '', open: false, toggle: () => {}, log: [], hasLog: false, noLog: true, off: true, sendStyle: '', chevStyle: '', input: '', onInput: () => {}, onKey: () => {}, chips: [], send: () => {} };
-    const profT = pv ? {
-      aria: 'Pig profile, pen ' + pv.code, style: profStyle, title: pv.title,
-      titleStyle: (pv.titleMono ? "font-family: 'Geist Mono', ui-monospace, monospace; font-size: 20px; letter-spacing: -0.01em; " : 'font-size: 18px; ') + 'line-height: 26px; font-weight: 600; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis',
-      sub: pv.sub, stage: pv.stage, hasStage: !!pv.stage, hasChip: pv.hasChip, chip: pv.chip, chipStyle: lvlChip(pv.urgent ? 'urgent' : 'watch'), why: pv.why,
-      whyStyle: 'margin-top: 3px; font-size: 13.5px; line-height: 19px; font-weight: 500; color: ' + (pv.urgent ? '#9A1F17' : '#7A4A00'),
-      close: () => this.selClear(), back: () => this.selClear(), backLabel: u.bv ? (this.batchData()[u.bv.id] || { name: 'Batch' }).name : '', hasBack: !!u.bv, askChat: () => { try { window.dispatchEvent(new CustomEvent('sentri:ask')); } catch (e) { /* ignore */ } }, canWatchBtn: pv.canWatch && !pv.feedOn, watch: () => this.openCam('pen', pv.code),
-      watchStyle: 'width: 100%; height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #121815; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer',
-      feedOn: pv.feedOn, empty: pv.empty, emptyNote: pv.emptyNote, sections: pv.sections, ask: pv.ask,
+    const pigLeft = !!pv && !u.bv && !intro && (!pd.group || !!member);
+    const pigCardStyle = 'position: absolute; left: 16px; top: 16px; z-index: 3; width: 360px; max-width: calc(100% - 32px); box-sizing: border-box; display: flex; flex-direction: column; max-height: calc(100% - ' + ((u.bh || 70) + 48) + 'px); overflow: hidden; background: rgba(255,255,255,.96); border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18,24,21,.05), 0 10px 28px rgba(18,24,21,.09)';
+    const profT = pv ? Object.assign({}, pv, {
+      aria: (pigLeft ? 'Location card, pig profile, pen ' : 'Pig profile, pen ') + pv.code,
+      style: pigLeft ? pigCardStyle : profStyle, left: pigLeft, bodyOpen: !pigLeft || !u.cc,
+      titleStyle: (pv.titleMono ? "font-family: 'Geist Mono', ui-monospace, monospace; font-size: 20px; " : 'font-size: 20px; ') + 'line-height: 28px; font-weight: 600; flex: 1; min-width: 0; overflow-wrap: anywhere',
+      backStyle: 'min-height: 44px; padding: 0; border: 0; background: transparent; color: #626C66; font: inherit; font-size: 14px; cursor: pointer; text-align: left',
+      taskStyle: 'display: block; width: 100%; min-height: 44px; box-sizing: border-box; margin-top: 8px; padding: 10px 12px; border: 1px solid #E3E6E1; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 14px; line-height: 21px; text-align: left; cursor: pointer',
+      canWatchBtn: pv.canWatch && !pv.feedOn, watch: () => this.openCam('pen', pv.code),
+      watchStyle: 'width: 100%; min-height: 44px; display: flex; align-items: center; gap: 8px; padding: 0; border: 0; background: transparent; color: #4A544E; font: inherit; font-size: 14px; cursor: pointer',
       hasBatch: !!pv.batchId, batch: pv.batchId ? 'Batch ' + pv.batchId : '', batchAria: 'Show Batch ' + pv.batchId + ' across the farm', openBatch: () => this.openBatch(pv.batchId),
-      batchStyle: 'flex: none; height: 28px; display: inline-flex; align-items: center; gap: 4px; padding: 0 8px 0 10px; border: 1px solid #DCE0DA; border-radius: 8px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600; color: #121815; cursor: pointer'
-    } : { aria: '', style: profStyle, title: '', titleStyle: '', sub: '', stage: '', hasStage: false, hasChip: false, chip: '', chipStyle: '', why: '', whyStyle: '', close: () => {}, askChat: () => {}, canWatchBtn: false, watch: () => {}, watchStyle: '', feedOn: false, empty: false, emptyNote: '', sections: [], ask: askDef, hasBatch: false, batch: '', batchAria: '', openBatch: () => {}, batchStyle: '' };
+      batchStyle: 'flex: none; min-height: 44px; display: inline-flex; align-items: center; padding: 0 8px; border: 1px solid #DCE0DA; border-radius: 8px; background: #FFFFFF; font: inherit; font-size: 13px; color: #4A544E; cursor: pointer'
+    }) : {};
     // batches, on the right where the pig panel opens: the list, one batch, or one running task
     let bpT = { aria: '', style: profStyle, hasBack: false, back: () => {}, backLabel: '', hasIco: true, title: '', sub: '', close: () => {}, closeAria: '', isList: false, batches: [], isBatch: false, tasks: [], doneToggle: () => {}, doneLabel: '', sched: [], hasComp: false, noComp: false, noCompText: '', thisHead: '', figRows: [], isTask: false, big: '', bigOf: '', segs: [], legend: [], hint: '' };
     const bvOn = !!(this.IP && ((u.bv && this.batchData()[u.bv.id]) || u.bl));
@@ -9623,7 +9397,7 @@ class Component extends DCLogic {
       setPtEl: (el) => { this.ptEl = el || null; },
       loading: !ready || !!u.err,
       loadMsg: u.err || 'Loading the 3D model…',
-      showCard: ready && !intro && !u.err,
+      showCard: ready && !intro && !u.err && !pigLeft,
       showBar: ready && !intro && !u.err,
       cardStyle: 'position: absolute; left: 16px; top: 16px; z-index: 3; width: ' + (VV ? 360 : 280) + 'px; box-sizing: border-box; display: flex; flex-direction: column; max-height: calc(100% - ' + ((u.bh || 70) + 48) + 'px); overflow: hidden; background: rgba(255, 255, 255, 0.96); border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 10px 28px rgba(18, 24, 21, 0.09)',
       barInnerStyle: 'display: flex; flex-direction: column; min-height: 0; ' + P.fade,
@@ -9646,7 +9420,7 @@ class Component extends DCLogic {
       nightLabel: u.night ? 'Day' : 'Night',
       nightIcon: u.night ? ic.sun : ic.moon,
       ready: ready,
-      loc: loc, setLocBody: (el) => { this.locBody = el || null; }, setLocEquipment: (el) => { this.locEquipment = el || null; }, showProf: !!pv && (!!u.bv || intro), prof: profT, showBatch: bvOn && !pv, bp: bpT, showMulti: false, multi: multi,
+      loc: loc, setLocBody: (el) => { this.locBody = el || null; }, setLocEquipment: (el) => { this.locEquipment = el || null; }, setPigBody: (el) => { this.pigBody = el || null; if (pigLeft) this.locBody = el || null; }, showProf: !!pv && (!!u.bv || intro || pigLeft), prof: profT, showBatch: bvOn && !pv, bp: bpT, showMulti: false, multi: multi,
       showLens: VV && isRoom, lensOn: !!u.lens, lensTitle: u.lens ? 'Hide devices' : 'Show devices', toLens: () => this.put({ lens: !this.ui().lens }),
       lensStyle: 'width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; cursor: pointer; background: ' + (u.lens ? '#EEF0EC' : 'transparent') + '; color: ' + (u.lens ? '#121815' : '#4A544E'),
       addBtnStyle: 'height: 44px; box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px 0 14px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer',
