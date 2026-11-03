@@ -1949,11 +1949,11 @@
            "type": "outcome",
            "id": "fa-x11-ask-discard-drops-change",
            "tree": "X-11",
-           "label": "In the log the top action carries Undo; the question names it and changes nothing until answered",
+           "label": "In the log the top action carries Undo; the question shows the entry and what Undo changes, and changes nothing until answered",
            "gwt": {
             "given": "The Farrowing log is open; +3 born alive is on top with Undo.",
             "when": "The worker taps Undo.",
-            "then": "The shared dialog asks Undo +3 born alive? (Back / Undo); nothing changes yet."
+            "then": "The shared dialog asks Undo this entry? over +3 born alive · 09:41 · G.H, with Alive now 12 → 9 and Born 17 → 14 (Back / Undo); nothing changes yet."
            },
            "authority": [
             {
@@ -1964,10 +1964,20 @@
            ],
            "visible": [
             {
-             "text": "Undo +3 born alive?",
+             "text": "Undo this entry?",
              "in": "sheet",
-             "says": "the question names the action in the log's words",
              "hard": "broken-ruling"
+            },
+            {
+             "text": "+3 born alive",
+             "in": "sheet",
+             "says": "the entry in the log's words",
+             "hard": "wrong-fact"
+            },
+            {
+             "el": ".undo-change[aria-label=\"Alive now 12 becomes 9, Born 17 becomes 14\"]",
+             "says": "what Undo changes, now → after",
+             "hard": "wrong-fact"
             },
             {
              "el": "[data-action='undoLast']",
