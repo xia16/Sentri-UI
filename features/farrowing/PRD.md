@@ -179,3 +179,6 @@ From the Edit record product round ([edit-record-round.md](edit-record-round.md)
 - **Drawers are the tint with white cards** (owner, 2026-11-03: no white background anymore): the record drawer, Finish, Record dead and Details, as the pages. The piglet condition rows are one white action card.
 - Applies to a sow that finished normally; a died or aborted sow keeps the earlier record face. Earlier litters are sample data here; the sow profile's production records hold the real ones.
 - **Put down is a piglet death cause** (owner, 2026-11-03): a piglet that cannot recover and is put down by trained staff is recorded in Record dead / Report death under Died after birth, before Other (it used to fall under Other).
+- **Assisted is marked on Finish only** (owner, 2026-11-03): no Assisted farrowing in ···. Drug help (oxytocin) is a Treat with its time and dose; hands-on help is the required No / Yes for the whole litter at Finish. One place, so the two can never disagree.
+- **The undo question is a tint dialog with one ledger card** (owner, 2026-11-03): "Undo this entry?", a row per figure that changes, now → after; no entry line or note.
+- **Actions on the finished record is the black primary** (owner, 2026-11-03); optional rows on the tint are a quiet well until they hold something (Photos with photos is a white card).

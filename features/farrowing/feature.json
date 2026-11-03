@@ -1500,7 +1500,8 @@
           "\"Classification (weak/deformed) happens at Finish, commits per tap … Healthy has no form row\" (Model)",
           "\"Optional facts at Finish: litter weight (soft range warn) + assisted checkbox, presented as one cohesive group\" (Model); owner 2026-10-15: Assisted is a required No / Yes, No preselected, and one list holds all four rows",
           "\"Lock born N is hold-to-commit\" (Surfaces & entrances)",
-          "Drawers are the tint with white cards (owner, 2026-11-03: no white background anymore)"
+          "Drawers are the tint with white cards (owner, 2026-11-03: no white background anymore)",
+          "Assisted is marked on Finish only (owner, 2026-11-03): no Assisted farrowing in ···; drug help is a Treat"
         ],
         "issues": [
           "The ruled button \"Lock born N\" reads \"Finish farrowing\", the same words as the sheet title.",
