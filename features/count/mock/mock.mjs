@@ -267,104 +267,206 @@ if (want('10')) {
   await shoot(p, 'mock-10-unit-recount.png');
 }
 
-// 11. Finish recount: the unit's balance sheet as a ledger (owner, 2026-11-03). On record, each change signed, Counted: the lines add
-//     up (59 + 2 − 1 + 0 = 60). Pigs found from another unit add; a pig not found subtracts and goes on the batch's balancing sheet; the
-//     pigs without ear tags net across the unit's pens. Each change line opens its detail (11b–d).
+// 11. Finish recount: the unit's balance sheet (owner, 2026-11-03: "like a ledger", each line opens its detail). A, recommended: the
+//     result first (59 → 60), then what changed, each line a door with its signed figure in a tonal tile; the one needing follow-up
+//     (not found, to the batch's balancing sheet) is the only amber. B: the same as a statement (sign column, lines, rule, total).
 //     Count: C1 3 · C2 2 · D4 16 (000801 000802 + 000512 from Unit 9, 000733 from Unit 6, 12 without; 000803 not found) · D5 39 (000915 + 38).
-if (want('11')) {
+const LEDGER_CSS = `
+  .m-hero{background:var(--paper,#fff);border:1px solid var(--line,#dfe4d8);border-radius:18px;padding:16px 18px 18px;display:grid;grid-template-columns:auto auto 1fr;grid-template-rows:auto auto;column-gap:16px;align-items:baseline;margin:4px 0 24px}.m-hero .m-k{display:contents}.m-hero .m-from small{grid-area:1/1}.m-hero .m-from strong{grid-area:2/1}.m-hero .m-to small{grid-area:1/3}.m-hero .m-to strong{grid-area:2/3}.m-hero .m-arrow{grid-area:2/2;align-self:center}
+  .m-hero .m-k small{display:block;font-size:13px;color:var(--muted,#657060);margin-bottom:6px}
+  .m-hero .m-from strong{font:500 26px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink-2,#5b625d)}
+  .m-hero .m-to strong{font:600 40px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f);letter-spacing:-1px}
+  .m-hero .m-arrow{color:var(--muted,#657060)}.m-hero .m-arrow svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .m-hero .m-net{margin-left:auto;align-self:center;font:600 14px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink-2,#5b625d)}
+  .m-count .m-fig{display:inline-block;min-width:44px;text-align:center;box-sizing:border-box;padding:6px 8px;border-radius:10px;font:600 16px/1.1 var(--font-mono,'IBM Plex Mono',monospace);background:var(--well,#eef1e7);color:var(--ink,#20291f)}
+  .m-count .m-fig.m-zero{color:var(--muted,#657060)}
+  .m-count .m-fig.m-owe{background:var(--amber-fill,#fede82);color:var(--amber-fill-ink,#5c3f00)}
+  .m-stmt{background:var(--paper,#fff);border:1px solid var(--line,#dfe4d8);border-radius:18px;padding:6px 16px;margin:4px 0 0}
+  .m-stmt .m-l{display:grid;grid-template-columns:22px 1fr auto 16px;align-items:center;gap:10px;padding:14px 0;border-top:1px solid var(--rule,#e9ece3)}
+  .m-stmt .m-l:first-child{border-top:0}
+  .m-stmt .m-s{font:600 18px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink-2,#5b625d);text-align:center}
+  .m-stmt .m-t{font-size:16px;color:var(--ink,#20291f)}.m-stmt .m-t small{display:block;font-size:13px;color:var(--muted,#657060);margin-top:3px}
+  .m-stmt .m-n{font:600 17px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f);text-align:right}
+  .m-stmt .m-c{color:var(--muted,#657060)}.m-stmt .m-c svg{width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:1.8}
+  .m-stmt .m-l.m-total{border-top:1.5px solid var(--ink,#20291f)}.m-stmt .m-l.m-total .m-t,.m-stmt .m-l.m-total .m-n{font-weight:600}.m-stmt .m-l.m-total .m-n{font-size:22px}
+  .m-stmt .m-l.m-owe .m-n{color:var(--amber,#896017)}`;
+const ARROW = '<svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg>';
+const CHEV = '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>';
+const hero = (fromLabel, from, toLabel, to, net) => `<div class="m-hero"><div class="m-k m-from"><small>${fromLabel}</small><strong>${from}</strong></div><span class="m-arrow">${ARROW}</span><div class="m-k m-to"><small>${toLabel}</small><strong>${to}</strong></div>${net ? `<span class="m-net">${net}</span>` : ''}</div>`;
+
+if (want('11-')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
-  await p.evaluate((UNIT_CSS) => {
-    const { U, page } = window.M;
-    const sum = (title, figure, end) => U.row({ title, trailing: figure, className: 'm-sum' + (end ? ' m-end' : '') });
-    const change = (title, description, figure, cls = '') => U.row({ variant: 'navigation', title, description, trailing: figure, trail: 'chevron', action: 'x', className: cls });
-    const ledger = '<section class="feature-section m-ledger">' + U.rowGroup(sum('On record', '59')
-      + change('Found from other units', '000512, 000733', '+2')
-      + change('Not found', '000803 · to batch 25 balancing sheet', '−1', 'm-owed')
-      + change('Without ear tags', 'D4 −1 · D5 +1', '0')
-      + sum('Counted', '60', true)) + '</section>';
-    page('Unit 7 balance sheet', 'Recount · 09:40 · L.M', ledger, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save recount', register: 'primary', action: 'x' }) + '</div>');
-    const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
-  }, UNIT_CSS);
+  await p.evaluate(({ UNIT_CSS, LEDGER_CSS, top }) => {
+    const { U, ic, page } = window.M;
+    const fig = (n, cls = '') => '<span class="m-fig ' + cls + '">' + n + '</span>';
+    const change = (icon, title, description, n, cls) => U.row({ variant: 'navigation', icon: ic(icon), title, description, trail: 'chevron', action: 'x' })
+      .replace('<span class="st-row-chevron">', fig(n, cls) + '<span class="st-row-chevron">');
+    const body = top + '<section class="feature-section">' + U.heading({ title: 'What changed', kind: 'section', level: 3 })
+      + U.rowGroup(change('transfer', 'Found from other units', '000512 · 000733', '+2')
+        + change('alert', 'Not found', '000803 · balancing sheet', '−1', 'm-owe')
+        + change('tag-off', 'Without ear tags', 'D4 −1 · D5 +1', '0', 'm-zero')) + '</section>';
+    page('Unit 7 balance sheet', 'Recount · 09:40 · L.M', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save recount', register: 'primary', action: 'x' }) + '</div>');
+    const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS; document.head.append(st);
+  }, { UNIT_CSS, LEDGER_CSS, top: hero('On record', '59', 'Counted', '60', '') });
   await shoot(p, 'mock-11-unit-balance.png');
 }
+if (want('11-')) {
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate(({ UNIT_CSS, LEDGER_CSS, CHEV }) => {
+    const { U, page } = window.M;
+    const l = (s, t, sub, n, cls = '', door = true) => `<div class="m-l ${cls}"><span class="m-s">${s}</span><span class="m-t">${t}${sub ? `<small>${sub}</small>` : ''}</span><span class="m-n">${n}</span><span class="m-c">${door ? CHEV : ''}</span></div>`;
+    const body = '<div class="m-stmt">' + l('', 'On record', '', '59', '', false) + l('+', 'Found from other units', '000512 · 000733', '2')
+      + l('−', 'Not found', '000803 · to the balancing sheet', '1', 'm-owe') + l('±', 'Without ear tags', 'D4 −1 · D5 +1', '0')
+      + l('=', 'Counted', '', '60', 'm-total', false) + '</div>';
+    page('Unit 7 balance sheet', 'Recount · 09:40 · L.M', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save recount', register: 'primary', action: 'x' }) + '</div>');
+    const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS; document.head.append(st);
+  }, { UNIT_CSS, LEDGER_CSS, CHEV });
+  await shoot(p, 'mock-11-unit-balance-b.png');
+}
 
-// 11b–d. A ledger line opened: the pigs behind it, with the same signed figure on top.
+// 11b–d. A line opened: its pigs, under the same figure.
 const DETAILS = [
-  ['mock-11b-found.png', 'Found from other units', '+2', [['000512', 'Was Unit 9 · C3', '→ D4'], ['000733', 'Was Unit 6 · D2', '→ D4']], 'Saved, they move into D4 and leave their old units.'],
-  ['mock-11c-not-found.png', 'Not found', '−1', [['000803', 'Recorded in D4 · in no pen counted', '−1']], 'She goes on batch 25 balancing sheet. A later count, transfer or death closes it; still open when the batch ends, she is an unaccounted loss.'],
-  ['mock-11d-without-tags.png', 'Without ear tags', '0', [['D4', 'Recorded 13, counted 12', '−1'], ['D5', 'Recorded 37, counted 38', '+1']], 'Pigs moved between pens and not recorded balance out inside the unit.'],
+  ['mock-11b-found.png', 'Found from other units', '+2', '', [['000512', 'Was Unit 9 · C3', '→ D4'], ['000733', 'Was Unit 6 · D2', '→ D4']], 'Saved, they move into D4 and leave their old units.'],
+  ['mock-11c-not-found.png', 'Not found', '−1', 'm-owe', [['000803', 'Recorded in D4', '']], 'She goes on batch 25 balancing sheet. A later count, transfer or death closes it; still open when the batch ends, she is an unaccounted loss.'],
+  ['mock-11d-without-tags.png', 'Without ear tags', '0', 'm-zero', [['D4', 'Recorded 13 · counted 12', '−1'], ['D5', 'Recorded 37 · counted 38', '+1']], 'Pigs moved between pens and not recorded balance out inside the unit.'],
 ];
-for (const [name, title, figure, rows, note] of DETAILS) {
+for (const [name, title, figure, cls, rows, note] of DETAILS) {
   if (!want(name.slice(5, 8))) continue;
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
-  await p.evaluate(({ UNIT_CSS, title, figure, rows, note }) => {
+  await p.evaluate(({ UNIT_CSS, LEDGER_CSS, title, figure, cls, rows, note }) => {
     const { U, page } = window.M;
-    const body = '<section class="feature-section m-ledger">' + U.rowGroup(U.row({ title: 'Unit 7', trailing: figure, className: 'm-sum' })
-      + rows.map(([code, description, trailing]) => U.row({ code, description, trailing, className: 'm-line' })).join(''))
+    const body = '<section class="feature-section">' + U.rowGroup(U.row({ title: 'Unit 7', className: 'm-sum', trailing: 'X' }).replace('<span class="st-row-trailing">X</span>', '<span class="m-fig ' + cls + '">' + figure + '</span>') + rows.map(([code, description, trailing]) => U.row({ code, description, trailing, className: 'm-line' })).join(''))
       + '<p class="m-hint m-explain">' + note + '</p></section>';
     page(title, 'Unit 7 balance sheet', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + '</div>');
-    const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
-  }, { UNIT_CSS, title, figure, rows, note });
+    const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS + '.m-count .st-sheet-line .m-fig,.m-count .sheet-line .m-fig{padding:2px 6px;font-size:13px;min-width:0}'; document.head.append(st);
+  }, { UNIT_CSS, LEDGER_CSS, title, figure, cls, rows, note });
   await shoot(p, name);
 }
 
-// 12. Receive pigs into one pen: the same pen count. All pigs put in N3, then the ear tags, so each tagged pig is placed in its pen.
+// 13–15. Receiving (owner, 2026-11-03), two parts. First the plan: where the pigs go and how many in each pen, drawn on the unit's
+//     pen map so the crew sees it at a glance; they put the pigs in by it, and it is only a guide. Then the count: once the pigs are in,
+//     they count the pens (the pen count, all pigs then ear tags), so what they counted is where the pigs are, whatever the plan said.
+//     Finish shows the balance against what was sent. Unit 9: lanes A–C, rows 1–4; batch 25 (120) planned 15 a pen into A1–B4.
+const PLAN_CSS = `
+  .m-count .m-map{margin:0}
+  .m-count .m-map .st-pen-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:64px}
+  .m-count .m-map .st-pen-tile .m-pc{font:600 13px var(--font-mono,'IBM Plex Mono',monospace);color:var(--muted,#657060)}
+  .m-count .m-map .st-pen-tile .m-pn{font:600 20px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}
+  .m-count .m-map .st-pen-tile[data-level="empty"] .m-pc{font-weight:500}
+  .m-count .m-map .st-pen-tile.m-done{background:var(--done-fill,#d5e8cc);border-color:transparent}
+  .m-count .m-map .st-pen-tile.m-done .m-pc,.m-count .m-map .st-pen-tile.m-done .m-pn{color:var(--done-fill-ink,#1d4d2e)}
+  .m-count .m-map .st-pen-tile.m-todo .m-pn{color:var(--muted,#657060);font-weight:500}
+  .m-count .m-plankey{display:flex;gap:16px;font-size:13px;color:var(--ink,#20291f);margin:2px 0 14px}.m-count .m-plankey i{display:inline-block;width:12px;height:12px;border-radius:4px;vertical-align:-1px;margin-right:6px}
+  .m-count .m-plankey b{font-family:var(--font-mono,'IBM Plex Mono',monospace)}`;
+async function receiveMap(name, opts) {
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate(({ UNIT_CSS, LEDGER_CSS, PLAN_CSS, o }) => {
+    const { U, ic, page, footer, primary } = window.M;
+    const pens = {}; for (const c of Object.keys(o.tiles)) pens[c] = 'plain';
+    let map = U.penMap({ lanes: o.lanes, depth: o.depth, pens, entrance: 'Entrance', key: 'recv' });
+    const host = document.createElement('div'); host.innerHTML = map;
+    host.querySelectorAll('.st-pen-tile').forEach((t) => {
+      const c = t.dataset.pen, v = o.tiles[c];
+      t.innerHTML = '<span class="m-pc">' + c + '</span>' + (v ? '<span class="m-pn">' + v[0] + '</span>' : '');
+      if (v && v[1]) t.classList.add(v[1]);
+    });
+    map = '<div class="m-map">' + host.innerHTML + '</div>';
+    const top = o.facts ? '<section class="feature-section">' + U.facts(o.facts.map(([label, value]) => ({ label, value })), { columns: o.facts.length }) + '</section>' : o.top;
+    page(o.title, o.line, top + o.key + map, footer(o.left, primary(o.cta)));
+    const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS + PLAN_CSS; document.head.append(st);
+  }, { UNIT_CSS, LEDGER_CSS, PLAN_CSS, o: opts });
+  await shoot(p, name);
+}
+const bar = (n, of, word, segs) => `<div class="m-recv-bar"><div class="m-recv-figs"><strong>${n}</strong><span>${word}</span></div><div class="m-recv-track" data-status-part="bar">${segs}</div><small>${of}</small></div>`;
+if (want('13-')) {
+  const tiles = {}; for (const c of ['A1', 'A2', 'A3', 'A4', 'B1', 'B2', 'B3', 'B4']) tiles[c] = ['15'];
+  await receiveMap('mock-13-receive-plan.png', {
+    title: 'Receive pigs', line: 'Batch 25 · from Farrowing room 3', lanes: ['A', 'B', 'C'], depth: 4, tiles,
+    facts: [['Arriving', '120'], ['Pens', '8'], ['Each pen', '15']],
+    key: '', left: '<div class="m-left"><strong>Pigs in?</strong><small>Count each pen</small></div>', cta: 'Count pens',
+  });
+}
+if (want('13b')) {
+  const tiles = {}; for (const c of ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7']) tiles[c] = [''];
+  await receiveMap('mock-13b-receive-crates.png', {
+    title: 'Receive sows', line: 'Batch 31 · into Gestation 2', lanes: ['A', 'B', 'C', 'D'], depth: 8, tiles,
+    facts: [['Arriving', '14'], ['Crates', '14']],
+    key: '', left: '<div class="m-left"><strong>One sow a crate</strong><small>Into the white crates</small></div>', cta: 'Check in sows',
+  });
+}
+if (want('14-')) {
+  const tiles = { A1: ['15', 'm-done'], A2: ['16', 'm-done'], A3: ['14', 'm-done'], B1: ['15', 'm-done'], A4: ['15', 'm-todo'], B2: ['15', 'm-todo'], B3: ['15', 'm-todo'], B4: ['15', 'm-todo'] };
+  await receiveMap('mock-14-receive-count.png', {
+    title: 'Receive pigs', line: 'Batch 25 · into Unit 9', lanes: ['A', 'B', 'C'], depth: 4, tiles,
+    top: bar('4', '60 counted of 120 sent', 'of 8 pens counted', '<i class="done" style="flex:1"></i>'.repeat(4) + '<i style="flex:1"></i>'.repeat(4)),
+    key: '<p class="m-plankey"><span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span><span><i style="background:#fff;border:1px solid var(--line,#dfe4d8);box-sizing:border-box"></i>Plan, not counted</span></p>',
+    left: '<div class="m-left"><strong>4 pens to count</strong><small>Tap a pen to count it</small></div>', cta: 'Finish receiving',
+  });
+}
+// 15. Finish receiving: sent against counted, and what's off. The plan is not a line: where they were counted is where they are.
+if (want('15-')) {
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate(({ UNIT_CSS, LEDGER_CSS, top }) => {
+    const { U, ic, page } = window.M;
+    const fig = (n, cls = '') => '<span class="m-fig ' + cls + '">' + n + '</span>';
+    const change = (icon, title, description, n, cls) => U.row({ variant: 'navigation', icon: ic(icon), title, description, trail: 'chevron', action: 'x' })
+      .replace('<span class="st-row-chevron">', fig(n, cls) + '<span class="st-row-chevron">');
+    const body = top + '<section class="feature-section">' + U.heading({ title: 'What changed', kind: 'section', level: 3 })
+      + U.rowGroup(change('tag-off', 'Not arrived', 'Without an ear tag · balancing sheet', '−1', 'm-owe')) + '</section>';
+    page('Unit 9 balance sheet', 'Receive · batch 25 · 11:20 · L.M', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save receiving', register: 'primary', action: 'x' }) + '</div>');
+    const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS; document.head.append(st);
+  }, { UNIT_CSS, LEDGER_CSS, top: hero('Sent', '120', 'Counted', '119', '') });
+  await shoot(p, 'mock-15-receive-balance.png');
+}
+
+// 12. Count one pen after putting pigs in: the same pen count, with the plan beside it.
 if (want('12')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
   await p.evaluate((UNIT_CSS) => {
     const { U, ic, page, footer, primary } = window.M;
-    const pig = (id, ctx) => U.rowSelectDoor({ code: id, description: ctx, contextWidth: '240px', right: { kind: 'tags', tags: [] }, checked: true, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig selected', label: id });
-    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs put in N3', value: 14, min: 1, max: 80, action: 'x', reserveHint: false }) + '</section>';
+    const pig = (id, ctx) => U.rowSelectDoor({ code: id, description: ctx, right: { kind: 'tags', tags: [] }, checked: true, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig selected', label: id });
+    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs in A3', value: 14, min: 1, max: 80, action: 'x', reserveHint: false }) + '</section>';
     const search = U.choiceSearch({ label: 'Search ear tag', placeholder: 'Ear tag', value: '', clear: { action: 'x' }, scan: { action: 'x', label: 'Scan ear tags' } });
     const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Ear tags · 1', icon: ic('tag'), kind: 'section', level: 3 })
-      + '<div class="m-inline-bar">' + search + '</div>' + U.rowGroup(pig('000904', 'Gilt · from B4')) + '</section>';
-    const left = '<div class="m-left"><strong>13 without ear tags</strong><small>Into N3 · batch 25</small></div>';
-    page('Put pigs in N3', 'Receive · Unit 9', count + tags, footer(left, primary('Done')));
+      + '<div class="m-inline-bar">' + search + '</div>' + U.rowGroup(pig('000904', 'Gilt')) + '</section>';
+    const left = '<div class="m-left"><strong>13 without ear tags</strong><small>Plan 15 · batch 25</small></div>';
+    page('Count A3', 'Receive · Unit 9', count + tags, footer(left, primary('Done')));
     const st = document.createElement('style'); st.textContent = UNIT_CSS + '.st-choice-trail input[type="checkbox"]{accent-color:#276640!important}.inspect-pig.selected,.roster-pig.selected{background:var(--paper,#fff)!important}'; document.head.append(st);
   }, UNIT_CSS);
   await shoot(p, 'mock-12-receive-pen.png');
 }
 
-// 8 (redrawn). Receive pigs into Unit 9: received against sent on top, then the unit's pens; tap a pen to put pigs in it.
-if (want('8-')) {
+// 9. Pigs to move: a reference list of what moves. A pen sending only some says how many of how many; the pigs that stay fold away
+//    behind one quiet line (owner, 2026-11-03: users don't need them, Expand shows them). 9b: expanded.
+for (const [name, open9] of [['mock-9-transfer-out.png', false], ['mock-9b-transfer-out-expanded.png', true]]) {
+  if (!want(name.slice(5, 7))) continue;
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
-  await p.evaluate((UNIT_CSS) => {
-    const { U, ic, page, footer, primary } = window.M;
-    const pen = (code, figure, what) => U.row({ variant: 'navigation', code, description: what, trailing: figure, trail: 'chevron', action: 'x', className: 'm-line' });
-    const bar = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>112</strong><span>of 120 received</span></div><div class="m-recv-track" data-status-part="bar"><i class="done" style="flex:112"></i><i style="flex:8"></i></div><small>Batch 25 · from Farrowing room 3</small></div>';
-    const list = U.heading({ title: 'Pens', icon: ic('grid'), kind: 'section', level: 3 })
-      + U.rowGroup(pen('N1', '15', 'Put in') + pen('N2', '15', 'Put in') + pen('N3', '14', 'Put in · 1 with ear tag') + pen('N4', '16', 'Put in') + pen('N5', '15', 'Put in') + pen('N6', '15', 'Put in') + pen('N7', '12', 'Put in') + pen('N8', '10', 'Put in') + pen('N9', '', 'Empty'));
-    const left = '<div class="m-left"><strong>8 still to come</strong><small>120 sent</small></div>';
-    page('Receive pigs', 'Batch 25 · into Unit 9', bar + list, footer(left, primary('Finish receiving')));
-    const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
-  }, UNIT_CSS);
-  await shoot(p, 'mock-8-receive.png');
-}
-
-// 9 (redrawn). Pigs to move: a reference list. A pen sending only some of its pigs says how many of how many, and names who stays.
-if (want('9-')) {
-  const p = await open(INSPECT, 'inspection.walk');
-  await prep(p);
-  await p.evaluate((UNIT_CSS) => {
+  await p.evaluate(({ UNIT_CSS, open9 }) => {
     const { U, ic, page } = window.M;
+    const DOWN = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="' + (open9 ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6') + '"/></svg>';
     const pen = (code, head, rows) => '<section class="inspect-pen m-card"><header class="inspect-pen-head"><span class="pen-name"><strong>' + code + '</strong><small>· ' + head + '</small></span></header>' + rows + '</section>';
     const heads = (n) => U.row({ icon: ic('tag-off'), title: n + ' pigs', description: 'Without ear tags' });
     const tagged = (id, ctx) => U.row({ code: id, description: ctx, trail: 'chevron', action: 'x' });
-    const stays = (id, ctx) => U.row({ code: id, description: ctx, className: 'm-stays' });
+    const stays = (n) => '<button type="button" class="m-more">' + (open9 ? 'Hide' : 'Show') + ' ' + n + ' that stays' + DOWN + '</button>';
     const head = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>120</strong><span>pigs to move</span></div><small>From Farrowing room 3 to Unit 9 · today</small></div>';
     const list = '<div class="inspect-list m-list">'
-      + pen('B1', 'all 11 move', heads(11))
-      + pen('B2', '12 of 13 move', heads(12) + stays('000901', 'Stays in B2 · kept for breeding'))
-      + pen('B3', 'all 10 move', heads(10))
-      + pen('B4', 'all 13 move', heads(12) + tagged('000904', 'Gilt')) + '</div>';
+      + pen('B1', 'all 11', heads(11))
+      + pen('B2', '12 of 13', heads(12) + (open9 ? U.row({ code: '000901', description: 'Stays in B2', className: 'm-stays' }) : '') + stays(1))
+      + pen('B3', 'all 10', heads(10))
+      + pen('B4', 'all 13', heads(12) + tagged('000904', 'Gilt')) + '</div>';
     page('Pigs to move', 'Transfer · batch 25', head + list, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Receive in Unit 9', register: 'primary', action: 'x' }) + '</div>');
-    const st = document.createElement('style'); st.textContent = UNIT_CSS + `.m-stays{background:var(--well,#eef1e7)}.m-stays .st-row-code,.m-stays .st-row-copy small{color:var(--muted,#657060)}`; document.head.append(st);
-  }, UNIT_CSS);
-  await shoot(p, 'mock-9-transfer-out.png');
+    const st = document.createElement('style'); st.textContent = UNIT_CSS + `.m-stays .st-row-code,.m-stays .st-row-copy small{color:var(--muted,#657060)}
+      .m-more{display:flex;align-items:center;gap:6px;width:100%;min-height:48px;padding:0 16px;border:0;border-top:1px solid var(--rule,#e9ece3);background:none;font:500 13px var(--font-sans,'Plus Jakarta Sans',sans-serif);color:var(--muted,#657060)}`;
+    document.head.append(st);
+  }, { UNIT_CSS, open9 });
+  await shoot(p, name);
 }
 
 await b.close(); server.kill();
