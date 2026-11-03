@@ -812,8 +812,8 @@ export interface PenMapProps {
   lanes?: Array<string | PenMapLane>;
   /** Rows (pens per lane) for letter lanes. Pen codes are the lane then the row: B3, A120. */
   depth?: number;
-  /** Pens across several lanes, in the row after the longer of those lanes (an end pen across A and B: C1). */
-  across?: Array<{ code: string; lanes: string[]; type?: string }>;
+  /** Rows of pens across the room (the layout's end rows): before the lanes (`door`) or after them (`far`, default), each run named and folded under the lanes, four across at most, counted from lane A's side. */
+  rows?: Array<{ letter?: string; at?: 'far' | 'door'; runs: Array<{ n: number; type?: string }> }>;
   /** Pens on their own (drawn, any shape): a column each beyond the last lane, at `row` or at the end. */
   apart?: Array<{ code: string; row?: number }>;
   /** Which side lane A is on as you walk in at the main door (default left). */

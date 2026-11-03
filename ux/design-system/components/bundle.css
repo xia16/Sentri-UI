@@ -1120,6 +1120,9 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-pen-exit svg{width:var(--size-16);height:var(--size-16);stroke-width:var(--icon-pad-stroke);transform:rotate(180deg)}
 /* a run of another pen type along a lane: its name, one quiet line over its first pen */
 .st-pen-run{display:flex;align-items:flex-end;min-width:0;padding:var(--space-8) 0 0;color:var(--muted);font:var(--type-weight-semibold) var(--type-meta-size)/1.25 var(--font-sans);overflow-wrap:anywhere}
+.st-pen-line{display:grid;grid-template-columns:repeat(var(--pm-across,1),minmax(var(--pm-tile),1fr));gap:var(--pm-gap);min-width:0}
+.st-pen-line[data-rtl]{direction:rtl}
+.st-pen-line[data-rtl]>*{direction:ltr}
 .st-pen-field{position:relative;display:flex;flex:0 1 auto;min-height:0}
 .st-pen-scroll{scroll-snap-type:both proximity;scroll-padding:calc(var(--pm-head) + var(--pm-gap)) 0 0 calc(var(--pm-label) + var(--pm-gap));position:relative;flex:1 1 auto;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:none;border-radius:var(--radius-control);-webkit-overflow-scrolling:touch}
 .st-pen-scroll::-webkit-scrollbar{display:none;width:0;height:0}
