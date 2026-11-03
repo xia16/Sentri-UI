@@ -31,8 +31,9 @@ Group heading (optional); lead control (optional); option label; meta line (opti
 | State | Rendering and response |
 | --- | --- |
 | Default | Label, optional meta, trailing mark; nothing selected is shown as nothing. |
+| Ticked inside | A navigate row over a multi level with ticks inside shows their number as a green `select-mark` badge before the chevron (`count`), read "N selected"; its meta keeps its own words (owner, 2026-11-03, canvas B3). |
 | Pressed | `choice-press` fill; static `pressed` prop. |
-| Selected | Single: a trailing ink check or ring plus stronger label; a single choice is never green (green is done). Multi: the checkbox ticked in `select-mark` green with a white tick, the row left white (owner, 2026-11-03). Never colour alone. |
+| Selected | Single: a trailing ink check or ring plus stronger label; a single choice is never green (green is done). Multi: the checkbox ticked in `select-mark` green with a white tick, the row left white (owner, 2026-11-03). The box is drawn by the system (bundle.css), not the browser, so it is one green under the pointer and after a tap. Never colour alone. |
 | Disabled | Prefer omission. Otherwise readable text, `aria-disabled`, and a persistent reason line; no dimming. |
 | Loading | Loading options status in place of rows. |
 | Empty | No options or no search match; never a blank panel. |
@@ -91,6 +92,8 @@ Component: generic and shared across sections. Selection modes are variants of t
 Wheels (`UIPickerView`, `NumberPicker`) are for long ordered values only (dates, times, numbers), never for named options: they are poor with gloves and hide options a farmer should see at once.
 
 ## Changelog
+
+2026-11-03 (Conditions, canvas B3): `count` on a navigate row; the tree's "N selected" meta becomes the badge. The checkbox is drawn in bundle.css (native accent-color darkened under the pointer: two greens).
 
 2026-10-22 (library merge, TaskRadios): TaskRadios folds in. The flat radio is `choiceRadios({ face: 'flat' })` and the inline pill field is `face: 'row'`; their CSS moved from task-skeleton.css to bundle.css; `SentriTask.radios` stays as a thin alias with the same markup, so every caller draws as before. The TaskRadios folder is archived; variant `radio-flat`.
 
