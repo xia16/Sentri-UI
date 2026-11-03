@@ -363,37 +363,55 @@ async function receiveMap(name, opts) {
   await shoot(p, name);
 }
 const bar = (n, of, word, segs) => `<div class="m-recv-bar"><div class="m-recv-figs"><strong>${n}</strong><span>${word}</span></div><div class="m-recv-track" data-status-part="bar">${segs}</div><small>${of}</small></div>`;
-const ROOM_KEY = '<p class="m-plankey"><span><i class="m-k-plan"></i>Planned</span><span><b>15</b> Free places</span></p>';
-const roomTiles = (planned) => {
-  const t = { C1: ['Full', 'm-word'], C2: ['6', 'm-free'], C3: ['15', 'm-free'], C4: ['15', 'm-free'] };
-  for (const [c, n] of Object.entries(planned)) t[c] = [n, 'm-plan'];
-  return t;
-};
-if (want('13-')) {
-  const tiles = roomTiles({ A1: '15', A2: '15', A3: '15', A4: '15', B1: '15', B2: '15', B3: '15', B4: '15' });
-  await receiveMap('mock-13-receive-plan.png', {
-    title: 'Receive pigs', line: 'Batch 25 · from Farrowing room 3', lanes: ['A', 'B', 'C'], depth: 4, tiles,
-    facts: [['Arriving', '120'], ['Planned room', '120'], ['Other room', '36']],
-    key: ROOM_KEY, left: '<div class="m-left"><strong>Pigs in?</strong><small>Count each pen</small></div>', cta: 'Count pens',
-  });
+// Receiving is a task page like Farrowing's room (owner, 2026-11-03): one header, the task card (this unit, and the task overview
+// across units, where the crew switches unit and ends the task); the unit's pen map below. Every pen shows pigs in it over its
+// capacity (0/15); the planned pens are outlined, a suggestion only; tap any pen to count it. Batch 25: 120 pigs to Unit 9 (planned
+// A1–A4, B1–B2) and Unit 10 (30, done). Run from a checkout that has Farrowing's room page.
+async function taskMap(name, o) {
+  const p = await b.newPage({ viewport: { width: 390, height: 844 } });
+  await p.goto(`http://localhost:${port}/ux/system/farrowing-astra-concept.html?layout=focus&screen=farrowing.room`);
+  await p.waitForSelector('html.atlas-ready', { timeout: 15000 });
+  await p.evaluate(({ PLAN_CSS, o }) => {
+    const U = window.SentriUI;
+    const titles = document.querySelector('.st-page-titles');
+    titles.children[0].textContent = o.title; if (titles.children[1]) titles.children[1].textContent = o.line;
+    document.querySelector('.room-context-strip').innerHTML = window.AstraTaskOverview.render({ headingIcons: true, unit: o.unit, task: o.task });
+    document.querySelector('.room-controls')?.remove();
+    const pens = {}; for (const c of Object.keys(o.tiles)) pens[c] = 'plain';
+    const host = document.createElement('div'); host.innerHTML = U.penMap({ lanes: o.lanes, depth: o.depth, pens, entrance: 'Entrance', key: 'recv' });
+    host.querySelectorAll('.st-pen-tile').forEach((t) => {
+      const c = t.dataset.pen, v = o.tiles[c];
+      t.innerHTML = '<span class="m-pc">' + c + '</span>' + (v ? '<span class="m-pn">' + v[0] + '</span>' : '');
+      if (v && v[1]) t.classList.add(v[1]);
+    });
+    const list = document.querySelector('.room-list'); list.classList.add('m-count');
+    list.innerHTML = o.key + '<div class="m-map">' + host.innerHTML + '</div>';
+    const walk = document.createTreeWalker(document.querySelector('.st-task-dock, [data-ds="TaskDock"]') || document.body, NodeFilter.SHOW_TEXT);
+    while (walk.nextNode()) if (walk.currentNode.nodeValue.trim() === 'Pen map') walk.currentNode.nodeValue = 'Pen list';
+    const st = document.createElement('style'); st.textContent = PLAN_CSS + '.room-list.m-count{padding-bottom:24px}'; document.head.append(st);
+  }, { PLAN_CSS, o });
+  await p.waitForTimeout(400);
+  await p.screenshot({ path: path.join(out, name) });
+  await p.close();
 }
-if (want('13b')) {
-  const tiles = roomTiles({ A1: '15', A2: '15', A3: '15', A4: '15', B1: '15', B2: '15', B3: '15', B4: '12' });
-  await receiveMap('mock-13b-receive-short.png', {
-    title: 'Receive pigs', line: 'Batch 25 · from Farrowing room 3', lanes: ['A', 'B', 'C'], depth: 4, tiles,
-    facts: [['Arriving', '120'], ['Planned room', '117'], ['Other room', '36']],
-    chip: '3 more than the planned pens hold',
-    key: ROOM_KEY, left: '<div class="m-left"><strong>Pigs in?</strong><small>Count each pen</small></div>', cta: 'Count pens',
-  });
+const keyOf = (counted) => '<p class="m-plankey">' + (counted ? '<span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span>' : '')
+  + '<span><i class="m-k-plan"></i>Planned</span><span><b>9/15</b> In / capacity</span></p>';
+const unit9 = (over) => {
+  const t = { A1: ['0/15', 'm-plan'], A2: ['0/15', 'm-plan'], A3: ['0/15', 'm-plan'], A4: ['0/15', 'm-plan'], B1: ['0/15', 'm-plan'], B2: ['0/15', 'm-plan'],
+    B3: ['0/15', 'm-free'], B4: ['0/15', 'm-free'], C1: ['15/15', 'm-free'], C2: ['9/15', 'm-free'], C3: ['0/15', 'm-free'], C4: ['0/15', 'm-free'] };
+  return { ...t, ...over };
+};
+const RECV = { title: 'Receive pigs', line: 'Batch 25 · from Farrowing room 3', lanes: ['A', 'B', 'C'], depth: 4 };
+if (want('13-')) {
+  await taskMap('mock-13-receive-plan.png', { ...RECV, tiles: unit9({}), key: keyOf(false),
+    unit: { name: 'Unit 9', value: '0', metric: 'Received', target: '6 pens planned' },
+    task: { value: 30, total: 120, label: 'Received', statuses: { farrowed: 30, active: 0, awaiting: 90 } } });
 }
 if (want('14-')) {
-  const tiles = { ...roomTiles({ A4: '15', B2: '15', B3: '15', B4: '15' }), A1: ['15', 'm-done'], A2: ['16', 'm-done'], A3: ['14', 'm-done'], B1: ['15', 'm-done'], C3: ['3', 'm-done'] };
-  await receiveMap('mock-14-receive-count.png', {
-    title: 'Receive pigs', line: 'Batch 25 · into Unit 9', lanes: ['A', 'B', 'C'], depth: 4, tiles,
-    top: bar('63', 'In 5 pens · C3 off the plan', 'of 120 pigs counted', '<i class="done" style="flex:63"></i><i style="flex:57"></i>'),
-    key: '<p class="m-plankey"><span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span><span><i class="m-k-plan"></i>Planned</span><span><b>15</b> Free</span></p>',
-    left: '<div class="m-left"><strong>57 still to count</strong><small>Tap a pen to count</small></div>', cta: 'End task',
-  });
+  await taskMap('mock-14-receive-count.png', { ...RECV, key: keyOf(true),
+    tiles: unit9({ A1: ['15/15', 'm-done'], A2: ['15/15', 'm-done'], A3: ['14/15', 'm-done'], B1: ['15/15', 'm-done'], C3: ['4/15', 'm-done'] }),
+    unit: { name: 'Unit 9', value: '63', metric: 'Received', target: '5 pens counted' },
+    task: { value: 93, total: 120, label: 'Received', statuses: { farrowed: 93, active: 0, awaiting: 27 } } });
 }
 if (want('10')) {
   const tiles = { C1: ['3', 'm-done'], C2: ['2', 'm-done'], D4: ['16', 'm-done'], D5: ['38', 'm-todo'] };
@@ -466,28 +484,21 @@ for (const [name, view] of [['mock-9b-pen-move.png', 'move'], ['mock-9c-pen-stay
 }
 
 // 16. End the transfer (owner, 2026-11-03: "look at how we do it for the farrowing end task"): Farrowing's End task, its own parts.
-//     The heading answers whether the task can close; one bar over the batch's pigs, then a row per part (Received, Still to count,
-//     Not arrived, which goes on the balancing sheet with the amber "!"; the row says what ending does); the hold. No second
+//     The heading answers whether the task can close; one bar over the batch's pigs, then a row per part (Received; Not arrived,
+//     never "still to count": the planned pens are a suggestion, so nothing is owed to a pen; which goes on the balancing sheet with the amber "!"; the row says what ending does); the hold. No second
 //     count card and no "When you end" (owner, 2026-11-03: confusing; the part rows already say it). These need Farrowing's End task (PR 294): run from a checkout that has it.
 const FARROW = `http://localhost:${port}/ux/system/farrowing-astra-concept.html?layout=focus`;
 const END = [
-  ['mock-16-end-blocked.png', 'task-blocked', {
-    heading: 'Before you can end', meta: '120 pigs', segs: [['farrowed', 105], ['active', 15]],
-    parts: [['done', 105, 'Received', 'Counted into 7 pens in Unit 9', false], ['active', 15, 'Still to count', 'Count B4 to end the task', true]],
-    sent: 120, counted: 105, countedNote: 'B4 not counted yet', tagged: 2,
-    ends: [['Recorded in Unit 9', '105'], ['Left in Farrowing room 3', '0']], owe: null,
-    hold: ['End task early', 'COUNT B4 FIRST', true],
-  }],
   ['mock-16b-end-early.png', 'task-ready', {
-    heading: 'Ready to end early', meta: '120 pigs', segs: [['farrowed', 119], ['awaiting', 1]],
-    parts: [['done', 119, 'Received', 'Counted into 9 pens in Unit 9', false], ['awaiting', 1, 'Not arrived', 'Goes on the balancing sheet', true, true]],
+    heading: 'Ready to end early', meta: '120 pigs', segs: [['farrowed', 105], ['awaiting', 15]],
+    parts: [['done', 105, 'Received', 'Counted into Unit 9 and Unit 10', false], ['awaiting', 15, 'Not arrived', 'Goes on the balancing sheet', true, true]],
     sent: 120, counted: 119, countedNote: '1 not arrived', tagged: 2,
     ends: [['Recorded in Unit 9', '119'], ['Left in Farrowing room 3', '0']], owe: ['To the balancing sheet', '1', 'A loss if not found by batch end'],
     hold: ['End task early', 'HOLD TO END EARLY', false, true],
   }],
   ['mock-16c-end-ready.png', 'task-complete', {
     heading: 'Ready to end', meta: '120 pigs', segs: [['farrowed', 120]],
-    parts: [['done', 120, 'Received', 'Counted into 9 pens in Unit 9', false]],
+    parts: [['done', 120, 'Received', 'Counted into Unit 9 and Unit 10', false]],
     sent: 120, counted: 120, countedNote: 'All arrived', tagged: 2,
     ends: [['Recorded in Unit 9', '120'], ['Left in Farrowing room 3', '0']], owe: null,
     hold: ['End task', 'HOLD TO END', false],
@@ -526,6 +537,21 @@ for (const [name, screen, d] of END) {
   await p.waitForTimeout(500);
   await p.screenshot({ path: path.join(out, name) });
   await p.close();
+}
+
+if (want('16d')) {
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate((UNIT_CSS) => {
+    const { U, ic, page } = window.M;
+    const pig = (id, was) => U.row({ code: id, description: was, trail: 'chevron', action: 'x' });
+    const body = '<section class="feature-section">' + U.rowGroup(U.row({ icon: ic('tag-off'), title: '13 pigs', description: 'Without ear tags' })) + '</section>'
+      + '<section class="feature-section">' + U.heading({ title: 'With ear tags', meta: '2', icon: ic('tag'), kind: 'section', level: 3 })
+      + U.rowGroup(pig('000903', 'Gilt · was A3') + pig('000911', 'Barrow · was B2')) + '</section>';
+    page('Not arrived', 'Batch 25 · 15 pigs', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + '</div>');
+    const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
+  }, UNIT_CSS);
+  await shoot(p, 'mock-16d-not-arrived.png');
 }
 
 await b.close(); server.kill();
