@@ -150,7 +150,7 @@
 .inspection-phone .picker-step .catalog-search input{min-height:48px;font-size:var(--type-row-title-size);font-weight:400}
 .inspection-phone .picker-step :is(.health-catalog,.medicine-results,.st-picker-options){scrollbar-width:none;overscroll-behavior:contain}
 .inspection-phone .picker-step :is(.health-catalog,.medicine-results,.st-picker-options)::-webkit-scrollbar{display:none}
-.inspection-phone .picker-step :is(.catalog-categories,.catalog-items,.chooser-options,.st-picker-options){border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper);overflow:hidden}
+.inspection-phone .picker-step :is(.catalog-categories,.catalog-items,.chooser-options,.st-picker-options){border:1px solid var(--st-rule,#dce2d5);border-radius:14px;background:var(--st-paper,#fff);overflow:hidden}
 .inspection-phone .picker-step .catalog-categories{gap:0}
 .inspection-phone .picker-step :is(.catalog-category,.catalog-item,.medicine-option,.st-picker-option){box-sizing:border-box;min-height:52px;padding:12px 14px;margin:0;border:0;border-bottom:1px solid var(--st-rule,#dce2d5);border-radius:0;background:transparent}
 .inspection-phone .picker-step :is(.catalog-category,.catalog-item,.medicine-option,.st-picker-option):last-child{border-bottom:0}
@@ -169,16 +169,10 @@
 .inspection-phone .option-picker-step .st-picker-options{flex:none}
 .inspection-phone .single-action-sheet .bulk-condition-button span{white-space:normal;overflow-wrap:anywhere}
 
-/* Short, immediate choices: one white card on the tint, nothing loose on it (owner, 2026-11-03). The chosen option is an ink ✓ and a 600 label, no fill. */
+/* Short, immediate choices: the picker's own white card on the tint (owner, 2026-11-03: nothing loose on the tint). */
 .inspection-phone .sheet.option-picker-step[data-st-context="drawer"]{height:auto;max-height:calc(100% - 32px)}
 .inspection-phone .sheet.option-picker-step>.sheet-body{flex:0 1 auto;padding-right:18px;padding-bottom:24px;padding-left:18px;gap:0;overflow-y:auto}
-.inspection-phone .option-picker-step .st-picker-options{border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper);overflow:hidden}
-.inspection-phone .option-picker-step .st-picker-option{min-height:52px;padding:12px 16px;border:0;border-bottom:1px solid var(--rule);border-radius:0;background:transparent}
-.inspection-phone .option-picker-step .st-picker-option:last-child{border-bottom:0}
-.inspection-phone .option-picker-step .st-picker-option[aria-selected="true"]{background:transparent;color:var(--ink)}
 .inspection-phone .option-picker-step .st-picker-option[aria-selected="true"] strong{font-weight:600}
-.inspection-phone .option-picker-step .st-picker-option:active{background:var(--press)}
-.inspection-phone .option-picker-step .st-picker-option>svg{margin-right:4px;color:var(--ink)}
 
 /* Selection bar (platform multi-select): one readable count that opens the review, then the primary. Clear lives in the
    review sheet's head; unticking the last subject ends selection. */
