@@ -178,3 +178,4 @@ From the Edit record product round ([edit-record-round.md](edit-record-round.md)
 - **The finished card's head band** reads "Finished Aug 27 · Details ›" (owner, 2026-11-03); the time and who finished her sit under Farrowing log on Details.
 - **Drawers are the tint with white cards** (owner, 2026-11-03: no white background anymore): the record drawer, Finish, Record dead and Details, as the pages. The piglet condition rows are one white action card.
 - Applies to a sow that finished normally; a died or aborted sow keeps the earlier record face. Earlier litters are sample data here; the sow profile's production records hold the real ones.
+- **Put down is a piglet death cause** (owner, 2026-11-03): a piglet that cannot recover and is put down by trained staff is recorded in Record dead / Report death under Died after birth, before Other (it used to fall under Other).

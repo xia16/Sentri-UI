@@ -1343,7 +1343,7 @@
           {
             "name": "Causes",
             "at": "Crushed",
-            "shows": "Born dead: Stillborn, Mummified. Died after birth: Crushed, Scours, Starve-out, Other. Each a Stepper from 0.",
+            "shows": "Born dead: Stillborn, Mummified. Died after birth: Crushed, Scours, Starve-out, Put down, Other (Put down: owner, 2026-11-03). Each a Stepper from 0.",
             "logic": "Died after birth stops when it would take Alive below 0 (saved Alive + born drafted).",
             "source": "farrowing-astra-concept.js act(\"deadStep\")"
           },
@@ -3562,7 +3562,7 @@
             "name": "Causes",
             "at": "Total dead",
             "shows": "One fact per cause that has a count, then \"Total dead\".",
-            "logic": "The six causes are Stillborn, Mummified, Crushed, Scours, Starve-out and Other; a cause with 0 is left out. The total is the same figure as the record's Dead.",
+            "logic": "The seven causes are Stillborn, Mummified, Crushed, Scours, Starve-out, Put down and Other; a cause with 0 is left out. The total is the same figure as the record's Dead.",
             "source": "farrowing-astra-concept.js deathBreakdown()"
           }
         ],
@@ -3825,7 +3825,7 @@
           {
             "name": "Cause",
             "at": "Cause",
-            "shows": "A picker: Cause unknown, Crushed, Scours, Starve-out, Other.",
+            "shows": "A picker: Cause unknown, Crushed, Scours, Starve-out, Put down, Other.",
             "logic": "One cause applies to the whole save (\"Use another pass when the causes differ\"). The litter's counters have six types: Cause unknown is counted under Other, and Stillborn and Mummified are not offered here.",
             "source": "farrowing-astra-concept.js mortalityCauses, savePigletMortality"
           },

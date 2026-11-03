@@ -916,7 +916,7 @@
              "hard": "lost-draft"
             },
             {
-             "expr": "s.dead.join() === '1,1,2,0,0,1'",
+             "expr": "s.dead.join() === '1,1,2,0,0,0,1'",
              "says": "posted deaths unchanged",
              "hard": "wrong-fact"
             }
@@ -969,7 +969,7 @@
                "hard": "lost-draft"
               },
               {
-               "expr": "s.dead.join() === '1,1,2,0,0,1'",
+               "expr": "s.dead.join() === '1,1,2,0,0,0,1'",
                "says": "posted deaths unchanged",
                "hard": "wrong-fact"
               }
@@ -1057,7 +1057,7 @@
                ],
                "record": [
                 {
-                 "expr": "sum(s.deathDraft) === 0 && s.dead.join() === '1,1,2,0,0,1'",
+                 "expr": "sum(s.deathDraft) === 0 && s.dead.join() === '1,1,2,0,0,0,1'",
                  "hard": "wrong-fact"
                 }
                ]
