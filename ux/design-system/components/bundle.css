@@ -1142,6 +1142,28 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-pen-map[data-wide]{--pm-label:calc(var(--size-24) + var(--space-6))}
 .st-pen-entrance{flex:none;display:flex;align-items:center;justify-content:center;gap:var(--space-8);min-height:calc(var(--size-34) + var(--size-2));margin:0 0 var(--space-10);border-radius:var(--radius-segment);background:var(--well);color:var(--ink);font:var(--type-weight-semibold) var(--type-meta-size) var(--font-sans)}
 .st-pen-entrance svg{width:var(--size-16);height:var(--size-16);stroke-width:var(--icon-pad-stroke)}
+/* the main door's place across the top of the room when it is not in the middle; a back door ends the map */
+.st-pen-entrance[data-at=left],.st-pen-exit[data-at=left]{justify-content:flex-start;padding-left:var(--space-16)}
+.st-pen-entrance[data-at=right],.st-pen-exit[data-at=right]{justify-content:flex-end;padding-right:var(--space-16)}
+.st-pen-exit{display:flex;align-items:center;justify-content:center;gap:var(--space-8);min-height:calc(var(--size-34) + var(--size-2));border-radius:var(--radius-segment);background:var(--well);color:var(--ink);font:var(--type-weight-semibold) var(--type-meta-size) var(--font-sans)}
+.st-pen-exit svg{width:var(--size-16);height:var(--size-16);stroke-width:var(--icon-pad-stroke);transform:rotate(180deg)}
+/* a run of another pen type along a lane: its name, one quiet line over its first pen */
+.st-pen-line{display:grid;grid-template-columns:repeat(var(--pm-across,1),minmax(var(--pm-tile),1fr));gap:var(--pm-gap);min-width:0}
+.st-pen-line[data-rtl]{direction:rtl}
+.st-pen-line[data-rtl]>*{direction:ltr}
+.st-pen-line[data-start]{margin-top:var(--space-8)}
+.st-pen-line[data-end]{margin-bottom:var(--space-8)}
+.st-pen-grid[hidden]{display:none}
+.st-pen-grid[data-stacked]{grid-template-columns:repeat(var(--pm-lanes),minmax(var(--pm-tile),1fr))}
+.st-pen-lane{display:flex;flex-direction:column;gap:var(--pm-gap);min-width:0}
+.st-pen-tile.st-pen-group{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:var(--space-8);padding:0 var(--space-6);font-size:var(--type-meta-size)}
+.st-pen-group>span:first-child{text-align:center;white-space:nowrap}
+.st-pen-marks{display:flex;gap:var(--size-2);height:var(--space-8)}
+.st-pen-marks i{flex:1;border-radius:var(--size-2);background:var(--well)}
+.st-pen-marks i[data-level=act]{background:var(--amber-fill)}
+.st-pen-marks i[data-level=live]{background:var(--progress-fill)}
+.st-pen-marks i[data-level=plain]{background:var(--handle)}
+.st-pen-group[data-level=empty] .st-pen-marks i{background:var(--paper)}
 .st-pen-field{position:relative;display:flex;flex:0 1 auto;min-height:0}
 .st-pen-scroll{scroll-snap-type:both proximity;scroll-padding:calc(var(--pm-head) + var(--pm-gap)) 0 0 calc(var(--pm-label) + var(--pm-gap));position:relative;flex:1 1 auto;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:none;border-radius:var(--radius-control);-webkit-overflow-scrolling:touch}
 .st-pen-scroll::-webkit-scrollbar{display:none;width:0;height:0}
@@ -1165,14 +1187,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-pen-peek-head b{font:var(--type-weight-semibold) var(--size-15) var(--font-mono)}
 .st-pen-peek-head span{color:var(--muted);font-size:var(--type-meta-size)}
 .st-pen-peek-more{margin:0;padding:var(--space-4) 0 var(--space-6);color:var(--muted);font-size:var(--type-meta-size)}
-.st-pen-ranges{flex:1 1 0;min-width:0;display:flex;gap:var(--space-2);height:var(--footer-height);padding:var(--space-4);border-radius:var(--radius-inset);background:var(--well);overflow-x:auto;scrollbar-width:none;scroll-padding:0 var(--space-24)}
-.st-pen-ranges::-webkit-scrollbar{display:none;width:0;height:0}
-.st-pen-ranges[data-more=end]{mask-image:linear-gradient(to right,#000 calc(100% - var(--space-32)),transparent)}
-.st-pen-ranges[data-more=start]{mask-image:linear-gradient(to left,#000 calc(100% - var(--space-32)),transparent)}
-.st-pen-ranges[data-more="start end"]{mask-image:linear-gradient(to right,transparent,#000 var(--space-32),#000 calc(100% - var(--space-32)),transparent)}
-.st-pen-ranges button{flex:1 0 auto;min-width:var(--size-56);margin:0;padding:0 var(--space-8);border:0;border-radius:var(--radius-segment);background:transparent;color:var(--ink);font:var(--type-weight-semibold) var(--type-identifier-size) var(--font-mono);white-space:nowrap}
-.st-pen-ranges button[aria-checked=true]{background:var(--paper);box-shadow:0 1px 2px #20291f22}
-.st-pen-ranges button[aria-checked=false]:active{background:var(--handle)}
 /* PenMap · landing ("colour carries over"). The host marks the pen it lands on with data-pen-land (the tapped tile's level) and that pen's
    header with data-pen-land-head: the header takes the tile's fill, holds it (--land-hold) and fades back (--land-fade); a pen whose tile
    is white (plain) gets a 2px ink ring on the marked element instead, drawn inside its edge (an outline at -2px: it covers the card's

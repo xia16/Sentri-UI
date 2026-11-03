@@ -2,7 +2,7 @@
   {
     "id": "map",
     "name": "Map",
-    "use": "Use for going to one of many places that have a layout, where it is matters, and each has a status to see before the tap: Farrowing's and Inspection's Pen map. A menu drawer: the legend, the Entrance band and the map, with Back and, past 20 pens in a row, the range control in the footer.",
+    "use": "Use for going to one of many places that have a layout, where it is matters, and each has a status to see before the tap: Farrowing's and Inspection's Pen map. A menu drawer: the legend, the Entrance band and the map, with Back in the footer, and Whole room beside it when the map is more than two screens tall.",
     "notUse": "Not for places with no layout or a list to read (use ChoiceList or Row · navigation); not for a few fixed choices of one list (use Segment); not for status that needs words (put it in the peek or on the page the tile opens).",
     "states": [
       "Default · Unit 7, 4 × 6",
@@ -11,10 +11,22 @@
       "Hold to peek · a pen of 30, +N more",
       "Filtered · a pen the list hides is empty",
       "Empty · no sows shown",
-      "Range control · 2 × 60",
+      "Long lane · 2 × 60, Whole room beside Back",
       "Long row · 2 × 100, the wider number column",
-      "Long row · 2 × 160, eight ranges",
+      "Long lane · 2 × 160",
       "Sideways scroll · 8 × 20, opens on E3",
+      "Lanes of different lengths · A 6, B 6, C 4, D 2",
+      "Mixed lane · 10 group pens, then 12 stalls, by size",
+      "Mixed lanes · 3 gilt pens, a stall, a gilt pen",
+      "Mixed lanes · A group pens then stalls, B stalls then crates",
+      "Row at the far end · one pen across the room, C1",
+      "Row at the far end · the gestation barn, 24 stalls",
+      "Row by the door · 3 sick pens before the lanes",
+      "Sketch room · sick pens, one large pen across the end",
+      "Pens on their own · an old drawn layout",
+      "Doors · the main door on the left, a back door",
+      "Lane A on the right as you walk in · the row counts from A",
+      "Long lane · 2 × 50 stalls",
       "Chinese · Unit 7",
       "Chinese · 2 × 100"
     ],
@@ -22,5 +34,19 @@
       "farrowing.pen-map",
       "inspection.go-to-pen"
     ]
+  },
+  {
+    "id": "whole-room",
+    "name": "Whole room",
+    "use": "Use for a room more than two screens tall pen by pen: the map adds Whole room beside Back, which shows the room on one screen with neighbouring pens of a run sharing a tile (A11–20), each pen a mark in its status colour. A tap on a shared tile goes back to pen by pen at that tile.",
+    "notUse": "Not for a room of two screens or less (it has Back alone); not as a second map of a different room or a summary of the room (use the room page); never as the only way to a pen (a pen is opened pen by pen).",
+    "states": [
+      "Whole room · 2 × 50 stalls, ten pens to a tile",
+      "Whole room · the gestation barn, group pens and the stall row",
+      "Whole room · four lanes, four types",
+      "Whole room · 8 × 20, the lane letters dropped",
+      "Pen by pen again · after a tap on B1–10"
+    ],
+    "usedBy": []
   }
 ]
