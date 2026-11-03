@@ -15627,11 +15627,9 @@
          ]
         ],
         [
-         "Finish",
+         "Log",
          [
-          "inspection.walk-log",
-          "inspection.finish",
-          "inspection.walk-recorded"
+          "inspection.walk-log"
          ]
         ],
         [
@@ -15761,21 +15759,6 @@
          "inspection.walk",
          "inspection.walk-log",
          "tap Log"
-        ],
-        [
-         "inspection.walk",
-         "inspection.finish",
-         "tap Finish walk"
-        ],
-        [
-         "inspection.finish",
-         "inspection.walk-recorded",
-         "tap Check in"
-        ],
-        [
-         "inspection.walk-recorded",
-         "inspection.walk",
-         "tap Back"
         ],
         [
          "inspection.sensors",
@@ -16028,23 +16011,23 @@
             "at": "Scan ear tag"
            },
            {
-            "name": "Finish walk and last check-in",
-            "shows": "Header button; \"Last check-in 06:40 · G. Hansen\"",
+            "name": "Last record",
+            "shows": "In the header line: \"Unit 7 · last record 06:40 · G.H\"; the history button at the top right opens This walk (no End walk, no check-in: owner, 2026-11-03)",
             "states": [
              {
-              "state": "Before check-in",
-              "when": "checkedIn is false",
-              "shows": "\"Finish walk\", last check-in 06:40"
+              "state": "Nothing recorded yet",
+              "when": "no record this walk",
+              "shows": "the unit's last record, 06:40"
              },
              {
-              "state": "After check-in",
-              "when": "checkedIn is true",
-              "shows": "\"Check in again\", last check-in 09:41"
+              "state": "After a record",
+              "when": "any record this walk",
+              "shows": "09:41 · G.H"
              }
             ],
-            "logic": "The name G. Hansen is fixed text, not the signed-in worker.",
-            "source": "c.checkedIn",
-            "at": "Finish walk"
+            "logic": "The unit shows when it was last worked on; walking it records nothing by itself.",
+            "source": "c.events",
+            "at": "Last record"
            }
           ],
           "controls": [
@@ -16056,9 +16039,7 @@
           ],
           "copy": [
            "Inspection (raw)",
-           "Finish walk (raw)",
-           "Check in again (raw)",
-           "Last check-in (raw)",
+           "Last record (raw)",
            "Pen map (raw)",
            "Scan ear tag (raw)",
            "No pigs match (raw)"
@@ -16073,7 +16054,7 @@
            "The pen header count \"3 pigs\" counts all pigs while the rows show only the filtered pigs; the feed total likewise covers all pigs.",
            "The care level (Monitor / Treat in place / Move to hospital pen) is shown only by icon and colour on the row; the words appear only in a tooltip, so a gloved worker cannot tell Monitor from Treat in place.",
            "The pig's stage, days and batch repeat in the row, the pig record header and the pig record body.",
-           "The author \"G. Hansen\" and the times 06:40 / 09:41 are fixed text; \"Last check-in\" is not tied to a real check-in.",
+           "The author \"G. Hansen\" and the times 06:40 / 09:41 are fixed text; \"Last record\" is the newest record in this walk, else the snapshot.",
            "The pen-level \"issue\" banner (Feeder low · 06:40) is in the code but the sample data clears it, so it never shows; the 2nd-round study removed the feeder alert.",
            "Filters for health status (needs attention / no action needed) and manual-feed have state and a strip label but no control sets them.",
            "Search, review and the Scan list show the raw stage \"Gestating\" while the row shows \"Gestation · 40 days\".",
@@ -16271,40 +16252,34 @@
           "elements": [
            {
             "name": "Note screen",
-            "shows": "Reading, editing or closed view",
+            "shows": "Reading or writing",
             "states": [
              {
               "state": "Reading",
               "when": "A note exists",
-              "shows": "Text, author line, Edit note, Close note"
+              "shows": "One card like a message: G. Hansen · today 06:40 on top, the note at 17px, \"Shows until Sat 19 Sep\" with a clock at its foot, the pencil top right; Close note in the footer"
              },
              {
-              "state": "Editing",
-              "when": "Edit note or Add pen note",
-              "shows": "One text area; Save note disabled while empty or blank"
-             },
-             {
-              "state": "Closed",
-              "when": "Just after Close note",
-              "shows": "\"Closed · Kept in pen log\", closer and time, Undo close (disabled when a new note was written meanwhile)"
+              "state": "Writing",
+              "when": "The pencil, or Note on the pen page",
+              "shows": "A five-line box that grows, then a white Show for card: a days stepper, 7 by default (1 to 60), and the end date; Save note disabled while empty"
              }
             ],
-            "rule": "One note per pen. Saving replaces the text and overwrites the author with the editor and \"today · 09:41\"; the old text survives only in the log. Close note moves the note to the pen log (\"Pen note closed\", original author) and clears the pen; Undo close restores it and logs \"Pen note reopened\".",
-            "at": "Edit note"
+            "rule": "One note per pen. Saving replaces the text, the author and its days. Close note moves the note to the pen log (\"Pen note closed\") and goes back to the pen page; there is no Undo (owner, 2026-11-03). When its days run out the note leaves the pen page and stays in the pen log.",
+            "at": "Close note"
            }
           ],
           "controls": [],
           "copy": [
            "Pen note (raw)",
            "Close note (raw)",
-           "Undo close (raw)"
+           "Show for (raw)"
           ],
           "edge": [
            "A pen note is written from its pen page only: Actions holds pig actions (owner, 2026-10-18). The pen page also has How the pen looks (a pen observation)."
           ],
           "issues": [
-           "Close note and Edit note overlap (edit replaces, close archives); two notes cannot coexist.",
-           "Author is overwritten on edit, so the original author is lost from the card."
+           "Close note and Edit note overlap (edit replaces, close archives); two notes cannot coexist."
           ]
          }
         },
@@ -17067,77 +17042,8 @@
            "No updates yet (raw)"
           ],
           "issues": [
-           "The button is called Log, the aria-label \"Updates this walk\" and the sheet \"This walk\": three names.",
            "The same events appear again in each pig's Log and the pen log."
           ]
-         }
-        },
-        {
-         "id": "inspection.finish",
-         "name": "Finish walk",
-         "zh": "结束巡检",
-         "status": "in-design",
-         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-         "preset": "walk",
-         "steps": [
-          "[data-action=\"finish\"]"
-         ],
-         "figma": "",
-         "notes": {
-          "purpose": "Check in to the unit to record that it was walked.",
-          "elements": [
-           {
-            "name": "Check-in",
-            "shows": "Recorded during this walk · 0; Check in to Unit 7",
-            "logic": "The count is updates saved in this walk. Check-in records only that the unit was walked; it does not mark pigs healthy or instructions completed.",
-            "rule": "Allowed with nothing recorded and pens unseen.",
-            "at": "Recorded during this walk"
-           }
-          ],
-          "controls": [],
-          "copy": [
-           "Finish walk (raw)",
-           "Check in to Unit 7 (raw)"
-          ],
-          "issues": [
-           "Walking all pens is not checked: check-in is allowed with nothing recorded."
-          ]
-         }
-        },
-        {
-         "id": "inspection.walk-recorded",
-         "name": "Walk recorded",
-         "zh": "巡检已记录",
-         "status": "in-design",
-         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-         "preset": "walk",
-         "steps": [
-          "[data-action=\"finish\"]",
-          "[data-action=\"check-in\"]"
-         ],
-         "figma": "",
-         "notes": {
-          "purpose": "Confirmation after check-in.",
-          "elements": [
-           {
-            "name": "Confirmation",
-            "shows": "Checked in at 09:41 · G. Hansen · Unit 7 · 0 updates recorded; the footer holds Back alone",
-            "states": [
-             {
-              "state": "One update",
-              "when": "Walk event count is 1",
-              "shows": "\"1 update\" (singular)"
-             }
-            ],
-            "logic": "Time is fixed at 09:41; the count is the walk's event count. One exit: Back leaves the sheet and lands on the unit's walk list, where the user came from (as the end receipt does).",
-            "at": "Checked in at 09:41"
-           }
-          ],
-          "controls": [],
-          "copy": [
-           "Walk recorded (raw)"
-          ],
-          "issues": []
          }
         },
         {

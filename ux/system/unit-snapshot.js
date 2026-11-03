@@ -7,7 +7,7 @@
   };
   const ongoing = {name:'Arthritis',kind:'Disease',day:120,issueStatus:'ongoing',triage:'None',recordedDate:'15 May 2026',recordedBy:'G. Hansen',note:'Condition recorded. No action needed.'};
   globalThis.SentriUnitSnapshot = {
-    checkIn: {time:'06:40',who:'G. Hansen'},
+    lastRecord: {time:'06:40',who:'G. Hansen'},   // the unit's last record (there is no check-in: owner, 2026-11-03)
     findings: id => structuredClone(findings[id] || []),
     ongoing: () => structuredClone(ongoing),
     health: Object.keys(findings).length + 1,

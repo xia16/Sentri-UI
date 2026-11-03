@@ -1,6 +1,6 @@
 # Stepper
 
-Counts animals one step at a time. Use Measure instead for scale readings and Numpad for typed identifiers.
+Counts animals one step at a time, and a number of days where a note says how long it shows (Show for, 7 by default). Use Measure instead for scale readings and Numpad for typed identifiers.
 
 Status: candidate; implementation checked on this branch, owner approval remains separate.
 
@@ -62,6 +62,8 @@ Component: generic input used across sections. The named faces are variants, not
 [Preview](preview.html); [verification and screenshots](verification.md); each variant's states live in variants/*.html and variants.json. Primary guidance: the [component standard](../../../../docs/design-workflow/research/component-standard.md), Ant Design Mobile and TDesign; Material 3 and Apple HIG guide labels and target sizes.
 
 ## Changelog
+
+2026-11-03: a row Stepper of days for a note's Show for (pen and pig notes; 1 to 60, default 7), in a white card on the tint.
 
 2026-10-10: a draft value is ink, not green. In a row the draft / corrected word sits beside the label, so every row keeps one height. A minus key at the floor uses the same disabled face as the plus key at the ceiling.
 2026-10-10: consolidated variants, corrected gate findings, documented states and migrated prototype forks. Numpad / Measure decisions remain outside this pass.

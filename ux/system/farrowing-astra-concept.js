@@ -674,7 +674,7 @@ function penDetails(c){
  ],{label:penPage.actions});
  const faultRows=faults.map(f=>SentriUI.row({variant:'navigation',action:'room-pen-fault-record',value:f.id,icon:icon('wrench'),title:f.device,description:f.description,wrap:true}));
  // The note is a row like the faults (one white group on the page's tint, SURFACES.md): its text over its hand and time, the door to the note.
- const attention=[...faultRows,...(pe.note?[SentriUI.row({variant:'navigation',action:'room-pen-read-note',icon:icon('note'),title:pe.note,description:pe.noteBy,wrap:true})]:[])];
+ const attention=[...faultRows,...(pe.note?[SentriUI.row({variant:'navigation',action:'room-pen-read-note',icon:icon('note'),title:pe.note,description:noteMeta(pe),wrap:true})]:[])];
  const farrowed=rows.filter(r=>born(r)>0),alive=sum(farrowed.map(r=>r.alive)),dead=sum(farrowed.map(r=>sum(r.dead)));
  const now=[{label:penPage.sows,value:String(rows.length),meta:penSowStates(rows)},...(farrowed.length?[{label:penPage.piglets,value:String(alive),meta:dead?rowText.dead(dead):''}]:[]),...(pe.feed?[{label:penPage.feed,value:pe.feed.formula,meta:pe.feed.mode}]:[])];
  const section=(title,k,body)=>`<section class="pen-page-section">${SentriUI.heading({title,icon:icon(k),kind:'section',level:4})}${body}</section>`;
@@ -689,8 +689,8 @@ function penSubpage(s,c){
  const pe=penInfo(c),draft=c.penDraft||{},feedPage=s.view==='roomPenFeed';
  const sheet=(title,body,action='')=>roomSheet(title,body,feedPage?pageFooter(action):footer(SentriUI.backButton({action:'room-back'}),action),feedPage?'pen-feed-page':['roomPenNote','roomPenReadNote'].includes(s.view)?'pen-form-sheet pen-note-sheet':'pen-form-sheet');
  if(s.view==='roomPenFeed')return sheet('Feed guidance',pe.feed?`<section class="pen-detail-section">${SentriUI.heading({title:'Feeding',icon:icon('feed'),kind:'section',level:4})}${SentriUI.facts([{label:'Formula',value:pe.feed.formula},{label:'Method',value:pe.feed.mode}])}${pe.feed.guidance?`<p class="pen-detail-copy">${esc(pe.feed.guidance)}</p>`:''}</section>`:'<p class="detail-empty">No feed guidance recorded for this pen.</p>');
- if(s.view==='roomPenReadNote')return sheet('Pen note',`<div class="st-panel"><p class="pen-detail-copy">${esc(pe.note)}</p><p class="pen-detail-meta">${esc(pe.noteBy)}</p></div>`,btn('room-pen-note','Edit note','button primary'));
- if(s.view==='roomPenNote')return sheet('Pen note',SentriUI.field({label:'Note',control:`<textarea data-pen-field="note">${esc(draft.note||'')}</textarea>`,className:'pen-field'}),btn('room-pen-save-note','Save note','button primary','',!draft.note?.trim()));
+ if(s.view==='roomPenReadNote')return sheet('Pen note',noteCard(pe.note,pe.noteBy,noteUntil(pe.noteDays).replace('Until','Shows until'),'clock','room-pen-note'),btn('room-pen-close-note','Close note','button primary'));
+ if(s.view==='roomPenNote')return sheet('Pen note',SentriUI.field({label:'Note',control:`<textarea class="st-note-input" data-pen-field="note">${esc(draft.note||'')}</textarea>`,className:'pen-field'})+noteDaysField(draft),btn('room-pen-save-note','Save note','button primary','',!draft.note?.trim()));
  if(s.view==='roomPenFault')return sheet('Report fault',`${SentriUI.pickerField({label:'Device',value:draft.device||'',placeholder:'Select',key:'pen:device',className:'pen-field'})}${draft.device==='Other'?SentriUI.field({label:'Device name',control:`<input data-pen-field="name" value="${esc(draft.name||'')}">`,className:'pen-field'}):''}${SentriUI.field({label:'Description',control:`<textarea data-pen-field="description" placeholder="What is broken or not working?">${esc(draft.description||'')}</textarea>`,className:'pen-field'})}`,btn('room-pen-save-fault','Report fault','button primary','',!validPenFault(draft)));
  if(s.view==='roomPenFaultRecord'){
   const f=pe.faults.find(x=>x.id===c.penFaultId);if(!f)return sheet('Equipment fault','<p class="detail-empty">No fault found.</p>');
@@ -698,11 +698,23 @@ function penSubpage(s,c){
  }
  return null;
 }
+/* Pen note life (proposal, 2026-11-03), as Inspection's pen page: a note shows for a chosen time, 1 week unless the writer picks
+   another, then leaves the pen page and stays in the pen log. The study's day is Inspection's walk day, so the dates stay put. */
+const NOTE_DAY='2026-09-12';   // the study's day is Inspection's walk day, so the dates stay put
+const NOTE_DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],NOTE_MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function noteEnd(n){const d=new Date(NOTE_DAY+'T12:00:00');d.setDate(d.getDate()+n);return d;}
+function noteUntil(n=7){const d=noteEnd(n);return 'Until '+NOTE_DAYS[d.getDay()]+' '+d.getDate()+' '+NOTE_MONTHS[d.getMonth()];}
+function noteMeta(pe){return pe.noteBy+' · until '+NOTE_DAYS[noteEnd(pe.noteDays||7).getDay()];}
+function noteDaysField(d){const n=d.days||7;return '<div class="st-panel st-note-days">'+SentriUI.stepper({label:'Show for',description:n+(n===1?' day':' days')+' · '+noteUntil(n),value:n,min:1,max:60,action:'room-pen-note-days',key:'days',variant:'row'})+'</div>';}
+/* A note read in full: who and when on top, the note at reading size, how long it shows at the foot; the pencil edits it. */
+function noteCard(text,by,foot,footIcon,editAction){const [name,...when]=String(by||'').split(' · ');return '<div class="st-panel st-note"><div class="st-note-head"><p class="st-note-by"><b>'+esc(name)+'</b>'+(when.length?' · '+esc(when.join(' · ')):'')+'</p>'+(editAction?SentriUI.iconButton({variant:'plain',icon:icon('edit'),label:'Edit note',action:editAction}):'')+'</div><p class="st-note-text">'+esc(text)+'</p><p class="st-note-foot">'+icon(footIcon)+esc(foot)+'</p></div>';}
 function validPenFault(draft){return !!draft.device&&!!draft.description?.trim()&&(draft.device!=='Other'||!!draft.name?.trim());}
 function handlePenAction(s,c,a,v){
  const destinations={'room-pen-feed':'roomPenFeed','room-pen-read-note':'roomPenReadNote','room-pen-note':'roomPenNote','room-pen-fault':'roomPenFault','room-pen-fault-record':'roomPenFaultRecord'};
- if(destinations[a]){const keep=(c.penKeeps||{})[destinations[a]+'|'+c.detailPen+(a==='room-pen-fault-record'?'|'+v:'')];c.penDraft=keep?clone(keep):a==='room-pen-note'?{note:penInfo(c).note}:{};if(a==='room-pen-fault-record')c.penFaultId=v;s.view=destinations[a];return;}
- if(a==='room-pen-save-note'&&c.penDraft?.note?.trim()){const pe=penInfo(c),note=c.penDraft.note.trim();penEvent(c,pe.note?'Pen note updated':'Pen note added',note);pe.note=note;pe.noteBy='G.H · Today · 09:41';delete c.penKeeps?.['roomPenNote|'+c.detailPen];s.view='roomPenDetail';}
+ if(destinations[a]){const keep=(c.penKeeps||{})[destinations[a]+'|'+c.detailPen+(a==='room-pen-fault-record'?'|'+v:'')];c.penDraft=keep?clone(keep):a==='room-pen-note'?{note:penInfo(c).note,days:penInfo(c).noteDays||7}:{};if(a==='room-pen-fault-record')c.penFaultId=v;s.view=destinations[a];return;}
+ if(a==='room-pen-save-note'&&c.penDraft?.note?.trim()){const pe=penInfo(c),note=c.penDraft.note.trim();penEvent(c,pe.note?'Pen note updated':'Pen note added',note);pe.note=note;pe.noteBy='G. Hansen · today 09:41';pe.noteDays=c.penDraft.days||7;delete c.penKeeps?.['roomPenNote|'+c.detailPen];s.view='roomPenDetail';}
+ if(a==='room-pen-note-days'&&c.penDraft){c.penDraft.days=Math.max(1,Math.min(60,(c.penDraft.days||7)+(noteStep||0)));}
+ if(a==='room-pen-close-note'){const pe=penInfo(c);if(pe.note){penEvent(c,'Pen note closed',pe.note);pe.note='';pe.noteBy='';}s.view='roomPenDetail';}
  if(a==='room-pen-save-fault'&&validPenFault(c.penDraft)){const d=c.penDraft,pe=penInfo(c),fault={id:String(pe.faults.length+1),device:d.device==='Other'?d.name.trim():d.device,description:d.description.trim(),time:'09:41',who:'G. Hansen',open:true};pe.faults.push(fault);penEvent(c,'Equipment fault reported',fault.device+' · '+fault.description);delete c.penKeeps?.['roomPenFault|'+c.detailPen];s.view='roomPenDetail';}
  if(a==='room-pen-resolve-fault'){const f=penInfo(c).faults.find(x=>x.id===c.penFaultId);if(f?.open){f.open=false;f.resolution=c.penDraft.resolution?.trim()||'';penEvent(c,'Equipment fault resolved',f.device+(f.resolution?' · '+f.resolution:''));delete c.penKeeps?.['roomPenFaultRecord|'+c.detailPen+'|'+f.id];s.view='roomPenDetail';}}
 }
@@ -1331,6 +1343,7 @@ gallery.addEventListener('pointercancel',()=>{grabStart=null});
 gallery.addEventListener('keydown',e=>{const pi=e.target.closest?.('[data-card]')?+e.target.closest('[data-card]').dataset.card:-1;if(e.key==='Tab'&&e.target.closest('.dialog,.sheet')){const items=[...e.target.closest('.dialog,.sheet').querySelectorAll('button:not(:disabled),input:not(:disabled):not([tabindex="-1"]),select,textarea')],first=items[0],last=items[items.length-1];if(e.shiftKey&&e.target===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&e.target===last){e.preventDefault();first?.focus();}}if(e.key==='Escape'){const i=+e.target.closest('[data-card]').dataset.card,s=states[i];if(s.popup)s.popup=null;else if(['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile'].includes(s.view))act(s,'featureBack');else if(['death','history','profile','deathBreakdown','litter'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else if(s.view.startsWith('room'))roomAction(i,'room-back');else act(s,'close');render(i);}});
 // Record dead: opening the sow's Details grows the body; keep the danger banner whole above the footer (crit round 2).
 gallery.addEventListener('click',e=>{const row=e.target.closest('.sheet[data-view=death] [data-st-optional]');if(row)requestAnimationFrame(()=>row.closest('.sheet-body')?.querySelector(':scope > .st-banner')?.scrollIntoView({block:'nearest'}));});
+let noteStep=0;gallery.addEventListener('click',e=>{noteStep=+(e.target.closest('[data-step]')?.dataset.step||0);},true);
 gallery.addEventListener('click',e=>{const el=e.target.closest('[data-action]');if(!el||el.disabled||el.classList.contains('st-hold'))return;
  // Finish waits while a draft is open; the tap brings the worker to Record dead, where the draft is said ("1 unsaved") and can be saved.
  if(el.dataset.action==='finish'&&el.getAttribute('aria-disabled')==='true'){const k=+el.closest('[data-card]').dataset.card,w=states[k];if(hasDraft(w)){act(w,'death');render(k);}return;}

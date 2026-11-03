@@ -178,6 +178,7 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 @media(prefers-reduced-motion:reduce){:is(.sheet,.scrim,.dialog-backdrop):is([data-enter],[data-leave]){animation:none}}
 /* Page hooks the prototypes keep. */
 .farrowing-phone .sheet[data-presentation="page"] .sow-header-actions:empty{display:none}
+.inspection-phone .inspect-controls{padding-top:0}   /* the walk's lens bar is the first thing under the header: space-section, no more */
 .inspection-phone .feed-feature{border:var(--border-width) solid var(--line);background:var(--st-panel-bg)}   /* End walk's figure: a white card on the tint (SURFACES.md) */
 :is(.farrowing-phone,.inspection-phone) .page-background{position:absolute;inset:0;pointer-events:none;z-index:1}
 :is(.farrowing-phone,.inspection-phone) .page-background>.sheet{z-index:1}
@@ -255,6 +256,19 @@ body{background:var(--ground);color:var(--ink)}
 .st-panel.st-panel.st-panel{background:var(--st-panel-bg);border:var(--border-width) solid var(--st-line);border-radius:var(--st-radius);box-shadow:none;color:var(--st-ink)}
 .st-panel{padding:var(--space-panel)}
 .st-panel .st-panel{--st-panel-bg:transparent}
+/* A note read in full (Panel · note, 2026-11-03 proposal): it reads like a message. Who and when on top, quiet; the note itself at reading
+   size; how long it shows (or that it was closed) at its foot under a rule; the pencil top right edits it. Writing: a row Stepper of days. */
+.st-panel.st-note{padding:var(--space-14) var(--space-16) var(--space-16)}
+.st-note-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-8);min-height:var(--tap-min);margin:calc(-1 * var(--space-8)) calc(-1 * var(--space-10)) var(--space-4) 0}
+.st-note-by{margin:0;min-width:0;font:400 var(--type-meta-size)/1.5 var(--font-sans);color:var(--muted)}
+.st-note-by b{font-weight:600;color:var(--ink)}
+.st-note-text{margin:0;font:400 17px/1.5 var(--font-sans);color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}
+.st-note-foot{display:flex;align-items:center;gap:var(--space-6);margin:var(--space-14) 0 0;padding-top:var(--space-12);border-top:var(--border-width) solid var(--rule);font:400 var(--type-meta-size)/1.5 var(--font-sans);color:var(--muted)}
+.st-note-foot svg{width:16px;height:16px}
+.st-panel.st-note-days{margin-top:var(--space-18);padding:var(--space-8) var(--space-16)}
+.st-note-days .st-stepper{margin:0}
+.attention-list+.st-note-row{margin-top:var(--space-12)}   /* a pig's note under its health cards (pig page) */
+.field textarea.st-note-input{min-height:144px;font-size:var(--type-input-size);line-height:1.5}   /* five lines, then it grows with the text (a note composer, as iOS Notes and Reminders) */
 .st-panel.st-panel--empty{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 16px}
 .st-panel--empty>span{display:flex;color:var(--muted)}
 .st-panel--empty svg{width:20px;height:20px;flex:none}
