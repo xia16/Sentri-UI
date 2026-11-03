@@ -1,7 +1,8 @@
-// The pig note as a bookmark (owner, 2026-11-03): on the record the note is a row led by a bookmark, its text not bold; adding a note
-// can carry a mark, the paint the worker put on the sow (a colour and, if wanted, a shape), or none ("they don't need one if it's
-// just a note"). Renders the canvas's screens from the live prototype at 390, one PNG each, into this folder. "now" is this branch's
-// page; "new" is laid over the live page, nothing is built.
+// The pig note, round 2 (owner, 2026-11-03): no mark ("make it simple"), and the note ends ("note should have an expiry, or else it
+// is always there"). On the record the note is a row led by the bookmark, its text not bold, its end on the right; past the end it
+// leaves the record and stays in the Log. The Add a note drawer is on the tint with white cards like every drawer (surfaces rule,
+// 2026-11-03: "we only have grey background"). Renders the canvas's screens from the live prototype at 390, one PNG each, into this
+// folder. "now" is this branch's page; the rest is laid over the live page, nothing is built.
 // Usage: node features/pig-profile/note-round/mock.mjs <base url>
 //   e.g. node features/pig-profile/note-round/mock.mjs http://localhost:4400/.claude/worktrees/pig-record-trim
 import path from 'node:path';
@@ -14,43 +15,51 @@ const { chromium } = playwright();
 const url = '/ux/system/inspection-astra-concept.html?layout=focus&screen=pig-profile.full';
 const open = ['[data-action="pig-actions"]', '.st-row-tile[data-action="note"]'];
 const save = (text) => [...open, { fill: 'textarea', text }, '[data-action="bulk-save"]', '[data-action="pig"][data-value="000306"]'];
+const TEXT = 'Red line on left shoulder · monitor overnight';
 
-// Marker paint, the colours stock markers come in. Green is left out: green means done. New tokens if built (mark-*).
-const PAINT = { red: ['Red', '#c0392b'], blue: ['Blue', '#2f62b5'], orange: ['Orange', '#d9741a'], purple: ['Purple', '#7148ad'], black: ['Black', '#20291f'] };
-
-// The record's note: one row led by the bookmark, the text at row weight. A mark colours the bookmark and says itself on line 2.
-function noteRow([text, mark, PAINT]) {
+// The record's note: one row led by the bookmark, the text at row weight, the day it ends on the right (the walk is 12 Sep).
+function noteRow([text, until]) {
   const sec = document.querySelector('.pig-note');
   if (!sec) return;
-  const p = mark && PAINT[mark.colour];
-  const glyph = SentriIcons.icon('bookmark').replace('<svg', `<svg style="${p ? `color:${p[1]};fill:${p[1]}` : ''}"`);
-  sec.innerHTML = '<div class="compact-actions st-panel st-row-group st-action-list">' + SentriUI.row({ variant: 'navigation', icon: glyph, title: text, description: p ? `${p[0]} ${mark.shape || 'mark'}`.trim() : '', wrap: true, action: 'pig-log', value: '000306' }) + '</div>';
+  sec.innerHTML = '<div class="compact-actions st-panel st-row-group st-action-list">' + SentriUI.row({ variant: 'navigation', icon: SentriIcons.icon('bookmark'), title: text, trailing: { text: until }, wrap: true, action: 'pig-log', value: '000306' }) + '</div>';
   const t = sec.querySelector('.st-row-copy strong');
   if (t) t.style.fontWeight = '400';
 }
 
-// Add a note: the note field as it is, then an optional Mark: a row of paint swatches (none chosen = just a note); a chosen colour
-// opens Shape inline beneath it (Line, Dot, Cross), the dependent-field law. Save says what it saves.
-function noteSheet([colour, shape, PAINT]) {
-  const field = document.querySelector('textarea')?.closest('.st-field, .field, label, div');
-  if (!field) return;
-  const sw = Object.entries(PAINT).map(([k, [name, hex]]) => `<button type="button" aria-label="${name}" aria-pressed="${k === colour}" style="display:grid;place-items:center;width:48px;height:48px;padding:0;border:0;border-radius:50%;background:transparent;${k === colour ? 'box-shadow:0 0 0 2px var(--ink)' : ''}"><span style="width:34px;height:34px;border-radius:50%;background:${hex}"></span></button>`).join('');
-  const shapes = ['Line', 'Dot', 'Cross'].map((s) => ({ value: s.toLowerCase(), label: s }));
-  const shapeRow = colour ? SentriUI.choiceRadios({ label: 'Shape', key: 'markShape', action: 'mark-shape', layout: 'inline', face: 'row', optional: 'Optional', options: shapes, selected: shape || '' }) : '';
-  const block = document.createElement('div');
-  block.innerHTML = `<div style="margin-top:20px"><div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px"><span style="font:500 15px/1.4 var(--font-sans);color:var(--ink)">Mark</span><span style="font:400 11px/1.4 var(--font-sans);color:var(--muted)">Optional · the paint on her</span></div><div role="radiogroup" aria-label="Mark colour" style="display:flex;gap:10px">${sw}</div>${shapeRow ? `<div style="margin-top:12px">${shapeRow}</div>` : ''}</div>`;
-  field.after(block);
-  const btn = document.querySelector('[data-action="bulk-save"]');
-  if (btn && colour) btn.textContent = 'Save note and mark';
+// Add a note: the drawer on the tint, the note in a white card, then how long it shows on her record: a Choice (3 days chosen), its
+// heading on the tint above its card. Nothing here is the drawer's real paint yet; the surfaces sweep moves every drawer.
+function noteSheet([showFor]) {
+  const sheet = document.querySelector('textarea')?.closest('.sheet');
+  const field = document.querySelector('textarea')?.closest('.field');
+  if (!sheet || !field || !showFor) return;
+  sheet.style.background = 'var(--app-background)';
+  sheet.querySelector('.sheet-head, header')?.style.setProperty('background', 'transparent');
+  const card = document.createElement('div');
+  card.className = 'st-panel';
+  card.style.setProperty('--st-panel-bg', 'var(--paper)');
+  field.before(card);
+  card.append(field);
+  const options = [['1', '1 day'], ['3', '3 days'], ['7', '1 week']].map(([value, label]) => ({ value, label }));
+  const choice = document.createElement('div');
+  choice.className = 'st-panel';
+  choice.style.cssText = 'margin-top:var(--space-12);--st-panel-bg:var(--paper)';
+  choice.innerHTML = SentriUI.choiceRadios({ label: 'Show on her record for', key: 'noteFor', action: 'note-for', layout: 'inline', face: 'row', options, selected: showFor });
+  // The label over the options, like the Note field's (the inline Choice puts it beside them; too long for that here).
+  const inline = choice.querySelector('.st-choice-inline');
+  inline.style.cssText = 'flex-wrap:wrap;row-gap:8px';
+  const lab = inline.querySelector('.st-choice-inline-label');
+  const noteLab = getComputedStyle(field.querySelector('span'));
+  lab.style.cssText = `flex:1 0 100%;font-size:${noteLab.fontSize};font-weight:${noteLab.fontWeight};color:${noteLab.color}`;
+  inline.querySelector('.st-choice-inline-opts').style.flex = '1 0 100%';
+  card.after(choice);
 }
 
 const shots = {
-  'record-now': { steps: save('Red line on left shoulder · monitor overnight') },
-  'record-plain': { steps: save('Red line on left shoulder · monitor overnight'), over: [noteRow, ['Red line on left shoulder · monitor overnight', null, PAINT]] },
-  'record-marked': { steps: save('Left shoulder · monitor overnight'), over: [noteRow, ['Left shoulder · monitor overnight', { colour: 'red', shape: 'line' }, PAINT]] },
+  'record-now': { steps: save(TEXT) },
+  'record-new': { steps: save(TEXT), over: [noteRow, [TEXT, 'Until 15 Sep']] },
   'sheet-now': { steps: open },
-  'sheet-new': { steps: open, over: [noteSheet, ['', '', PAINT]] },
-  'sheet-marked': { steps: [...open, { fill: 'textarea', text: 'Left shoulder · monitor overnight' }], over: [noteSheet, ['red', 'line', PAINT]] },
+  'sheet-new': { steps: open, over: [noteSheet, ['3']] },
+  'sheet-filled': { steps: [...open, { fill: 'textarea', text: TEXT }], over: [noteSheet, ['3']] },
 };
 
 const browser = await chromium.launch();
