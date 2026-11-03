@@ -146,7 +146,7 @@ for (const [name, fewer, tick] of [['mock-3-count-pen.png', true, 'B'], ['mock-3
         + line('Died', 'Yesterday · 07:05 · G.H', '−1')
         + line('Should be here now', '3 with ear tags · 13 without', '16', true), { className: 'm-evidence' });
     const left = '<div class="m-left"><strong>' + untagged + ' without ear tags</strong><small>' + (diff === 0 ? 'Matches the record' : Math.abs(diff) + ' not accounted for') + '</small></div>';
-    page('Count pigs', 'Pen D4 · Unit 7', count + tags + `<section class="feature-section">${evidence}</section>`, footer(left, primary('Review count')));
+    page('Count D4', 'Recount · Unit 7', count + tags + `<section class="feature-section">${evidence}</section>`, footer(left, primary('Done')));
   }, { fewer });
   if (TICK[tick]) await p.addStyleTag({ content: TICK[tick] });
   await shoot(p, name);
@@ -226,57 +226,114 @@ if (want('7-')) {
   await shoot(p, 'mock-7-noid-conditions.png');
 }
 
-// 8. Receive pigs (the movement feature's receiving side): the one place a whole room is counted. A batch is sent to a room, not to
-//    pens (choosing pens ahead would be a logistics nightmare); as pigs are put in, the worker types how many went into each pen,
-//    scanning any with ear tags. The header keeps received against sent, the old web task's 已转入 / 已转出.
+// 10–13 (owner, 2026-11-03): the recount is the unit's. Recount opens the unit's pens; tap a pen to count it (all pigs, then the ear
+// tags); Count on a pen page opens the same recount, straight into that pen. Finish shows the unit's balance sheet, where pens net out
+// against each other and only what is still missing goes to the batch. Receiving is the same list and the same pen count.
+// Unit 7 on record: C1 000254 000267 000281 · C2 000306 000312 · D4 000801 000802 000803 + 13 without · D5 38 without = 59.
+const UNIT_CSS = `.m-count .m-line .st-row-trailing{font:600 17px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f);white-space:nowrap}
+  .m-count .m-off .st-row-copy small{color:var(--amber,#896017)}
+  .m-count .m-explain{font-size:13px;line-height:1.5;margin-top:10px;color:var(--ink,#20291f)}
+  .m-recv-bar{background:var(--paper,#fff);border:1px solid var(--line,#dfe4d8);border-radius:18px;padding:14px 16px;margin:4px 0 20px}
+  .m-recv-figs{display:flex;align-items:baseline;gap:8px}.m-recv-figs strong{font:600 32px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}.m-recv-figs span{font-size:14px;color:var(--ink,#20291f)}
+  .m-recv-track{height:8px;border-radius:4px;background:#eef1e7;margin:12px 0 10px;overflow:hidden}.m-recv-track i{display:block;height:100%;background:#466888;border-radius:4px}
+  .m-recv-bar small{display:block;font-size:12px;color:var(--muted,#657060)}
+  .m-done .st-row-chevron{color:#276640}`;
+
+// 10. Recount · Unit 7, part-way: each pen a row with what was found; a pen not counted yet says so; tap any pen to count it.
+if (want('10')) {
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate((UNIT_CSS) => {
+    const { U, ic, page, footer, primary } = window.M;
+    const pen = (code, figure, what, cls = '') => U.row({ variant: 'navigation', code, description: what, trailing: figure, trail: 'chevron', action: 'x', className: 'm-line ' + cls });
+    const bar = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>3</strong><span>of 4 pens counted</span></div><div class="m-recv-track"><i style="width:75%"></i></div><small>Started 09:05 · L.M</small></div>';
+    const list = U.heading({ title: 'Pens', icon: ic('grid'), kind: 'section', level: 3 })
+      + U.rowGroup(pen('C1', '3', 'Counted · matches') + pen('C2', '3', 'Counted · 1 found here', 'm-off') + pen('D4', '15', 'Counted · 000803 not found', 'm-off') + pen('D5', '38', 'Not counted yet'));
+    const left = '<div class="m-left"><strong>D5 still to count</strong><small>Pens you skip stay as recorded</small></div>';
+    page('Recount', 'Unit 7', bar + list, footer(left, primary('Finish recount')));
+    const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
+  }, UNIT_CSS);
+  await shoot(p, 'mock-10-unit-recount.png');
+}
+
+// 11. Finish recount: the unit's balance sheet. What changed, pen against pen: pigs found in another pen move; the pigs without ear
+//     tags net out across the unit (D4 −1, D5 +1 = balanced); only what is still missing goes on the batch's balancing sheet.
+if (want('11')) {
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate((UNIT_CSS) => {
+    const { U, ic, page } = window.M;
+    const line = (o) => U.row({ ...o, className: 'm-line ' + (o.className || '') });
+    const totals = '<section class="feature-section">' + U.facts([{ label: 'On record', value: '59' }, { label: 'Counted', value: '60' }, { label: 'Pens', value: '4 of 4' }], { columns: 3 }) + '</section>';
+    const found = '<section class="feature-section">' + U.heading({ title: '2 pigs found in another pen', icon: ic('transfer'), kind: 'section', level: 3 })
+      + U.rowGroup(line({ code: '000512', description: 'Was Unit 9 · C3', trailing: '→ C2' }) + line({ code: '000733', description: 'Was Unit 6 · D2', trailing: '→ D4' })) + '</section>';
+    const heads = '<section class="feature-section">' + U.heading({ title: 'Without ear tags · balanced', icon: ic('tag-off'), kind: 'section', level: 3 })
+      + U.rowGroup(line({ code: 'D4', description: 'Recorded 13, now 12', trailing: '−1' }) + line({ code: 'D5', description: 'Recorded 38, now 39', trailing: '+1' }) + line({ title: 'Unit 7', description: 'They balance out', trailing: '0', className: 'm-total' })) + '</section>';
+    const lost = '<section class="feature-section">' + U.heading({ title: '1 pig not accounted for', icon: ic('alert'), kind: 'section', level: 3 })
+      + U.rowGroup(line({ code: '000803', description: 'Recorded in D4, not found in any pen', trailing: '−1', className: 'm-off' }))
+      + '<p class="m-hint m-explain">She goes on batch 25\'s balancing sheet. Found in a later count or transfer, she closes; still open when batch 25 ends, an unaccounted loss.</p></section>';
+    page('Unit 7 balance sheet', 'Recount · 09:40 · L.M', totals + found + heads + lost, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save recount', register: 'primary', action: 'x' }) + '</div>');
+    const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
+  }, UNIT_CSS);
+  await p.waitForTimeout(400); await p.screenshot({ path: path.join(out, 'mock-11-unit-balance.png') });
+  await p.evaluate(() => { const s = document.querySelector('.phone .sheet-body'); if (s) s.scrollTop = 500; });
+  await shoot(p, 'mock-11b-unit-balance-scrolled.png');
+}
+
+// 12. Receive pigs into one pen: the same pen count. All pigs put in N3, then the ear tags, so each tagged pig is placed in its pen.
+if (want('12')) {
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate((UNIT_CSS) => {
+    const { U, ic, page, footer, primary } = window.M;
+    const pig = (id, ctx) => U.rowSelectDoor({ code: id, description: ctx, contextWidth: '240px', right: { kind: 'tags', tags: [] }, checked: true, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig selected', label: id });
+    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs put in N3', value: 14, min: 1, max: 80, action: 'x', reserveHint: false }) + '</section>';
+    const search = U.choiceSearch({ label: 'Search ear tag', placeholder: 'Ear tag', value: '', clear: { action: 'x' }, scan: { action: 'x', label: 'Scan ear tags' } });
+    const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Ear tags · 1', icon: ic('tag'), kind: 'section', level: 3 })
+      + '<div class="m-inline-bar">' + search + '</div>' + U.rowGroup(pig('000904', 'Gilt · from B4')) + '</section>';
+    const left = '<div class="m-left"><strong>13 without ear tags</strong><small>Into N3 · batch 25</small></div>';
+    page('Put pigs in N3', 'Receive · Unit 9', count + tags, footer(left, primary('Done')));
+    const st = document.createElement('style'); st.textContent = UNIT_CSS + '.st-choice-trail input[type="checkbox"]{accent-color:#276640!important}.inspect-pig.selected,.roster-pig.selected{background:var(--paper,#fff)!important}'; document.head.append(st);
+  }, UNIT_CSS);
+  await shoot(p, 'mock-12-receive-pen.png');
+}
+
+// 8 (redrawn). Receive pigs into Unit 9: received against sent on top, then the unit's pens; tap a pen to put pigs in it.
 if (want('8-')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
-  await p.evaluate(() => {
+  await p.evaluate((UNIT_CSS) => {
     const { U, ic, page, footer, primary } = window.M;
-    const field = (value, idle) => { const t = document.createElement('div'); t.innerHTML = U.rowSelectDoor({ code: 'x', value: 'x', action: '', checked: false, count: { value, idle, attrs: { 'data-m-total': '' } } }); return t.querySelector('[data-m-total]')?.outerHTML || ''; };
-    const pen = (code, n, idle) => '<div class="m-recv-pen' + (idle ? ' m-idle' : '') + '"><span class="m-recv-code">' + code + '</span><span class="m-recv-what">' + (idle ? 'Empty' : '') + '</span><span class="m-total-field">' + field(n, idle) + '</span></div>';
-    const bar = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>112</strong><span>of 120 received</span></div><div class="m-recv-track"><i style="width:93%"></i></div><small>Sent from Farrowing room 3 · 08:10 · G.H</small></div>';
-    const pens = U.heading({ title: 'Pigs put in each pen', icon: ic('grid'), kind: 'section', level: 3 })
-      + '<div class="m-recv-list">' + pen('N1', 15) + pen('N2', 15) + pen('N3', 14) + pen('N4', 16) + pen('N5', 15) + pen('N6', 15) + pen('N7', 12) + pen('N8', 10) + pen('N9', 0, true) + pen('N10', 0, true) + '</div>';
-    const left = '<div class="m-left"><strong>8 still to come</strong><small>Batch 25 · 120 sent</small></div>';
-    page('Receive pigs', 'Batch 25 · into Unit 9', bar + pens, footer(left, primary('Finish receiving')));
-    const st = document.createElement('style');
-    st.textContent = `.m-recv-bar{background:var(--paper,#fff);border:1px solid var(--line,#dfe4d8);border-radius:18px;padding:14px 16px;margin:4px 0 20px}
-      .m-recv-figs{display:flex;align-items:baseline;gap:8px}.m-recv-figs strong{font:600 32px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}.m-recv-figs span{font-size:14px;color:var(--ink,#20291f)}
-      .m-recv-track{height:8px;border-radius:4px;background:#eef1e7;margin:12px 0 10px;overflow:hidden}.m-recv-track i{display:block;height:100%;background:#466888;border-radius:4px}
-      .m-recv-bar small{font-size:12px;color:var(--muted,#657060)}
-      .m-recv-list{background:var(--paper,#fff);border:1px solid var(--line,#dfe4d8);border-radius:18px;overflow:hidden}
-      .m-recv-pen{display:flex;align-items:center;gap:12px;min-height:60px;padding:0 14px;border-top:1px solid var(--rule,#e8eddf)}.m-recv-pen:first-child{border-top:0}
-      .m-recv-code{font:600 15px var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f);width:44px}
-      .m-recv-what{flex:1;font-size:13px;color:var(--muted,#657060)}
-      .m-recv-pen .m-total-field{margin-left:auto}
-      .m-idle .m-recv-code{color:var(--muted,#657060)}`;
-    document.head.append(st);
-  });
+    const pen = (code, figure, what) => U.row({ variant: 'navigation', code, description: what, trailing: figure, trail: 'chevron', action: 'x', className: 'm-line' });
+    const bar = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>112</strong><span>of 120 received</span></div><div class="m-recv-track"><i style="width:93%"></i></div><small>Batch 25 · from Farrowing room 3</small></div>';
+    const list = U.heading({ title: 'Pens', icon: ic('grid'), kind: 'section', level: 3 })
+      + U.rowGroup(pen('N1', '15', 'Put in') + pen('N2', '15', 'Put in') + pen('N3', '14', 'Put in · 1 with ear tag') + pen('N4', '16', 'Put in') + pen('N5', '15', 'Put in') + pen('N6', '15', 'Put in') + pen('N7', '12', 'Put in') + pen('N8', '10', 'Put in') + pen('N9', '', 'Empty'));
+    const left = '<div class="m-left"><strong>8 still to come</strong><small>120 sent</small></div>';
+    page('Receive pigs', 'Batch 25 · into Unit 9', bar + list, footer(left, primary('Finish receiving')));
+    const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
+  }, UNIT_CSS);
   await shoot(p, 'mock-8-receive.png');
 }
 
-// 9. Transfer out (owner, 2026-11-03): a reference list of the pigs to move, nothing more. No count and no scanning at the source:
-//    the list says which pigs and where they are now; receiving is where they are received and located into pens.
+// 9 (redrawn). Pigs to move: a reference list. A pen sending only some of its pigs says how many of how many, and names who stays.
 if (want('9-')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
-  await p.evaluate(() => {
+  await p.evaluate((UNIT_CSS) => {
     const { U, ic, page } = window.M;
-    const pen = (code, n, rows) => '<section class="inspect-pen m-card"><header class="inspect-pen-head"><span class="pen-name"><strong>' + code + '</strong><small>· ' + n + ' pigs</small></span></header>' + rows + '</section>';
-    const heads = (n) => U.row({ icon: ic('tag-off'), title: n + ' pigs', description: 'Without ear tags', className: 'm-line' });
+    const pen = (code, head, rows) => '<section class="inspect-pen m-card"><header class="inspect-pen-head"><span class="pen-name"><strong>' + code + '</strong><small>· ' + head + '</small></span></header>' + rows + '</section>';
+    const heads = (n) => U.row({ icon: ic('tag-off'), title: n + ' pigs', description: 'Without ear tags' });
     const tagged = (id, ctx) => U.row({ code: id, description: ctx, trail: 'chevron', action: 'x' });
+    const stays = (id, ctx) => U.row({ code: id, description: ctx, className: 'm-stays' });
     const head = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>120</strong><span>pigs to move</span></div><small>From Farrowing room 3 to Unit 9 · today</small></div>';
-    const list = '<div class="inspect-list m-list">' + pen('B1', 11, heads(11)) + pen('B2', 13, heads(12) + tagged('000901', 'Kept for breeding')) + pen('B3', 10, heads(10)) + pen('B4', 13, heads(13)) + '</div>';
+    const list = '<div class="inspect-list m-list">'
+      + pen('B1', 'all 11 move', heads(11))
+      + pen('B2', '12 of 13 move', heads(12) + stays('000901', 'Stays in B2 · kept for breeding'))
+      + pen('B3', 'all 10 move', heads(10))
+      + pen('B4', 'all 13 move', heads(12) + tagged('000904', 'Gilt')) + '</div>';
     page('Pigs to move', 'Transfer · batch 25', head + list, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Receive in Unit 9', register: 'primary', action: 'x' }) + '</div>');
-    const st = document.createElement('style');
-    st.textContent = `.m-recv-bar{background:var(--paper,#fff);border:1px solid var(--line,#dfe4d8);border-radius:18px;padding:14px 16px;margin:4px 0 20px}
-      .m-recv-figs{display:flex;align-items:baseline;gap:8px}.m-recv-figs strong{font:600 32px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}.m-recv-figs span{font-size:14px;color:var(--ink,#20291f)}
-      .m-recv-bar small{display:block;margin-top:8px;font-size:12px;color:var(--muted,#657060)}
-      .m-ref .st-choice-trail{display:none}`;
-    document.head.append(st);
-  });
+    const st = document.createElement('style'); st.textContent = UNIT_CSS + `.m-stays{background:var(--well,#eef1e7)}.m-stays .st-row-code,.m-stays .st-row-copy small{color:var(--muted,#657060)}`; document.head.append(st);
+  }, UNIT_CSS);
   await shoot(p, 'mock-9-transfer-out.png');
 }
 

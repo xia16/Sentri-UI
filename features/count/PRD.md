@@ -28,6 +28,10 @@ Reviewed on the Claude Design canvas ([canvas.md](canvas.md)). Ruled and redrawn
 
 - **Transfer out is a reference list; receiving receives and locates** (owner, 2026-11-03). The source side counts nothing and scans nothing: *Pigs to move* lists the pigs in the transfer by source pen (tagged pigs by ear tag, the rest as a number), with one action, *Receive in Unit 9*. *Receive pigs* is where pigs are received and placed into pens, pen by pen; pigs not received when receiving finishes go on the batch's balancing sheet. ([mock](mock/mock-9-transfer-out.png); the live back end's transfer research: [transfer-research.md](transfer-research.md).)
 
+- **Recount is the unit's, with a balance sheet** (owner, 2026-11-03; supersedes the per-pen Review count). *Recount · Unit 7* lists the unit's pens, each with what was found or *Not counted yet*; tapping a pen opens the pen count (all pigs, then ear tags by search or scan), whose *Done* returns to the list. *Count* on a pen page opens the same recount, straight into that pen. *Finish recount* shows the **unit balance sheet**: on record against counted; pigs found in another pen, which move; pigs without ear tags netted pen against pen (D4 −1, D5 +1: balanced), so pigs moved and not updated, or piglets shuffled between pens, stop being losses; and only what the unit can't account for (000803, found in no pen) goes on the batch's balancing sheet. *Save recount*. ([mock 10](mock/mock-10-unit-recount.png), [11](mock/mock-11-unit-balance.png), [11b](mock/mock-11b-unit-balance-scrolled.png).)
+- **Receiving uses the same pattern**: the unit's pens, tap a pen, *Put pigs in N3* is the pen count, so tagged pigs are placed in the right pen ([mock 8](mock/mock-8-receive.png), [12](mock/mock-12-receive-pen.png)). **Pigs to move** shows partial pens as *12 of 13 move* and names the pig that stays ([mock 9](mock/mock-9-transfer-out.png)).
+- **Sex and weight of pigs without ear tags** (owner question): recommended kept on the batch (sex split and the last average weight), never per pen, so a move or count never asks for them.
+
 ---
 
 ## 1. The old system, and what is complex about it
