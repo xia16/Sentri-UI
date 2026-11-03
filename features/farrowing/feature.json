@@ -1530,7 +1530,7 @@
           {
             "name": "Bar",
             "at": "Record dead",
-            "shows": "Back · Actions · Record dead, one row at 56px.",
+            "shows": "Back · Actions · Record dead, one row at 56px; Actions is the black primary (owner, 2026-11-03), the other two outlined.",
             "logic": "Nothing stacks in the body (owner, 2026-11-02). Record dead opens the post-lock death record; Actions the sow's actions.",
             "source": "farrowing-astra-concept.js locked()"
           }

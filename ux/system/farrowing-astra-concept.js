@@ -896,7 +896,7 @@ function finishedDetails(s){
 function locked(s){
  const e=s.events[0];
  const ab=s.productionOutcome==='abortion'?s.events.find(e=>e.text.startsWith('Abortion')):null;
- if(!ab&&!s.ended)return {cls:'completed-record-body finished-record-body',body:finishedCard(s),footer:footer(SentriUI.backButton({action:'close'}),btn('sowActions',`${icon('more')}<span>Actions</span>`,'button secondary').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)+btn('death',`${icon('death')}<span>Record dead</span>`,'button secondary'),'execution-completion finished-footer')};
+ if(!ab&&!s.ended)return {cls:'completed-record-body finished-record-body',body:finishedCard(s),footer:footer(SentriUI.backButton({action:'close'}),btn('sowActions',`${icon('more')}<span>Actions</span>`,'button primary').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)+btn('death',`${icon('death')}<span>Record dead</span>`,'button secondary'),'execution-completion finished-footer')};
  const body=ab?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Aborted',ab.text.replace(/^Abortion · ?/,''),[ab.day,ab.time].filter(Boolean).join(' '),initials(ab.who)].filter(Boolean).join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:s.ended?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Sow died',s.sowCause.toLowerCase(),...diedStamp(s)].join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:'';
  return {cls:'completed-record-body',body:`${body}${recordActions(s)}`,footer:recordNavigation()};
 }
