@@ -43,7 +43,7 @@ Screens choose a context and never paint a panel colour. The context sets `--st-
 | Pressed row | `press` (`#f1f5eb`) | `choice-press` (`#eaf0e2`) |
 | Current row (`aria-current`) | ink ✓ in the right rail, 600 title, no fill | the same |
 | Ticked or multi-selected row | `select-mark` checkbox with a white tick; no fill | the same |
-| Ticked task item (Row · Task item) | ink disc; `well` fill (the owner is deciding whether it follows the box, 2026-11-03) | the same |
+| Ticked task item (Row · Task item) | ink disc; `well` fill (unchanged: Piglet processing, its one user, is not designed yet, owner 2026-11-03) | the same |
 | Selected tile (a choice tile, a pen cell) | 2px `ink` ring on `paper`, no fill | the same |
 | Field | bare on the base, `field-border` | bare on the base |
 | Footer, dock, bottom nav | `paper`, `line` top border | `paper`, `line` top border |
