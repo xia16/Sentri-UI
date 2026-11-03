@@ -904,8 +904,9 @@ function recordNavigation(primary=''){return footer(SentriUI.backButton({action:
 // Hand-rear and the rearing pen a drawer each) and Back here means later. What has already gone where sits under them.
 // Header line (information budget): the piglets left and her tag. Pen and time of death are on her row.
 function allocate(s){
- const rows=[SentriUI.choiceRow({mode:'navigate',label:'Foster',meta:'Send them to one or more other sows',action:'allocFoster'}),SentriUI.choiceRow({mode:'navigate',label:'Hand-rear',meta:'Bottle or milk replacer in her crate',action:'allocHandPage'}),...(farmConfig.rearingPen?[SentriUI.choiceRow({mode:'navigate',label:'Rearing pen',meta:'Move them to the rescue deck',action:'allocRearPage'})]:[])];
- return {cls:'allocate-body',body:SentriUI.choiceGroup(rows,{title:'Where do they go?'})+allocSentList(s),footer:footer(SentriUI.backButton({action:'close'}))};
+ // Each choice is a navigation row (owner, 2026-11-02: the question should look better): its icon tile, its name over what it means, ›.
+ const rows=[SentriUI.row({variant:'navigation',icon:icon('transfer'),title:'Foster',description:'Send them to other sows',action:'allocFoster',trail:'chevron'}),SentriUI.row({variant:'navigation',icon:icon('drop'),title:'Hand-rear',description:'Bottle or milk replacer in her crate',action:'allocHandPage',trail:'chevron'}),...(farmConfig.rearingPen?[SentriUI.row({variant:'navigation',icon:icon('barn'),title:'Rearing pen',description:'Move them to the rescue deck',action:'allocRearPage',trail:'chevron'})]:[])];
+ return {cls:'allocate-body',body:SentriUI.heading({title:'Where do they go?',kind:'section',level:3,className:'allocate-question'})+SentriUI.rowGroup(rows.join(''))+allocSentList(s),footer:footer(SentriUI.backButton({action:'close'}))};
 }
 // What has gone where so far (owner, 2026-11-02): one row per send, the sow, her pen, the IDs that went and how many.
 function allocSentList(s){

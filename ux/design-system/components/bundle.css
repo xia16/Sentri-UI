@@ -1661,3 +1661,5 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .foster-pick .allocate-sent{margin:0 0 var(--space-18)}
 /* Hand-rear and Rearing pen: a short content drawer; the card keeps the section space above the footer. */
 .farrowing-phone .alloc-done-body{padding-bottom:var(--space-24)}
+.farrowing-phone .allocate-body{padding-bottom:var(--space-24)}   /* the question's card keeps the section space above the footer */
+.farrowing-phone .allocate-question{margin:0 0 var(--space-12)}
