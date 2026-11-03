@@ -539,19 +539,36 @@ for (const [name, screen, d] of END) {
   await p.close();
 }
 
-if (want('16d')) {
+// 16d, 16e: Not arrived opened (owner, 2026-11-03): the pigs without ID are one number; the ones with ID sit in Fostering's With ID
+//     picker (search and scan in one box, a read ticks). Ticking a pig that turned up makes the footer Move to, to put her in a pen.
+const WITH_ID_CSS = `
+  .m-ids{display:flex;flex-direction:column;gap:8px}
+  .m-ids-head{display:flex;align-items:baseline;justify-content:space-between;margin:0;font:500 15px/1.5 var(--font-sans,inherit);color:var(--ink,#20291f)}
+  .m-ids-count{font:400 13px/1.5 var(--font-sans,inherit);color:var(--muted,#657060)}
+  .m-ids .st-choice-search{margin:0}
+  .m-id-box{border:1px solid var(--line,#dfe4d8);border-radius:var(--radius-panel,18px);background:var(--paper,#fff);overflow:clip}
+  .m-id-box>.st-row+.st-row{border-top:1px solid var(--line,#dfe4d8)}
+  .st-choice-trail input[type="checkbox"]{accent-color:#276640!important}
+  .m-id-box .st-row.selected{background:var(--paper,#fff)!important}`;
+for (const [name, ticked] of [['mock-16d-not-arrived.png', []], ['mock-16e-not-arrived-move.png', ['000903']]]) {
+  if (!want(name.slice(5, 8))) continue;
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
-  await p.evaluate((UNIT_CSS) => {
-    const { U, ic, page } = window.M;
-    const pig = (id, was) => U.row({ code: id, description: was, trail: 'chevron', action: 'x' });
-    const body = '<section class="feature-section">' + U.rowGroup(U.row({ icon: ic('tag-off'), title: '13 pigs', description: 'Without ear tags' })) + '</section>'
-      + '<section class="feature-section">' + U.heading({ title: 'With ear tags', meta: '2', icon: ic('tag'), kind: 'section', level: 3 })
-      + U.rowGroup(pig('000903', 'Gilt · was A3') + pig('000911', 'Barrow · was B2')) + '</section>';
-    page('Not arrived', 'Batch 25 · 15 pigs', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + '</div>');
-    const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
-  }, UNIT_CSS);
-  await shoot(p, 'mock-16d-not-arrived.png');
+  await p.evaluate(({ UNIT_CSS, WITH_ID_CSS, ticked }) => {
+    const { U, ic, page, footer, primary } = window.M;
+    const pigs = [['000903', 'Gilt · was A3'], ['000911', 'Barrow · was B2']];
+    const rows = pigs.map(([id, d]) => U.rowSelect({ code: id, description: d, right: { kind: 'state', figure: '', word: '', level: 'settled' }, checked: ticked.includes(id), fill: false, action: 'x', value: id }).replace('class="', ticked.includes(id) ? 'class="selected ' : 'class="')).join('');
+    const search = U.choiceSearch({ label: 'Search pig ID', placeholder: 'Pig ID', value: '', clear: { action: 'x' }, scan: { action: 'x', label: 'Scan ear tags' } });
+    const body = '<section class="feature-section">' + U.rowGroup(U.row({ icon: ic('tag-off'), title: '13 pigs', description: 'Without ID' })) + '</section>'
+      + '<section class="feature-section m-ids"><p class="m-ids-head"><span>With ID</span><span class="m-ids-count">' + ticked.length + ' of ' + pigs.length + '</span></p>'
+      + search + '<div class="m-id-box">' + rows + '</div></section>';
+    const foot = ticked.length
+      ? footer('<div class="m-left"><strong>' + ticked.length + ' found</strong><small>' + ticked.join(' · ') + '</small></div>', primary('Move to'))
+      : '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + '</div>';
+    page('Not arrived', 'Batch 25 · 15 pigs', body, foot);
+    const st = document.createElement('style'); st.textContent = UNIT_CSS + WITH_ID_CSS; document.head.append(st);
+  }, { UNIT_CSS, WITH_ID_CSS, ticked });
+  await shoot(p, name);
 }
 
 await b.close(); server.kill();
