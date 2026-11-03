@@ -178,6 +178,7 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 @media(prefers-reduced-motion:reduce){:is(.sheet,.scrim,.dialog-backdrop):is([data-enter],[data-leave]){animation:none}}
 /* Page hooks the prototypes keep. */
 .farrowing-phone .sheet[data-presentation="page"] .sow-header-actions:empty{display:none}
+.inspection-phone .inspect-controls{padding-top:0}   /* the walk's lens bar is the first thing under the header: space-section, no more */
 .inspection-phone .feed-feature{border:var(--border-width) solid var(--line);background:var(--st-panel-bg)}   /* End walk's figure: a white card on the tint (SURFACES.md) */
 :is(.farrowing-phone,.inspection-phone) .page-background{position:absolute;inset:0;pointer-events:none;z-index:1}
 :is(.farrowing-phone,.inspection-phone) .page-background>.sheet{z-index:1}
