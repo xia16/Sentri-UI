@@ -1639,17 +1639,17 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
    (first chip under the section title, Allocate piglets' Unit filter). */
 .st-filter-section .st-filter-chips{margin-inline:calc(-1 * var(--space-gutter))}
 /* Foster piglets · With ID (owner, 2026-11-02): a label as Without ID's (its ticked count at the end), the search or scan bar, then one
-   box of tick rows that scrolls past about 2½ rows, so the count and Send stay on screen. No card inside the box. Foster off is a
+   box of tick rows that scrolls past three whole rows (a fade says there are more), so the count and Send stay on screen. No card inside the box. Foster off is a
    page (the tint), so the box is white (Surfaces rule 1). */
 .farrowing-phone .foster-ids{display:flex;flex-direction:column;gap:var(--space-8)}
 .farrowing-phone .foster-ids-head{display:flex;align-items:baseline;justify-content:space-between;margin:0;font:500 var(--type-entry-label-size)/1.5 var(--font-sans);color:var(--ink)}
 .farrowing-phone .foster-ids-count{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
 .farrowing-phone .foster-ids .st-choice-search{margin:0}
 .farrowing-phone .foster-id-box{border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--paper);overflow:clip}
-.farrowing-phone .foster-id-scroll{max-height:calc(2.5 * var(--animal-row-min));overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;scroll-snap-type:y mandatory}
+.farrowing-phone .foster-id-scroll{max-height:calc(3 * var(--row-min) + 2 * var(--border-width));overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;scroll-snap-type:y mandatory}
 .farrowing-phone .foster-id-scroll>.st-row{scroll-snap-align:start}   /* a whole row at the top of the box, never a half one */
-.farrowing-phone .piglet-sex{display:inline-flex;margin-left:var(--space-6);vertical-align:-2px;color:var(--muted)}
-.farrowing-phone .piglet-sex svg{width:var(--size-14);height:var(--size-14);stroke-width:2}
+/* Three whole rows show; while more sit below, the bottom edge fades (owner, 2026-11-03: a cut row read as a spacing bug). */
+.farrowing-phone .foster-id-scroll[data-more]{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - var(--space-28)),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - var(--space-28)),transparent)}
 .farrowing-phone .foster-id-scroll::-webkit-scrollbar{display:none}
 .farrowing-phone .foster-id-scroll>.st-row+.st-row{border-top:var(--border-width) solid var(--line)}
 .farrowing-phone .foster-id-none{margin:0;padding:var(--space-16)}
