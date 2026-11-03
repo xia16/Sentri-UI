@@ -11,11 +11,12 @@ const card = '[data-card="0"] ';
 
 // Each shot: a preset, then taps ({act, value}), typing ({type}), slider moves ({range: [index, value]}) or demo reads ({read: n}).
 const shots = {
-  'p-dead': { preset: 'allocate' },
-  'p-finished': { preset: 'locked' },
+  'now-ended': { preset: 'ended' },
+  'now-count': { preset: 'count' },
+  'now-locked': { preset: 'locked' },
   'p-list': { preset: 'piglets-dead' },
   'p-ticked': { preset: 'piglets-ticked' },
-  'p-count': { preset: 'piglets-count' },
+  
   'p-actions': { preset: 'piglets-actions' },
   'p-sow': { preset: 'piglets-sow' },
   'p-confirm': { preset: 'piglets-confirm' },
@@ -23,6 +24,8 @@ const shots = {
   'p-pen': { preset: 'piglets-pen' },
   'p-live': { preset: 'piglets-live' },
   'p-scan': { preset: 'piglets-dead', steps: [{ act: 'fosterIdScan' }, { read: 2 }] },
+  'p-search': { preset: 'piglets-dead', steps: [{ fill: ['[data-litter-search]', '05'] }] },
+  'p-typed': { preset: 'piglets-live', steps: [{ fill: ['[data-litter-count]', '3'] }] },
   'alloc-filter': { preset: 'piglets-filter' },
   'foster': { preset: 'foster' },
   'foster-on': { preset: 'foster-receive' },
@@ -40,7 +43,8 @@ for (const [name, shot] of Object.entries(shots)) {
   await page.evaluate((v) => { const s = document.querySelector('select.scenario'); s.value = v; s.dispatchEvent(new Event('change', { bubbles: true })); }, shot.preset);
   await page.waitForTimeout(600);
   for (const st of shot.steps || []) {
-    if (st.type != null) await page.fill(card + '[data-foster-search]', st.type);
+    if (st.fill) { await page.fill(card + st.fill[0], st.fill[1]); await page.locator(card + st.fill[0]).dispatchEvent('change'); }
+    else if (st.type != null) await page.fill(card + '[data-foster-search]', st.type);
     else if (st.range) await page.locator(card + '.st-range input[type=range]').nth(st.range[0]).evaluate((e, v) => { e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); }, st.range[1]);
     else if (st.read) for (let k = 0; k < st.read; k++) { await page.click('[data-demo-scan]'); await page.waitForTimeout(250); }
     else await page.click(card + `[data-action="${st.act}"]` + (st.value != null ? `[data-value="${st.value}"]` : ''));
