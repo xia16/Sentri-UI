@@ -21,7 +21,7 @@
   const units = {
     1:{pigs:48,pens:6,checked:'Today, 08:20 · M. Chen'},2:{pigs:46,pens:6,checked:'Yesterday, 16:10 · G. Hansen'},3:{pigs:44,pens:6,checked:'Today, 08:45 · M. Chen'},4:{pigs:46,pens:6,checked:'Yesterday, 15:40 · G. Hansen'},
     6:{pigs:8,pens:4,checked:'Today, 08:15 · G. Hansen'},
-    7:{pigs:86,pens:8,checked:SentriUnitSnapshot.checkIn.time+' · '+SentriUnitSnapshot.checkIn.who},8:{pigs:74,pens:7,checked:'Today, 08:35 · M. Chen'},9:{pigs:86,pens:8,checked:'Yesterday, 16:40 · G. Hansen'},
+    7:{pigs:86,pens:8,checked:SentriUnitSnapshot.lastRecord.time+' · '+SentriUnitSnapshot.lastRecord.who},8:{pigs:74,pens:7,checked:'Today, 08:35 · M. Chen'},9:{pigs:86,pens:8,checked:'Yesterday, 16:40 · G. Hansen'},
     10:{pigs:24,pens:24,checked:'Today, 08:15 · G. Hansen'},11:{pigs:24,pens:24,checked:'Yesterday, 17:00 · M. Chen'},12:{pigs:180,pens:6,checked:'Today, 08:30 · M. Chen'},13:{pigs:180,pens:6,checked:'Today, 08:50 · M. Chen'}
   };
   // Unit context belongs at the entrance; values remain sample data for this study.
@@ -256,7 +256,7 @@
     return `<section class="unit-hub unit-hub-unified" aria-label="Unit ${state.unit} status">
       <button type="button" class="unit-hub-inspect" data-action="inspect" data-entry="inspection" aria-label="${esc(inspectLabel)}">
         <span class="uhi-head">${icon('grid')}<span class="uhi-title">Inspect unit<small>${u.pigs} pigs · ${u.pens} pens</small></span>${icon('arrow')}</span>
-        <span class="unit-check-row"><small>Checked ${esc(u.checked.split(' · ')[0])}</small></span>
+        <span class="unit-check-row"><small>Last record ${esc(u.checked.split(' · ')[0])}</small></span>
         <span class="unit-attention" aria-label="Unit attention">${active.length?`<span class="unit-attention-chips">${active.map(s=>`<span class="unit-attention-chip" role="img" aria-label="${s.label}: ${s.count} ${s.unit}${s.count===1?'':'s'} needing attention" title="${s.label}: ${s.count} ${s.unit}${s.count===1?'':'s'} needing attention">${icon(s.icon)}<span aria-hidden="true">${s.label}</span><strong aria-hidden="true">${s.count}</strong></span>`).join('')}</span>`:!unavailable?`<span class="unit-attention-clear">${icon('check')}No flagged items</span>`:''}${unavailable?'<span class="unit-attention-unknown">Health and feed summary unavailable</span>':''}</span>
       </button>
       ${sensors.length||devices.length?btn('environment',`<span class="unit-environment-label">Environment & devices</span><span class="unit-environment-bottom">${sensors.length?`<span class="unit-live-readings">${sensors.map(s=>`<span>${icon(s.icon)}${s.value}<small>${s.unit}</small></span>`).join('')}</span>`:`<span class="unit-device-count">${devices.length} ${devices.length===1?'device':'devices'}</span>`}${icon('arrow')}</span>`,'unit-hub-environment','','data-entry="environment"'):''}
