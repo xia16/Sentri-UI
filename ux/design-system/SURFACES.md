@@ -26,7 +26,7 @@ Green means done, recorded or synced, and a ticked multi-select box; nothing els
 | A dialog | (`.dialog`) | tint | white | `press` |
 | A dock, footer or bottom nav | (inside any of the above) | white, `line` top | | |
 
-`drawer` and `menu` paint the same; the name only picks a sheet's sizing rules in some prototypes. `skeleton` (the task skeletons nobody has designed yet: Piglet processing, the production task) keeps the old white drawer with tinted cards until each is designed (owner, 2026-11-03). Screens choose a context and never paint a panel colour. The context sets `--st-panel-bg` (a card's colour, always paper) and `--st-press` (a press); components read them. `.st-panel.st-panel.st-panel` beats any page rule on purpose, so a screen that sets `background` on a panel loses and looks "almost right by accident".
+`drawer` and `menu` paint the same; the name only picks a sheet's sizing rules in some prototypes. `skeleton` (the task skeletons nobody has designed yet: Piglet processing, the production task, Maintenance) keeps the old white drawer with tinted cards until each is designed (owner, 2026-11-03). Screens choose a context and never paint a panel colour. The context sets `--st-panel-bg` (a card's colour, always paper) and `--st-press` (a press); components read them. `.st-panel.st-panel.st-panel` beats any page rule on purpose, so a screen that sets `background` on a panel loses and looks "almost right by accident".
 
 **Status colours (owner, 2026-11-02).** A status takes one hue on every base: a light fill with same-hue ink when the shape holds a number, the mid-tone mark for a bar segment or dot, the dark ink for a word; waiting is the empty track or an outline. The table and its rules are in [README.md](README.md) › Colour.
 

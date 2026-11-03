@@ -227,7 +227,7 @@ body{background:var(--ground);color:var(--ink)}
 [data-st-context="page"]{--st-panel-bg:var(--st-paper);--st-context-bg:var(--st-canvas);--st-press:var(--press)}
 :is([data-st-context="drawer"],[data-st-context="menu"]){--st-panel-bg:var(--st-paper);--st-context-bg:var(--st-canvas);--st-press:var(--press)}
 .sheet:is([data-st-context="drawer"],[data-st-context="menu"]),.dialog{background:var(--st-canvas)}
-/* Not designed yet (owner, 2026-11-03): the task skeletons (Piglet processing, the production task) keep the old white drawer with tinted
+/* Not designed yet (owner, 2026-11-03): the screens not designed yet (Piglet processing, the production task, Maintenance) keep the old white drawer with tinted
    cards until each is designed. */
 [data-st-context="skeleton"]{--st-panel-bg:var(--st-inset);--st-context-bg:var(--st-paper);--st-press:var(--choice-press)}
 .dialog>.sheet-footer{background:transparent}
@@ -339,7 +339,7 @@ button.st-row:disabled{cursor:default}
 .device .drawer[data-st-context="drawer"][data-size="short"]{max-height:var(--drawer-short-max)}
 .device .drawer[data-st-context="drawer"][data-size="long"]{max-height:var(--drawer-long-max)}
 .device .sheet-footer .primary{margin:0;min-width:0;flex:1;min-height:var(--footer-height);background:var(--st-ink)}
-[data-st-context="drawer"] .evidence,.device .drawer[data-st-context="drawer"] .evidence{background:var(--st-panel-bg)}
+[data-st-context="drawer"] .evidence,[data-st-context="skeleton"] .evidence,.device .drawer[data-st-context="drawer"] .evidence{background:var(--st-panel-bg)}
 
 
 /* Picker field: the mobile-standard choice control that replaces native selects.
@@ -747,15 +747,15 @@ input[type="checkbox"]:disabled:checked{border-color:var(--control-border);backg
 /* Segment (owner, 2026-11-03, option B): a grey track (line) with the chosen option a white thumb on the handle shadow, the iOS segmented
    control. It stands alone on the tint, never in a card. Piglet processing (not designed yet) keeps its old well track. */
 .st-segment{display:flex;gap:var(--space-3);padding:var(--space-3);border:1px solid transparent;border-radius:var(--radius-segment);background:var(--line)}
-.tk-phone .st-segment{border-color:var(--line);background:var(--well)}
+:is(.tk-phone,.environment-page) .st-segment{border-color:var(--line);background:var(--well)}   /* not designed yet: Piglet processing, Environment */
 .st-segment button,.st-filter-chips button{box-sizing:border-box;min-width:var(--tap-min);min-height:var(--tap-min);border:0;border-radius:var(--radius-8);padding:var(--space-4) var(--space-6);background:transparent;color:var(--ink);font:400 var(--type-row-title-size)/1.4 var(--font-sans);display:flex;align-items:center;justify-content:center;gap:var(--space-3);cursor:pointer}
 .st-segment button{flex:1 0 auto;min-width:var(--tap-min);flex-wrap:wrap}
 .st-selection-label{white-space:nowrap;min-width:0}
 .st-selection-count{font:500 var(--type-meta-size)/1.4 var(--font-mono);color:var(--muted)}
 .st-segment .st-selection-count{color:var(--ink-2)}   /* muted on the grey track is 4.0:1; ink-2 is 6.4:1 */
-.tk-phone .st-segment .st-selection-count{color:var(--muted)}
+:is(.tk-phone,.environment-page) .st-segment .st-selection-count{color:var(--muted)}
 .st-segment button[aria-pressed=true]{background:var(--paper);font-weight:var(--type-weight-strong);box-shadow:var(--shadow-handle)}
-.tk-phone .st-segment button[aria-pressed=true]{box-shadow:none}
+:is(.tk-phone,.environment-page) .st-segment button[aria-pressed=true]{box-shadow:none}
 .st-segment[data-variant=two-line-lens] button{flex-direction:column}
 .st-segment[data-variant=two-line-lens] .st-selection-count:empty{min-height:1.4em}
 .st-segment button:not([aria-pressed=true]):not(:disabled):active,.st-filter-chips button:not([aria-checked=true]):not(:disabled):active,[data-state=Pressed].st-segment button:nth-child(2),[data-state=Pressed].st-filter-chips button:nth-child(2){background:var(--handle)}
