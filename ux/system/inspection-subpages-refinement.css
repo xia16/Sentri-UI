@@ -154,7 +154,6 @@
 .inspection-phone .picker-step .catalog-categories{gap:0}
 .inspection-phone .picker-step :is(.catalog-category,.catalog-item,.medicine-option,.st-picker-option){box-sizing:border-box;min-height:52px;padding:12px 14px;margin:0;border:0;border-bottom:1px solid var(--st-rule,#dce2d5);border-radius:0;background:transparent}
 .inspection-phone .picker-step :is(.catalog-category,.catalog-item,.medicine-option,.st-picker-option):last-child{border-bottom:0}
-.inspection-phone .picker-step :is(.catalog-item:has(input:checked),.medicine-option[aria-pressed="true"],.st-picker-option[aria-selected="true"]){background:var(--well)}
 .inspection-phone .picker-step :is(.catalog-category strong,.catalog-item strong,.medicine-option strong,.st-picker-option strong){font-size:var(--type-row-title-size);font-weight:500;line-height:1.45}
 .inspection-phone .picker-step :is(.catalog-category small,.catalog-item small,.medicine-option small){font-size:var(--type-meta-size);line-height:1.4;color:var(--st-muted,#68745d)}
 .inspection-phone .picker-step .catalog-path{position:static;min-height:44px;padding:0 0 12px;border:0;background:transparent}
@@ -170,15 +169,10 @@
 .inspection-phone .option-picker-step .st-picker-options{flex:none}
 .inspection-phone .single-action-sheet .bulk-condition-button span{white-space:normal;overflow-wrap:anywhere}
 
-/* Short, immediate choices: the sheet itself is the only container. */
+/* Short, immediate choices: the picker's own white card on the tint (owner, 2026-11-03: nothing loose on the tint). */
 .inspection-phone .sheet.option-picker-step[data-st-context="drawer"]{height:auto;max-height:calc(100% - 32px)}
 .inspection-phone .sheet.option-picker-step>.sheet-body{flex:0 1 auto;padding-right:18px;padding-bottom:24px;padding-left:18px;gap:0;overflow-y:auto}
-.inspection-phone .option-picker-step .st-picker-options{border:0;border-radius:0;background:transparent;overflow:visible}
-.inspection-phone .option-picker-step .st-picker-option{min-height:52px;padding:12px 4px;border:0;border-radius:0;background:transparent}
-.inspection-phone .option-picker-step .st-picker-option[aria-selected="true"]{background:transparent;color:#486141}
 .inspection-phone .option-picker-step .st-picker-option[aria-selected="true"] strong{font-weight:600}
-.inspection-phone .option-picker-step .st-picker-option:active{background:#f0f4eb}
-.inspection-phone .option-picker-step .st-picker-option>svg{margin-right:4px;color:#486141}
 
 /* Selection bar (platform multi-select): one readable count that opens the review, then the primary. Clear lives in the
    review sheet's head; unticking the last subject ends selection. */
@@ -190,10 +184,8 @@
 
 /* Bulk rows say only the exceptions (Already recorded, Not eligible, an error), in plain muted text: no tag, no green. */
 .inspection-phone .bulk-action-sheet .bulk-pig-row .feed-change-state{min-height:0;padding:0;border-radius:0;background:none;color:var(--muted);font:400 var(--type-meta-size)/1.35 var(--font-sans);font-weight:400;white-space:normal;max-width:150px;text-align:right}
-/* Selection is ink: the tick is ink and a ticked row takes the neutral well, never green (green is done). */
-.inspection-phone .check-target input,.inspection-phone .bulk-pig-check input{accent-color:var(--ink)}
-.inspection-phone .roster-pig.selected{background:var(--well)}
-.inspection-phone .catalog-item:has(input:checked){background:var(--well)}
+/* A multi-select tick is the green box with a white tick (select-mark, owner 2026-11-03); the ticked row stays white. */
+.inspection-phone .check-target input,.inspection-phone .bulk-pig-check input,.inspection-phone .catalog-item input[type=checkbox]{accent-color:var(--select-mark)}
 /* Required: the word sits at the end of the field's label line, so marking fields never changes the details' height. */
 .inspection-phone .bulk-controls .field.error{position:relative}
 .inspection-phone .bulk-controls .field.error>:is(.st-field-message,.st-picker-hint){position:absolute;top:0;right:0;margin:0;font:600 var(--type-meta-size)/1.4 var(--font-sans);color:var(--red)}

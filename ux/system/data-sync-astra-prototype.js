@@ -91,7 +91,7 @@
 
   // ---- pages ----
   const page = (title, line, body, { pageAction = null } = {}) => S.sheet({ variant: 'page', title, line: line ? { text: line } : null, back: { action: 'back', label: t(C.back) }, pageAction, body, footer: false });
-  const clock = (scope) => ({ icon: I.icon('clock'), label: t(C.pastUploads), action: 'past', value: scope });
+  const clock = (scope) => ({ icon: I.icon('history'), label: t(C.pastUploads), action: 'past', value: scope });
   const bar = (x) => {
     if (state.signedOut) return S.toast(t(C.signIn), { detail: t(C.safe), tone: 'attention', standing: { action: 'open-reauth', value: '' } });
     const n = x ? x.notAccepted.length : 0;

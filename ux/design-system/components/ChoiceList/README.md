@@ -32,7 +32,7 @@ Group heading (optional); lead control (optional); option label; meta line (opti
 | --- | --- |
 | Default | Label, optional meta, trailing mark; nothing selected is shown as nothing. |
 | Pressed | `choice-press` fill; static `pressed` prop. |
-| Selected | Trailing ink check, checkbox tick or ring plus stronger label. Selection is ink, never green (green is done). Never colour alone. |
+| Selected | Single: a trailing ink check or ring plus stronger label; a single choice is never green (green is done). Multi: the checkbox ticked in `select-mark` green with a white tick, the row left white (owner, 2026-11-03). Never colour alone. |
 | Disabled | Prefer omission. Otherwise readable text, `aria-disabled`, and a persistent reason line; no dimming. |
 | Loading | Loading options status in place of rows. |
 | Empty | No options or no search match; never a blank panel. |
@@ -57,7 +57,7 @@ Rows meet `tap-min` (radio and inline rows `radio-row-min`). Single rows expose 
 
 `choiceRow`, `choiceGroup`, `choiceSearch`, `choiceEmpty` (`title` and `icon` for the can-add empty state), `choiceRadios` (`layout: 'inline'`, `face: 'key'` or `'row'`; `face: 'flat'` on the radio rows), `radioBind`; `pickerOptions` is a compatibility adapter. `secondaryAction` exposes a separately named removal control. `labelHidden` hides only the field label when an enclosing optional row already names it; the accessible label and Clear remain. Types in `../index.d.ts`. `SentriTask.radios` (task-skeleton.js) is a compatibility alias of `choiceRadios` with the flat face (layout `'row'`: the inline field in the row face); the frozen Piglet processing pages still call it. It was the part TaskRadios (archived, [archive/design-system/components/TaskRadios](../../../../archive/design-system/components/TaskRadios/README.md)).
 
-Tokens: `tap-min`, `choice-row-min`, `radio-row-min`, `rule`, `paper`, `ink`, `muted`, `green`, `choice-press`, `disabled-surface`, `font-sans`, `font-size-14`, `type-weight-strong`, `space-8`, `space-12`, `size-20`, `size-24`.
+Tokens: `tap-min`, `choice-row-min`, `radio-row-min`, `rule`, `paper`, `ink`, `muted`, `green`, `select-mark`, `choice-press`, `disabled-surface`, `font-sans`, `font-size-14`, `type-weight-strong`, `space-8`, `space-12`, `size-20`, `size-24`.
 
 ## Do / don't
 

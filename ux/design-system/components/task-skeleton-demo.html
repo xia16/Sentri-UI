@@ -200,7 +200,7 @@
       return { title: s(x[2], ''), description: s(x[2] + '.sub', ''), icon: x[1], action: 'pen-' + x[0] };
     });
     return K.page({ title: s('tk.demo.pen.title', 'Pen B1'), back: { action: 'back' }, view: 'pen',
-      body: K.doors({ card: true, title: s('tk.demo.pen.info', 'Pen information'), icon: 'grid', items: items }), footer: false });
+      body: K.doors({ card: true, title: s('tk.demo.pen.info', 'Pen information'), icon: 'pen', items: items }), footer: false });
   }
 
   function perf(meta, bal, sb, sbSub, born, alive, deaths) {

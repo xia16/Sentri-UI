@@ -350,7 +350,6 @@ button.st-row:disabled{cursor:default}
 
 /* Shared chooser: catalogue = flat; short ungrouped choices = one muted inset.
    A second text line never changes selection behavior or adds a nested card. */
-.inspection-phone .sheet.picker-step:is(.medicine-picker-step,.health-picker-step)>.sheet-body{background:var(--st-paper)}
 .inspection-phone .sheet.picker-step .st-chooser-list{border:0;border-radius:0;background:transparent;min-width:0;flex:none}
 .inspection-phone .sheet.picker-step .st-chooser-list[data-chooser-tone="inset"]{padding:0}
 .inspection-phone .sheet.picker-step .catalog-path{background:transparent}
@@ -385,7 +384,7 @@ button.st-row:disabled{cursor:default}
 .st-choice-trail svg{width:var(--size-20);height:var(--size-20);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .st-choice-row[data-mode="navigate"] .st-choice-trail{color:var(--st-muted)}
 .st-choice-row[data-mode="navigate"] .st-choice-trail svg{width:var(--size-18);height:var(--size-18)}
-.st-choice-trail input[type="checkbox"]{width:var(--size-20);height:var(--size-20);margin:0;accent-color:var(--st-ink)}
+.st-choice-trail input[type="checkbox"]{width:var(--size-20);height:var(--size-20);margin:0;accent-color:var(--select-mark)}
 .st-choice-search.st-choice-search{position:relative;margin:0 0 var(--space-20)}
 .st-choice-search input::-webkit-search-cancel-button,.st-choice-search input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
 /* The search field in a picker, a sheet or a list (choiceSearch): the host sizes the input, which stays the box; the search glyph
@@ -404,7 +403,7 @@ button.st-row:disabled{cursor:default}
 /* In a picker sheet every option row is one height: one line and a wrapped two-line label both fit the 56px row. */
 .st-picker-body .st-choice-row.st-choice-row{padding-block:var(--space-8)}
 /* Search stays at the top of the sheet while the one list scrolls under it (sticky in the sheet body, never a second scroller). */
-.sheet-body>.st-picker-body>.st-choice-search,.sheet-body>*>.st-picker-body>.st-choice-search{position:sticky;top:calc(-1 * var(--space-section));z-index:1;margin:calc(-1 * var(--space-section)) calc(-1 * var(--space-gutter-sheet)) var(--space-12);padding:var(--space-section) var(--space-gutter-sheet) var(--space-8);background:var(--paper)}
+.sheet-body>.st-picker-body>.st-choice-search,.sheet-body>*>.st-picker-body>.st-choice-search{position:sticky;top:calc(-1 * var(--space-section));z-index:1;margin:calc(-1 * var(--space-section)) calc(-1 * var(--space-gutter-sheet)) var(--space-12);padding:var(--space-section) var(--space-gutter-sheet) var(--space-8);background:var(--st-context-bg,var(--paper))}
 /* Toast: what was just saved, on the ink above the page's dock (the Android snackbar). Solid, never see-through: it is read in sun
    and glare. A glyph says how it went (done: a check on the green; offline: no-signal, saved on this phone), the title what was done,
    the second line for whom or where it went. It rises in once and never takes a tap. */
@@ -701,7 +700,8 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-picker-field.error .st-picker-hint{color:var(--red)}
 .st-choice-label,.st-choice-meta{overflow-wrap:anywhere;white-space:normal}
 .st-choice-row[data-mode="single"] .st-choice-trail{color:var(--ink)}
-.st-choice-trail input[type="checkbox"]{accent-color:var(--ink)}
+/* A ticked multi-select box is green with a white tick (select-mark, owner 2026-11-03); its row stays white. */
+.st-choice-trail input[type="checkbox"]{accent-color:var(--select-mark)}
 .st-choice-row[data-mode="multi"]:has(:checked) .st-choice-label{font-weight:var(--type-weight-strong)}
 .st-picker-value.is-names{display:flex;align-items:baseline;gap:var(--space-6);white-space:normal;overflow:visible}
 .st-picker-names{min-width:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
@@ -780,8 +780,7 @@ button.st-row[data-variant="tick"]:active:not(:disabled){background:var(--st-pre
 .st-row-chevron[data-rail="edit"]{align-items:center;gap:var(--space-4);font-size:var(--type-description-size)}
 
 .st-row[data-variant="select-door"]{padding:0 var(--space-row-x) 0 0;gap:0}
-.st-row[data-variant="select-door"][data-ticked],.st-row[data-variant="select-door"]:has(input:checked){background:var(--well)}
-/* Just scanned (data-arrival, owner 2026-10-20; any row a read lands on, 2026-10-22): the pale progress wash for a moment, never the ticked well; "off" fades it back before the host drops the attribute. A ticked row keeps its well. */
+/* Just scanned (data-arrival, owner 2026-10-20; any row a read lands on, 2026-10-22): the pale progress wash for a moment; "off" fades it back to white before the host drops the attribute. A ticked row stays white: the green box says it (owner, 2026-11-03). */
 .st-row[data-arrival]{transition:background-color .9s ease-out}
 .st-row[data-arrival="on"]{background:var(--progress-wash);transition-duration:.12s}
 @media(prefers-reduced-motion:reduce){.st-row[data-variant="select-door"][data-arrival]{transition:none}}
@@ -1316,8 +1315,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-choice-heading.st-choice-heading:has(> svg) { display: flex; align-items: center; gap: 6px; padding-left: 0; }
 .st-choice-heading > svg { width: 16px; height: 16px; flex: none; }
 
-/* Row · select: fill:false (a box whose tick doesn't tint its cell; the Inspection pen header, owner 2026-10-18). */
-.st-row[data-variant="select-door"][data-fill="none"]:has(input:checked){background:transparent}
 /* Row · Animal · group (owner, 2026-10-18): animals without an ID as one row. The name ("14 pigs") leads with a muted glyph and is
    sans, the tags take the context line, the door has no chevron, and a 48px count field ends the row: idle (not ticked) its
    number is ink-2 at 500, which holds 7:1 at 17px. The padding keeps the Animal row's height. */
@@ -1542,3 +1539,90 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .task-perf-facts dd{margin:6px 0 0;font:500 17px/1.3 var(--font-mono);color:var(--ink)}
 .farrowing-phone .task-perf-facts dd small{margin-left:3px;font:500 13px var(--font-sans);color:var(--muted)}
 @media(max-width:370px){.farrowing-phone .task-perf-card.st-panel{padding:18px 14px}.farrowing-phone .task-perf-kpis strong{font-size:32px}}
+/* Farrowing, the finished sow (owner, 2026-11-02). Her drawer: one card, a tappable card in a white drawer (SURFACES rule 6: white body,
+   1px line, a tinted head band with the finished line and Details), a ring of where the litter went; her actions in the bar. */
+.farrowing-phone .finished-card{display:block;width:100%;padding:0;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper);color:var(--ink);text-align:left;font:inherit}
+.farrowing-phone .finished-card:active{background:var(--press)}
+.farrowing-phone .finished-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--app-background);font:500 14px/1.4 var(--font-sans);color:var(--ink-2)}
+.farrowing-phone .finished-card-go{display:inline-flex;align-items:center;gap:2px;flex:none;font-weight:600;color:var(--ink)}
+.farrowing-phone .finished-card-go svg{width:15px;height:15px}
+.farrowing-phone .finished-card-body{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:center;padding:18px}
+.farrowing-phone .finished-ring{position:relative;display:block;width:150px;height:150px}
+.farrowing-phone .finished-ring svg{display:block;width:150px;height:150px}
+.farrowing-phone .finished-ring circle{fill:none;stroke-width:18}
+.farrowing-phone .finished-ring-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.farrowing-phone .finished-ring-mid b{font:600 40px/1 var(--font-mono);color:var(--ink)}
+.farrowing-phone .finished-ring-mid small{margin-top:4px;font:500 13px/1.2 var(--font-sans);color:var(--ink-2)}
+.farrowing-phone .finished-key{display:flex;flex-direction:column;gap:10px;min-width:0}
+.farrowing-phone .finished-key-row{display:flex;justify-content:space-between;align-items:center;gap:8px;font:500 14px/1.3 var(--font-sans)}
+.farrowing-phone .finished-key-row>span{display:inline-flex;align-items:center;gap:8px}
+.farrowing-phone .finished-key-row b{font:600 18px var(--font-mono)}
+.farrowing-phone .finished-key-row b small{margin-left:3px;font:500 13px var(--font-mono);color:var(--ink-2)}
+.farrowing-phone .finished-key-total{padding-top:10px;border-top:1px solid var(--rule)}
+.farrowing-phone .finished-key-total>span{font-weight:600}
+.farrowing-phone .finished-key i,.farrowing-phone .finished-parts>li>i{flex:none;width:10px;height:10px;border-radius:3px}
+.farrowing-phone .finished-ring [data-part="alive"]{stroke:var(--green)}
+.farrowing-phone .finished-ring [data-part="after"]{stroke:var(--neutral-mark)}
+.farrowing-phone .finished-ring [data-part="dead"]{stroke:var(--handle)}
+.farrowing-phone :is(.finished-key,.finished-parts,.finished-bar) [data-part="alive"]{background:var(--green)}
+.farrowing-phone :is(.finished-key,.finished-parts,.finished-bar) [data-part="after"]{background:var(--neutral-mark)}
+.farrowing-phone :is(.finished-key,.finished-parts,.finished-bar) [data-part="dead"]{background:var(--handle)}
+.farrowing-phone :is(.finished-key,.finished-parts) i[data-part="dead"]{box-shadow:inset 0 0 0 1px var(--control-border)}
+.farrowing-phone .finished-footer{display:grid;grid-template-columns:86px 1fr 1.3fr;gap:10px}
+.farrowing-phone .finished-footer .button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:var(--footer-height);padding:0 10px;white-space:nowrap}
+.farrowing-phone .finished-footer .button svg{width:16px;height:16px}
+/* Details, a page (SURFACES rule 1: the tint, white cards): the litter, against her batch, against herself. Labels in ink-2, not muted. */
+.farrowing-phone .finished-details-body{display:flex;flex-direction:column;gap:var(--space-24)}
+.farrowing-phone .finished-details-body>*{flex-shrink:0}
+.farrowing-phone .finished-section>.st-heading{margin-bottom:10px}
+.farrowing-phone .finished-section>.st-heading .st-heading-title{color:var(--ink);font-weight:600}
+.farrowing-phone .finished-section>.st-heading .st-heading-meta{color:var(--ink-2)}
+.farrowing-phone .finished-panel.st-panel{padding:20px 18px}
+.farrowing-phone .finished-bar{display:flex;gap:3px;height:16px;border-radius:8px;overflow:hidden}
+.farrowing-phone .finished-bar i{display:block}
+.farrowing-phone .finished-parts{margin:4px 0 0;padding:0;list-style:none}
+.farrowing-phone .finished-parts>li{display:grid;grid-template-columns:14px 1fr auto;column-gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--rule)}
+.farrowing-phone .finished-parts>li:last-child{border-bottom:0}
+.farrowing-phone .finished-parts>li>span{font:600 15px/1.3 var(--font-sans);color:var(--ink)}
+.farrowing-phone .finished-parts>li>b{font:600 18px var(--font-mono);color:var(--ink)}
+.farrowing-phone .finished-parts>li>small{grid-column:2 / 4;margin-top:3px;font:500 13px/1.4 var(--font-sans);color:var(--ink-2)}
+.farrowing-phone .finished-facts{display:grid;grid-template-columns:auto auto auto auto;justify-content:space-between;margin:12px 0 0;padding-top:14px;border-top:1px solid var(--rule)}
+.farrowing-phone .finished-facts dt{font:600 13px/1.4 var(--font-sans);color:var(--ink-2)}
+.farrowing-phone .finished-facts dd{margin:4px 0 0;font:600 17px var(--font-mono);color:var(--ink)}
+.farrowing-phone .finished-facts dd small{margin-left:2px;font:500 13px var(--font-sans);color:var(--ink-2)}
+.farrowing-phone .finished-measures{display:flex;flex-direction:column;gap:20px}
+.farrowing-phone .finished-measure p{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 8px;font:600 14px/1.3 var(--font-sans);color:var(--ink)}
+.farrowing-phone .finished-measure p span:last-child{font:500 13px var(--font-sans);color:var(--ink-2)}
+.farrowing-phone .finished-measure p b{margin-right:4px;font:600 17px var(--font-mono);color:var(--done-fill-ink)}
+.farrowing-phone .finished-track{position:relative;display:block;height:14px;border-radius:7px;background:var(--well)}
+.farrowing-phone .finished-range{position:absolute;top:0;bottom:0;border-radius:7px;background:var(--handle)}
+.farrowing-phone .finished-dot{position:absolute;top:50%;z-index:1;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--paper)}
+.farrowing-phone .finished-avg{position:absolute;top:-6px;bottom:-6px;z-index:2;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--ink)}
+.farrowing-phone .finished-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:14px 0 0;padding-top:12px;border-top:1px solid var(--rule);font:500 13px/1.4 var(--font-sans);color:var(--ink)}
+.farrowing-phone .finished-legend>span{display:inline-flex;align-items:center;gap:6px}
+.farrowing-phone .finished-legend i{display:inline-block}
+.farrowing-phone .finished-legend [data-key="dot"]{width:12px;height:12px;border-radius:50%;background:var(--green)}
+.farrowing-phone .finished-legend [data-key="avg"]{width:3px;height:14px;border-radius:2px;background:var(--ink)}
+.farrowing-phone .finished-legend [data-key="range"]{width:18px;height:10px;border-radius:5px;background:var(--handle)}
+.farrowing-phone .finished-legend [data-key="born"]{width:12px;height:12px;border-radius:3px;background:var(--done-fill);box-shadow:inset 0 0 0 1px var(--done-mark)}
+.farrowing-phone .finished-legend [data-key="weaned"]{width:12px;height:12px;border-radius:3px;box-shadow:inset 0 0 0 2px var(--done-mark)}
+.farrowing-phone .finished-legend [data-key="target"]{width:18px;border-top:2px dashed var(--ink-2)}
+.farrowing-phone .finished-none{margin:0;font:500 14px/1.5 var(--font-sans);color:var(--ink-2)}
+.farrowing-phone .finished-chart{position:relative;display:flex;align-items:flex-end;justify-content:space-around;height:140px;border-bottom:1px solid var(--line)}
+.farrowing-phone .finished-litter{display:flex;align-items:flex-end;gap:5px}
+.farrowing-phone .finished-litter i{position:relative;display:block;width:30px;border-radius:7px 7px 2px 2px}
+.farrowing-phone .finished-litter i b{position:absolute;left:0;right:0;top:8px;text-align:center;font:600 14px var(--font-mono)}
+.farrowing-phone .finished-litter [data-series="born"]{background:var(--done-fill);box-shadow:inset 0 0 0 1px var(--done-mark)}
+.farrowing-phone .finished-litter [data-series="born"] b{color:var(--done-fill-ink)}
+.farrowing-phone .finished-litter[data-now] [data-series="born"] b{color:var(--paper)}
+.farrowing-phone .finished-litter [data-series="weaned"]{background:var(--paper);box-shadow:inset 0 0 0 2px var(--done-mark)}
+.farrowing-phone .finished-litter [data-series="weaned"] b{color:var(--ink)}
+.farrowing-phone .finished-litter[data-now] [data-series="born"]{background:var(--green)}
+.farrowing-phone .finished-litter[data-now] [data-series="weaned"]{box-shadow:inset 0 0 0 2px var(--green)}
+.farrowing-phone .finished-target{position:absolute;left:0;right:0;border-top:2px dashed var(--ink-2)}
+.farrowing-phone .finished-axis{display:flex;justify-content:space-around;margin:8px 0 0;font:600 13px var(--font-sans);color:var(--ink-2)}
+.farrowing-phone .finished-axis [data-now]{color:var(--ink)}
+.farrowing-phone .finished-first{display:flex;gap:12px;align-items:center;padding:18px;border:1.5px dashed var(--control-border);border-radius:var(--radius-panel);color:var(--ink-2)}
+.farrowing-phone .finished-first svg{flex:none;width:22px;height:22px}
+.farrowing-phone .finished-first p{margin:0;font:500 14px/1.5 var(--font-sans)}
+.farrowing-phone .finished-first strong{display:block;color:var(--ink);font-weight:600}

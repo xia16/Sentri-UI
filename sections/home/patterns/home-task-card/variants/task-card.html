@@ -28,7 +28,7 @@
   // one card from a kind and the facts the Home prototype would supply for it
   const card = (kind, title, context, facts, progress, extra = {}) => {
     const r = C.attention(kind, facts);
-    return C.render({ id: kind, ...r, identity: { title, context, icon: 'production' }, progress, status: { label: r.state === 'active' ? 'Due now' : 'Waiting', tone: r.state === 'active' ? 'blue' : '' }, timing: { elapsed: 'Day 2 of 7', remaining: 'Overdue 1 day' }, scope, ...extra });
+    return C.render({ id: kind, ...r, identity: { title, context, icon: ({ farrowing: 'farrow', pregnancy: 'pregnancy', piglet: 'pig' })[kind] || 'production' }, progress, status: { label: r.state === 'active' ? 'Due now' : 'Waiting', tone: r.state === 'active' ? 'blue' : '' }, timing: { elapsed: 'Day 2 of 7', remaining: 'Overdue 1 day' }, scope, ...extra });
   };
   const closed = (state, stamp) => C.render({ id: 'x' + state, state, identity: { title: 'Pregnancy check', context: 'Batch 31' }, scope, completedAt: stamp });
   const preg = (facts, p = prog(7, 18)) => card('pregnancy', 'Pregnancy check', 'Batch 31 · First check', { label: 'sows ready to check', ...facts }, p);

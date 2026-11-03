@@ -1,19 +1,19 @@
 # Surfaces: bases, cards and colour
 
-Owner ruling, 2026-10-12. **Read this before you build or change any screen, sheet or component.** The rule is mechanical, so most of it can be checked without taste: pick the base, the card is the opposite, and colour appears only where this page says it does. A guard test (`ux/system/surfaces.test.cjs`) fails the two regressions most likely to come back: a green current or selected fill, and a footer or dock button under 56px.
+Owner ruling, 2026-10-12. **Read this before you build or change any screen, sheet or component.** The rule is mechanical, so most of it can be checked without taste: pick the base, the card is the opposite, and colour appears only where this page says it does. A guard test (`ux/system/surfaces.test.cjs`) fails the regressions most likely to come back: a green current or selected fill, a multi-select box in any colour but `select-mark` or its row tinted, and a footer or dock button under 56px.
 
 ## The rule
 
 1. **Pages and menu drawers are the tint (`app-background`) with white cards.** A menu drawer is one where every row is an option or a verb (Choose a unit, More actions, Allocate piglets, Pen map, Measurements & condition). **Content and input drawers are white with tinted cards**: search, forms, records, filters, pen sheets, and **Today**, which stays white.
 2. **A card is always the opposite of its base, with a 1px `line` border.** Nothing is flat (white on white), nothing is tint on tint, and no row list sits on a base without a card. **Docks and footers are white.**
 3. **Icon tiles are `row-icon-bg`. Pressed is one step deeper than its surface:** `press` on white, `choice-press` on the tint.
-4. **Current or selected is ink:** a ✓, a checkbox, or an ink ring. No green fill and no inset marker bar, anywhere.
+4. **Current or selected is ink:** a ✓ or an ink ring. No green fill and no inset marker bar, anywhere. **The one exception is the multi-select box** (owner, 2026-11-03): a ticked checkbox is `select-mark` (the green of Counting's + Born alive key) with a white tick, and its row stays white, with no fill behind it.
 5. **One tint.** `inset`, `surface` and `ground` are aliases of `app-background`; there is no second or third near-white. A stray hex tint (`#f6f7f2`, `#fbfcf8`, `#f8f9f3`, `#f8faf5`…) is a bug.
 6. **Tint is for reading, white is for tapping.** Inside a white content drawer, a card you only read (facts, evidence, a batch) is the tint. A card that holds items you tap (a day's checklist) keeps a **white body** with a 1px `line` border and a **tinted head band** for its title, so the label and the work sit on two levels (owner, 2026-10-12, after an all-tint Day card read as dull). Never make a card of tappable items all tint.
 
-Open question (owner to decide): lists of tappable rows in input drawers (Find a sow results, picker lists, the allocation choices) are a tinted card today. Rule 6 suggests white; both versions will be mocked before this changes.
+**Changing (owner, 2026-11-03):** every page and drawer becomes the tint with white cards, and nothing sits loose on the tint: every group is a white card ([canvas](https://claude.ai/artifact/BugjQscz9ZjPy9hm8kMggg)). Medicines is the reference. The pickers (Conditions, Medicines, Vaccines, a medicine's category, a short option list such as Outcome) are built that way first; the other drawers move in one pass, and this page is rewritten with it.
 
-Green means done, recorded or synced, nothing else. Amber and red washes mean status and are never a card's resting colour.
+Green means done, recorded or synced, and a ticked multi-select box; nothing else. Amber and red washes mean status and are never a card's resting colour.
 
 **Fills and washes (owner, 2026-10-14).** Fills colour a status that covers a whole area (a pen tile); washes stay text backgrounds; a fill is never a card's resting colour. The washes measure ΔE 2.8 from the tint and read grey at tile size, so an area takes a fill: `amber-fill` and `progress-fill`, each with its own dark ink, at 85% strength.
 
@@ -42,7 +42,8 @@ Screens choose a context and never paint a panel colour. The context sets `--st-
 | Icon tile | `row-icon-bg` | `row-icon-bg` |
 | Pressed row | `press` (`#f1f5eb`) | `choice-press` (`#eaf0e2`) |
 | Current row (`aria-current`) | ink ✓ in the right rail, 600 title, no fill | the same |
-| Ticked or multi-selected row | ink checkbox or ink disc; at most `well` fill | the same |
+| Ticked or multi-selected row | `select-mark` checkbox with a white tick; no fill | the same |
+| Ticked task item (Row · Task item) | ink disc; `well` fill (unchanged: Piglet processing, its one user, is not designed yet, owner 2026-11-03) | the same |
 | Selected tile (a choice tile, a pen cell) | 2px `ink` ring on `paper`, no fill | the same |
 | Field | bare on the base, `field-border` | bare on the base |
 | Footer, dock, bottom nav | `paper`, `line` top border | `paper`, `line` top border |
