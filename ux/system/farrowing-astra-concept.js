@@ -916,13 +916,15 @@ function death(s){if(!s.locked&&!s.ended)return reportDeath(s);const n=sum(s.dea
 // Reading destinations share Inspection's medium drawer and record timeline.
 // The log and the death breakdown are read from the sow's record drawer, one Back away: no header line (Headers law, 2026-10-13).
 function detailSheet(s,title,body,size='medium'){const page=s.view==='history';return SentriUI.sheet({variant:page?'page':'drawer',surface:'menu',title,back:{action:'back'},body,footer:page?false:footer(SentriUI.backButton({action:'back'})),className:'detail-sheet',size,label:title,close:{action:'back',label:'Close '+title},scrim:{action:'back',label:'Dismiss '+title},bar:s.view==='history'?status():''});}
+// A withdrawn line keeps one stamp line (owner, 2026-11-03): when and who saved it, then Withdrawn, with its own when and who only where they differ.
+function withdrawnLine(e){const w=e.withdrawn,saved=[e.time,initials(e.who)].filter(Boolean).join(' · ');if(!w)return saved+' · Withdrawn';const same=w.time===e.time&&w.who===e.who;return saved+' · Withdrawn'+(same?'':' '+[w.time,initials(w.who)].join(' · '));}
 function history(s){
  const list=[...s.events];
  if(s.pending)list.unshift({text:s.pending>0?`+${s.pending} alive · this visit`:`${-s.pending} died · this visit`,day:'Today',time:s.stamp,who:'G. Hansen',kind:'open'});
  const groups=[];
  for(const e of list){if(groups.at(-1)?.day!==e.day)groups.push({day:e.day,events:[]});groups.at(-1).events.push(e);}
  const top=canUndo(s)&&topAction(s),undo=`<button type="button" class="log-undo" data-action="undoAsk" aria-label="Undo ${top?actionText(top):''}">${icon('undo')}<span>Undo</span></button>`;
- const logGroups=groups.map(group=>({label:group.day,entries:group.events.map(e=>({title:e.text,detail:e.kind==='withdrawn'?(e.withdrawn?`Withdrawn ${e.withdrawn.time} · ${initials(e.withdrawn.who)}`:'Withdrawn'):'',...(e.kind==='corrected'?{corrected:true,was:e.was}:{}),at:e.time,by:e.who,extraHtml:(e===top?undo:e.kind==='withdrawn'?'<i class="log-withdrawn" hidden></i>':'')+(e.photos?.length?`<div class="photos">${e.photos.map((p,i)=>btn('savedPhoto',`<img src="${esc(p)}" alt="Recorded photo ${i+1}">`,'',p)).join('')}</div>`:'')}))}));
+ const logGroups=groups.map(group=>({label:group.day,entries:group.events.map(e=>({title:e.text,...(e.kind==='withdrawn'?{meta:withdrawnLine(e)}:{}),...(e.kind==='corrected'?{corrected:true,was:e.was}:{}),at:e.time,by:e.who,extraHtml:(e===top?undo:e.kind==='withdrawn'?'<i class="log-withdrawn" hidden></i>':'')+(e.photos?.length?`<div class="photos">${e.photos.map((p,i)=>btn('savedPhoto',`<img src="${esc(p)}" alt="Recorded photo ${i+1}">`,'',p)).join('')}</div>`:'')}))}));
  const body=SentriUI.log(logGroups,{empty:'Counts and saved updates will appear here.'});
  return detailSheet(s,s.productionOutcome?'Production log':'Farrowing log',body);
 }

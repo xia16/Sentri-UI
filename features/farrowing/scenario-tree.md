@@ -137,7 +137,7 @@ recorded by G.H.
 | X-9 | X0 | look | → the drawer names no last save and offers no Undo (Alive 12 · Details ›); no banner | owner decision 2026-11-03 | `fa-x9-changed-row-shows-was` |
 | X-10 | X0 | Details | → Details opens with Farrowing log on top, `+3 born alive · 09:41 · G.H` under it, then This litter; no Undo here, no comparisons while she farrows | owner decision 2026-11-03 | `fa-x10-back-with-change-asks-save` |
 | X-11 | X-10 | Farrowing log, Undo on the top line | → the shared dialog asks `Undo this entry?` over one ledger card: Alive now 12 → 9 · Born 17 → 14 (Back / Undo); nothing changes until it is answered | owner decision 2026-11-03 | `fa-x11-ask-discard-drops-change` |
-| X-12 | X-11 | Undo | → the counts go back (9 alive, born 14); the line stays marked Withdrawn 09:41 · G.H; Undo moves to the save before it | owner decision 2026-11-03 | `fa-x12-ask-save-posts-correction` |
+| X-12 | X-11 | Undo | → the counts go back (9 alive, born 14); the line stays, one stamp line `09:41 · G.H · Withdrawn`; Undo moves to the save before it | owner decision 2026-11-03 | `fa-x12-ask-save-posts-correction` |
 
 ## 7 · Sow death (M)
 

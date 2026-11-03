@@ -1766,6 +1766,13 @@
             "shows": "On the top action only, top right of its entry: the undo glyph and \"Undo\", a 44px text action in ink.",
             "logic": "The top of her stack: the newest save not withdrawn (after Finish, only what came after it). Tapping it asks first (farrowing.undo). Nothing left to take back, no Undo.",
             "source": "farrowing-astra-concept.js history(), topAction()"
+          },
+          {
+            "name": "Withdrawn line",
+            "at": "Withdrawn",
+            "shows": "The taken-back line stays, struck through and quiet, with one stamp line: \"09:41 · G.H · Withdrawn\"; when someone else or later takes it back, its own stamp follows (\"14:02 · L.M · Withdrawn 09:41 · G.H\").",
+            "logic": "Say it once (owner, 2026-11-03): the withdrawn time and who are shown only where they differ from the save.",
+            "source": "farrowing-astra-concept.js withdrawnLine()"
           }
         ],
         "controls": [],
@@ -1773,7 +1780,7 @@
           "(raw) Farrowing log",
           "(raw) Counts and saved updates will appear here.",
           "(raw) Undo",
-          "(raw) Withdrawn <time> · <who>"
+          "(raw) <time> · <who> · Withdrawn [<time> · <who>]"
         ],
         "edge": [],
         "rules": [

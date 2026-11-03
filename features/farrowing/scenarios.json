@@ -2014,21 +2014,32 @@
              "gwt": {
               "given": "The question Undo +3 born alive? is open.",
               "when": "The worker taps Undo.",
-              "then": "Alive is 9 and born 14 again; the line stays in the log marked Withdrawn 09:41 · G.H; Undo now sits on +3 born alive · 1 crushed (L.M)."
+              "then": "Alive is 9 and born 14 again; the line stays in the log, one stamp line \"09:41 · G.H · Withdrawn\" (no second time when the same worker takes it back at once); Undo now sits on +3 born alive · 1 crushed (L.M)."
              },
              "authority": [
               {
                "src": "owner",
                "at": "decision 2026-11-03",
                "says": "Undo moves into the Farrowing log: Details opens with the log row and its last action; in the log the top action carries Undo, one by one; the old Litter details grid is gone"
+              },
+              {
+               "src": "owner",
+               "at": "decision 2026-11-03",
+               "says": "fix the withdrawn time showing twice"
               }
              ],
              "visible": [
               {
+               "text": "09:41 · G.H · Withdrawn",
+               "in": "sheet",
+               "says": "one stamp: saved and withdrawn by the same worker at once",
+               "hard": "wrong-fact"
+              },
+              {
                "text": "Withdrawn 09:41 · G.H",
                "in": "sheet",
-               "says": "who took it back and when",
-               "hard": "wrong-fact"
+               "absent": true,
+               "says": "the time is not said twice"
               },
               {
                "el": "[aria-label='Undo +3 born alive · 1 crushed']",
@@ -2187,8 +2198,9 @@
            "hard": "dead-end"
           },
           {
-           "text": "Withdrawn 09:41 · G.H",
+           "text": "09:41 · G.H · Withdrawn",
            "in": "sheet",
+           "says": "one stamp line: recorded and taken back by G.H at once",
            "hard": "wrong-fact"
           }
          ],
