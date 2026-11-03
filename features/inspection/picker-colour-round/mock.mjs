@@ -69,16 +69,37 @@ const hues = () => {
     tile.style.background = bg; tile.style.color = ink;
   }
 };
-const options = { now: [], a: [white], b: [white, counts], c: [white, counts, consequence], d: [white, counts, consequence, hues] };
+// B2 · B as the convention (Mobbin, 2026-11-03: PlayStation, Discord, WhatsApp, Thrive): a filled count badge in the box's own
+//      green beside the area's name; the description line stays. B3 · the same badge at the right, before the chevron.
+const badge = (where) => {
+  for (const r of document.querySelectorAll('.st-row[data-variant="navigation"]')) {
+    const meta = r.querySelector('.st-row-copy > small'), name = r.querySelector('.st-row-copy > strong');
+    const t = meta && /^(\d+) selected$/.exec(meta.textContent.trim());
+    if (!t) continue;
+    const label = name.textContent.trim().toLowerCase();
+    meta.textContent = ({ breathing: 'Coughing, breathing hard, sneezing' })[label] || meta.textContent;
+    const b = document.createElement('span');
+    b.textContent = t[1];
+    b.setAttribute('aria-label', `${t[1]} selected`);
+    b.style.cssText = 'display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--select-mark);color:#fff;font:600 13px/1 var(--font-sans);box-sizing:border-box;flex:none';
+    if (where === 'name') { name.style.cssText += ';display:inline-flex;align-items:center;gap:8px'; name.appendChild(b); }
+    else { b.style.marginLeft = 'auto'; r.insertBefore(b, r.querySelector('.st-row-chevron')); }
+  }
+};
+const options = { now: [], a: [white], b: [white, counts], b2: [[badge, 'name']], b3: [[badge, 'right']], c: [white, counts, consequence], d: [white, counts, consequence, hues] };
+// ONLY=screen:opt,opt renders just those (e.g. ONLY=conditions:now,b,b2,b3).
+const only = process.env.ONLY && Object.fromEntries([process.env.ONLY.split(':')].map(([k, v]) => [k, v.split(',')]));
 
 const browser = await chromium.launch();
 for (const [name, shot] of Object.entries(screens)) {
+  if (only && !only[name]) continue;
   for (const [opt, steps] of Object.entries(options)) {
+    if (only && !only[name].includes(opt)) continue;
     const p = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
     await p.goto(base + shot.url);
     await p.waitForTimeout(1500);
     for (const t of shot.taps || []) { const el = p.locator(t).first(); if (await el.count()) { await el.click(); await p.waitForTimeout(400); } else console.warn(`${name}: no ${t}`); }
-    for (const f of steps) await p.evaluate(f, days);
+    for (const f of steps) await (Array.isArray(f) ? p.evaluate(f[0], f[1]) : p.evaluate(f, days));
     await p.waitForTimeout(400);
     await p.screenshot({ path: path.join(here, `${name}-${opt}.png`) });
     await p.close();
