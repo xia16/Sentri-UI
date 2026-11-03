@@ -385,7 +385,7 @@ button.st-row:disabled{cursor:default}
 .st-choice-trail svg{width:var(--size-20);height:var(--size-20);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .st-choice-row[data-mode="navigate"] .st-choice-trail{color:var(--st-muted)}
 .st-choice-row[data-mode="navigate"] .st-choice-trail svg{width:var(--size-18);height:var(--size-18)}
-.st-choice-trail input[type="checkbox"]{width:var(--size-20);height:var(--size-20);margin:0;accent-color:var(--st-ink)}
+.st-choice-trail input[type="checkbox"]{width:var(--size-20);height:var(--size-20);margin:0;accent-color:var(--select-mark)}
 .st-choice-search.st-choice-search{position:relative;margin:0 0 var(--space-20)}
 .st-choice-search input::-webkit-search-cancel-button,.st-choice-search input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
 /* The search field in a picker, a sheet or a list (choiceSearch): the host sizes the input, which stays the box; the search glyph
@@ -701,7 +701,8 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-picker-field.error .st-picker-hint{color:var(--red)}
 .st-choice-label,.st-choice-meta{overflow-wrap:anywhere;white-space:normal}
 .st-choice-row[data-mode="single"] .st-choice-trail{color:var(--ink)}
-.st-choice-trail input[type="checkbox"]{accent-color:var(--ink)}
+/* A ticked multi-select box is green with a white tick (select-mark, owner 2026-11-03); its row stays white. */
+.st-choice-trail input[type="checkbox"]{accent-color:var(--select-mark)}
 .st-choice-row[data-mode="multi"]:has(:checked) .st-choice-label{font-weight:var(--type-weight-strong)}
 .st-picker-value.is-names{display:flex;align-items:baseline;gap:var(--space-6);white-space:normal;overflow:visible}
 .st-picker-names{min-width:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
@@ -780,8 +781,7 @@ button.st-row[data-variant="tick"]:active:not(:disabled){background:var(--st-pre
 .st-row-chevron[data-rail="edit"]{align-items:center;gap:var(--space-4);font-size:var(--type-description-size)}
 
 .st-row[data-variant="select-door"]{padding:0 var(--space-row-x) 0 0;gap:0}
-.st-row[data-variant="select-door"][data-ticked],.st-row[data-variant="select-door"]:has(input:checked){background:var(--well)}
-/* Just scanned (data-arrival, owner 2026-10-20; any row a read lands on, 2026-10-22): the pale progress wash for a moment, never the ticked well; "off" fades it back before the host drops the attribute. A ticked row keeps its well. */
+/* Just scanned (data-arrival, owner 2026-10-20; any row a read lands on, 2026-10-22): the pale progress wash for a moment; "off" fades it back to white before the host drops the attribute. A ticked row stays white: the green box says it (owner, 2026-11-03). */
 .st-row[data-arrival]{transition:background-color .9s ease-out}
 .st-row[data-arrival="on"]{background:var(--progress-wash);transition-duration:.12s}
 @media(prefers-reduced-motion:reduce){.st-row[data-variant="select-door"][data-arrival]{transition:none}}
@@ -1306,8 +1306,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-choice-heading.st-choice-heading:has(> svg) { display: flex; align-items: center; gap: 6px; padding-left: 0; }
 .st-choice-heading > svg { width: 16px; height: 16px; flex: none; }
 
-/* Row · select: fill:false (a box whose tick doesn't tint its cell; the Inspection pen header, owner 2026-10-18). */
-.st-row[data-variant="select-door"][data-fill="none"]:has(input:checked){background:transparent}
 /* Row · Animal · group (owner, 2026-10-18): animals without an ID as one row. The name ("14 pigs") leads with a muted glyph and is
    sans, the tags take the context line, the door has no chevron, and a 48px count field ends the row: idle (not ticked) its
    number is ink-2 at 500, which holds 7:1 at 17px. The padding keeps the Animal row's height. */

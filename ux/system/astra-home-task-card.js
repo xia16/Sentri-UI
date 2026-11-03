@@ -27,7 +27,7 @@
       ${!quiet&&m.route?`<div class="hc-route"><span>${escape(m.route.from)}</span>${icon('arrow')}<span>${escape(m.route.to)}</span></div>`:''}
       ${m.progress&&m.state!=='upcoming'?`<div class="hc-progress">${marker(3)}<div class="hc-progress-caption"><span>${escape(p.label)}</span><span>${progressCount}</span></div><div ${progressAttrs}>${bar}</div>${p.legend?`<div class="hc-legend">${p.legend.map(l=>`<span><i class="${escape(l.tone)}"></i>${escape(l.text)}</span>`).join('')}</div>`:''}${p.note?`<p class="hc-progress-note">${escape(p.note)}</p>`:''}</div>`:''}
       ${m.exception?`<div class="hc-exception">${escape(m.exception)}</div>`:''}
-      ${!unit?`<div class="hc-footer">${marker(4)}${icon('location')}<span>${escape(m.scope.label)}</span><span>${escape(m.scope.action)}</span>${icon('arrow')}</div>`:''}
+      ${!unit?`<div class="hc-footer">${marker(4)}${icon('place')}<span>${escape(m.scope.label)}</span><span>${escape(m.scope.action)}</span>${icon('arrow')}</div>`:''}
     </button>`;
   }
   const displayRules={

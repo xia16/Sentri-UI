@@ -1,0 +1,44 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Sentri icon set</title>
+<link rel="stylesheet" href="../../ux/design-system/tokens.css">
+<style>
+body{margin:0;padding:24px;font-family:var(--font-sans);color:var(--ink);background:var(--app-background)}
+h2{font:600 20px/26px var(--font-sans);margin:24px 0 10px}h2:first-child{margin-top:0}
+.set{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ic{display:grid;grid-template-columns:44px 1fr;gap:4px 12px;align-items:center;background:var(--paper,#fff);border-radius:14px;padding:12px}
+.ic svg{grid-row:span 2;width:28px;height:28px;justify-self:center;fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round}
+.ic b{font:600 15px/18px var(--font-sans);display:flex;gap:6px;align-items:center}
+.ic span{font:400 13px/17px var(--font-sans);color:var(--muted)}
+.ic i{font:600 11px/16px var(--font-sans);font-style:normal;padding:0 6px;border-radius:99px;background:#e3eee6;color:#1d5a35}
+.ic i.redrawn{background:#f1ead9;color:#6b5418}
+.pairs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pair{background:var(--paper,#fff);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.pair .row{display:flex;align-items:center;gap:14px;font:400 13px/17px var(--font-sans);color:var(--muted)}
+.pair .row b{width:34px;color:var(--ink);font:600 13px/17px var(--font-sans)}
+.pair .g{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:64px;color:var(--ink)}
+.pair svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round}
+.pair small{font:400 12px/15px var(--font-mono);color:var(--muted)}
+.lead{font:400 15px/21px var(--font-sans);color:var(--muted);max-width:920px;margin:0 0 8px}
+</style>
+<body><div id="out"></div>
+<script src="../../ux/design-system/components/bundle.js"></script>
+<script src="icons.js"></script>
+<script>
+(async()=>{
+const m=await (await fetch('meanings.json')).json();const q=new URLSearchParams(location.search);
+const now=SentriIcons.paths,next=Object.assign({},now,SentriIconsNext.paths);
+const svg=d=>`<svg viewBox="0 0 24 24" aria-hidden="true">${d===now.more?[5,12,19].map(cx=>`<circle cx="${cx}" cy="12" r="1.5" fill="currentColor" stroke="none"/>`).join(''):`<path d="${d}"/>`}</svg>`;
+const only=q.get('groups');let html='';
+if(q.get('view')==='cut'){
+  const why=Object.fromEntries((await (await fetch('blind-test.json')).json()).cut.map(x=>[x.name,x.read]));
+  html='<h2>Drawn, tested blind, cut</h2><p class="lead">A fresh tester named each icon unlabelled at 16–18 px, then matched it to the labels on the list. These could not be told apart or were read as something else, so they stay out of the registry. Each meaning falls back to an icon that passed.</p><div class="set">'+Object.keys(why).filter(n=>SentriIconsNext.cut[n]).map(n=>[n,SentriIconsNext.cut[n]]).map(([n,d])=>`<div class="ic">${svg(d)}<b>${n}</b><span>${why[n]}</span></div>`).join('')+'</div>';
+}else if(q.get('view')==='pairs'){
+  const pairs=[['chart','production','Both were the same three bars'],['farrow','pregnancy','Both were the same pulse line'],['note','record','Both were the same lined page'],['return','up','return becomes undo; up was a copy of back-chevron and becomes its alias'],['pig','profile','A person stood in for a sow']];
+  html='<h2>Look-alike pairs, before and after</h2><p class="lead">Each pair had one shape doing two jobs. Now each name has its own shape.</p><div class="pairs">'+pairs.map(([a,b,why])=>{
+    const nn=k=>({return:'undo',up:'back-chevron'})[k]||k;
+    return `<div class="pair"><div class="row"><b>Now</b><span class="g">${svg(now[a])}<small>${a}</small></span><span class="g">${svg(now[b])}<small>${b}</small></span></div><div class="row"><b>New</b><span class="g">${svg(next[nn(a)])}<small>${nn(a)}</small></span><span class="g">${svg(next[b==='profile'?'pig':nn(b)])}<small>${b==='profile'?'pig':nn(b)}</small></span></div><div class="row">${why}</div></div>`}).join('')+'</div>';
+}else{
+  for(const [g,items] of m.groups){if(only&&!only.split(',').includes(g))continue;
+    html+=`<h2>${g}</h2><div class="set">`+items.map(([n,st,mean,use])=>`<div class="ic">${svg(next[n])}<b>${n}${st!=='kept'?`<i class="${st}">${st}</i>`:''}</b><span>${mean}</span></div>`).join('')+'</div>';}
+}
+document.getElementById('out').innerHTML=html;})();
+</script></body></html>

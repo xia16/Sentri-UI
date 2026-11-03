@@ -31,6 +31,7 @@ import { routeFonts } from './font-route.mjs';
 import { auditSpacingPage } from './check-spacing.mjs';
 import { auditHeadersPage, RUNS as HEADER_RUNS, dedupe as dedupeHeaders } from './check-headers.mjs';
 import { auditLegibilityPage, legibilityWorse, count as legCount, failing as legFailing } from './check-legibility.mjs';
+import { auditColourPage, colourWorse, loadPalette, stylesheetColours, readStylesheets } from './check-colours.mjs';
 import { checkStatesHtml, VW as STATE_VW } from './check-states.mjs';
 import { walkTree, leafEntryUrl } from './scenario-tree.mjs';
 import { renderDef } from './atlas-screens.mjs';
@@ -45,7 +46,7 @@ const BUNDLE_CSS = 'ux/design-system/components/bundle.css';
 const NOT_LOADED = [/^docs\//, /^\.github\//, /^tests\//, /^\.claude\//, /^scripts\//, /^(?!ux\/).*\.md$/i];
 const short = (s) => String(s || '?').slice(0, 7);
 const secs = (ms) => Math.round(ms / 100) / 10;
-const CHECKERS = { legibility: ['scripts/check-legibility.mjs'], spacing: ['scripts/check-spacing.mjs'], headers: ['scripts/check-headers.mjs'], states: ['scripts/check-states.mjs'], leaf: ['scripts/scenario-runner.mjs'] };
+const CHECKERS = { legibility: ['scripts/check-legibility.mjs'], colour: ['scripts/check-colours.mjs'], spacing: ['scripts/check-spacing.mjs'], headers: ['scripts/check-headers.mjs'], states: ['scripts/check-states.mjs'], leaf: ['scripts/scenario-runner.mjs'] };
 
 function git(args, cwd) { const r = spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 256 << 20 }); return { code: r.status, out: r.stdout || '', err: r.stderr || '' }; }
 
@@ -406,6 +407,7 @@ async function evaluateIn(opts, { kids, cleanups }) {
     if (hr) out.push({ name: 'headers', params: { checks: hr.checks } });
     if (width === 390 && lang === 'en') {
       out.push({ name: 'spacing', params: {} });
+      out.push({ name: 'colour', params: {} });
       if (side === 'cand' || !strictLeg) out.push({ name: 'legibility', params: {} });
     }
     return out;
@@ -435,7 +437,7 @@ async function evaluateIn(opts, { kids, cleanups }) {
   mark('plan');
 
   const urlOf = (side, x) => { const u = new URL(S[side].url + x.url); if (!componentPage(x.id)) u.searchParams.set('screen', x.id); return u.href; };
-  const auditFor = { spacing: (page) => auditSpacingPage(page), headers: async (page, it) => dedupeHeaders((await auditHeadersPage(page, { width: it.width, lang: it.lang, checks: it.params.checks })).defects), legibility: (page) => auditLegibilityPage(page) };
+  const auditFor = { spacing: (page) => auditSpacingPage(page), headers: async (page, it) => dedupeHeaders((await auditHeadersPage(page, { width: it.width, lang: it.lang, checks: it.params.checks })).defects), legibility: (page) => auditLegibilityPage(page), colour: (page) => auditColourPage(page) };
   const visitTask = (v) => ({
     kind: 'visit', label: `${v.side} ${v.x.id} ${v.lang}-${v.width}`, priority: 0,
     run: async ({ browser: b }) => {
@@ -785,6 +787,25 @@ async function evaluateIn(opts, { kids, cleanups }) {
       const on = [...new Set(added.map((a) => a.split(':')[0]))];
       check('clear spacing on changed screens (P4)', !added.length, added.length ? `${added.length} new on ${on.slice(0, 4).join(', ')}${on.length > 4 ? ' …' : ''}: ${added.slice(0, 2).join(' | ')}` : debt ? `${debt} defect(s) already on main` : '');
       if (debt) gaps.push(`spacing: ${debt} defect(s) on changed screens are already on main`);
+    }
+    // the colour family (owner, 2026-11-02): token colours only and the status roles; a stray or a role defect main already has on
+    // that screen is main's debt, and a new screen may reuse a colour main's stylesheets already hold
+    {
+      const palette = loadPalette(fs.readFileSync(path.join(S.cand.dir, 'ux/design-system/tokens.json'), 'utf8'));
+      let known = null;
+      const added = [], debt = { strays: 0, defects: 0 };
+      for (const id of changed) {
+        const c = evOf('cand', id, 390, 'en', 'colour'), b = onBase(id) ? evOf('base', id, 390, 'en', 'colour') : null;
+        if (!c?.ok) { missingCheck('colour', 'cand', id, 'en-390', c); continue; }
+        if (onBase(id) && !b?.ok) { missingCheck('colour', 'base', id, 'en-390', b); continue; }
+        if (!onBase(id) && !known) known = stylesheetColours(readStylesheets(S.base.dir));
+        const w = colourWorse(b?.ok ? b.result : null, c.result, { palette, known: known || [] });
+        debt.strays += w.debt.strays; debt.defects += w.debt.defects;
+        if (w.worse) { added.push(`${tag(id)}: ${w.why.join('; ')}`); if (isOutside(id)) outsideNew++; }
+      }
+      const owed = debt.strays + debt.defects;
+      check('colour family on changed screens', !added.length, added.length ? `${added.length} screen(s) leave it: ${added.slice(0, 2).join(' | ')}` : `debt ${debt.strays} stray colour(s), ${debt.defects} role defect(s) already on main`);
+      if (owed) gaps.push(`colour: ${debt.strays} stray colour(s) and ${debt.defects} role defect(s) on changed screens are already on main`);
     }
     // P3: the Headers law, base against candidate
     {

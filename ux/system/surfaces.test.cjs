@@ -2,6 +2,8 @@
 //  1. Footer and dock buttons are 56px tall: the `footer-height` token is at least 56, and no rule sizes a footer or dock button under it.
 //  2. Current and selected are ink, never green: no rule paints an aria-current, selected, ticked, pressed-on or checked state with a green
 //     token (green means done, recorded or synced). The active category tab's underline is the one marker kept.
+//  3. The one green choice is the multi-select box (owner, 2026-11-03): every checkbox ticks in `select-mark` (the count-key green, white
+//     tick), and a ticked row stays white: no rule fills a row that holds a checked box.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -89,10 +91,49 @@ test('no current, selected or ticked state is painted green', () => {
   }
   assert.deepEqual([...new Set(bad)], [], 'current/selected is ink: a check, a checkbox or an ink ring (SURFACES.md)');
 });
+test('the multi-select box is select-mark, the count-key green', () => {
+  const tokens = JSON.parse(read(path.join(__dirname, '../design-system/tokens.json')));
+  const t = tokens.color.tokens.find((x) => x.name === 'select-mark');
+  assert.ok(t, 'tokens.json has no select-mark token');
+  assert.equal(t.value, 'var(--count-key)', 'select-mark is the count-key green (owner, 2026-11-03)');
+});
+
+/* A checkbox: an input that is not a range slider (a range keeps its own fill colour). */
+const isBox = (sel) => /\binput\b/.test(sel) && !/range/.test(sel);
+test('every checkbox ticks in select-mark', () => {
+  const bad = [];
+  for (const r of all) {
+    for (const sel of r.selector.split(',').map((s) => s.trim())) {
+      if (!isBox(sel)) continue;
+      for (const [k, v] of decls(r.body)) if (k === 'accent-color' && v !== 'var(--select-mark)') bad.push(`${r.file}: ${sel} { ${k}: ${v} }`);
+    }
+  }
+  assert.deepEqual([...new Set(bad)], [], 'a multi-select box is accent-color: var(--select-mark) (SURFACES.md rule 4)');
+});
+
+/* A row around a ticked box: a :has() that finds a checked input. */
+const TICKED_ROW = /:has\([^)]*:checked/;
+test('a ticked multi-select row stays white', () => {
+  const bad = [];
+  for (const r of all) {
+    for (const sel of r.selector.split(',').map((s) => s.trim())) {
+      if (!TICKED_ROW.test(sel) || /:has\([^)]*:checked[^)]*\)\s+\S/.test(sel)) continue; // a part inside the row (its label) may change
+      for (const [k, v] of decls(r.body)) if ((k === 'background' || k === 'background-color') && !/^(transparent|none|var\(--(paper|st-paper)\))$/.test(v)) bad.push(`${r.file}: ${sel} { ${k}: ${v} }`);
+    }
+  }
+  assert.deepEqual([...new Set(bad)], [], 'the green box says it is ticked; the row takes no fill (SURFACES.md rule 4)');
+});
+
 test('the guard itself sees a green current row and an under-height footer button', () => {
   const css = 'button.st-row[aria-current="location"]{background:var(--green-wash)} .sheet-footer>.button{min-height:var(--control-height)}';
   const rs = rules(css);
   assert.equal(rs.length, 2);
   assert.ok(STATE.test(rs[0].selector) && GREEN.test(decls(rs[0].body)[0][1]));
   assert.ok(inFooter.test(rs[1].selector) && isControl.test(rs[1].selector) && /var\(--(tap-min|control-height)/.test(decls(rs[1].body)[0][1]));
+});
+test('the guard itself sees an ink box and a tinted ticked row', () => {
+  const rs = rules('.st-choice-trail input[type="checkbox"]{accent-color:var(--ink)} .st-row:has(input:checked){background:var(--well)} .st-row:has(:checked) .st-choice-label{font-weight:600}');
+  assert.ok(isBox(rs[0].selector) && decls(rs[0].body)[0][1] !== 'var(--select-mark)');
+  assert.ok(TICKED_ROW.test(rs[1].selector));
+  assert.ok(/:has\([^)]*:checked[^)]*\)\s+\S/.test(rs[2].selector), 'a part inside a ticked row is not the row');
 });

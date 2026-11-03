@@ -61,7 +61,7 @@ test('code: a module is hashed with its local imports, static, dynamic and requi
   fs.rmSync(dir, { recursive: true, force: true });
   // gate-simplify.md S3: finding Playwright and telling processes apart decide no result, so a lock fix re-checks nothing
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-  for (const checker of ['scripts/check-legibility.mjs', 'scripts/check-spacing.mjs', 'scripts/check-headers.mjs', 'scripts/check-states.mjs', 'scripts/visit.mjs', 'scripts/scenario-runner.mjs']) {
+  for (const checker of ['scripts/check-legibility.mjs', 'scripts/check-colours.mjs', 'scripts/check-spacing.mjs', 'scripts/check-headers.mjs', 'scripts/check-states.mjs', 'scripts/visit.mjs', 'scripts/scenario-runner.mjs']) {
     const files = Object.keys(codeClosure(root, [checker]).files);
     assert.ok(files.includes(checker));
     for (const x of ['scripts/playwright-path.mjs', 'scripts/process-start.mjs']) assert.ok(!files.includes(x), `${checker}'s identity leaves out ${x}`);
