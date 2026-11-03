@@ -49,7 +49,11 @@ Between the two, pigs are **in transit**: the daily dashboard counts `pigs_out_i
 5. **Conditions on untagged pigs**: the back end's ad hoc move still has MOVE / COPY per record. The Count proposal replaces it with conditions that follow the pick by count, so nothing is copied. A change for the developers.
 6. **Exits** (sale, off farm) are outbound tasks, each pig logged; they feed *Since the last count* like deaths and moves.
 
-## Open questions this raises
+## Owner ruling, 2026-11-03
+
+Transfer out is a reference list of the pigs to move, nothing more; receiving receives the pigs and locates them into pens. So the phone sends no transfer-out count: the back end's `transfer_out` (with `missing_targets`) is either sent whole by receiving, or not used by the phone. Pigs not received go on the balancing sheet when receiving finishes. Open question 1 below is answered (no).
+
+## Open questions this raised
 
 1. Should the phone's **Transfer out** also be a pen-by-pen count (all pigs, then scan the tags), like Count and Transfer in? The back end takes tagged pigs plus missing ones; untagged pigs leaving would need a number per source pen.
 2. Does a **transfer in that comes up short** (112 of 120) close the task with 8 not accounted for, or does the task wait open? The dashboard's in-transit figure suggests it waits; the owner's balancing sheet suggests it closes and the sheet carries the 8.

@@ -257,4 +257,27 @@ if (want('8-')) {
   await shoot(p, 'mock-8-receive.png');
 }
 
+// 9. Transfer out (owner, 2026-11-03): a reference list of the pigs to move, nothing more. No count and no scanning at the source:
+//    the list says which pigs and where they are now; receiving is where they are received and located into pens.
+if (want('9-')) {
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate(() => {
+    const { U, ic, page } = window.M;
+    const pen = (code, n, rows) => '<section class="inspect-pen m-card"><header class="inspect-pen-head"><span class="pen-name"><strong>' + code + '</strong><small>· ' + n + ' pigs</small></span></header>' + rows + '</section>';
+    const heads = (n) => U.row({ icon: ic('tag-off'), title: n + ' pigs', description: 'Without ear tags', className: 'm-line' });
+    const tagged = (id, ctx) => U.row({ code: id, description: ctx, trail: 'chevron', action: 'x' });
+    const head = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>120</strong><span>pigs to move</span></div><small>From Farrowing room 3 to Unit 9 · today</small></div>';
+    const list = '<div class="inspect-list m-list">' + pen('B1', 11, heads(11)) + pen('B2', 13, heads(12) + tagged('000901', 'Kept for breeding')) + pen('B3', 10, heads(10)) + pen('B4', 13, heads(13)) + '</div>';
+    page('Pigs to move', 'Transfer · batch 25', head + list, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Receive in Unit 9', register: 'primary', action: 'x' }) + '</div>');
+    const st = document.createElement('style');
+    st.textContent = `.m-recv-bar{background:var(--paper,#fff);border:1px solid var(--line,#dfe4d8);border-radius:18px;padding:14px 16px;margin:4px 0 20px}
+      .m-recv-figs{display:flex;align-items:baseline;gap:8px}.m-recv-figs strong{font:600 32px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}.m-recv-figs span{font-size:14px;color:var(--ink,#20291f)}
+      .m-recv-bar small{display:block;margin-top:8px;font-size:12px;color:var(--muted,#657060)}
+      .m-ref .st-choice-trail{display:none}`;
+    document.head.append(st);
+  });
+  await shoot(p, 'mock-9-transfer-out.png');
+}
+
 await b.close(); server.kill();
