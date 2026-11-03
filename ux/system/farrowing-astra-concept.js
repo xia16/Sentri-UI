@@ -142,8 +142,11 @@ function act(s,a,v){
  if(a==='allocHandPage'){s.handDraft={moves:[]};s.view='allocHand';}
  // Hand-rear (owner, 2026-11-03): they stay in her crate unless moved; Move some to another pen adds a pen with a count, so 2 can go to
  // one pen and 5 to another. Her crate keeps what is not moved.
- if(a==='handAddPen')s.view='allocHandPen';
- if(a==='handPen'){const [unit,pen]=String(v).split('|'),m=s.handDraft.moves;if(!m.some(x=>x.unit===unit&&x.pen===pen)&&handCrate(s)>0)m.push({unit,pen,n:1});s.view='allocHand';}
+ if(a==='handAddPen'){s.handDraft.q='';s.handDraft.scanning=false;s.view='allocHandPen';}
+ if(a==='handPenClear')s.handDraft.q='';
+ if(a==='handPenScan'){s.handDraft.scanning=roomContext(s).scan.connected?true:'waiting';s.handDraft.q='';}
+ if(a==='handPenScanStop')s.handDraft.scanning=false;
+ if(a==='handPen'){const [unit,pen]=String(v).split('|'),m=s.handDraft.moves;if(!m.some(x=>x.unit===unit&&x.pen===pen)&&handCrate(s)>0)m.push({unit,pen,n:1});s.handDraft.scanning=false;s.view='allocHand';}
  if(a==='handCount'){const [i,d]=String(v).split(',').map(Number),m=s.handDraft.moves[i];if(m){m.n=Math.max(0,Math.min(m.n+handCrate(s),m.n+d));if(!m.n)s.handDraft.moves.splice(i,1);}}
  // Allocate's sow picker opens filtered to her own unit. The filter is the room's (expected farrowing, parity) plus the unit, whose chips
  // reach the batch's other units; All is no unit filter (owner, 2026-11-02). The sheet works on a draft: Show N sows applies it, Reset
@@ -833,7 +836,7 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
  return true;
 }
 function pageAfterRender(i,s,c,root){
- const demo=root.querySelector('[data-demo-scan]');if(demo){demo.hidden=s.view==='fosterSend'?!s.fosterDraft.idScan:fosterPicking(s)?!s.fosterDraft.scanning:s.view==='roomBatchPick'?!c.batch?.scanning:s.view!=='roomScan'||!c.scan.connected;demo.disabled=s.view==='roomScan'&&!c.scan.listening;demo.textContent=s.view==='roomBatchPick'&&c.batch?.scanning==='waiting'||(s.view==='fosterSend'?s.fosterDraft.idScan:fosterPicking(s)&&s.fosterDraft.scanning)==='waiting'?'Simulate reader on':'Simulate scan';}
+ const demo=root.querySelector('[data-demo-scan]');if(demo){demo.hidden=s.view==='allocHandPen'?!s.handDraft?.scanning:s.view==='fosterSend'?!s.fosterDraft.idScan:fosterPicking(s)?!s.fosterDraft.scanning:s.view==='roomBatchPick'?!c.batch?.scanning:s.view!=='roomScan'||!c.scan.connected;demo.disabled=s.view==='roomScan'&&!c.scan.listening;demo.textContent=s.view==='roomBatchPick'&&c.batch?.scanning==='waiting'||(s.view==='fosterSend'?s.fosterDraft.idScan:fosterPicking(s)&&s.fosterDraft.scanning)==='waiting'?'Simulate reader on':'Simulate scan';}
  if(s.view==='roomPig')connectPig(root,c);
  if(s.view==='roomBatchForm')connectBatchForm(root,c);
  // The pig just read is brought into view where she is, and her row keeps Row's Just scanned state for a moment.
@@ -916,24 +919,29 @@ function allocSentList(s){
  if(!(s.allocSent||[]).length)return '';
  return `<section class="allocate-sent">${SentriUI.heading({title:'Sent',kind:'group',level:4})}${SentriUI.panel(s.allocSent.map(x=>SentriUI.row({variant:'animal',code:x.tag,description:[rowText.pen(x.pen),x.ids.length?'ID '+x.ids.join(', '):''].filter(Boolean).join(' · '),right:{kind:'state',figure:`${x.n} piglet${x.n===1?'':'s'}`,word:'',level:'settled'}})).join(''),{className:'st-row-group allocate-sent-rows'})}</section>`;
 }
-// Hand-rear (owner, 2026-11-03: the rearing pen folds in here): a drawer on the tint with one white card (owner, 2026-11-03: grey, the
-// controls on white). Her crate keeps what is not moved; each pen added takes a count; Move some to another pen opens the pens. Back
-// returns to the question with nothing recorded.
+// Hand-rear (owner, 2026-11-03: the rearing pen folds in here; the drawer must not ask the question again): a drawer on the tint whose
+// white card is the answer itself, where the piglets are: her crate with what is left, then each pen moved to with its own count. Move
+// some to another pen sits under the card as a quiet button; it goes once none are left. Back returns to the question, nothing recorded.
 const handCrate=s=>s.alive-sum((s.handDraft?.moves||[]).map(m=>m.n));
 function allocDonePage(s){
  const n=s.alive,pigs=`${n} piglet${n===1?'':'s'}`,c=roomContext(s),moves=s.handDraft?.moves||[],crate=handCrate(s);
  const crateRow=SentriUI.row({variant:'navigation',icon:icon('drop'),title:'Her crate',description:rowText.pen(s.pen),trailing:{text:String(crate)}});
- const moveRows=moves.map((m,i)=>`<div class="hand-move">${farmStepper({variant:'row',label:`${farmUnit(c,m.unit).name} · ${rowText.pen(m.pen)}`,value:m.n,min:0,max:m.n+crate,action:'handCount',reserveHint:false},i+',')}</div>`).join('');
- const add=crate?SentriUI.row({variant:'navigation',icon:icon('plus'),title:'Move some to another pen',action:'handAddPen',trail:'chevron'}):'';
- const body=SentriUI.heading({title:'Where they stay',kind:'section',level:3,className:'allocate-question'})+SentriUI.rowGroup(crateRow+moveRows+add);
- return SentriUI.sheet({variant:'drawer',surface:'menu',title:'Hand-rear',line:{text:[{text:pigs},{text:' · '+s.tag}]},body,bodyClass:'alloc-done-body',footer:footer(SentriUI.backButton({action:'featureBack'}),btn('allocHand',`Hand-rear ${pigs}`,'button primary')),size:'medium',sizing:'content',label:'Hand-rear',scrim:{action:'featureBack',label:'Back to Allocate piglets'}});
+ const moveRows=moves.map((m,i)=>`<div class="hand-move">${farmStepper({variant:'row',label:`${rowText.pen(m.pen)} · ${farmUnit(c,m.unit).name}`,value:m.n,min:0,max:m.n+crate,action:'handCount',reserveHint:false},i+',')}</div>`).join('');
+ const add=crate?SentriUI.button({register:'secondary',label:'Move some to another pen',icon:icon('plus'),action:'handAddPen',className:'hand-add'}):'';
+ return SentriUI.sheet({variant:'drawer',surface:'menu',title:'Hand-rear',line:{text:[{text:pigs},{text:' · '+s.tag}]},body:SentriUI.rowGroup(crateRow+moveRows)+add,bodyClass:'alloc-done-body',footer:footer(SentriUI.backButton({action:'featureBack'}),btn('allocHand',`Hand-rear ${pigs}`,'button primary')),size:'medium',sizing:'content',label:'Hand-rear',scrim:{action:'featureBack',label:'Back to Allocate piglets'}});
 }
-// Move to another pen: the pens of the batch's units, hers first, without her own crate or a pen already chosen. A pick adds it.
+// Move to a pen is Move's destination picker (features/move: her unit pinned first, her own crate dimmed, search reaches any pen and the
+// scan reads a pen's plate, a tap picks and closes). A pen already chosen is dimmed too.
+function handPenOptions(s){
+ const c=roomContext(s),home=homeUnit(s),taken=new Set((s.handDraft?.moves||[]).map(m=>m.unit+'|'+m.pen)),q=(s.handDraft?.q||'').trim().toLowerCase();
+ return [home,...c.units.filter(u=>u!==home)].flatMap(u=>[...new Set(u.records.map(r=>r.pen))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).filter(p=>!q||p.toLowerCase().includes(q)).map(p=>{const own=u===home&&p===s.pen,added=taken.has(u.id+'|'+p);return [u.id+'|'+p,rowText.pen(p),'',u.name,own||added?{disabled:true,reason:own?'Her crate':'Added'}:undefined];}));
+}
 function allocHandPenPage(s){
- const c=roomContext(s),home=homeUnit(s),taken=new Set((s.handDraft?.moves||[]).map(m=>m.unit+'|'+m.pen));
- const units=[home,...c.units.filter(u=>u!==home)];
- const options=units.flatMap(u=>[...new Set(u.records.map(r=>r.pen))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).filter(p=>!(u===home&&p===s.pen)&&!taken.has(u.id+'|'+p)).map(p=>[u.id+'|'+p,rowText.pen(p),'',u.name]));
- return SentriUI.sheet({variant:'drawer',surface:'menu',title:'Move to a pen',line:{text:[{text:'Hand-rear · '+s.tag}]},body:SentriUI.pickerOptions({options,action:'handPen'}),bodyClass:'alloc-done-body',footer:footer(SentriUI.backButton({action:'featureBack'})),size:'long',sizing:'content',label:'Move to a pen',scrim:{action:'featureBack',label:'Back to Hand-rear'}});
+ const d=s.handDraft||{},opts=handPenOptions(s);
+ const bar=d.scanning?SentriUI.scanBar({state:d.scanning==='waiting'?'waiting':'scanning',device:'Reader 1',text:d.scanning==='waiting'?'':'Scan the pen plate',stop:{action:'handPenScanStop'}})
+  :SentriUI.choiceSearch({label:'Search pen',placeholder:'Pen',value:d.q||'',attrs:{'data-hand-pen-search':''},clear:{action:'handPenClear'},scan:{action:'handPenScan',label:'Scan pen plate'}});
+ const list=opts.length?SentriUI.pickerOptions({options:opts,action:'handPen'}):`<p class="st-find-hint">No pen matching “${esc((d.q||'').trim())}”.</p>`;
+ return SentriUI.sheet({variant:'drawer',surface:'menu',title:'Move to a pen',line:{text:[{text:'Hand-rear · '+s.tag}]},body:`<div class="hand-pen-bar">${bar}</div><div class="hand-pen-list">${list}</div>`,bodyClass:'alloc-done-body',footer:footer(SentriUI.backButton({action:'featureBack'})),size:'long',sizing:'content',label:'Move to a pen',scrim:{action:'featureBack',label:'Back to Hand-rear'}});
 }
 // The finished sow (owner, 2026-11-02): her drawer says only what happened this time, one ring of where the litter went in a card that
 // opens Details (a tappable card in a white drawer: white body, tinted head band); her actions sit in the bar, nothing stacked in the body.
@@ -1255,6 +1263,7 @@ const gallery=document.getElementById('gallery');gallery.innerHTML=cards.map((c,
 // The range slider reports each change; keep the draft and the live count in step.
 gallery.addEventListener('sentri-range-change',e=>{const root=e.target.closest('[data-card]'),c=roomContext(states[+root.dataset.card]);if(/^foster/.test(e.detail.key)){const s=states[+root.dataset.card];Object.assign(s.fosterDraft.filterDraft,e.detail.values);const n=fosterShown(s,s.fosterDraft.filterDraft);e.target.closest('.sheet').querySelector('[data-action="fosterFilterApply"]').textContent='Show '+n+' '+(n===1?'sow':'sows');return;}Object.assign(c.filterDraft,e.detail.values);const n=visibleRoomRecords(c,c.filterDraft).length;e.target.closest('.sheet').querySelector('[data-action="room-apply-filter"]').textContent='Show '+n+' '+(n===1?'sow':'sows');});
 // Choose pigs: typing narrows the list where it is, so the field keeps focus; Clear shows only while something is typed.
+gallery.addEventListener('input',e=>{if(!e.target.matches('[data-hand-pen-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,s=states[i],sh=e.target.closest('.sheet');s.handDraft.q=e.target.value;const opts=handPenOptions(s);sh.querySelector('.hand-pen-list').innerHTML=opts.length?SentriUI.pickerOptions({options:opts,action:'handPen'}):`<p class="st-find-hint">No pen matching “${esc(s.handDraft.q.trim())}”.</p>`;sh.querySelector('[data-action="handPenClear"]')?.toggleAttribute('hidden',!s.handDraft.q);});
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-foster-id-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,s=states[i],box=e.target.closest('.foster-ids');s.fosterDraft.idQ=e.target.value;box.querySelector('.foster-id-scroll').innerHTML=fosterIdRows(fosterIds(fosterFrom(s)),s.fosterDraft);fosterIdMore(box.querySelector('.foster-id-scroll'));box.querySelector('[data-action="fosterIdClear"]')?.toggleAttribute('hidden',!s.fosterDraft.idQ);});
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-foster-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,s=states[i],page=e.target.closest('.foster-pick');s.fosterDraft.q=e.target.value;page.querySelector('.foster-list').innerHTML=fosterPickList(s);page.querySelector('[data-action="fosterClear"]')?.toggleAttribute('hidden',!s.fosterDraft.q);if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(s,roomContext(s)));});
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-batch-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,c=roomContext(states[i]),page=e.target.closest('.batch-pick');c.batch.q=e.target.value;page.querySelector('.batch-list').innerHTML=batchRows(c);page.querySelector('[data-action="room-batch-clear"]')?.toggleAttribute('hidden',!c.batch.q);});
@@ -1262,6 +1271,7 @@ gallery.addEventListener('input',e=>{if(!e.target.matches('[data-room-search]'))
 // The demo's own control, outside the phone: the reader reads the next sample sow.
 document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const i=+b.closest('[data-card]').dataset.card,s=states[i],c=roomContext(s);
  // Foster, scanning: a read opens the count for the sow read (single-action), as tapping her does; the reader connecting starts it.
+ if(s.view==='allocHandPen'&&s.handDraft?.scanning){const d=s.handDraft;if(d.scanning==='waiting'){c.scan.connected=true;d.scanning=true;render(i);return;}const o=handPenOptions(s).find(o=>!o[4]);if(o)act(s,'handPen',o[0]);render(i);return;}   // a plate read picks that pen
  if(s.view==='fosterSend'&&s.fosterDraft.idScan){const f=s.fosterDraft;if(f.idScan==='waiting'){c.scan.connected=true;f.idScan=true;render(i);return;}const next=fosterIds(fosterFrom(s)).find(p=>!f.ids.includes(p.tag));if(next){f.ids.push(next.tag);f.idRead=next.tag;}render(i);return;}   // a read ticks that piglet
  if(fosterPicking(s)&&s.fosterDraft.scanning&&!s.fosterDraft.target){const f=s.fosterDraft;if(f.scanning==='waiting'){c.scan.connected=true;f.scanning=true;render(i);return;}const list=fosterCandidates(s),x=list[f.seq++%list.length];if(x)act(s,'fosterPick',x.r.tag);render(i);return;}
  // Choosing pigs, scanning: a read ticks her and marks her row (a repeat read keeps her ticked); a pig from another unit isn't added (a toast says where she is).

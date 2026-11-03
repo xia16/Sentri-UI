@@ -1666,3 +1666,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 /* Hand-rear (owner, 2026-11-03): a pen moved to is a count row inside the white card, between her crate and Move some to another pen. */
 .farrowing-phone .hand-move{padding:var(--space-4) var(--space-row-x);border-top:var(--border-width) solid var(--rule)}
 .farrowing-phone .hand-move .st-stepper{margin:0}
+.farrowing-phone .alloc-done-body .hand-add{width:100%;margin-top:var(--space-12)}
+.farrowing-phone .hand-pen-bar{margin-bottom:var(--space-12)}
+.farrowing-phone .hand-pen-bar .st-choice-search{margin:0}
