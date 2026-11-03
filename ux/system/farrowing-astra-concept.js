@@ -86,8 +86,9 @@ function event(s,text,kind='',photos=[]){s.events.unshift({text,kind,day:'Today'
 // was; saved again unchanged: the line as it was.
 function saved(s,line,visit,afterLock=false){const was=s.undone,fixed=!!was&&was.text!==line;s.undone=null;event(s,line,fixed?'corrected':'',s.photos);Object.assign(s.events[0],{visit,afterLock},fixed?{was:'Was '+was.text}:{});}
 function withdraw(s){const e=s.undone;if(!e)return;s.undone=null;s.events.unshift({text:e.text,kind:'withdrawn',day:'Today',time:'09:41',who:ME});}
-function undoLast(s){if(!canUndo(s))return;const e=topAction(s),v=e.visit;s.popup=null;e.kind='withdrawn';e.withdrawn={time:'09:41',who:ME};s.dead=s.dead.map((x,i)=>x-v.dead[i]);
- if(s.locked)s.alive=s.frozen-sum(s.dead)-(s.moved||0);else{s.alive-=(v.born||0)-sum(v.dead.slice(2));s.anchor=born(s);}}
+// What taking a visit back leaves: its deaths come off; while she farrows its net alive comes off too, after Finish born stays and alive is what is left.
+const undone=(s,v)=>{const dead=s.dead.map((x,i)=>x-v.dead[i]);return {...s,dead,alive:s.locked?s.frozen-sum(dead)-(s.moved||0):s.alive-((v.born||0)-sum(v.dead.slice(2)))};};
+function undoLast(s){if(!canUndo(s))return;const e=topAction(s),t=undone(s,e.visit);s.popup=null;e.kind='withdrawn';e.withdrawn={time:'09:41',who:ME};s.dead=t.dead;s.alive=t.alive;if(!s.locked)s.anchor=born(s);}
 function fold(s){if(s.pending){event(s,s.pending>0?`+${s.pending} alive`:`${-s.pending} died this visit`);s.pending=0;}s.anchor=born(s);}
 // The litter weight is typed on the phone's own decimal keyboard; on save or finish it is normalised to one decimal place,
 // and an empty value or 0 is "not recorded".
@@ -925,7 +926,9 @@ function history(s){
  const body=SentriUI.log(logGroups,{empty:'Counts and saved updates will appear here.'});
  return detailSheet(s,s.productionOutcome?'Production log':'Farrowing log',body);
 }
-function popup(s){const p=s.popup;if(!p)return'';if(p.kind==='undo'){const e=topAction(s);if(!e)return '';return SentriUI.sheet({variant:'dialog',title:`Undo ${actionText(e)}?`,body:`<p class="undo-note">The counts go back. The log keeps it as Withdrawn.</p>`,footer:footer(btn('cancelPopup','Back','button secondary'),btn('undoLast','Undo','button primary'))});}if(p.kind==='photo')return SentriUI.sheet({variant:'dialog',title:'Photo',body:`<img src="${esc(p.src)}" alt="Death record attachment">`,footer:footer(SentriUI.backButton({action:'cancelPopup'}),p.editable?btn('deletePhoto','Delete','button primary danger'):'')});
+// The question shows what Undo does (owner, 2026-11-03): each figure it changes, now → after; Alive now first, unchanged figures left out.
+function undoChange(s,e){const a=litterParts(s),b=litterParts(undone(s,e.visit));const rows=[['Alive now','alive'],['Died after birth','after'],['Born dead','bornDead'],['Born','born']].filter(([,k])=>a[k]!==b[k]);return `<ul class="undo-change" aria-label="What Undo changes">${rows.map(([l,k])=>`<li><span>${l}</span><span class="undo-was">${a[k]}</span><span class="undo-to" aria-label="becomes">→</span><b>${b[k]}</b></li>`).join('')}</ul>`;}
+function popup(s){const p=s.popup;if(!p)return'';if(p.kind==='undo'){const e=topAction(s);if(!e)return '';return SentriUI.sheet({variant:'dialog',title:`Undo ${actionText(e)}?`,body:undoChange(s,e)+`<p class="undo-note">The log keeps it, marked Withdrawn.</p>`,footer:footer(btn('cancelPopup','Back','button secondary'),btn('undoLast','Undo','button primary'))});}if(p.kind==='photo')return SentriUI.sheet({variant:'dialog',title:'Photo',body:`<img src="${esc(p.src)}" alt="Death record attachment">`,footer:footer(SentriUI.backButton({action:'cancelPopup'}),p.editable?btn('deletePhoto','Delete','button primary danger'):'')});
 return '';
 }
 // Details (owner, 2026-11-03): one page while she farrows and after Finish; the old Litter details grid is gone.

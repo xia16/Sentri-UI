@@ -1641,5 +1641,12 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .st-log-entry:has(.log-withdrawn):before{background:var(--line)}
 .farrowing-phone .st-log-extra:has(>.log-withdrawn:only-child){display:none}
 .farrowing-phone .undo-note{margin:0;font:500 15px/1.5 var(--font-sans);color:var(--ink-2)}
+/* Undo shows what it does: label left, now → after right, the after figure in ink. */
+.farrowing-phone .undo-change{list-style:none;margin:0 0 var(--space-12);padding:0}
+.farrowing-phone .undo-change li{display:grid;grid-template-columns:1fr auto 24px auto;align-items:baseline;gap:var(--space-8);min-height:44px;padding:var(--space-8) 0;border-bottom:1px solid var(--line);font:500 15px/1.4 var(--font-sans);color:var(--ink)}
+.farrowing-phone .undo-change li:last-child{border-bottom:0}
+.farrowing-phone .undo-was{font:500 17px/1 var(--font-sans);color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.farrowing-phone .undo-to{color:var(--muted);text-align:center}
+.farrowing-phone .undo-change b{min-width:2ch;font:600 22px/1 var(--font-sans);color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
 /* On the tint drawer the card is white and its head band is white too, set off by its divider. */
 .farrowing-phone .sheet[data-st-context="menu"] .finished-card-head{background:var(--paper)}

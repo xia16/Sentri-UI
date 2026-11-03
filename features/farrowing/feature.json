@@ -1179,9 +1179,9 @@
           {
             "name": "Question",
             "at": "Undo +3 born alive?",
-            "shows": "The shared dialog: \"Undo +3 born alive?\", one line \"The counts go back. The log keeps it as Withdrawn.\", and Back · Undo.",
-            "logic": "The title names the action in the log's own words. Undo withdraws it: counts go back, the line stays marked Withdrawn <time> · <who>; Undo moves to the next action down.",
-            "source": "farrowing-astra-concept.js popup(), undoLast()"
+            "shows": "The shared dialog: \"Undo +3 born alive?\", then one row per figure Undo changes, now → after (Alive now 12 → 9 · Born 17 → 14), the after figure in ink; one line \"The log keeps it, marked Withdrawn.\"; Back · Undo.",
+            "logic": "The title names the action in the log's own words. Undo withdraws it: counts go back, the line stays marked Withdrawn <time> · <who>; Undo moves to the next action down. The rows show what Undo does (owner, 2026-11-03): from Alive now, Died after birth, Born dead and Born, only the figures it changes; after Finish Born never changes.",
+            "source": "farrowing-astra-concept.js popup(), undoChange(), undone()"
           }
         ],
         "controls": [
@@ -1196,7 +1196,9 @@
         ],
         "copy": [
           "(raw) Undo <action>?",
-          "(raw) The counts go back. The log keeps it as Withdrawn.",
+          "(raw) Alive now · Died after birth · Born dead · Born",
+          "(raw) <now> → <after>",
+          "(raw) The log keeps it, marked Withdrawn.",
           "(raw) Back · Undo"
         ],
         "edge": [
