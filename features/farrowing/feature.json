@@ -2029,7 +2029,7 @@
           {
             "name": "Actions",
             "at": "Foster",
-            "shows": "A drawer over the list, titled \"3 piglets\", line \"Sow <ID>\": Foster (the pig; \"Send to another sow\") and Move (transfer; \"To another pen\"), each with a chevron; Back.",
+            "shows": "A drawer over the list, titled \"Actions\" (one Back away, so no line): Foster (the pig; \"Send to another sow\") and Move (transfer; \"To another pen\"), each with a chevron; Back.",
             "logic": "One icon per meaning (PR 303): the pig for fostering, transfer for moving pigs.",
             "source": "farrowing-astra-concept.js litterActionsSheet()"
           }
@@ -2052,7 +2052,7 @@
           }
         ],
         "copy": [
-          "<N> piglets",
+          "Actions",
           "Foster",
           "Send to another sow",
           "Move",
@@ -2080,7 +2080,7 @@
           {
             "name": "Other sow",
             "at": "Ear tag or pen",
-            "shows": "\"Send piglets\", line \"3 piglets · <ID>\"; search with scan inside and Filter sows, pinned over the list of sows that can take piglets, by unit (her unit first) and pen.",
+            "shows": "\"Send piglets\", line \"From <ID>\" (the count is on her list); search with scan inside and Filter sows, pinned over the list of sows that can take piglets, by unit (her unit first) and pen.",
             "logic": "The piglets are already chosen, so no Send · Receive switch (prefer omission). Only sows that can take piglets: nursing a litter, or a nurse sow who has just weaned hers. An ear tag reaches beyond the batch, but never a gilt or a pregnant sow; a read of one says \"<ID> can't take piglets\" and opens nothing.",
             "source": "farrowing-astra-concept.js fosterPage(), fosterPickList()"
           }
@@ -2104,7 +2104,7 @@
         ],
         "copy": [
           "Send piglets",
-          "<N> piglets · <ID>",
+          "From <ID>",
           "Ear tag or pen",
           "No sow that can take piglets matches “…”",
           "<ID> can't take piglets"
@@ -2178,7 +2178,7 @@
           {
             "name": "Send piglets",
             "at": "Send 3 piglets",
-            "shows": "A drawer over the sows: \"Send piglets\", line \"To 000418 · Pen B1 · 9 alive\", one row \"3 piglets · ID 399001, 399002 · 1 without ID\", Back · Send 3 piglets.",
+            "shows": "A drawer over the sows: \"Send piglets\", line \"To 000418 · Pen B1\", one row \"3 piglets · ID 399001, 399002 · 1 without ID\", Back · Send 3 piglets.",
             "logic": "Saving changes both litters: hers falls, the receiving sow's rises (the IDs go with them); each record logs the foster with the IDs. Back to her list, the piglets off it and in Sent and moved.",
             "source": "farrowing-astra-concept.js allocConfirm(), act saveFoster"
           }
@@ -2197,7 +2197,7 @@
         ],
         "copy": [
           "Send piglets",
-          "To <ID> · Pen <pen> · <N> alive",
+          "To <ID> · Pen <pen>",
           "Send <N> piglets"
         ],
         "edge": [],
@@ -2222,7 +2222,7 @@
           {
             "name": "Move to a pen",
             "at": "Pen",
-            "shows": "A drawer: \"Move to a pen\", line \"3 piglets · <ID>\"; search a pen with scan inside (a plate read moves them there); pens by unit, her unit first, her own crate dimmed (\"Her crate\"); Back.",
+            "shows": "A drawer: \"Move to a pen\", line \"From <ID>\"; search a pen with scan inside (a plate read moves them there); pens by unit, her unit first, her own crate dimmed (\"Her crate\"); Back.",
             "logic": "A tap moves them and returns to her list: they leave her litter, her record logs \"3 piglets moved to Pen B1 · Unit 7 · ID …\", and Sent and moved gains the row.",
             "source": "farrowing-astra-concept.js allocPenPage(), act allocPen"
           }
@@ -3130,7 +3130,7 @@
           {
             "name": "Send piglets",
             "at": "With ID",
-            "shows": "A page \"Send piglets\", line \"To 000406 · Pen B3 · 11 alive\". With ID: search with scan inside, then a box of tick rows that scrolls past three whole rows (a fade says there are more); Without ID: a count. Back · Send N piglets.",
+            "shows": "A page \"Send piglets\", line \"To 000406 · Pen B3\". With ID: search with scan inside, then a box of tick rows that scrolls past three whole rows (a fade says there are more); Without ID: a count. Back · Send N piglets.",
             "logic": "Receive piglets is the same page from the other side. Saving changes both litters; each logs the foster with the IDs.",
             "source": "farrowing-astra-concept.js fosterSendPage(), fosterIdList()"
           }

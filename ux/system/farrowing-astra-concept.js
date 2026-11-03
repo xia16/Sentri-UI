@@ -939,13 +939,13 @@ function litterPage(s){
 function litterActionsSheet(s){
  const k=litterPicked(s);
  const rows=SentriUI.row({variant:'navigation',icon:icon('pig'),title:'Foster',description:'Send to another sow',trail:'chevron',action:'allocToSow'})+SentriUI.row({variant:'navigation',icon:icon('transfer'),title:'Move',description:'To another pen',trail:'chevron',action:'allocToPen'});
- return SentriUI.sheet({variant:'drawer',surface:'menu',title:pigletWord(k),line:{text:[{text:'Sow '+s.tag}]},body:SentriUI.rowGroup(rows),bodyClass:'alloc-done-body',footer:footer(SentriUI.backButton({action:'featureBack'})),size:'short',sizing:'content',label:'Actions for '+pigletWord(k),scrim:{action:'featureBack',label:'Back to her piglets'}});
+ return SentriUI.sheet({variant:'drawer',surface:'menu',title:'Actions',body:SentriUI.rowGroup(rows),bodyClass:'alloc-done-body',footer:footer(SentriUI.backButton({action:'featureBack'})),size:'short',sizing:'content',label:'Actions for '+pigletWord(k),scrim:{action:'featureBack',label:'Back to her piglets'}});
 }
 // Send: the sow is chosen on the sow picker; this confirms who takes which piglets.
 function allocConfirm(s){
  const f=s.fosterDraft,other=fosterSow(s,f.target);if(!other)return '';const n=f.ids.length+f.count;
  const what=SentriUI.row({variant:'navigation',icon:icon('pig'),title:`${n} piglet${n===1?'':'s'}`,description:[f.ids.length?'ID '+f.ids.join(', '):'',f.count?`${f.count} without ID`:''].filter(Boolean).join(' · ')});
- return SentriUI.sheet({variant:'drawer',surface:'menu',title:'Send piglets',line:{text:[{text:'To '},{text:other.tag,strong:true},{text:` · ${rowText.pen(other.pen)} · ${other.farm?other.stage:rowText.alive(other.alive)}`}]},body:SentriUI.rowGroup(what),bodyClass:'alloc-done-body',footer:footer(SentriUI.backButton({action:'featureBack'}),btn('saveFoster',`Send ${n} piglet${n===1?'':'s'}`,'button primary')),size:'short',sizing:'content',label:'Send piglets',scrim:{action:'featureBack',label:'Back to the sows'}});
+ return SentriUI.sheet({variant:'drawer',surface:'menu',title:'Send piglets',line:{text:[{text:'To '},{text:other.tag,strong:true},{text:` · ${rowText.pen(other.pen)}${other.farm?' · '+other.stage:''}`}]},body:SentriUI.rowGroup(what),bodyClass:'alloc-done-body',footer:footer(SentriUI.backButton({action:'featureBack'}),btn('saveFoster',`Send ${n} piglet${n===1?'':'s'}`,'button primary')),size:'short',sizing:'content',label:'Send piglets',scrim:{action:'featureBack',label:'Back to the sows'}});
 }
 // What has gone where so far: one row per send or move, where they went, the IDs that went and how many.
 function allocSentList(s){
@@ -964,7 +964,7 @@ function allocPenPage(s){
  const f=s.fosterDraft,k=litterPicked(s);
  const bar=f.penScan?SentriUI.scanBar({state:f.penScan==='waiting'?'waiting':'scanning',device:'Reader 1',text:f.penScan==='waiting'?'':'Scan the pen plate',stop:{action:'allocPenScanStop'}})
   :SentriUI.choiceSearch({label:'Search pen',placeholder:'Pen',value:f.penQ||'',attrs:{'data-alloc-pen-search':''},clear:{action:'allocPenClear'},scan:{action:'allocPenScan',label:'Scan pen plate'}});
- return SentriUI.sheet({variant:'drawer',surface:'menu',title:'Move to a pen',line:{text:[{text:`${pigletWord(k)} · ${s.tag}`}]},body:`<div class="hand-pen-bar">${bar}</div><div class="hand-pen-list">${allocPenList(s)}</div>`,bodyClass:'alloc-done-body',footer:footer(SentriUI.backButton({action:'featureBack'})),size:'long',sizing:'content',label:'Move to a pen',scrim:{action:'featureBack',label:'Back to her piglets'}});
+ return SentriUI.sheet({variant:'drawer',surface:'menu',title:'Move to a pen',line:{text:[{text:'From '},{text:s.tag,strong:true}]},body:`<div class="hand-pen-bar">${bar}</div><div class="hand-pen-list">${allocPenList(s)}</div>`,bodyClass:'alloc-done-body',footer:footer(SentriUI.backButton({action:'featureBack'})),size:'long',sizing:'content',label:'Move to a pen',scrim:{action:'featureBack',label:'Back to her piglets'}});
 }
 // The finished sow (owner, 2026-11-02): her drawer says only what happened this time, one ring of where the litter went in a card that
 // opens Details (a tappable card in a white drawer: white body, tinted head band); her actions sit in the bar, nothing stacked in the body.
@@ -1196,7 +1196,7 @@ function fosterPage(s){
  // A dead sow can never receive, so from Allocate the switch is left out and the title says the job (Segment: prefer omission to a
  // disabled option that never comes back; owner, 2026-11-03: the dashed disabled option read wrong).
  const seg=dead?'':dir;
- const k=litterPicked(s),line=dead?{text:[{text:`${k} piglet${k===1?'':'s'}`},{text:' · '+s.tag}]}:null;   // the ones ticked on her list
+ const line=dead?{text:[{text:'From '},{text:s.tag,strong:true}]}:null;   // whose piglets (Headers law: the count is on her list, not here)
  const page=SentriUI.sheet({variant:'page',title:dead?'Send piglets':'Foster piglets',line,back:{action:'featureBack'},above:`${seg?`<div class="foster-direction">${seg}</div>`:''}${fosterBar(s,'batch-bar')}`,body:`<div class="foster-list">${fosterPickList(s)}</div>`,footer:false,className:'room-utility batch-pick foster-pick',label:'Foster piglets',bar:status()});
  const layer=fosterLayer(s);
  return layer?'<div class="page-background" inert aria-hidden="true">'+page+'</div>'+layer:page;
@@ -1259,7 +1259,7 @@ function fosterIdList(list,f,headAct=null){
 function fosterSendPage(s){
  const f=s.fosterDraft,other=fosterSow(s,f.target);if(!other)return '';
  const out=f.direction==='out',max=fosterMax(s),src=out?s:other,withId=fosterIds(src),n=f.count+f.ids.length,word=out?'Send':'Receive';
- const line={text:[{text:out?'To ':'From '},{text:other.tag,strong:true},{text:` · ${rowText.pen(other.pen)} · ${other.farm?other.stage:rowText.alive(other.alive)}`}]};
+ const line={text:[{text:out?'To ':'From '},{text:other.tag,strong:true},{text:` · ${rowText.pen(other.pen)}${other.farm?' · '+other.stage:''}`}]};
  const body=`${fosterIdList(withId,f)}${max||!withId.length?`<section class="feature-section">${farmStepper({variant:'well',label:withId.length?'Without ID':'Number of piglets',value:f.count,min:withId.length?0:1,max,action:'fosterCount',reserveHint:false})}</section>`:''}`;
  const commit=btn('saveFoster',`${word} ${n} piglet${n===1?'':'s'}`,'button primary','',n<1||f.count>max);
  return SentriUI.sheet({variant:'page',title:out?'Send piglets':'Receive piglets',line,back:{action:'featureBack'},body,footer:footer(SentriUI.backButton({action:'featureBack'}),commit),className:'feature-page foster-send-page',label:out?'Send piglets':'Receive piglets',bar:status()});
