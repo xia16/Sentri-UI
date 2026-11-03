@@ -386,14 +386,17 @@ async function taskMap(name, o) {
       if (v && v[1]) t.classList.add(v[1]);
     });
     const list = document.querySelector('.room-list'); list.classList.add('m-count');
-    list.innerHTML = (o.scan ? '<div class="m-scanbar">' + U.scanBar({ state: 'scanning', device: 'Reader 1', text: o.scan.bar, stop: { action: 'x', label: 'Stop' } }) + '</div>' : o.key) + '<div class="m-map">' + host.innerHTML + '</div>';
+    list.innerHTML = o.key + '<div class="m-map">' + host.innerHTML + '</div>';
     if (o.scan) {
       let dock = null; for (let d = document.querySelector('[data-action="room-scan"]'); d && d !== document.body; d = d.parentElement) if (/dock/i.test(d.className)) dock = d;
       const read = o.scan.read;
-      const left = read.length ? '<div class="m-left"><strong>' + read.length + ' scanned · tap a pen</strong><small>' + read.join(' · ') + '</small></div>'
-        : '<div class="m-left"><strong>Scan the next pigs</strong><small>Then tap the pen they are in</small></div>';
+      // Scan starts in the dock, so the footer owns it, as on Farrowing's Scan page (owner, 2026-11-03: not a bar at the top): Stop scanning
+      // while listening; with pigs read, the count and the tags, and Clear (the action is tapping their pen).
+      const left = '<div class="m-left"><strong>' + read.length + ' scanned · tap their pen</strong><small>' + read.join(' · ') + '</small></div>';
       const foot = document.createElement('div'); foot.className = 'sheet-footer m-scanfoot'; foot.dataset.ds = 'Sheet';
-      foot.innerHTML = left + (read.length ? U.button({ label: 'Clear', register: 'secondary', action: 'x' }) : '');
+      foot.innerHTML = read.length ? left + U.button({ label: 'Clear', register: 'secondary', action: 'x' })
+        : U.button({ label: 'Stop scanning', icon: window.SentriIcons.icon('stop'), register: 'secondary', className: 'st-scan-toggle', action: 'x' });
+      if (!read.length) foot.classList.add('st-scan-foot');
       dock.replaceWith(foot);
       if (o.scan.toast) { const t = document.createElement('div'); t.className = 'm-toast'; t.innerHTML = U.toast(o.scan.toast, { tone: 'done' }); foot.append(t); }
     }
@@ -509,14 +512,14 @@ for (const [name, view] of [['mock-9b-pen-move.png', 'move'], ['mock-9c-pen-stay
 }
 
 if (want('14s')) {
-  await taskMap('mock-14s-receive-scan.png', { ...RECV, key: '',
+  await taskMap('mock-14s-receive-scan.png', { ...RECV, key: keyOf(true),
     tiles: unit9({ A1: ['15/15', 'm-done'], A2: ['15/15', 'm-done'], A3: ['14/15', 'm-done'], B1: ['15/15', 'm-done'], C3: ['4/15', 'm-done'] }),
     unit: { name: 'Unit 9', value: '63', metric: 'Received', target: '5 pens counted' },
     task: { value: 93, total: 120, label: 'Received', statuses: { farrowed: 93, active: 0, awaiting: 27 } },
     scan: { bar: 'Scan, then tap a pen', read: ['000903', '000911', '000915'] } });
 }
 if (want('14t')) {
-  await taskMap('mock-14t-receive-placed.png', { ...RECV, key: '',
+  await taskMap('mock-14t-receive-placed.png', { ...RECV, key: keyOf(true),
     tiles: unit9({ A1: ['15/15', 'm-done'], A2: ['15/15', 'm-done'], A3: ['14/15', 'm-done'], B1: ['15/15', 'm-done'], C3: ['4/15', 'm-done'], B2: ['3/15', 'm-done'] }),
     unit: { name: 'Unit 9', value: '66', metric: 'Received', target: '6 pens counted' },
     task: { value: 96, total: 120, label: 'Received', statuses: { farrowed: 96, active: 0, awaiting: 24 } },
