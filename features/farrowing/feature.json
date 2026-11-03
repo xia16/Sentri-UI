@@ -30,7 +30,8 @@
           "farrowing.foster",
           "farrowing.foster-search",
           "farrowing.foster-scanning",
-          "farrowing.foster-count",
+          "farrowing.foster-send",
+          "farrowing.foster-filter",
           "farrowing.reconcile",
           "farrowing.piglet-care",
           "farrowing.piglet-identity",
@@ -54,9 +55,13 @@
         "name": "Died",
         "screens": [
           "farrowing.ended",
-          "farrowing.allocate",
-          "farrowing.foster-dead",
-          "farrowing.foster-move"
+          "farrowing.piglets",
+          "farrowing.piglets-ticked",
+          "farrowing.piglets-actions",
+          "farrowing.piglets-sow",
+          "farrowing.piglets-filter",
+          "farrowing.piglets-confirm",
+          "farrowing.piglets-pen"
         ]
       }
     ],
@@ -171,7 +176,7 @@
     [
       "farrowing.room",
       "farrowing.ended",
-      "tap a Sow died row once nothing is left to allocate (hand-reared)"
+      "tap a Sow died row"
     ],
     [
       "farrowing.room",
@@ -365,8 +370,23 @@
     ],
     [
       "farrowing.foster",
+      "farrowing.foster-send",
+      "tap (or scan) a sow that can take piglets"
+    ],
+    [
+      "farrowing.foster",
+      "farrowing.foster-filter",
+      "Filter"
+    ],
+    [
+      "farrowing.foster-send",
       "farrowing.count",
-      "Save, or Back"
+      "Send N piglets"
+    ],
+    [
+      "farrowing.foster-send",
+      "farrowing.foster",
+      "Back"
     ],
     [
       "farrowing.count",
@@ -640,8 +660,8 @@
     ],
     [
       "farrowing.death",
-      "farrowing.allocate",
-      "Save (hold) in The sow mode, when piglets are alive"
+      "farrowing.ended",
+      "Save (hold) in The sow mode, when piglets are alive: her record, Sow died over the card, Piglets under it"
     ],
     [
       "farrowing.death",
@@ -649,29 +669,74 @@
       "Save (hold) in The sow mode, when no piglet is alive"
     ],
     [
-      "farrowing.room",
-      "farrowing.allocate",
-      "tap a Sow died row while piglets wait"
+      "farrowing.ended",
+      "farrowing.piglets",
+      "Piglets (Foster or move)"
     ],
     [
-      "farrowing.allocate",
-      "farrowing.room",
-      "Back (decide later), or Hand-rear here"
+      "farrowing.locked",
+      "farrowing.piglets",
+      "Piglets"
     ],
     [
-      "farrowing.allocate",
-      "farrowing.foster",
-      "Move to other sows"
+      "farrowing.piglets",
+      "farrowing.piglets-ticked",
+      "tick piglets (tap, scan a tag, or type how many without ID)"
     ],
     [
-      "farrowing.foster",
-      "farrowing.allocate",
-      "Save while piglets remain, or Back"
+      "farrowing.piglets",
+      "farrowing.ended",
+      "Back"
     ],
     [
-      "farrowing.foster",
-      "farrowing.room",
-      "Save when the last piglet has moved"
+      "farrowing.piglets-ticked",
+      "farrowing.piglets-actions",
+      "Actions · N"
+    ],
+    [
+      "farrowing.piglets-actions",
+      "farrowing.piglets-sow",
+      "Foster"
+    ],
+    [
+      "farrowing.piglets-actions",
+      "farrowing.piglets-pen",
+      "Move"
+    ],
+    [
+      "farrowing.piglets-sow",
+      "farrowing.piglets-filter",
+      "Filter"
+    ],
+    [
+      "farrowing.piglets-filter",
+      "farrowing.piglets-sow",
+      "Show N sows, or Back"
+    ],
+    [
+      "farrowing.piglets-sow",
+      "farrowing.piglets-confirm",
+      "tap (or scan) a sow that can take piglets"
+    ],
+    [
+      "farrowing.piglets-confirm",
+      "farrowing.piglets",
+      "Send N piglets (they leave her list)"
+    ],
+    [
+      "farrowing.piglets-confirm",
+      "farrowing.piglets-sow",
+      "Back"
+    ],
+    [
+      "farrowing.piglets-pen",
+      "farrowing.piglets",
+      "tap a pen, or read its plate (they leave her list)"
+    ],
+    [
+      "farrowing.piglets-pen",
+      "farrowing.piglets-ticked",
+      "Back"
     ],
     [
       "farrowing.room",
@@ -801,14 +866,9 @@
                 "shows": "Green tile with a tick, \"done\". Facts \"11 alive · 2 dead · 05:58 · G.H\". No pencil: the row opens the record, and Edit is inside it."
               },
               {
-                "state": "Sow died · piglets to allocate",
-                "when": "She died and none of her live piglets is hand-reared, placed elsewhere, in a rearing pen or recorded dead",
-                "shows": "Red tile \"7 / to allocate\". Facts \"Sow died\" (red) · \"yesterday · L.M\". Tapping opens the allocation sheet. Owner decision 2026-10-10."
-              },
-              {
-                "state": "Sow died · hand-reared",
-                "when": "Her piglets were kept hand-reared on her record",
-                "shows": "Neutral tile \"2 / hand-reared\"; facts \"Sow died · 09:40 · L.M\". The row stays while hand-reared piglets remain; a partial allocation keeps the remaining count (never \"5 moved\"). Tapping opens her record. Owner decision 2026-10-10."
+                "state": "Sow died",
+                "when": "She died and piglets are still alive on her litter",
+                "shows": "\"7 piglets\" over Sow died, settled (no red: nothing has to be decided); context \"yesterday · L.M\". Tapping opens her record, Piglets under the card. Owner decision 2026-11-03."
               },
               {
                 "state": "Aborted",
@@ -822,11 +882,11 @@
               },
               {
                 "state": "Left the list",
-                "when": "Sow died with nothing left to allocate or hand-rear; or aborted with no live piglet",
+                "when": "Sow died and every piglet fostered, moved or recorded dead; or aborted with no live piglet",
                 "shows": "Not drawn in any lens, Find a sow or Pen map. The Task overview counts her once, under \"Left the task\". Owner decision 2026-10-10."
               }
             ],
-            "logic": "Tile colour is meaning only: red solid (white text) is work for the worker (to allocate, days late), green wash is done, neutral is everything else; no border or shadow, the whole row is the tap target. The ID is shown exactly as stored (never grouped, truncated or styled by part; it wraps and the row grows). Only recorded counts show; never \"born N\" when alive and dead are shown, never an expected or carried count. Pens stay as dividers in aisle order. One function draws the row (sowRow).",
+            "logic": "Tile colour is meaning only: red solid (white text) is work for the worker (days late), green wash is done, neutral is everything else; no border or shadow, the whole row is the tap target. The ID is shown exactly as stored (never grouped, truncated or styled by part; it wraps and the row grows). Only recorded counts show; never \"born N\" when alive and dead are shown, never an expected or carried count. Pens stay as dividers in aisle order. One function draws the row (sowRow).",
             "source": "farrowing-astra-concept.js sowRow(), leftTask(); Row layout need; PRD Decisions 2026-10-10",
             "at": "000418"
           },
@@ -866,7 +926,7 @@
               },
               {
                 "state": "Left the task",
-                "when": "Sows aborted with no live piglet, or died with nothing left to allocate",
+                "when": "Sows aborted with no live piglet, or died with no piglet left",
                 "shows": "Out of the number and the denominator, so the figure still adds up (7 / 18 once one of 19 has left). The overview counts them under Left the task."
               }
             ],
@@ -1535,6 +1595,13 @@
             "source": "farrowing-astra-concept.js finishedCard()"
           },
           {
+            "name": "Piglets",
+            "at": "Piglets",
+            "shows": "A row under the card: the pig, \"Piglets\", a chevron.",
+            "logic": "Her piglet list (farrowing.piglets): tick some, then Actions.",
+            "source": "farrowing-astra-concept.js litterDoor()"
+          },
+          {
             "name": "Bar",
             "at": "Record dead",
             "shows": "Back · Actions · Record dead, one row at 56px; Actions is the black primary (owner, 2026-11-03), the other two outlined.",
@@ -1795,72 +1862,392 @@
       }
     },
     {
-      "id": "farrowing.allocate",
-      "name": "Sow died · piglets to allocate",
-      "zh": "母猪死亡·仔猪安置",
+      "id": "farrowing.piglets",
+      "name": "Piglets · a dead sow's litter",
+      "zh": "仔猪",
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "allocate",
+      "preset": "piglets-dead",
       "figma": "",
       "notes": {
-        "purpose": "Right after the hold records her death, or from her row while piglets wait: where do her live piglets go? Footer Back means later.",
-        "states": [
-          "Title \"N piglets to allocate\", subtitle \"<ID> · <pen> · sow died <time>\". After a partial move the sheet returns with the remaining count.",
-          "On a farm with no rearing pen the third option is absent."
-        ],
+        "purpose": "Her piglets, from her record: tick some to foster or move them; the rest stay with her.",
+        "states": [],
         "elements": [
           {
-            "name": "Options",
-            "at": "Move to other sows",
-            "shows": "Three rows with a chevron: Move to other sows (\"Foster or nurse sow\"), Hand-rear here (\"Bottle or milk replacer in her crate\"), Move to a rearing pen (\"Rescue deck\").",
+            "name": "Her piglets",
+            "at": "399001",
+            "shows": "Inspection's pen list for one litter, in one white card: a row per piglet with an ID (the tag over its notch, a tick box), then one row for those without (the struck tag, \"1 piglet\", a count box). Heading \"7 alive\" with Tick all (Clear when all are ticked) at its end; search with scan inside above the card.",
             "states": [
               {
-                "state": "Move to other sows",
-                "when": "Tap",
-                "shows": "Opens the Move page (Foster piglets, sending out of this litter) with all her piglets pre-selected; the stepper lowers the count so several receiving sows can split them. Saving returns here with the remaining count, or to the room when none is left."
+                "state": "Typed",
+                "when": "The worker types part of a piglet ID",
+                "shows": "The card narrows to the IDs that match; the row without ID steps aside while a search is on. Nothing matching: \"No piglet ID matching “…”.\""
               },
               {
-                "state": "Hand-rear here",
-                "when": "Tap",
-                "shows": "The piglets stay on her record and piglet care continues. Back to the room; her row reads \"N hand-reared\"."
+                "state": "Scanning",
+                "when": "The scan icon, with the reader on",
+                "shows": "The search becomes the scan bar \"Scanning · Scan piglet tags\" with Stop; each read ticks that piglet (a read never unticks)."
               },
               {
-                "state": "Move to a rearing pen",
-                "when": "Tap, only when farm config says the farm has a rearing pen (prototype flag, on for the demo; ?rearing=off)",
-                "shows": "Every remaining piglet leaves her record. Back to the room; she leaves the list."
+                "state": "Count typed",
+                "when": "The worker taps the count box of the row without ID",
+                "shows": "The phone's own number keypad; the number typed is how many of them are ticked (0 unticks the row). Ticking the row alone takes them all."
               }
             ],
-            "logic": "Back is the only exit and means later: nothing is decided, her row reads \"N to allocate\" and tapping it reopens this sheet. No ✕, no extra question line.",
-            "source": "farrowing-astra-concept.js allocate(), act(allocMove | allocHand | allocRear)"
+            "logic": "With ID = her piglet records still alive; without ID = alive − those. Ticked: the green box on a white row (PR 302). Nothing opens a piglet: there is no piglet page (piglet processing is not designed).",
+            "source": "farrowing-astra-concept.js litterPage(), litterRows()"
+          },
+          {
+            "name": "Sent and moved",
+            "at": "Sent and moved",
+            "shows": "Under the list once something has gone: a row per send or move, \"To 000418 · Pen B1\" (the pig) or \"To Pen B1 · Unit 7\" (transfer), its IDs or \"Without ID\", and how many.",
+            "logic": "Each send or move takes its piglets off the list; tick the next ones for the next place.",
+            "source": "farrowing-astra-concept.js allocSentList()"
+          },
+          {
+            "name": "Bar",
+            "at": "Back",
+            "shows": "Back alone while nothing is ticked.",
+            "logic": "Back returns to her record; nothing was recorded. Piglets nobody moves stay with her: a dead sow's are hand-reared in her crate, so there is nothing to confirm.",
+            "source": "farrowing-astra-concept.js litterPage()"
           }
         ],
         "controls": [
           {
-            "control": "Back",
-            "does": "leaves; nothing is decided",
-            "goesTo": "farrowing.room"
+            "control": "Piglets (her record)",
+            "does": "opens this list",
+            "goesTo": "farrowing.piglets"
           },
           {
-            "control": "Move to other sows",
-            "does": "opens the move page",
-            "goesTo": "farrowing.foster"
+            "control": "Back",
+            "does": "back to her record",
+            "goesTo": "farrowing.ended"
+          },
+          {
+            "control": "a tick",
+            "does": "ticks that piglet",
+            "goesTo": "farrowing.piglets-ticked"
           }
         ],
         "copy": [
-          "N piglets to allocate · <ID> · <pen> · sow died <time>",
-          "Move to other sows · Foster or nurse sow",
-          "Hand-rear here · Bottle or milk replacer in her crate",
-          "Move to a rearing pen · Rescue deck"
+          "Piglets",
+          "Sow died · <ID> · <pen>",
+          "<N> alive",
+          "Tick all",
+          "Piglet ID",
+          "<N> piglet(s)",
+          "Sent and moved"
         ],
         "edge": [
-          "A sow who died with no live piglet gets no sheet: she leaves the list at once.",
-          "The receiving sows' own litters are not changed in this prototype."
+          "A living sow's list is the same, its line \"Sow · <ID> · <pen>\" (preset piglets-live)."
         ],
-        "issues": [
-          "Rearing pen: how a farm declares it is open (To confirm farrowing-room-list-1)."
-        ],
+        "issues": [],
         "rules": [
-          "Owner decision 2026-10-10: fostering is in scope for the sow-died case; an orphan litter can stay in the task, hand-reared; a rearing pen is a farm-level option (configuration open, To confirm farrowing-room-list-1)."
+          "Owner, 2026-11-03: no Allocate step; a sow's record leads to her piglets, Inspection's pen list for one litter. Tick some, then Actions: Foster or Move; piglets nobody moves stay with her.",
+          "Owner, 2026-11-03: search with scan inside on top, Back at the bottom; the count without ID is typed on the phone's keypad (no pad of ours)."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.piglets-ticked",
+      "name": "Piglets · three ticked",
+      "zh": "仔猪",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "piglets-ticked",
+      "figma": "",
+      "notes": {
+        "purpose": "Two piglets with an ID and the one without are ticked: Actions joins Back.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Her piglets",
+            "at": "399001",
+            "shows": "Inspection's pen list for one litter, in one white card: a row per piglet with an ID (the tag over its notch, a tick box), then one row for those without (the struck tag, \"1 piglet\", a count box). Heading \"7 alive\" with Tick all (Clear when all are ticked) at its end; search with scan inside above the card.",
+            "states": [
+              {
+                "state": "Typed",
+                "when": "The worker types part of a piglet ID",
+                "shows": "The card narrows to the IDs that match; the row without ID steps aside while a search is on. Nothing matching: \"No piglet ID matching “…”.\""
+              },
+              {
+                "state": "Scanning",
+                "when": "The scan icon, with the reader on",
+                "shows": "The search becomes the scan bar \"Scanning · Scan piglet tags\" with Stop; each read ticks that piglet (a read never unticks)."
+              },
+              {
+                "state": "Count typed",
+                "when": "The worker taps the count box of the row without ID",
+                "shows": "The phone's own number keypad; the number typed is how many of them are ticked (0 unticks the row). Ticking the row alone takes them all."
+              }
+            ],
+            "logic": "With ID = her piglet records still alive; without ID = alive − those. Ticked: the green box on a white row (PR 302). Nothing opens a piglet: there is no piglet page (piglet processing is not designed).",
+            "source": "farrowing-astra-concept.js litterPage(), litterRows()"
+          },
+          {
+            "name": "Bar",
+            "at": "Actions · 3",
+            "shows": "Back · \"··· Actions · 3\" (primary).",
+            "logic": "··· for every Actions button (icon rules, PR 303). The number is everything ticked: IDs plus the count without ID.",
+            "source": "farrowing-astra-concept.js litterPage()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Actions · N",
+            "does": "opens Actions on the ticked piglets",
+            "goesTo": "farrowing.piglets-actions"
+          },
+          {
+            "control": "Back",
+            "does": "back to her record; the ticks are dropped",
+            "goesTo": "farrowing.ended"
+          }
+        ],
+        "copy": [
+          "Actions · <N>"
+        ],
+        "edge": [],
+        "issues": [],
+        "rules": [
+          "Owner, 2026-11-03: no Allocate step; a sow's record leads to her piglets, Inspection's pen list for one litter. Tick some, then Actions: Foster or Move; piglets nobody moves stay with her."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.piglets-actions",
+      "name": "Piglets · Actions",
+      "zh": "仔猪操作",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "piglets-actions",
+      "figma": "",
+      "notes": {
+        "purpose": "What the ticked piglets can do.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Actions",
+            "at": "Foster",
+            "shows": "A drawer over the list, titled \"3 piglets\", line \"Sow <ID>\": Foster (the pig; \"Send to another sow\") and Move (transfer; \"To another pen\"), each with a chevron; Back.",
+            "logic": "One icon per meaning (PR 303): the pig for fostering, transfer for moving pigs.",
+            "source": "farrowing-astra-concept.js litterActionsSheet()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Foster",
+            "does": "opens the sow picker for the ticked piglets",
+            "goesTo": "farrowing.piglets-sow"
+          },
+          {
+            "control": "Move",
+            "does": "opens Move's pen picker",
+            "goesTo": "farrowing.piglets-pen"
+          },
+          {
+            "control": "Back",
+            "does": "back to the list; the ticks stay",
+            "goesTo": "farrowing.piglets-ticked"
+          }
+        ],
+        "copy": [
+          "<N> piglets",
+          "Foster",
+          "Send to another sow",
+          "Move",
+          "To another pen"
+        ],
+        "edge": [],
+        "issues": [],
+        "rules": [
+          "Owner, 2026-11-03: no Allocate step; a sow's record leads to her piglets, Inspection's pen list for one litter. Tick some, then Actions: Foster or Move; piglets nobody moves stay with her."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.piglets-sow",
+      "name": "Piglets · foster to a sow",
+      "zh": "寄养",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "piglets-sow",
+      "figma": "",
+      "notes": {
+        "purpose": "The sow picker for the ticked piglets: the same list as Foster piglets, titled Send piglets.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Other sow",
+            "at": "Ear tag or pen",
+            "shows": "\"Send piglets\", line \"3 piglets · <ID>\"; search with scan inside and Filter sows, pinned over the list of sows that can take piglets, by unit (her unit first) and pen.",
+            "logic": "The piglets are already chosen, so no Send · Receive switch (prefer omission). Only sows that can take piglets: nursing a litter, or a nurse sow who has just weaned hers. An ear tag reaches beyond the batch, but never a gilt or a pregnant sow; a read of one says \"<ID> can't take piglets\" and opens nothing.",
+            "source": "farrowing-astra-concept.js fosterPage(), fosterPickList()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "a sow",
+            "does": "asks to confirm",
+            "goesTo": "farrowing.piglets-confirm"
+          },
+          {
+            "control": "Filter",
+            "does": "opens Filter sows",
+            "goesTo": "farrowing.piglets-filter"
+          },
+          {
+            "control": "Back",
+            "does": "back to her piglets",
+            "goesTo": "farrowing.piglets-ticked"
+          }
+        ],
+        "copy": [
+          "Send piglets",
+          "<N> piglets · <ID>",
+          "Ear tag or pen",
+          "No sow that can take piglets matches “…”",
+          "<ID> can't take piglets"
+        ],
+        "edge": [],
+        "issues": [],
+        "rules": [
+          "Owner, 2026-11-03: no Allocate step; a sow's record leads to her piglets, Inspection's pen list for one litter. Tick some, then Actions: Foster or Move; piglets nobody moves stay with her.",
+          "Owner, 2026-11-03: search and scan reach only sows that can take piglets; a nurse sow is eligible."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.piglets-filter",
+      "name": "Piglets · filter sows",
+      "zh": "筛选母猪",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "piglets-filter",
+      "figma": "",
+      "notes": {
+        "purpose": "Fostering's own filter: what makes a good nurse sow.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Filter sows",
+            "at": "Unit",
+            "shows": "Unit as chips (All, then each unit with its count), then Farrowed (Today · 3 days ago · 7+ days ago) and Alive now (0 · 8 · 16+) as ranges with their bars; Back · Show N sows.",
+            "logic": "Opens on her unit. Only sows that have farrowed can take piglets, so the room's Expected farrowing and Parity are not here. A range every sow in view shares is left out. The drawer opens long enough that all of it fits on one screen.",
+            "source": "farrowing-astra-concept.js fosterFilterSheet(), fosterRangeSections()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Show N sows",
+            "does": "applies the filter",
+            "goesTo": "farrowing.piglets-sow"
+          },
+          {
+            "control": "Back",
+            "does": "keeps the draft and closes",
+            "goesTo": "farrowing.piglets-sow"
+          }
+        ],
+        "copy": [
+          "Filter sows",
+          "Unit",
+          "Farrowed",
+          "Alive now",
+          "Show <N> sows"
+        ],
+        "edge": [],
+        "issues": [],
+        "rules": [
+          "Owner, 2026-11-03: fostering's filter is the farrowing filter plus Unit; it fits on one screen."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.piglets-confirm",
+      "name": "Piglets · confirm the sow",
+      "zh": "确认寄养",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "piglets-confirm",
+      "figma": "",
+      "notes": {
+        "purpose": "The ticked piglets go to the sow tapped: who takes them, which, how many.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Send piglets",
+            "at": "Send 3 piglets",
+            "shows": "A drawer over the sows: \"Send piglets\", line \"To 000418 · Pen B1 · 9 alive\", one row \"3 piglets · ID 399001, 399002 · 1 without ID\", Back · Send 3 piglets.",
+            "logic": "Saving changes both litters: hers falls, the receiving sow's rises (the IDs go with them); each record logs the foster with the IDs. Back to her list, the piglets off it and in Sent and moved.",
+            "source": "farrowing-astra-concept.js allocConfirm(), act saveFoster"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Send N piglets",
+            "does": "saves both litters; back to her piglets",
+            "goesTo": "farrowing.piglets"
+          },
+          {
+            "control": "Back",
+            "does": "back to the sows; nothing sent",
+            "goesTo": "farrowing.piglets-sow"
+          }
+        ],
+        "copy": [
+          "Send piglets",
+          "To <ID> · Pen <pen> · <N> alive",
+          "Send <N> piglets"
+        ],
+        "edge": [],
+        "issues": [],
+        "rules": [
+          "Owner, 2026-11-03: no Allocate step; a sow's record leads to her piglets, Inspection's pen list for one litter. Tick some, then Actions: Foster or Move; piglets nobody moves stay with her."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.piglets-pen",
+      "name": "Piglets · move to a pen",
+      "zh": "转栏",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "piglets-pen",
+      "figma": "",
+      "notes": {
+        "purpose": "Move's destination picker for the ticked piglets.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Move to a pen",
+            "at": "Pen",
+            "shows": "A drawer: \"Move to a pen\", line \"3 piglets · <ID>\"; search a pen with scan inside (a plate read moves them there); pens by unit, her unit first, her own crate dimmed (\"Her crate\"); Back.",
+            "logic": "A tap moves them and returns to her list: they leave her litter, her record logs \"3 piglets moved to Pen B1 · Unit 7 · ID …\", and Sent and moved gains the row.",
+            "source": "farrowing-astra-concept.js allocPenPage(), act allocPen"
+          }
+        ],
+        "controls": [
+          {
+            "control": "a pen",
+            "does": "moves the ticked piglets there; back to her piglets",
+            "goesTo": "farrowing.piglets"
+          },
+          {
+            "control": "Back",
+            "does": "back to her piglets; nothing moved",
+            "goesTo": "farrowing.piglets-ticked"
+          }
+        ],
+        "copy": [
+          "Move to a pen",
+          "Pen",
+          "Her crate"
+        ],
+        "edge": [],
+        "issues": [],
+        "rules": [
+          "Owner, 2026-11-03: no Allocate step; a sow's record leads to her piglets, Inspection's pen list for one litter. Tick some, then Actions: Foster or Move; piglets nobody moves stay with her."
         ]
       }
     },
@@ -1873,22 +2260,29 @@
       "preset": "ended",
       "figma": "",
       "notes": {
-        "purpose": "The record of a litter whose sow died: a red band with the cause and the litter facts as they stood.",
+        "purpose": "A dead sow's record is the finished record: the ring card, its head band saying she died, and her piglets under it.",
         "states": [],
         "elements": [
           {
-            "name": "Death band",
-            "shows": "\"Sow died · prolapse · Aug 25 06:20 · L.M\" in one red band.",
-            "logic": "The death is said once, in the band: cause (Other prints its details), date, time and hand, from the Sow died event. The header keeps only pen and parity; the room row carries the word.",
-            "source": "farrowing-astra-concept.js diedStamp(), locked()",
-            "at": "Sow died"
+            "name": "Litter card",
+            "at": "alive now",
+            "shows": "The finished sow's card (farrowing.locked): head band \"Sow died Aug 25 · Prolapse\" (Sow died in red, the one red) · Details ›; the ring with 7 alive now, died after birth and born dead; Born alive 8 / 10.",
+            "logic": "The death is said once, in the head band. Details opens the one Details page.",
+            "source": "farrowing-astra-concept.js finishedCard(), locked()"
           },
           {
-            "name": "Litter summary",
-            "shows": "Born 10 · Alive 7 · Dead 3 with a causes line.",
-            "logic": "No finish facts (nothing was finished). Record death here is for piglets only. The 7 alive piglets stay under piglet care.",
-            "source": "farrowing-astra-concept.js summary()",
-            "at": "Litter summary"
+            "name": "Piglets",
+            "at": "Piglets",
+            "shows": "A row under the card: the pig, \"Piglets\", \"Foster or move\", a chevron.",
+            "logic": "Only a dead sow's says Foster or move; a living sow's is just Piglets (owner, 2026-11-03).",
+            "source": "farrowing-astra-concept.js litterDoor()"
+          },
+          {
+            "name": "Bar",
+            "at": "Record dead",
+            "shows": "Back · ··· Actions · Record dead, as the finished record's.",
+            "logic": "Back and Record dead keep their labels whole; Actions takes the rest, so all three fit a 375 phone.",
+            "source": "farrowing-astra-concept.js locked()"
           },
           {
             "name": "Death timing",
@@ -1917,7 +2311,7 @@
           "(raw) Born · Alive · Dead"
         ],
         "edge": [
-          "She stays in the room while her piglets are unallocated or hand-reared; she leaves once none is left",
+          "She stays in the room while any of her piglets is alive on her litter; she leaves once none is left",
           "Piglet deaths are recorded through Record dead on this record and her count drops (Owner decision 2026-10-10)"
         ],
         "rules": [
@@ -2722,158 +3116,84 @@
       }
     },
     {
-      "id": "farrowing.foster-count",
-      "name": "Foster piglets · send or receive",
+      "id": "farrowing.foster-send",
+      "name": "Foster piglets · send to a sow",
       "zh": "寄养",
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "foster-count",
+      "preset": "foster-send",
       "figma": "",
       "notes": {
-        "purpose": "The count for 000605, over the list: Send piglets or Receive piglets, how many, and save.",
+        "purpose": "From a living sow's Actions: the sow tapped, then which piglets go.",
         "states": [],
         "elements": [
           {
-            "name": "Count",
-            "at": "Number of piglets",
-            "shows": "A drawer over the list: title Send piglets (or Receive piglets), the line \"To <ID> · Pen <pen> · N alive\" (From … when receiving), the Well stepper \"Number of piglets\", one hint line, footer Back and \"Send N piglets\".",
-            "logic": "Send takes at most this litter's alive, Receive at most hers. Saving changes both litters: the sender's alive falls (piglets without identity move first), the receiver's rises (they arrive without identity); each record logs \"N piglets fostered to/from <ID>\". Back closes the drawer; the list keeps its place.",
-            "source": "farrowing-astra-concept.js fosterPage(), fosterList(), fosterCount()"
-          },
-          {
-            "name": "Direction",
-            "at": "Send piglets",
-            "shows": "The segment Send piglets / Receive piglets, first in the drawer (the general Foster action only).",
-            "logic": "Switching sets the count back to 1; the title, line and button follow.",
-            "source": "farrowing-astra-concept.js fosterPage(), fosterList(), fosterCount()"
+            "name": "Send piglets",
+            "at": "With ID",
+            "shows": "A page \"Send piglets\", line \"To 000406 · Pen B3 · 11 alive\". With ID: search with scan inside, then a box of tick rows that scrolls past three whole rows (a fade says there are more); Without ID: a count. Back · Send N piglets.",
+            "logic": "Receive piglets is the same page from the other side. Saving changes both litters; each logs the foster with the IDs.",
+            "source": "farrowing-astra-concept.js fosterSendPage(), fosterIdList()"
           }
         ],
         "controls": [
           {
             "control": "Send N piglets",
-            "does": "saves both litters and returns to her Actions",
-            "goesTo": "farrowing.sow-actions"
+            "does": "saves both litters; back to her Actions",
+            "goesTo": "farrowing.count"
           },
           {
             "control": "Back",
-            "does": "closes the drawer; the list stays",
+            "does": "back to the sows; nothing sent",
             "goesTo": "farrowing.foster"
           }
         ],
         "copy": [
-          "Send piglets · Receive piglets",
-          "To <ID> · Pen <pen> · N alive",
-          "Piglets without identity move first.",
-          "They join without identity until it is recorded.",
-          "Send N piglets · Receive N piglets"
-        ],
-        "edge": [],
-        "issues": [],
-        "rules": [
-          "Owner, 2026-11-02: the other sow is a list to search by pen or ear tag, or scan, grouped pen then pig, scrolling under the field; no Receive for a dead sow; the same search and rows for the general Foster action."
-        ]
-      }
-    },
-    {
-      "id": "farrowing.foster-dead",
-      "name": "Sow died · move to other sows",
-      "zh": "寄养",
-      "status": "in-design",
-      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "foster-dead",
-      "figma": "",
-      "notes": {
-        "purpose": "From a dead sow's Allocate piglets → Move to other sows: the same list, and the line says how many piglets are to move. Piglets only go out.",
-        "states": [],
-        "elements": [
-          {
-            "name": "Other sow",
-            "at": "Tap the other sow, or scan.",
-            "shows": "Choose pigs' bar (the search field \"Ear tag or pen\" with the scan icon at its end), pinned over the list. The list scrolls: every sow with a litter on the task, under a plain unit heading (this unit first), one pen card per pen (\"A3 · 2 sows\"), each row her room row (tag over when, litter figure over state word) with a chevron.",
-            "states": [
-              {
-                "state": "Typed",
-                "when": "The worker types part of a pen or an ear tag",
-                "shows": "The list narrows where it is; the matching part of the tag or the pen code is bold. Nothing matching: \"No sow with a litter matching “…”.\""
-              },
-              {
-                "state": "Scanning",
-                "when": "The scan icon, with the reader on",
-                "shows": "The field becomes the scan bar \"Scanning · Scan the other sow\" with Stop; the list stays. A read opens the count for the sow read, as a tap does."
-              },
-              {
-                "state": "Waiting",
-                "when": "The scan icon, with no reader connected",
-                "shows": "The scan bar \"Waiting for reader · Make sure Reader 1 is on\"; it starts scanning when the reader connects."
-              }
-            ],
-            "logic": "Search = type, tap one, act (the owner's search/scan ruling); Farrowing is a single-action task, so a read opens, it does not tick. Offered: every sow on the task's lists, in any unit, with a litter (not one that died, not a production outcome, not herself).",
-            "source": "farrowing-astra-concept.js fosterPage(), fosterList(), fosterCount()"
-          }
-        ],
-        "controls": [
-          {
-            "control": "A sow",
-            "does": "opens the count with all her piglets",
-            "goesTo": "farrowing.foster-move"
-          },
-          {
-            "control": "Back",
-            "does": "returns to Allocate piglets; nothing changes",
-            "goesTo": "farrowing.allocate"
-          }
-        ],
-        "copy": [
-          "<b>N piglets</b> · tap the sow that takes them, or scan."
-        ],
-        "edge": [],
-        "issues": [],
-        "rules": [
-          "Owner, 2026-11-02: the other sow is a list to search by pen or ear tag, or scan, grouped pen then pig, scrolling under the field; no Receive for a dead sow; the same search and rows for the general Foster action."
-        ]
-      }
-    },
-    {
-      "id": "farrowing.foster-move",
-      "name": "Sow died · send to a sow",
-      "zh": "寄养",
-      "status": "in-design",
-      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "foster-move",
-      "figma": "",
-      "notes": {
-        "purpose": "The dead sow's piglets to 000418: no Send/Receive, all of them counted, lowered to split them between sows.",
-        "states": [],
-        "elements": [
-          {
-            "name": "Count",
-            "at": "Number of piglets",
-            "shows": "A drawer over the list: title Send piglets (or Receive piglets), the line \"To <ID> · Pen <pen> · N alive\" (From … when receiving), the Well stepper \"Number of piglets\", one hint line, footer Back and \"Send N piglets\".",
-            "logic": "Send takes at most this litter's alive, Receive at most hers. Saving changes both litters: the sender's alive falls (piglets without identity move first), the receiver's rises (they arrive without identity); each record logs \"N piglets fostered to/from <ID>\". Back closes the drawer; the list keeps its place.",
-            "source": "farrowing-astra-concept.js fosterPage(), fosterList(), fosterCount()"
-          }
-        ],
-        "controls": [
-          {
-            "control": "Send N piglets",
-            "does": "saves; Allocate piglets returns with the rest, or the room when none is left",
-            "goesTo": "farrowing.allocate"
-          },
-          {
-            "control": "Back",
-            "does": "closes the drawer; the list stays",
-            "goesTo": "farrowing.foster-dead"
-          }
-        ],
-        "copy": [
           "Send piglets",
-          "To <ID> · Pen <pen> · N alive",
-          "Send N piglets"
+          "With ID",
+          "Without ID",
+          "Send <N> piglets"
         ],
         "edge": [],
         "issues": [],
         "rules": [
-          "Owner, 2026-11-02: the other sow is a list to search by pen or ear tag, or scan, grouped pen then pig, scrolling under the field; no Receive for a dead sow; the same search and rows for the general Foster action."
+          "Owner, 2026-11-02/03: Send piglets · Receive piglets; no sex or weight on the ID rows."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.foster-filter",
+      "name": "Foster piglets · filter sows",
+      "zh": "筛选母猪",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "foster-filter",
+      "figma": "",
+      "notes": {
+        "purpose": "The same Filter sows as from her piglets, from a living sow's Foster piglets.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Filter sows",
+            "at": "Unit",
+            "shows": "Unit chips, Farrowed and Alive now with their bars; Back · Show N sows.",
+            "logic": "As farrowing.piglets-filter.",
+            "source": "farrowing-astra-concept.js fosterFilterSheet()"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Show N sows",
+            "does": "applies the filter",
+            "goesTo": "farrowing.foster"
+          }
+        ],
+        "copy": [
+          "Filter sows"
+        ],
+        "edge": [],
+        "issues": [],
+        "rules": [
+          "Owner, 2026-11-03: fostering's filter is the farrowing filter plus Unit."
         ]
       }
     },
@@ -3013,7 +3333,7 @@
             "states": [
               {
                 "state": "Needs you",
-                "when": "Any sow the list shows in the pen is at the animal row’s act level (overdue, or sow died with piglets to allocate)",
+                "when": "Any sow the list shows in the pen is at the animal row’s act level (overdue)",
                 "shows": "amber fill, dark amber code, no border"
               },
               {
