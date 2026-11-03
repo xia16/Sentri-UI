@@ -700,8 +700,18 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-picker-field.error .st-picker-hint{color:var(--red)}
 .st-choice-label,.st-choice-meta{overflow-wrap:anywhere;white-space:normal}
 .st-choice-row[data-mode="single"] .st-choice-trail{color:var(--ink)}
-/* A ticked multi-select box is green with a white tick (select-mark, owner 2026-11-03); its row stays white. */
-.st-choice-trail input[type="checkbox"]{accent-color:var(--select-mark)}
+/* A ticked multi-select box is green with a white tick (select-mark, owner 2026-11-03); its row stays white. The box is drawn here,
+   not left to the browser: a native box with accent-color darkens under the pointer and after a tap, so two ticked boxes showed two
+   greens (owner, 2026-11-03). Every checkbox in the system takes this face; hosts set only its size. */
+input[type="checkbox"]{appearance:none;-webkit-appearance:none;display:inline-flex;align-items:center;justify-content:center;flex:none;box-sizing:border-box;border:1.5px solid var(--muted);border-radius:var(--radius-4);background:var(--paper);cursor:pointer}
+input[type="checkbox"]:checked{border-color:var(--select-mark);background:var(--select-mark)}
+input[type="checkbox"]:checked::before{content:'';width:28%;height:52%;margin-top:-12%;border:solid var(--paper);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+input[type="checkbox"]:disabled{border-color:var(--control-border);background:var(--disabled-fill);cursor:default}
+input[type="checkbox"]:disabled:checked{border-color:var(--control-border);background:var(--control-border)}
+/* The count of ticked items inside a door (Row, ChoiceList navigate; owner 2026-11-03, canvas B3): the box's green, before the chevron. */
+.st-count-badge{flex:none;display:inline-grid;place-items:center;min-width:var(--size-22);height:var(--size-22);padding:0 var(--space-6);margin-left:auto;box-sizing:border-box;border-radius:var(--radius-11);background:var(--select-mark);color:var(--paper);font:600 var(--font-size-13)/1 var(--font-sans);font-variant-numeric:tabular-nums}
+.st-row .st-count-badge{margin-right:var(--space-8)}
+.st-choice-row .st-count-badge{margin-left:var(--space-8)}
 .st-choice-row[data-mode="multi"]:has(:checked) .st-choice-label{font-weight:var(--type-weight-strong)}
 .st-picker-value.is-names{display:flex;align-items:baseline;gap:var(--space-6);white-space:normal;overflow:visible}
 .st-picker-names{min-width:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
@@ -1075,6 +1085,13 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-optional-row[data-face="row"] .st-optional-act svg{box-sizing:content-box;width:var(--size-16);height:var(--size-16);padding:var(--space-6);border:var(--ring-width-fine) solid var(--muted);border-radius:50%;background:var(--paper)}
 .st-optional-row[data-face="row"][aria-disabled="true"] .st-optional-act{color:var(--disabled-ink)}
 .st-optional-row[data-face="row"][aria-disabled="true"] .st-optional-act svg{border-style:dashed}
+/* On the tint (owner, 2026-11-03): an empty optional row is a quiet well, not a white card, so it reads as extra; once it holds
+   something (Photos with photos) it becomes a white card with its contents inside, and the thumbnails say how many. */
+[data-st-context="menu"] .st-optional-row[data-face="row"]:not([data-filled="true"]){border-color:transparent;background:var(--well)}
+[data-st-context="menu"] .st-photos:has(.st-photos-items){border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--paper);overflow:hidden}
+[data-st-context="menu"] .st-photos:has(.st-photos-items) .st-optional-row{border:0;border-radius:0;background:transparent}
+[data-st-context="menu"] .st-photos:has(.st-photos-items) .st-photos-items{padding:0 var(--space-row-x) var(--space-row-x)}
+[data-st-context="menu"] .st-photos:has(.st-photos-items):not(:has([data-pending])) .st-optional-answer{display:none}
 /* Photos waiting (inactive): the floor-gray. The row stays, its camera dashed; the reason is the row's description for a
    screen reader and shows in the hint line only while a tap is answered (guard's data-answer), never as a standing line. */
 .st-photos[data-inactive]>.st-photos-hint:not([data-answer]){position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -1433,7 +1450,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
    every state, so the drawer never jumps. Below it Born alive (Stepper count) and Report death; Report death is a level of the drawer. */
 /* The card is one surface (owner, 2026-11-02): the figure is the door to Litter details; under a divider the last save, with a quiet Undo
    beside it, never inside the door. The surface carries the border and fill so the door and the run share one box. */
-.farrowing-phone .alive-surface{margin:0 0 16px;border:1px solid var(--line);border-radius:20px;background:#f6f7f1;overflow:hidden}
+.farrowing-phone .alive-surface{margin:0 0 16px;border:1px solid var(--line);border-radius:20px;background:var(--paper);overflow:hidden}
 .farrowing-phone .alive-card{position:relative;display:block;width:100%;box-sizing:border-box;margin:0;padding:16px;border:0;border-radius:0;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
 .farrowing-phone .alive-card:active{background:#eef1e7}
 /* The last save as a run: "Saved 09:41 · G.H", its results on one line as quiet chips (no glyph: the word says it), Undo centred at the right. */
@@ -1543,10 +1560,13 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .task-perf-facts dd small{margin-left:3px;font:500 13px var(--font-sans);color:var(--muted)}
 @media(max-width:370px){.farrowing-phone .task-perf-card.st-panel{padding:18px 14px}.farrowing-phone .task-perf-kpis strong{font-size:32px}}
 /* Farrowing, the finished sow (owner, 2026-11-02). Her drawer: one card, a tappable card in a white drawer (SURFACES rule 6: white body,
-   1px line, a tinted head band with the finished line and Details), a ring of where the litter went; her actions in the bar. */
-.farrowing-phone .finished-card{display:block;width:100%;padding:0;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper);color:var(--ink);text-align:left;font:inherit}
-.farrowing-phone .finished-card:active{background:var(--press)}
-.farrowing-phone .finished-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--app-background);font:500 14px/1.4 var(--font-sans);color:var(--ink-2)}
+   1px line, a tinted head band with the most recent change and Details, or Undo for whoever saved it), a ring of where the litter went;
+   her actions in the bar. */
+.farrowing-phone .finished-card{overflow:hidden;border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper);color:var(--ink)}
+.farrowing-phone :is(.finished-card-head,.finished-card-body){width:100%;margin:0;border:0;color:inherit;text-align:left;font:inherit}
+.farrowing-phone .finished-card-body{background:var(--paper)}
+.farrowing-phone :is(button.finished-card-head,.finished-card-body):active{background:var(--press)}
+.farrowing-phone .finished-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--app-background);font:500 14px/1.4 var(--font-sans);color:var(--ink-2)}
 .farrowing-phone .finished-card-go{display:inline-flex;align-items:center;gap:2px;flex:none;font-weight:600;color:var(--ink)}
 .farrowing-phone .finished-card-go svg{width:15px;height:15px}
 .farrowing-phone .finished-card-body{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:center;padding:18px}
@@ -1601,30 +1621,26 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .finished-range{position:absolute;top:0;bottom:0;border-radius:7px;background:var(--handle)}
 .farrowing-phone .finished-dot{position:absolute;top:50%;z-index:1;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--paper)}
 .farrowing-phone .finished-avg{position:absolute;top:-6px;bottom:-6px;z-index:2;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--ink)}
-.farrowing-phone .finished-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:14px 0 0;padding-top:12px;border-top:1px solid var(--rule);font:500 13px/1.4 var(--font-sans);color:var(--ink)}
+.farrowing-phone .finished-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;margin:14px 0 0;padding-top:12px;border-top:1px solid var(--rule);font:500 13px/1.4 var(--font-sans);color:var(--ink)}
 .farrowing-phone .finished-legend>span{display:inline-flex;align-items:center;gap:6px}
 .farrowing-phone .finished-legend i{display:inline-block}
 .farrowing-phone .finished-legend [data-key="dot"]{width:12px;height:12px;border-radius:50%;background:var(--green)}
 .farrowing-phone .finished-legend [data-key="avg"]{width:3px;height:14px;border-radius:2px;background:var(--ink)}
 .farrowing-phone .finished-legend [data-key="range"]{width:18px;height:10px;border-radius:5px;background:var(--handle)}
 .farrowing-phone .finished-legend [data-key="born"]{width:12px;height:12px;border-radius:3px;background:var(--done-fill);box-shadow:inset 0 0 0 1px var(--done-mark)}
-.farrowing-phone .finished-legend [data-key="weaned"]{width:12px;height:12px;border-radius:3px;box-shadow:inset 0 0 0 2px var(--done-mark)}
+.farrowing-phone .finished-legend [data-key="weaned"]{width:12px;height:12px;border-radius:3px;background:var(--green)}
 .farrowing-phone .finished-legend [data-key="target"]{width:18px;border-top:2px dashed var(--ink-2)}
 .farrowing-phone .finished-none{margin:0;font:500 14px/1.5 var(--font-sans);color:var(--ink-2)}
-.farrowing-phone .finished-chart{position:relative;display:flex;align-items:flex-end;justify-content:space-around;height:140px;border-bottom:1px solid var(--line)}
-.farrowing-phone .finished-litter{display:flex;align-items:flex-end;gap:5px}
-.farrowing-phone .finished-litter i{position:relative;display:block;width:30px;border-radius:7px 7px 2px 2px}
-.farrowing-phone .finished-litter i b{position:absolute;left:0;right:0;top:8px;text-align:center;font:600 14px var(--font-mono)}
-.farrowing-phone .finished-litter [data-series="born"]{background:var(--done-fill);box-shadow:inset 0 0 0 1px var(--done-mark)}
-.farrowing-phone .finished-litter [data-series="born"] b{color:var(--done-fill-ink)}
-.farrowing-phone .finished-litter[data-now] [data-series="born"] b{color:var(--paper)}
-.farrowing-phone .finished-litter [data-series="weaned"]{background:var(--paper);box-shadow:inset 0 0 0 2px var(--done-mark)}
-.farrowing-phone .finished-litter [data-series="weaned"] b{color:var(--ink)}
-.farrowing-phone .finished-litter[data-now] [data-series="born"]{background:var(--green)}
-.farrowing-phone .finished-litter[data-now] [data-series="weaned"]{box-shadow:inset 0 0 0 2px var(--green)}
+.farrowing-phone .finished-chart{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;justify-items:center;align-items:end;height:150px;border-bottom:1px solid var(--line)}
+/* One bar per litter: born alive is the whole bar (the light part is what was lost before weaning), weaned (or alive now, this litter) the solid part. */
+.farrowing-phone .finished-litter{display:flex;align-items:flex-end}
+.farrowing-phone .finished-litter [data-series="born"]{position:relative;display:block;width:44px;border-radius:8px 8px 2px 2px;background:var(--done-fill);box-shadow:inset 0 0 0 1px var(--done-mark)}
+.farrowing-phone .finished-litter [data-series="born"]>b{position:absolute;left:0;right:0;bottom:100%;padding-bottom:4px;text-align:center;font:600 14px var(--font-mono);color:var(--ink)}
+.farrowing-phone .finished-litter [data-series="weaned"]{position:absolute;left:0;right:0;bottom:0;display:block;border-radius:8px 8px 2px 2px;background:var(--green)}
+.farrowing-phone .finished-litter [data-series="weaned"]>b{position:absolute;left:0;right:0;top:7px;text-align:center;font:600 14px var(--font-mono);color:var(--paper)}
 .farrowing-phone .finished-target{position:absolute;left:0;right:0;border-top:2px dashed var(--ink-2)}
-.farrowing-phone .finished-axis{display:flex;justify-content:space-around;margin:8px 0 0;font:600 13px var(--font-sans);color:var(--ink-2)}
-.farrowing-phone .finished-axis [data-now]{color:var(--ink)}
+.farrowing-phone .finished-axis{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;justify-items:center;margin:8px 0 0;font:500 13px var(--font-sans);color:var(--ink-2)}
+.farrowing-phone .finished-axis [data-now]{font-weight:600;color:var(--ink)}
 .farrowing-phone .finished-first{display:flex;gap:12px;align-items:center;padding:18px;border:1.5px dashed var(--control-border);border-radius:var(--radius-panel);color:var(--ink-2)}
 .farrowing-phone .finished-first svg{flex:none;width:22px;height:22px}
 .farrowing-phone .finished-first p{margin:0;font:500 14px/1.5 var(--font-sans)}
@@ -1667,3 +1683,30 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .litter-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .farrowing-phone .litter-head .st-heading{flex:1;min-width:0;margin:0}
 .farrowing-phone .litter-head{margin-bottom:8px}
+
+/* Farrowing drawers are the tint with white cards (owner, 2026-11-03: no white background anymore). Her chip sits on the tint, so it is
+   paper; the piglet condition rows and the death causes are each one white action card. */
+.farrowing-phone .sheet[data-st-context="menu"] .st-subject-chip{background:var(--paper);box-shadow:inset 0 0 0 1px var(--line)}
+.farrowing-phone :is(.finish-rows,.death-causes){padding:0 16px;border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper)}
+/* Undo in the log (owner, 2026-11-03): the top of her stack carries Undo, top right of its entry, a 44px text action. */
+.farrowing-phone .st-log-entry:has(>.st-log-extra>.log-undo){padding-right:88px}
+.farrowing-phone .st-log-extra:has(>.log-undo){position:absolute;top:calc((var(--tap-min) - 21px) / -2);right:0;margin:0}
+.farrowing-phone .log-undo{display:inline-flex;align-items:center;gap:6px;min-height:var(--tap-min);padding:0 0 0 12px;border:0;background:transparent;font:600 15px/1.5 var(--font-sans);color:var(--ink);touch-action:manipulation}
+.farrowing-phone .log-undo svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:var(--icon-stroke)}
+.farrowing-phone .log-undo:active{opacity:.6}
+/* A withdrawn line stays, struck through and quiet: it no longer counts. */
+.farrowing-phone .st-log-entry:has(.log-withdrawn) .st-log-title{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.farrowing-phone .st-log-entry:has(.log-withdrawn):before{background:var(--line)}
+.farrowing-phone .st-log-extra:has(>.log-withdrawn:only-child){display:none}
+/* Undo (owner, 2026-11-03): a tint dialog with one white ledger card: each figure Undo changes, now → after. */
+.farrowing-phone .dialog.undo-dialog{background:var(--app-background)}
+.farrowing-phone .undo-dialog>.sheet-footer{background:transparent}
+.farrowing-phone .undo-dialog .dialog-title{margin-bottom:var(--space-16)}
+.farrowing-phone .undo-ledger{list-style:none;margin:0;padding:0 var(--space-16);border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper)}
+.farrowing-phone .undo-ledger li{display:grid;grid-template-columns:1fr auto auto 2ch;align-items:center;gap:var(--space-8);min-height:52px;border-bottom:1px solid var(--rule);font:400 15px/1.4 var(--font-sans);color:var(--ink);font-variant-numeric:tabular-nums}
+.farrowing-phone .undo-ledger li:last-child{border-bottom:0}
+.farrowing-phone .undo-ledger s{text-decoration:none;color:var(--muted);text-align:right}
+.farrowing-phone .undo-ledger i{font-style:normal;color:var(--muted);text-align:center}
+.farrowing-phone .undo-ledger b{font:600 17px/1.4 var(--font-sans);color:var(--ink);text-align:right}
+/* On the tint drawer the card is white and its head band is white too, set off by its divider. */
+.farrowing-phone .sheet[data-st-context="menu"] .finished-card-head{background:var(--paper)}

@@ -100,6 +100,9 @@
   'use strict';
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   // String-id twin helpers. sa: attribute text for an id; tx: escaped text, wrapped in a span when an id is given.
+  /* A count of ticked items inside a door (owner, 2026-11-03, canvas B3): a green badge in the select-mark colour, before the
+     chevron; the description keeps its own words. Read as "N selected". */
+  const countBadge=n=>n?`<span class="st-count-badge"><span aria-hidden="true">${esc(n)}</span><span class="st-visually-hidden"${sa('ds.picker.selected',{n})}>${esc(n)} selected</span></span>`:'';
   const sa=(id,args)=>id?` data-str="${esc(id)}"${args&&Object.keys(args).length?` data-args="${esc(JSON.stringify(args))}"`:''}`:'';
   const tx=(text,o,key)=>{const id=o&&o.strs&&o.strs[key];return id?`<span${sa(id,o.args&&o.args[key])}>${esc(text)}</span>`:esc(text);};
   const has=(o,key)=>!!(o&&o.strs&&o.strs[key]);
@@ -193,7 +196,7 @@
     if(chip&&trailing)warn(card,'chip and trailing together: a row says one thing on the right; the chip wins');
     return chip?status(Object.assign({},chip,{className:'st-row-chip'})):'';
   }
-  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',trail='auto',attrs={},strs,args,code='',mono=false,chip=null,wrap=false,tight=false,id='',variant='',reason='',mark='',right=null,contextWidth=''}={}){
+  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',trail='auto',attrs={},strs,args,code='',mono=false,chip=null,wrap=false,tight=false,id='',variant='',reason='',mark='',right=null,contextWidth='',count=0}={}){
     const o={strs,args};
     variant=variant||(mark?'tick':code?'animal':trail==='edit'||(chip&&chip.kind==='done')?'record':icon?'navigation':attrs['aria-current']?'scope':'plain');
     if(disabled) description=reason||description||'Unavailable — try again later';
@@ -209,7 +212,7 @@
       return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="animal" data-animal="${a.kind}"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${safeAttr(attrs)}>${a.html}${railHtml}</${tag}>`;
     }
     const c=rowCopy({title,description,code,mono,tight,o,titleId:id?id+'-title':''});
-    return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="${esc(variant)}"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${rowMark(mark)}${icon&&!code&&variant==='navigation'?`<span class="st-row-icon">${icon}</span>`:''}${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,trailing,'Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,trailing,'Row')}${trailHtml}${railHtml}</${tag}>`;
+    return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="${esc(variant)}"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${rowMark(mark)}${icon&&!code&&variant==='navigation'?`<span class="st-row-icon">${icon}</span>`:''}${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,trailing,'Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,trailing,'Row')}${trailHtml}${countBadge(count)}${railHtml}</${tag}>`;
   }
   /* rowSelect: the select + door variant without the door (a select-only list): the whole row is a <label>, leading box. Payload is change-only: rowSelectChange(event) → { value, checked }. */
   /* right: an animal's right side (state or tags, as Row · Animal), for a list that only chooses animals (Actions for several sows). */
@@ -361,7 +364,7 @@
     const visible=q?leaves(scope).filter(n=>[n.label,n.group||'',...n.trail,...(n.aliases||[])].join(' ').toLocaleLowerCase().includes(q)):cascade?nodes:leaves(items);
     const count=n=>leaves([n]).filter(x=>selected.includes(x.value)).length;
     const rows=visible.map(n=>{
-      const row=choiceRow({label:n.label,meta:n.children?(multi&&count(n)?count(n)+' selected':''):q?n.trail.join(' › '):n.meta||'',mode:n.children?'navigate':multi?'multi':'single',action:n.children||!multi?action:'',value:n.value,selected:selected.includes(n.value),disabled:!!n.disabled,reason:n.reason||'',attrs:n.attrs||{},strs:{...n.strs,...(n.children&&multi&&count(n)?{meta:'ds.picker.selected'}:{})},args:{...n.args,...(n.children&&multi&&count(n)?{meta:{n:count(n)}}:{})}});
+      const row=choiceRow({label:n.label,meta:n.children?(n.meta||''):q?n.trail.join(' › '):n.meta||'',mode:n.children?'navigate':multi?'multi':'single',action:n.children||!multi?action:'',value:n.value,selected:selected.includes(n.value),disabled:!!n.disabled,reason:n.reason||'',attrs:n.attrs||{},count:n.children&&multi?count(n):0,strs:n.strs,args:n.args});
       const extra=n.secondaryAction?`<div class="st-choice-extra">${button({label:n.secondaryAction.label,action:n.secondaryAction.action,value:n.value,register:'text',attrs:{'aria-label':n.secondaryAction.label+' '+n.label}})}</div>`:'';
       return row+extra;
     });
@@ -403,7 +406,7 @@
      nested = navigate rows, then a leaf list (flat or sectioned) under a new sheet title.
      Row geometry never varies: label, optional meta line, one trailing slot on the right.
      mode: 'navigate' (chevron), 'single' (check when selected), 'multi' (checkbox). */
-  function choiceRow({label='',meta='',mode='single',action='',value='',selected=false,attrs={},className='',mono=false,tabindex=null,disabled=false,reason='',pressed=false,strs,args}={}){
+  function choiceRow({label='',meta='',mode='single',action='',value='',selected=false,attrs={},className='',mono=false,tabindex=null,disabled=false,reason='',pressed=false,count=0,strs,args}={}){
     if(reason)meta=meta?meta+' · '+reason:reason;
     const o={strs,args};
     attrs={...attrs,...(disabled?{'aria-disabled':'true'}:{}),...(pressed?{'data-preview':'pressed'}:{})};
@@ -414,7 +417,7 @@
     if(mode==='multi')return `<label class="st-choice-row ${esc(className)}" data-ds="ChoiceList" data-mode="multi"${disabled?' aria-disabled="true"':''}${pressed?' data-preview="pressed"':''}>${copy}<span class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${selected?' checked':''}${disabled?' disabled':''}${extra}></span></label>`;
     const trail=mode==='navigate'?chevron:selected?check:'';
     const state=mode==='single'?` aria-pressed="${selected?'true':'false'}"`:'';
-    return `<button type="button" class="st-choice-row ${esc(className)}" data-ds="ChoiceList" data-mode="${mode==='navigate'?'navigate':'single'}" data-action="${esc(action)}" data-value="${esc(value)}"${state}${extra}>${copy}<span class="st-choice-trail" aria-hidden="true">${trail}</span></button>`;
+    return `<button type="button" class="st-choice-row ${esc(className)}" data-ds="ChoiceList" data-mode="${mode==='navigate'?'navigate':'single'}" data-action="${esc(action)}" data-value="${esc(value)}"${state}${extra}>${copy}${mode==='navigate'?countBadge(count):''}<span class="st-choice-trail" aria-hidden="true">${trail}</span></button>`;
   }
   // lead: optional control between heading and panel (e.g. a segment that filters only this group).
   // radio (candidate, ADR 0002): the panel is the radiogroup, labelled by the heading.
