@@ -19,17 +19,16 @@ is the only point where someone stops anyway, because the pigs have to be put so
    they are in transit).
 3. **The destination records once, by exception.** What has to be recorded depends on whether the pigs have IDs:
    - **Pigs without ID** (piglets, growers): count each pen. Designed: the task page with the unit's pen map, tap a pen, count.
-   - **Pigs with ID** (sows, gilts): the plan already says which sow goes to which pen or crate, so receiving is confirming it.
-     Each pen or the whole room is confirmed with one *All here*; only a difference is recorded (scan a sow into a different
-     crate; tick one who didn't come). A crate map shows each crate's sow; a big group pen (dozens of sows on electronic
-     feeders) is confirmed as one pen, never sow by sow.
+   - **Pigs with ID** (sows, gilts): a batch goes out together and each sow takes whichever crate or pen she reaches first
+     (owner, 2026-11-03), so there is no sow-by-sow plan to confirm. Receiving locates them: *Scan* in the dock keeps the pen map
+     on screen; scan one sow or a batch, they gather in the footer, tap the pen or crate they are in and they are in it.
 4. **It ends on End task**: Received, Not arrived (opens: without ID as a number, with ID in the With ID picker, Move to).
 
 ## Questions
 
 1. The source records nothing; pigs leave its record when received. **Ruled (owner, 2026-11-03): moving out is nothing, just a list
-   to show them.** Each pen says *Move all* or *Move 12* in words; no icon, no 12/13, no key, no list of pigs that stay.
-2. Sows and gilts are received by exception (*All here* per pen, scan only a difference), never counted. *Recommend: yes.* Open.
+   to show them.** A pen that empties says *All*; a pen moving some says *12/13*, the 12 that move big; no icon, no key, no list of pigs that stay.
+2. ~~Sows received by exception against a sow-by-sow plan.~~ Withdrawn (owner, 2026-11-03): farms move a batch at once and sows take any crate; sows are scanned into where they are (above).
 3. Moving into farrowing is its own Transfer task. **Ruled (owner, 2026-11-03): yes; transfer tasks and their triggers are set up in
    the Console.** How farms automate moves (where to and when, by date or by a change in a pig's status) gets its own doc later;
    for now only the phone side is designed.
