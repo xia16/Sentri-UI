@@ -1,0 +1,129 @@
+{
+  "_": "One meaning per icon. Reuse an icon anywhere its meaning applies (owner, 2026-11-03), but never repeat one icon across the sections of the same page. status: new = drawn this round, redrawn = same name, new shape, kept = unchanged. Uses are the screens after the swaps in swaps.json.",
+  "groups": [
+    [
+      "Animals",
+      [
+        ["pig", "redrawn", "A pig of any kind or age: sow, gilt, boar, piglet. The word says which", "Parity facet; Report death: The sow; actions: Piglet processing, Foster piglets; + born chip; Pig profile: General details, Basic information; Home: Piglet processing task, Nursery section; Foster piglets row; condition picker: On these pigs"],
+        [
+          "batch",
+          "new",
+          "A batch: pigs managed together (\"Batch 27\"). Borderline in the blind test: reads as a stack, fine beside the word",
+          "Move to another farrowing batch; Pig actions: Batch membership; Pig profile: Batches"
+        ],
+        ["missing", "new", "A missing pig (a dashed circle with a question mark, no pig)", "Drawn for Report missing (no screen yet)"]
+      ]
+    ],
+    [
+      "Events",
+      [
+        ["service", "new", "Service (breeding, insemination)", "Home: Breeding section and task; Pig profile: Sow cycle, Gilt breeding, Boar breeding, Sow & cycle"],
+        ["heat", "kept", "Heat check", "Home: Heat check tasks"],
+        ["return-heat", "new", "Return-heat check", "Home: Return-heat check task"],
+        ["pregnancy", "kept", "Pregnancy: the check, abortion, not in pig", "Home: Gestation, Pregnancy check; Actions: Record abortion, Mark not in pig"],
+        ["farrow", "redrawn", "Farrowing: a sow lying down, a piglet at her belly. Borderline in the blind test", "Home: Farrowing section and task; Pig actions: Open Farrowing"],
+        ["death", "new", "A death", "Farrowing: Death key, Died after birth, − died chip; Actions: Record piglet deaths, Record sow death, Record dead"],
+        ["transfer", "kept", "Moving or transferring pigs to another pen or room (generic)", "Actions: Transfer; Home: Pig transfer tasks; Home: Other"],
+        ["truck", "new", "Pigs leaving the farm", "Home: Outbound pickups"],
+        ["sample", "new", "Sampling", "Home: Sampling tasks"],
+        ["count", "new", "A count of animals", "Farrowing actions: Reconcile piglet count"],
+        ["production", "kept", "Production work (bars; chart no longer shares the shape)", "Home: Production heading; Pig profile: production tasks; Pig actions: Production"]
+      ]
+    ],
+    [
+      "Records",
+      [
+        ["record", "redrawn", "A record or summary of what was done", "Litter summary, Task outcomes, Other outcomes, Pig record, Batches, Task overview"],
+        ["note", "redrawn", "A note someone wrote", "Pen note, sow note, Add a note, Details (other cause)"],
+        ["history", "new", "Past records, the log", "Home: Records; Pig profile: Log; Pen log; walk Log; Past uploads"],
+        ["tasks", "new", "A list of tasks", "Pig profile: Current tasks"],
+        ["chart", "redrawn", "Performance over time", "Performance metrics, Averages, Base curve, Production totals & averages, Production stats"],
+        ["edit", "kept", "Edit", "Edit conditions, Edit finding, correction banner"],
+        ["undo", "new", "Undo the last save (was return)", "Farrowing: Undo"],
+        ["camera", "kept", "Photos", "Photos field"],
+        ["calendar", "kept", "A date", "Expected farrowing; first-litter placeholder"],
+        ["clock", "kept", "Time or due", "Header times; Home task timing"],
+        ["details", "kept", "More detail fields (sliders)", "Piglet processing end page"],
+        ["bookmark", "kept", "Mark a pig: breeder pick, Mark as breeder", "Piglet processing; Mark as breeder"]
+      ]
+    ],
+    [
+      "Places",
+      [
+        ["barn", "kept", "A building on the farm", "Sections"],
+        ["pen", "new", "A pen", "Pen page: Now; fault pen rows; Pen information"],
+        ["grid", "kept", "The pen map, and a unit", "Dock map; Choose a unit; unit rows"],
+        ["place", "kept", "Where something is (location pin)", "Scope label, Origin & dates, task-card scope"],
+        ["home", "kept", "Home tab", "Bottom navigation"],
+        ["hospital", "kept", "Hospital pen", "Care instructions: Move to hospital pen"]
+      ]
+    ],
+    [
+      "Health",
+      [
+        ["health", "kept", "Health", "Home: Health heading and signals; Actions page: Health"],
+        ["care", "kept", "Care instructions", "Care instructions (actions, batch tiles); To-treat filter: Care"],
+        ["treat", "kept", "Treatment, vaccines", "Treat tiles, To treat, Record treatment"],
+        ["pill", "kept", "Medicine: antibiotics, pain relief", "Medicine categories (antibiotics, pain relief); medicine picker groups; no-brand state"],
+        ["bug", "kept", "Parasites", "Medicine categories"],
+        ["drop", "kept", "Vitamins; udder", "Medicine categories, udder area"],
+        ["monitor", "kept", "Monitoring", "Monitoring list, Observe"],
+        ["alert", "kept", "Needs attention", "Warnings, Care"],
+        ["lungs", "kept", "Breathing area", "Condition areas"],
+        ["head", "kept", "Head area", "Condition areas"],
+        ["skin", "kept", "Skin area", "Condition areas"],
+        ["leg", "kept", "Legs area", "Condition areas"],
+        ["tail", "kept", "Rear area", "Condition areas"],
+        ["gut", "kept", "Gut", "Condition areas, diseases"],
+        ["repro", "kept", "Reproductive system; hormones", "Condition areas, medicine categories"],
+        ["bone", "kept", "Bones and joints", "Condition areas"],
+        ["trend-down", "kept", "Falling (appetite)", "Inspection: Poor appetite"]
+      ]
+    ],
+    [
+      "Farm and measures",
+      [
+        ["feed", "kept", "Feed", "Feed tiles, Feeding"],
+        ["weight", "kept", "Weight", "Weight measure"],
+        ["measure", "kept", "Measurements", "Measurements & condition, Record body condition, Record backfat"],
+        ["temperature", "kept", "Temperature", "Sensors, measure"],
+        ["humidity", "kept", "Air humidity", "Sensors"],
+        ["air", "kept", "Ventilation reading", "Sensors"],
+        ["fan", "new", "A fan (a device)", "Home unit: fan controls"],
+        ["wrench", "kept", "A fault, maintenance", "Report fault, Maintenance"],
+        ["toolbox", "kept", "Toolbox tab", "Bottom navigation"],
+        ["spark", "kept", "Assistant", "Assistant"],
+        ["tag", "kept", "Ear tag and identity marks", "Tag chips, Identity records, Ear notch"],
+        ["tag-off", "kept", "No ear tag", "Untagged pigs"]
+      ]
+    ],
+    [
+      "Controls",
+      [
+        ["back", "kept", "Back (arrow)", "Unused; kept for page back"],
+        ["back-chevron", "kept", "Back (chevron); up is now its alias", "Page back buttons"],
+        ["chevron", "kept", "Opens more", "Rows, doors"],
+        ["down", "kept", "Opens a picker", "Pickers, section switcher"],
+        ["arrow-down", "kept", "Sort or move down", "Bundle"],
+        ["close", "kept", "Close or remove", "Drawers, Remove from batch"],
+        ["check", "kept", "Done or selected", "Checks"],
+        ["plus", "kept", "Add (condition is its alias)", "Add, Condition"],
+        ["minus", "kept", "Subtract", "Stepper, born dead"],
+        ["search", "kept", "Search", "Search"],
+        ["scan", "kept", "Scan an ear tag", "Scan"],
+        ["filter", "kept", "Filters", "Filter buttons"],
+        ["more", "kept", "More actions: every Actions button and ··· menu", "Actions buttons (Farrowing, Inspection, pig profile, scan footer); ··· icon buttons"],
+        ["info", "kept", "How to read this", "Schedule key"],
+        ["link", "kept", "A link", "Unused"],
+        ["send", "kept", "Send a message", "Assistant send"],
+        ["upload", "kept", "Records waiting to upload", "Header sync"],
+        ["offline", "kept", "No signal", "Toasts"],
+        ["stop", "kept", "Stop scanning", "Scan"],
+        ["backspace", "kept", "Delete the last digit", "Numpad"],
+        ["profile", "kept", "A person (a worker)", "No pig uses it after this round"],
+        ["signal", "kept", "Phone signal (status bar only)", "Status bar"],
+        ["battery", "kept", "Battery (status bar only)", "Status bar"]
+      ]
+    ]
+  ]
+}

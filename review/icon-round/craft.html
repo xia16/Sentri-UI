@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Icon craft grid</title>
+<link rel="stylesheet" href="../../ux/design-system/tokens.css">
+<style>
+body{margin:0;padding:16px;font-family:var(--font-sans);color:var(--ink);background:#fff}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.cell{display:flex;flex-direction:column;align-items:center;gap:6px}
+.big{width:120px;height:120px;background-image:linear-gradient(#e7ebe3 1px,transparent 1px),linear-gradient(90deg,#e7ebe3 1px,transparent 1px);background-size:5px 5px;outline:1px solid #cfd6ca}
+.big svg{width:120px;height:120px}
+.pad{position:relative}.pad::after{content:'';position:absolute;inset:10px;outline:1px dashed #e0a4a4}
+svg{fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round;display:block}
+.sizes{display:flex;gap:10px;align-items:center}
+.s16{width:16px;height:16px}.s18{width:18px;height:18px}.s20{width:20px;height:20px}.s24{width:24px;height:24px}
+small{font-size:13px}
+</style>
+<body><div class="grid" id="g"></div>
+<script src="../../ux/design-system/components/bundle.js"></script>
+<script src="icons.js"></script>
+<script>
+const q=new URLSearchParams(location.search),only=(q.get('names')||'').split(',').filter(Boolean);
+const P=Object.assign({},SentriIcons.paths,SentriIconsNext.cut,SentriIconsNext.trial,SentriIconsNext.paths);
+const names=only.length?only:Object.keys(SentriIconsNext.paths);
+const svg=(d,c)=>`<svg viewBox="0 0 24 24" class="${c}"><path d="${d}"/></svg>`;
+document.getElementById('g').innerHTML=names.map(n=>`<div class="cell"><div class="big pad">${svg(P[n],'')}</div><div class="sizes">${['s16','s18','s20','s24'].map(c=>svg(P[n],c)).join('')}</div><small>${n}</small></div>`).join('');
+</script></body></html>
