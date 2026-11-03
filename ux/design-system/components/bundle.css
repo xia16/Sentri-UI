@@ -700,8 +700,18 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-picker-field.error .st-picker-hint{color:var(--red)}
 .st-choice-label,.st-choice-meta{overflow-wrap:anywhere;white-space:normal}
 .st-choice-row[data-mode="single"] .st-choice-trail{color:var(--ink)}
-/* A ticked multi-select box is green with a white tick (select-mark, owner 2026-11-03); its row stays white. */
-.st-choice-trail input[type="checkbox"]{accent-color:var(--select-mark)}
+/* A ticked multi-select box is green with a white tick (select-mark, owner 2026-11-03); its row stays white. The box is drawn here,
+   not left to the browser: a native box with accent-color darkens under the pointer and after a tap, so two ticked boxes showed two
+   greens (owner, 2026-11-03). Every checkbox in the system takes this face; hosts set only its size. */
+input[type="checkbox"]{appearance:none;-webkit-appearance:none;display:inline-flex;align-items:center;justify-content:center;flex:none;box-sizing:border-box;border:1.5px solid var(--muted);border-radius:var(--radius-4);background:var(--paper);cursor:pointer}
+input[type="checkbox"]:checked{border-color:var(--select-mark);background:var(--select-mark)}
+input[type="checkbox"]:checked::before{content:'';width:28%;height:52%;margin-top:-12%;border:solid var(--paper);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+input[type="checkbox"]:disabled{border-color:var(--control-border);background:var(--disabled-fill);cursor:default}
+input[type="checkbox"]:disabled:checked{border-color:var(--control-border);background:var(--control-border)}
+/* The count of ticked items inside a door (Row, ChoiceList navigate; owner 2026-11-03, canvas B3): the box's green, before the chevron. */
+.st-count-badge{flex:none;display:inline-grid;place-items:center;min-width:var(--size-22);height:var(--size-22);padding:0 var(--space-6);margin-left:auto;box-sizing:border-box;border-radius:var(--radius-11);background:var(--select-mark);color:var(--paper);font:600 var(--font-size-13)/1 var(--font-sans);font-variant-numeric:tabular-nums}
+.st-row .st-count-badge{margin-right:var(--space-8)}
+.st-choice-row .st-count-badge{margin-left:var(--space-8)}
 .st-choice-row[data-mode="multi"]:has(:checked) .st-choice-label{font-weight:var(--type-weight-strong)}
 .st-picker-value.is-names{display:flex;align-items:baseline;gap:var(--space-6);white-space:normal;overflow:visible}
 .st-picker-names{min-width:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}

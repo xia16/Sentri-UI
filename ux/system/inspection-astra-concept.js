@@ -338,7 +338,7 @@ function catalogItem(c,item){ if(c.view==='record-optional'&&c.form.optionalKey=
  if(item.custom)details.push('Custom · '+item.group);if(existing)details.push('Already on '+existing+' selected');
  return SentriUI.choiceRow({label:item.name,meta:details.join(' · '),mode:'multi',selected:f.conditions.includes(item.name),attrs:{'data-condition':item.name,'data-condition-kind':item.kind}})+(item.custom?button('health-remove-custom','Remove custom '+item.kind.toLowerCase()+' '+esc(item.name),'st-text-action',item.name):'');
 }
-function catalogDoor(c,action,label,value,items,type){const selected=items.filter(item=>c.form.conditions.includes(item.name)).length;return SentriUI.choiceRow({label,meta:items.length+' '+(type||'options')+' · '+selected+' selected',mode:'navigate',action,value});}
+function catalogDoor(c,action,label,value,items,type){const selected=items.filter(item=>c.form.conditions.includes(item.name)).length;return SentriUI.choiceRow({label,meta:items.length+' '+(type||'options'),count:selected,mode:'navigate',action,value});}
 
 function catalogPath(label,context){return '<div class="catalog-path">'+ib('health-catalog-back','back','Back to categories').replace('icon-button','icon-button catalog-path-back')+'<span><strong>'+esc(label)+'</strong></span></div>';}
 
@@ -1151,7 +1151,7 @@ function conditionRootGroups(c){
  const symptoms=tree.filter(n=>n.value.startsWith('g:')),systems=tree.filter(n=>n.value.startsWith('s:'));
  /* Owner, 2026-10-19: Actions-style rows in the drawer's ChoiceList card: an icon tile, the area, and a line of examples
     ("1 selected" once something inside is ticked). Diseases sit right under Symptoms; a row opens its level in one tap. */
- const row=n=>{const k=leaves(n).filter(v=>f.conditions.includes(v)).length,[ic,ex]=CONDITION_AREA[n.value]||['health',''];return stRow({action:'condition-level',value:n.value,title:n.label,description:k?str('ds.picker.selected',{n:k}):ex,icon:icon(ic),className:'action-item condition-area-row'});};
+ const row=n=>{const k=leaves(n).filter(v=>f.conditions.includes(v)).length,[ic,ex]=CONDITION_AREA[n.value]||['health',''];return stRow({action:'condition-level',value:n.value,title:n.label,description:ex,count:k,icon:icon(ic),className:'action-item condition-area-row'});};
  return SentriUI.choiceGroup(symptoms.map(row),{title:'Symptoms',icon:'health'})+SentriUI.choiceGroup(systems.map(row),{title:'Diseases',icon:'care'});
 }
 /* The first level's areas: their icon and the examples that say what is inside. */
@@ -2021,14 +2021,15 @@ function sheet(c,title,scope,body,actions,surface='',line=null,corner=null){
     drawer, the footer's Back goes up one level. No "‹ Parent", no breadcrumb. */
  const lv=levels(c,title);let cross=null,holdRows=0;
  if(lv){title=lv.title;cross=lv.cross;holdRows=lv.rows||0;}
- const picker=['bulk-health-picker','medicine-picker','picker','record-optional'].includes(c.view),page=AstraSurfaces.isPage('inspection',c.view,c);
+ const page=AstraSurfaces.isPage('inspection',c.view,c),tinted=!page&&['bulk-health-picker','medicine-picker','picker','record-optional','brand-picker','medicine-sheet','finding','finding-edit','finding-close','triage','edit-conditions','resolve'].includes(c.view);
  const wantBack=!(c.view==='record-optional'&&c.form.optionalKey==='target');
  const nav=actions||'';
  const above=(c.view==='pig-log'?logFilterBar(c,pigLogEntries(c),'pig'):c.view==='pen-log'?logFilterBar(c,penLogEntries(c,c.penId),'pen'):'');
  let foot=nav||(wantBack&&!page?SentriUI.sheetFooter({back:{action:'back'}}):false);
  if(page&&foot){foot=foot.replace(back(),'');if(!/<button/.test(foot))foot=false;}
- /* A picker is the tint with white cards, as every drawer will be (owner, 2026-11-03: one surface convention; Medicines is the reference). */
- return SentriUI.sheet({variant:page?'page':'drawer',surface:surface||(picker?'menu':''),title,line,corner,cross,back:{action:'back'},above,body,footer:foot,className:c.view==='actions'?'actions-sheet':'',size:drawerSize(c.view,c),sizing:['search','scan','grid'].includes(c.view)||c.view==='record-optional'&&c.form.optionalKey==='target'?'full':holdRows?'hold':'content',holdRows,label:title,scrim:{action:'dismiss',label:'Dismiss '+title},bar:page?status():''});
+ /* The health and treatment drawers are the tint with white cards, as every drawer will be (owner, 2026-11-03: one surface convention;
+    Medicines is the reference; Conditions and Medicines ship first, the rest in the full sweep). */
+ return SentriUI.sheet({variant:page?'page':'drawer',surface:surface||(tinted?'menu':''),title,line,corner,cross,back:{action:'back'},above,body,footer:foot,className:c.view==='actions'?'actions-sheet':'',size:drawerSize(c.view,c),sizing:['search','scan','grid'].includes(c.view)||c.view==='record-optional'&&c.form.optionalKey==='target'?'full':holdRows?'hold':'content',holdRows,label:title,scrim:{action:'dismiss',label:'Dismiss '+title},bar:page?status():''});
 }
 function back(){return SentriUI.backButton({action:'back'});}
 /* Header lines (features/pig-profile/budget.md ## Headers): a surface that writes to or is about one pig shows that pig on screen
