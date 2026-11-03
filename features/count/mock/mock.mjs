@@ -340,7 +340,8 @@ const PLAN_CSS = `
   .m-count .m-plankey .m-k-plan{background:#fff;border:1.5px solid var(--ink,#20291f);box-sizing:border-box}
   .m-count .m-plankey{display:flex;gap:16px;font-size:13px;color:var(--ink,#20291f);margin:2px 0 14px}.m-count .m-plankey i{display:inline-block;width:12px;height:12px;border-radius:4px;vertical-align:-1px;margin-right:6px}
   .m-count .m-over{margin:0 0 12px}.m-count .m-over > *{max-width:none;white-space:nowrap}
-  .m-count .m-plankey b{font-family:var(--font-mono,'IBM Plex Mono',monospace)}`;
+  .m-count .m-plankey b{font-family:var(--font-mono,'IBM Plex Mono',monospace)}
+  .m-count .m-map .st-pen-grid{--pm-label:0px;margin-left:calc(-1 * var(--pm-gap));min-width:calc(100% + var(--pm-gap))}.m-count .m-map .st-pen-row:not(.st-pen-col){visibility:hidden}`;
 async function receiveMap(name, opts) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
@@ -363,8 +364,8 @@ async function receiveMap(name, opts) {
   await shoot(p, name);
 }
 const bar = (n, of, word, segs) => `<div class="m-recv-bar"><div class="m-recv-figs"><strong>${n}</strong><span>${word}</span></div><div class="m-recv-track" data-status-part="bar">${segs}</div><small>${of}</small></div>`;
-// Receiving is a task page like Farrowing's room (owner, 2026-11-03): one header, the task card (this unit, and the task overview
-// across units, where the crew switches unit and ends the task); the unit's pen map below. Every pen shows pigs in it over its
+// Receiving is the unit's pen map, full screen (owner, 2026-11-03, replacing the task card): the header, the legend and the pens;
+// Scan is the only control. Every pen shows pigs in it over its
 // capacity (0/15); the planned pens are outlined, a suggestion only; tap any pen to count it. Batch 25: 120 pigs to Unit 9 (planned
 // A1–A4, B1–B2) and Unit 10 (30, done). Run from a checkout that has Farrowing's room page.
 async function taskMap(name, o) {
@@ -375,7 +376,7 @@ async function taskMap(name, o) {
     const U = window.SentriUI;
     const titles = document.querySelector('.st-page-titles');
     titles.children[0].textContent = o.title; if (titles.children[1]) titles.children[1].textContent = o.line;
-    document.querySelector('.room-context-strip').innerHTML = window.AstraTaskOverview.render({ headingIcons: true, unit: o.unit, task: o.task });
+    document.querySelector('.room-context-strip')?.remove();
     document.querySelector('.room-controls')?.remove();
     const pens = {}; for (const c of Object.keys(o.tiles)) pens[c] = 'plain';
     const host = document.createElement('div'); host.innerHTML = U.penMap({ lanes: o.lanes, depth: o.depth, rows: o.rows, pens, entrance: 'Entrance', key: 'recv' });
@@ -387,8 +388,13 @@ async function taskMap(name, o) {
     });
     const list = document.querySelector('.room-list'); list.classList.add('m-count');
     list.innerHTML = o.key + '<div class="m-map">' + host.innerHTML + '</div>';
+    let dock = null; for (let d = document.querySelector('[data-action="room-scan"]'); d && d !== document.body; d = d.parentElement) if (/dock/i.test(d.className)) dock = d;
+    if (!o.scan) {
+      const foot = document.createElement('div'); foot.className = 'sheet-footer st-scan-foot'; foot.dataset.ds = 'Sheet';
+      foot.innerHTML = U.button({ label: 'Scan', icon: window.SentriIcons.icon('scan'), register: 'primary', className: 'st-scan-toggle', action: 'x' });
+      dock.replaceWith(foot);
+    }
     if (o.scan) {
-      let dock = null; for (let d = document.querySelector('[data-action="room-scan"]'); d && d !== document.body; d = d.parentElement) if (/dock/i.test(d.className)) dock = d;
       const read = o.scan.read;
       // Scan starts in the dock, so the footer owns it, as on Farrowing's Scan page (owner, 2026-11-03: not a bar at the top): Stop scanning
       // while listening; with pigs read, the count and the tags, and Clear (the action is tapping their pen).
@@ -400,8 +406,6 @@ async function taskMap(name, o) {
       dock.replaceWith(foot);
       if (o.scan.toast) { const t = document.createElement('div'); t.className = 'm-toast'; t.innerHTML = U.toast(o.scan.toast, { tone: 'done' }); foot.append(t); }
     }
-    const walk = document.createTreeWalker(document.querySelector('.st-task-dock, [data-ds="TaskDock"]') || document.body, NodeFilter.SHOW_TEXT);
-    while (walk.nextNode()) if (walk.currentNode.nodeValue.trim() === 'Pen map') walk.currentNode.nodeValue = 'Pen list';
     const st = document.createElement('style'); st.textContent = PLAN_CSS + '.m-count .m-scanbar{margin:0 0 14px}.m-scanfoot{display:flex;align-items:center;justify-content:space-between;gap:12px}.m-scanfoot .m-left strong{display:block;font-size:15px}.m-scanfoot .m-left small{display:block;font-size:13px;color:var(--muted,#657060)}.m-scanfoot{position:relative}.m-toast{position:absolute;left:0;right:0;bottom:calc(100% + 12px);z-index:5;--toast-bottom:0px}'
       + '.room-list.m-count{padding-bottom:24px}.m-count .m-map .st-pen-tile{position:relative;overflow:hidden}' // the fill line only where room matters: pens not counted
       + '.m-count .m-fill{position:absolute;left:12px;right:12px;bottom:8px;height:4px;border-radius:2px;background:var(--handle,#dce0d4)}'
