@@ -11,22 +11,26 @@ const card = '[data-card="0"] ';
 
 // Each shot: a preset, then taps ({act, value}), typing ({type}), slider moves ({range: [index, value]}) or demo reads ({read: n}).
 const shots = {
-  'new-allocate': { preset: 'allocate' },
-  'new-pick': { preset: 'allocate-pick' },
-  'new-sow': { preset: 'allocate-foster' },
-  'new-confirm': { preset: 'allocate-confirm' },
-  'new-after': { preset: 'allocate-after' },
-  'new-pen': { preset: 'allocate-pen' },
-  'new-scan': { preset: 'allocate', steps: [{ act: 'fosterIdScan' }, { read: 3 }] },
-  'new-split': { preset: 'allocate-after', steps: [{ act: 'fosterId', value: '399003' }, { act: 'fosterId', value: '399004' }, { act: 'allocToPen' }, { act: 'allocPen', value: '7|B1' }] },
-  'alloc-filter': { preset: 'allocate-filter' },
+  'p-dead': { preset: 'allocate' },
+  'p-finished': { preset: 'locked' },
+  'p-list': { preset: 'piglets-dead' },
+  'p-ticked': { preset: 'piglets-ticked' },
+  'p-count': { preset: 'piglets-count' },
+  'p-actions': { preset: 'piglets-actions' },
+  'p-sow': { preset: 'piglets-sow' },
+  'p-confirm': { preset: 'piglets-confirm' },
+  'p-after': { preset: 'piglets-after' },
+  'p-pen': { preset: 'piglets-pen' },
+  'p-live': { preset: 'piglets-live' },
+  'p-scan': { preset: 'piglets-dead', steps: [{ act: 'fosterIdScan' }, { read: 2 }] },
+  'alloc-filter': { preset: 'piglets-filter' },
   'foster': { preset: 'foster' },
   'foster-on': { preset: 'foster-receive' },
   'foster-send': { preset: 'foster-send' },
   'foster-tag': { preset: 'foster', steps: [{ type: '43' }] },
   'room-filter': { preset: 'room', steps: [{ act: 'room-filter' }] },
   'room-filter-narrow': { preset: 'room', steps: [{ act: 'room-filter' }, { range: [0, -2] }, { range: [1, 1] }, { range: [2, 2] }, { range: [3, 5] }] },
-  'foster-filter-unit8': { preset: 'allocate-filter', steps: [{ act: 'fosterUnit', value: '8' }] },
+  'foster-filter-unit8': { preset: 'piglets-filter', steps: [{ act: 'fosterUnit', value: '8' }] },
 };
 
 const browser = await chromium.launch();
