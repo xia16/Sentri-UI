@@ -4,7 +4,7 @@
     [
       "Animals",
       [
-        ["pig", "redrawn", "A pig of any kind or age: sow, gilt, boar, piglet. The word says which", "Parity facet; Report death: The sow; actions: Piglet processing, Foster piglets; + born chip; Pig profile: title, General details, Basic information, Sow & cycle; Home: Piglet processing task, Nursery section"],
+        ["pig", "redrawn", "A pig of any kind or age: sow, gilt, boar, piglet. The word says which", "Parity facet; Report death: The sow; actions: Piglet processing, Foster piglets; + born chip; Pig profile: General details, Basic information; Home: Piglet processing task, Nursery section"],
         [
           "batch",
           "new",
@@ -17,12 +17,12 @@
     [
       "Events",
       [
-        ["service", "new", "Service (breeding, insemination)", "Home: Breeding section, Breeding task"],
+        ["service", "new", "Service (breeding, insemination)", "Home: Breeding section and task; Pig profile: Sow cycle, Gilt breeding, Boar breeding, Sow & cycle"],
         ["heat", "kept", "Heat check", "Home: Heat check tasks"],
         ["return-heat", "new", "Return-heat check", "Home: Return-heat check task"],
         ["pregnancy", "kept", "Pregnancy: the check, abortion, not in pig", "Home: Gestation, Pregnancy check; Actions: Record abortion, Mark not in pig"],
         ["farrow", "redrawn", "Farrowing: a sow lying down, a piglet at her belly. Borderline in the blind test", "Home: Farrowing section and task; Pig actions: Open Farrowing"],
-        ["death", "new", "A death", "Farrowing: Death key, Died after birth, − died chip; Actions: Record piglet deaths, Record sow death"],
+        ["death", "new", "A death", "Farrowing: Death key, Died after birth, − died chip; Actions: Record piglet deaths, Record sow death, Record dead"],
         ["transfer", "kept", "Moving or transferring pigs to another pen or room (generic)", "Actions: Transfer; Home: Pig transfer tasks; Home: Other"],
         ["truck", "new", "Pigs leaving the farm", "Home: Outbound pickups"],
         ["sample", "new", "Sampling", "Home: Sampling tasks"],
@@ -52,7 +52,7 @@
       [
         ["barn", "kept", "A building on the farm", "Sections"],
         ["pen", "new", "A pen", "Inspection: fault pen rows"],
-        ["grid", "kept", "The pen map, a unit, and the Actions button", "Dock map; Choose a unit; Actions buttons"],
+        ["grid", "kept", "The pen map, and a unit", "Dock map; Choose a unit; unit rows"],
         ["place", "kept", "Where something is (location pin)", "Scope label, Origin & dates"],
         ["home", "kept", "Home tab", "Bottom navigation"],
         ["hospital", "kept", "Hospital pen", "Care instructions: Move to hospital pen"]
@@ -112,7 +112,7 @@
         ["search", "kept", "Search", "Search"],
         ["scan", "kept", "Scan an ear tag", "Scan"],
         ["filter", "kept", "Filters", "Filter buttons"],
-        ["more", "kept", "More actions", "··· buttons"],
+        ["more", "kept", "More actions: every Actions button and ··· menu", "Actions buttons (Farrowing, Inspection, pig profile, scan footer); ··· icon buttons"],
         ["info", "kept", "How to read this", "Schedule key"],
         ["link", "kept", "A link", "Unused"],
         ["send", "kept", "Send a message", "Assistant send"],

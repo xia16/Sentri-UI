@@ -23,6 +23,7 @@ const screens = [
   ['pig-profile.full', 'pig-profile'],
   ['pig-profile.actions', 'pig-actions'],
   ['farrowing.count', 'count'],
+  ['farrowing.locked', 'record-bar'],
   ['farrowing.death', 'death'],
   ['farrowing.filter', 'filter'],
   ['farrowing.sow-actions', 'unit-actions'],

@@ -34,13 +34,13 @@ Five pairs are the same shape under two names:
 
 | Group | Glyph | Meaning | First uses |
 |---|---|---|---|
-| Animals | **pig** (redrawn) | A pig of any kind or age: sow, gilt, boar, piglet (the word says which) | Parity; Report death: *The sow*; Piglet processing and Foster actions; + born chip; Pig profile; Home: Piglet processing, Nursery |
+| Animals | **pig** (redrawn) | A pig of any kind or age: sow, gilt, boar, piglet (the word says which) | Parity; Report death: *The sow*; Piglet processing and Foster actions; + born chip; Pig profile: General details; Home: Piglet processing, Nursery |
 | | **batch** (borderline) | A batch, such as "Batch 27": a stack of cards | Move to another farrowing batch; Batch membership; Pig profile: Batches |
 | | **missing** | A missing pig: a dashed circle with a question mark | Drawn for Report missing (no screen yet) |
-| Events | **service** | Service (breeding): ♀♂ | Home: Breeding section and task |
+| Events | **service** | Service (breeding): ♀♂ | Home: Breeding section and task; Pig profile: Sow cycle, Gilt and Boar breeding |
 | | **return-heat** | Return-heat check | Home: Return-heat task (was the Undo arrow) |
 | | **farrow** (redrawn, borderline) | Farrowing: a sow lying down, a piglet at her belly | Home: Farrowing; Open Farrowing |
-| | **death** | A death (a headstone, no cross) | Death key, Died after birth, − died chip, Record piglet and sow deaths |
+| | **death** | A death (a headstone, no cross) | Death key, Record dead, Died after birth, − died chip, Record piglet and sow deaths |
 | | **truck** | Pigs leaving the farm | Home: Outbound pickups (was `send`) |
 | | **sample** | Sampling | Home: Sampling tasks |
 | | **count** | A count of animals | Reconcile piglet count |
@@ -68,10 +68,12 @@ Five pairs are the same shape under two names:
 
 ## The usage swaps
 
+**Actions is ··· everywhere** (owner asked, 2026-11-03). The ellipsis is the platform's "more actions" mark, the shared scan footer and Farrowing already use it, and the blind test read it as "more / overflow" with high confidence. Inspection's three Actions buttons move from `grid` to `more`. `grid` keeps the pen map and units; the testers read it as "apps".
+
 Farrowing Details is the Farrowing session's page. Its section icons (This litter, Against her batch, Against herself) are chosen there, from this set. This round only supplies the icons.
 
 
-46 swaps in five files are listed in [swaps.json](swaps.json), each with its reason. The mock applies them in memory, and `node review/icon-round/swaps.mjs --write` applies them for the build.
+50 swaps in five files are listed in [swaps.json](swaps.json), each with its reason. The mock applies them in memory, and `node review/icon-round/swaps.mjs --write` applies them for the build.
 - **Inspection:** icon names only (`'clock'` → `'sow'`, and so on). No logic changes.
 - **Farrowing:** two action entries that had no icon get one (`Record abortion` and `Record sow death`). Everything else is a name change.
 - **Fallbacks for cut icons:**
