@@ -5,7 +5,7 @@
 Two (or three) big tiles for a choice that changes the whole page below it (the direction of a move). Replaces a Segment on task pages.
 
 **Anatomy** (`.tk-choice`, `data-ds="TaskChoice"`, `role=group`)
-- A grid of equal columns, 10px apart. Each tile (`.tk-choice-tile`, a button with `aria-pressed`): at least `choice-tile-min` (92px), `radius-inset`, 1px `task-key-border`, `paper`, `muted`; a 24px icon over the label (14px/600), 10px apart.
+- A grid of equal columns, 10px apart. Each tile (`.tk-choice-tile`, a button with `aria-pressed`): at least `choice-tile-min` (92px), `radius-inset`, 1px `task-key-border`, `paper`, `muted`; a 24px icon over the label (13px/500, `type-description-size`: one quiet line at three across; owner, 2026-11-02: 16px/600 read clunky), 10px apart.
 - **Chosen:** `green-wash`, 1px `choice-pressed-border`, `ink`.
 
 **Component contract**

@@ -925,3 +925,30 @@ End task's Performance metrics (two measures, the neutral split, small facts); t
 - **Better because** one look says how the litter went, and the comparisons a manager needs sit one tap away, drawn, not written.
 - Earlier litters are sample data; the batch range collapses when every litter has the same figure (her dot sits on the average).
 - The Death breakdown page is no longer opened from a finished sow; its causes are on Details.
+
+# Her piglets and fostering (2026-11-03), critique
+
+Scope: a sow's piglets (farrowing.piglets and its states), Foster from them and from a living sow (farrowing.piglets-sow, -filter, -confirm, farrowing.foster-send, -filter), Move (farrowing.piglets-pen), a dead sow's record (farrowing.ended) and her room row. The owner shaped it on the canvas https://claude.ai/artifact/FtdJokXX1Xhgywg34HC26q over a day: Allocate's three options, then two tiles, then a Hand-rear drawer, then her litter's list, then Inspection's pen list. Retires farrowing.allocate, foster-count, foster-dead and foster-move.
+
+## Problems
+
+- **major** · Allocate asked a question (Foster, Hand-rear, Rearing pen) before the worker had seen the piglets, and each answer was all-or-nothing; splitting a litter meant a stepper and a second trip.
+- **major** · Hand-rear needed a commit, though leaving the piglets where they are is what hand-rearing is.
+- **major** · Search and scan reached every pig on the farm, gilts and pregnant sows included.
+- **minor** · The dead sow's record had the old summary face while a finished sow had the ring card.
+- **minor** · Fostering's filter cut Alive now under the footer.
+
+## Attention budget
+
+1 which piglets (her list: ID rows, the count without ID) · 2 what to do with the ticked (Actions: Foster, Move) · 3 where they went (Sent and moved) · then on the sow picker: the sows that can take piglets, her unit first.
+
+## House pattern
+
+Inspection's pen list and its No tags row (Row · select-door with a count), the selection dock's Actions; Foster piglets' sow picker; Move's destination picker; the finished record (ring card, Back · Actions · Record dead).
+
+## Self-crit
+
+- **Better because** the worker acts on the piglets they see, a few at a time, and what stays needs no decision; the record, the list and the pickers are ones they already know.
+- The count without ID is typed on the phone's keypad; on the web prototype that is a text field with a numeric keyboard.
+- Record dead does not take ticked piglets yet: a piglet that is put down is recorded through Record dead with its cause, by count.
+- Nurse sows are sample data (two weaned sows); the farm's real weaned sows come from production records.
