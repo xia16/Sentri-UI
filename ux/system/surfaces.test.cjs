@@ -4,6 +4,8 @@
 //     token (green means done, recorded or synced). The active category tab's underline is the one marker kept.
 //  3. The one green choice is the multi-select box (owner, 2026-11-03): every checkbox ticks in `select-mark` (the count-key green, white
 //     tick), and a ticked row stays white: no rule fills a row that holds a checked box.
+//  4. One surface (owner, 2026-11-03): every page, drawer and dialog is the tint with white cards. No rule gives a card (`--st-panel-bg`)
+//     any colour but paper, and the drawer, menu and dialog bases are the tint.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -122,6 +124,25 @@ test('a ticked multi-select row stays white', () => {
     }
   }
   assert.deepEqual([...new Set(bad)], [], 'the green box says it is ticked; the row takes no fill (SURFACES.md rule 4)');
+});
+
+/* The colour a context hands its cards: paper, or transparent for a panel inside a panel (no nested card). */
+const CARD_OK = /^(var\(--(st-paper|paper)\)|transparent)$/;
+test('every card is white: no context or screen paints a card the tint', () => {
+  const bad = [];
+  for (const r of all) for (const [k, v] of decls(r.body)) if (k === '--st-panel-bg' && !CARD_OK.test(v)) bad.push(`${r.file}: ${r.selector} { ${k}: ${v} }`);
+  assert.deepEqual([...new Set(bad)], [], 'a card is paper on the tint (SURFACES.md rule 2)');
+});
+test('drawers, menus and dialogs are the tint', () => {
+  const bundle = rules(read(path.join(compDir, 'bundle.css')));
+  const tint = (want) => bundle.some((r) => r.selector.split(/,(?![^(]*\))/).some((s) => want(s.trim())) && decls(r.body).some(([k, v]) => k === 'background' && v === 'var(--st-canvas)'));
+  assert.ok(tint((s) => /^\.sheet:is\(/.test(s) && /data-st-context="drawer"/.test(s) && /data-st-context="menu"/.test(s)), 'a drawer and a menu drawer are the tint (SURFACES.md rule 1)');
+  assert.ok(tint((s) => s === '.dialog'), 'a dialog is the tint (SURFACES.md rule 1)');
+});
+test('the guard itself sees a tinted card', () => {
+  const rs = rules('[data-st-context="drawer"]{--st-panel-bg:var(--st-inset)} .st-panel .st-panel{--st-panel-bg:transparent}');
+  assert.ok(!CARD_OK.test(decls(rs[0].body)[0][1]));
+  assert.ok(CARD_OK.test(decls(rs[1].body)[0][1]));
 });
 
 test('the guard itself sees a green current row and an under-height footer button', () => {
