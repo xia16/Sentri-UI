@@ -1864,7 +1864,8 @@
          "text": "Correcting a past record",
          "in": "sheet",
          "absent": true,
-         "says": "no banner"
+         "says": "no banner",
+         "hard": "broken-ruling"
         }
        ],
        "record": [
@@ -2232,6 +2233,15 @@
             }
            ],
            "visible": [
+            {
+             "screen": "farrowing.history",
+             "hard": "dead-end"
+            },
+            {
+             "text": "Farrowing finished",
+             "in": "sheet",
+             "says": "the finish line stays, the floor of the stack"
+            },
             {
              "el": ".log-undo",
              "in": "sheet",
