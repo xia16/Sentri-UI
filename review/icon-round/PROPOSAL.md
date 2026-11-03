@@ -28,14 +28,14 @@ Five pairs are the same shape under two names:
 6. **One pig:** every animal is one parametric body in [pig-family.mjs](pig-family.mjs): a stadium facing right, with a square snout, a pointed ear, two legs, a curled tail and an eye. Kinds and ages (sow, boar, gilt, piglet) can't be told apart at 16 px, so they share it and the word says which. A pig plus a sign is allowed only where the sign reads: a piglet under her (`farrow`).
 7. **No library:** every path is hand-written here. Lucide and Tabler served only as references for common shapes such as the clock with a back arrow and the clipboard.
 8. **Good enough or not at all** (owner, 2026-11-03). Every new glyph passes a blind naming test ([BLIND-TEST.md](BLIND-TEST.md)). A glyph that fails is not used: its meaning takes an icon that passed, or the word alone.
-9. **One meaning per icon.** A new screen that needs a meaning with no glyph gets a new glyph, never a borrowed one.
+9. **One meaning per icon, used freely** (owner, 2026-11-03). An icon goes wherever its meaning applies; reuse a passing icon instead of keeping a weaker one or drawing a near-duplicate. **Never repeat an icon across the sections of the same page:** each section names a different thing.
 
 ## What to draw: 13 new glyphs, 5 redrawn (all passed the blind test; two borderline)
 
 | Group | Glyph | Meaning | First uses |
 |---|---|---|---|
-| Animals | **pig** (redrawn) | A pig of any kind or age: sow, gilt, boar, piglet (the word says which) | Farrowing Details: *This litter*, *Against herself*; Parity; Report death: *The sow*; Piglet processing and Foster actions; + born chip; Pig profile; Home: Piglet processing, Nursery |
-| | **batch** (borderline) | A batch, such as "Batch 27": a stack of cards | *Against her batch*; Move to another farrowing batch; Batch membership |
+| Animals | **pig** (redrawn) | A pig of any kind or age: sow, gilt, boar, piglet (the word says which) | Farrowing Details: *This litter*; Parity; Report death: *The sow*; Piglet processing and Foster actions; + born chip; Pig profile; Home: Piglet processing, Nursery |
+| | **batch** (borderline) | A batch, such as "Batch 27": a stack of cards | *Against her batch*; Move to another farrowing batch; Batch membership; Pig profile: Batches |
 | | **missing** | A missing pig: a dashed circle with a question mark | Drawn for Report missing (no screen yet) |
 | Events | **service** | Service (breeding): ♀♂ | Home: Breeding section and task |
 | | **return-heat** | Return-heat check | Home: Return-heat task (was the Undo arrow) |
@@ -46,7 +46,7 @@ Five pairs are the same shape under two names:
 | | **count** | A count of animals | Reconcile piglet count |
 | Records | **record** (redrawn) | A record: a clipboard | Litter summary, Task outcomes, Pig record |
 | | **note** (redrawn) | A note: a sticky note | Pen and sow notes, Add a note |
-| | **history** | Past records, the log | Home: Records |
+| | **history** | Past records, the log | Home: Records; Farrowing Details: *Against herself* (her past litters); Pig profile: Log |
 | | **tasks** | A list of tasks | Pig profile: Current tasks |
 | | **chart** (redrawn) | Performance over time: a line on axes | Performance metrics, Averages, Base curve |
 | | **undo** | Undo (the old `return` shape) | Farrowing: Undo; `return` becomes its alias |
@@ -68,7 +68,7 @@ Five pairs are the same shape under two names:
 
 ## The usage swaps
 
-47 swaps in five files are listed in [swaps.json](swaps.json), each with its reason. The mock applies them in memory, and `node review/icon-round/swaps.mjs --write` applies them for the build.
+49 swaps in five files are listed in [swaps.json](swaps.json), each with its reason. The mock applies them in memory, and `node review/icon-round/swaps.mjs --write` applies them for the build.
 - **Inspection:** icon names only (`'clock'` → `'sow'`, and so on). No logic changes.
 - **Farrowing:** two action entries that had no icon get one (`Record abortion` and `Record sow death`). Everything else is a name change.
 - **Fallbacks for cut icons:**
