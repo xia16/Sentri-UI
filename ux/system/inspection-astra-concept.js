@@ -2029,7 +2029,7 @@ function sheet(c,title,scope,body,actions,surface='',line=null,corner=null){
  if(page&&foot){foot=foot.replace(back(),'');if(!/<button/.test(foot))foot=false;}
  /* The health and treatment drawers are the tint with white cards, as every drawer will be (owner, 2026-11-03: one surface convention;
     Medicines is the reference; Conditions and Medicines ship first, the rest in the full sweep). */
- return SentriUI.sheet({variant:page?'page':'drawer',surface:surface||(tinted?'menu':''),title,line,corner,cross,back:{action:'back'},above,body,footer:foot,className:c.view==='actions'?'actions-sheet':'',size:drawerSize(c.view,c),sizing:['search','scan','grid'].includes(c.view)||c.view==='record-optional'&&c.form.optionalKey==='target'?'full':holdRows?'hold':'content',holdRows,label:title,scrim:{action:'dismiss',label:'Dismiss '+title},bar:page?status():''});
+ return SentriUI.sheet({variant:page?'page':'drawer',surface:surface||(tinted?'menu':c.view==='production-task'?'skeleton':''),title,line,corner,cross,back:{action:'back'},above,body,footer:foot,className:c.view==='actions'?'actions-sheet':'',size:drawerSize(c.view,c),sizing:['search','scan','grid'].includes(c.view)||c.view==='record-optional'&&c.form.optionalKey==='target'?'full':holdRows?'hold':'content',holdRows,label:title,scrim:{action:'dismiss',label:'Dismiss '+title},bar:page?status():''});
 }
 function back(){return SentriUI.backButton({action:'back'});}
 /* Header lines (features/pig-profile/budget.md ## Headers): a surface that writes to or is about one pig shows that pig on screen

@@ -1208,9 +1208,9 @@
   const SHEET_SIZES=['compact','short','medium','long'];
   function sheet({variant='drawer',surface='',headClass='',title,line=null,pageAction=null,corner=null,cross=null,back=null,description,icon='',close={action:'dismiss'},holdRows=0,lead='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
     const v=oneOf('Sheet','variant',variant,['drawer','page','dialog'],'drawer'),sz=oneOf('Sheet','size',size,SHEET_SIZES,'medium');
-    /* surface (drawer only): '' is a content or input drawer (white, tinted cards). 'menu' is a drawer whose every row is an option or a verb
-       (Choose a unit, More actions, Go to pen): the tint with white cards, like a page. See SURFACES.md. */
-    const ctx=oneOf('Sheet','surface',surface||'drawer',['drawer','menu'],'drawer');
+    /* surface (drawer only): every drawer is the tint with white cards (SURFACES.md); 'menu' paints the same. 'skeleton' keeps the old white
+       drawer with tinted cards for the task skeletons nobody has designed yet (Piglet processing, the production task, Maintenance), until each is. */
+    const ctx=oneOf('Sheet','surface',surface||'drawer',['drawer','menu','skeleton'],'drawer');
     const foot=f===false?'':(f==null?sheetFooter({}):f),ex=safeAttr(attrs),cls=className?' '+esc(className):'',vw=view?` data-view="${esc(view)}"`:'';
     if(v==='dialog'){
       return `<div class="dialog-backdrop" data-ds="Sheet" data-variant="dialog"${sLayer(layer)}><div class="dialog${cls}" role="dialog" aria-modal="true" tabindex="-1"${id?` id="${esc(id)}"`:''}${vw}${inert?' inert':''}${sL(label??title)}${ex}><div class="dialog-body${bodyClass?' '+esc(bodyClass):''}"><h2 class="dialog-title">${icon?sGlyph(icon):''}${sT(title)}</h2>${description?`<p class="dialog-desc">${sParts(description)}</p>`:''}${body}</div>${foot}</div></div>`;
@@ -1295,7 +1295,7 @@
     rangeFormats.set(key,f);
     const open=v[0]===min&&v[1]===max,steps=Math.round((max-min)/step),ticks=steps<=20?`<div class="st-range-ticks" aria-hidden="true">${'<i></i>'.repeat(steps+1)}</div>`:'';
     const top=counts&&counts.length===steps+1&&steps<=20?Math.max(...counts):0,hist=top?`<div class="st-range-hist" aria-hidden="true">${counts.map((n,i)=>{const x=min+i*step;return `<i style="left:${i/steps*100}%;height:${n?Math.max(10,Math.round(n/top*100)):0}%"${!open&&x>=v[0]&&x<=v[1]?' data-on':''}></i>`;}).join('')}</div>`:'';
-    return `<div class="st-range${className?' '+esc(className):''}" data-ds="RangeSlider" data-key="${esc(key)}" data-names="${esc(names.join(','))}"${open?' data-open':''}><div class="st-range-head">${title?heading({title,icon,kind:'section',level:4,className:'st-range-title'}):''}<output class="st-range-value">${esc(rangeLine(f,v[0],v[1],open))}</output></div>${hist}<div class="st-range-rail" style="${rangeVars(v[0],v[1],min,max)}"><div class="st-range-track"></div>${ticks}${v.map((x,i)=>`<input type="range" min="${min}" max="${max}" step="${step}" value="${x}" data-range="${esc(names[i])}" aria-label="${esc(labels[i])}" aria-valuetext="${esc(format(x))}">`).join('')}</div>${ends.length?`<div class="st-range-ends">${ends.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}</div>`;
+    return `<div class="st-range${className?' '+esc(className):''}" data-ds="RangeSlider" data-key="${esc(key)}" data-names="${esc(names.join(','))}"${open?' data-open':''}><div class="st-range-head">${title?heading({title,icon,kind:'section',level:4,className:'st-range-title'}):''}<output class="st-range-value">${esc(rangeLine(f,v[0],v[1],open))}</output></div><div class="st-range-body">${hist}<div class="st-range-rail" style="${rangeVars(v[0],v[1],min,max)}"><div class="st-range-track"></div>${ticks}${v.map((x,i)=>`<input type="range" min="${min}" max="${max}" step="${step}" value="${x}" data-range="${esc(names[i])}" aria-label="${esc(labels[i])}" aria-valuetext="${esc(format(x))}">`).join('')}</div>${ends.length?`<div class="st-range-ends">${ends.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}</div></div>`;
   }
   function rangeSet(root,input,n){
     const ins=[...root.querySelectorAll('input[type="range"]')],i=ins.indexOf(input),min=+input.min,max=+input.max,step=+input.step,f=rangeFormats.get(root.dataset.key)||{format:String};

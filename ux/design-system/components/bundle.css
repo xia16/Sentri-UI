@@ -178,6 +178,7 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 @media(prefers-reduced-motion:reduce){:is(.sheet,.scrim,.dialog-backdrop):is([data-enter],[data-leave]){animation:none}}
 /* Page hooks the prototypes keep. */
 .farrowing-phone .sheet[data-presentation="page"] .sow-header-actions:empty{display:none}
+.inspection-phone .feed-feature{border:var(--border-width) solid var(--line);background:var(--st-panel-bg)}   /* End walk's figure: a white card on the tint (SURFACES.md) */
 :is(.farrowing-phone,.inspection-phone) .page-background{position:absolute;inset:0;pointer-events:none;z-index:1}
 :is(.farrowing-phone,.inspection-phone) .page-background>.sheet{z-index:1}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet>.sheet-body{display:block}
@@ -220,13 +221,16 @@ body{background:var(--ground);color:var(--ink)}
 /* Canonical shared components, loaded after legacy prototype styles.
    Context belongs to the containing page/drawer, not its individual panels. */
 :root{--st-press:var(--press);--st-canvas:var(--app-background);--st-paper:var(--paper);--st-inset:var(--inset);--st-ink:var(--ink);--st-muted:var(--muted);--st-line:var(--line);--st-rule:var(--rule);--st-panel-bg:var(--st-paper);--st-space-section:var(--space-section);--st-radius:var(--radius-panel);--drawer-medium-height:var(--drawer-medium-max);--drawer-long-height:var(--drawer-long-max)}
-/* Surfaces (SURFACES.md): two colours, paper (white) and the tint (app-background). A card is the opposite of its base. A press is one step
-   deeper than the surface pressed: press on paper, choice-press on the tint. A page and a menu drawer (every row an option or a verb) are the
-   tint with white cards; a content or input drawer is white with tinted cards. Screens choose a context; they never paint a panel colour. */
+/* Surfaces (SURFACES.md, owner 2026-11-03): two colours, paper (white) and the tint (app-background). Every page, drawer and dialog is the
+   tint with white cards; nothing sits loose on the tint. "drawer" and "menu" paint the same; the name only picks the sheet's sizing rules.
+   Screens choose a context; they never paint a panel colour. */
 [data-st-context="page"]{--st-panel-bg:var(--st-paper);--st-context-bg:var(--st-canvas);--st-press:var(--press)}
-[data-st-context="drawer"]{--st-panel-bg:var(--st-inset);--st-context-bg:var(--st-paper);--st-press:var(--choice-press)}
-[data-st-context="menu"]{--st-panel-bg:var(--st-paper);--st-context-bg:var(--st-canvas);--st-press:var(--press)}
-.sheet[data-st-context="menu"]{background:var(--st-canvas)}
+:is([data-st-context="drawer"],[data-st-context="menu"]){--st-panel-bg:var(--st-paper);--st-context-bg:var(--st-canvas);--st-press:var(--press)}
+.sheet:is([data-st-context="drawer"],[data-st-context="menu"]),.dialog{background:var(--st-canvas)}
+/* Not designed yet (owner, 2026-11-03): the screens not designed yet (Piglet processing, the production task, Maintenance) keep the old white drawer with tinted
+   cards until each is designed. */
+[data-st-context="skeleton"]{--st-panel-bg:var(--st-inset);--st-context-bg:var(--st-paper);--st-press:var(--choice-press)}
+.dialog>.sheet-footer{background:transparent}
 .st-heading.st-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-12);margin:0 0 var(--space-heading);padding:0;min-height:0;border:0;background:transparent;color:var(--st-ink)}
 .st-heading .st-heading-main{min-width:0;flex:1}
 .st-heading.st-heading .st-heading-title{display:flex;align-items:center;gap:var(--space-8);font:500 var(--type-section-title-size)/1.5 var(--font-sans);letter-spacing:0;margin:0;padding:0;border:0;color:var(--st-ink);text-transform:none}
@@ -319,12 +323,12 @@ button.st-row:disabled{cursor:default}
 .device :is(.page-footer,.sheet-body,.environment-page,.maintenance-page) .primary:not(:disabled){background:var(--st-ink);border-color:var(--st-ink);color:var(--paper)}
 @media(max-width:370px){.st-panel,.st-facts.st-facts,.st-log.st-log{padding:var(--space-12)}.st-panel.st-row-group{padding:0}.st-heading{gap:var(--space-8)}.st-row.st-row{padding-left:var(--space-12);padding-right:var(--space-12)}}
 
-.device .drawer[data-st-context="drawer"]{background:var(--st-paper);max-height:var(--drawer-medium-max);height:auto;overflow:hidden}
+.device .drawer[data-st-context="drawer"]{background:var(--st-canvas);max-height:var(--drawer-medium-max);height:auto;overflow:hidden}
 .device .drawer[data-st-context="drawer"][data-size="compact"]{max-height:var(--drawer-compact-max)}
 .device .drawer[data-st-context="drawer"][data-size="short"]{max-height:var(--drawer-short-max)}
 .device .drawer[data-st-context="drawer"][data-size="long"]{max-height:var(--drawer-long-max)}
 .device .sheet-footer .primary{margin:0;min-width:0;flex:1;min-height:var(--footer-height);background:var(--st-ink)}
-[data-st-context="drawer"] .evidence,.device .drawer[data-st-context="drawer"] .evidence{background:var(--st-panel-bg)}
+[data-st-context="drawer"] .evidence,[data-st-context="skeleton"] .evidence,.device .drawer[data-st-context="drawer"] .evidence{background:var(--st-panel-bg)}
 
 
 /* Picker field: the mobile-standard choice control that replaces native selects.
@@ -729,12 +733,18 @@ input[type="checkbox"]:disabled:checked{border-color:var(--control-border);backg
 /* Segment and FilterChips: independent of phone/prototype scopes. */
 .st-selection{min-width:0;flex:none}
 .tk-lens-bar>.st-selection,.room-lensbar>.st-selection,.inspect-controls>.st-selection{flex:1}
-.st-segment{display:flex;gap:var(--space-3);padding:var(--space-3);border:1px solid var(--line);border-radius:var(--radius-segment);background:var(--well)}
+/* Segment (owner, 2026-11-03, option B): a grey track (line) with the chosen option a white thumb on the handle shadow, the iOS segmented
+   control. It stands alone on the tint, never in a card. Piglet processing (not designed yet) keeps its old well track. */
+.st-segment{display:flex;gap:var(--space-3);padding:var(--space-3);border:1px solid transparent;border-radius:var(--radius-segment);background:var(--line)}
+:is(.tk-phone,.environment-page) .st-segment{border-color:var(--line);background:var(--well)}   /* not designed yet: Piglet processing, Environment */
 .st-segment button,.st-filter-chips button{box-sizing:border-box;min-width:var(--tap-min);min-height:var(--tap-min);border:0;border-radius:var(--radius-8);padding:var(--space-4) var(--space-6);background:transparent;color:var(--ink);font:400 var(--type-row-title-size)/1.4 var(--font-sans);display:flex;align-items:center;justify-content:center;gap:var(--space-3);cursor:pointer}
 .st-segment button{flex:1 0 auto;min-width:var(--tap-min);flex-wrap:wrap}
 .st-selection-label{white-space:nowrap;min-width:0}
 .st-selection-count{font:500 var(--type-meta-size)/1.4 var(--font-mono);color:var(--muted)}
-.st-segment button[aria-pressed=true]{background:var(--paper);font-weight:var(--type-weight-strong)}
+.st-segment .st-selection-count{color:var(--ink-2)}   /* muted on the grey track is 4.0:1; ink-2 is 6.4:1 */
+:is(.tk-phone,.environment-page) .st-segment .st-selection-count{color:var(--muted)}
+.st-segment button[aria-pressed=true]{background:var(--paper);font-weight:var(--type-weight-strong);box-shadow:var(--shadow-handle)}
+:is(.tk-phone,.environment-page) .st-segment button[aria-pressed=true]{box-shadow:none}
 .st-segment[data-variant=two-line-lens] button{flex-direction:column}
 .st-segment[data-variant=two-line-lens] .st-selection-count:empty{min-height:1.4em}
 .st-segment button:not([aria-pressed=true]):not(:disabled):active,.st-filter-chips button:not([aria-checked=true]):not(:disabled):active,[data-state=Pressed].st-segment button:nth-child(2),[data-state=Pressed].st-filter-chips button:nth-child(2){background:var(--handle)}
@@ -833,6 +843,15 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 /* FilterSheet: a Sheet that narrows a list. Sections sit 28 apart; the last one has no gap before the footer. */
 .st-filter-section{margin:0 0 var(--space-28);padding:0}
 .st-filter-section:last-child{margin-bottom:0}
+/* On the tint every filter is a white card (owner, 2026-11-03): the title sits on the tint above it, and the chips or a
+   range's histogram, rail and ends go inside. A Segment and a picker field stand alone (their own faces). The chips scroll inside their card. */
+.st-filter-section>.st-filter-chips,.st-filter-section .st-range-body{border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--paper)}
+.st-filter-section>.st-filter-chips{padding:var(--space-8) 0;overflow:hidden}
+.st-filter-section .st-filter-chips-track{padding-inline:var(--space-12)}
+.st-filter-section .st-range-head{margin:0 0 var(--space-heading)}
+.st-filter-section .st-range-body{padding:var(--space-12) var(--space-12) var(--space-8)}
+.st-filter-section .st-range-hist{margin-top:0}
+.st-filter-section .st-range-ends{margin:0}
 .st-filter-help{margin:var(--space-10) 0 0;font-size:var(--type-description-size);line-height:1.7;color:var(--muted)}
 
 /* RangeSlider: two native range inputs laid over one track. The rail is 48px tall and takes the whole touch (the nearest handle moves),
@@ -1005,12 +1024,12 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .dialog .st-selection{margin:16px 0 1px}
 .dialog .st-segment{border-width:0}
 .st-segment[data-variant=scope]{gap:var(--space-4);padding:var(--space-4);border-width:1px;border-style:solid;border-color:var(--line);border-radius:var(--radius-control)}
-.st-segment[data-variant=scope] button{flex:1 1 0;min-width:0;min-height:var(--tap-min);gap:var(--space-6);padding:0 var(--space-12);border-radius:var(--radius-8);font-size:var(--type-row-title-size);color:var(--ink-2)}
+.st-segment[data-variant=scope] button{flex:1 1 0;min-width:0;min-height:var(--tap-min);gap:var(--space-6);padding:0 var(--space-12);border-radius:var(--radius-8);font-size:var(--type-row-title-size);color:var(--ink)}   /* 16px on the grey track: ink, 7:1 and over */
 .st-segment[data-variant=scope] button:first-child{flex:0 0 auto}
 .st-segment[data-variant=scope] button{align-items:baseline;align-content:center} /* the count sits on the label's baseline, the pair centred (the button wraps) */
 .st-segment[data-variant=scope] button[aria-haspopup]{justify-content:flex-start}
 .st-segment[data-variant=scope] button[aria-pressed=true]{color:var(--ink);font-weight:500;box-shadow:0 1px 3px #20271f0d}
-.st-segment[data-variant=scope] .st-selection-count{font:500 13px var(--font-mono);color:var(--muted)}
+.st-segment[data-variant=scope] .st-selection-count{font:500 13px var(--font-mono);color:var(--ink-2)}
 .st-segment[data-variant=scope] button[aria-pressed=true] .st-selection-count{color:var(--ink-2)}
 .st-segment-door{display:grid;place-items:center;margin-left:auto;color:var(--muted)}
 .st-segment-door svg{width:16px;height:16px}
@@ -1087,11 +1106,11 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-optional-row[data-face="row"][aria-disabled="true"] .st-optional-act svg{border-style:dashed}
 /* On the tint (owner, 2026-11-03): an empty optional row is a quiet well, not a white card, so it reads as extra; once it holds
    something (Photos with photos) it becomes a white card with its contents inside, and the thumbnails say how many. */
-[data-st-context="menu"] .st-optional-row[data-face="row"]:not([data-filled="true"]){border-color:transparent;background:var(--well)}
-[data-st-context="menu"] .st-photos:has(.st-photos-items){border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--paper);overflow:hidden}
-[data-st-context="menu"] .st-photos:has(.st-photos-items) .st-optional-row{border:0;border-radius:0;background:transparent}
-[data-st-context="menu"] .st-photos:has(.st-photos-items) .st-photos-items{padding:0 var(--space-row-x) var(--space-row-x)}
-[data-st-context="menu"] .st-photos:has(.st-photos-items):not(:has([data-pending])) .st-optional-answer{display:none}
+:is([data-st-context="drawer"],[data-st-context="menu"]) .st-optional-row[data-face="row"]:not([data-filled="true"]){border-color:transparent;background:var(--well)}
+:is([data-st-context="drawer"],[data-st-context="menu"]) .st-photos:has(.st-photos-items){border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--paper);overflow:hidden}
+:is([data-st-context="drawer"],[data-st-context="menu"]) .st-photos:has(.st-photos-items) .st-optional-row{border:0;border-radius:0;background:transparent}
+:is([data-st-context="drawer"],[data-st-context="menu"]) .st-photos:has(.st-photos-items) .st-photos-items{padding:0 var(--space-row-x) var(--space-row-x)}
+:is([data-st-context="drawer"],[data-st-context="menu"]) .st-photos:has(.st-photos-items):not(:has([data-pending])) .st-optional-answer{display:none}
 /* Photos waiting (inactive): the floor-gray. The row stays, its camera dashed; the reason is the row's description for a
    screen reader and shows in the hint line only while a tap is answered (guard's data-answer), never as a standing line. */
 .st-photos[data-inactive]>.st-photos-hint:not([data-answer]){position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -1362,10 +1381,10 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-row-count{flex:none;display:flex;align-items:center;padding-right:6px}
 .st-row-count input{width:52px;height:48px;box-sizing:border-box;margin:0;padding:0;border:1px solid var(--control-border,var(--line));border-radius:var(--radius-10);background:var(--paper,#fff);color:var(--ink);font:600 17px/1 var(--font-sans);text-align:center}
 .st-row-count[data-idle] input{color:var(--ink-2);font-weight:500}
-/* Lookup: Find and Scan, the two ways to reach an animal by its ear tag (components/Lookup/README.md). Find is a white input page with the
-   field pinned at the top; Scan is a Sheet page on the tint, its list carrying the page gutter itself. Unit cards sit under plain section headings. */
-.st-find{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--paper)}
-.st-find.st-find>.statusbar{flex:none;background:var(--paper)}
+/* Lookup: Find and Scan, the two ways to reach an animal by its ear tag (components/Lookup/README.md). Find is an input page on the tint with the
+   field pinned at the top and its unit cards white; Scan is a Sheet page on the tint, its list carrying the page gutter itself. Unit cards sit under plain section headings. */
+.st-find{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--st-canvas)}
+.st-find.st-find>.statusbar{flex:none;background:var(--st-canvas)}
 .st-find-top{flex:none;display:flex;align-items:center;gap:10px;padding:6px 16px 12px;border-bottom:1px solid var(--line)}
 /* The search field (searchBox): one look wherever a worker types to narrow. In a page or sheet body it is a field (48px, 16px text):
    at rest a 1px control border, typing (focused) a 2px ink border, the padding keeping the glyph and text still. Find's field is the
@@ -1383,7 +1402,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-find-results::-webkit-scrollbar,.st-scan-body::-webkit-scrollbar{display:none;width:0;height:0}
 .st-find-results{padding:14px 16px 24px}
 .st-find-results .st-heading.st-heading,.st-scan-body .st-heading.st-heading{margin:16px 2px 8px}
-.st-find-list{--st-panel-bg:var(--app-background);margin-bottom:16px}
+.st-find-list{margin-bottom:16px}
 .st-find-hint{margin:4px 2px;color:var(--muted);font:400 14px/20px var(--font-sans)}
 /* The typed part is bold ink; the rest of the tag is muted. */
 .st-find-row .st-animal-id{color:var(--ink-2);font-weight:500}
@@ -1661,10 +1680,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .finished-first strong{display:block;color:var(--ink);font-weight:600}
 /* Farrowing · Foster piglets (owner, 2026-11-02): the count drawer over the list of sows; its parts stack 18px apart, as a feature page's, and the hint keeps the section space above the footer. */
 .farrowing-phone .sheet.foster-count>.sheet-body{display:flex;flex-direction:column;gap:var(--space-18);padding-bottom:var(--space-24)}
-.farrowing-phone .foster-list .st-find-list{--st-panel-bg:var(--paper)}   /* a page is tinted, so its cards are white (Surfaces); Lookup's card is tinted for Find's white page */
-/* FilterChips in a FilterSheet section: the chip track pads itself to the gutter and scrolls to the sheet edge, so the section lets it bleed
-   (first chip under the section title, Allocate piglets' Unit filter). */
-.st-filter-section .st-filter-chips{margin-inline:calc(-1 * var(--space-gutter))}
 /* Foster piglets · With ID (owner, 2026-11-02): a label as Without ID's (its ticked count at the end), the search or scan bar, then one
    box of tick rows that scrolls past three whole rows (a fade says there are more), so the count and Send stay on screen. No card inside the box. Foster off is a
    page (the tint), so the box is white (Surfaces rule 1). */
@@ -1702,7 +1717,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 
 /* Farrowing drawers are the tint with white cards (owner, 2026-11-03: no white background anymore). Her chip sits on the tint, so it is
    paper; the piglet condition rows and the death causes are each one white action card. */
-.farrowing-phone .sheet[data-st-context="menu"] .st-subject-chip{background:var(--paper);box-shadow:inset 0 0 0 1px var(--line)}
+.farrowing-phone .sheet:is([data-st-context="drawer"],[data-st-context="menu"]) .st-subject-chip{background:var(--paper);box-shadow:inset 0 0 0 1px var(--line)}
 .farrowing-phone :is(.finish-rows,.death-causes){padding:0 16px;border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper)}
 /* Undo in the log (owner, 2026-11-03): the top of her stack carries Undo, top right of its entry, a 44px text action. */
 .farrowing-phone .st-log-entry:has(>.st-log-extra>.log-undo){padding-right:88px}
@@ -1714,9 +1729,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .st-log-entry:has(.log-withdrawn) .st-log-title{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
 .farrowing-phone .st-log-entry:has(.log-withdrawn):before{background:var(--line)}
 .farrowing-phone .st-log-extra:has(>.log-withdrawn:only-child){display:none}
-/* Undo (owner, 2026-11-03): a tint dialog with one white ledger card: each figure Undo changes, now → after. */
-.farrowing-phone .dialog.undo-dialog{background:var(--app-background)}
-.farrowing-phone .undo-dialog>.sheet-footer{background:transparent}
+/* Undo (owner, 2026-11-03): one white ledger card on the dialog's tint: each figure Undo changes, now → after. */
 .farrowing-phone .undo-dialog .dialog-title{margin-bottom:var(--space-16)}
 .farrowing-phone .undo-ledger{list-style:none;margin:0;padding:0 var(--space-16);border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper)}
 .farrowing-phone .undo-ledger li{display:grid;grid-template-columns:1fr auto auto 2ch;align-items:center;gap:var(--space-8);min-height:52px;border-bottom:1px solid var(--rule);font:400 15px/1.4 var(--font-sans);color:var(--ink);font-variant-numeric:tabular-nums}
@@ -1725,4 +1738,4 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .undo-ledger i{font-style:normal;color:var(--muted);text-align:center}
 .farrowing-phone .undo-ledger b{font:600 17px/1.4 var(--font-sans);color:var(--ink);text-align:right}
 /* On the tint drawer the card is white and its head band is white too, set off by its divider. */
-.farrowing-phone .sheet[data-st-context="menu"] .finished-card-head{background:var(--paper)}
+.farrowing-phone .sheet:is([data-st-context="drawer"],[data-st-context="menu"]) .finished-card-head{background:var(--paper)}

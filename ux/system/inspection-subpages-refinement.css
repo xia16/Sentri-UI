@@ -80,7 +80,6 @@
 .inspection-phone .unit-empty-state{border:1px dashed var(--line);}
 .inspection-phone .walk-complete{padding-top:0;}
 .inspection-phone .walk-complete>.complete-mark{background:var(--green-wash);color:var(--green);}
-.inspection-phone .feed-feature{border:1px solid #dfe8d8;background:var(--surface);}
 
 @media(max-width:370px){
  .inspection-phone .bulk-control-grid{grid-template-columns:1fr;}
