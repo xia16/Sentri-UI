@@ -170,12 +170,14 @@ function auditHeaders({ TOL, checks }) {
         }
       };
       // the topmost such thing (a row's text centred beside a taller control starts where the control does)
+      const scrolled = (el) => { let s = 0; for (let e = el.parentElement; e && e !== host; e = e.parentElement) s += e.scrollTop; return s; };
       const descend = (els) => {
         let best = null;
         for (const el of els) {
           if (['SCRIPT', 'STYLE', 'TEMPLATE'].includes(el.tagName) || !vis(el) || chrome(el) || cs(el).position === 'absolute') continue;
           const hit = stop(el) ? el : descend([...el.children]);
-          if (hit && (!best || topOf(hit) < topOf(best))) best = hit;
+          // compared at rest: a list scrolled to a pen keeps its scrolled-away rows from counting as the first thing under the header
+          if (hit && (!best || topOf(hit) + scrolled(hit) < topOf(best) + scrolled(best))) best = hit;
         }
         return best;
       };
@@ -184,7 +186,6 @@ function auditHeaders({ TOL, checks }) {
       const centred = (el) => { for (let e = el.parentElement; e && e !== host; e = e.parentElement) { const c = cs(e); if ((/flex/.test(c.display) && c.flexDirection.startsWith('column') && c.justifyContent === 'center') || (/grid/.test(c.display) && /center/.test(c.alignContent))) return true; } return false; };
       // the gap is the layout at rest: a body scrolled down (a list landed on a pen) is measured as if at its top, by adding back
       // the scroll of every container between the body content and the header's surface
-      const scrolled = (el) => { let s = 0; for (let e = el.parentElement; e && e !== host; e = e.parentElement) s += e.scrollTop; return s; };
       if (first && !centred(first.el)) {
         const gap = first.top + scrolled(first.el) - from;
         note.gap = Math.round(gap * 10) / 10;
