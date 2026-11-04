@@ -13,7 +13,7 @@
 <div id="board" style="width: 1760px; padding: 40px 48px 64px; box-sizing: border-box; background: #F3F4F1; font-family: 'Geist', system-ui, sans-serif; font-size: 14px; line-height: 20px; color: #111511; -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums;">
 <h1 style="margin: 0; font-size: 28px; line-height: 36px; font-weight: 600; letter-spacing: -.025em;">Batches · every page</h1>
 <div style="margin-top: 6px; color: #6B726D;">Desktop panel, 380 wide, as short as it can be. The farm view sits behind it.</div>
-<ol style="margin: 16px 0 0; padding-left: 20px; display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 48px; row-gap: 4px;"><li style="font-size: 14px; line-height: 20px;">A batch is its tasks. Clicking a batch opens its page and outlines all its pigs on the farm.</li><li style="font-size: 14px; line-height: 20px;">A running task shows progress and its KPI so far. No comparison until it ends.</li><li style="font-size: 14px; line-height: 20px;">A done task opens its completion page: progress, performance, the litter. Compare lives here.</li><li style="font-size: 14px; line-height: 20px;">Pigs live on the farm: hovering a pen shows its tasks' status; clicking opens the pig profile. No pig page inside a task.</li><li style="font-size: 14px; line-height: 20px;">All dates: done and running tasks open their page. Upcoming on the batch: at most 3, hidden when none.</li><li style="font-size: 14px; line-height: 20px;">Atlas parts: header, TaskProgress (counts are the legend and the filter), TaskMetrics. At most two filters a page.</li></ol>
+<ol style="margin: 16px 0 0; padding-left: 20px; display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 48px; row-gap: 4px;"><li style="font-size: 14px; line-height: 20px;">A batch is its tasks. Clicking a batch opens its page and outlines all its pigs on the farm.</li><li style="font-size: 14px; line-height: 20px;">A running task shows progress and its KPI so far. No comparison until it ends.</li><li style="font-size: 14px; line-height: 20px;">A done task opens its completion page: the phone's Task outcomes and Performance metrics. Compare lives here.</li><li style="font-size: 14px; line-height: 20px;">Outside Compare, pigs live on the farm: hover = her tasks' status, click = her profile.</li><li style="font-size: 14px; line-height: 20px;">Inside Compare, the farm compares too: pens tint against the batch, hover = her figure, click = her card beside the batch.</li><li style="font-size: 14px; line-height: 20px;">Atlas parts throughout: header, TaskProgress, Performance metrics, the finished sow's Details. At most two filters a page.</li></ol>
 <div style="display: grid; grid-template-columns: repeat(4, 380px); gap: 56px 48px; align-items: start; margin-top: 40px;">
 <div id="batches" style="width: 380px; scroll-margin-top: 24px;">
 <div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">1 · Batches</div>
@@ -235,8 +235,8 @@
 </div></section></div>
 <div id="farrowing-done" style="width: 380px; scroll-margin-top: 24px;">
 <div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">7 · Farrowing · done</div>
-<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Batch 31, from its All dates · its completion page</div>
-<section aria-label="7 · Farrowing · done" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Batch 31's completion page: the phone's Performance card</div>
+<section aria-label="7 · Farrowing · done" style="position: relative; width: 380px; max-height: none; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
 
 <div style="display: flex; align-items: center; gap: 12px; min-height: 44px;">
   <a href="#dates" aria-label="Back" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; border-radius: 14px; background: #EEF0EB; color: #111511;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m15 5-7 7 7 7"></path></svg></a>
@@ -246,42 +246,48 @@
   <span aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; margin-right: -8px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
 </div>
 <div style="height: 1px; background: #E6E9E3; margin: 16px -20px 0;"></div>
-<div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 20px;"><h3 style="margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Whole-task progress</h3><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">50 sows</span></div>
-<div style="position: relative; width: 340px; height: 10px; margin-top: 12px;"><span style="position: absolute; left: 0px; top: 0; width: 331px; height: 10px; background: #28734F; opacity: 1; border-radius: 6px 0 0 6px; box-shadow: none;"></span><span style="position: absolute; left: 333px; top: 0; width: 7px; height: 10px; background: #D3D8D0; opacity: 1; border-radius: 0 6px 6px 0; box-shadow: none;"></span></div>
-<div style="display: flex; gap: 6px; margin-top: 10px; margin-left: 0;"><span style="display: flex; flex-direction: column; gap: 2px; padding: 0; min-width: 64px; margin-right: 18px; border-radius: 10px; background: transparent; opacity: 1;">
-    <span style="font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; color: #111511;">49</span>
-    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;"><i style="width: 6px; height: 6px; border-radius: 2px; background: #28734F;"></i>Done</span>
-  </span><span style="display: flex; flex-direction: column; gap: 2px; padding: 0; min-width: 64px; margin-right: 18px; border-radius: 10px; background: transparent; opacity: 1;">
-    <span style="font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; color: #111511;">1</span>
-    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;"><i style="width: 6px; height: 6px; border-radius: 2px; background: #D3D8D0;"></i>Sow died</span>
-  </span></div>
-<div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 24px;"><h3 style="margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Performance</h3><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">49 litters</span></div>
-<div style="margin-top: 10px; padding: 14px 16px; border-radius: 16px; background: #F7F8F5;"><div style="display: flex; gap: 16px;"><span style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+<div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 24px;"><h3 style="margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Task outcomes</h3><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">50 sows</span></div>
+<div style="margin-top: 12px; padding: 4px 20px; border-radius: 18px; background: #F7F8F5;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; color: inherit; text-decoration: none;"><span style="display: flex; align-items: center; gap: 12px; min-width: 0;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Finished farrowing</span></span><span style="display: flex; align-items: center; gap: 8px; color: #6B726D;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">49</span></span></div><div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; color: inherit; text-decoration: none;"><span style="display: flex; align-items: center; gap: 12px; min-width: 0;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Sow deaths</span></span><span style="display: flex; align-items: center; gap: 8px; color: #6B726D;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">1</span></span></div></div>
+<div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 28px;"><h3 style="margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Performance metrics</h3><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">49 finished litters</span></div>
+<div style="margin-top: 12px; padding: 20px; border-radius: 18px; background: #F7F8F5;">
+  <div style="display: flex; gap: 20px;"><span style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
   <span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Born alive / litter</span>
-  <span style="display: flex; align-items: baseline; gap: 2px;"><span style="font-size: 28px; line-height: 34px; font-weight: 600; letter-spacing: -.03em;">12.4</span></span>
-  <span style="font-size: 12px; line-height: 16px; color: #28734F; white-space: nowrap; font-weight: 500;">on target · 12</span>
-</span><span style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+  <span style="display: flex; align-items: baseline; gap: 2px;"><span style="font-size: 32px; line-height: 38px; font-weight: 600; letter-spacing: -.03em;">12.9</span></span>
+  <span style="display: flex; align-items: center; gap: 4px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #28734F; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="m5 12 5 5 9-10"></path></svg><span style="font-size: 13px; line-height: 18px; color: #28734F; white-space: nowrap; font-weight: 500;">On target · 12</span></span>
+</span><span style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
   <span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Stillborn rate</span>
-  <span style="display: flex; align-items: baseline; gap: 2px;"><span style="font-size: 28px; line-height: 34px; font-weight: 600; letter-spacing: -.03em;">2.8</span><span style="font-size: 15px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 500;">%</span></span>
-  <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">mummified 1.2 %</span>
+  <span style="display: flex; align-items: baseline; gap: 2px;"><span style="font-size: 32px; line-height: 38px; font-weight: 600; letter-spacing: -.03em;">2.0</span><span style="font-size: 15px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 500;">%</span></span>
+  <span style="display: flex; align-items: center; gap: 4px;"><span style="font-size: 13px; line-height: 18px; color: #6B726D; white-space: nowrap; font-weight: 400;">Mummified 0.8 %</span></span>
 </span></div>
-  <div style="height: 1px; background: #E6E9E3; margin: 14px 0 12px;"></div>
-  <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">652 piglets born</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">13.3 / litter</span></div>
-  <div style="position: relative; width: 316px; height: 8px; margin-top: 10px;"><span style="position: absolute; left: 0px; top: 0; width: 288px; height: 8px; background: #3F4A42; opacity: 1; border-radius: 6px 0 0 6px; box-shadow: none;"></span><span style="position: absolute; left: 290px; top: 0; width: 15px; height: 8px; background: #A7AEA6; opacity: 1; border-radius: 0; box-shadow: none;"></span><span style="position: absolute; left: 307px; top: 0; width: 9px; height: 8px; background: #D9DED6; opacity: 1; border-radius: 0 6px 6px 0; box-shadow: none;"></span></div>
-  <div style="display: flex; gap: 6px; margin-top: 10px; margin-left: 0;"><span style="display: flex; flex-direction: column; gap: 2px; padding: 0; min-width: 64px; margin-right: 18px; border-radius: 10px; background: transparent; opacity: 1;">
-    <span style="font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -.02em; color: #111511;">598</span>
-    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;"><i style="width: 6px; height: 6px; border-radius: 2px; background: #3F4A42;"></i>Alive now</span>
-  </span><span style="display: flex; flex-direction: column; gap: 2px; padding: 0; min-width: 64px; margin-right: 18px; border-radius: 10px; background: transparent; opacity: 1;">
-    <span style="font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -.02em; color: #111511;">36</span>
-    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;"><i style="width: 6px; height: 6px; border-radius: 2px; background: #A7AEA6;"></i>Died after birth</span>
-  </span><span style="display: flex; flex-direction: column; gap: 2px; padding: 0; min-width: 64px; margin-right: 18px; border-radius: 10px; background: transparent; opacity: 1;">
-    <span style="font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -.02em; color: #111511;">18</span>
-    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;"><i style="width: 6px; height: 6px; border-radius: 2px; background: #D9DED6;"></i>Born dead</span>
-  </span></div></div>
-<div style="display: flex; gap: 8px; margin-top: 20px;"><a href="#compare" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; background: #EEF0EB; color: #111511; text-decoration: none; font-size: 14px; font-weight: 500; white-space: nowrap;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 20V11m7 9V5m7 15v-6"></path></svg>Compare</a><a href="#farrowing-done" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; background: #EEF0EB; color: #111511; text-decoration: none; font-size: 14px; font-weight: 500; white-space: nowrap;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"></path></svg>Log</a></div></section></div>
+  <div style="height: 1px; background: #E6E9E3; margin: 20px 0 16px;"></div>
+  <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="display: flex; align-items: baseline; gap: 6px;"><span style="font-size: 17px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">652</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">piglets born</span></span><span style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">13.3</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">/ litter</span></span></div>
+  <div style="position: relative; width: 300px; height: 10px; margin-top: 14px;"><span style="position: absolute; left: 0px; top: 0; width: 273px; height: 10px; background: #3F4A42; opacity: 1; border-radius: 6px 0 0 6px; box-shadow: none;"></span><span style="position: absolute; left: 275px; top: 0; width: 15px; height: 10px; background: #A7AEA6; opacity: 1; border-radius: 0; box-shadow: none;"></span><span style="position: absolute; left: 292px; top: 0; width: 8px; height: 10px; background: #D9DED6; opacity: 1; border-radius: 0 6px 6px 0; box-shadow: none;"></span></div>
+  <div style="margin-top: 12px;">
+  <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-top: 1px solid #E6E9E3;">
+  <i style="width: 8px; height: 8px; margin-top: 6px; border-radius: 999px; background: #3F4A42; flex-shrink: 0;"></i>
+  <span style="flex: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; line-height: 20px; color: #111511; white-space: nowrap;">Alive now</span></span>
+  <span style="font-size: 15px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600; width: 44px; display: inline-block; text-align: right;">598</span>
+  <span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; width: 40px; display: inline-block; text-align: right;">92%</span>
+</div>
+  <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-top: 1px solid #E6E9E3;">
+  <i style="width: 8px; height: 8px; margin-top: 6px; border-radius: 999px; background: #A7AEA6; flex-shrink: 0;"></i>
+  <span style="flex: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; line-height: 20px; color: #111511; white-space: nowrap;">Died after birth</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">31 crushed · 5 other</span></span>
+  <span style="font-size: 15px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600; width: 44px; display: inline-block; text-align: right;">36</span>
+  <span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; width: 40px; display: inline-block; text-align: right;">6%</span>
+</div>
+  <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-top: 1px solid #E6E9E3;">
+  <i style="width: 8px; height: 8px; margin-top: 6px; border-radius: 999px; background: #D9DED6; flex-shrink: 0;"></i>
+  <span style="flex: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; line-height: 20px; color: #111511; white-space: nowrap;">Born dead</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">13 stillborn · 5 mummified</span></span>
+  <span style="font-size: 15px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600; width: 44px; display: inline-block; text-align: right;">18</span>
+  <span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; width: 40px; display: inline-block; text-align: right;">3%</span>
+</div>
+  </div>
+  <div style="display: flex; gap: 12px; padding-top: 16px; border-top: 1px solid #E6E9E3;"><span style="flex: 1; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Alive / litter</span><span style="display: flex; align-items: baseline; gap: 2px;"><span style="font-size: 17px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">12.2</span></span></span><span style="flex: 1; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Assisted</span><span style="display: flex; align-items: baseline; gap: 2px;"><span style="font-size: 17px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">6</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">of 49</span></span></span><span style="flex: 1; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Weight / litter</span><span style="display: flex; align-items: baseline; gap: 2px;"><span style="font-size: 17px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">13.1</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">kg</span></span></span></div>
+</div>
+<div style="display: flex; gap: 8px; margin-top: 24px;"><a href="#compare" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; background: #EEF0EB; color: #111511; text-decoration: none; font-size: 14px; font-weight: 500; white-space: nowrap;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 20V11m7 9V5m7 15v-6"></path></svg>Compare</a><a href="#farrowing-done" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; background: #EEF0EB; color: #111511; text-decoration: none; font-size: 14px; font-weight: 500; white-space: nowrap;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"></path></svg>Log</a></div></section></div>
 <div id="compare" style="width: 380px; scroll-margin-top: 24px;">
 <div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">8 · Compare · hover</div>
-<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Inside a done task · Hover a bar → that batch</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Opens from a done task · the farm switches to compare</div>
 <section aria-label="8 · Compare · hover" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
 
 <div style="display: flex; align-items: center; gap: 12px; min-height: 44px;">
@@ -294,11 +300,11 @@
 <div style="height: 1px; background: #E6E9E3; margin: 16px -20px 0;"></div>
 <div style="display: flex; gap: 2px; padding: 4px; margin-top: 16px; border-radius: 999px; background: #EEF0EB;"><span style="display: flex; align-items: center; justify-content: center; flex: 1; height: 36px; border-radius: 999px; font-size: 14px; white-space: nowrap; background: #FFFFFF; box-shadow: 0 2px 5px rgba(17,21,17,.07); font-weight: 600;">Born alive</span><span style="display: flex; align-items: center; justify-content: center; flex: 1; height: 36px; border-radius: 999px; font-size: 14px; white-space: nowrap; background: transparent; box-shadow: none; font-weight: 400;">Stillborn</span><span style="display: flex; align-items: center; justify-content: center; flex: 1; height: 36px; border-radius: 999px; font-size: 14px; white-space: nowrap; background: transparent; box-shadow: none; font-weight: 400;">Died after birth</span></div>
 <div style="display: flex; gap: 8px; margin-top: 12px;"><span style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #E6E9E3; font-size: 13px; color: #111511; white-space: nowrap;">Last 5 batches<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 9 6 6 6-6"></path></svg></span></div>
-<div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px;">
-  <span style="display: flex; align-items: baseline; gap: 10px;"><span style="font-size: 32px; line-height: 38px; font-weight: 600; letter-spacing: -.03em;">12.4</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap;">born alive / litter</span></span>
+<div style="display: flex; align-items: center; justify-content: space-between; margin-top: 24px;">
+  <span style="display: flex; align-items: baseline; gap: 10px;"><span style="font-size: 32px; line-height: 38px; font-weight: 600; letter-spacing: -.03em;">12.9</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap;">born alive / litter</span></span>
   <span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; background: #E3F0E8; flex-shrink: 0;"><span style="width: 6px; height: 6px; border-radius: 999px; background: #28734F;"></span><span style="font-size: 13px; line-height: 20px; color: #28734F; white-space: nowrap; font-weight: 500;">On target</span></span>
 </div>
-<div style="position: relative; height: 164px; margin-top: 20px;">
+<div style="position: relative; height: 164px; margin-top: 24px;">
   <div style="position: absolute; left: 0; right: 0; bottom: 108px; border-top: 1.5px dashed #111511; opacity: 0.4;"></div>
   <span style="position: absolute; right: 0; bottom: 112px;"><span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;">Target 12</span></span>
   <div style="position: absolute; left: 0; right: 72px; bottom: 0; top: 0; display: flex; align-items: flex-end; gap: 12px;">
@@ -323,15 +329,143 @@
     <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">B30</span>
     
   </div><div style="position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
-    <span style="width: 100%; height: 95px; border-radius: 6px 6px 3px 3px; background: #28734F; box-shadow: none;"></span>
+    <span style="width: 100%; height: 109px; border-radius: 6px 6px 3px 3px; background: #28734F; box-shadow: none;"></span>
     <span style="font-size: 12px; line-height: 16px; color: #111511; white-space: nowrap; font-weight: 600;">This</span>
     
   </div>
   </div>
 </div>
-<div style="display: flex; align-items: center; gap: 10px; margin-top: 20px; padding: 10px 14px; border-radius: 12px; background: #111511; color: #FFFFFF;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 3v15l4-3.7 2.6 5.8 2.3-1-2.6-5.7H17L5 3Z"></path></svg><span style="font-size: 13px; line-height: 20px; color: #FFFFFF; white-space: nowrap;">Click a pig on the farm → her own performance</span></div></section></div>
+<div style="display: flex; align-items: center; gap: 10px; margin-top: 24px; padding: 12px 14px; border-radius: 12px; background: #EAF1FC;"><span style="font-size: 13px; line-height: 18px; color: #3972B7; white-space: normal;">Pens now show each sow against the batch. Click one for her card.</span></div></section></div>
+<div id="pencompare" style="width: 380px;">
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600;">9 · On the farm · Compare open</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; margin-bottom: 12px; white-space: nowrap;">Pens tint above or below the batch · hover → one line</div>
+<div style="position: relative; height: 250px; border-radius: 22px; background: #E4EADF; overflow: hidden;">
+  <span style="position: absolute; left: 24px; top: 150px; width: 72px; height: 72px; border-radius: 10px; background: #F4F6F1; box-shadow: inset 0 0 0 1px #CFD6CA; display: flex; align-items: flex-end; padding: 6px 8px; box-sizing: border-box;"><span style="font-size: 12px; line-height: 16px; color: #111511; white-space: nowrap; font-weight: 600;">A5</span></span><span style="position: absolute; left: 108px; top: 150px; width: 72px; height: 72px; border-radius: 10px; background: #FCF0DB; box-shadow: inset 0 0 0 1px #CFD6CA; display: flex; align-items: flex-end; padding: 6px 8px; box-sizing: border-box;"><span style="font-size: 12px; line-height: 16px; color: #111511; white-space: nowrap; font-weight: 600;">A6</span></span><span style="position: absolute; left: 192px; top: 150px; width: 72px; height: 72px; border-radius: 10px; background: #CFE3D6; box-shadow: 0 0 0 3px #28734F; display: flex; align-items: flex-end; padding: 6px 8px; box-sizing: border-box;"><span style="font-size: 12px; line-height: 16px; color: #111511; white-space: nowrap; font-weight: 600;">A7</span></span><span style="position: absolute; left: 276px; top: 150px; width: 72px; height: 72px; border-radius: 10px; background: #F4F6F1; box-shadow: inset 0 0 0 1px #CFD6CA; display: flex; align-items: flex-end; padding: 6px 8px; box-sizing: border-box;"><span style="font-size: 12px; line-height: 16px; color: #111511; white-space: nowrap; font-weight: 600;">A8</span></span>
+  <svg viewBox="0 0 16 22" aria-hidden="true" style="position: absolute; left: 220px; top: 180px; width: 16px; height: 22px; z-index: 5; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25));"><path d="M1 1v17l4.5-4.2 3 6.6 2.6-1.2-3-6.4H14L1 1Z" fill="#111511" stroke="#FFFFFF" stroke-width="1.2" stroke-linejoin="round"></path></svg>
+  <div style="position: absolute; left: 120px; top: 40px; padding: 10px 14px; border-radius: 12px; background: #111511; box-shadow: 0 8px 24px rgba(17,21,17,.18);">
+    <div style="font-size: 13px; line-height: 18px; color: #FFFFFF; font-weight: 500; white-space: nowrap;">A7 · 14 born alive</div>
+    <div style="font-size: 12px; line-height: 16px; color: #B9C2BB; white-space: nowrap;">batch 12.9 · click for her card</div>
+  </div>
+</div></div>
+<div id="compare-pig" style="grid-column: span 2; width: 808px;">
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600;">10 · Compare · a pig clicked</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; margin-bottom: 12px; white-space: nowrap;">Her card opens beside the batch, so the two read together · ✕ closes her card · another pen swaps it</div>
+<div style="display: flex; gap: 48px; align-items: flex-start;"><section aria-label="Her card" style="position: relative; width: 360px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.08);">
+  <div style="display: flex; align-items: center; gap: 12px; min-height: 44px;">
+    <span style="flex: 1; display: flex; flex-direction: column;"><h2 style="margin: 0; font-size: 20px; line-height: 24px; font-weight: 600; letter-spacing: -.02em;">203976</h2><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Sow · A7 · parity 3</span></span>
+    <span style="display: flex; width: 44px; height: 44px; align-items: center; justify-content: center; margin-right: -8px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
+  </div>
+  <div style="height: 1px; background: #E6E9E3; margin: 16px -20px 0;"></div>
+  <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 20px;"><h3 style="margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">This litter</h3><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">15 born</span></div>
+  <div style="position: relative; width: 320px; height: 10px; margin-top: 12px;"><span style="position: absolute; left: 0px; top: 0; width: 254px; height: 10px; background: #3F4A42; opacity: 1; border-radius: 6px 0 0 6px; box-shadow: none;"></span><span style="position: absolute; left: 256px; top: 0; width: 41px; height: 10px; background: #A7AEA6; opacity: 1; border-radius: 0; box-shadow: none;"></span><span style="position: absolute; left: 299px; top: 0; width: 21px; height: 10px; background: #D9DED6; opacity: 1; border-radius: 0 6px 6px 0; box-shadow: none;"></span></div>
+  <div style="display: flex; gap: 6px; margin-top: 10px; margin-left: 0;"><span style="display: flex; flex-direction: column; gap: 2px; padding: 0; min-width: 64px; margin-right: 18px; border-radius: 10px; background: transparent; opacity: 1;">
+    <span style="font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -.02em; color: #111511;">12</span>
+    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;"><i style="width: 6px; height: 6px; border-radius: 2px; background: #3F4A42;"></i>Alive now</span>
+  </span><span style="display: flex; flex-direction: column; gap: 2px; padding: 0; min-width: 64px; margin-right: 18px; border-radius: 10px; background: transparent; opacity: 1;">
+    <span style="font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -.02em; color: #111511;">2</span>
+    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;"><i style="width: 6px; height: 6px; border-radius: 2px; background: #A7AEA6;"></i>Died after birth</span>
+  </span><span style="display: flex; flex-direction: column; gap: 2px; padding: 0; min-width: 64px; margin-right: 18px; border-radius: 10px; background: transparent; opacity: 1;">
+    <span style="font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -.02em; color: #111511;">1</span>
+    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;"><i style="width: 6px; height: 6px; border-radius: 2px; background: #D9DED6;"></i>Born dead</span>
+  </span></div>
+  <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 24px;"><h3 style="margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Against her batch</h3><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">49 litters</span></div>
+  <div style="margin-top: 14px;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Born alive</span><span style="display: flex; align-items: baseline; gap: 6px;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">14</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">batch 12.9</span></span></div>
+  <div style="position: relative; height: 14px; margin-top: 8px; border-radius: 999px; background: #ECEFE9;">
+    <span style="position: absolute; top: 0; bottom: 0; left: 55px; width: 190px; border-radius: 999px; background: #DCE1D8;"></span>
+    <span style="position: absolute; top: -3px; left: 160px; width: 3px; height: 20px; border-radius: 2px; background: #111511;"></span>
+    <span style="position: absolute; top: -1px; left: 183px; width: 16px; height: 16px; border-radius: 999px; background: #28734F; box-shadow: 0 0 0 2px #FFFFFF;"></span>
+  </div></div>
+  <div style="margin-top: 14px;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Born dead</span><span style="display: flex; align-items: baseline; gap: 6px;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">1</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">batch 0.4</span></span></div>
+  <div style="position: relative; height: 14px; margin-top: 8px; border-radius: 999px; background: #ECEFE9;">
+    <span style="position: absolute; top: 0; bottom: 0; left: 0px; width: 180px; border-radius: 999px; background: #DCE1D8;"></span>
+    <span style="position: absolute; top: -3px; left: 23px; width: 3px; height: 20px; border-radius: 2px; background: #111511;"></span>
+    <span style="position: absolute; top: -1px; left: 52px; width: 16px; height: 16px; border-radius: 999px; background: #28734F; box-shadow: 0 0 0 2px #FFFFFF;"></span>
+  </div></div>
+  <div style="margin-top: 14px;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Died after birth</span><span style="display: flex; align-items: baseline; gap: 6px;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">2</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">batch 0.7</span></span></div>
+  <div style="position: relative; height: 14px; margin-top: 8px; border-radius: 999px; background: #ECEFE9;">
+    <span style="position: absolute; top: 0; bottom: 0; left: 0px; width: 200px; border-radius: 999px; background: #DCE1D8;"></span>
+    <span style="position: absolute; top: -3px; left: 34px; width: 3px; height: 20px; border-radius: 2px; background: #111511;"></span>
+    <span style="position: absolute; top: -1px; left: 92px; width: 16px; height: 16px; border-radius: 999px; background: #28734F; box-shadow: 0 0 0 2px #FFFFFF;"></span>
+  </div></div>
+  <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 24px;"><h3 style="margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Against herself</h3><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">3 litters</span></div>
+  <div style="position: relative; height: 136px; margin-top: 12px;">
+    <div style="position: absolute; left: 0; right: 0; bottom: 109px; border-top: 1.5px dashed #111511; opacity: 0.45;"></div>
+    <span style="position: absolute; right: 0; bottom: 113px;"><span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;">Target 12</span></span>
+    <div style="position: absolute; left: 8px; right: 80px; top: 0; bottom: 0; display: flex; align-items: flex-end; gap: 28px;">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <span style="position: relative; width: 100%; height: 76px; border-radius: 8px 8px 4px 4px; background: #CFE3D6;">
+        <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 69px; border-radius: 8px 8px 4px 4px; background: #28734F; opacity: 0.75; display: flex; justify-content: center; padding-top: 6px; box-sizing: border-box;"><span style="font-size: 12px; line-height: 16px; color: #FFFFFF; white-space: nowrap; font-weight: 600;">10</span></span>
+        <span style="position: absolute; left: 0; right: 0; top: -22px; text-align: center; z-index: 2;"><span style="font-size: 12px; line-height: 16px; color: #111511; white-space: nowrap; font-weight: 600; background: #FFFFFF; padding: 0 5px; border-radius: 4px; position: relative;">11</span></span>
+      </span>
+      <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">1st</span>
+    </div><div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <span style="position: relative; width: 100%; height: 89px; border-radius: 8px 8px 4px 4px; background: #CFE3D6;">
+        <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 83px; border-radius: 8px 8px 4px 4px; background: #28734F; opacity: 0.75; display: flex; justify-content: center; padding-top: 6px; box-sizing: border-box;"><span style="font-size: 12px; line-height: 16px; color: #FFFFFF; white-space: nowrap; font-weight: 600;">12</span></span>
+        <span style="position: absolute; left: 0; right: 0; top: -22px; text-align: center; z-index: 2;"><span style="font-size: 12px; line-height: 16px; color: #111511; white-space: nowrap; font-weight: 600; background: #FFFFFF; padding: 0 5px; border-radius: 4px; position: relative;">13</span></span>
+      </span>
+      <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">2nd</span>
+    </div><div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <span style="position: relative; width: 100%; height: 96px; border-radius: 8px 8px 4px 4px; background: #CFE3D6;">
+        <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 83px; border-radius: 8px 8px 4px 4px; background: #28734F; opacity: 1; display: flex; justify-content: center; padding-top: 6px; box-sizing: border-box;"><span style="font-size: 12px; line-height: 16px; color: #FFFFFF; white-space: nowrap; font-weight: 600;">12</span></span>
+        <span style="position: absolute; left: 0; right: 0; top: -22px; text-align: center; z-index: 2;"><span style="font-size: 12px; line-height: 16px; color: #111511; white-space: nowrap; font-weight: 600; background: #FFFFFF; padding: 0 5px; border-radius: 4px; position: relative;">14</span></span>
+      </span>
+      <span style="font-size: 12px; line-height: 16px; color: #111511; white-space: nowrap; font-weight: 600;">This litter</span>
+    </div>
+    </div>
+  </div>
+</section><section aria-label="Compare" style="position: relative; width: 380px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
+
+<div style="display: flex; align-items: center; gap: 12px; min-height: 44px;">
+  <a href="#farrowing-done" aria-label="Back" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; border-radius: 14px; background: #EEF0EB; color: #111511;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m15 5-7 7 7 7"></path></svg></a>
+  <span style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+    <h2 style="margin: 0; font-size: 20px; line-height: 24px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Compare</h2><span style="font-size: 13px; line-height: 18px; color: #6B726D; white-space: nowrap; margin-top: 1px;">Farrowing · Batch 31</span>
+  </span>
+  <span aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; margin-right: -8px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
+</div>
+<div style="height: 1px; background: #E6E9E3; margin: 16px -20px 0;"></div>
+<div style="display: flex; gap: 2px; padding: 4px; margin-top: 16px; border-radius: 999px; background: #EEF0EB;"><span style="display: flex; align-items: center; justify-content: center; flex: 1; height: 36px; border-radius: 999px; font-size: 14px; white-space: nowrap; background: #FFFFFF; box-shadow: 0 2px 5px rgba(17,21,17,.07); font-weight: 600;">Born alive</span><span style="display: flex; align-items: center; justify-content: center; flex: 1; height: 36px; border-radius: 999px; font-size: 14px; white-space: nowrap; background: transparent; box-shadow: none; font-weight: 400;">Stillborn</span><span style="display: flex; align-items: center; justify-content: center; flex: 1; height: 36px; border-radius: 999px; font-size: 14px; white-space: nowrap; background: transparent; box-shadow: none; font-weight: 400;">Died after birth</span></div>
+<div style="display: flex; gap: 8px; margin-top: 12px;"><span style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #E6E9E3; font-size: 13px; color: #111511; white-space: nowrap;">Last 5 batches<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 9 6 6 6-6"></path></svg></span></div>
+<div style="display: flex; align-items: center; justify-content: space-between; margin-top: 24px;">
+  <span style="display: flex; align-items: baseline; gap: 10px;"><span style="font-size: 32px; line-height: 38px; font-weight: 600; letter-spacing: -.03em;">12.9</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap;">born alive / litter</span></span>
+  <span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; background: #E3F0E8; flex-shrink: 0;"><span style="width: 6px; height: 6px; border-radius: 999px; background: #28734F;"></span><span style="font-size: 13px; line-height: 20px; color: #28734F; white-space: nowrap; font-weight: 500;">On target</span></span>
+</div>
+<div style="position: relative; height: 164px; margin-top: 24px;">
+  <div style="position: absolute; left: 0; right: 0; bottom: 108px; border-top: 1.5px dashed #111511; opacity: 0.4;"></div>
+  <span style="position: absolute; right: 0; bottom: 112px;"><span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;">Target 12</span></span>
+  <div style="position: absolute; left: 0; right: 72px; bottom: 0; top: 0; display: flex; align-items: flex-end; gap: 12px;">
+  <div style="position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span style="width: 100%; height: 81px; border-radius: 6px 6px 3px 3px; background: #D9DED6; box-shadow: none;"></span>
+    <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">B26</span>
+    
+  </div><div style="position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span style="width: 100%; height: 87px; border-radius: 6px 6px 3px 3px; background: #D9DED6; box-shadow: none;"></span>
+    <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">B27</span>
+    
+  </div><div style="position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span style="width: 100%; height: 73px; border-radius: 6px 6px 3px 3px; background: #D9DED6; box-shadow: none;"></span>
+    <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">B28</span>
+    
+  </div><div style="position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span style="width: 100%; height: 101px; border-radius: 6px 6px 3px 3px; background: #D9DED6; box-shadow: none;"></span>
+    <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">B29</span>
+    
+  </div><div style="position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span style="width: 100%; height: 90px; border-radius: 6px 6px 3px 3px; background: #D9DED6; box-shadow: none;"></span>
+    <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">B30</span>
+    
+  </div><div style="position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span style="width: 100%; height: 109px; border-radius: 6px 6px 3px 3px; background: #28734F; box-shadow: none;"></span>
+    <span style="font-size: 12px; line-height: 16px; color: #111511; white-space: nowrap; font-weight: 600;">This</span>
+    
+  </div>
+  </div>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; margin-top: 24px; padding: 12px 14px; border-radius: 12px; background: #EAF1FC;"><span style="font-size: 13px; line-height: 18px; color: #3972B7; white-space: normal;">A7 is open beside this. Click another pen to swap her.</span></div></section></div></div>
 <div id="actions" style="width: 380px; scroll-margin-top: 24px;">
-<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">9 · Actions for Batch 32</div>
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">11 · Actions for Batch 32</div>
 <div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Opens from the bar · each opens its own page</div>
 <section aria-label="Actions for Batch 32" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
 <div style="opacity: 0.35;">
@@ -356,7 +490,7 @@
 </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script="" data-props='{"$preview":{"width":1760,"height":2474}}'>
+<script type="text/x-dc" data-dc-script="" data-props='{"$preview":{"width":1760,"height":2761}}'>
 class Component extends DCLogic {
   renderVals() { return {}; }
 }
