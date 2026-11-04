@@ -59,5 +59,14 @@ Canvas: https://claude.ai/artifact/3d1Q4z2YMnFwmFBXtaCeMm (v68 live). Page: `aif
 - Equipment and controls live on the bottom bar (the left shows, the bottom does); cameras are equipment (no Cameras button). Equipment opens tiles (icon, name, one word of state; on bright, off muted, fault red); a tile opens the device card (one big drag control, mode, last change, Apply).
 - A device that serves pens: picking pens **switches the farm to Plan (bird's-eye)**, a box on each pen it serves; the bar becomes the control (On/Off, level, Cancel, Apply to N pens). **Do not change the 3D view for this yet.**
 - The main card holds the pigs of a pen: a fixed-height scrolling list; pigs without an ID as one row.
-- Moving floor (canvas F1–F2; owner 2026-11-04): bound to a **lane**; it can run per pen. **Auto**: a model decides when and in which pens to run; the card shows its day (ammonia, each run and each wait marked); hovering a mark gives why (reasons) and which pens ran or were skipped (also a C1–C12 strip in the card, and the pens that ran tinted on the farm). "Run once now" overrides. **Manual**: the user runs the whole lane or picked pens (Plan); the model only suggests, on the card. No link to the decision board.
+- Moving floor (canvas F1–F2; owner 2026-11-04): bound to a **lane**; it can run per pen. **Auto**: a model decides when and in which pens to run; the card shows its day (ammonia, each run and each wait marked); hovering a mark gives why (reasons, skipped pens); a click pins it, and **Show pens** opens Plan with the pens that ran inked and the skipped ones hatched with why. "Run once now" overrides. **Manual**: the user runs the whole lane or picked pens (Plan); the model only suggests, on the card. No link to the decision board.
 - 3D follow-up (not now): add moving floors to the unit level in the 3D model, bound to lanes and targetable on individual pens.
+
+### Views: 3D, Plan and the levels (owner 2026-11-04; canvas LocationCard "Moving between 3D, Plan and the levels")
+- 3D is home. Plan is a tool: a task that needs pens (Show pens, Pick pens, Pick rows) tilts the camera straight down over the same place, framed to the pens involved.
+- The task ends with Done, Apply, Cancel or Esc and the camera returns to the exact 3D camera the user had (save it on entry).
+- Choosing Plan with the 3D | Plan switch is a choice, not a task: it stays until switched back.
+- While Plan is open for a task, a pill at the top names it and holds Done; the location card and the bar stay.
+- Going to another place (a crumb, another room) ends the task; the new place opens in 3D.
+- Esc: closes a popover, then ends the task (back to 3D), then goes up one level.
+- Farm › Room › Section › Lane › Pen are the same levels in both views; switching view keeps place and level. One short tilt and zoom (~0.4 s) on the same centre; reduced motion: a quick fade.
