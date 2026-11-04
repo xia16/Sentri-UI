@@ -70,3 +70,12 @@ Canvas: https://claude.ai/artifact/3d1Q4z2YMnFwmFBXtaCeMm (v68 live). Page: `aif
 - Going to another place (a crumb, another room) ends the task; the new place opens in 3D.
 - Esc: closes a popover, then ends the task (back to 3D), then goes up one level.
 - Farm › Room › Section › Lane › Pen are the same levels in both views; switching view keeps place and level. One short tilt and zoom (~0.4 s) on the same centre; reduced motion: a quick fade.
+
+## Overhaul (owner 2026-11-04): build the farm view to the two boards
+A presentation demo: the farm view (`ActLayout3JS.dc.html`) rebuilt to `BatchPages.dc.html` and `LocationCard.dc.html`. One ticket at a time (same file), each reviewed and walked before the canvas is published. Briefs: `briefs/O1.md` … `O6.md` (common rules at the top of each).
+- **O1** · the bottom bar (Select · Batches · Equipment · Actions) and the batch panel's running side: Batches, a batch, a running task, the filter dropdown, All dates.
+- **O2** · done tasks, Compare (stacked bars, tooltip), Compare on the farm, her card beside Compare, the pen hover card.
+- **O3** · the pig profile (tags, cycle ring, tasks, litters, details), Performance, Log; the main card for a pen.
+- **O4** · the location card: lowest level, breadcrumb on hover, sibling menus, chips, sensor trend, fault dot.
+- **O5** · Equipment tiles from the bar, device cards, picking pens in Plan, and the view rules (task Plan, restore the 3D camera, pill, Esc).
+- **O6** · the moving floor (demo): Auto with its day and hover reasons, Manual, Show pens in Plan.
