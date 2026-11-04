@@ -12,7 +12,7 @@
     el.appendChild(body); el.appendChild(tip);
     this.ovBody = body; this.ovTipEl = tip;
     el.addEventListener('click', (e) => { const h = e.target.closest('[data-a]'); if (!h || !el.contains(h)) { if (this.ovS().pop && !e.target.closest('[data-pop]')) this.ovSet({ pop: '' }); return; } e.preventDefault(); e.stopPropagation(); this.ovAct(h.getAttribute('data-a'), h); });
-    el.addEventListener('mouseover', (e) => { const h = e.target.closest('[data-tip]'); if (h && el.contains(h)) this.ovTip(h.getAttribute('data-tip'), h); const lc = e.target.closest('[data-zone="loc"]'); if (lc && !this.ovS().loc) this.ovSet({ loc: 'hover' }); });
+    el.addEventListener('mouseover', (e) => { const h = e.target.closest('[data-tip]'); if (h && el.contains(h)) this.ovTip(h.getAttribute('data-tip'), h); const cr = e.target.closest('[data-crumb]'); if (cr && el.contains(cr) && this.ovS().crumb !== +cr.getAttribute('data-crumb')) { this.ovSet({ crumb: +cr.getAttribute('data-crumb'), loc: 'hover' }); return; } const lc = e.target.closest('[data-zone="loc"]'); if (lc && !this.ovS().loc) this.ovSet({ loc: 'hover' }); });
     el.addEventListener('mouseout', (e) => { const h = e.target.closest('[data-tip]'); if (h && (!e.relatedTarget || !h.contains(e.relatedTarget))) this.ovTipHide(); const lc = e.target.closest('[data-zone="loc"]'), to = e.relatedTarget; if (lc && this.ovS().loc && !(to && to.closest && to.closest('[data-zone="loc"]'))) this.ovSet({ loc: '', crumb: -1 }); });
     if (!this.ovKey) { this.ovKey = (e) => { if (e.key !== 'Escape' || !this.ovOn()) return; const O = this.ovS(); if (O.pop) { this.ovSet({ pop: '' }); return; } if (O.picking) { this.ovAct('pickcancel'); return; } if (O.showing) { this.ovAct('showdone'); return; } if (O.panel) this.ovAct(O.hist.length ? 'back' : 'close'); }; window.addEventListener('keydown', this.ovKey); }
     this.ovPaint();
@@ -46,7 +46,7 @@
       return;
     }
     if (k === 'open') { this.ovPush(); this.ovSet({ panel: 'batch', batchId: v, pop: '' }); if (this.batchData()[v]) this.openBatch(v); return; }
-    if (k === 'task') { this.ovPush(); if (!this.ui().bv) this.openBatch('32'); this.put({ bvOnly: '' }); this.openBatchTask(v === 'post' ? 'post' : 'farrow'); this.ovSet({ panel: 'task', taskId: v === 'post' ? 'post' : 'farrow', only: '', pop: '' }); return; }
+    if (k === 'task') { const pr = v.split('/'), bid = pr.length > 1 ? pr[0] : (O.batchId || '32'), tid = pr.length > 1 ? pr[1] : v; this.ovPush(); if (!this.ui().bv || String(this.ui().bv.id) !== bid) this.openBatch(bid); this.put({ bvOnly: '' }); this.openBatchTask(tid); this.ovSet({ panel: 'task', batchId: bid, taskId: tid, only: '', pop: '' }); return; }
     if (k === 'dates') { this.ovPush(); this.ovSet({ panel: 'dates', pop: '' }); return; }
     if (k === 'donetask') { this.ovPush(); this.ovSet({ panel: 'done', pop: '' }); return; }
     if (k === 'only') { const nv = O.only === v ? '' : v; this.put({ bvOnly: nv }); this.repaintBv(); this.ovSet({ only: nv }); return; }
@@ -57,20 +57,57 @@
     if (k === 'select') { this.ovSet({ selecting: !O.selecting }); return; }
     if (k === 'crumb') { this.ovSet({ crumb: +v, loc: 'hover' }); return; }
     if (k === 'goroom') { this.ovSet({ loc: '', crumb: -1 }); if (this.ui().bv) this.closeBatch(); this.goRoom(v); return; }
-    if (k === 'gofarm') { this.ovSet({ loc: '', crumb: -1 }); this.goScope('', ''); return; }
+    if (k === 'gofarm') { this.ovSet({ loc: '', crumb: -1 }); if (this.ui().bv) this.closeBatch(); this.goScope('', ''); return; }
+    if (k === 'gozone') { this.ovSet({ loc: '', crumb: -1 }); if (this.ui().bv) this.closeBatch(); this.goScope(v, ''); return; }
+    if (k === 'gosec') { const sc = this.secById(v); this.ovSet({ loc: '', crumb: -1 }); if (this.ui().bv) this.closeBatch(); this.goScope(sc ? (sc.zone || '') : '', v); return; }
     if (this.ovAct2 && this.ovAct2(k, v, h, at)) return;
   }
-  // the location card: only where you are; hover → the breadcrumb; a crumb → its siblings
+  // ----- the location card, v2: every level switchable; pigs at every level -----
   ovPlace(u) {
-    const r = u.view === 'room' ? this.roomById(u.roomId) : null, ps = u.psel || [];
-    const pen = r && ps.length === 1 ? ps[0] : (r && u.pen ? u.pen : '');
-    const crumbs = [{ label: 'Farm', a: 'gofarm' }];
-    const sec = r && r.section ? this.secById(r.section) : (u.secId ? this.secById(u.secId) : null);
-    if (sec) crumbs.push({ label: sec.name, a: 'noop' });
-    if (r) crumbs.push({ label: r.name, a: 'goroom:' + r.id, sibs: true, roomId: r.id });
-    const name = pen ? 'Pen ' + pen : r ? r.name : (sec ? sec.name : (this.M().name || 'Hillside Sow Farm'));
-    if (pen) crumbs.push({ label: 'Pen ' + pen, a: 'noop' });
-    return { r: r, pen: pen, name: name, crumbs: crumbs.slice(0, -1) };
+    const M = this.M(), r = u.view === 'room' ? this.roomById(u.roomId) : null, ps = u.psel || [];
+    const pen = r && ps.length === 1 ? ps[0] : '';
+    const secId = r ? (r.section || '') : (u.secId || ''), sec = secId ? this.secById(secId) : null;
+    const zoneId = r ? this.zoneOfRoom(r) : (sec ? (sec.zone || u.zoneId || '') : (u.zoneId || '')), zone = zoneId ? this.zoneById(zoneId) : null;
+    const levels = [{ kind: 'farm', label: M.name || 'Hillside Sow Farm', a: 'gofarm' }];
+    if (zone) levels.push({ kind: 'zone', id: zone.id, label: zone.name, a: 'gozone:' + zone.id });
+    if (sec) levels.push({ kind: 'section', id: sec.id, zoneId: zoneId, label: sec.name, a: 'gosec:' + sec.id });
+    if (r) levels.push({ kind: 'room', id: r.id, secId: secId, zoneId: zoneId, label: r.name, a: 'goroom:' + r.id });
+    if (pen) levels.push({ kind: 'pen', label: 'Pen ' + pen, a: 'noop' });
+    const cur = levels[levels.length - 1];
+    const rooms = r ? [r] : sec ? this.roomsOf(sec.id) : zone ? M.rooms.filter((x) => this.zoneOfRoom(x) === zone.id) : M.rooms;
+    return { r: r, pen: pen, name: cur.label, cur: cur, crumbs: levels.slice(0, -1), rooms: rooms, levels: levels };
+  }
+  ovPigsIn(rooms) { const n = {}; rooms.forEach((x) => this.ovPigs(x.id).forEach((k) => { n[k[1]] = (n[k[1]] || 0) + k[0]; })); return Object.keys(n).map((k) => [n[k], k]).sort((a, b) => b[0] - a[0]); }
+  ovSibs(lv) {
+    const M = this.M();
+    if (lv.kind === 'zone') return M.zones.map((z) => ({ id: z.id, label: z.name, a: 'gozone:' + z.id, rooms: M.rooms.filter((x) => this.zoneOfRoom(x) === z.id) }));
+    if (lv.kind === 'section') return M.sections.filter((s) => (s.zone || '') === (lv.zoneId || '')).map((s) => ({ id: s.id, label: s.name, a: 'gosec:' + s.id, rooms: this.roomsOf(s.id) }));
+    if (lv.kind === 'room') return M.rooms.filter((x) => (x.section || '') === (lv.secId || '') && (lv.secId || this.zoneOfRoom(x) === lv.zoneId)).map((x) => ({ id: x.id, label: x.name, a: 'goroom:' + x.id, rooms: [x] }));
+    return [];
+  }
+  ovLoc(u) {
+    const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u), A = H.A;
+    const kinds = P.pen ? this.ovPigs(P.r.id, P.pen) : this.ovPigsIn(P.rooms), fault = P.rooms.some((x) => this.ovFault(x.id, P.pen));
+    this.ovTips = this.ovTips || {};
+    const word = (x) => x[0] + ' ' + (x[0] === 1 ? x[1].replace(/s$/, '') : x[1]);
+    const total = kinds.reduce((a, x) => a + x[0], 0), vf = u.vf && u.vf.kind === 'stage' ? u.vf.id : '', SW = ['2F3A33', '4F5D53', '718075', '93A096', 'B4BFB6', 'D3DBD4'];
+    this.ovKinds = kinds;
+    this.ovTips.kinds = () => H.tip(total + ' pigs', kinds.map((x, j) => ['#' + SW[Math.min(j, 5)], x[1].charAt(0).toUpperCase() + x[1].slice(1), String(x[0])]), 'Click to show one kind on the farm');
+    const vk = vf ? kinds.find((x) => this.ovKindId(x[1]) === vf) : null;
+    let chips = total ? H.lchip(H.I.pig, vk ? word(vk) + ' shown' : total + (total === 1 ? ' pig' : ' pigs'), { tip: 'kinds', a: 'kinds', on: O.pop === 'kinds' || !!vk }) : '';
+    if (P.r && !P.pen) { const gest = /gest/i.test(P.r.name); chips += H.lchip(H.I.temp, '22.4 °C', { a: 'trend:temp', on: O.pop === 'trend' && O.trendKind === 'temp' }) + H.lchip(H.I.drop, '61 %', { a: 'trend:hum', on: O.pop === 'trend' && O.trendKind === 'hum' }) + H.lchip(H.I.air, gest ? 'NH₃ 9.4' : 'NH₃ 6.8', gest ? { bg: K.amberT, color: K.amber, a: 'trend:nh3', on: O.pop === 'trend' && O.trendKind === 'nh3' } : { a: 'trend:nh3', on: O.pop === 'trend' && O.trendKind === 'nh3' }); }
+    // the crumbs (ancestors) and the name each open their siblings on hover
+    const all = P.levels, curIdx = all.length - 1;
+    const crumb = (lv, i) => '<span' + A(lv.kind === 'farm' ? 'gofarm' : 'crumb:' + i) + (lv.kind === 'farm' ? '' : ' data-crumb="' + i + '"') + ' style="' + H.st({ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '12px', lineHeight: '18px', padding: '1px 5px', borderRadius: '6px', color: i === O.crumb ? K.ink : K.muted, background: i === O.crumb ? K.press : 'transparent', fontWeight: i === O.crumb ? 600 : 400, whiteSpace: 'nowrap', cursor: 'pointer' }) + '">' + H.esc(lv.label) + (lv.kind !== 'farm' ? H.icon(H.I.down, 11) : '') + '</span><span style="color: #B5BDB2; font-size: 11px;">›</span>';
+    const crumbsHtml = O.loc && P.crumbs.length ? '<div data-zone="crumbs" style="' + H.st({ display: 'flex', alignItems: 'center', gap: '2px', marginBottom: '6px', flexWrap: 'wrap' }) + '">' + P.crumbs.map(crumb).join('') + '</div>' : '';
+    const nameHtml = '<span' + (P.cur.kind !== 'farm' && P.cur.kind !== 'pen' ? A('crumb:' + curIdx) + ' data-crumb="' + curIdx + '"' : '') + ' style="' + H.st({ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '2px 6px', margin: '-2px -6px', borderRadius: '8px', background: O.crumb === curIdx ? K.press : 'transparent', cursor: P.cur.kind !== 'farm' && P.cur.kind !== 'pen' ? 'pointer' : 'default' }) + '">' + H.t(P.name, { fontSize: '15px', fontWeight: 600 }) + (fault ? H.dot(K.red, 8) : '') + (O.loc && P.cur.kind !== 'farm' && P.cur.kind !== 'pen' ? H.icon(H.I.down, 13) : '') + '</span>';
+    let menu = '';
+    const lv = O.crumb >= 0 ? all[O.crumb] : null;
+    if (O.loc && lv && lv.kind !== 'farm' && lv.kind !== 'pen') {
+      const sibs = this.ovSibs(lv);
+      menu = '<div data-pop="1" style="' + H.st({ position: 'absolute', left: '8px', top: '100%', marginTop: '6px', width: '280px', maxHeight: '360px', overflowY: 'auto', padding: '6px 0', borderRadius: '14px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 14px 32px rgba(17,21,17,.16)', zIndex: 6 }) + '"><div style="' + H.st({ padding: '4px 12px 6px', fontSize: '12px', color: K.muted }) + '">' + ({ zone: 'Zones', section: 'Sections', room: 'Rooms' }[lv.kind]) + '</div>' + sibs.map((x) => { const k = this.ovPigsIn(x.rooms).reduce((a, y) => a + y[0], 0), on = x.id === lv.id, f = x.rooms.some((y) => this.ovFault(y.id)); return '<div' + A(x.a) + ' style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', height: '38px', padding: '0 12px', fontSize: '13.5px', color: K.ink, fontWeight: on ? 600 : 400, background: on ? K.press : 'transparent', cursor: 'pointer' }) + '"><span style="flex: 1;">' + H.esc(x.label) + '</span>' + H.mu(k ? k + ' pigs' : 'empty') + (f ? H.dot(K.red, 7) : '') + (on ? H.icon(H.I.check, 14) : '') + '</div>'; }).join('') + '</div>';
+    }
+    return '<div data-zone="loc" style="' + H.st({ position: 'absolute', left: '16px', top: '16px', padding: '10px 12px', borderRadius: '16px', background: '#FFFFFF', boxShadow: (O.loc ? '0 0 0 1.5px ' + K.ink + ', ' : '') + '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", maxWidth: 'calc(100% - 580px)', minWidth: '180px' }) + '">' + crumbsHtml + '<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }) + '">' + nameHtml + chips + '</div>' + menu + '</div>';
   }
   ovPigs(roomId, code) {
     const cells = (this.IP && this.IP.cell[roomId]) || {}, n = {};
@@ -78,28 +115,12 @@
     return Object.keys(n).map((k) => [n[k], n[k] === 1 ? k.replace(/s$/, '') : k]).sort((a, b) => b[0] - a[0]);
   }
   ovFault(roomId, code) { const cells = (this.IP && this.IP.cell[roomId]) || {}; return Object.keys(cells).some((c) => (!code || c === code) && cells[c] && cells[c].flag && cells[c].flag.lvl === 'urgent'); }
-  ovLoc(u) {
-    const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u), A = H.A;
-    const kinds = P.r ? this.ovPigs(P.r.id, P.pen) : [], fault = P.r ? this.ovFault(P.r.id, P.pen) : false;
-    this.ovTips = this.ovTips || {};
-    let chips = kinds.slice(0, kinds.length > 3 ? 2 : 3).map((x, i) => H.lchip(i ? '' : H.I.pig, x[0] + ' ' + x[1])).join('');
-    if (kinds.length > 3) { this.ovTips.kinds = () => H.tip(kinds.reduce((a, x) => a + x[0], 0) + ' pigs', kinds.map((x, j) => ['#' + ['2F3A33', '4F5D53', '718075', '93A096', 'B4BFB6', 'D3DBD4'][Math.min(j, 5)], x[1].charAt(0).toUpperCase() + x[1].slice(1), String(x[0])]), 'Click a kind → only those pens'); chips += H.lchip('', '+' + (kinds.length - 2), { tip: 'kinds' }); }
-    if (P.r && !P.pen) { chips += H.lchip(H.I.temp, '22.4 °C') + H.lchip(H.I.drop, '61 %') + (/gest/i.test(P.r.name) ? H.lchip(H.I.air, 'NH₃ 9.4', { bg: K.amberT, color: K.amber, a: 'trend', on: O.pop === 'trend' }) : H.lchip(H.I.air, 'NH₃ 6.8', { a: 'trend' })); }
-    const crumbsHtml = O.loc ? '<div data-zone="crumbs" style="' + H.st({ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }) + '">' + P.crumbs.map((c, i) => '<span' + A(c.sibs ? 'crumb:' + i : c.a) + ' style="' + H.st({ fontSize: '12px', lineHeight: '18px', padding: '1px 5px', borderRadius: '6px', color: i === O.crumb ? K.ink : K.muted, background: i === O.crumb ? K.press : 'transparent', fontWeight: i === O.crumb ? 600 : 400, whiteSpace: 'nowrap', cursor: 'pointer' }) + '">' + H.esc(c.label) + '</span>' + (i < P.crumbs.length - 1 || true ? '<span style="color: #B5BDB2; font-size: 11px;">›</span>' : '')).join('') + '</div>' : '';
-    let menu = '';
-    const cc = O.crumb >= 0 ? P.crumbs[O.crumb] : null;
-    if (O.loc && cc && cc.sibs) {
-      const me = this.roomById(cc.roomId), sibs = this.M().rooms.filter((x) => (x.section || '') === (me.section || ''));
-      menu = '<div data-pop="1" style="' + H.st({ position: 'absolute', left: '40px', top: '100%', marginTop: '6px', width: '270px', padding: '6px 0', borderRadius: '14px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 14px 32px rgba(17,21,17,.16)', zIndex: 6 }) + '">' + sibs.map((x) => { const k = this.ovPigs(x.id).reduce((a, y) => a + y[0], 0), on = x.id === cc.roomId, f = this.ovFault(x.id); return '<div' + A('goroom:' + x.id) + ' style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', height: '38px', padding: '0 12px', fontSize: '13.5px', color: K.ink, fontWeight: on ? 600 : 400, background: on ? K.press : 'transparent', cursor: 'pointer' }) + '"><span style="flex: 1;">' + H.esc(x.name) + '</span>' + H.mu(k ? k + ' pigs' : 'empty') + (f ? H.dot(K.red, 7) : '') + (on ? H.icon(H.I.check, 14) : '') + '</div>'; }).join('') + '</div>';
-    }
-    return '<div data-zone="loc" style="' + H.st({ position: 'absolute', left: '16px', top: '16px', padding: '10px 12px', borderRadius: '16px', background: '#FFFFFF', boxShadow: (O.loc ? '0 0 0 1.5px ' + K.ink + ', ' : '') + '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", maxWidth: 'calc(100% - 580px)', minWidth: '180px' }) + '">' + crumbsHtml + '<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }) + '"><span style="display: inline-flex; align-items: center; gap: 6px;">' + H.t(P.name, { fontSize: '15px', fontWeight: 600 }) + (fault ? H.dot(K.red, 8) : '') + '</span>' + chips + '</div>' + menu + '</div>';
-  }
   ovPanelHtml(O, u) {
     const p = O.panel;
-    if (p === 'list') return OVP.list(O);
-    if (p === 'batch') return OVP.batch(O);
-    if (p === 'task') return OVP.task(O);
-    if (p === 'dates') return OVP.dates(O);
+    if (p === 'list') return this.ovListHtml();
+    if (p === 'batch') return this.ovBatchHtml(O.batchId);
+    if (p === 'task') return this.ovTaskHtml(O.batchId || '32', O.taskId, O);
+    if (p === 'dates') return this.ovDatesHtml(O.batchId || '32');
     if (this.ovPanel2) return this.ovPanel2(p, O, u);
     return '';
   }
@@ -143,7 +164,7 @@
     const html = this.ovLoc(u) +
       (panel ? '<section data-zone="panel" aria-label="Panel" style="' + H.st({ position: 'absolute', right: '16px', top: '72px', maxHeight: 'calc(100% - 164px)', width: '380px', boxSizing: 'border-box', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint, boxShadow: '0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12)', overflowY: 'auto', overflowX: 'hidden', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums', color: K.ink, fontSize: '14px', lineHeight: '20px' }) + '">' + panel + '</section>' : '') +
       (this.ovSide ? this.ovSide(O, u) : '') +
-      '<div data-zone="bar" role="toolbar" aria-label="Actions bar" style="' + H.st({ position: 'absolute', left: '16px', right: '16px', bottom: '16px', height: '60px', padding: '0 8px', boxSizing: 'border-box', borderRadius: '18px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', display: 'flex', alignItems: 'center', gap: '6px', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif" }) + '">' + OVP.bar(Object.assign({}, O, { barCtl: O.picking && this.ovBarCtl ? this.ovBarCtl(O) : '' })) + '</div>' +
+      '<div data-zone="bar" role="toolbar" aria-label="Actions bar" style="' + H.st({ position: 'absolute', left: '16px', right: '16px', bottom: '16px', height: '60px', padding: '0 8px', boxSizing: 'border-box', borderRadius: '18px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', display: 'flex', alignItems: 'center', gap: '6px', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif" }) + '">' + OVP.bar(Object.assign({}, O, { barCtl: O.picking && this.ovBarCtl ? this.ovBarCtl(O) : '', eqOk: u.view === 'room' })) + '</div>' +
       this.ovPopHtml(O, u) + (this.ovExtra ? this.ovExtra(O, u) : '');
     if (html === this.ovLast) return;
     const pEl = this.ovBody.querySelector('[data-zone="panel"]'), keep = pEl ? pEl.scrollTop : 0, sc = {};

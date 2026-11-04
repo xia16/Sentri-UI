@@ -3085,7 +3085,8 @@ const OVH = (function () {
   const lchip = (ic, label, o) => { o = o || {}; return '<span' + (o.a ? A(o.a) : '') + (o.tip ? TIP(o.tip) : '') + ' style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '5px', height: '28px', padding: '0 9px', borderRadius: '999px', background: o.bg || '#F2F4EF', color: o.color || K.ink, fontSize: '12.5px', fontWeight: 500, whiteSpace: 'nowrap', boxShadow: o.on ? 'inset 0 0 0 1.5px ' + K.ink : 'none', cursor: o.a ? 'pointer' : 'default' }) + '">' + (ic ? icon(ic, 14) : '') + esc(label) + '</span>'; };
   const ptag = (kind, ic, label, sub, o) => { o = o || {}; const m = { red: [K.redT, K.red, '#F0CFCB'], amber: [K.amberT, K.amber, '#F1DDB4'], grey: ['#FFFFFF', K.ink, K.line] }[kind]; return '<span' + (o.tip ? TIP(o.tip) : '') + ' style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '6px', height: '30px', padding: '0 10px', borderRadius: '999px', background: m[0], border: '1px solid ' + m[2], color: m[1], fontSize: '13px', fontWeight: 500, whiteSpace: 'nowrap', boxSizing: 'border-box', cursor: 'default' }) + '">' + (ic ? icon(ic, 15) : '') + esc(label) + (sub ? '<span style="font-weight: 400; opacity: .8;">' + esc(sub) + '</span>' : '') + '</span>'; };
 
-  return { K, st, esc, t, mu, sm, icon, I, chev, A, TIP, badge, card, head, sec, meta, wbtn, row, field, seg, dot, check, tip, radial, centre, legend, kpi, lchip, ptag };
+  const tipText = (headTxt, text, sub) => '<div style="' + st({ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '12px', marginBottom: '6px' }) + '"><span style="' + st({ fontSize: '13px', fontWeight: 600, color: K.ink }) + '">' + esc(headTxt) + '</span>' + (sub ? '<span style="' + st({ fontSize: '12px', color: K.muted }) + '">' + esc(sub) + '</span>' : '') + '</div><div style="' + st({ fontSize: '13px', lineHeight: '19px', color: K.ink, whiteSpace: 'normal' }) + '">' + esc(text) + '</div>';
+  return { tipText, K, st, esc, t, mu, sm, icon, I, chev, A, TIP, badge, card, head, sec, meta, wbtn, row, field, seg, dot, check, tip, radial, centre, legend, kpi, lchip, ptag };
 })();
 
 // ===== OVP: the pages of the overhauled UI (demo data from the canvas boards) =====
@@ -3111,7 +3112,7 @@ const OVP = (function () {
   function bar(O) {
     const b = (ic, l, a, on) => '<button type="button"' + A(a) + ' style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '8px', height: '44px', padding: '0 14px', borderRadius: '12px', border: 0, background: on ? K.press : 'transparent', boxShadow: on ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '14px', fontWeight: on ? 600 : 500, color: K.ink, whiteSpace: 'nowrap', cursor: 'pointer', fontFamily: 'inherit' }) + '">' + icon(ic, 18) + esc(l) + '</button>';
     if (O.barCtl) return O.barCtl;
-    return b(I.select, 'Select', 'select', O.selecting) + b(I.layers, 'Batches', 'batches', O.panel && O.panel !== 'pig' && O.panel !== 'pigperf' && O.panel !== 'piglog' && O.panel !== 'pen') + b(I.tool, 'Equipment', 'equip', !!O.pop && O.pop.indexOf('eq') === 0) + '<span style="flex: 1;"></span><button type="button"' + A('actions') + ' style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '8px', height: '44px', padding: '0 18px', borderRadius: '12px', border: 0, background: K.ink, color: '#FFFFFF', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }) + '">Actions</button>';
+    return b(I.select, 'Select', 'select', O.selecting) + b(I.layers, 'Batches', 'batches', O.panel && O.panel !== 'pig' && O.panel !== 'pigperf' && O.panel !== 'piglog' && O.panel !== 'pen') + (O.eqOk ? b(I.tool, 'Equipment', 'equip', !!O.pop && O.pop.indexOf('eq') === 0) : '') + '<span style="flex: 1;"></span><button type="button"' + A('actions') + ' style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '8px', height: '44px', padding: '0 18px', borderRadius: '12px', border: 0, background: K.ink, color: '#FFFFFF', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }) + '">Actions</button>';
   }
 
   // ----- the batch panel -----
@@ -3215,8 +3216,9 @@ const OVP2 = (function () {
   function littersMini(L, P) { const h = 96, y = (n) => Math.round((n / 16) * h); return '<div style="' + st({ display: 'flex', alignItems: 'baseline', gap: '8px' }) + '"><span style="' + st({ fontSize: '26px', lineHeight: '32px', fontWeight: 600, letterSpacing: '-.03em' }) + '">' + esc(P.headN) + '</span>' + mu(P.headL) + '<span style="margin-left: auto;">' + mu('target 12') + '</span></div><div style="' + st({ position: 'relative', height: (h + 22) + 'px', marginTop: '14px' }) + '"><div style="' + st({ position: 'absolute', left: 0, right: '58px', bottom: (22 + y(12)) + 'px', borderTop: '1.5px dashed ' + K.ink, opacity: 0.5, zIndex: 2 }) + '"></div><span style="' + st({ position: 'absolute', right: 0, bottom: (22 + y(12) - 8) + 'px' }) + '">' + sm('Target 12', { color: K.ink }) + '</span><div style="' + st({ position: 'absolute', left: 0, right: '70px', top: 0, bottom: 0, display: 'flex', alignItems: 'flex-end', gap: '10px' }) + '">' + L.map((l) => '<div' + TIP('lit-' + l[0]) + ' style="' + st({ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }) + '"><span style="' + st({ position: 'relative', height: y(l[1]) + 'px', borderRadius: '5px 5px 2px 2px', background: '#CFE3D6', opacity: l[3] ? 1 : 0.65 }) + '"><span style="' + st({ position: 'absolute', left: 0, right: 0, bottom: 0, height: y(l[2]) + 'px', borderRadius: '5px 5px 2px 2px', background: G }) + '"></span></span><span style="text-align: center;">' + sm(l[0], { color: l[3] ? K.ink : K.muted, fontWeight: l[3] ? 600 : 400 }) + '</span></div>').join('') + '</div></div>'; }
   function pig(P) {
     const tags = (P.tags || []).map((x, i) => H.ptag(x[0], x[1], x[2], x[3], { tip: 'tag-' + i }));
-    return H.head(P.tag, P.meta, P.back ? 'back' : '') + tagRow(tags) + '<div style="margin-top: 12px;">' + cycleTile(P) + '</div>' +
-      (P.tasks && P.tasks.length ? H.sec('Her tasks') + H.card(P.tasks.map((x, i) => H.row(t(x[0]), H.badge(x[1], x[2]), !i, x[3])).join(''), { pad: '0 16px' }) : '') +
+    const tasksH = (!P.tasks.length && P.npd == null) ? H.sec('Now', '', 20) + H.card('<div style="' + st({ display: 'flex', alignItems: 'baseline', gap: '8px' }) + '">' + t(P.stage, { fontSize: '17px', fontWeight: 600 }) + mu('day ' + P.d + ' of ' + P.of + ' · no task running') + '</div>', { pad: '14px 16px' }) : P.npd != null ? H.sec('Non-productive', '', 20) + H.card('<div style="' + st({ display: 'flex', alignItems: 'baseline', gap: '8px' }) + '"><span style="' + st({ fontSize: '30px', lineHeight: '36px', fontWeight: 600, letterSpacing: '-.03em' }) + '">' + P.npd + '</span>' + mu('days without a production task') + '</div>', { pad: '14px 16px' })
+      : H.sec('Her tasks', P.batchName ? '<span' + A('open:' + P.batch) + ' style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '2px', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }) + '">' + esc(P.batchName) + icon(I.chev, 14) + '</span>' : '', 20) + H.card(P.tasks.map((x, i) => '<div' + A(x[3]) + ' style="' + st({ display: 'flex', alignItems: 'center', gap: '10px', minHeight: '56px', borderTop: i ? '1px solid ' + K.line : '0', cursor: 'pointer' }) + '"><span style="' + st({ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }) + '">' + t(x[0], { fontWeight: 500 }) + (x[4] ? mu(x[4]) : '') + '</span>' + H.badge(x[1], x[2]) + H.chev + '</div>').join(''), { pad: '0 16px' });
+    return H.head(P.tag, P.meta, P.back ? 'back' : '') + tagRow(tags) + tasksH +
       H.sec('Her litters', '<span' + A('pigperf') + ' style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '2px', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }) + '">Performance' + icon(I.chev, 14) + '</span>') + H.card(littersMini(P.litters, P)) +
       H.sec('Details') + H.card(factsGrid(P.facts), { pad: '2px 16px' }) +
       '<div style="' + st({ display: 'flex', gap: '8px', marginTop: '20px' }) + '">' + H.wbtn(I.litters, 'Performance', 'pigperf') + H.wbtn(I.log, 'Log', 'piglog') + '</div>';
@@ -5284,7 +5286,7 @@ class Component extends DCLogic {
     clearTimeout(this.locScrollT);
     this.locScrollT = setTimeout(() => { if (this.locEquipment && this.locBody) this.locBody.scrollTop = this.locEquipment.offsetTop - this.locBody.offsetTop; }, 100);
   }
-  locationMatches(cell, vf) { return !!cell && (vf.kind === 'stage' ? cell.kind === vf.id : !!cell.flag && cell.flag.lvl === vf.id); }
+  locationMatches(cell, vf) { return !!cell && (vf.kind === 'stage' ? (cell.kind === vf.id || (vf.id === 'sow' && cell.kind === 'litter')) : !!cell.flag && cell.flag.lvl === vf.id); }
   locationFilter(kind, id) {
     const old = this.ui().vf;
     this.put({ vf: old && old.kind === kind && old.id === id ? null : { kind: kind, id: id } });
@@ -5360,6 +5362,7 @@ class Component extends DCLogic {
     // View: the card is only the place's name, top left; the model takes the width, under it
     if (this.IP) { ins.l = 28; ins.t = Math.max(ins.t, 104); ins.r = prof ? pw : 28; }
     if (this.IP && u.view === 'room') ins.t = Math.max(ins.t, 128);
+    if (this.ovOn && this.ovOn(u)) { const O = this.ovS(); /* ovInsets */ ins.l = 28; ins.t = 84; ins.b = 92; ins.r = O.panel ? 412 + (O.her && O.panel === 'compare' ? 376 : 0) : 28; return ins; }
     if (this.IP && u.mode === 'saved' && u.vm === 'view') {
       const hasPen = !u.bv && (u.psel || []).length === 1;
       const rs = u.view === 'room' ? this.M().rooms.filter((r) => r.id === u.roomId) : u.secId ? this.roomsOf(u.secId) : u.zoneId ? this.M().rooms.filter((r) => this.zoneOfRoom(r) === u.zoneId) : this.M().rooms;
@@ -8812,7 +8815,7 @@ class Component extends DCLogic {
     el.appendChild(body); el.appendChild(tip);
     this.ovBody = body; this.ovTipEl = tip;
     el.addEventListener('click', (e) => { const h = e.target.closest('[data-a]'); if (!h || !el.contains(h)) { if (this.ovS().pop && !e.target.closest('[data-pop]')) this.ovSet({ pop: '' }); return; } e.preventDefault(); e.stopPropagation(); this.ovAct(h.getAttribute('data-a'), h); });
-    el.addEventListener('mouseover', (e) => { const h = e.target.closest('[data-tip]'); if (h && el.contains(h)) this.ovTip(h.getAttribute('data-tip'), h); const lc = e.target.closest('[data-zone="loc"]'); if (lc && !this.ovS().loc) this.ovSet({ loc: 'hover' }); });
+    el.addEventListener('mouseover', (e) => { const h = e.target.closest('[data-tip]'); if (h && el.contains(h)) this.ovTip(h.getAttribute('data-tip'), h); const cr = e.target.closest('[data-crumb]'); if (cr && el.contains(cr) && this.ovS().crumb !== +cr.getAttribute('data-crumb')) { this.ovSet({ crumb: +cr.getAttribute('data-crumb'), loc: 'hover' }); return; } const lc = e.target.closest('[data-zone="loc"]'); if (lc && !this.ovS().loc) this.ovSet({ loc: 'hover' }); });
     el.addEventListener('mouseout', (e) => { const h = e.target.closest('[data-tip]'); if (h && (!e.relatedTarget || !h.contains(e.relatedTarget))) this.ovTipHide(); const lc = e.target.closest('[data-zone="loc"]'), to = e.relatedTarget; if (lc && this.ovS().loc && !(to && to.closest && to.closest('[data-zone="loc"]'))) this.ovSet({ loc: '', crumb: -1 }); });
     if (!this.ovKey) { this.ovKey = (e) => { if (e.key !== 'Escape' || !this.ovOn()) return; const O = this.ovS(); if (O.pop) { this.ovSet({ pop: '' }); return; } if (O.picking) { this.ovAct('pickcancel'); return; } if (O.showing) { this.ovAct('showdone'); return; } if (O.panel) this.ovAct(O.hist.length ? 'back' : 'close'); }; window.addEventListener('keydown', this.ovKey); }
     this.ovPaint();
@@ -8846,7 +8849,7 @@ class Component extends DCLogic {
       return;
     }
     if (k === 'open') { this.ovPush(); this.ovSet({ panel: 'batch', batchId: v, pop: '' }); if (this.batchData()[v]) this.openBatch(v); return; }
-    if (k === 'task') { this.ovPush(); if (!this.ui().bv) this.openBatch('32'); this.put({ bvOnly: '' }); this.openBatchTask(v === 'post' ? 'post' : 'farrow'); this.ovSet({ panel: 'task', taskId: v === 'post' ? 'post' : 'farrow', only: '', pop: '' }); return; }
+    if (k === 'task') { const pr = v.split('/'), bid = pr.length > 1 ? pr[0] : (O.batchId || '32'), tid = pr.length > 1 ? pr[1] : v; this.ovPush(); if (!this.ui().bv || String(this.ui().bv.id) !== bid) this.openBatch(bid); this.put({ bvOnly: '' }); this.openBatchTask(tid); this.ovSet({ panel: 'task', batchId: bid, taskId: tid, only: '', pop: '' }); return; }
     if (k === 'dates') { this.ovPush(); this.ovSet({ panel: 'dates', pop: '' }); return; }
     if (k === 'donetask') { this.ovPush(); this.ovSet({ panel: 'done', pop: '' }); return; }
     if (k === 'only') { const nv = O.only === v ? '' : v; this.put({ bvOnly: nv }); this.repaintBv(); this.ovSet({ only: nv }); return; }
@@ -8857,20 +8860,57 @@ class Component extends DCLogic {
     if (k === 'select') { this.ovSet({ selecting: !O.selecting }); return; }
     if (k === 'crumb') { this.ovSet({ crumb: +v, loc: 'hover' }); return; }
     if (k === 'goroom') { this.ovSet({ loc: '', crumb: -1 }); if (this.ui().bv) this.closeBatch(); this.goRoom(v); return; }
-    if (k === 'gofarm') { this.ovSet({ loc: '', crumb: -1 }); this.goScope('', ''); return; }
+    if (k === 'gofarm') { this.ovSet({ loc: '', crumb: -1 }); if (this.ui().bv) this.closeBatch(); this.goScope('', ''); return; }
+    if (k === 'gozone') { this.ovSet({ loc: '', crumb: -1 }); if (this.ui().bv) this.closeBatch(); this.goScope(v, ''); return; }
+    if (k === 'gosec') { const sc = this.secById(v); this.ovSet({ loc: '', crumb: -1 }); if (this.ui().bv) this.closeBatch(); this.goScope(sc ? (sc.zone || '') : '', v); return; }
     if (this.ovAct2 && this.ovAct2(k, v, h, at)) return;
   }
-  // the location card: only where you are; hover → the breadcrumb; a crumb → its siblings
+  // ----- the location card, v2: every level switchable; pigs at every level -----
   ovPlace(u) {
-    const r = u.view === 'room' ? this.roomById(u.roomId) : null, ps = u.psel || [];
-    const pen = r && ps.length === 1 ? ps[0] : (r && u.pen ? u.pen : '');
-    const crumbs = [{ label: 'Farm', a: 'gofarm' }];
-    const sec = r && r.section ? this.secById(r.section) : (u.secId ? this.secById(u.secId) : null);
-    if (sec) crumbs.push({ label: sec.name, a: 'noop' });
-    if (r) crumbs.push({ label: r.name, a: 'goroom:' + r.id, sibs: true, roomId: r.id });
-    const name = pen ? 'Pen ' + pen : r ? r.name : (sec ? sec.name : (this.M().name || 'Hillside Sow Farm'));
-    if (pen) crumbs.push({ label: 'Pen ' + pen, a: 'noop' });
-    return { r: r, pen: pen, name: name, crumbs: crumbs.slice(0, -1) };
+    const M = this.M(), r = u.view === 'room' ? this.roomById(u.roomId) : null, ps = u.psel || [];
+    const pen = r && ps.length === 1 ? ps[0] : '';
+    const secId = r ? (r.section || '') : (u.secId || ''), sec = secId ? this.secById(secId) : null;
+    const zoneId = r ? this.zoneOfRoom(r) : (sec ? (sec.zone || u.zoneId || '') : (u.zoneId || '')), zone = zoneId ? this.zoneById(zoneId) : null;
+    const levels = [{ kind: 'farm', label: M.name || 'Hillside Sow Farm', a: 'gofarm' }];
+    if (zone) levels.push({ kind: 'zone', id: zone.id, label: zone.name, a: 'gozone:' + zone.id });
+    if (sec) levels.push({ kind: 'section', id: sec.id, zoneId: zoneId, label: sec.name, a: 'gosec:' + sec.id });
+    if (r) levels.push({ kind: 'room', id: r.id, secId: secId, zoneId: zoneId, label: r.name, a: 'goroom:' + r.id });
+    if (pen) levels.push({ kind: 'pen', label: 'Pen ' + pen, a: 'noop' });
+    const cur = levels[levels.length - 1];
+    const rooms = r ? [r] : sec ? this.roomsOf(sec.id) : zone ? M.rooms.filter((x) => this.zoneOfRoom(x) === zone.id) : M.rooms;
+    return { r: r, pen: pen, name: cur.label, cur: cur, crumbs: levels.slice(0, -1), rooms: rooms, levels: levels };
+  }
+  ovPigsIn(rooms) { const n = {}; rooms.forEach((x) => this.ovPigs(x.id).forEach((k) => { n[k[1]] = (n[k[1]] || 0) + k[0]; })); return Object.keys(n).map((k) => [n[k], k]).sort((a, b) => b[0] - a[0]); }
+  ovSibs(lv) {
+    const M = this.M();
+    if (lv.kind === 'zone') return M.zones.map((z) => ({ id: z.id, label: z.name, a: 'gozone:' + z.id, rooms: M.rooms.filter((x) => this.zoneOfRoom(x) === z.id) }));
+    if (lv.kind === 'section') return M.sections.filter((s) => (s.zone || '') === (lv.zoneId || '')).map((s) => ({ id: s.id, label: s.name, a: 'gosec:' + s.id, rooms: this.roomsOf(s.id) }));
+    if (lv.kind === 'room') return M.rooms.filter((x) => (x.section || '') === (lv.secId || '') && (lv.secId || this.zoneOfRoom(x) === lv.zoneId)).map((x) => ({ id: x.id, label: x.name, a: 'goroom:' + x.id, rooms: [x] }));
+    return [];
+  }
+  ovLoc(u) {
+    const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u), A = H.A;
+    const kinds = P.pen ? this.ovPigs(P.r.id, P.pen) : this.ovPigsIn(P.rooms), fault = P.rooms.some((x) => this.ovFault(x.id, P.pen));
+    this.ovTips = this.ovTips || {};
+    const word = (x) => x[0] + ' ' + (x[0] === 1 ? x[1].replace(/s$/, '') : x[1]);
+    const total = kinds.reduce((a, x) => a + x[0], 0), vf = u.vf && u.vf.kind === 'stage' ? u.vf.id : '', SW = ['2F3A33', '4F5D53', '718075', '93A096', 'B4BFB6', 'D3DBD4'];
+    this.ovKinds = kinds;
+    this.ovTips.kinds = () => H.tip(total + ' pigs', kinds.map((x, j) => ['#' + SW[Math.min(j, 5)], x[1].charAt(0).toUpperCase() + x[1].slice(1), String(x[0])]), 'Click to show one kind on the farm');
+    const vk = vf ? kinds.find((x) => this.ovKindId(x[1]) === vf) : null;
+    let chips = total ? H.lchip(H.I.pig, vk ? word(vk) + ' shown' : total + (total === 1 ? ' pig' : ' pigs'), { tip: 'kinds', a: 'kinds', on: O.pop === 'kinds' || !!vk }) : '';
+    if (P.r && !P.pen) { const gest = /gest/i.test(P.r.name); chips += H.lchip(H.I.temp, '22.4 °C', { a: 'trend:temp', on: O.pop === 'trend' && O.trendKind === 'temp' }) + H.lchip(H.I.drop, '61 %', { a: 'trend:hum', on: O.pop === 'trend' && O.trendKind === 'hum' }) + H.lchip(H.I.air, gest ? 'NH₃ 9.4' : 'NH₃ 6.8', gest ? { bg: K.amberT, color: K.amber, a: 'trend:nh3', on: O.pop === 'trend' && O.trendKind === 'nh3' } : { a: 'trend:nh3', on: O.pop === 'trend' && O.trendKind === 'nh3' }); }
+    // the crumbs (ancestors) and the name each open their siblings on hover
+    const all = P.levels, curIdx = all.length - 1;
+    const crumb = (lv, i) => '<span' + A(lv.kind === 'farm' ? 'gofarm' : 'crumb:' + i) + (lv.kind === 'farm' ? '' : ' data-crumb="' + i + '"') + ' style="' + H.st({ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '12px', lineHeight: '18px', padding: '1px 5px', borderRadius: '6px', color: i === O.crumb ? K.ink : K.muted, background: i === O.crumb ? K.press : 'transparent', fontWeight: i === O.crumb ? 600 : 400, whiteSpace: 'nowrap', cursor: 'pointer' }) + '">' + H.esc(lv.label) + (lv.kind !== 'farm' ? H.icon(H.I.down, 11) : '') + '</span><span style="color: #B5BDB2; font-size: 11px;">›</span>';
+    const crumbsHtml = O.loc && P.crumbs.length ? '<div data-zone="crumbs" style="' + H.st({ display: 'flex', alignItems: 'center', gap: '2px', marginBottom: '6px', flexWrap: 'wrap' }) + '">' + P.crumbs.map(crumb).join('') + '</div>' : '';
+    const nameHtml = '<span' + (P.cur.kind !== 'farm' && P.cur.kind !== 'pen' ? A('crumb:' + curIdx) + ' data-crumb="' + curIdx + '"' : '') + ' style="' + H.st({ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '2px 6px', margin: '-2px -6px', borderRadius: '8px', background: O.crumb === curIdx ? K.press : 'transparent', cursor: P.cur.kind !== 'farm' && P.cur.kind !== 'pen' ? 'pointer' : 'default' }) + '">' + H.t(P.name, { fontSize: '15px', fontWeight: 600 }) + (fault ? H.dot(K.red, 8) : '') + (O.loc && P.cur.kind !== 'farm' && P.cur.kind !== 'pen' ? H.icon(H.I.down, 13) : '') + '</span>';
+    let menu = '';
+    const lv = O.crumb >= 0 ? all[O.crumb] : null;
+    if (O.loc && lv && lv.kind !== 'farm' && lv.kind !== 'pen') {
+      const sibs = this.ovSibs(lv);
+      menu = '<div data-pop="1" style="' + H.st({ position: 'absolute', left: '8px', top: '100%', marginTop: '6px', width: '280px', maxHeight: '360px', overflowY: 'auto', padding: '6px 0', borderRadius: '14px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 14px 32px rgba(17,21,17,.16)', zIndex: 6 }) + '"><div style="' + H.st({ padding: '4px 12px 6px', fontSize: '12px', color: K.muted }) + '">' + ({ zone: 'Zones', section: 'Sections', room: 'Rooms' }[lv.kind]) + '</div>' + sibs.map((x) => { const k = this.ovPigsIn(x.rooms).reduce((a, y) => a + y[0], 0), on = x.id === lv.id, f = x.rooms.some((y) => this.ovFault(y.id)); return '<div' + A(x.a) + ' style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', height: '38px', padding: '0 12px', fontSize: '13.5px', color: K.ink, fontWeight: on ? 600 : 400, background: on ? K.press : 'transparent', cursor: 'pointer' }) + '"><span style="flex: 1;">' + H.esc(x.label) + '</span>' + H.mu(k ? k + ' pigs' : 'empty') + (f ? H.dot(K.red, 7) : '') + (on ? H.icon(H.I.check, 14) : '') + '</div>'; }).join('') + '</div>';
+    }
+    return '<div data-zone="loc" style="' + H.st({ position: 'absolute', left: '16px', top: '16px', padding: '10px 12px', borderRadius: '16px', background: '#FFFFFF', boxShadow: (O.loc ? '0 0 0 1.5px ' + K.ink + ', ' : '') + '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", maxWidth: 'calc(100% - 580px)', minWidth: '180px' }) + '">' + crumbsHtml + '<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }) + '">' + nameHtml + chips + '</div>' + menu + '</div>';
   }
   ovPigs(roomId, code) {
     const cells = (this.IP && this.IP.cell[roomId]) || {}, n = {};
@@ -8878,28 +8918,12 @@ class Component extends DCLogic {
     return Object.keys(n).map((k) => [n[k], n[k] === 1 ? k.replace(/s$/, '') : k]).sort((a, b) => b[0] - a[0]);
   }
   ovFault(roomId, code) { const cells = (this.IP && this.IP.cell[roomId]) || {}; return Object.keys(cells).some((c) => (!code || c === code) && cells[c] && cells[c].flag && cells[c].flag.lvl === 'urgent'); }
-  ovLoc(u) {
-    const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u), A = H.A;
-    const kinds = P.r ? this.ovPigs(P.r.id, P.pen) : [], fault = P.r ? this.ovFault(P.r.id, P.pen) : false;
-    this.ovTips = this.ovTips || {};
-    let chips = kinds.slice(0, kinds.length > 3 ? 2 : 3).map((x, i) => H.lchip(i ? '' : H.I.pig, x[0] + ' ' + x[1])).join('');
-    if (kinds.length > 3) { this.ovTips.kinds = () => H.tip(kinds.reduce((a, x) => a + x[0], 0) + ' pigs', kinds.map((x, j) => ['#' + ['2F3A33', '4F5D53', '718075', '93A096', 'B4BFB6', 'D3DBD4'][Math.min(j, 5)], x[1].charAt(0).toUpperCase() + x[1].slice(1), String(x[0])]), 'Click a kind → only those pens'); chips += H.lchip('', '+' + (kinds.length - 2), { tip: 'kinds' }); }
-    if (P.r && !P.pen) { chips += H.lchip(H.I.temp, '22.4 °C') + H.lchip(H.I.drop, '61 %') + (/gest/i.test(P.r.name) ? H.lchip(H.I.air, 'NH₃ 9.4', { bg: K.amberT, color: K.amber, a: 'trend', on: O.pop === 'trend' }) : H.lchip(H.I.air, 'NH₃ 6.8', { a: 'trend' })); }
-    const crumbsHtml = O.loc ? '<div data-zone="crumbs" style="' + H.st({ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }) + '">' + P.crumbs.map((c, i) => '<span' + A(c.sibs ? 'crumb:' + i : c.a) + ' style="' + H.st({ fontSize: '12px', lineHeight: '18px', padding: '1px 5px', borderRadius: '6px', color: i === O.crumb ? K.ink : K.muted, background: i === O.crumb ? K.press : 'transparent', fontWeight: i === O.crumb ? 600 : 400, whiteSpace: 'nowrap', cursor: 'pointer' }) + '">' + H.esc(c.label) + '</span>' + (i < P.crumbs.length - 1 || true ? '<span style="color: #B5BDB2; font-size: 11px;">›</span>' : '')).join('') + '</div>' : '';
-    let menu = '';
-    const cc = O.crumb >= 0 ? P.crumbs[O.crumb] : null;
-    if (O.loc && cc && cc.sibs) {
-      const me = this.roomById(cc.roomId), sibs = this.M().rooms.filter((x) => (x.section || '') === (me.section || ''));
-      menu = '<div data-pop="1" style="' + H.st({ position: 'absolute', left: '40px', top: '100%', marginTop: '6px', width: '270px', padding: '6px 0', borderRadius: '14px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 14px 32px rgba(17,21,17,.16)', zIndex: 6 }) + '">' + sibs.map((x) => { const k = this.ovPigs(x.id).reduce((a, y) => a + y[0], 0), on = x.id === cc.roomId, f = this.ovFault(x.id); return '<div' + A('goroom:' + x.id) + ' style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', height: '38px', padding: '0 12px', fontSize: '13.5px', color: K.ink, fontWeight: on ? 600 : 400, background: on ? K.press : 'transparent', cursor: 'pointer' }) + '"><span style="flex: 1;">' + H.esc(x.name) + '</span>' + H.mu(k ? k + ' pigs' : 'empty') + (f ? H.dot(K.red, 7) : '') + (on ? H.icon(H.I.check, 14) : '') + '</div>'; }).join('') + '</div>';
-    }
-    return '<div data-zone="loc" style="' + H.st({ position: 'absolute', left: '16px', top: '16px', padding: '10px 12px', borderRadius: '16px', background: '#FFFFFF', boxShadow: (O.loc ? '0 0 0 1.5px ' + K.ink + ', ' : '') + '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", maxWidth: 'calc(100% - 580px)', minWidth: '180px' }) + '">' + crumbsHtml + '<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }) + '"><span style="display: inline-flex; align-items: center; gap: 6px;">' + H.t(P.name, { fontSize: '15px', fontWeight: 600 }) + (fault ? H.dot(K.red, 8) : '') + '</span>' + chips + '</div>' + menu + '</div>';
-  }
   ovPanelHtml(O, u) {
     const p = O.panel;
-    if (p === 'list') return OVP.list(O);
-    if (p === 'batch') return OVP.batch(O);
-    if (p === 'task') return OVP.task(O);
-    if (p === 'dates') return OVP.dates(O);
+    if (p === 'list') return this.ovListHtml();
+    if (p === 'batch') return this.ovBatchHtml(O.batchId);
+    if (p === 'task') return this.ovTaskHtml(O.batchId || '32', O.taskId, O);
+    if (p === 'dates') return this.ovDatesHtml(O.batchId || '32');
     if (this.ovPanel2) return this.ovPanel2(p, O, u);
     return '';
   }
@@ -8943,7 +8967,7 @@ class Component extends DCLogic {
     const html = this.ovLoc(u) +
       (panel ? '<section data-zone="panel" aria-label="Panel" style="' + H.st({ position: 'absolute', right: '16px', top: '72px', maxHeight: 'calc(100% - 164px)', width: '380px', boxSizing: 'border-box', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint, boxShadow: '0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12)', overflowY: 'auto', overflowX: 'hidden', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums', color: K.ink, fontSize: '14px', lineHeight: '20px' }) + '">' + panel + '</section>' : '') +
       (this.ovSide ? this.ovSide(O, u) : '') +
-      '<div data-zone="bar" role="toolbar" aria-label="Actions bar" style="' + H.st({ position: 'absolute', left: '16px', right: '16px', bottom: '16px', height: '60px', padding: '0 8px', boxSizing: 'border-box', borderRadius: '18px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', display: 'flex', alignItems: 'center', gap: '6px', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif" }) + '">' + OVP.bar(Object.assign({}, O, { barCtl: O.picking && this.ovBarCtl ? this.ovBarCtl(O) : '' })) + '</div>' +
+      '<div data-zone="bar" role="toolbar" aria-label="Actions bar" style="' + H.st({ position: 'absolute', left: '16px', right: '16px', bottom: '16px', height: '60px', padding: '0 8px', boxSizing: 'border-box', borderRadius: '18px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', display: 'flex', alignItems: 'center', gap: '6px', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif" }) + '">' + OVP.bar(Object.assign({}, O, { barCtl: O.picking && this.ovBarCtl ? this.ovBarCtl(O) : '', eqOk: u.view === 'room' })) + '</div>' +
       this.ovPopHtml(O, u) + (this.ovExtra ? this.ovExtra(O, u) : '');
     if (html === this.ovLast) return;
     const pEl = this.ovBody.querySelector('[data-zone="panel"]'), keep = pEl ? pEl.scrollTop : 0, sc = {};
@@ -8963,15 +8987,18 @@ class Component extends DCLogic {
     P.meta = (cell.kind === 'boar' ? 'Boar' : 'Sow') + ' · ' + code + ' · ' + P.room;
     if (farrow) Object.assign(P, { stage: 'Lactating', d: 3, of: 21, headN: '14', headL: 'born alive this litter', litters: [['1st', 11, 10], ['2nd', 13, 12], ['This', 14, 12, 1]], cycle: [[OVH.K.green, 'Served', '15 Jul'], [OVH.K.green, 'Farrowed', '1 Nov'], [OVH.K.blue, 'Lactating', 'day 3', true], ['#D3D8D0', 'Wean due', '22 Nov']] });
     else Object.assign(P, { stage: 'Gestation', d: 78, of: 115, headN: '12.4', headL: 'born alive a litter', litters: [['1', 11, 10], ['2', 12, 11], ['3', 14, 12], ['4', 13, 12], ['5', 12, 11, 1]], cycle: [[OVH.K.green, 'Served', '16 Aug'], [OVH.K.blue, 'Gestation', 'day 78', true], ['#D3D8D0', 'Due', '9 Dec']] });
+    if (!farrow) { const L = [[11, 10], [12, 11], [14, 12], [13, 12], [12, 11], [13, 12]].slice(0, Math.max(1, parity)); P.litters = L.map((x, k) => [String(k + 1), x[0], x[1], k === L.length - 1 ? 1 : 0]); P.headN = (L.reduce((q, x) => q + x[0], 0) / L.length).toFixed(1); }
     P.facts = [['Parity', String(parity)], ['Breed', 'LY'], ['Weight', farrow ? '228' : '192', 'kg'], ['Backfat', farrow ? '17' : '13', 'mm'], ['Teats', '14'], ['Feed', farrow ? '5.8' : '2.6', 'kg / day']];
     const tags = [];
     if (cell.flag) tags.push(cell.flag.lvl === 'urgent' ? ['red', OVH.I.temp, 'Fever', 'Treat · day 2', ['Fever · Treat', [[OVH.K.red, 'Temperature', '40.1 °C', true], ['', 'Since', 'Tue 3 Nov', false, 'none'], ['', 'Treatment', 'Amoxicillin · day 2 of 5', false, 'none']]]] : ['amber', OVH.I.eye, 'Thin', 'Monitor · day 12', ['Thin · Monitor', [[OVH.K.amberBar, 'Body condition', '2 of 5', true], ['', 'Since', '24 Oct', false, 'none'], ['', 'Feed', '+10 %', false, 'none'], ['', 'Recorded by', 'G. Hansen', false, 'none']]]]);
     if (this.hs(roomId + code) % 3 === 0 || farrow) tags.push(['grey', OVH.I.note, 'Note', farrow ? 'today' : 'until 15 Sep', ['Note · Z. Min', [['', '', farrow ? 'Two piglets slow to suckle.' : 'Watch the left hind leg.', true, 'none']]]]);
     P.tags = tags.map((x) => [x[0], x[1], x[2], x[3]]);
     this.ovTips = this.ovTips || {};
-    tags.forEach((x, k) => { this.ovTips['tag-' + k] = () => OVH.tip(x[4][0], x[4][1], 'Click to keep this open'); });
+    tags.forEach((x, k) => { this.ovTips['tag-' + k] = () => x[2] === 'Note' ? OVH.tipText(x[4][0], x[4][1][0][2], x[3]) : OVH.tip(x[4][0], x[4][1], 'Click to keep this open'); });
     this.ovTips.cycle = () => OVH.tip('Her cycle', P.cycle);
-    P.tasks = P.batch === '32' ? [['Farrowing', 'green', 'Done · 12 alive', 'task:farrow'], ['Post-farrowing check', 'amber', 'Recheck', 'task:post']] : [];
+    const T = this.ovPigTasks(roomId, code);
+    P.npd = T.npd; P.batchName = T.batch ? T.batch.name : ''; P.tasks = T.batch ? T.tasks.map((x) => [x[0], x[1], x[2], 'task:' + T.batch.id + '/' + x[3].slice(5), x[4]]) : [];
+    if (T.npd != null) P.meta = P.meta.replace(/^Sow/, 'Sow · non-productive');
     return P;
   }
   ovPenData(roomId, code) {
@@ -9008,7 +9035,8 @@ class Component extends DCLogic {
   }
   ovEqCtx(u) { const r = u.view === 'room' ? this.roomById(u.roomId) : null, ps = u.psel || []; return { room: r ? r.name : '', roomId: r ? r.id : '', pen: r && ps.length === 1 ? ps[0] : '' }; }
   ovPop2(O, u, at, box) {
-    if (O.pop === 'trend') return box(OVP2.trend(), { left: at.x + 'px', top: (at.y + at.h + 8) + 'px' }, 292);
+    if (O.pop === 'trend') return box(this.ovTrend(O.trendKind || 'nh3', u), { left: at.x + 'px', top: (at.y + at.h + 8) + 'px' }, 292);
+    if (O.pop === 'kinds') { const H = OVH, K = H.K, ks = this.ovKinds || [], vf = u.vf && u.vf.kind === 'stage' ? u.vf.id : '', SW = ['2F3A33', '4F5D53', '718075', '93A096', 'B4BFB6', 'D3DBD4']; return box('<div style="' + H.st({ padding: '4px 14px 6px', fontSize: '12px', color: K.muted }) + '">Show on the farm</div>' + ks.map((x, j) => { const id = this.ovKindId(x[1]), on = vf === id; return '<div' + H.A('kind:' + id) + ' style="' + H.st({ display: 'flex', alignItems: 'center', gap: '10px', height: '40px', padding: '0 14px', fontSize: '14px', fontWeight: on ? 600 : 400, background: on ? K.press : 'transparent', cursor: 'pointer' }) + '"><i style="' + H.st({ width: '10px', height: '10px', borderRadius: '3px', background: '#' + SW[Math.min(j, 5)] }) + '"></i><span style="flex: 1;">' + H.esc(x[1].charAt(0).toUpperCase() + x[1].slice(1)) + '</span>' + H.t(String(x[0]), { fontWeight: 600 }) + (on ? H.icon(H.I.check, 15) : '') + '</div>'; }).join('') + (vf ? '<div style="' + H.st({ height: '1px', background: K.line, margin: '6px 0' }) + '"></div><div' + H.A('kindall') + ' style="' + H.st({ display: 'flex', alignItems: 'center', height: '40px', padding: '0 14px', fontSize: '14px', cursor: 'pointer' }) + '">Show all pigs</div>' : ''), { left: at.x + 'px', top: (at.y + at.h + 8) + 'px' }, 240); }
     if (O.pop === 'eq') {
       const E = Object.assign(this.ovEqCtx(u), O.eqs || {}), inner = O.dev === 'fan' ? OVP2.fan(E) : O.dev === 'lamps' ? OVP2.lamps(E) : O.dev === 'floor' ? OVP2.floor(E) : OVP2.tiles(E);
       return '<div data-pop="1" style="' + OVH.st({ position: 'absolute', left: Math.max(16, Math.min(at.x - 12, (this.W || 1200) - 400)) + 'px', bottom: (at.bottom + 8) + 'px', width: '380px', maxHeight: 'calc(100% - 120px)', overflowY: 'auto', boxSizing: 'border-box', padding: '12px', borderRadius: '20px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 18px 40px rgba(17,21,17,.18)', pointerEvents: 'auto', zIndex: 30, fontFamily: "'Geist', system-ui, sans-serif", color: OVH.K.ink, fontVariantNumeric: 'tabular-nums' }) + '">' + inner + '</div>';
@@ -9037,7 +9065,10 @@ class Component extends DCLogic {
     if (k === 'herclose') { this.ovSet({ her: '' }); return true; }
     if (k === 'pigperf' || k === 'piglog') { this.ovPush(); this.ovSet({ panel: k }); return true; }
     if (k === 'pigtag') { this.ovPush(); this.ovSet({ panel: 'pig' }); return true; }
-    if (k === 'trend' || k === 'trendt') { this.ovSet({ pop: O.pop === 'trend' ? '' : 'trend', popAt: at() }); return true; }
+    if (k === 'trend' || k === 'trendt') { const kind = v || 'nh3'; this.ovSet({ pop: O.pop === 'trend' && O.trendKind === kind ? '' : 'trend', trendKind: kind, popAt: at() }); return true; }
+    if (k === 'kinds') { this.ovSet({ pop: O.pop === 'kinds' ? '' : 'kinds', popAt: at() }); return true; }
+    if (k === 'kind') { this.locationFilter('stage', v); this.ovPaint(); return true; }
+    if (k === 'kindall') { this.put({ vf: null }); this.repaintBv(); this.ovSet({ pop: '' }); return true; }
     if (k === 'popclose') { this.ovSet({ pop: '', dev: '' }); return true; }
     if (k === 'devback') { this.ovSet({ dev: '', eqs: Object.assign({}, O.eqs, { fpin: null }) }); return true; }
     if (k === 'dev') { this.ovSet({ dev: v === 'lamp1' ? 'lamps' : v }); return true; }
@@ -9058,12 +9089,16 @@ class Component extends DCLogic {
   }
   // the pen hover on the farm: the pen's tasks with their status; in Compare, her figure against the batch
   ovPenTip(hit) {
-    const O = this.ovS(), H = OVH, i = (() => { try { return this.pigInfo(hit.rm, hit.pen); } catch (e) { return {}; } })(), code = hit.pen.code;
-    if (i.empty) return H.tip(code, [['', '', 'Empty', false, 'none']]);
-    const P = this.ovPigData(hit.rm.id, code);
-    if (O.panel === 'compare') { const mine = 10 + (this.hs(hit.rm.id + code) % 6); return H.tip(code + ' · ' + P.tag + ' · born alive', [[H.K.green, 'Her litter', String(mine), true], ['', 'Batch average', '12.9', false, 'tick']], 'Click for her card'); }
-    const rows = P.tasks.length ? [[H.K.green, 'Farrowing', 'Done · 12 alive'], [H.K.amberBar, 'Post-farrowing check', this.hs(code) % 4 === 0 ? 'Recheck' : 'Checked']] : [['', P.stage, 'day ' + P.d, true, 'none']];
-    return H.tip(code + ' · ' + P.tag, rows, P.tags.length ? P.tags.map((x) => x[2]).join(' · ') : '');
+    const O = this.ovS(), H = OVH, K = H.K, code = hit.pen.code;
+    let i = {}; try { i = this.pigInfo(hit.rm, hit.pen); } catch (e) { i = {}; }
+    if (i.empty) return '<div style="' + H.st({ fontSize: '13px', fontWeight: 600 }) + '">' + H.esc(code) + '</div><div style="' + H.st({ fontSize: '12px', color: K.muted }) + '">Empty</div>';
+    const P = this.ovPigData(hit.rm.id, code), cell = ((this.IP && this.IP.cell[hit.rm.id]) || {})[code] || {}, group = (cell.n || 1) > 1;
+    const headH = '<div style="' + H.st({ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '14px' }) + '">' + H.t(code + (group ? '' : ' · ' + P.tag), { fontSize: '13px', fontWeight: 600 }) + H.t(group ? cell.n + ' ' + (cell.kind || 'pigs') : 'Sow · P' + P.parity, { fontSize: '12px', color: K.muted }) + '</div>';
+    if (O.panel === 'compare') { const mine = 10 + (this.hs(hit.rm.id + code) % 6); return headH + H.tip('', [[K.green, 'Her litter', String(mine), true], ['', 'Batch average', '12.9', false, 'tick']], 'Click for her card').replace(/^<div[^>]*><\/div>/, ''); }
+    const line = (l, r) => '<div style="' + H.st({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', minHeight: '30px', borderTop: '1px solid ' + K.line, marginTop: '6px', paddingTop: '6px' }) + '">' + H.t(l, { fontSize: '13px' }) + r + '</div>';
+    let body = P.tasks.length ? P.tasks.map((x) => line(x[0], H.badge(x[1], x[2]))).join('') : line(P.npd != null ? 'Non-productive' : P.stage, H.t(P.npd != null ? P.npd + ' days' : 'day ' + P.d, { fontSize: '13px', fontWeight: 600 }));
+    if (P.tags.length) body += '<div style="' + H.st({ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '8px' }) + '">' + P.tags.map((x) => H.badge(x[0] === 'grey' ? 'grey' : x[0], x[2])).join('') + '</div>';
+    return headH + body;
   }
   ovStart2(st) {
     const L = { panel: 'list' }, B = { panel: 'batch', batchId: '32' }, D = { panel: 'dates', batchId: '32' };
@@ -9089,6 +9124,70 @@ class Component extends DCLogic {
       flmanual: { O: {}, after: eq('g2', { dev: 'floor', eqs: { fmode: 'manual' } }) },
       flshow: { O: {}, after: () => { this.goRoom('g2'); setTimeout(() => this.ovAct('showpens'), 400); } },
     }[st] || null;
+  }
+
+  // ----- every batch from the farm's own data: list, batch, task, dates -----
+  ovCol(c) { return ({ '#A7CDAE': OVH.K.green, '#A9C2E2': OVH.K.blue, '#EBC27E': OVH.K.amberBar, '#D9D6CC': OVH.K.grey })[c] || OVH.K.grey; }
+  ovDay(w) { const m = /Day (\d+)(?: of (\d+))?/.exec(w || ''); return m ? [+m[1], +(m[2] || m[1])] : [1, 1]; }
+  ovParts(id, t) {
+    const n = this.bvCounts(id, t.id);
+    return t.states.map((x) => { const col = this.ovCol(x.col); return { id: x.id, label: x.label, n: n[x.id] || 0, col: col, skip: col === OVH.K.grey, warn: col === OVH.K.amberBar }; });
+  }
+  ovBatches() { const B = this.batchData(); return Object.keys(B).map((k) => B[k]).sort((a, b) => (parseInt(b.id, 10) || 0) - (parseInt(a.id, 10) || 0)); }
+  ovListHtml() {
+    const H = OVH, K = H.K;
+    return H.head('Batches', '', '') + '<div style="margin-top: 16px;">' + H.card(this.ovBatches().map((b, i) => { const t = (b.tasks || [])[0] || {}, d = this.ovDay(t.when); return '<div' + H.A('open:' + b.id) + ' style="' + H.st({ display: 'flex', alignItems: 'center', gap: '14px', height: '64px', padding: '0 16px', margin: '0 -16px', borderTop: i ? '1px solid ' + K.line : '0', cursor: 'pointer' }) + '">' + H.radial({ size: 30, sw: 4, parts: [[d[0], '', K.blue], [Math.max(0, d[1] - d[0]), '', K.grey, true]], total: d[1] }) + '<span style="' + H.st({ flex: 1, display: 'flex', flexDirection: 'column' }) + '">' + H.t(b.name, { fontWeight: 600, fontSize: '15px' }) + H.mu((t.title || '') + ' · day ' + d[0] + ' of ' + d[1]) + '</span>' + H.chev + '</div>'; }).join(''), { pad: '0 16px' }) + '</div>';
+  }
+  ovBatchHtml(id) {
+    const H = OVH, K = H.K, b = this.batchData()[id];
+    if (!b) return OVP.batch(this.ovS());
+    this.ovTips = this.ovTips || {};
+    const tiles = (b.tasks || []).map((t) => {
+      const P = this.ovParts(id, t), tot = P.reduce((a, x) => a + x.n, 0) || 1, goal = P.find((x) => x.id === t.goal) || P[0], d = this.ovDay(t.when), attn = P.filter((x) => x.warn && x.n).map((x) => x.n + ' ' + x.label.toLowerCase()).join(' · ');
+      this.ovTips['ring-' + id + '-' + t.id] = () => H.tip(t.title + ' · ' + tot + ' ' + (b.kind === 'growers' ? 'pens' : 'sows'), P.map((x) => [x.col, x.label, String(x.n), x.warn]), 'Click to open the task');
+      return H.card('<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '14px' }) + '">' + H.radial({ size: 52, sw: 7, parts: P.map((x) => [x.n, x.label, x.col, x.skip]), total: tot, center: H.t(String(goal ? goal.n : 0), { fontSize: '14px', fontWeight: 600 }), tip: 'ring-' + id + '-' + t.id }) + '<span style="' + H.st({ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }) + '">' + H.t(t.title, { fontSize: '15px', fontWeight: 600 }) + '<span style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }) + '">' + H.mu('day ' + d[0] + (d[1] !== d[0] ? ' of ' + d[1] : '')) + (attn ? H.badge('amber', attn) : '') + '</span></span>' + H.chev + '</div>', { pad: '14px 16px', a: 'task:' + t.id });
+    }).join('<div style="height: 8px;"></div>');
+    const next = (b.sched || []).filter((x) => x.st === 'next').slice(0, 3);
+    return H.head(b.name, (b.sub || '').replace(/^Line \d+ · /, ''), 'back') + H.sec('Running now', '', 20) + tiles +
+      (next.length ? H.sec('Upcoming') + H.card(next.map((x, i) => H.row('<span style="display: flex; align-items: center;">' + H.t(x.d, { fontSize: '13px', color: K.muted, width: '84px', display: 'inline-block' }) + H.t(x.t) + '</span>', H.mu(x.meta), !i)).join(''), { pad: '0 16px' }) : '') +
+      '<div style="' + H.st({ display: 'flex', marginTop: '20px' }) + '">' + H.wbtn(H.I.cal, 'All dates', 'dates') + '</div>';
+  }
+  ovTaskHtml(id, tid, O) {
+    const H = OVH, b = this.batchData()[id], t = b && this.bvTask(id, tid);
+    if (!t) return OVP.task(O);
+    this.ovTips = this.ovTips || {};
+    const P = this.ovParts(id, t), tot = P.reduce((a, x) => a + x.n, 0) || 1, goal = P.find((x) => x.id === t.goal) || P[0], d = this.ovDay(t.when), unit = b.kind === 'growers' ? 'pens' : 'sows';
+    this.ovTips['ring-task'] = () => H.tip(t.title, P.map((x) => [x.col, x.label, String(x.n), x.id === O.only]), 'Click a part → only those pens');
+    return H.head(t.title, b.name + ' · day ' + d[0] + (d[1] !== d[0] ? ' of ' + d[1] : ''), 'back') +
+      '<div style="' + H.st({ display: 'flex', gap: '8px', marginTop: '16px' }) + '">' + H.field(O.parity || 'All parities', 'filter', { on: O.pop === 'filter' }) + H.field('All rooms', 'noop') + '</div>' +
+      H.sec('Whole-task progress', H.meta(tot + ' ' + unit)) +
+      H.card('<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '20px' }) + '">' + H.radial({ size: 132, sw: 16, parts: P.map((x) => [x.n, x.label, x.col, x.skip]), total: tot, half: true, center: H.centre(String(goal ? goal.n : 0), 'of ' + tot + ' ' + (t.goalWord || '')), tip: 'ring-task' }) + H.legend(P, { a: 'only', only: O.only }) + '</div>') +
+      (id === '32' && tid === 'farrow' ? H.sec('Performance so far', H.meta('31 finished litters')) + '<div style="' + H.st({ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }) + '">' + H.kpi('Born alive / litter', '11.8', '', H.badge('amber', '0.2 under target'), 'Target 12') + H.kpi('Stillborn rate', '6.1', '%', '', '', 'kpi-still') + '</div>' : '');
+  }
+  ovDatesHtml(id) {
+    const H = OVH, K = H.K, b = this.batchData()[id];
+    if (!b) return OVP.dates(this.ovS());
+    const S = b.sched || [], nowIdx = Math.max(0, S.findIndex((x) => x.st === 'now'));
+    const rows = S.map((x) => { const st = x.st === 'late' ? 'done' : x.st, open = st === 'now' ? 'task:' + (((b.tasks || []).find((t) => t.title === x.t) || {}).id || '') : st === 'done' && /Farrowing/.test(x.t) ? 'donetask' : ''; return '<div' + (open && open !== 'task:' ? H.A(open) : '') + ' style="' + H.st({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', height: '40px', paddingRight: '10px', cursor: open ? 'pointer' : 'default' }) + '"><span style="' + H.st({ display: 'flex', alignItems: 'center', gap: '12px' }) + '"><span style="' + H.st({ width: '12px', height: '12px', borderRadius: '999px', boxSizing: 'border-box', background: st === 'done' ? K.grey : st === 'now' ? K.blue : '#FFFFFF', border: st === 'next' ? '2px solid #858D86' : '0', position: 'relative', zIndex: 1 }) + '"></span>' + H.t(st === 'now' ? 'Now' : x.d.replace(/^\w+ /, ''), { fontSize: '13px', color: st === 'now' ? K.blue : K.muted, fontWeight: st === 'now' ? 600 : 400, width: '48px', display: 'inline-block' }) + H.t(x.t, { color: st === 'done' ? K.muted : K.ink, fontWeight: st === 'now' ? 600 : 400 }) + '</span><span style="' + H.st({ display: 'flex', alignItems: 'center', gap: '4px' }) + '">' + (x.st === 'late' || st === 'next' ? H.t(x.meta, { fontSize: '13px', color: x.st === 'late' ? K.amber : K.muted, fontWeight: x.st === 'late' ? 500 : 400 }) : '') + (open && open !== 'task:' ? H.chev : '') + '</span></div>'; }).join('');
+    return H.head('All dates', b.name, 'back') + H.card('<div data-scroll="dates" data-scroll-to="' + Math.max(0, nowIdx * 40 - 160) + '" style="' + H.st({ position: 'relative', height: Math.min(400, S.length * 40 + 8) + 'px', overflowY: 'auto' }) + '"><div style="' + H.st({ position: 'absolute', left: '5px', top: '20px', height: (S.length * 40 - 40) + 'px', width: '2px', background: K.line }) + '"></div>' + rows + '</div>', { mt: 16, pad: '8px 16px' });
+  }
+  // her tasks with her status in each, from the batch she is in; no batch → non-productive days
+  ovPigTasks(roomId, code) {
+    const cell = ((this.IP && this.IP.cell[roomId]) || {})[code] || {}, id = cell.batch != null ? String(cell.batch) : '', b = id ? this.batchData()[id] : null;
+    if (!b) { const rr = this.roomById(roomId); return /gest|farrow/i.test((rr && rr.name) || '') ? {} : { npd: 8 + (this.hs(roomId + code) % 30) }; }
+    return { batch: b, tasks: (b.tasks || []).map((t) => { const s = this.bvState(id, roomId, code, t.id), d = this.bvStateDef(id, s, t.id) || {}; const col = this.ovCol(d.col); return [t.title, col === OVH.K.green ? 'green' : col === OVH.K.blue ? 'blue' : col === OVH.K.amberBar ? 'amber' : 'grey', d.label || '', 'task:' + t.id, (t.why || {})[s] || '']; }) };
+  }
+
+  ovKindId(word) { return ({ sows: 'sow', sow: 'sow', boars: 'boar', boar: 'boar', gilts: 'gilts', weaners: 'weaners' })[word] || word; }
+  // a sensor's trend: today against its range; amber when out of it
+  ovTrend(kind) {
+    const H = OVH, K = H.K, T = { temp: { name: 'Temperature', unit: '°C', now: 22.4, lo: 18, hi: 24, min: 16, max: 26, v: [20.6, 20.4, 20.6, 21.6, 22.6, 23.3, 23.6, 23.1, 22.7, 22.5, 22.4, 22.4], note: 'in range all day', col: K.blue },
+      hum: { name: 'Humidity', unit: '%', now: 61, lo: 50, hi: 75, min: 40, max: 85, v: [58, 60, 63, 66, 64, 62, 61, 61, 60, 61, 61, 61], note: 'in range all day', col: K.blue },
+      nh3: { name: 'Ammonia', unit: 'ppm', now: 9.4, lo: 0, hi: 8, min: 0, max: 12, v: [6.2, 6.4, 6.8, 7.0, 7.6, 8.1, 8.6, 8.9, 9.1, 9.3, 9.4, 9.4], note: 'above 8 for 2 h', col: K.amberBar } }[kind] || {};
+    const W = 260, Hh = 70, y = (v) => Hh - ((v - T.min) / (T.max - T.min)) * Hh, xy = T.v.map((v, i) => [(i / (T.v.length - 1)) * W, y(v)]), l = xy.map((p) => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L'), out = T.now > T.hi || T.now < T.lo;
+    return '<div style="padding: 6px 14px 10px;"><div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '6px' }) + '">' + H.t(T.name, { fontWeight: 600 }) + '<span style="margin-left: auto; display: inline-flex; gap: 4px;">' + H.lchip('', '24 h', { on: true }) + H.lchip('', '7 d', { bg: 'transparent', color: K.muted }) + '</span></div><div style="' + H.st({ display: 'flex', alignItems: 'baseline', gap: '4px', marginTop: '4px' }) + '">' + H.t(String(T.now), { fontSize: '24px', lineHeight: '30px', fontWeight: 600, color: out ? K.amber : K.ink }) + H.mu(T.unit + ' · ' + T.note) + '</div>' +
+      '<svg viewBox="0 0 ' + W + ' ' + Hh + '" style="width: ' + W + 'px; height: ' + Hh + 'px; display: block; margin-top: 10px; overflow: visible;">' + (kind !== 'nh3' ? '<rect x="0" y="' + y(T.hi).toFixed(1) + '" width="' + W + '" height="' + (y(T.lo) - y(T.hi)).toFixed(1) + '" fill="#EEF4EF"></rect>' : '<line x1="0" x2="' + W + '" y1="' + y(T.hi) + '" y2="' + y(T.hi) + '" stroke="' + K.amber + '" stroke-opacity=".6" stroke-dasharray="4 3"></line>') + '<path d="M0 ' + Hh + ' L' + l + ' L' + W + ' ' + Hh + ' Z" fill="' + T.col + '" fill-opacity=".16"></path><path d="M' + l + '" fill="none" stroke="' + T.col + '" stroke-width="2"></path><circle cx="' + W + '" cy="' + xy[xy.length - 1][1] + '" r="3.5" fill="' + T.col + '"></circle></svg>' +
+      '<div style="' + H.st({ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }) + '">' + H.sm('00:00') + H.sm(kind === 'nh3' ? 'limit ' + T.hi : 'range ' + T.lo + '–' + T.hi + ' ' + T.unit) + H.sm('now') + '</div></div>';
   }
 
   renderVals() {

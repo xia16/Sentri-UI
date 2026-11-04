@@ -40,3 +40,11 @@ if (!s.includes('u.ovCmp && ')) { const a = "    if (cell.flag) return cell.flag
 // 9) in Compare, a pig clicked keeps the batch open (her card opens beside it)
 if (!s.includes('ovS().panel === \'compare\') return;')) { const a = "  leaveBatch() { const u = this.ui();"; if (!s.includes(a)) { console.error('MISS leave'); process.exit(1); } s = s.replace(a, "  leaveBatch() { if (this.ovOn && this.ovOn() && this.ovS().panel === 'compare') return; const u = this.ui();"); }
 fs.writeFileSync(f, s); console.log('applied 2');
+// 10) the camera frames the farm around the new small card, the bar and the panel only when it is open
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('ovInsets')) { const a = "    if (this.IP && u.mode === 'saved' && u.vm === 'view') {"; if (!s.includes(a)) { console.error('MISS insets'); process.exit(1); } s = s.replace(a, "    if (this.ovOn && this.ovOn(u)) { const O = this.ovS(); /* ovInsets */ ins.l = 28; ins.t = 84; ins.b = 92; ins.r = O.panel ? 412 + (O.her && O.panel === 'compare' ? 376 : 0) : 28; return ins; }\n" + a); }
+fs.writeFileSync(f, s); console.log('applied 3');
+// 11) a sow with her litter counts as a sow when a kind is shown
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes("vf.id === 'sow' && cell.kind === 'litter'")) { const a = "locationMatches(cell, vf) { return !!cell && (vf.kind === 'stage' ? cell.kind === vf.id :"; if (!s.includes(a)) { console.error('MISS lm'); process.exit(1); } s = s.replace(a, "locationMatches(cell, vf) { return !!cell && (vf.kind === 'stage' ? (cell.kind === vf.id || (vf.id === 'sow' && cell.kind === 'litter')) :"); }
+fs.writeFileSync(f, s); console.log('applied 4');
