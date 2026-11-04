@@ -17,6 +17,7 @@
   <div style="flex: 1 1 0; min-height: 0; min-width: 0; position: relative; background: #F3F2EE; overflow: hidden; isolation: isolate">
     <div ref="{{setMount}}" style="position: absolute; inset: 0"></div>
     <div ref="{{setLabels}}" aria-label="Labels" style="position: absolute; inset: 0; pointer-events: none; overflow: hidden"></div>
+    <div ref="{{setOvh}}" style="position: absolute; inset: 0; pointer-events: none; z-index: 30; font-family: 'Geist', system-ui, sans-serif"></div>
 
     <sc-if value="{{loading}}" hint-placeholder-val="{{true}}">
       <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #626C66">{{loadMsg}}</div>
@@ -1155,7 +1156,7 @@
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["pigsow","piggilt","pigsub","pigbatch","locroom","locpen","locgroup","locfilter","saved","view","batchlist","viewbatch","viewbatchtask","actionsmenu","pigwaiting","devicesetup","devicefeeder","devicepens","addpens","typepicker","newtypeinline","ungroupsel","viewroom","picked","addmenu","typemanager","device","devicenew","viewpen","viewcam","editfromview","doneask","endrow","sickview","doors","movezone","night","intronight","introroom","introgest","introlist","introcam","intropen","zone","section","room","lane","pentype","place","select","newsection","confirm","draw","drawn","drawing","roomsize","roomedit","repeat","shape","fit","removed","intro","start","draft","pens","ready","sickroom","grouped","dup","plan","edit","mixed","grouptype","farm-acres","farm-groupgest","farm-weaner","farm-sketch"],"default":"saved"},"$preview":{"width":1360,"height":830}}'>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["pigsow","piggilt","pigsub","pigbatch","locroom","locpen","locgroup","locfilter","saved","view","batchlist","viewbatch","viewbatchtask","actionsmenu","pigwaiting","devicesetup","devicefeeder","devicepens","addpens","typepicker","newtypeinline","ungroupsel","viewroom","picked","addmenu","typemanager","device","devicenew","viewpen","viewcam","editfromview","doneask","endrow","sickview","doors","movezone","night","intronight","introroom","introgest","introlist","introcam","intropen","zone","section","room","lane","pentype","place","select","newsection","confirm","draw","drawn","drawing","roomsize","roomedit","repeat","shape","fit","removed","intro","start","draft","pens","ready","sickroom","grouped","dup","plan","edit","mixed","grouptype","farm-acres","farm-groupgest","farm-weaner","farm-sketch","bxlist","bxbatch","bxtask","bxfilter","bxdates"],"default":"saved"},"$preview":{"width":1360,"height":830}}'>
 // <inlined>
 const LAYOUT_ENGINE = (function () {
 // Layout engine: the farm as a plain document (JSON, centimetres) and every rule that turns it into geometry.
@@ -3017,6 +3018,153 @@ return { makeRng, CLASSES, PIG_SCALE, VARIETIES, railSet, pigKit, stallSow, stal
 })();
 const FARM_DOCS = {"acres":{"version":1,"types":[{"id":"crate","name":"Farrowing crate","uses":["Farrowing"],"perPen":{"Farrowing":1},"w":180,"l":260,"color":0}],"zones":[{"id":"island-acres","name":"Island Acres","code":"Z1"}],"sections":[{"id":"farrowing-house","name":"Farrowing house","code":"FAR","zone":"island-acres"}],"rooms":[{"id":"farrowing-1","name":"Farrowing 1","section":"farrowing-house","num":1,"at":{"x":0,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"crate","n":20}]},{"runs":[{"type":"crate","n":20}]}],"aisle":{"wall":0,"between":222}},{"id":"farrowing-2","name":"Farrowing 2","section":"farrowing-house","num":2,"at":{"x":792,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"crate","n":20}]},{"runs":[{"type":"crate","n":20}]}],"aisle":{"wall":0,"between":222}},{"id":"farrowing-3","name":"Farrowing 3","section":"farrowing-house","num":3,"at":{"x":1584,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"crate","n":20}]},{"runs":[{"type":"crate","n":20}]}],"aisle":{"wall":0,"between":222}},{"id":"farrowing-4","name":"Farrowing 4","section":"farrowing-house","num":4,"at":{"x":2376,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"crate","n":20}]},{"runs":[{"type":"crate","n":20}]}],"aisle":{"wall":0,"between":222}},{"id":"farrowing-5","name":"Farrowing 5","section":"farrowing-house","num":5,"at":{"x":3168,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"crate","n":20}]},{"runs":[{"type":"crate","n":20}]}],"aisle":{"wall":0,"between":222}},{"id":"farrowing-6","name":"Farrowing 6","section":"farrowing-house","num":6,"at":{"x":3960,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"crate","n":20}]},{"runs":[{"type":"crate","n":20}]}],"aisle":{"wall":0,"between":222}},{"id":"farrowing-7","name":"Farrowing 7","section":"farrowing-house","num":7,"at":{"x":4752,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"crate","n":20}]},{"runs":[{"type":"crate","n":20}]}],"aisle":{"wall":0,"between":222}},{"id":"farrowing-8","name":"Farrowing 8","section":"farrowing-house","num":8,"at":{"x":5544,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"crate","n":20}]},{"runs":[{"type":"crate","n":20}]}],"aisle":{"wall":0,"between":222}},{"id":"farrowing-9","name":"Farrowing 9","section":"farrowing-house","num":9,"at":{"x":6336,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"crate","n":20}]},{"runs":[{"type":"crate","n":20}]}],"aisle":{"wall":0,"between":222}},{"id":"farrowing-10","name":"Farrowing 10","section":"farrowing-house","num":10,"at":{"x":7128,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"crate","n":20}]},{"runs":[{"type":"crate","n":20}]}],"aisle":{"wall":0,"between":222}},{"id":"farrowing-11","name":"Farrowing 11","section":"farrowing-house","num":11,"at":{"x":7920,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"crate","n":20}]},{"runs":[{"type":"crate","n":20}]}],"aisle":{"wall":0,"between":222}}],"name":"Island Acres"},"groupgest":{"version":1,"types":[{"id":"group","name":"Group pen","uses":["Gestation"],"perPen":{"Gestation":14},"w":483,"l":564,"color":0},{"id":"stall","name":"Gestation stall","uses":["Gestation"],"perPen":{"Gestation":1},"w":65,"l":210,"color":1}],"zones":[{"id":"barn-site","name":"Barn site","code":"Z1"}],"sections":[{"id":"group-gestation","name":"Group gestation","code":"GRO","zone":"barn-site"}],"rooms":[{"id":"gestation-barn","name":"Gestation barn","section":"group-gestation","num":1,"at":{"x":0,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"group","n":10}]},{"runs":[{"type":"group","n":10}]}],"aisle":{"wall":0,"between":92},"ends":[{"at":"far","runs":[{"type":"stall","n":24}]}]}],"name":"Prestage gestation barn"},"weaner":{"version":1,"types":[{"id":"weaner","name":"Weaner pen","uses":["Nursery"],"perPen":{"Nursery":25},"w":545,"l":300,"color":0}],"zones":[{"id":"weaner-unit","name":"Weaner unit","code":"Z1"}],"sections":[{"id":"weaners","name":"Weaners","code":"WEA","zone":"weaner-unit"}],"rooms":[{"id":"weaner-1","name":"Weaner 1","section":"weaners","num":1,"at":{"x":0,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"weaner","n":4}]},{"runs":[{"type":"weaner","n":4}]}],"aisle":{"wall":0,"between":80}},{"id":"weaner-2","name":"Weaner 2","section":"weaners","num":2,"at":{"x":730,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"weaner","n":4}]},{"runs":[{"type":"weaner","n":4}]}],"aisle":{"wall":0,"between":80}},{"id":"weaner-3","name":"Weaner 3","section":"weaners","num":3,"at":{"x":1460,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"weaner","n":4}]},{"runs":[{"type":"weaner","n":4}]}],"aisle":{"wall":0,"between":80}},{"id":"weaner-4","name":"Weaner 4","section":"weaners","num":4,"at":{"x":2190,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"weaner","n":4}]},{"runs":[{"type":"weaner","n":4}]}],"aisle":{"wall":0,"between":80}},{"id":"weaner-5","name":"Weaner 5","section":"weaners","num":5,"at":{"x":2920,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"weaner","n":4}]},{"runs":[{"type":"weaner","n":4}]}],"aisle":{"wall":0,"between":80}},{"id":"weaner-6","name":"Weaner 6","section":"weaners","num":6,"at":{"x":3650,"z":0},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"weaner","n":4}]},{"runs":[{"type":"weaner","n":4}]}],"aisle":{"wall":0,"between":80}}],"name":"Spanish weaner unit"},"sketch":{"version":1,"types":[{"id":"sick","name":"Sick pen","uses":["Sick"],"perPen":{"Sick":2},"w":250,"l":400,"color":0},{"id":"large","name":"Sick pen, large","uses":["Sick"],"perPen":{"Sick":8},"w":900,"l":400,"color":1}],"zones":[{"id":"sketch-farm","name":"Sketch farm","code":"Z1"}],"sections":[{"id":"isolation","name":"Isolation","code":"ISO","zone":"sketch-farm"}],"rooms":[{"id":"sketch-room","name":"Sketch room","section":"isolation","num":1,"at":{"x":0,"z":-435},"rot":0,"aLeft":true,"lanes":[{"runs":[{"type":"sick","n":2}]},{"runs":[{"type":"sick","n":2}]}],"outline":[[0,0],[1160,0],[1160,220],[1340,360],[1460,610],[1460,860],[1340,1080],[1160,1215],[0,1215]],"ends":[{"at":"far","runs":[{"type":"large","n":1}]}]}],"name":"The owner's sketch"}};
 // </inlined>
+// >>>OVH-LIB
+// ===== OVH: the overhauled view-mode UI (location card, the main panel, the bottom bar, popovers), drawn as HTML into one overlay layer =====
+// Built to the canvas boards BatchPages and LocationCard. Every interactive element carries data-a="action[:arg]"; hovers carry data-tip="key".
+const OVH = (function () {
+  const K = { tint: '#F6F7F1', paper: '#FFFFFF', line: '#DFE4D8', ink: '#20291F', muted: '#657060', press: '#EEF0EA', green: '#28734F', greenT: '#E3F0E8', blue: '#3972B7', blueT: '#EAF1FC', amber: '#946015', amberBar: '#D9A441', amberT: '#FCF0DB', red: '#B34B43', redT: '#F9EAE7', grey: '#D3D8D0', faint: '#9CA59D' };
+  const st = (o) => Object.entries(o).map(([k, v]) => k.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase()) + ': ' + v).join('; ') + ';';
+  const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  const t = (s, o) => '<span style="' + st(Object.assign({ fontSize: '14px', lineHeight: '20px', color: K.ink, whiteSpace: 'nowrap' }, o || {})) + '">' + esc(s) + '</span>';
+  const mu = (s, o) => t(s, Object.assign({ fontSize: '13px', color: K.muted }, o || {}));
+  const sm = (s, o) => t(s, Object.assign({ fontSize: '12px', lineHeight: '16px', color: K.muted }, o || {}));
+  const icon = (d, size, o) => '<svg viewBox="0 0 24 24" aria-hidden="true" style="' + st(Object.assign({ width: (size || 18) + 'px', height: (size || 18) + 'px', flexShrink: 0, fill: 'none', stroke: 'currentColor', strokeWidth: 1.7, strokeLinecap: 'round', strokeLinejoin: 'round' }, o || {})) + '"><path d="' + d + '"></path></svg>';
+  const I = {
+    back: 'm15 5-7 7 7 7', x: 'm6 6 12 12M18 6 6 18', chev: 'm9 5 7 7-7 7', down: 'm6 9 6 6 6-6', check: 'm5 12 5 5 9-10',
+    cal: 'M4 5h16v15H4V5Zm4-2v4m8-4v4M4 10h16', chart: 'M5 20V11m7 9V5m7 15v-6', log: 'M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01', litters: 'M4 20h16M7 20v-6m5 6V9m5 11V4',
+    select: 'M4 4h16v16H4zM8 12l3 3 5-6', layers: 'm12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5', tool: 'M14 6a4 4 0 0 0 5 5l-9 9-3-3 9-9a4 4 0 0 0-2-2Z', more: 'M5 12h.01M12 12h.01M19 12h.01',
+    pig: 'M5 12a7 5 0 1 0 14 0 7 5 0 0 0-14 0Zm9-1h.01M19 10l2-2M6 9 4 7', temp: 'M14 14.8V4a2 2 0 1 0-4 0v10.8a4 4 0 1 0 4 0Z', drop: 'M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11Z', air: 'M3 9h11a3 3 0 1 0-3-3M3 15h15a3 3 0 1 1-3 3M3 12h7',
+    fan: 'M12 12m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0M12 10c0-4 1-7 4-7 2 0 2 3-1 5M14 12c4 0 7 1 7 4 0 2-3 2-5-1M12 14c0 4-1 7-4 7-2 0-2-3 1-5M10 12c-4 0-7-1-7-4 0-2 3-2 5 1', chip: 'M7 7h10v10H7zM9 3v4m6-4v4M9 17v4m6-4v4M3 9h4m-4 6h4m10-6h4m-4 6h4',
+    feeder: 'M5 10h14l-2 10H7L5 10Zm3-6 1 6m7-6-1 6', water: 'M4 7h16M7 7v4a5 5 0 0 0 10 0V7M12 16v5', lamp: 'M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3Z', cam: 'M3 7h12v10H3zM15 10l6-3v10l-6-3',
+    floor: 'M3 7h18M3 12h18M3 17h18M16 4l3 3-3 3M8 14l-3 3 3 3', minus: 'M5 12h14', plus: 'M12 5v14M5 12h14', reset: 'M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4',
+    syringe: 'm18 2 4 4m-6-2 4 4M14 6l4 4-9 9H5v-4l9-9Zm-5 5 2 2m1-5 2 2', shield: 'M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6l-7-3Z', flask: 'M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M7.5 14h9',
+    out: 'M14 4h6v16h-6M4 12h11m-4-4 4 4-4 4', move: 'M4 12h16m-5-5 5 5-5 5', note: 'M6 3h12v18l-6-4-6 4V3Z', plan: 'M4 5h16v15H4V5Zm4-2v4m8-4v4M4 10h16', stop: 'M6 6h12v12H6z', report: 'M7 3h10v18H7ZM10 8h4m-4 4h4m-4 4h4',
+    eye: 'M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z', heart: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z', grid: 'M4 4h16v16H4zM4 12h16M12 4v16',
+  };
+  const chev = '<span style="display: flex; color: ' + K.muted + ';">' + icon(I.chev, 16) + '</span>';
+  const A = (a) => ' data-a="' + esc(a) + '"';
+  const TIP = (k) => ' data-tip="' + esc(k) + '"';
+
+  // ----- parts -----
+  const badge = (kind, text) => { const m = { red: [K.redT, K.red], amber: [K.amberT, K.amber], green: [K.greenT, K.green], blue: [K.blueT, K.blue], grey: ['#EEF1EA', K.muted] }[kind] || ['#EEF1EA', K.muted]; return '<span style="' + st({ display: 'inline-flex', alignItems: 'center', height: '22px', padding: '0 8px', borderRadius: '6px', background: m[0], color: m[1], fontSize: '12px', fontWeight: 500, whiteSpace: 'nowrap' }) + '">' + esc(text) + '</span>'; };
+  const card = (inner, o) => { o = o || {}; return '<div' + (o.a ? A(o.a) : '') + (o.tip ? TIP(o.tip) : '') + ' style="' + st({ position: 'relative', padding: o.pad || '16px', borderRadius: '16px', background: K.paper, border: '1px solid ' + K.line, marginTop: (o.mt || 0) + 'px', cursor: o.a ? 'pointer' : 'default' }) + '">' + inner + '</div>'; };
+  const head = (title, meta, back, o) => { o = o || {}; return '<div style="' + st({ display: 'flex', alignItems: 'center', gap: '12px', minHeight: '44px' }) + '">' +
+    (back ? '<button type="button"' + A(back) + ' aria-label="Back" style="' + st({ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', flexShrink: 0, borderRadius: '14px', background: K.paper, border: '1px solid ' + K.line, boxSizing: 'border-box', color: K.ink, cursor: 'pointer', padding: 0 }) + '">' + icon(I.back, 18) + '</button>' : '') +
+    '<span style="' + st({ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }) + '"><span style="' + st({ margin: 0, fontSize: '20px', lineHeight: '24px', fontWeight: 600, letterSpacing: '-.02em', color: K.ink, whiteSpace: 'nowrap' }) + '">' + esc(title) + '</span>' + (meta ? t(meta, { fontSize: '13px', lineHeight: '18px', color: K.muted }) : '') + '</span>' +
+    '<button type="button"' + A(o.close || 'close') + ' aria-label="Close" style="' + st({ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', marginRight: '-8px', color: K.muted, background: 'transparent', border: 0, cursor: 'pointer', padding: 0 }) + '">' + icon(I.x, 18) + '</button></div>'; };
+  const sec = (title, meta, mt) => '<div style="' + st({ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', margin: (mt == null ? 24 : mt) + 'px 4px 8px' }) + '"><span style="' + st({ fontSize: '15px', lineHeight: '20px', fontWeight: 600, color: K.ink, whiteSpace: 'nowrap' }) + '">' + esc(title) + '</span>' + (meta || '') + '</div>';
+  const meta = (s) => mu(s);
+  const wbtn = (ic, label, a, o) => { o = o || {}; return '<button type="button"' + A(a) + ' style="' + st({ flex: o.flex || 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', height: '48px', padding: '0 16px', borderRadius: '999px', background: o.dark ? K.ink : K.paper, color: o.dark ? '#FFFFFF' : K.ink, border: o.dark ? '0' : '1px solid ' + K.line, boxSizing: 'border-box', fontSize: '14px', fontWeight: o.dark ? 600 : 500, whiteSpace: 'nowrap', cursor: 'pointer', fontFamily: 'inherit' }) + '">' + (ic ? icon(ic, 18) : '') + esc(label) + '</button>'; };
+  const row = (l, r, first, a) => '<div' + (a ? A(a) : '') + ' style="' + st({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', minHeight: '48px', borderTop: first ? '0' : '1px solid ' + K.line, cursor: a ? 'pointer' : 'default' }) + '">' + l + '<span style="display: flex; align-items: center; gap: 6px;">' + (r || '') + (a ? chev : '') + '</span></div>';
+  const field = (label, a, o) => '<button type="button"' + A(a) + ' style="' + st({ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', height: '44px', padding: '0 14px', borderRadius: '12px', background: K.paper, border: '1px solid ' + ((o || {}).on ? K.ink : K.line), boxSizing: 'border-box', fontSize: '14px', color: K.ink, whiteSpace: 'nowrap', cursor: 'pointer', fontFamily: 'inherit' }) + '">' + esc(label) + icon(I.down, 14) + '</button>';
+  const seg = (items, on, aPrefix) => '<div style="' + st({ display: 'flex', gap: '2px', padding: '4px', borderRadius: '12px', background: '#F1F3EE' }) + '">' + items.map((s, i) => '<button type="button"' + A(aPrefix + ':' + i) + ' style="' + st({ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '36px', borderRadius: '9px', border: 0, fontSize: '13px', background: i === on ? '#FFFFFF' : 'transparent', boxShadow: i === on ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontWeight: i === on ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit', color: K.ink }) + '">' + esc(s) + '</button>').join('') + '</div>';
+  const dot = (c, s) => '<i style="' + st({ display: 'inline-block', width: (s || 8) + 'px', height: (s || 8) + 'px', borderRadius: '999px', background: c || K.red, boxShadow: '0 0 0 2px #FFFFFF', flexShrink: 0 }) + '"></i>';
+  const check = '<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: ' + K.green + '; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m5 12 5 5 9-10"></path></svg>';
+  // the tooltip (research/tooltips.md): white, header, a keyed row per part, values right; an optional summary and action
+  const tip = (headTxt, rows, hint, summary, extra) => {
+    const key = (c, kind) => kind === 'none' ? '' : kind === 'line' ? '<i style="' + st({ width: '12px', borderTop: '2px dashed ' + K.ink }) + '"></i>' : kind === 'tick' ? '<i style="' + st({ width: '3px', height: '12px', margin: '0 4px', borderRadius: '2px', background: K.ink }) + '"></i>' : '<i style="' + st({ width: '8px', height: '8px', margin: '0 2px', borderRadius: '2px', background: c, boxShadow: 'inset 0 0 0 1px rgba(32,41,31,.18)' }) + '"></i>';
+    const r = (x) => '<div style="' + st({ display: 'flex', alignItems: 'center', gap: '8px', minHeight: '24px', fontSize: '12px', lineHeight: '18px', color: x[3] ? K.ink : K.muted, fontWeight: x[3] ? 600 : 400 }) + '"><span style="' + st({ display: 'flex', justifyContent: 'center', width: '12px' }) + '">' + key(x[0], x[4]) + '</span><span style="flex: 1;">' + esc(x[1]) + '</span><span style="' + st({ fontSize: '13px', color: K.ink, fontWeight: x[3] ? 600 : 500, marginLeft: '16px' }) + '">' + esc(x[2]) + '</span></div>';
+    return '<div style="' + st({ fontSize: '13px', lineHeight: '18px', color: K.ink, fontWeight: 600, marginBottom: '6px' }) + '">' + esc(headTxt) + '</div>' + (rows || []).map(r).join('') + ((summary && summary.length) ? '<div style="' + st({ height: '1px', background: K.line, margin: '6px 0' }) + '"></div>' + summary.map(r).join('') : '') + (hint ? '<div style="' + st({ marginTop: '6px', fontSize: '12px', lineHeight: '18px', color: K.muted }) + '">' + esc(hint) + '</div>' : '') + (extra || '');
+  };
+  // the shadcn-style radial: rounded ends, the parts end to end inside them, the number inside
+  const pt = (cx, cy, r, deg) => [cx + r * Math.cos(deg * Math.PI / 180), cy - r * Math.sin(deg * Math.PI / 180)];
+  const arc = (cx, cy, r, a0, a1) => { const p0 = pt(cx, cy, r, a0), p1 = pt(cx, cy, r, a1); return 'M' + p0[0].toFixed(2) + ' ' + p0[1].toFixed(2) + ' A' + r + ' ' + r + ' 0 ' + (Math.abs(a0 - a1) > 180 ? 1 : 0) + ' 1 ' + p1[0].toFixed(2) + ' ' + p1[1].toFixed(2); };
+  function radial(o) {
+    const size = o.size, sw = o.sw, half = o.half, span = half ? 180 : 360, r = (size - sw) / 2, cx = size / 2, cy = size / 2;
+    const map = (x) => (half ? 180 - x : 90 - x), cap = ((sw / 2) / r) * (180 / Math.PI), gap = 1.6, lo = cap, hi = span - cap, room = hi - lo;
+    let x = lo; const segs = [], drawn = [];
+    o.parts.forEach((p) => { const len = (p[0] / o.total) * room; if (!p[3] && p[0] > 0) { const a0 = x + (drawn.length ? gap / 2 : 0), b0 = x + len - gap / 2; segs.push('<path d="' + arc(cx, cy, r, map(a0), map(Math.max(a0 + 0.01, b0))) + '" fill="none" stroke="' + p[2] + '" stroke-width="' + sw + '"></path>'); drawn.push([a0, b0, p[2]]); } x += len; });
+    if (drawn.length) { const s0 = pt(cx, cy, r, map(drawn[0][0])), e1 = pt(cx, cy, r, map(drawn[drawn.length - 1][1])); segs.push('<circle cx="' + s0[0].toFixed(2) + '" cy="' + s0[1].toFixed(2) + '" r="' + sw / 2 + '" fill="' + drawn[0][2] + '"></circle><circle cx="' + e1[0].toFixed(2) + '" cy="' + e1[1].toFixed(2) + '" r="' + sw / 2 + '" fill="' + drawn[drawn.length - 1][2] + '"></circle>'); }
+    const track = half ? '<path d="' + arc(cx, cy, r, map(cap), map(180 - cap)) + '" fill="none" stroke="#EDF0E9" stroke-width="' + sw + '" stroke-linecap="round"></path>' : '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="#EDF0E9" stroke-width="' + sw + '"></circle>';
+    const h = half ? size / 2 + sw / 2 + 2 : size;
+    return '<span' + (o.tip ? TIP(o.tip) : '') + (o.a ? A(o.a) : '') + ' style="' + st({ position: 'relative', display: 'inline-block', width: size + 'px', height: h + 'px', flexShrink: 0, cursor: o.a ? 'pointer' : 'default' }) + '"><svg viewBox="0 0 ' + size + ' ' + h + '" aria-hidden="true" style="' + st({ position: 'absolute', left: 0, top: 0, width: size + 'px', height: h + 'px', pointerEvents: 'none' }) + '">' + track + segs.join('') + '</svg>' + (o.center ? '<span style="' + st({ position: 'absolute', left: 0, right: 0, top: half ? (size / 2 - 30) + 'px' : 0, bottom: half ? 'auto' : 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }) + '">' + o.center + '</span>' : '') + '</span>';
+  }
+  const centre = (big, sub) => t(big, { fontSize: '28px', lineHeight: '32px', fontWeight: 600, letterSpacing: '-.03em' }) + (sub ? t(sub, { fontSize: '12px', lineHeight: '16px', color: K.muted }) : '');
+  const legend = (items, o) => { o = o || {}; return '<div style="' + st({ flex: 1, display: 'flex', flexDirection: 'column' }) + '">' + items.map((x, i) => { const on = o.only === x.id, off = o.only && !on; return '<div' + (o.a ? A(o.a + ':' + x.id) : '') + ' style="' + st({ display: 'flex', alignItems: 'center', gap: '10px', height: (o.h || 36) + 'px', margin: '0 -8px', padding: '0 8px', borderRadius: '8px', borderTop: i ? '1px solid ' + K.line : '0', background: on ? K.press : 'transparent', boxShadow: on ? 'inset 0 0 0 1.5px ' + K.ink : 'none', opacity: off ? 0.45 : 1, cursor: o.a ? 'pointer' : 'default' }) + '"><i style="' + st({ width: '10px', height: '10px', borderRadius: '999px', background: x.col, flexShrink: 0 }) + '"></i>' + t(x.label, { flex: 1, fontSize: '14px', color: x.warn ? K.amber : K.ink, fontWeight: x.warn || on ? 500 : 400 }) + t(String(x.n), { fontSize: '15px', fontWeight: 600 }) + '</div>'; }).join('') + '</div>'; };
+  const kpi = (label, value, unit, b, foot, tipKey) => card(t(label, { fontSize: '13px', color: K.muted, display: 'block' }) + '<div style="' + st({ display: 'flex', alignItems: 'baseline', gap: '2px', marginTop: '6px' }) + '"><span style="' + st({ fontSize: '30px', lineHeight: '36px', fontWeight: 600, letterSpacing: '-.03em', color: K.ink }) + '">' + esc(value) + '</span>' + (unit ? t(unit, { fontSize: '15px', fontWeight: 500 }) : '') + '</div><div style="' + st({ marginTop: '8px', minHeight: '22px' }) + '">' + (b || '') + '</div>' + (foot ? '<div style="' + st({ marginTop: '10px', fontSize: '12px', lineHeight: '16px', color: K.muted }) + '">' + esc(foot) + '</div>' : ''), { pad: '14px 16px', tip: tipKey });
+  const lchip = (ic, label, o) => { o = o || {}; return '<span' + (o.a ? A(o.a) : '') + (o.tip ? TIP(o.tip) : '') + ' style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '5px', height: '28px', padding: '0 9px', borderRadius: '999px', background: o.bg || '#F2F4EF', color: o.color || K.ink, fontSize: '12.5px', fontWeight: 500, whiteSpace: 'nowrap', boxShadow: o.on ? 'inset 0 0 0 1.5px ' + K.ink : 'none', cursor: o.a ? 'pointer' : 'default' }) + '">' + (ic ? icon(ic, 14) : '') + esc(label) + '</span>'; };
+  const ptag = (kind, ic, label, sub, o) => { o = o || {}; const m = { red: [K.redT, K.red, '#F0CFCB'], amber: [K.amberT, K.amber, '#F1DDB4'], grey: ['#FFFFFF', K.ink, K.line] }[kind]; return '<span' + (o.tip ? TIP(o.tip) : '') + ' style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '6px', height: '30px', padding: '0 10px', borderRadius: '999px', background: m[0], border: '1px solid ' + m[2], color: m[1], fontSize: '13px', fontWeight: 500, whiteSpace: 'nowrap', boxSizing: 'border-box', cursor: 'default' }) + '">' + (ic ? icon(ic, 15) : '') + esc(label) + (sub ? '<span style="font-weight: 400; opacity: .8;">' + esc(sub) + '</span>' : '') + '</span>'; };
+
+  return { K, st, esc, t, mu, sm, icon, I, chev, A, TIP, badge, card, head, sec, meta, wbtn, row, field, seg, dot, check, tip, radial, centre, legend, kpi, lchip, ptag };
+})();
+
+// ===== OVP: the pages of the overhauled UI (demo data from the canvas boards) =====
+const OVP = (function () {
+  const H = OVH, K = H.K, st = H.st, t = H.t, mu = H.mu, sm = H.sm, icon = H.icon, I = H.I, A = H.A, TIP = H.TIP, esc = H.esc;
+  const G = K.green, B = K.blue, AM = K.amberBar, N = K.grey;
+  // ----- demo data (the boards) -----
+  const BATCHES = [
+    { id: '34', name: 'Batch 34', stage: 'Breeding', d: 2, of: 5 }, { id: '33', name: 'Batch 33', stage: 'Moving in', d: 1, of: 2 },
+    { id: '32', name: 'Batch 32', stage: 'Farrowing', d: 3, of: 7 }, { id: '31', name: 'Batch 31', stage: 'Nursery', d: 24, of: 42 },
+    { id: '30', name: 'Batch 30', stage: 'Nursery', d: 31, of: 42 }, { id: '35G', name: 'Batch 35G', stage: 'Quarantine', d: 18, of: 42 },
+  ];
+  const FAR = [{ id: 'done', label: 'Done', n: 31, col: G }, { id: 'active', label: 'Active', n: 4, col: B }, { id: 'await', label: 'Awaiting', n: 15, col: N, skip: true }];
+  const PFC = [{ id: 'checked', label: 'Checked', n: 25, col: G }, { id: 'recheck', label: 'Recheck', n: 3, col: AM, warn: true }, { id: 'todo', label: 'To do', n: 3, col: N, skip: true }];
+  const parts = (L) => L.map((x) => [x.n, x.label, x.col, x.skip]);
+  const DATES = [
+    ['done', '13 Jul', 'Heat check', '', 1], ['done', '15 Jul', 'Breeding', '', 1], ['done', '7 Sep', 'Pregnancy check', '', 1], ['done', '28 Oct', 'Into Farrowing Room 2', 'late 1 day', 1],
+    ['now', 'Now', 'Farrowing', '', 'task'], ['now', 'Now', 'Post-farrowing check', '', 'post'],
+    ['next', '6 Nov', 'Piglet processing', 'in 2 days'], ['next', '27 Nov', 'Weaning check', 'in 23 days'], ['next', '30 Nov', 'Wean to Nursery 1', 'in 26 days'], ['next', '7 Dec', 'Heat check', 'in 5 weeks'], ['next', '11 Jan', 'Out of nursery', 'in 10 weeks'],
+  ];
+
+  // ----- the bottom bar: Select · Batches · Equipment · Actions -----
+  function bar(O) {
+    const b = (ic, l, a, on) => '<button type="button"' + A(a) + ' style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '8px', height: '44px', padding: '0 14px', borderRadius: '12px', border: 0, background: on ? K.press : 'transparent', boxShadow: on ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '14px', fontWeight: on ? 600 : 500, color: K.ink, whiteSpace: 'nowrap', cursor: 'pointer', fontFamily: 'inherit' }) + '">' + icon(ic, 18) + esc(l) + '</button>';
+    if (O.barCtl) return O.barCtl;
+    return b(I.select, 'Select', 'select', O.selecting) + b(I.layers, 'Batches', 'batches', O.panel && O.panel !== 'pig' && O.panel !== 'pigperf' && O.panel !== 'piglog' && O.panel !== 'pen') + b(I.tool, 'Equipment', 'equip', !!O.pop && O.pop.indexOf('eq') === 0) + '<span style="flex: 1;"></span><button type="button"' + A('actions') + ' style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '8px', height: '44px', padding: '0 18px', borderRadius: '12px', border: 0, background: K.ink, color: '#FFFFFF', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }) + '">Actions</button>';
+  }
+
+  // ----- the batch panel -----
+  function list(O) {
+    return H.head('Batches', '', '') + '<div style="margin-top: 16px;">' + H.card(BATCHES.map((b, i) => '<div' + A('open:' + b.id) + ' style="' + st({ display: 'flex', alignItems: 'center', gap: '14px', height: '64px', padding: '0 16px', margin: '0 -16px', borderTop: i ? '1px solid ' + K.line : '0', cursor: 'pointer' }) + '">' + H.radial({ size: 30, sw: 4, parts: [[b.d, '', B], [b.of - b.d, '', N, true]], total: b.of }) + '<span style="' + st({ flex: 1, display: 'flex', flexDirection: 'column' }) + '">' + t(b.name, { fontWeight: 600, fontSize: '15px' }) + mu(b.stage + ' · day ' + b.d + ' of ' + b.of) + '</span>' + H.chev + '</div>').join(''), { pad: '0 16px' }) + '</div>';
+  }
+  function tile(name, metaTxt, L, total, attn, a, tipKey) {
+    return H.card('<div style="' + st({ display: 'flex', alignItems: 'center', gap: '14px' }) + '">' + H.radial({ size: 52, sw: 7, parts: parts(L), total: total, center: t(String(L[0].n), { fontSize: '14px', fontWeight: 600 }), tip: tipKey }) +
+      '<span style="' + st({ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }) + '">' + t(name, { fontSize: '15px', fontWeight: 600 }) + '<span style="' + st({ display: 'flex', alignItems: 'center', gap: '8px' }) + '">' + mu(metaTxt) + (attn ? H.badge('amber', attn) : '') + '</span></span>' + H.chev + '</div>', { pad: '14px 16px', a: a });
+  }
+  function batch(O) {
+    const b = BATCHES.find((x) => x.id === O.batchId) || BATCHES[2];
+    if (b.id !== '32') return H.head(b.name, b.stage + ' · day ' + b.d + ' of ' + b.of, 'back') + H.sec('Running now', '', 20) + H.card(mu('This batch is shown on the farm. Its pages in this demo are Batch 32\'s.'));
+    return H.head('Batch 32', 'Farrowing Room 2 · 50 sows', 'back') + H.sec('Running now', '', 20) + '<div style="' + st({ display: 'flex', flexDirection: 'column', gap: '8px' }) + '">' +
+      tile('Farrowing', 'day 3 of 7', FAR, 50, '', 'task:farrow', 'ring-far') + tile('Post-farrowing check', 'day 3', PFC, 31, '3 recheck', 'task:post', 'ring-pfc') + '</div>' +
+      H.sec('Upcoming') + H.card([['Fri 6 Nov', 'Piglet processing', 'in 2 days'], ['Fri 27 Nov', 'Weaning check', 'in 23 days'], ['Mon 30 Nov', 'Wean to Nursery 1', 'in 26 days']].map((r, i) => H.row('<span style="display: flex; align-items: center;">' + t(r[0], { fontSize: '13px', color: K.muted, width: '84px', display: 'inline-block' }) + t(r[1]) + '</span>', mu(r[2]), !i)).join(''), { pad: '0 16px' }) +
+      '<div style="' + st({ display: 'flex', marginTop: '20px' }) + '">' + H.wbtn(I.cal, 'All dates', 'dates') + '</div>';
+  }
+  function task(O) {
+    const isPost = O.taskId === 'post', L = isPost ? PFC : FAR, total = isPost ? 31 : 50;
+    const done = L[0].n;
+    return H.head(isPost ? 'Post-farrowing check' : 'Farrowing', 'Batch 32 · day 3' + (isPost ? '' : ' of 7'), 'back') +
+      '<div style="' + st({ display: 'flex', gap: '8px', marginTop: '16px' }) + '">' + H.field(O.parity || 'All parities', 'filter', { on: O.pop === 'filter' }) + H.field('Farrowing Room 2', 'noop') + '</div>' +
+      H.sec('Whole-task progress', H.meta(total + ' sows')) +
+      H.card('<div style="' + st({ display: 'flex', alignItems: 'center', gap: '20px' }) + '">' + H.radial({ size: 132, sw: 16, parts: parts(L), total: total, half: true, center: H.centre(String(done), 'of ' + total + ' ' + (isPost ? 'checked' : 'done')), tip: isPost ? 'ring-pfc' : 'ring-far' }) + H.legend(L, { a: 'only', only: O.only }) + '</div>') +
+      (isPost ? '' : H.sec('Performance so far', H.meta('31 finished litters')) + '<div style="' + st({ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }) + '">' + H.kpi('Born alive / litter', '11.8', '', H.badge('amber', '0.2 under target'), 'Target 12') + H.kpi('Stillborn rate', '6.1', '%', '', '', 'kpi-still') + '</div>');
+  }
+  function dates(O) {
+    const rows = DATES.map((d) => '<div' + (d[4] ? A(d[4] === 1 ? 'donetask' : 'task:' + (d[4] === 'post' ? 'post' : 'farrow')) : '') + ' style="' + st({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', height: '40px', paddingRight: '10px', cursor: d[4] ? 'pointer' : 'default' }) + '"><span style="' + st({ display: 'flex', alignItems: 'center', gap: '12px' }) + '"><span style="' + st({ width: '12px', height: '12px', borderRadius: '999px', boxSizing: 'border-box', background: d[0] === 'done' ? N : d[0] === 'now' ? B : '#FFFFFF', border: d[0] === 'next' ? '2px solid #858D86' : '0', position: 'relative', zIndex: 1 }) + '"></span>' + t(d[1], { fontSize: '13px', color: d[0] === 'now' ? B : K.muted, fontWeight: d[0] === 'now' ? 600 : 400, width: '48px', display: 'inline-block' }) + t(d[2], { color: d[0] === 'done' ? K.muted : K.ink, fontWeight: d[0] === 'now' ? 600 : 400 }) + '</span><span style="' + st({ display: 'flex', alignItems: 'center', gap: '4px' }) + '">' + (d[3] ? t(d[3], { fontSize: '13px', color: d[3].indexOf('late') === 0 ? K.amber : K.muted, fontWeight: d[3].indexOf('late') === 0 ? 500 : 400 }) : '') + (d[4] ? H.chev : '') + '</span></div>').join('');
+    return H.head('All dates', 'Batch 32', 'back') + H.card('<div data-scroll="dates" data-scroll-to="160" style="' + st({ position: 'relative', height: '400px', overflowY: 'auto' }) + '"><div style="' + st({ position: 'absolute', left: '5px', top: '20px', height: (DATES.length * 40 - 40) + 'px', width: '2px', background: K.line }) + '"></div>' + rows + '</div>', { mt: 16, pad: '8px 16px' });
+  }
+
+  // ----- tooltips by key -----
+  const TIPS = {
+    'ring-far': () => H.tip('Farrowing · 50 sows', [[G, 'Done', '31'], [B, 'Active', '4'], [N, 'Awaiting', '15']], 'Click to open the task'),
+    'ring-pfc': () => H.tip('Post-farrowing check · 31 sows', [[G, 'Checked', '25'], [AM, 'Recheck', '3', true], [N, 'To do', '3']], 'Click to open the task'),
+    'kpi-still': () => H.tip('Stillborn rate · 31 litters', [['', 'Stillborn', '6.1 %', true, 'none'], ['', 'Mummified', '2.0 %', false, 'none']]),
+  };
+
+  // ----- popovers -----
+  function filterPop(O) {
+    const opts = ['All parities', 'Parity 1', 'Parity 2–4', 'Parity 5+'], cur = O.parity || 'All parities';
+    return opts.map((l) => '<div' + A('parity:' + l) + ' style="' + st({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '44px', padding: '0 14px', fontSize: '14px', color: K.ink, fontWeight: l === cur ? 600 : 400, cursor: 'pointer' }) + '">' + esc(l) + (l === cur ? icon(I.check, 16, { strokeWidth: 2 }) : '') + '</div>').join('');
+  }
+  function actionsPop() {
+    const it = (ic, l) => '<div' + A('noop') + ' style="' + st({ display: 'flex', alignItems: 'center', gap: '12px', height: '40px', padding: '0 14px', fontSize: '14px', color: K.ink, cursor: 'pointer' }) + '">' + icon(ic, 18) + esc(l) + '</div>';
+    return '<div style="' + st({ padding: '6px 14px 4px', fontSize: '12px', color: K.muted }) + '">Actions</div>' + [[I.syringe, 'Treatment'], [I.shield, 'Vaccination'], [I.flask, 'Sampling'], [I.out, 'Culling'], [I.move, 'Move'], [I.feeder, 'Feed'], [I.note, 'Note']].map((x) => it(x[0], x[1])).join('') + '<div style="' + st({ height: '1px', background: K.line, margin: '6px 0' }) + '"></div>' + [[I.plan, 'Vaccination plan'], [I.report, 'Open batch report'], [I.stop, 'End batch']].map((x) => it(x[0], x[1])).join('');
+  }
+
+  return { BATCHES, list, batch, task, dates, bar, TIPS, filterPop, actionsPop, FAR, PFC };
+})();
+
+// <<<OVH-LIB
 class Component extends DCLogic {
   icons() {
     return {
@@ -3435,6 +3583,7 @@ class Component extends DCLogic {
   }
   componentDidUpdate() {
     this.dirty = true;
+    this.ovPaint(); // ovh
     this.ctxSync();
     if (this.pf) {
       const el = { title: this.edEl, ed: this.edEl, ar: this.arEl, dv: this.dvEl, nn: this.nnEl, dup: this.dupEl, pt: this.ptEl, vt: this.vtEl }[this.pf];
@@ -6487,12 +6636,12 @@ class Component extends DCLogic {
           D('Thu 5 Nov', 'Farrowing', 'next', 'in 2 days'), D('Sat 7 Nov', 'Piglet processing', 'next', 'in 4 days'), D('Fri 4 Dec', 'Wean, to Nursery 2', 'next', 'in 4 weeks')],
         comp: [F('ba', 'Born alive per litter', '', bs([12.2, 12.6, 12.1, 12.8, 12.4, 11.6]), 13, false, 'Batch 33 has not farrowed yet: from Thu 5 Nov.'), F('fr', 'Farrowing rate', '%', bs([86, 88, 84, 87, 85, 89]), 88)] },
       32: { id: '32', name: 'Batch 32', sub: 'Line 1 · Lactating, day 9 · 50 sows, 580 piglets', kind: 'sows', total: 50,
-        tasks: [{ id: 'lact', title: 'Lactation', when: 'Day 9 of 26 · weaning Mon 16 Nov', goal: 'plan', goalWord: 'on plan',
-          states: [{ id: 'plan', label: 'Litter on plan', col: G }, { id: 'loss', label: 'Losses above average', col: A }],
-          pick: { loss: ['A7', 'A12', 'A19', 'B4', 'B12', 'B21'] }, why: { plan: 'Litter on plan', loss: '2 piglets lost this week' } },
-          { id: 'post', title: 'Post-farrowing check', when: 'Day 9 of 10 · ends Wed 4 Nov', goal: 'done', goalWord: 'checked',
-          states: [{ id: 'done', label: 'Checked', col: G }, { id: 'due', label: 'Not checked yet', col: B }, { id: 'recheck', label: 'Recheck needed', col: A }],
-          pick: { recheck: ['A7', 'A19', 'B12'], due: ['A12', 'A23', 'B4', 'B21', 'B24', 'B25'] }, why: { done: 'Checked, all fine', due: 'Check due today', recheck: 'Recheck: udder and milk' } }],
+        tasks: [{ id: 'farrow', title: 'Farrowing', when: 'Day 3 of 7', goal: 'done', goalWord: 'done',
+          states: [{ id: 'done', label: 'Done', col: G }, { id: 'active', label: 'Active', col: B }, { id: 'await', label: 'Awaiting', col: N }],
+          share: { done: 31, active: 4, await: 15 }, why: { done: 'Farrowed', active: 'Farrowing now', await: 'Due this week' } },
+          { id: 'post', title: 'Post-farrowing check', when: 'Day 3', goal: 'checked', goalWord: 'checked',
+          states: [{ id: 'checked', label: 'Checked', col: G }, { id: 'recheck', label: 'Recheck', col: A }, { id: 'todo', label: 'To do', col: N }],
+          share: { checked: 25, recheck: 3, todo: 3 }, why: { checked: 'Checked, all fine', recheck: 'Recheck: udder and milk', todo: 'Check due today' } }],
         sched: [D('Mon 13 Jul', 'Heat check', 'done', 'on time'), D('Wed 15 Jul', 'Breeding', 'done', 'on time'), D('Mon 7 Sep', 'Pregnancy check', 'done', 'on time'), D('Mon 26 Oct', 'Move into Farrowing Room 2', 'done', 'on time'),
           D('Mon 26 Oct', 'Farrowing', 'late', '1 day late'), D('Fri 30 Oct', 'Piglet processing', 'done', 'on time'), D('Mon 26 Oct', 'Lactation', 'now', 'day 9 of 26'), D('Mon 26 Oct', 'Post-farrowing check', 'now', 'day 9 of 10'),
           D('Fri 13 Nov', 'Weaning check', 'next', 'in 10 days'), D('Mon 16 Nov', 'Wean, to Nursery 1', 'next', 'in 13 days'), D('Mon 23 Nov', 'Heat check after weaning', 'next', 'in 3 weeks'), D('Mon 28 Dec', 'End of nursery', 'next', 'in 8 weeks')],
@@ -6557,7 +6706,7 @@ class Component extends DCLogic {
     if (!bv) return null;
     if (!cell || cell.batch == null || String(cell.batch) !== String(bv.id)) return '#F4F3EE';
     if (cell.flag) return cell.flag.lvl === 'urgent' ? '#E7A196' : '#EFCF8C';
-    if (bv.task) { const d = this.bvStateDef(String(bv.id), this.bvState(String(bv.id), roomId, code, bv.task), bv.task); if (d) return d.col; }
+    if (bv.task) { const sx = this.bvState(String(bv.id), roomId, code, bv.task); if (u.bvOnly && sx !== u.bvOnly) return '#F4F3EE'; const d = this.bvStateDef(String(bv.id), sx, bv.task); if (d) return d.col; }
     return '#E8B9AC';
   }
   // a room's name while a batch is shown: how many of the batch are in it
@@ -8517,7 +8666,169 @@ class Component extends DCLogic {
   openTypeList() { this.put({ ed: null, arT: null, ptList: true, chT: false, ptForm: null, nn: null, cf: null, dupT: null, mvT: false, tool: '', moreOpen: false }); }
 
   // ---------- template values ----------
+  // >>>OVH-COMP
+  // ===================== the overhauled view-mode UI (OVH parts, OVP pages) =====================
+  ovOn(u) { u = u || this.ui(); return !!(u.ready && !u.err && u.mode !== 'intro' && this.IP && u.vm === 'view'); }
+  ovS() { return this.O || (this.O = { panel: '', batchId: '', taskId: '', only: '', pop: '', popAt: null, parity: '', hist: [], loc: '', crumb: -1 }); }
+  ovSet(p) { Object.assign(this.ovS(), p || {}); this.ovPaint(); }
+  setOvh(el) {
+    if (!el || el === this.ovEl) return;
+    this.ovEl = el;
+    el.innerHTML = '';
+    const body = document.createElement('div'); body.style.cssText = 'position:absolute; inset:0; pointer-events:none';
+    const tip = document.createElement('div'); tip.setAttribute('role', 'tooltip');
+    tip.style.cssText = "position:absolute; left:0; top:0; z-index:40; pointer-events:none; display:none; min-width:220px; max-width:300px; box-sizing:border-box; padding:10px 12px; border-radius:8px; background:#FFFFFF; border:1px solid #DFE4D8; box-shadow:0 4px 16px rgba(32,41,31,.14); font-family:'Geist', system-ui, sans-serif; font-variant-numeric: tabular-nums";
+    el.appendChild(body); el.appendChild(tip);
+    this.ovBody = body; this.ovTipEl = tip;
+    el.addEventListener('click', (e) => { const h = e.target.closest('[data-a]'); if (!h || !el.contains(h)) { if (this.ovS().pop && !e.target.closest('[data-pop]')) this.ovSet({ pop: '' }); return; } e.preventDefault(); e.stopPropagation(); this.ovAct(h.getAttribute('data-a'), h); });
+    el.addEventListener('mouseover', (e) => { const h = e.target.closest('[data-tip]'); if (h && el.contains(h)) this.ovTip(h.getAttribute('data-tip'), h); const lc = e.target.closest('[data-zone="loc"]'); if (lc && !this.ovS().loc) this.ovSet({ loc: 'hover' }); });
+    el.addEventListener('mouseout', (e) => { const h = e.target.closest('[data-tip]'); if (h && (!e.relatedTarget || !h.contains(e.relatedTarget))) this.ovTipHide(); const lc = e.target.closest('[data-zone="loc"]'), to = e.relatedTarget; if (lc && this.ovS().loc && !(to && to.closest && to.closest('[data-zone="loc"]'))) this.ovSet({ loc: '', crumb: -1 }); });
+    if (!this.ovKey) { this.ovKey = (e) => { if (e.key !== 'Escape' || !this.ovOn()) return; const O = this.ovS(); if (O.pop) { this.ovSet({ pop: '' }); return; } if (O.panel) this.ovAct(O.hist.length ? 'back' : 'close'); }; window.addEventListener('keydown', this.ovKey); }
+    this.ovPaint();
+  }
+  ovTip(key, h) {
+    const O = this.ovS(), f = (OVP.TIPS[key] || (this.ovTips && this.ovTips[key]));
+    if (!f || !this.ovTipEl || !this.ovEl) return;
+    const el = this.ovTipEl; el.innerHTML = typeof f === 'function' ? f(O) : f; el.style.display = 'block';
+    const R = this.ovEl.getBoundingClientRect(), r = h.getBoundingClientRect(), w = el.offsetWidth, hh = el.offsetHeight;
+    let x = r.left - R.left + r.width / 2 - w / 2, y = r.top - R.top - hh - 8;
+    if (y < 8) y = r.bottom - R.top + 8;
+    x = Math.max(8, Math.min(R.width - w - 8, x));
+    el.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)';
+  }
+  ovTipHide() { if (this.ovTipEl) this.ovTipEl.style.display = 'none'; }
+  ovPush() { const O = this.ovS(); O.hist.push({ panel: O.panel, batchId: O.batchId, taskId: O.taskId }); }
+  ovAct(a, h) {
+    const O = this.ovS(), u = this.ui(), i = a.indexOf(':'), k = i < 0 ? a : a.slice(0, i), v = i < 0 ? '' : a.slice(i + 1);
+    this.ovTipHide();
+    const at = () => { if (!h || !this.ovEl) return null; const R = this.ovEl.getBoundingClientRect(), r = h.getBoundingClientRect(); return { x: r.left - R.left, y: r.top - R.top, w: r.width, h: r.height, bottom: R.height - (r.top - R.top) }; };
+    if (k === 'noop') return;
+    if (k === 'batches') { if (O.panel && ['list', 'batch', 'task', 'dates', 'done', 'compare'].indexOf(O.panel) >= 0) { this.ovAct('close'); return; } if (u.bv) this.closeBatch(); this.ovSet({ panel: 'list', hist: [], pop: '' }); return; }
+    if (k === 'close') { if (this.ui().bv) { this.put({ bvOnly: '' }); this.closeBatch(); } this.ovSet({ panel: '', hist: [], only: '', pop: '' }); return; }
+    if (k === 'back') {
+      const prev = O.hist.pop();
+      if (!prev) { this.ovAct('close'); return; }
+      if (O.panel === 'task' && prev.panel !== 'task') { this.put({ bvOnly: '' }); this.closeBatchTask(); }
+      if (prev.panel === 'list' && this.ui().bv) { this.put({ bvOnly: '' }); this.closeBatch(); }
+      this.ovSet(Object.assign({}, prev, { only: '', pop: '' }));
+      return;
+    }
+    if (k === 'open') { this.ovPush(); this.ovSet({ panel: 'batch', batchId: v, pop: '' }); if (this.batchData()[v]) this.openBatch(v); return; }
+    if (k === 'task') { this.ovPush(); if (!this.ui().bv) this.openBatch('32'); this.put({ bvOnly: '' }); this.openBatchTask(v === 'post' ? 'post' : 'farrow'); this.ovSet({ panel: 'task', taskId: v === 'post' ? 'post' : 'farrow', only: '', pop: '' }); return; }
+    if (k === 'dates') { this.ovPush(); this.ovSet({ panel: 'dates', pop: '' }); return; }
+    if (k === 'donetask') { this.ovPush(); this.ovSet({ panel: 'done', pop: '' }); return; }
+    if (k === 'only') { const nv = O.only === v ? '' : v; this.put({ bvOnly: nv }); this.repaintBv(); this.ovSet({ only: nv }); return; }
+    if (k === 'filter') { this.ovSet({ pop: O.pop === 'filter' ? '' : 'filter', popAt: at() }); return; }
+    if (k === 'parity') { this.ovSet({ parity: v, pop: '' }); return; }
+    if (k === 'actions') { this.ovSet({ pop: O.pop === 'actions' ? '' : 'actions', popAt: at() }); return; }
+    if (k === 'equip') { this.ovSet({ pop: O.pop === 'eq' ? '' : 'eq', popAt: at() }); return; }
+    if (k === 'select') { this.ovSet({ selecting: !O.selecting }); return; }
+    if (k === 'crumb') { this.ovSet({ crumb: +v, loc: 'hover' }); return; }
+    if (k === 'goroom') { this.ovSet({ loc: '', crumb: -1 }); if (this.ui().bv) this.closeBatch(); this.goRoom(v); return; }
+    if (k === 'gofarm') { this.ovSet({ loc: '', crumb: -1 }); this.goScope('', ''); return; }
+    if (this.ovAct2 && this.ovAct2(k, v, h, at)) return;
+  }
+  // the location card: only where you are; hover → the breadcrumb; a crumb → its siblings
+  ovPlace(u) {
+    const r = u.view === 'room' ? this.roomById(u.roomId) : null, ps = u.psel || [];
+    const pen = r && ps.length === 1 ? ps[0] : (r && u.pen ? u.pen : '');
+    const crumbs = [{ label: 'Farm', a: 'gofarm' }];
+    const sec = r && r.section ? this.secById(r.section) : (u.secId ? this.secById(u.secId) : null);
+    if (sec) crumbs.push({ label: sec.name, a: 'noop' });
+    if (r) crumbs.push({ label: r.name, a: 'goroom:' + r.id, sibs: true, roomId: r.id });
+    const name = pen ? 'Pen ' + pen : r ? r.name : (sec ? sec.name : (this.M().name || 'Hillside Sow Farm'));
+    if (pen) crumbs.push({ label: 'Pen ' + pen, a: 'noop' });
+    return { r: r, pen: pen, name: name, crumbs: crumbs.slice(0, -1) };
+  }
+  ovPigs(roomId, code) {
+    const cells = (this.IP && this.IP.cell[roomId]) || {}, n = {};
+    Object.keys(cells).forEach((c) => { if (code && c !== code) return; const x = cells[c]; if (!x || !x.kind) return; const k = x.kind === 'sow' || x.kind === 'litter' ? 'sows' : x.kind === 'boar' ? 'boars' : x.kind === 'gilts' ? 'gilts' : x.kind === 'weaners' ? 'weaners' : x.kind; n[k] = (n[k] || 0) + (x.kind === 'sow' || x.kind === 'boar' || x.kind === 'litter' ? 1 : (x.n || 1)); });
+    return Object.keys(n).map((k) => [n[k], n[k] === 1 ? k.replace(/s$/, '') : k]).sort((a, b) => b[0] - a[0]);
+  }
+  ovFault(roomId, code) { const cells = (this.IP && this.IP.cell[roomId]) || {}; return Object.keys(cells).some((c) => (!code || c === code) && cells[c] && cells[c].flag && cells[c].flag.lvl === 'urgent'); }
+  ovLoc(u) {
+    const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u), A = H.A;
+    const kinds = P.r ? this.ovPigs(P.r.id, P.pen) : [], fault = P.r ? this.ovFault(P.r.id, P.pen) : false;
+    this.ovTips = this.ovTips || {};
+    let chips = kinds.slice(0, kinds.length > 3 ? 2 : 3).map((x, i) => H.lchip(i ? '' : H.I.pig, x[0] + ' ' + x[1])).join('');
+    if (kinds.length > 3) { this.ovTips.kinds = () => H.tip(kinds.reduce((a, x) => a + x[0], 0) + ' pigs', kinds.map((x, j) => ['#' + ['2F3A33', '4F5D53', '718075', '93A096', 'B4BFB6', 'D3DBD4'][Math.min(j, 5)], x[1].charAt(0).toUpperCase() + x[1].slice(1), String(x[0])]), 'Click a kind → only those pens'); chips += H.lchip('', '+' + (kinds.length - 2), { tip: 'kinds' }); }
+    if (P.r && !P.pen) { chips += H.lchip(H.I.temp, '22.4 °C') + H.lchip(H.I.drop, '61 %') + (/gest/i.test(P.r.name) ? H.lchip(H.I.air, 'NH₃ 9.4', { bg: K.amberT, color: K.amber, a: 'trend', on: O.pop === 'trend' }) : H.lchip(H.I.air, 'NH₃ 6.8', { a: 'trend' })); }
+    const crumbsHtml = O.loc ? '<div data-zone="crumbs" style="' + H.st({ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }) + '">' + P.crumbs.map((c, i) => '<span' + A(c.sibs ? 'crumb:' + i : c.a) + ' style="' + H.st({ fontSize: '12px', lineHeight: '18px', padding: '1px 5px', borderRadius: '6px', color: i === O.crumb ? K.ink : K.muted, background: i === O.crumb ? K.press : 'transparent', fontWeight: i === O.crumb ? 600 : 400, whiteSpace: 'nowrap', cursor: 'pointer' }) + '">' + H.esc(c.label) + '</span>' + (i < P.crumbs.length - 1 || true ? '<span style="color: #B5BDB2; font-size: 11px;">›</span>' : '')).join('') + '</div>' : '';
+    let menu = '';
+    const cc = O.crumb >= 0 ? P.crumbs[O.crumb] : null;
+    if (O.loc && cc && cc.sibs) {
+      const me = this.roomById(cc.roomId), sibs = this.M().rooms.filter((x) => (x.section || '') === (me.section || ''));
+      menu = '<div data-pop="1" style="' + H.st({ position: 'absolute', left: '40px', top: '100%', marginTop: '6px', width: '270px', padding: '6px 0', borderRadius: '14px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 14px 32px rgba(17,21,17,.16)', zIndex: 6 }) + '">' + sibs.map((x) => { const k = this.ovPigs(x.id).reduce((a, y) => a + y[0], 0), on = x.id === cc.roomId, f = this.ovFault(x.id); return '<div' + A('goroom:' + x.id) + ' style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', height: '38px', padding: '0 12px', fontSize: '13.5px', color: K.ink, fontWeight: on ? 600 : 400, background: on ? K.press : 'transparent', cursor: 'pointer' }) + '"><span style="flex: 1;">' + H.esc(x.name) + '</span>' + H.mu(k ? k + ' pigs' : 'empty') + (f ? H.dot(K.red, 7) : '') + (on ? H.icon(H.I.check, 14) : '') + '</div>'; }).join('') + '</div>';
+    }
+    return '<div data-zone="loc" style="' + H.st({ position: 'absolute', left: '16px', top: '16px', padding: '10px 12px', borderRadius: '16px', background: '#FFFFFF', boxShadow: (O.loc ? '0 0 0 1.5px ' + K.ink + ', ' : '') + '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", maxWidth: 'calc(100% - 460px)' }) + '">' + crumbsHtml + '<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }) + '"><span style="display: inline-flex; align-items: center; gap: 6px;">' + H.t(P.name, { fontSize: '15px', fontWeight: 600 }) + (fault ? H.dot(K.red, 8) : '') + '</span>' + chips + '</div>' + menu + '</div>';
+  }
+  ovPanelHtml(O, u) {
+    const p = O.panel;
+    if (p === 'list') return OVP.list(O);
+    if (p === 'batch') return OVP.batch(O);
+    if (p === 'task') return OVP.task(O);
+    if (p === 'dates') return OVP.dates(O);
+    if (this.ovPanel2) return this.ovPanel2(p, O, u);
+    return '';
+  }
+  ovPopHtml(O, u) {
+    if (!O.pop) return '';
+    const at = O.popAt || { x: 16, y: 80, w: 0, h: 0, bottom: 100 }, sh = '0 1px 2px rgba(17,21,17,.06), 0 14px 32px rgba(17,21,17,.16)';
+    const box = (inner, pos, w) => '<div data-pop="1" style="' + OVH.st(Object.assign({ position: 'absolute', width: (w || 220) + 'px', padding: '6px 0', borderRadius: '14px', background: '#FFFFFF', boxShadow: sh, pointerEvents: 'auto', zIndex: 30, fontFamily: "'Geist', system-ui, sans-serif" }, pos)) + '">' + inner + '</div>';
+    if (O.pop === 'filter') return box(OVP.filterPop(O), { left: at.x + 'px', top: (at.y + at.h + 6) + 'px' }, Math.max(180, at.w));
+    if (O.pop === 'actions') return box(OVP.actionsPop(O), { left: Math.max(16, at.x + at.w - 240) + 'px', bottom: (at.bottom + 8) + 'px' }, 240);
+    if (this.ovPop2) return this.ovPop2(O, u, at, box);
+    return '';
+  }
+  // the canvas frames open straight onto a screen
+  ovStart(st) {
+    const L = { panel: 'list' }, B = { panel: 'batch', batchId: '32' };
+    const S = {
+      bxlist: { O: { panel: 'list', hist: [] } },
+      bxbatch: { O: { panel: 'batch', batchId: '32', hist: [L] }, b: '32' },
+      bxtask: { O: { panel: 'task', batchId: '32', taskId: 'farrow', hist: [L, B] }, b: '32', t: 'farrow' },
+      bxfilter: { O: { panel: 'task', batchId: '32', taskId: 'farrow', hist: [L, B] }, b: '32', t: 'farrow', pop: 'filter' },
+      bxdates: { O: { panel: 'dates', batchId: '32', hist: [L, B] }, b: '32' },
+    }[st] || (this.ovStart2 ? this.ovStart2(st) : null);
+    if (!S) return;
+    Object.assign(this.ovS(), S.O);
+    if (S.b) this.openBatch(S.b);
+    if (S.t) this.openBatchTask(S.t);
+    if (S.pop) setTimeout(() => { const h = this.ovBody && this.ovBody.querySelector('[data-a="' + S.pop + '"]'); if (h) this.ovAct(S.pop, h); }, 60);
+    if (S.after) setTimeout(() => S.after(), 80);
+  }
+  ovPaint() {
+    if (!this.ovBody) return;
+    const u = this.ui();
+    if (!this.ovOn(u)) { if (this.ovLast !== '') { this.ovBody.innerHTML = ''; this.ovLast = ''; this.ovTipHide(); } return; }
+    const O = this.ovS(), st0 = this.props.start || 'saved';
+    if (this.ovStarted !== st0) { this.ovStarted = st0; this.ovStart(st0); }
+    // a pen picked on the farm: her profile (O3) takes the main panel
+    const ps = (u.psel || []).join(',');
+    if (ps !== this.ovPsel) { this.ovPsel = ps; if (this.ovPicked) this.ovPicked(u); }
+    const panel = O.panel ? this.ovPanelHtml(O, u) : '';
+    const H = OVH, K = H.K;
+    const html = this.ovLoc(u) +
+      (panel ? '<section data-zone="panel" aria-label="Panel" style="' + H.st({ position: 'absolute', right: '16px', top: '72px', maxHeight: 'calc(100% - 164px)', width: '380px', boxSizing: 'border-box', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint, boxShadow: '0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12)', overflowY: 'auto', overflowX: 'hidden', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums', color: K.ink, fontSize: '14px', lineHeight: '20px' }) + '">' + panel + '</section>' : '') +
+      (this.ovSide ? this.ovSide(O, u) : '') +
+      '<div data-zone="bar" role="toolbar" aria-label="Actions bar" style="' + H.st({ position: 'absolute', left: '16px', right: '16px', bottom: '16px', height: '60px', padding: '0 8px', boxSizing: 'border-box', borderRadius: '18px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', display: 'flex', alignItems: 'center', gap: '6px', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif" }) + '">' + OVP.bar(O) + '</div>' +
+      this.ovPopHtml(O, u) + (this.ovExtra ? this.ovExtra(O, u) : '');
+    if (html === this.ovLast) return;
+    const pEl = this.ovBody.querySelector('[data-zone="panel"]'), keep = pEl ? pEl.scrollTop : 0, sc = {};
+    this.ovBody.querySelectorAll('[data-scroll]').forEach((x) => { sc[x.getAttribute('data-scroll')] = x.scrollTop; });
+    const samePanel = this.ovLastPanel === O.panel;
+    this.ovBody.innerHTML = html; this.ovLast = html; this.ovLastPanel = O.panel;
+    const p2 = this.ovBody.querySelector('[data-zone="panel"]'); if (p2 && samePanel) p2.scrollTop = keep;
+    this.ovBody.querySelectorAll('[data-scroll]').forEach((x) => { const id = x.getAttribute('data-scroll'); if (sc[id] != null && samePanel) x.scrollTop = sc[id]; else if (x.getAttribute('data-scroll-to')) x.scrollTop = +x.getAttribute('data-scroll-to'); });
+  }
   renderVals() {
+    const r = this.renderValsBase();
+    r.setOvh = (el) => this.setOvh(el);
+    if (this.ovOn()) { r.showProf = false; r.showBatch = false; r.showCard = false; r.showBar = false; r.showCrumbMenu = false; }
+    return r;
+  }
+  // <<<OVH-COMP
+  renderValsBase() {
     const u = this.ui();
     const ic = this.icons();
     const m = this.M();
