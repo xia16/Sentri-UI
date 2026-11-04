@@ -3050,12 +3050,12 @@ const OVH = (function () {
   const card = (inner, o) => { o = o || {}; return '<div' + (o.a ? A(o.a) : '') + (o.tip ? TIP(o.tip) : '') + ' style="' + st({ position: 'relative', padding: o.pad || '16px', borderRadius: '16px', background: K.paper, border: '1px solid ' + K.line, marginTop: (o.mt || 0) + 'px', cursor: o.a ? 'pointer' : 'default' }) + '">' + inner + '</div>'; };
   const head = (title, meta, back, o) => { o = o || {}; return '<div style="' + st({ display: 'flex', alignItems: 'center', gap: '12px', minHeight: '44px' }) + '">' +
     (back ? '<button type="button"' + A(back) + ' aria-label="Back" style="' + st({ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', flexShrink: 0, borderRadius: '14px', background: K.paper, border: '1px solid ' + K.line, boxSizing: 'border-box', color: K.ink, cursor: 'pointer', padding: 0 }) + '">' + icon(I.back, 18) + '</button>' : '') +
-    '<span style="' + st({ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }) + '"><span style="' + st({ margin: 0, fontSize: '20px', lineHeight: '24px', fontWeight: 600, letterSpacing: '-.02em', color: K.ink, whiteSpace: 'nowrap' }) + '">' + esc(title) + '</span>' + (meta ? t(meta, { fontSize: '13px', lineHeight: '18px', color: K.muted }) : '') + '</span>' +
-    '<button type="button"' + A(o.close || 'close') + ' aria-label="Close" style="' + st({ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', marginRight: '-8px', color: K.muted, background: 'transparent', border: 0, cursor: 'pointer', padding: 0 }) + '">' + icon(I.x, 18) + '</button></div>'; };
+    '<span style="' + st({ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }) + '"><span style="' + st({ margin: 0, fontSize: '20px', lineHeight: '24px', fontWeight: 600, letterSpacing: '-.02em', color: K.ink, whiteSpace: 'nowrap' }) + '">' + esc(title) + '</span>' + (meta ? t(meta, { fontSize: '13px', lineHeight: '18px', color: K.muted, whiteSpace: 'normal', textWrap: 'balance' }) : '') + '</span>' +
+    '<button type="button"' + A(o.close || 'close') + ' aria-label="Close" style="' + st({ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', flexShrink: 0, marginRight: '-8px', color: K.muted, background: 'transparent', border: 0, cursor: 'pointer', padding: 0 }) + '">' + icon(I.x, 18) + '</button></div>'; };
   const sec = (title, meta, mt) => '<div style="' + st({ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', margin: (mt == null ? 24 : mt) + 'px 4px 8px' }) + '"><span style="' + st({ fontSize: '15px', lineHeight: '20px', fontWeight: 600, color: K.ink, whiteSpace: 'nowrap' }) + '">' + esc(title) + '</span>' + (meta || '') + '</div>';
   const meta = (s) => mu(s);
   const wbtn = (ic, label, a, o) => { o = o || {}; return '<button type="button"' + A(a) + ' style="' + st({ flex: o.flex || 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', height: '48px', padding: '0 16px', borderRadius: '999px', background: o.dark ? K.ink : K.paper, color: o.dark ? '#FFFFFF' : K.ink, border: o.dark ? '0' : '1px solid ' + K.line, boxSizing: 'border-box', fontSize: '14px', fontWeight: o.dark ? 600 : 500, whiteSpace: 'nowrap', cursor: 'pointer', fontFamily: 'inherit' }) + '">' + (ic ? icon(ic, 18) : '') + esc(label) + '</button>'; };
-  const row = (l, r, first, a) => '<div' + (a ? A(a) : '') + ' style="' + st({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', minHeight: '48px', borderTop: first ? '0' : '1px solid ' + K.line, cursor: a ? 'pointer' : 'default' }) + '">' + l + '<span style="display: flex; align-items: center; gap: 6px;">' + (r || '') + (a ? chev : '') + '</span></div>';
+  const row = (l, r, first, a) => '<div' + (a ? A(a) : '') + ' style="' + st({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', minHeight: '48px', borderTop: first ? '0' : '1px solid ' + K.line, cursor: a ? 'pointer' : 'default' }) + '"><span style="flex: 1; min-width: 0;">' + l + '</span><span style="display: flex; align-items: center; gap: 6px; flex-shrink: 0; white-space: nowrap;">' + (r || '') + (a ? chev : '') + '</span></div>';
   const field = (label, a, o) => '<button type="button"' + A(a) + ' style="' + st({ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', height: '44px', padding: '0 14px', borderRadius: '12px', background: K.paper, border: '1px solid ' + ((o || {}).on ? K.ink : K.line), boxSizing: 'border-box', fontSize: '14px', color: K.ink, whiteSpace: 'nowrap', cursor: 'pointer', fontFamily: 'inherit' }) + '">' + esc(label) + icon(I.down, 14) + '</button>';
   const seg = (items, on, aPrefix) => '<div style="' + st({ display: 'flex', gap: '2px', padding: '4px', borderRadius: '12px', background: '#F1F3EE' }) + '">' + items.map((s, i) => '<button type="button"' + A(aPrefix + ':' + i) + ' style="' + st({ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '36px', borderRadius: '9px', border: 0, fontSize: '13px', background: i === on ? '#FFFFFF' : 'transparent', boxShadow: i === on ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontWeight: i === on ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit', color: K.ink }) + '">' + esc(s) + '</button>').join('') + '</div>';
   const dot = (c, s) => '<i style="' + st({ display: 'inline-block', width: (s || 8) + 'px', height: (s || 8) + 'px', borderRadius: '999px', background: c || K.red, boxShadow: '0 0 0 2px #FFFFFF', flexShrink: 0 }) + '"></i>';
@@ -3071,10 +3071,12 @@ const OVH = (function () {
   const arc = (cx, cy, r, a0, a1) => { const p0 = pt(cx, cy, r, a0), p1 = pt(cx, cy, r, a1); return 'M' + p0[0].toFixed(2) + ' ' + p0[1].toFixed(2) + ' A' + r + ' ' + r + ' 0 ' + (Math.abs(a0 - a1) > 180 ? 1 : 0) + ' 1 ' + p1[0].toFixed(2) + ' ' + p1[1].toFixed(2); };
   function radial(o) {
     const size = o.size, sw = o.sw, half = o.half, span = half ? 180 : 360, r = (size - sw) / 2, cx = size / 2, cy = size / 2;
-    const map = (x) => (half ? 180 - x : 90 - x), cap = ((sw / 2) / r) * (180 / Math.PI), gap = 1.6, lo = cap, hi = span - cap, room = hi - lo;
+    const full = !half && o.parts.filter((p) => !p[3]).reduce((a, p) => a + p[0], 0) >= o.total;
+    const map = (x) => (half ? 180 - x : 90 - x), cap = ((sw / 2) / r) * (180 / Math.PI), gap = 1.6, lo = full ? 0 : cap, hi = full ? 360 : span - cap, room = hi - lo;
     let x = lo; const segs = [], drawn = [];
     o.parts.forEach((p) => { const len = (p[0] / o.total) * room; if (!p[3] && p[0] > 0) { const a0 = x + (drawn.length ? gap / 2 : 0), b0 = x + len - gap / 2; segs.push('<path d="' + arc(cx, cy, r, map(a0), map(Math.max(a0 + 0.01, b0))) + '" fill="none" stroke="' + p[2] + '" stroke-width="' + sw + '"></path>'); drawn.push([a0, b0, p[2]]); } x += len; });
-    if (drawn.length) { const s0 = pt(cx, cy, r, map(drawn[0][0])), e1 = pt(cx, cy, r, map(drawn[drawn.length - 1][1])); segs.push('<circle cx="' + s0[0].toFixed(2) + '" cy="' + s0[1].toFixed(2) + '" r="' + sw / 2 + '" fill="' + drawn[0][2] + '"></circle><circle cx="' + e1[0].toFixed(2) + '" cy="' + e1[1].toFixed(2) + '" r="' + sw / 2 + '" fill="' + drawn[drawn.length - 1][2] + '"></circle>'); }
+    if (full && drawn.length === 1) { segs.length = 0; segs.push('<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + drawn[0][2] + '" stroke-width="' + sw + '"></circle>'); }
+    else if (drawn.length && !full) { const s0 = pt(cx, cy, r, map(drawn[0][0])), e1 = pt(cx, cy, r, map(drawn[drawn.length - 1][1])); segs.push('<circle cx="' + s0[0].toFixed(2) + '" cy="' + s0[1].toFixed(2) + '" r="' + sw / 2 + '" fill="' + drawn[0][2] + '"></circle><circle cx="' + e1[0].toFixed(2) + '" cy="' + e1[1].toFixed(2) + '" r="' + sw / 2 + '" fill="' + drawn[drawn.length - 1][2] + '"></circle>'); }
     const track = half ? '<path d="' + arc(cx, cy, r, map(cap), map(180 - cap)) + '" fill="none" stroke="#EDF0E9" stroke-width="' + sw + '" stroke-linecap="round"></path>' : '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="#EDF0E9" stroke-width="' + sw + '"></circle>';
     const h = half ? size / 2 + sw / 2 + 2 : size;
     return '<span' + (o.tip ? TIP(o.tip) : '') + (o.a ? A(o.a) : '') + ' style="' + st({ position: 'relative', display: 'inline-block', width: size + 'px', height: h + 'px', flexShrink: 0, cursor: o.a ? 'pointer' : 'default' }) + '"><svg viewBox="0 0 ' + size + ' ' + h + '" aria-hidden="true" style="' + st({ position: 'absolute', left: 0, top: 0, width: size + 'px', height: h + 'px', pointerEvents: 'none' }) + '">' + track + segs.join('') + '</svg>' + (o.center ? '<span style="' + st({ position: 'absolute', left: 0, right: 0, top: half ? (size / 2 - 30) + 'px' : 0, bottom: half ? 'auto' : 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }) + '">' + o.center + '</span>' : '') + '</span>';
@@ -4237,6 +4239,7 @@ class Component extends DCLogic {
   nightWanted() {
     const s = this.props.start || 'saved';
     if (s === 'night' || s === 'intronight') return true;
+    if (/^(bx|pg|lc|eq|fl)[a-z]+$/.test(s)) return false; /* ovDay */
     if (typeof window.__l3jsNight === 'boolean') return window.__l3jsNight;
     if (window.__dbg) return false;
     if (this.eff(s) === 'intro') return false;
@@ -9133,6 +9136,7 @@ class Component extends DCLogic {
     const n = this.bvCounts(id, t.id);
     return t.states.map((x) => { const col = this.ovCol(x.col); return { id: x.id, label: x.label, n: n[x.id] || 0, col: col, skip: col === OVH.K.grey, warn: col === OVH.K.amberBar }; });
   }
+  ovIsStage(t) { return !!t && (t.id === 'nurs' || t.id === 'quar'); }
   ovBatches() { const B = this.batchData(); return Object.keys(B).map((k) => B[k]).sort((a, b) => (parseInt(b.id, 10) || 0) - (parseInt(a.id, 10) || 0)); }
   ovListHtml() {
     const H = OVH, K = H.K;
@@ -9142,14 +9146,16 @@ class Component extends DCLogic {
     const H = OVH, K = H.K, b = this.batchData()[id];
     if (!b) return OVP.batch(this.ovS());
     this.ovTips = this.ovTips || {};
-    const tiles = (b.tasks || []).map((t) => {
+    const stageT = (b.tasks || []).find((t) => this.ovIsStage(t)), sd = stageT ? this.ovDay(stageT.when) : null;
+    const tiles = (b.tasks || []).filter((t) => !this.ovIsStage(t)).map((t) => {
       const P = this.ovParts(id, t), tot = P.reduce((a, x) => a + x.n, 0) || 1, goal = P.find((x) => x.id === t.goal) || P[0], d = this.ovDay(t.when), attn = P.filter((x) => x.warn && x.n).map((x) => x.n + ' ' + x.label.toLowerCase()).join(' · ');
       this.ovTips['ring-' + id + '-' + t.id] = () => H.tip(t.title + ' · ' + tot + ' ' + (b.kind === 'growers' ? 'pens' : 'sows'), P.map((x) => [x.col, x.label, String(x.n), x.warn]), 'Click to open the task');
       return H.card('<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '14px' }) + '">' + H.radial({ size: 52, sw: 7, parts: P.map((x) => [x.n, x.label, x.col, x.skip]), total: tot, center: H.t(String(goal ? goal.n : 0), { fontSize: '14px', fontWeight: 600 }), tip: 'ring-' + id + '-' + t.id }) + '<span style="' + H.st({ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }) + '">' + H.t(t.title, { fontSize: '15px', fontWeight: 600 }) + '<span style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }) + '">' + H.mu('day ' + d[0] + (d[1] !== d[0] ? ' of ' + d[1] : '')) + (attn ? H.badge('amber', attn) : '') + '</span></span>' + H.chev + '</div>', { pad: '14px 16px', a: 'task:' + t.id });
     }).join('<div style="height: 8px;"></div>');
     const next = (b.sched || []).filter((x) => x.st === 'next').slice(0, 3);
-    return H.head(b.name, (b.sub || '').replace(/^Line \d+ · /, ''), 'back') + H.sec('Running now', '', 20) + tiles +
-      (next.length ? H.sec('Upcoming') + H.card(next.map((x, i) => H.row('<span style="display: flex; align-items: center;">' + H.t(x.d, { fontSize: '13px', color: K.muted, width: '84px', display: 'inline-block' }) + H.t(x.t) + '</span>', H.mu(x.meta), !i)).join(''), { pad: '0 16px' }) : '') +
+    const nowH = tiles ? H.sec('Running now', '', 20) + tiles : H.sec('Now', '', 20) + H.card('<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '14px' }) + '">' + H.radial({ size: 52, sw: 7, parts: [[sd ? sd[0] : 1, '', K.blue], [sd ? Math.max(0, sd[1] - sd[0]) : 0, '', K.grey, true]], total: sd ? sd[1] : 1 }) + '<span style="' + H.st({ display: 'flex', flexDirection: 'column', gap: '4px' }) + '">' + H.t(stageT ? stageT.title : 'No task running', { fontSize: '15px', fontWeight: 600 }) + H.mu(sd ? 'day ' + sd[0] + ' of ' + sd[1] + ' · no task running' : '') + '</span></div>', { pad: '14px 16px' });
+    return H.head(b.name, (b.sub || '').replace(/^Line \d+ · /, ''), 'back') + nowH +
+      (next.length ? H.sec('Upcoming') + H.card(next.map((x, i) => H.row('<span style="display: flex; align-items: center;">' + H.t(x.d, { fontSize: '13px', color: K.muted, width: '80px', flexShrink: 0, display: 'inline-block' }) + H.t(x.t, { padding: '6px 0', whiteSpace: 'normal' }) + '</span>', H.mu(x.meta), !i)).join(''), { pad: '0 16px' }) : '') +
       '<div style="' + H.st({ display: 'flex', marginTop: '20px' }) + '">' + H.wbtn(H.I.cal, 'All dates', 'dates') + '</div>';
   }
   ovTaskHtml(id, tid, O) {
@@ -9175,7 +9181,7 @@ class Component extends DCLogic {
   ovPigTasks(roomId, code) {
     const cell = ((this.IP && this.IP.cell[roomId]) || {})[code] || {}, id = cell.batch != null ? String(cell.batch) : '', b = id ? this.batchData()[id] : null;
     if (!b) { const rr = this.roomById(roomId); return /gest|farrow/i.test((rr && rr.name) || '') ? {} : { npd: 8 + (this.hs(roomId + code) % 30) }; }
-    return { batch: b, tasks: (b.tasks || []).map((t) => { const s = this.bvState(id, roomId, code, t.id), d = this.bvStateDef(id, s, t.id) || {}; const col = this.ovCol(d.col); return [t.title, col === OVH.K.green ? 'green' : col === OVH.K.blue ? 'blue' : col === OVH.K.amberBar ? 'amber' : 'grey', d.label || '', 'task:' + t.id, (t.why || {})[s] || '']; }) };
+    return { batch: b, tasks: (b.tasks || []).filter((t) => !this.ovIsStage(t)).map((t) => { const s = this.bvState(id, roomId, code, t.id), d = this.bvStateDef(id, s, t.id) || {}; const col = this.ovCol(d.col); return [t.title, col === OVH.K.green ? 'green' : col === OVH.K.blue ? 'blue' : col === OVH.K.amberBar ? 'amber' : 'grey', d.label || '', 'task:' + t.id, (t.why || {})[s] || '']; }) };
   }
 
   ovKindId(word) { return ({ sows: 'sow', sow: 'sow', boars: 'boar', boar: 'boar', gilts: 'gilts', weaners: 'weaners' })[word] || word; }

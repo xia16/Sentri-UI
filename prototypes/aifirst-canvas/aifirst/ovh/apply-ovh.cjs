@@ -48,3 +48,7 @@ fs.writeFileSync(f, s); console.log('applied 3');
 s = fs.readFileSync(f, 'utf8');
 if (!s.includes("vf.id === 'sow' && cell.kind === 'litter'")) { const a = "locationMatches(cell, vf) { return !!cell && (vf.kind === 'stage' ? cell.kind === vf.id :"; if (!s.includes(a)) { console.error('MISS lm'); process.exit(1); } s = s.replace(a, "locationMatches(cell, vf) { return !!cell && (vf.kind === 'stage' ? (cell.kind === vf.id || (vf.id === 'sow' && cell.kind === 'litter')) :"); }
 fs.writeFileSync(f, s); console.log('applied 4');
+// 12) the overhaul frames are shown in daylight, whatever the clock says
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('/* ovDay */')) { const a = "    if (s === 'night' || s === 'intronight') return true;"; if (!s.includes(a)) { console.error('MISS night'); process.exit(1); } s = s.replace(a, a + "\n    if (/^(bx|pg|lc|eq|fl)[a-z]+$/.test(s)) return false; /* ovDay */"); }
+fs.writeFileSync(f, s); console.log('applied 5');

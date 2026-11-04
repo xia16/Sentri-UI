@@ -154,6 +154,7 @@
     const n = this.bvCounts(id, t.id);
     return t.states.map((x) => { const col = this.ovCol(x.col); return { id: x.id, label: x.label, n: n[x.id] || 0, col: col, skip: col === OVH.K.grey, warn: col === OVH.K.amberBar }; });
   }
+  ovIsStage(t) { return !!t && (t.id === 'nurs' || t.id === 'quar'); }
   ovBatches() { const B = this.batchData(); return Object.keys(B).map((k) => B[k]).sort((a, b) => (parseInt(b.id, 10) || 0) - (parseInt(a.id, 10) || 0)); }
   ovListHtml() {
     const H = OVH, K = H.K;
@@ -163,14 +164,16 @@
     const H = OVH, K = H.K, b = this.batchData()[id];
     if (!b) return OVP.batch(this.ovS());
     this.ovTips = this.ovTips || {};
-    const tiles = (b.tasks || []).map((t) => {
+    const stageT = (b.tasks || []).find((t) => this.ovIsStage(t)), sd = stageT ? this.ovDay(stageT.when) : null;
+    const tiles = (b.tasks || []).filter((t) => !this.ovIsStage(t)).map((t) => {
       const P = this.ovParts(id, t), tot = P.reduce((a, x) => a + x.n, 0) || 1, goal = P.find((x) => x.id === t.goal) || P[0], d = this.ovDay(t.when), attn = P.filter((x) => x.warn && x.n).map((x) => x.n + ' ' + x.label.toLowerCase()).join(' · ');
       this.ovTips['ring-' + id + '-' + t.id] = () => H.tip(t.title + ' · ' + tot + ' ' + (b.kind === 'growers' ? 'pens' : 'sows'), P.map((x) => [x.col, x.label, String(x.n), x.warn]), 'Click to open the task');
       return H.card('<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '14px' }) + '">' + H.radial({ size: 52, sw: 7, parts: P.map((x) => [x.n, x.label, x.col, x.skip]), total: tot, center: H.t(String(goal ? goal.n : 0), { fontSize: '14px', fontWeight: 600 }), tip: 'ring-' + id + '-' + t.id }) + '<span style="' + H.st({ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }) + '">' + H.t(t.title, { fontSize: '15px', fontWeight: 600 }) + '<span style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }) + '">' + H.mu('day ' + d[0] + (d[1] !== d[0] ? ' of ' + d[1] : '')) + (attn ? H.badge('amber', attn) : '') + '</span></span>' + H.chev + '</div>', { pad: '14px 16px', a: 'task:' + t.id });
     }).join('<div style="height: 8px;"></div>');
     const next = (b.sched || []).filter((x) => x.st === 'next').slice(0, 3);
-    return H.head(b.name, (b.sub || '').replace(/^Line \d+ · /, ''), 'back') + H.sec('Running now', '', 20) + tiles +
-      (next.length ? H.sec('Upcoming') + H.card(next.map((x, i) => H.row('<span style="display: flex; align-items: center;">' + H.t(x.d, { fontSize: '13px', color: K.muted, width: '84px', display: 'inline-block' }) + H.t(x.t) + '</span>', H.mu(x.meta), !i)).join(''), { pad: '0 16px' }) : '') +
+    const nowH = tiles ? H.sec('Running now', '', 20) + tiles : H.sec('Now', '', 20) + H.card('<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '14px' }) + '">' + H.radial({ size: 52, sw: 7, parts: [[sd ? sd[0] : 1, '', K.blue], [sd ? Math.max(0, sd[1] - sd[0]) : 0, '', K.grey, true]], total: sd ? sd[1] : 1 }) + '<span style="' + H.st({ display: 'flex', flexDirection: 'column', gap: '4px' }) + '">' + H.t(stageT ? stageT.title : 'No task running', { fontSize: '15px', fontWeight: 600 }) + H.mu(sd ? 'day ' + sd[0] + ' of ' + sd[1] + ' · no task running' : '') + '</span></div>', { pad: '14px 16px' });
+    return H.head(b.name, (b.sub || '').replace(/^Line \d+ · /, ''), 'back') + nowH +
+      (next.length ? H.sec('Upcoming') + H.card(next.map((x, i) => H.row('<span style="display: flex; align-items: center;">' + H.t(x.d, { fontSize: '13px', color: K.muted, width: '80px', flexShrink: 0, display: 'inline-block' }) + H.t(x.t, { padding: '6px 0', whiteSpace: 'normal' }) + '</span>', H.mu(x.meta), !i)).join(''), { pad: '0 16px' }) : '') +
       '<div style="' + H.st({ display: 'flex', marginTop: '20px' }) + '">' + H.wbtn(H.I.cal, 'All dates', 'dates') + '</div>';
   }
   ovTaskHtml(id, tid, O) {
@@ -196,7 +199,7 @@
   ovPigTasks(roomId, code) {
     const cell = ((this.IP && this.IP.cell[roomId]) || {})[code] || {}, id = cell.batch != null ? String(cell.batch) : '', b = id ? this.batchData()[id] : null;
     if (!b) { const rr = this.roomById(roomId); return /gest|farrow/i.test((rr && rr.name) || '') ? {} : { npd: 8 + (this.hs(roomId + code) % 30) }; }
-    return { batch: b, tasks: (b.tasks || []).map((t) => { const s = this.bvState(id, roomId, code, t.id), d = this.bvStateDef(id, s, t.id) || {}; const col = this.ovCol(d.col); return [t.title, col === OVH.K.green ? 'green' : col === OVH.K.blue ? 'blue' : col === OVH.K.amberBar ? 'amber' : 'grey', d.label || '', 'task:' + t.id, (t.why || {})[s] || '']; }) };
+    return { batch: b, tasks: (b.tasks || []).filter((t) => !this.ovIsStage(t)).map((t) => { const s = this.bvState(id, roomId, code, t.id), d = this.bvStateDef(id, s, t.id) || {}; const col = this.ovCol(d.col); return [t.title, col === OVH.K.green ? 'green' : col === OVH.K.blue ? 'blue' : col === OVH.K.amberBar ? 'amber' : 'grey', d.label || '', 'task:' + t.id, (t.why || {})[s] || '']; }) };
   }
 
   ovKindId(word) { return ({ sows: 'sow', sow: 'sow', boars: 'boar', boar: 'boar', gilts: 'gilts', weaners: 'weaners' })[word] || word; }
