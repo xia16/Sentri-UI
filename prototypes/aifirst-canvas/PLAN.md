@@ -52,3 +52,10 @@ Canvas: https://claude.ai/artifact/3d1Q4z2YMnFwmFBXtaCeMm (v68 live). Page: `aif
 ## Who builds
 - T1 here (small). T2–T5 by Codex (`gpt-6.1-sol`, the worker tier) on `mini`, one ticket at a time (they all edit the same file), each with a brief, then reviewed and walked here before publishing.
 - Transport: dispatch sends a git branch. The canvas is not in the repo, so the sources need a working branch in Sentri-UI (proposed `aifirst-canvas`, a `prototypes/aifirst/` folder, never merged). That push needs the owner's OK.
+
+### Location card and equipment (canvas `LocationCard.dc.html`, owner 2026-11-04) — supersedes T2/T5 where they differ
+- The location card is a supporting card: only the lowest level you are at; hover shows the breadcrumb; hovering a crumb drops its siblings (click → go there). A red dot when something under it is wrong; the farm shows what and where (a broken connected device in 3D, the red ! on the pen). No fault text on the card.
+- Chips only: the pigs (by kind, never production status; three chips, the rest behind +N) and the sensors (amber when out of range). A sensor chip opens its small trend (24 h / 7 d).
+- Equipment and controls live on the bottom bar (the left shows, the bottom does): Equipment opens tiles (icon, name, one word of state; on bright, off muted, fault red); a tile opens the device card (one big drag control, mode, last change, Apply).
+- A device that serves pens: picking pens **switches the farm to Plan (bird's-eye)**, a box on each pen it serves; the bar becomes the control (On/Off, level, Cancel, Apply to N pens). **Do not change the 3D view for this yet.**
+- The main card holds the pigs of a pen: a fixed-height scrolling list; pigs without an ID as one row.
