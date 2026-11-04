@@ -10,851 +10,358 @@
 <helmet>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 </helmet>
-<div id="board" style="width: 1760px; min-height: 2608px; padding: 40px 48px 48px; box-sizing: border-box; background: #F3F4F1; font-family: &#x27;Geist&#x27;, system-ui, sans-serif; font-size: 14px; line-height: 20px; font-weight: 400; color: #111511; -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums;"><h1 style="font-size: 28px; font-weight: 600; line-height: 36px; letter-spacing: -.025em; margin: 0; white-space: nowrap;">Batches · every page</h1>
-<div style="font-size: 14px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-top: 8px;">Panel 380 × ≤ 720. One line per row; details in note boxes.</div>
-<div style="display: grid; grid-template-columns: repeat(4, 380px); gap: 48px; align-items: start; margin-top: 32px;"><div id="calendar" style="width: 380px; scroll-margin-top: 24px;"><div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 4px;">Batches · calendar</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 12px;">Tap Batch 32 → overview; List → batch list</div>
-<section aria-label="Batches · calendar" data-panel="calendar" style="position: relative; display: flex; flex-direction: column; width: 380px; height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-bottom: 8px;"><a href="#board" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding-left: 0; background: transparent;">‹ Farm</a>
-<a href="#board" aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #6B726D; text-decoration: none;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path>
-</svg>
+<div id="board" style="width: 1760px; padding: 40px 48px 64px; box-sizing: border-box; background: #F3F4F1; font-family: 'Geist', system-ui, sans-serif; font-size: 14px; line-height: 20px; color: #111511; -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums;">
+<h1 style="margin: 0; font-size: 28px; line-height: 36px; font-weight: 600; letter-spacing: -.025em;">Batches · every page</h1>
+<div style="margin-top: 6px; color: #6B726D;">Desktop panel, 380 wide, as short as it can be. The farm view sits behind it.</div>
+<ol style="margin: 16px 0 0; padding-left: 20px; display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 48px; row-gap: 4px;"><li style="font-size: 14px; line-height: 20px;">Hover tells, click shows: bars and charts carry no legend and no explaining sentence.</li><li style="font-size: 14px; line-height: 20px;">Small words sit under each part of a bar: the number and what it is.</li><li style="font-size: 14px; line-height: 20px;">The farm is the pig list: clicking a part outlines those pens; no pen list in the panel.</li><li style="font-size: 14px; line-height: 20px;">Filters (parity, room) live on the location card, not in the batch panel.</li></ol>
+<div style="display: grid; grid-template-columns: repeat(4, 380px); gap: 56px 48px; align-items: start; margin-top: 40px;">
+<div id="batches" style="width: 380px; scroll-margin-top: 24px;">
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">Batches</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Hover a batch → its pens outline on the farm · Click → the batch</div>
+<section aria-label="Batches" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: -8px;">
+  <a href="#batches" style="display: inline-flex; align-items: center; height: 44px; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">‹ Farm</a>
+  <span aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -12px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px;">
+  <h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Batches</h2>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
+<a href="#breeding" style="position: relative; display: block; padding: 12px 14px; border-radius: 16px; background: #F7F8F5; color: inherit; text-decoration: none;">
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 20px;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">Batch 34</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Breeding · day 2 of 5</span></div>
+  <div style="position: relative; height: 4px; margin: 10px 0; border-radius: 999px; background: #E6E9E3;"><span style="position: absolute; left: 0; top: 0; bottom: 0; width: 40%; border-radius: 999px; background: #3972B7;"></span></div>
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 20px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Next · Pregnancy check Wed 2 Dec</span></div>
+  
 </a>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 30px;"><h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Batches</h2>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">6 running</span>
-</span>
-</div>
-<div style="margin-top: 18px;"><div style="display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: #EEF0EB;"><a href="#calendar" aria-current="page" style="display: flex; align-items: center; justify-content: center; flex: 1; height: 44px; padding: 0 8px; border: 0; border-radius: 999px; font: inherit; font-size: 14px; white-space: nowrap; color: #111511; background: #FFFFFF; box-shadow: 0 2px 5px rgba(17,21,17,.07); font-weight: 600;text-decoration: none;">Calendar</a>
-<a href="#list" aria-current="false" style="display: flex; align-items: center; justify-content: center; flex: 1; height: 44px; padding: 0 8px; border: 0; border-radius: 999px; font: inherit; font-size: 14px; white-space: nowrap; color: #111511; background: transparent;text-decoration: none;">List</a>
-</div>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-top: 12px;"><span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">3 Nov</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">This week + 5</span>
-</div>
-<div style="display: grid; grid-template-columns: repeat(6, 1fr); margin-left: 80px; margin-bottom: 10px;"><div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;text-align: center;">2 Nov</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;text-align: center;">9</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;text-align: center;">16</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;text-align: center;">23</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;text-align: center;">30</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;text-align: center;">7 Dec</div>
-</div>
-<div style="position: relative;"><a href="#breeding" style="display: flex; align-items: center; min-height: 65px; text-decoration: none; color: inherit;"><div style="width: 80px; flex-shrink: 0;"><div style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Batch 34</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">48 sows</div>
-</div>
-<div style="height: 65px; flex: 1; position: relative; background: repeating-linear-gradient(to right, transparent 0, transparent calc(16.666% - 1px), #EDF0EA calc(16.666% - 1px), #EDF0EA 16.666%);"><div aria-label="Breed" style="position: absolute; left: 0%; width: 20%; top: 24px; height: 30px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 0 8px; background: #27382F; border: 0; border-radius: 8px;"></div>
-<div style="position: absolute; left: 71.43%; width: 25.0%; top: 24px; height: 30px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 0 8px; background: #FFFFFF; border: 1px solid #A6B1A7; border-radius: 8px;"><span style="font-size: 13px; color: #6B726D; font-weight: 500; line-height: 20px; white-space: nowrap;">Check</span>
-</div>
-</div>
+<a href="#batches" style="position: relative; display: block; padding: 12px 14px; border-radius: 16px; background: #F7F8F5; color: inherit; text-decoration: none;">
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 20px;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">Batch 33</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Moving in · 26 of 48</span></div>
+  <div style="position: relative; height: 4px; margin: 10px 0; border-radius: 999px; background: #E6E9E3;"><span style="position: absolute; left: 0; top: 0; bottom: 0; width: 54%; border-radius: 999px; background: #3972B7;"></span></div>
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 20px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Next · Farrowing Thu 5 Nov</span></div>
+  
 </a>
-<a href="#list" style="display: flex; align-items: center; min-height: 65px; text-decoration: none; color: inherit;"><div style="width: 80px; flex-shrink: 0;"><div style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Batch 33</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">26/48 moved</div>
-</div>
-<div style="height: 65px; flex: 1; position: relative; background: repeating-linear-gradient(to right, transparent 0, transparent calc(16.666% - 1px), #EDF0EA calc(16.666% - 1px), #EDF0EA 16.666%);"><div aria-label="Move" style="position: absolute; left: 0%; width: 15%; top: 2px; height: 30px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 0 8px; background: #27382F; border: 0; border-radius: 8px;"></div>
-<div style="position: absolute; left: 7.14%; width: 24.0%; top: 34px; height: 30px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 0 8px; background: #FFFFFF; border: 1px solid #A6B1A7; border-radius: 8px;"><span style="font-size: 13px; color: #6B726D; font-weight: 500; line-height: 20px; white-space: nowrap;">Farrow</span>
-</div>
-</div>
+<a href="#batch32" style="position: relative; display: block; padding: 12px 14px; border-radius: 16px; background: #EDF0EA; color: inherit; text-decoration: none;">
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 20px;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">Batch 32</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Lactating · day 9</span></div>
+  <div style="position: relative; height: 4px; margin: 10px 0; border-radius: 999px; background: #E6E9E3;"><span style="position: absolute; left: 0; top: 0; bottom: 0; width: 43%; border-radius: 999px; background: #3972B7;"></span></div>
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 20px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Next · Weaning check Fri 13 Nov</span><span style="font-size: 13px; line-height: 20px; color: #946015; white-space: nowrap; font-weight: 500;">3 flags</span></div>
+  <svg viewBox="0 0 16 22" aria-hidden="true" style="position: absolute; left: 150px; top: 26px; width: 16px; height: 22px; z-index: 5; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25));"><path d="M1 1v17l4.5-4.2 3 6.6 2.6-1.2-3-6.4H14L1 1Z" fill="#111511" stroke="#FFFFFF" stroke-width="1.2" stroke-linejoin="round"></path></svg>
 </a>
-<a href="#batch32" style="display: flex; align-items: center; min-height: 65px; text-decoration: none; color: inherit;"><div style="width: 80px; flex-shrink: 0;"><div style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Batch 32</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">50 sows</div>
-</div>
-<div style="height: 65px; flex: 1; position: relative; background: repeating-linear-gradient(to right, transparent 0, transparent calc(16.666% - 1px), #EDF0EA calc(16.666% - 1px), #EDF0EA 16.666%);"><div style="position: absolute; left: 0%; width: 34%; top: 24px; height: 30px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 0 8px; background: #27382F; border: 0; border-radius: 8px;"><span style="font-size: 13px; color: #FFFFFF; font-weight: 500; line-height: 20px; white-space: nowrap;">Lactate</span>
-</div>
-<div aria-label="Wean" style="position: absolute; left: 33.33%; width: 16.0%; top: 24px; height: 30px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 0 8px; background: #FFFFFF; border: 1px solid #A6B1A7; border-radius: 8px;"></div>
-<div style="position: absolute; left: 50%; width: 19%; top: 24px; height: 30px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 0 8px; background: #FFFFFF; border: 1px solid #A6B1A7; border-radius: 8px;"><span style="font-size: 13px; color: #6B726D; font-weight: 500; line-height: 20px; white-space: nowrap;">Heat</span>
-</div>
-</div>
+<a href="#batches" style="position: relative; display: block; padding: 12px 14px; border-radius: 16px; background: #F7F8F5; color: inherit; text-decoration: none;">
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 20px;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">Batch 31</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Nursery · day 24 of 42</span></div>
+  <div style="position: relative; height: 4px; margin: 10px 0; border-radius: 999px; background: #E6E9E3;"><span style="position: absolute; left: 0; top: 0; bottom: 0; width: 57%; border-radius: 999px; background: #3972B7;"></span></div>
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 20px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Next · Out of nursery Mon 16 Nov</span></div>
+  
 </a>
-<a href="#list" style="display: flex; align-items: center; min-height: 65px; text-decoration: none; color: inherit;"><div style="width: 80px; flex-shrink: 0;"><div style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Batch 31</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">488 weaners</div>
-</div>
-<div style="height: 65px; flex: 1; position: relative; background: repeating-linear-gradient(to right, transparent 0, transparent calc(16.666% - 1px), #EDF0EA calc(16.666% - 1px), #EDF0EA 16.666%);"><div style="position: absolute; left: 0%; width: 48%; top: 24px; height: 30px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 0 8px; background: #27382F; border: 0; border-radius: 8px;"><span style="font-size: 13px; color: #FFFFFF; font-weight: 500; line-height: 20px; white-space: nowrap;">Nursery</span>
-</div>
-</div>
+<a href="#batches" style="position: relative; display: block; padding: 12px 14px; border-radius: 16px; background: #F7F8F5; color: inherit; text-decoration: none;">
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 20px;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">Batch 30</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Nursery · day 31 of 42</span></div>
+  <div style="position: relative; height: 4px; margin: 10px 0; border-radius: 999px; background: #E6E9E3;"><span style="position: absolute; left: 0; top: 0; bottom: 0; width: 74%; border-radius: 999px; background: #3972B7;"></span></div>
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 20px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Next · Out of nursery Mon 9 Nov</span></div>
+  
 </a>
-<a href="#list" style="display: flex; align-items: center; min-height: 65px; text-decoration: none; color: inherit;"><div style="width: 80px; flex-shrink: 0;"><div style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Batch 30</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">470 weaners</div>
-</div>
-<div style="height: 65px; flex: 1; position: relative; background: repeating-linear-gradient(to right, transparent 0, transparent calc(16.666% - 1px), #EDF0EA calc(16.666% - 1px), #EDF0EA 16.666%);"><div style="position: absolute; left: 0%; width: 30%; top: 24px; height: 30px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 0 8px; background: #27382F; border: 0; border-radius: 8px;"><span style="font-size: 13px; color: #FFFFFF; font-weight: 500; line-height: 20px; white-space: nowrap;">Nursery</span>
-</div>
-</div>
+<a href="#batches" style="position: relative; display: block; padding: 12px 14px; border-radius: 16px; background: #F7F8F5; color: inherit; text-decoration: none;">
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 20px;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">Batch 35G</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Quarantine · day 18 of 42</span></div>
+  <div style="position: relative; height: 4px; margin: 10px 0; border-radius: 999px; background: #E6E9E3;"><span style="position: absolute; left: 0; top: 0; bottom: 0; width: 43%; border-radius: 999px; background: #3972B7;"></span></div>
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 20px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Next · Gilts out Mon 30 Nov</span></div>
+  
 </a>
-<a href="#list" style="display: flex; align-items: center; min-height: 65px; text-decoration: none; color: inherit;"><div style="width: 80px; flex-shrink: 0;"><div style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Batch 35G</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Quarantine</div>
+</div></section></div>
+<div id="batch32" style="width: 380px; scroll-margin-top: 24px;">
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">Batch 32</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Click a task → its page · Hover the bar → each date</div>
+<section aria-label="Batch 32" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: -8px;">
+  <a href="#batches" style="display: inline-flex; align-items: center; height: 44px; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">‹ Batches</a>
+  <span aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -12px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
 </div>
-<div style="height: 65px; flex: 1; position: relative; background: repeating-linear-gradient(to right, transparent 0, transparent calc(16.666% - 1px), #EDF0EA calc(16.666% - 1px), #EDF0EA 16.666%);"><div style="position: absolute; left: 0%; width: 62%; top: 24px; height: 30px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 0 8px; background: #27382F; border: 0; border-radius: 8px;"><span style="font-size: 13px; color: #FFFFFF; font-weight: 500; line-height: 20px; white-space: nowrap;">Quarantine</span>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px;">
+  <h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Batch 32</h2><span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; background: #EAF1FC; flex-shrink: 0;"><span style="width: 6px; height: 6px; border-radius: 999px; background: #3972B7;"></span><span style="font-size: 13px; line-height: 20px; color: #3972B7; white-space: nowrap; font-weight: 500;">Lactating</span></span>
+</div><div style="margin-top: 2px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Line 1 · 50 sows · 580 piglets · Farrowing Room 2</span></div>
+<div style="display: flex; align-items: baseline; gap: 10px; margin-top: 20px;"><span style="font-size: 38px; line-height: 44px; font-weight: 600; letter-spacing: -.03em; white-space: nowrap;">Wean 16 Nov</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap;">in 12 days</span></div>
+<div style="position: relative; height: 40px; margin-top: 14px;">
+  <div style="position: absolute; left: 0; right: 0; top: 5px; height: 4px; border-radius: 999px; background: #E6E9E3;"></div>
+  <div style="position: absolute; left: 0; width: 43%; top: 5px; height: 4px; border-radius: 999px; background: #3972B7;"></div>
+  <span style="position: absolute; left: calc(43% - 7px); top: 0; width: 14px; height: 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 0 0 3px #3972B7;"></span>
+  <span style="position: absolute; left: 0; top: 20px;"><span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;">Farrowed 26 Oct</span></span>
+  <span style="position: absolute; left: calc(43% - 16px); top: 20px;"><span style="font-size: 12px; line-height: 16px; color: #3972B7; white-space: nowrap; font-weight: 600;">Day 9</span></span>
+  <span style="position: absolute; right: 0; top: 20px;"><span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;">Wean</span></span>
 </div>
+<h3 style="margin: 24px 0 4px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Running now</h3>
+<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+  <a href="#lactation" style="display: block; padding: 12px 14px; border-radius: 16px; background: #F7F8F5; color: inherit; text-decoration: none;">
+    <div style="display: flex; justify-content: space-between; height: 20px;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 500;">Lactation</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">44 of 50 on plan</span></div>
+    <div style="position: relative; width: 312px; height: 6px; margin-top: 10px;"><span title="" style="position: absolute; left: 0px; top: 0; width: 273px; height: 6px; background: #28734F; opacity: 1; border-radius: 999px 0 0 999px; box-shadow: none;"></span><span title="" style="position: absolute; left: 275px; top: 0; width: 37px; height: 6px; background: #D9A441; opacity: 1; border-radius: 0 999px 999px 0; box-shadow: none;"></span></div>
+  </a>
+  <a href="#batch32" style="display: block; padding: 12px 14px; border-radius: 16px; background: #F7F8F5; color: inherit; text-decoration: none;">
+    <div style="display: flex; justify-content: space-between; height: 20px;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 500;">Post-farrowing check</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">41 of 50 checked</span></div>
+    <div style="position: relative; width: 312px; height: 6px; margin-top: 10px;"><span title="" style="position: absolute; left: 0px; top: 0; width: 254px; height: 6px; background: #28734F; opacity: 1; border-radius: 999px 0 0 999px; box-shadow: none;"></span><span title="" style="position: absolute; left: 256px; top: 0; width: 17px; height: 6px; background: #D9A441; opacity: 1; border-radius: 0; box-shadow: none;"></span><span title="" style="position: absolute; left: 275px; top: 0; width: 37px; height: 6px; background: #D3D8D0; opacity: 1; border-radius: 0 999px 999px 0; box-shadow: none;"></span></div>
+  </a>
 </div>
+<h3 style="margin: 24px 0 4px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Coming up</h3>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; color: inherit; text-decoration: none;"><span style="display: flex; align-items: center; gap: 12px; min-width: 0;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; width: 84px; display: inline-block;">Fri 13 Nov</span><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Weaning check</span></span><span style="display: flex; align-items: center; gap: 8px; color: #6B726D;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">in 9 days</span></span></div><div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; color: inherit; text-decoration: none;"><span style="display: flex; align-items: center; gap: 12px; min-width: 0;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; width: 84px; display: inline-block;">Mon 16 Nov</span><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Wean to Nursery 1</span></span><span style="display: flex; align-items: center; gap: 8px; color: #6B726D;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">in 12 days</span></span></div><div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; color: inherit; text-decoration: none;"><span style="display: flex; align-items: center; gap: 12px; min-width: 0;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; width: 84px; display: inline-block;">Mon 23 Nov</span><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Heat check</span></span><span style="display: flex; align-items: center; gap: 8px; color: #6B726D;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">in 19 days</span></span></div>
+<div style="display: flex; gap: 8px; margin-top: 16px;"><a href="#dates" style="display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; background: #EEF0EB; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">All dates</a><a href="#compare" style="display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; background: #EEF0EB; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">Compare</a><a href="#flags" style="display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; background: #EEF0EB; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">Flags<span style="display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; box-sizing: border-box; background: #FCF0DB; color: #946015; font-size: 12px; font-weight: 600;">3</span></a></div></section></div>
+<div id="lactation" style="width: 380px; scroll-margin-top: 24px;">
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">Lactation · hover</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Hover a part → what it is · Click it → only those pens on the farm</div>
+<section aria-label="Lactation · hover" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: -8px;">
+  <a href="#batch32" style="display: inline-flex; align-items: center; height: 44px; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">‹ Batch 32</a>
+  <span aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -12px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px;">
+  <h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Lactation</h2><span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; background: #FCF0DB; flex-shrink: 0;"><span style="width: 6px; height: 6px; border-radius: 999px; background: #946015;"></span><span style="font-size: 13px; line-height: 20px; color: #946015; white-space: nowrap; font-weight: 500;">Attention</span></span>
+</div>
+<div style="display: flex; align-items: baseline; gap: 10px; margin-top: 20px;"><span style="font-size: 38px; line-height: 44px; font-weight: 600; letter-spacing: -.03em; white-space: nowrap;">44 of 50</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap;">litters on plan</span></div>
+<div style="position: relative; width: 340px; height: 36px; margin-top: 20px;"><span title="44 litters on plan" style="position: absolute; left: 0px; top: 0; width: 297px; height: 12px; background: #28734F; opacity: 1; border-radius: 999px 0 0 999px; box-shadow: none;"></span><span title="6 litters with losses above average" style="position: absolute; left: 299px; top: 0; width: 41px; height: 12px; background: #D9A441; opacity: 1; border-radius: 0 999px 999px 0; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #D9A441;"></span><span style="position: absolute; top: 18px; font-size: 12px; line-height: 16px; white-space: nowrap; color: #6B726D; font-weight: 400;left: 0px;">44 on plan</span><span style="position: absolute; top: 18px; font-size: 12px; line-height: 16px; white-space: nowrap; color: #946015; font-weight: 400;right: 0px;">6 losses</span><svg viewBox="0 0 16 22" aria-hidden="true" style="position: absolute; left: 317.5px; top: 4px; width: 16px; height: 22px; z-index: 5; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25));"><path d="M1 1v17l4.5-4.2 3 6.6 2.6-1.2-3-6.4H14L1 1Z" fill="#111511" stroke="#FFFFFF" stroke-width="1.2" stroke-linejoin="round"></path></svg><div role="tooltip" style="position: absolute; left: 129.5px; top: 40px; z-index: 6; padding: 8px 12px; border-radius: 10px; background: #111511; box-shadow: 0 6px 18px rgba(17,21,17,.18); white-space: nowrap;"><div style="font-size: 13px; line-height: 18px; color: #FFFFFF; font-weight: 500;">6 litters · losses above average</div><div style="font-size: 12px; line-height: 16px; color: #B9C2BB; font-weight: 400;">Click to show their pens</div></div></div>
+<div style="height: 56px;"></div>
+</section></div>
+<div id="lactation-shown" style="width: 380px; scroll-margin-top: 24px;">
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">Lactation · showing losses</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">The farm outlines 6 pens · Click a pen → that sow · Show all → back</div>
+<section aria-label="Lactation · showing losses" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: -8px;">
+  <a href="#batch32" style="display: inline-flex; align-items: center; height: 44px; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">‹ Batch 32</a>
+  <span aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -12px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px;">
+  <h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Lactation</h2><span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; background: #FCF0DB; flex-shrink: 0;"><span style="width: 6px; height: 6px; border-radius: 999px; background: #946015;"></span><span style="font-size: 13px; line-height: 20px; color: #946015; white-space: nowrap; font-weight: 500;">Attention</span></span>
+</div>
+<div style="display: flex; align-items: baseline; gap: 10px; margin-top: 20px;"><span style="font-size: 38px; line-height: 44px; font-weight: 600; letter-spacing: -.03em; white-space: nowrap;">44 of 50</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap;">litters on plan</span></div>
+<div style="position: relative; width: 340px; height: 36px; margin-top: 20px;"><span title="44 litters on plan" style="position: absolute; left: 0px; top: 0; width: 297px; height: 12px; background: #28734F; opacity: 0.28; border-radius: 999px 0 0 999px; box-shadow: none;"></span><span title="6 litters with losses above average" style="position: absolute; left: 299px; top: 0; width: 41px; height: 12px; background: #D9A441; opacity: 1; border-radius: 0 999px 999px 0; box-shadow: none;"></span><span style="position: absolute; top: 18px; font-size: 12px; line-height: 16px; white-space: nowrap; color: #9CA59D; font-weight: 400;left: 0px;">44 on plan</span><span style="position: absolute; top: 18px; font-size: 12px; line-height: 16px; white-space: nowrap; color: #946015; font-weight: 600;right: 0px;">6 losses</span></div>
+<div style="display: flex; align-items: center; justify-content: space-between; margin-top: 16px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Outlined on the farm</span><a href="#lactation" style="display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; background: #EEF0EB; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">Show all</a></div></section></div>
+<div id="sow" style="width: 380px; scroll-margin-top: 24px;">
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">Sow A7 · from the batch</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Performance → her litters · Log → everything recorded</div>
+<section aria-label="Sow A7 · from the batch" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: -8px;">
+  <a href="#lactation-shown" style="display: inline-flex; align-items: center; height: 44px; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">‹ Lactation</a>
+  <span aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -12px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px;">
+  <h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">203976</h2><span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; background: #FCF0DB; flex-shrink: 0;"><span style="width: 6px; height: 6px; border-radius: 999px; background: #946015;"></span><span style="font-size: 13px; line-height: 20px; color: #946015; white-space: nowrap; font-weight: 500;">Watch</span></span>
+</div><div style="margin-top: 2px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Sow · pen A7 · parity 3</span></div>
+<div style="display: flex; align-items: baseline; gap: 10px; margin-top: 20px;"><span style="font-size: 38px; line-height: 44px; font-weight: 600; letter-spacing: -.03em; white-space: nowrap;">12</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap;">piglets · day 9</span></div>
+<h3 style="margin: 20px 0 4px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">In this batch</h3>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; color: inherit; text-decoration: none;"><span style="display: flex; align-items: center; gap: 12px; min-width: 0;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Lactation</span></span><span style="display: flex; align-items: center; gap: 8px; color: #6B726D;"><span style="font-size: 13px; line-height: 20px; color: #946015; white-space: nowrap; font-weight: 500;">2 lost this week</span></span></div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; color: inherit; text-decoration: none;"><span style="display: flex; align-items: center; gap: 12px; min-width: 0;"><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Post-farrowing check</span></span><span style="display: flex; align-items: center; gap: 8px; color: #6B726D;"><span style="font-size: 13px; line-height: 20px; color: #946015; white-space: nowrap; font-weight: 500;">Recheck</span></span></div>
+<div style="margin-top: 12px; padding: 12px 14px; border-radius: 12px; background: #F3F4F1;"><div style="font-size: 14px; line-height: 20px; color: #111511;">Zhao Min, 06:40: recheck udder and milk.</div><div style="font-size: 14px; line-height: 20px; color: #111511;">Two piglets slow to suckle.</div></div>
+<div style="display: flex; gap: 8px; margin-top: 24px;"><a href="#performance" style="display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; background: #EEF0EB; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">Performance</a><a href="#sow" style="display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; background: #EEF0EB; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">Log</a></div></section></div>
+<div id="performance" style="width: 380px; scroll-margin-top: 24px;">
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">A7 · Performance · hover</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Hover a litter → born alive and weaned · No legend</div>
+<section aria-label="A7 · Performance · hover" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: -8px;">
+  <a href="#sow" style="display: inline-flex; align-items: center; height: 44px; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">‹ 203976</a>
+  <span aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -12px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px;">
+  <h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Performance</h2>
+</div>
+<div style="display: flex; align-items: baseline; gap: 10px; margin-top: 20px;"><span style="font-size: 38px; line-height: 44px; font-weight: 600; letter-spacing: -.03em; white-space: nowrap;">12.0</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap;">born alive a litter</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; margin-top: 16px;">
+<div style="position: relative; display: flex; align-items: center; gap: 12px; height: 40px;">
+  <span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; width: 56px; display: inline-block;">Litter 1</span>
+  <span style="position: relative; width: 250px; height: 14px;">
+    <span style="position: absolute; left: 0; top: 0; height: 14px; width: 196px; border-radius: 999px; background: #CFE3D6; box-shadow: none;"></span>
+    <span style="position: absolute; left: 0; top: 0; height: 14px; width: 179px; border-radius: 999px; background: #28734F;"></span>
+    
+  </span>
+  <span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600; width: 24px; display: inline-block; text-align: right;">11</span>
+</div>
+<div style="position: relative; display: flex; align-items: center; gap: 12px; height: 40px;">
+  <span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; width: 56px; display: inline-block;">Litter 2</span>
+  <span style="position: relative; width: 250px; height: 14px;">
+    <span style="position: absolute; left: 0; top: 0; height: 14px; width: 232px; border-radius: 999px; background: #CFE3D6; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #28734F;"></span>
+    <span style="position: absolute; left: 0; top: 0; height: 14px; width: 214px; border-radius: 999px; background: #28734F;"></span>
+    <svg viewBox="0 0 16 22" aria-hidden="true" style="position: absolute; left: 223px; top: 4px; width: 16px; height: 22px; z-index: 5; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25));"><path d="M1 1v17l4.5-4.2 3 6.6 2.6-1.2-3-6.4H14L1 1Z" fill="#111511" stroke="#FFFFFF" stroke-width="1.2" stroke-linejoin="round"></path></svg><div role="tooltip" style="position: absolute; left: 82px; top: -54px; z-index: 6; padding: 8px 12px; border-radius: 10px; background: #111511; box-shadow: 0 6px 18px rgba(17,21,17,.18); white-space: nowrap;"><div style="font-size: 13px; line-height: 18px; color: #FFFFFF; font-weight: 500;">Litter 2 · Mar 2026</div><div style="font-size: 12px; line-height: 16px; color: #B9C2BB; font-weight: 400;">13 born alive · 12 weaned</div></div>
+  </span>
+  <span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600; width: 24px; display: inline-block; text-align: right;">13</span>
+</div>
+<div style="position: relative; display: flex; align-items: center; gap: 12px; height: 40px;">
+  <span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; width: 56px; display: inline-block;">Litter 3</span>
+  <span style="position: relative; width: 250px; height: 14px;">
+    <span style="position: absolute; left: 0; top: 0; height: 14px; width: 214px; border-radius: 999px; background: #EAF1FC; box-shadow: none;"></span>
+    <span style="position: absolute; left: 0; top: 0; height: 14px; width: 214px; border-radius: 999px; background: #3972B7; opacity: 0.55;"></span>
+    
+  </span>
+  <span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600; width: 24px; display: inline-block; text-align: right;">12</span>
+</div>
+</div></section></div>
+<div id="compare" style="width: 380px; scroll-margin-top: 24px;">
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">Compare · hover</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Switch the figure · Hover a bar → that batch</div>
+<section aria-label="Compare · hover" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: -8px;">
+  <a href="#batch32" style="display: inline-flex; align-items: center; height: 44px; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">‹ Batch 32</a>
+  <span aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -12px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px;">
+  <h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Compare</h2>
+</div>
+<div style="display: flex; gap: 2px; padding: 4px; margin-top: 16px; border-radius: 999px; background: #EEF0EB;">
+<span style="display: flex; align-items: center; justify-content: center; flex: 1; height: 36px; border-radius: 999px; font-size: 14px; white-space: nowrap; background: #FFFFFF; box-shadow: 0 2px 5px rgba(17,21,17,.07); font-weight: 600;">Losses</span><span style="display: flex; align-items: center; justify-content: center; flex: 1; height: 36px; border-radius: 999px; font-size: 14px; white-space: nowrap; background: transparent; box-shadow: none; font-weight: 400;">Born alive</span><span style="display: flex; align-items: center; justify-content: center; flex: 1; height: 36px; border-radius: 999px; font-size: 14px; white-space: nowrap; background: transparent; box-shadow: none; font-weight: 400;">Farrowing rate</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px;">
+  <span style="display: flex; align-items: baseline; gap: 10px;"><span style="font-size: 38px; line-height: 44px; font-weight: 600; letter-spacing: -.03em;">9.8 %</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap;">pre-wean losses</span></span>
+  <span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; background: #FCF0DB; flex-shrink: 0;"><span style="width: 6px; height: 6px; border-radius: 999px; background: #946015;"></span><span style="font-size: 13px; line-height: 20px; color: #946015; white-space: nowrap; font-weight: 500;">1.8 over</span></span>
+</div>
+<div style="position: relative; height: 174px; margin-top: 24px;">
+  <div style="position: absolute; left: 0; right: 0; bottom: 109.71428571428571px; border-top: 1.5px dashed #111511; opacity: 0.45;"></div>
+  <span style="position: absolute; right: 0; bottom: 113.71428571428571px;"><span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap;">Target 8</span></span>
+  <div style="position: absolute; left: 0; right: 64px; bottom: 0; top: 0; display: flex; align-items: flex-end; gap: 14px;">
+  <div style="position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span title="Batch 27 · 12.1 %" style="width: 100%; height: 130px; border-radius: 8px 8px 4px 4px; background: #D9DED6; box-shadow: none;"></span>
+    <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">27</span>
+    
+  </div><div style="position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span title="Batch 28 · 10.4 %" style="width: 100%; height: 111px; border-radius: 8px 8px 4px 4px; background: #D9DED6; box-shadow: none;"></span>
+    <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">28</span>
+    
+  </div><div style="position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span title="Batch 29 · 11.8 %" style="width: 100%; height: 126px; border-radius: 8px 8px 4px 4px; background: #D9DED6; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #A6B1A7;"></span>
+    <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">29</span>
+    <svg viewBox="0 0 16 22" aria-hidden="true" style="position: absolute; left: 20px; top: 40px; width: 16px; height: 22px; z-index: 5; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25));"><path d="M1 1v17l4.5-4.2 3 6.6 2.6-1.2-3-6.4H14L1 1Z" fill="#111511" stroke="#FFFFFF" stroke-width="1.2" stroke-linejoin="round"></path></svg><div role="tooltip" style="position: absolute; left: -40px; top: -6px; z-index: 6; padding: 8px 12px; border-radius: 10px; background: #111511; box-shadow: 0 6px 18px rgba(17,21,17,.18); white-space: nowrap;"><div style="font-size: 13px; line-height: 18px; color: #FFFFFF; font-weight: 500;">Batch 29 · 11.8 %</div><div style="font-size: 12px; line-height: 16px; color: #B9C2BB; font-weight: 400;">3.8 over target</div></div>
+  </div><div style="position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span title="Batch 30 · 9.6 %" style="width: 100%; height: 103px; border-radius: 8px 8px 4px 4px; background: #D9DED6; box-shadow: none;"></span>
+    <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">30</span>
+    
+  </div><div style="position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span title="Batch 31 · 10.9 %" style="width: 100%; height: 117px; border-radius: 8px 8px 4px 4px; background: #D9DED6; box-shadow: none;"></span>
+    <span style="font-size: 12px; line-height: 16px; color: #6B726D; white-space: nowrap; font-weight: 400;">31</span>
+    
+  </div><div style="position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <span title="Batch 32 · 9.8 %" style="width: 100%; height: 105px; border-radius: 8px 8px 4px 4px; background: #D9A441; box-shadow: none;"></span>
+    <span style="font-size: 12px; line-height: 16px; color: #111511; white-space: nowrap; font-weight: 600;">This</span>
+    
+  </div>
+  </div>
+</div></section></div>
+<div id="dates" style="width: 380px; scroll-margin-top: 24px;">
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">All dates</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Only exceptions carry words: late, or how far off</div>
+<section aria-label="All dates" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: -8px;">
+  <a href="#batch32" style="display: inline-flex; align-items: center; height: 44px; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">‹ Batch 32</a>
+  <span aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -12px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px;">
+  <h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">All dates</h2>
+</div>
+<div style="position: relative; margin-top: 12px;">
+  <div style="position: absolute; left: 5px; top: 20px; bottom: 20px; width: 2px; background: #E6E9E3;"></div>
+  <div style="position: relative; display: flex; align-items: center; justify-content: space-between; height: 40px;">
+    <span style="display: flex; align-items: center; gap: 14px;"><span style="width: 12px; height: 12px; border-radius: 999px; box-sizing: border-box; background: #D3D8D0; border: 0;"></span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400; width: 52px; display: inline-block;">13 Jul</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400;">Heat check</span></span>
+    
+  </div><div style="position: relative; display: flex; align-items: center; justify-content: space-between; height: 40px;">
+    <span style="display: flex; align-items: center; gap: 14px;"><span style="width: 12px; height: 12px; border-radius: 999px; box-sizing: border-box; background: #D3D8D0; border: 0;"></span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400; width: 52px; display: inline-block;">15 Jul</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400;">Breeding</span></span>
+    
+  </div><div style="position: relative; display: flex; align-items: center; justify-content: space-between; height: 40px;">
+    <span style="display: flex; align-items: center; gap: 14px;"><span style="width: 12px; height: 12px; border-radius: 999px; box-sizing: border-box; background: #D3D8D0; border: 0;"></span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400; width: 52px; display: inline-block;">7 Sep</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400;">Pregnancy check</span></span>
+    
+  </div><div style="position: relative; display: flex; align-items: center; justify-content: space-between; height: 40px;">
+    <span style="display: flex; align-items: center; gap: 14px;"><span style="width: 12px; height: 12px; border-radius: 999px; box-sizing: border-box; background: #D3D8D0; border: 0;"></span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400; width: 52px; display: inline-block;">26 Oct</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400;">Into Farrowing Room 2</span></span>
+    
+  </div><div style="position: relative; display: flex; align-items: center; justify-content: space-between; height: 40px;">
+    <span style="display: flex; align-items: center; gap: 14px;"><span style="width: 12px; height: 12px; border-radius: 999px; box-sizing: border-box; background: #D3D8D0; border: 0;"></span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400; width: 52px; display: inline-block;">26 Oct</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400;">Farrowing</span></span>
+    <span style="font-size: 13px; line-height: 20px; color: #946015; white-space: nowrap; font-weight: 500;">late 1 day</span>
+  </div><div style="position: relative; display: flex; align-items: center; justify-content: space-between; height: 40px;">
+    <span style="display: flex; align-items: center; gap: 14px;"><span style="width: 12px; height: 12px; border-radius: 999px; box-sizing: border-box; background: #D3D8D0; border: 0;"></span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400; width: 52px; display: inline-block;">30 Oct</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400;">Piglet processing</span></span>
+    
+  </div><div style="position: relative; display: flex; align-items: center; justify-content: space-between; height: 40px;">
+    <span style="display: flex; align-items: center; gap: 14px;"><span style="width: 12px; height: 12px; border-radius: 999px; box-sizing: border-box; background: #3972B7; border: 0;"></span><span style="font-size: 13px; line-height: 20px; color: #3972B7; white-space: nowrap; font-weight: 600; width: 52px; display: inline-block;">Now</span><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 500;">Lactation</span></span>
+    
+  </div><div style="position: relative; display: flex; align-items: center; justify-content: space-between; height: 40px;">
+    <span style="display: flex; align-items: center; gap: 14px;"><span style="width: 12px; height: 12px; border-radius: 999px; box-sizing: border-box; background: #3972B7; border: 0;"></span><span style="font-size: 13px; line-height: 20px; color: #3972B7; white-space: nowrap; font-weight: 600; width: 52px; display: inline-block;">Now</span><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 500;">Post-farrowing check</span></span>
+    
+  </div><div style="position: relative; display: flex; align-items: center; justify-content: space-between; height: 40px;">
+    <span style="display: flex; align-items: center; gap: 14px;"><span style="width: 12px; height: 12px; border-radius: 999px; box-sizing: border-box; background: #FFFFFF; border: 2px solid #858D86;"></span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400; width: 52px; display: inline-block;">13 Nov</span><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 400;">Weaning check</span></span>
+    <span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400;">in 9 days</span>
+  </div><div style="position: relative; display: flex; align-items: center; justify-content: space-between; height: 40px;">
+    <span style="display: flex; align-items: center; gap: 14px;"><span style="width: 12px; height: 12px; border-radius: 999px; box-sizing: border-box; background: #FFFFFF; border: 2px solid #858D86;"></span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400; width: 52px; display: inline-block;">16 Nov</span><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 400;">Wean to Nursery 1</span></span>
+    <span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400;">in 12 days</span>
+  </div><div style="position: relative; display: flex; align-items: center; justify-content: space-between; height: 40px;">
+    <span style="display: flex; align-items: center; gap: 14px;"><span style="width: 12px; height: 12px; border-radius: 999px; box-sizing: border-box; background: #FFFFFF; border: 2px solid #858D86;"></span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400; width: 52px; display: inline-block;">23 Nov</span><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 400;">Heat check</span></span>
+    <span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400;">in 19 days</span>
+  </div><div style="position: relative; display: flex; align-items: center; justify-content: space-between; height: 40px;">
+    <span style="display: flex; align-items: center; gap: 14px;"><span style="width: 12px; height: 12px; border-radius: 999px; box-sizing: border-box; background: #FFFFFF; border: 2px solid #858D86;"></span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400; width: 52px; display: inline-block;">28 Dec</span><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 400;">Out of nursery</span></span>
+    <span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; font-weight: 400;">in 8 weeks</span>
+  </div>
+</div></section></div>
+<div id="flags" style="width: 380px; scroll-margin-top: 24px;">
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">Flags</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Hover a flag → its pens outline · Click → the task, filtered</div>
+<section aria-label="Flags" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: -8px;">
+  <a href="#batch32" style="display: inline-flex; align-items: center; height: 44px; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">‹ Batch 32</a>
+  <span aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -12px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px;">
+  <h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Flags</h2>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px;">
+<a href="#flags" style="display: block; padding: 14px; border-radius: 16px; background: #F7F8F5; color: inherit; text-decoration: none;">
+  <div style="display: flex; align-items: center; justify-content: space-between; height: 28px;"><span style="font-size: 15px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">Feed line</span><span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; background: #F9EAE7; flex-shrink: 0;"><span style="width: 6px; height: 6px; border-radius: 999px; background: #B34B43;"></span><span style="font-size: 13px; line-height: 20px; color: #B34B43; white-space: nowrap; font-weight: 500;">Fault</span></span></div>
+  <div style="margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #FFFFFF;"><div style="font-size: 14px; line-height: 20px;">Li Wei reported it at 07:12.</div><div style="font-size: 14px; line-height: 20px;">Serves A1–A12.</div></div>
 </a>
-<div style="position: absolute; left: 86px; top: 0; bottom: 0; width: 1px; background: #111511; opacity: .5; pointer-events: none;"></div>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-top: 8px;"><span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 16px; height: 8px; border-radius: 3px; background: #27382F; border: 0;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Running</span>
-</span>
-<span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 16px; height: 8px; border-radius: 3px; background: #FFFFFF; border: 1px solid #A6B1A7;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Coming</span>
-</span>
-<span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 16px; height: 8px; border-radius: 3px; background: #DDE2DA; border: 0;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Done</span>
-</span>
-</div>
-</section>
-</div>
-<div id="list" style="width: 380px; scroll-margin-top: 24px;"><div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 4px;">Batches · list</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 12px;">Tap Batch 32 → overview; Calendar → first page</div>
-<section aria-label="Batches · list" data-panel="list" style="position: relative; display: flex; flex-direction: column; width: 380px; height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-bottom: 8px;"><a href="#board" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding-left: 0; background: transparent;">‹ Farm</a>
-<a href="#board" aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #6B726D; text-decoration: none;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path>
-</svg>
+<a href="#lactation-shown" style="display: block; padding: 14px; border-radius: 16px; background: #F7F8F5; color: inherit; text-decoration: none;">
+  <div style="display: flex; align-items: center; justify-content: space-between; height: 28px;"><span style="font-size: 15px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">Piglet losses</span><span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; background: #FCF0DB; flex-shrink: 0;"><span style="width: 6px; height: 6px; border-radius: 999px; background: #946015;"></span><span style="font-size: 13px; line-height: 20px; color: #946015; white-space: nowrap; font-weight: 500;">6 litters</span></span></div>
+  <div style="margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #FFFFFF;"><div style="font-size: 14px; line-height: 20px;">Mostly on days 2–4.</div></div>
 </a>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 30px;"><h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Batches</h2>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">6 running</span>
-</span>
-</div>
-<div style="margin-top: 18px;"><div style="display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: #EEF0EB;"><a href="#calendar" aria-current="false" style="display: flex; align-items: center; justify-content: center; flex: 1; height: 44px; padding: 0 8px; border: 0; border-radius: 999px; font: inherit; font-size: 14px; white-space: nowrap; color: #111511; background: transparent;text-decoration: none;">Calendar</a>
-<a href="#list" aria-current="page" style="display: flex; align-items: center; justify-content: center; flex: 1; height: 44px; padding: 0 8px; border: 0; border-radius: 999px; font: inherit; font-size: 14px; white-space: nowrap; color: #111511; background: #FFFFFF; box-shadow: 0 2px 5px rgba(17,21,17,.07); font-weight: 600;text-decoration: none;">List</a>
-</div>
-</div>
-<div style="display: grid; gap: 8px; margin-top: 16px;"><a href="#breeding" aria-label="Batch 34: 48 sows, Gestation 1. Next: pregnancy check · Wed 2 Dec" style="display: block; padding: 8px 14px; border-radius: 16px; background: #F7F8F5; text-decoration: none; color: inherit;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Batch 34</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">Breeding · 2/5</span>
-</span>
-</div>
-<div style="margin: 6px 0 4px;"><div style="display: flex; height: 4px; background: #E6E9E3; border-radius: 999px; overflow: hidden;"><div style="width: 40%; background: #3972B7; height: 100%;"></div>
-<div style="width: 60%; background: #E1E6DD; height: 100%;"></div>
-</div>
-</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Next: pregnancy check · Wed 2 Dec</div>
+<a href="#batch32" style="display: block; padding: 14px; border-radius: 16px; background: #F7F8F5; color: inherit; text-decoration: none;">
+  <div style="display: flex; align-items: center; justify-content: space-between; height: 28px;"><span style="font-size: 15px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">Recheck</span><span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; background: #FCF0DB; flex-shrink: 0;"><span style="width: 6px; height: 6px; border-radius: 999px; background: #946015;"></span><span style="font-size: 13px; line-height: 20px; color: #946015; white-space: nowrap; font-weight: 500;">3 sows</span></span></div>
+  <div style="margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #FFFFFF;"><div style="font-size: 14px; line-height: 20px;">Post-farrowing check: udder and milk.</div></div>
 </a>
-<a href="#calendar" aria-label="Batch 33: Moving into Farrowing Room 4. Next: farrowing · Thu 5 Nov" style="display: block; padding: 8px 14px; border-radius: 16px; background: #F7F8F5; text-decoration: none; color: inherit;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Batch 33</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">Moving · 26/48</span>
-</span>
-</div>
-<div style="margin: 6px 0 4px;"><div style="display: flex; height: 4px; background: #E6E9E3; border-radius: 999px; overflow: hidden;"><div style="width: 54.17%; background: #3972B7; height: 100%;"></div>
-<div style="width: 45.83%; background: #E1E6DD; height: 100%;"></div>
-</div>
-</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Next: farrowing · Thu 5 Nov</div>
-</a>
-<a href="#batch32" aria-label="Batch 32: 50 sows, 580 piglets, Farrowing Room 2. Next: weaning check · Fri 13 Nov" style="display: block; padding: 8px 14px; border-radius: 16px; background: #F7F8F5; text-decoration: none; color: inherit;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Batch 32</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">Lactating · 9/26</span>
-</span>
-</div>
-<div style="margin: 6px 0 4px;"><div style="display: flex; height: 4px; background: #E6E9E3; border-radius: 999px; overflow: hidden;"><div style="width: 34.62%; background: #3972B7; height: 100%;"></div>
-<div style="width: 65.38%; background: #E1E6DD; height: 100%;"></div>
-</div>
-</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Next: weaning check · Fri 13 Nov</div>
-</a>
-<a href="#calendar" aria-label="Batch 31: Nursery day 24 of 42. Next: nursery ends · 49/52 pens on plan" style="display: block; padding: 8px 14px; border-radius: 16px; background: #F7F8F5; text-decoration: none; color: inherit;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Batch 31</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">Nursery · 24/42</span>
-</span>
-</div>
-<div style="margin: 6px 0 4px;"><div style="display: flex; height: 4px; background: #E6E9E3; border-radius: 999px; overflow: hidden;"><div style="width: 57.14%; background: #3972B7; height: 100%;"></div>
-<div style="width: 42.86%; background: #E1E6DD; height: 100%;"></div>
-</div>
-</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Next: nursery ends · 49/52 pens on plan</div>
-</a>
-<a href="#calendar" aria-label="Batch 30: Nursery day 31 of 42. Next: nursery ends · 470 weaners" style="display: block; padding: 8px 14px; border-radius: 16px; background: #F7F8F5; text-decoration: none; color: inherit;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Batch 30</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">Nursery · 31/42</span>
-</span>
-</div>
-<div style="margin: 6px 0 4px;"><div style="display: flex; height: 4px; background: #E6E9E3; border-radius: 999px; overflow: hidden;"><div style="width: 73.81%; background: #3972B7; height: 100%;"></div>
-<div style="width: 26.189999999999998%; background: #E1E6DD; height: 100%;"></div>
-</div>
-</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Next: nursery ends · 470 weaners</div>
-</a>
-<a href="#calendar" aria-label="Batch 35G: Gilts in quarantine day 18 of 42. Next: quarantine ends · gilts" style="display: block; padding: 8px 14px; border-radius: 16px; background: #F7F8F5; text-decoration: none; color: inherit;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Batch 35G</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">Quarantine · 18/42</span>
-</span>
-</div>
-<div style="margin: 6px 0 4px;"><div style="display: flex; height: 4px; background: #E6E9E3; border-radius: 999px; overflow: hidden;"><div style="width: 42.86%; background: #3972B7; height: 100%;"></div>
-<div style="width: 57.14%; background: #E1E6DD; height: 100%;"></div>
-</div>
-</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Next: quarantine ends · gilts</div>
-</a>
-</div>
-</section>
-</div>
-<div id="batch32" style="width: 380px; scroll-margin-top: 24px;"><div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 4px;">Batch 32</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 12px;">Tap Lactation → task; Actions → bottom menu</div>
-<section aria-label="Batch 32" data-panel="batch32" style="position: relative; display: flex; flex-direction: column; width: 380px; height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-bottom: 4px;"><a href="#calendar" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding-left: 0; background: transparent;">‹ Batches</a>
-<a href="#board" aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #6B726D; text-decoration: none;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path>
-</svg>
-</a>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 30px;"><h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Batch 32</h2>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">Lactating · day 9</span>
-</span>
-</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-top: 8px;">50 sows · 580 piglets · Farrowing Room 2</div>
-<div style="margin-top: 20px;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 20px; margin-bottom: 16px;"><span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Served</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Farrowed</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Weaned</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Nursery</span>
-</div>
-<div style="height: 8px; background: #E6E9E3; border-radius: 999px; position: relative;"><div style="width: 44.9%; height: 8px; background: #3972B7; border-radius: 999px;"></div>
-<div style="position: absolute; left: 44.9%; top: -4px; width: 16px; height: 16px; box-sizing: border-box; border: 3px solid #FFFFFF; border-radius: 999px; background: #3972B7; box-shadow: 0 1px 5px rgba(17,21,17,.2);"></div>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 20px; margin-top: 10px;"><span style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Day 9 of 26</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Wean Mon 16 Nov</span>
-</div>
-</div>
-<div style="margin-top: 22px;margin-top: 20px;"><h3 style="margin: 0 0 12px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Running now</h3>
-<div style="display: grid; gap: 12px;"><a href="#lactation" style="display: block; padding: 12px 14px; border-radius: 16px; background: #F7F8F5; text-decoration: none; color: inherit;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Lactation</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">Running</span>
-</span>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin: 4px 0; min-height: 20px;"><span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">44/50 on plan</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">6 above average</span>
-</div>
-<div style="display: flex; height: 6px; background: #E6E9E3; border-radius: 999px; overflow: hidden;"><div style="width: 88%; background: #28734F; height: 100%;"></div>
-<div style="width: 12%; background: #D5AE67; height: 100%;"></div>
-</div>
-</a>
-<a href="#sow" style="display: block; padding: 12px 14px; border-radius: 16px; background: #F7F8F5; text-decoration: none; color: inherit;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Post-farrowing</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #FCF0DB;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #946015;"></span>
-<span style="font-size: 13px; color: #946015; font-weight: 500; line-height: 20px; white-space: nowrap;">3 recheck</span>
-</span>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin: 4px 0; min-height: 20px;"><span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">41/50 checked</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">6 not yet</span>
-</div>
-<div style="display: flex; height: 6px; background: #E6E9E3; border-radius: 999px; overflow: hidden;"><div style="width: 82%; background: #28734F; height: 100%;"></div>
-<div style="width: 12%; background: #D9DED6; height: 100%;"></div>
-<div style="width: 6%; background: #D5AE67; height: 100%;"></div>
-</div>
-</a>
-</div>
-</div>
-<div style="margin-top: 22px;margin-top: 20px;"><h3 style="margin: 0 0 12px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Coming up</h3>
-<a href="#dates" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;text-decoration: none; color: inherit;"><span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Fri 13 Nov</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Weaning check</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">in 10 days</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-<a href="#dates" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;text-decoration: none; color: inherit;"><span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Mon 16 Nov</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Wean → Nursery 1</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">in 13 days</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-<a href="#dates" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;text-decoration: none; color: inherit;"><span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Mon 23 Nov</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Heat check</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">in 20 days</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-</div>
-<div style="display: flex; gap: 8px; margin-top: 16px;"><a href="#dates" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding: 0 11px;">All dates</a>
-<a href="#compare" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding: 0 11px;">Compare</a>
-<a href="#flags" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding: 0 11px;">Flags 3</a>
-<a href="#actions" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding: 0 11px;">Actions</a>
-</div>
-</section>
-</div>
-<div id="lactation" style="width: 380px; scroll-margin-top: 24px;"><div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 4px;">Lactation · running task</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 12px;">Tap Losses above average → filtered sows</div>
-<section aria-label="Lactation · running task" data-panel="lactation" style="position: relative; display: flex; flex-direction: column; width: 380px; height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-bottom: 8px;"><a href="#batch32" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding-left: 0; background: transparent;">‹ Batch 32</a>
-<a href="#board" aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #6B726D; text-decoration: none;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path>
-</svg>
-</a>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 30px;"><h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Lactation</h2>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">Running</span>
-</span>
-</div>
-<div style="margin-top: 22px;"><div style="font-size: 38px; line-height: 46px; font-weight: 600; letter-spacing: -.035em; white-space: nowrap;">44 of 50 on plan</div>
-<div style="font-size: 14px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-top: 2px;">Farrowing Room 2</div>
-</div>
-<div style="margin-top: 22px;"><div style="display: flex; height: 14px; background: #E6E9E3; border-radius: 999px; overflow: hidden;"><div style="width: 88%; background: #28734F; height: 100%;"></div>
-<div style="width: 12%; background: #D5AE67; height: 100%;"></div>
-</div>
-</div>
-<div style="margin-top: 22px;"><h3 style="margin: 0 0 12px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Show pens</h3>
-<div style="display: grid; gap: 12px;"><a href="#lactation" aria-pressed="false" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;padding: 0 12px; background: #F7F8F5;border-radius: 12px; text-decoration: none; color: inherit;"><span style="display: flex; align-items: center; gap: 9px;"><span style="width: 9px; height: 9px; background: #28734F; border-radius: 999px; flex-shrink: 0;"></span>
-<span style="font-size: 14px; color: #111511; font-weight: 500; line-height: 20px; white-space: nowrap;">Litter on plan</span>
-</span>
-<span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">44</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-<a href="#filtered" aria-pressed="false" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;padding: 0 12px; background: #F7F8F5;border-radius: 12px; text-decoration: none; color: inherit;"><span style="display: flex; align-items: center; gap: 9px;"><span style="width: 9px; height: 9px; background: #946015; border-radius: 999px; flex-shrink: 0;"></span>
-<span style="font-size: 14px; color: #111511; font-weight: 500; line-height: 20px; white-space: nowrap;">Losses above average</span>
-</span>
-<span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">6</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-</div>
-</div>
-<div style="margin-top: 22px;"><div data-note="true" style="background: #F3F4F1; border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 20px; box-sizing: border-box;">The pens in Farrowing Room 2 show each sow in these colours. Tap a row to show only those.</div>
-</div>
-</section>
-</div>
-<div id="filtered" style="width: 380px; scroll-margin-top: 24px;"><div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 4px;">Lactation · filtered</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 12px;">Tap A7 → sow; Back → unfiltered Lactation</div>
-<section aria-label="Lactation · filtered" data-panel="filtered" style="position: relative; display: flex; flex-direction: column; width: 380px; height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-bottom: 8px;"><a href="#lactation" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding-left: 0; background: transparent;">‹ Lactation</a>
-<a href="#board" aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #6B726D; text-decoration: none;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path>
-</svg>
-</a>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 30px;"><h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Lactation</h2>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #FCF0DB;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #946015;"></span>
-<span style="font-size: 13px; color: #946015; font-weight: 500; line-height: 20px; white-space: nowrap;">Attention</span>
-</span>
-</div>
-<div style="margin-top: 20px;"><div style="font-size: 38px; line-height: 46px; font-weight: 600; letter-spacing: -.035em; white-space: nowrap;">4 sows</div>
-<div style="font-size: 14px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-top: 2px;">losses above average · parity 2–4</div>
-</div>
-<div style="display: flex; gap: 8px; margin-top: 20px;"><button type="button" aria-pressed="false" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;">Parity 1</button>
-<button type="button" aria-pressed="true" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #111511; color: #FFFFFF; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;">2–4</button>
-<button type="button" aria-pressed="false" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;">5+</button>
-</div>
-<div style="margin-top: 20px;"><h3 style="margin: 0 0 12px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Show pens</h3>
-<a href="#lactation" aria-pressed="true" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;padding: 0 12px; background: #FCF0DB;border-radius: 12px; text-decoration: none; color: inherit;"><span style="display: flex; align-items: center; gap: 9px;"><span style="width: 9px; height: 9px; background: #946015; border-radius: 999px; flex-shrink: 0;"></span>
-<span style="font-size: 14px; color: #111511; font-weight: 500; line-height: 20px; white-space: nowrap;">Losses above average</span>
-</span>
-<span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">4</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-</div>
-<div style="margin-top: 20px;"><h3 style="margin: 0 0 12px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Matching pens</h3>
-<div style="display: grid; gap: 12px;"><a href="#sow" aria-label="Sow A7, tag 203976, 2 piglets lost this week" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;text-decoration: none; color: inherit;"><span style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">A7</span>
-<span style="font-size: 14px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">203976</span>
-<span style="font-size: 14px; color: #946015; font-weight: 400; line-height: 20px; white-space: nowrap;">2 lost</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-<a href="#filtered" aria-label="Sow A12, tag 208532, 2 piglets lost this week" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;text-decoration: none; color: inherit;"><span style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">A12</span>
-<span style="font-size: 14px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">208532</span>
-<span style="font-size: 14px; color: #946015; font-weight: 400; line-height: 20px; white-space: nowrap;">2 lost</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-<a href="#filtered" aria-label="Sow A19, tag 209511, 1 piglet lost this week" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;text-decoration: none; color: inherit;"><span style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">A19</span>
-<span style="font-size: 14px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">209511</span>
-<span style="font-size: 14px; color: #946015; font-weight: 400; line-height: 20px; white-space: nowrap;">1 lost</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-<a href="#filtered" aria-label="Sow B4, tag 209624, 2 piglets lost this week" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;text-decoration: none; color: inherit;"><span style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">B4</span>
-<span style="font-size: 14px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">209624</span>
-<span style="font-size: 14px; color: #946015; font-weight: 400; line-height: 20px; white-space: nowrap;">2 lost</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-</div>
-</div>
-<div style="margin-top: 20px;"><div data-note="true" style="background: #F3F4F1; border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 20px; box-sizing: border-box;">Four sows match this view. A7 lost 2 piglets this week.</div>
-</div>
-</section>
-</div>
-<div id="sow" style="width: 380px; scroll-margin-top: 24px;"><div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 4px;">Sow A7 · from the batch</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 12px;">Tap Performance → past litters; Back → Lactation</div>
-<section aria-label="Sow A7 · from the batch" data-panel="sow" style="position: relative; display: flex; flex-direction: column; width: 380px; height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-bottom: 8px;"><a href="#lactation" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding-left: 0; background: transparent;">‹ Lactation</a>
-<a href="#board" aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #6B726D; text-decoration: none;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path>
-</svg>
-</a>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 30px;"><h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">203976</h2>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #FCF0DB;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #946015;"></span>
-<span style="font-size: 13px; color: #946015; font-weight: 500; line-height: 20px; white-space: nowrap;">Watch</span>
-</span>
-</div>
-<div style="font-size: 14px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-top: 8px;">Sow · parity 3 · 12 piglets</div>
-<div style="margin-top: 22px;"><div style="font-size: 38px; line-height: 46px; font-weight: 600; letter-spacing: -.035em; white-space: nowrap;">26 Oct</div>
-<div style="font-size: 14px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-top: 2px;">Farrowed · day 9</div>
-</div>
-<div style="margin-top: 22px;"><h3 style="margin: 0 0 12px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">In this batch</h3>
-<a href="#filtered" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;text-decoration: none; color: inherit;"><span style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Lactation</span>
-<span style="font-size: 13px; color: #946015; font-weight: 400; line-height: 20px; white-space: nowrap;">Losses above average</span>
-</a>
-<a href="#flags" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;text-decoration: none; color: inherit;"><span style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Post-farrowing check</span>
-<span style="font-size: 13px; color: #946015; font-weight: 400; line-height: 20px; white-space: nowrap;">Recheck needed</span>
-</a>
-<div style="margin-top: 12px;"><div data-note="true" style="background: #F3F4F1; border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 20px; box-sizing: border-box;">Zhao Min marked the recheck at 06:40: udder and milk.</div>
-</div>
-</div>
-<div style="margin-top: 22px;"><h3 style="margin: 0 0 12px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Watch</h3>
-<div data-note="true" style="background: #F3F4F1; border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 20px; box-sizing: border-box;">Two piglets slow to suckle. A7 lost 2 piglets this week.</div>
-</div>
-<div style="display: flex; gap: 8px; margin-top: 22px;"><a href="#performance" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;">Performance</a>
-<button type="button" aria-pressed="false" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;">Log</button>
-</div>
-</section>
-</div>
-<div id="performance" style="width: 380px; scroll-margin-top: 24px;"><div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 4px;">A7 · Performance</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 12px;">Tap Back → 203976</div>
-<section aria-label="A7 · Performance" data-panel="performance" style="position: relative; display: flex; flex-direction: column; width: 380px; height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-bottom: 8px;"><a href="#sow" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding-left: 0; background: transparent;">‹ 203976</a>
-<a href="#board" aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #6B726D; text-decoration: none;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path>
-</svg>
-</a>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 30px;"><h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Performance</h2>
-</div>
-<div style="margin-top: 22px;"><div style="font-size: 38px; line-height: 46px; font-weight: 600; letter-spacing: -.035em; white-space: nowrap;">12.0</div>
-<div style="font-size: 14px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-top: 2px;">born alive on average</div>
-</div>
-<div style="margin-top: 22px;"><h3 style="margin: 0 0 12px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Past litters</h3>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 20px;"><span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Born alive</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Weaned</span>
-</div>
-<div style="display: grid; gap: 12px; margin-top: 12px;"><div style="padding: 14px; background: #F7F8F5; border-radius: 16px; box-sizing: border-box;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Litter 1</span>
-</div>
-<div style="margin-top: 12px;"><div style="display: flex; align-items: center; gap: 12px; height: 30px;"><div style="width: 78.57142857142857%; height: 14px; background: #86A58D; border-radius: 999px;"></div>
-<span style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">11</span>
-</div>
-<div style="display: flex; align-items: center; gap: 12px; height: 30px;"><div style="width: 71.42857142857143%; height: 14px; background: #CCDCCE; border-radius: 999px;"></div>
-<span style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">10</span>
-</div>
-</div>
-</div>
-<div style="padding: 14px; background: #F7F8F5; border-radius: 16px; box-sizing: border-box;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Litter 2</span>
-</div>
-<div style="margin-top: 12px;"><div style="display: flex; align-items: center; gap: 12px; height: 30px;"><div style="width: 92.85714285714286%; height: 14px; background: #86A58D; border-radius: 999px;"></div>
-<span style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">13</span>
-</div>
-<div style="display: flex; align-items: center; gap: 12px; height: 30px;"><div style="width: 85.71428571428571%; height: 14px; background: #CCDCCE; border-radius: 999px;"></div>
-<span style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">12</span>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-top: 22px;"><span style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Weaned 11 a litter</span>
-</div>
-<div style="margin-top: 12px;"><div data-note="true" style="background: #F3F4F1; border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 20px; box-sizing: border-box;">The darker bars show born alive. The lighter bars show weaned.</div>
-</div>
-</section>
-</div>
-<div id="compare" style="width: 380px; scroll-margin-top: 24px;"><div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 4px;">Batch 32 · Compare</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 12px;">Tap Back → Batch 32; Losses is selected</div>
-<section aria-label="Batch 32 · Compare" data-panel="compare" style="position: relative; display: flex; flex-direction: column; width: 380px; height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-bottom: 8px;"><a href="#batch32" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding-left: 0; background: transparent;">‹ Batch 32</a>
-<a href="#board" aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #6B726D; text-decoration: none;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path>
-</svg>
-</a>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 30px;"><h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Compare</h2>
-</div>
-<div aria-label="Losses selected. Born alive B27–B31: 12.2, 12.6, 12.1, 12.8, 12.4; Batch 32 11.6, target 13. Farrowing rate B27–B31: 86, 88, 84, 87, 85; Batch 32 89 percent, target 88." style="margin-top: 18px;"><div style="display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: #EEF0EB;"><button type="button" aria-pressed="true" style="display: flex; align-items: center; justify-content: center; flex: 1; height: 44px; padding: 0 8px; border: 0; border-radius: 999px; font: inherit; font-size: 14px; white-space: nowrap; color: #111511; background: #FFFFFF; box-shadow: 0 2px 5px rgba(17,21,17,.07); font-weight: 600;text-decoration: none;">Losses</button>
-<button type="button" aria-pressed="false" style="display: flex; align-items: center; justify-content: center; flex: 1; height: 44px; padding: 0 8px; border: 0; border-radius: 999px; font: inherit; font-size: 14px; white-space: nowrap; color: #111511; background: transparent;text-decoration: none;">Born alive</button>
-<button type="button" aria-pressed="false" style="display: flex; align-items: center; justify-content: center; flex: 1; height: 44px; padding: 0 8px; border: 0; border-radius: 999px; font: inherit; font-size: 14px; white-space: nowrap; color: #111511; background: transparent;text-decoration: none;">Farrowing rate</button>
-</div>
-</div>
-<div style="margin-top: 22px;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;"><span style="font-size: 38px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;line-height: 46px; letter-spacing: -.035em;">9.8 %</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #FCF0DB;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #946015;"></span>
-<span style="font-size: 13px; color: #946015; font-weight: 500; line-height: 20px; white-space: nowrap;">1.8 above target</span>
-</span>
-</div>
-</div>
-<div style="font-size: 14px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-top: 4px;">Pre-wean losses</div>
-<div style="margin-top: 22px;"><h3 style="margin: 0 0 12px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Last six batches</h3>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 20px; margin-bottom: 8px;"><span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Pre-wean losses</span>
-<span style="font-size: 13px; color: #946015; font-weight: 400; line-height: 20px; white-space: nowrap;">Target 8 %</span>
-</div>
-<div role="img" aria-label="Pre-wean losses B27 to B31: 12.1, 10.4, 11.8, 9.6, 10.9 percent. Batch 32: 9.8 percent. Target: 8 percent." style="position: relative; display: flex; gap: 6px; height: 196px;"><div style="position: relative; flex: 1; height: 196px;"><div style="position: absolute; left: 0; right: 0; bottom: 167.1px; text-align: center;"><span style="font-size: 13px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">12.1</span>
-</div>
-<div style="position: absolute; left: 7px; right: 7px; bottom: 28px; height: 133.1px; border-radius: 7px 7px 2px 2px; background: #DDE2D8;"></div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;position: absolute; bottom: 0; left: 0; right: 0; text-align: center;">B27</div>
-</div>
-<div style="position: relative; flex: 1; height: 196px;"><div style="position: absolute; left: 0; right: 0; bottom: 148.4px; text-align: center;"><span style="font-size: 13px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">10.4</span>
-</div>
-<div style="position: absolute; left: 7px; right: 7px; bottom: 28px; height: 114.4px; border-radius: 7px 7px 2px 2px; background: #DDE2D8;"></div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;position: absolute; bottom: 0; left: 0; right: 0; text-align: center;">B28</div>
-</div>
-<div style="position: relative; flex: 1; height: 196px;"><div style="position: absolute; left: 0; right: 0; bottom: 163.8px; text-align: center;"><span style="font-size: 13px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">11.8</span>
-</div>
-<div style="position: absolute; left: 7px; right: 7px; bottom: 28px; height: 129.8px; border-radius: 7px 7px 2px 2px; background: #DDE2D8;"></div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;position: absolute; bottom: 0; left: 0; right: 0; text-align: center;">B29</div>
-</div>
-<div style="position: relative; flex: 1; height: 196px;"><div style="position: absolute; left: 0; right: 0; bottom: 139.6px; text-align: center;"><span style="font-size: 13px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">9.6</span>
-</div>
-<div style="position: absolute; left: 7px; right: 7px; bottom: 28px; height: 105.6px; border-radius: 7px 7px 2px 2px; background: #DDE2D8;"></div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;position: absolute; bottom: 0; left: 0; right: 0; text-align: center;">B30</div>
-</div>
-<div style="position: relative; flex: 1; height: 196px;"><div style="position: absolute; left: 0; right: 0; bottom: 153.9px; text-align: center;"><span style="font-size: 13px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">10.9</span>
-</div>
-<div style="position: absolute; left: 7px; right: 7px; bottom: 28px; height: 119.9px; border-radius: 7px 7px 2px 2px; background: #DDE2D8;"></div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;position: absolute; bottom: 0; left: 0; right: 0; text-align: center;">B31</div>
-</div>
-<div style="position: relative; flex: 1; height: 196px;"><div style="position: absolute; left: 0; right: 0; bottom: 141.8px; text-align: center;"><span style="font-size: 13px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">9.8</span>
-</div>
-<div style="position: absolute; left: 7px; right: 7px; bottom: 28px; height: 107.80000000000001px; border-radius: 7px 7px 2px 2px; background: #D5AE67;"></div>
-<div style="font-size: 13px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;position: absolute; bottom: 0; left: 0; right: 0; text-align: center;">This</div>
-</div>
-<div style="position: absolute; left: 0; right: 0; bottom: 116px; border-top: 1px dashed #946015; pointer-events: none;"></div>
-</div>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-top: 20px;"><span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Last 3 average</span>
-<span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">10.8 %</span>
-</div>
-<div style="margin-top: 16px;"><div data-note="true" style="background: #F3F4F1; border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 20px; box-sizing: border-box;">Born alive: 11.6, target 13. Farrowing rate: 89%, target 88%.</div>
-</div>
-</section>
-</div>
-<div id="dates" style="width: 380px; scroll-margin-top: 24px;"><div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 4px;">Batch 32 · All dates</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 12px;">Tap Back → Batch 32; timeline stays in panel</div>
-<section aria-label="Batch 32 · All dates" data-panel="dates" style="position: relative; display: flex; flex-direction: column; width: 380px; height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-bottom: 8px;"><a href="#batch32" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding-left: 0; background: transparent;">‹ Batch 32</a>
-<a href="#board" aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #6B726D; text-decoration: none;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path>
-</svg>
-</a>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 30px;"><h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">All dates</h2>
-</div>
-<div style="flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; margin-top: 18px;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 20px; margin-bottom: 8px;"><span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Done</span>
-<span style="font-size: 13px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Now</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Coming</span>
-</div>
-<div style="position: relative;"><div style="position: absolute; left: 4px; top: 22px; bottom: 22px; width: 1px; background: #E1E6DD;"></div>
-<div style="position: relative;"><div data-timeline-row="true" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;position: relative;"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 999px; background: #858D86; border: 1px solid #858D86;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;width: 47px; flex-shrink: 0;">13 Jul</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;flex: 1;">Heat check</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">on time</span>
-</div>
-<div data-timeline-row="true" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;position: relative;"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 999px; background: #858D86; border: 1px solid #858D86;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;width: 47px; flex-shrink: 0;">15 Jul</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;flex: 1;">Breeding</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">on time</span>
-</div>
-<div data-timeline-row="true" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;position: relative;"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 999px; background: #858D86; border: 1px solid #858D86;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;width: 47px; flex-shrink: 0;">7 Sep</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;flex: 1;">Pregnancy check</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">on time</span>
-</div>
-<div data-timeline-row="true" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;position: relative;"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 999px; background: #858D86; border: 1px solid #858D86;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;width: 47px; flex-shrink: 0;">26 Oct</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;flex: 1;">Move → FR2</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">on time</span>
-</div>
-<div data-timeline-row="true" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;position: relative;"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 999px; background: #858D86; border: 1px solid #858D86;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;width: 47px; flex-shrink: 0;">26 Oct</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;flex: 1;">Farrowing</span>
-<span style="font-size: 13px; color: #946015; font-weight: 400; line-height: 20px; white-space: nowrap;">late 1 day</span>
-</div>
-<div data-timeline-row="true" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;position: relative;"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 999px; background: #858D86; border: 1px solid #858D86;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;width: 47px; flex-shrink: 0;">30 Oct</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;flex: 1;">Piglet processing</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">on time</span>
-</div>
-</div>
-<div style="position: relative; margin-top: 12px;"><div data-timeline-row="true" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;position: relative;"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 999px; background: #111511; border: 1px solid #111511;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;width: 47px; flex-shrink: 0;">Now</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;flex: 1;">Lactation</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">day 9</span>
-</div>
-<div data-timeline-row="true" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;position: relative;"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 999px; background: #111511; border: 1px solid #111511;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;width: 47px; flex-shrink: 0;">Now</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;flex: 1;">Post-farrowing</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">41/50</span>
-</div>
-</div>
-<div style="position: relative; margin-top: 12px;"><div data-timeline-row="true" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;position: relative;"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 999px; background: #FFFFFF; border: 1px solid #9CA59D;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;width: 47px; flex-shrink: 0;">13 Nov</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;flex: 1;">Weaning check</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">in 10 days</span>
-</div>
-<div data-timeline-row="true" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;position: relative;"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 999px; background: #FFFFFF; border: 1px solid #9CA59D;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;width: 47px; flex-shrink: 0;">16 Nov</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;flex: 1;">Wean → N1</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">in 13 days</span>
-</div>
-<div data-timeline-row="true" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;position: relative;"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 999px; background: #FFFFFF; border: 1px solid #9CA59D;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;width: 47px; flex-shrink: 0;">23 Nov</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;flex: 1;">Heat check</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">in 20 days</span>
-</div>
-<div data-timeline-row="true" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;position: relative;"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 999px; background: #FFFFFF; border: 1px solid #9CA59D;"></span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;width: 47px; flex-shrink: 0;">28 Dec</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;flex: 1;">Nursery ends</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">in 55 days</span>
-</div>
-</div>
-</div>
-</div>
-</section>
-</div>
-<div id="flags" style="width: 380px; scroll-margin-top: 24px;"><div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 4px;">Batch 32 · Flags</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 12px;">Tap Back → Batch 32</div>
-<section aria-label="Batch 32 · Flags" data-panel="flags" style="position: relative; display: flex; flex-direction: column; width: 380px; height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-bottom: 8px;"><a href="#batch32" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding-left: 0; background: transparent;">‹ Batch 32</a>
-<a href="#board" aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #6B726D; text-decoration: none;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path>
-</svg>
-</a>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 30px;"><h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Flags</h2>
-</div>
-<div style="display: grid; gap: 16px; margin-top: 22px;"><div style="padding: 14px; background: #F7F8F5; border-radius: 16px; box-sizing: border-box;background: #FFFFFF; box-shadow: 0 2px 8px rgba(17,21,17,.04), 0 6px 20px rgba(17,21,17,.04);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px; margin-bottom: 12px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Litter losses</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #FCF0DB;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #946015;"></span>
-<span style="font-size: 13px; color: #946015; font-weight: 500; line-height: 20px; white-space: nowrap;">Attention</span>
-</span>
-</div>
-<div data-note="true" style="background: #F3F4F1; border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 20px; box-sizing: border-box;">6 litters have losses above average, mostly on days 2–4.</div>
-</div>
-<div style="padding: 14px; background: #F7F8F5; border-radius: 16px; box-sizing: border-box;background: #FFFFFF; box-shadow: 0 2px 8px rgba(17,21,17,.04), 0 6px 20px rgba(17,21,17,.04);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px; margin-bottom: 12px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Sow recheck</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #FCF0DB;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #946015;"></span>
-<span style="font-size: 13px; color: #946015; font-weight: 500; line-height: 20px; white-space: nowrap;">Attention</span>
-</span>
-</div>
-<div data-note="true" style="background: #F3F4F1; border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 20px; box-sizing: border-box;">3 sows need a post-farrowing recheck.</div>
-</div>
-<div style="padding: 14px; background: #F7F8F5; border-radius: 16px; box-sizing: border-box;background: #FFFFFF; box-shadow: 0 2px 8px rgba(17,21,17,.04), 0 6px 20px rgba(17,21,17,.04);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px; margin-bottom: 12px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Feed line</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #F9EAE7;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #B34B43;"></span>
-<span style="font-size: 13px; color: #B34B43; font-weight: 500; line-height: 20px; white-space: nowrap;">Fault</span>
-</span>
-</div>
-<div data-note="true" style="background: #F3F4F1; border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 20px; box-sizing: border-box;">Li Wei reported it at 07:12. Farrowing Room 2. Serves A1–A12.</div>
-</div>
-</div>
-</section>
-</div>
-<div id="breeding" style="width: 380px; scroll-margin-top: 24px;"><div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 4px;">Batch 34 · breeding task</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 12px;">Tap a legend row → matching pens</div>
-<section aria-label="Batch 34 · breeding task" data-panel="breeding" style="position: relative; display: flex; flex-direction: column; width: 380px; height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-bottom: 8px;"><a href="#list" aria-label="Back to Batch 34 in the batch list" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding-left: 0; background: transparent;">‹ Batch 34</a>
-<a href="#board" aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #6B726D; text-decoration: none;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path>
-</svg>
-</a>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 30px;"><h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Breeding</h2>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">Day 2 of 5</span>
-</span>
-</div>
-<div style="margin-top: 22px;"><div style="font-size: 38px; line-height: 46px; font-weight: 600; letter-spacing: -.035em; white-space: nowrap;">29 of 48 bred</div>
-<div style="font-size: 14px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-top: 2px;">Gestation 1</div>
-</div>
-<div style="margin-top: 22px;"><div style="display: flex; height: 14px; background: #E6E9E3; border-radius: 999px; overflow: hidden;"><div style="width: 60.416666666666664%; background: #28734F; height: 100%;"></div>
-<div style="width: 22.916666666666664%; background: #3972B7; height: 100%;"></div>
-<div style="width: 16.666666666666664%; background: #CCD2C9; height: 100%;"></div>
-</div>
-</div>
-<div style="display: flex; gap: 8px; margin-top: 22px;"><button type="button" aria-pressed="false" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;">Not bred in 2+ days</button>
-<button type="button" aria-pressed="false" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;">Parity 1</button>
-</div>
-<div style="margin-top: 22px;"><h3 style="margin: 0 0 12px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Show pens</h3>
-<div style="display: grid; gap: 12px;"><a href="#breeding" aria-pressed="false" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;padding: 0 12px; background: #F7F8F5;border-radius: 12px; text-decoration: none; color: inherit;"><span style="display: flex; align-items: center; gap: 9px;"><span style="width: 9px; height: 9px; background: #28734F; border-radius: 999px; flex-shrink: 0;"></span>
-<span style="font-size: 14px; color: #111511; font-weight: 500; line-height: 20px; white-space: nowrap;">Bred</span>
-</span>
-<span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">29</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-<a href="#breeding" aria-pressed="false" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;padding: 0 12px; background: #F7F8F5;border-radius: 12px; text-decoration: none; color: inherit;"><span style="display: flex; align-items: center; gap: 9px;"><span style="width: 9px; height: 9px; background: #3972B7; border-radius: 999px; flex-shrink: 0;"></span>
-<span style="font-size: 14px; color: #111511; font-weight: 500; line-height: 20px; white-space: nowrap;">In heat · not bred</span>
-</span>
-<span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">11</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-<a href="#breeding" aria-pressed="false" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;padding: 0 12px; background: #F7F8F5;border-radius: 12px; text-decoration: none; color: inherit;"><span style="display: flex; align-items: center; gap: 9px;"><span style="width: 9px; height: 9px; background: #858D86; border-radius: 999px; flex-shrink: 0;"></span>
-<span style="font-size: 14px; color: #111511; font-weight: 500; line-height: 20px; white-space: nowrap;">Heat not seen</span>
-</span>
-<span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">8</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-</div>
-</div>
-<div style="margin-top: 22px;"><h3 style="margin: 0 0 12px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Next</h3>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;"><span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Wed 2 Dec</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Pregnancy check</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">in 4 weeks</span>
-</div>
-</div>
-<div style="margin-top: 22px;"><div data-note="true" style="background: #F3F4F1; border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 20px; box-sizing: border-box;">11 sows are in heat and not yet bred. 8 have not been seen in heat.</div>
-</div>
-</section>
-</div>
-<div id="actions" style="width: 380px; scroll-margin-top: 24px;"><div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 4px;">Batch 32 · Actions</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-bottom: 12px;">Tap × → Batch 32; pick an action → its flow</div>
-<section aria-label="Batch 32 · Actions" data-panel="actions" style="position: relative; display: flex; flex-direction: column; width: 380px; height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);overflow: hidden;"><div aria-hidden="true" inert="inert" style="height: 100%; display: flex; flex-direction: column;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin-bottom: 4px;"><a href="#calendar" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding-left: 0; background: transparent;">‹ Batches</a>
-<a href="#board" aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex-shrink: 0; color: #6B726D; text-decoration: none;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path>
-</svg>
-</a>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 30px;"><h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Batch 32</h2>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">Lactating · day 9</span>
-</span>
-</div>
-<div style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;margin-top: 8px;">50 sows · 580 piglets · Farrowing Room 2</div>
-<div style="margin-top: 20px;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 20px; margin-bottom: 16px;"><span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Served</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Farrowed</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Weaned</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Nursery</span>
-</div>
-<div style="height: 8px; background: #E6E9E3; border-radius: 999px; position: relative;"><div style="width: 44.9%; height: 8px; background: #3972B7; border-radius: 999px;"></div>
-<div style="position: absolute; left: 44.9%; top: -4px; width: 16px; height: 16px; box-sizing: border-box; border: 3px solid #FFFFFF; border-radius: 999px; background: #3972B7; box-shadow: 0 1px 5px rgba(17,21,17,.2);"></div>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 20px; margin-top: 10px;"><span style="font-size: 14px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Day 9 of 26</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Wean Mon 16 Nov</span>
-</div>
-</div>
-<div style="margin-top: 22px;margin-top: 20px;"><h3 style="margin: 0 0 12px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Running now</h3>
-<div style="display: grid; gap: 12px;"><a href="#lactation" style="display: block; padding: 12px 14px; border-radius: 16px; background: #F7F8F5; text-decoration: none; color: inherit;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Lactation</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #EAF1FC;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #3972B7;"></span>
-<span style="font-size: 13px; color: #3972B7; font-weight: 500; line-height: 20px; white-space: nowrap;">Running</span>
-</span>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin: 4px 0; min-height: 20px;"><span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">44/50 on plan</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">6 above average</span>
-</div>
-<div style="display: flex; height: 6px; background: #E6E9E3; border-radius: 999px; overflow: hidden;"><div style="width: 88%; background: #28734F; height: 100%;"></div>
-<div style="width: 12%; background: #D5AE67; height: 100%;"></div>
-</div>
-</a>
-<a href="#sow" style="display: block; padding: 12px 14px; border-radius: 16px; background: #F7F8F5; text-decoration: none; color: inherit;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;min-height: 28px;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Post-farrowing</span>
-<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; white-space: nowrap; background: #FCF0DB;"><span style="width: 6px; height: 6px; border-radius: 999px; flex-shrink: 0; background: #946015;"></span>
-<span style="font-size: 13px; color: #946015; font-weight: 500; line-height: 20px; white-space: nowrap;">3 recheck</span>
-</span>
-</div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;margin: 4px 0; min-height: 20px;"><span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">41/50 checked</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">6 not yet</span>
-</div>
-<div style="display: flex; height: 6px; background: #E6E9E3; border-radius: 999px; overflow: hidden;"><div style="width: 82%; background: #28734F; height: 100%;"></div>
-<div style="width: 12%; background: #D9DED6; height: 100%;"></div>
-<div style="width: 6%; background: #D5AE67; height: 100%;"></div>
-</div>
-</a>
-</div>
-</div>
-<div style="margin-top: 22px;margin-top: 20px;"><h3 style="margin: 0 0 12px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Coming up</h3>
-<a href="#dates" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;text-decoration: none; color: inherit;"><span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Fri 13 Nov</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Weaning check</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">in 10 days</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-<a href="#dates" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;text-decoration: none; color: inherit;"><span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Mon 16 Nov</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Wean → Nursery 1</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">in 13 days</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-<a href="#dates" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;text-decoration: none; color: inherit;"><span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">Mon 23 Nov</span>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Heat check</span>
-<span style="font-size: 13px; color: #6B726D; font-weight: 400; line-height: 20px; white-space: nowrap;">in 20 days</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</a>
-</div>
-<div style="display: flex; gap: 8px; margin-top: 16px;"><a href="#dates" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding: 0 11px;">All dates</a>
-<a href="#compare" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding: 0 11px;">Compare</a>
-<a href="#flags" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding: 0 11px;">Flags 3</a>
-<a href="#actions" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 14px; box-sizing: border-box; border: 0; border-radius: 999px; background: #EEF0EB; color: #111511; font: inherit; font-size: 14px; text-decoration: none; white-space: nowrap;padding: 0 11px;">Actions</a>
-</div>
-</div>
-<div style="position: absolute; inset: 0; border-radius: 22px; background: rgba(17,21,17,.28);"></div>
-<div role="dialog" aria-label="Actions for Batch 32" style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 20px 20px; border-radius: 22px; background: #FFFFFF; box-shadow: 0 -8px 32px rgba(17,21,17,.12);"><div style="width: 32px; height: 4px; border-radius: 999px; background: #C4CBC1; margin: 0 auto 8px;"></div>
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;"><span style="font-size: 15px; color: #111511; font-weight: 600; line-height: 20px; white-space: nowrap;">Actions</span>
-<a href="#batch32" aria-label="Close Actions" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; text-decoration: none; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path>
-</svg>
-</a>
-</div>
-<button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: #111511; text-align: left;"><span style="display: flex; align-items: center; gap: 14px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6Z"></path>
-</svg>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Treatment</span>
-</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</button>
-<button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: #111511; text-align: left;"><span style="display: flex; align-items: center; gap: 14px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m14 3 7 7M17 6 3 20m3-1-2-2m5-9 7 7m-5-9 7 7"></path>
-</svg>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Vaccination</span>
-</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</button>
-<button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: #111511; text-align: left;"><span style="display: flex; align-items: center; gap: 14px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M8 3h8m-7 0v8l-4 7a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-4-7V3M8 15h8"></path>
-</svg>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Sampling</span>
-</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</button>
-<button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: #111511; text-align: left;"><span style="display: flex; align-items: center; gap: 14px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M12 3 2 21h20ZM12 9v5m0 3v1"></path>
-</svg>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Culling</span>
-</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</button>
-<button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: #111511; text-align: left;"><span style="display: flex; align-items: center; gap: 14px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M3 12h18m-6-6 6 6-6 6"></path>
-</svg>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Move</span>
-</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</button>
-<button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: #111511; text-align: left;"><span style="display: flex; align-items: center; gap: 14px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 9h16v7a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4ZM8 3v3m4-3v3m4-3v3"></path>
-</svg>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Feed</span>
-</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</button>
-<button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: #111511; text-align: left;"><span style="display: flex; align-items: center; gap: 14px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 3h14v18H5ZM8 8h8M8 12h8m-8 4h5"></path>
-</svg>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Note</span>
-</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</button>
-<div style="height: 1px; background: #E5E8E1; margin: 10px 0;"></div>
-<button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: #111511; text-align: left;"><span style="display: flex; align-items: center; gap: 14px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M7 3h10v18H7ZM10 8h4m-4 4h4m-4 4h4"></path>
-</svg>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Vaccination plan</span>
-</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</button>
-<button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: #111511; text-align: left;"><span style="display: flex; align-items: center; gap: 14px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M7 3h10v18H7ZM10 8h4m-4 4h4m-4 4h4"></path>
-</svg>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Culling plan</span>
-</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</button>
-<button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: #111511; text-align: left;"><span style="display: flex; align-items: center; gap: 14px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M7 3h10v18H7ZM10 8h4m-4 4h4m-4 4h4"></path>
-</svg>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Keep plan</span>
-</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</button>
-<button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: #111511; text-align: left;"><span style="display: flex; align-items: center; gap: 14px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M7 3h10v18H7ZM10 8h4m-4 4h4m-4 4h4"></path>
-</svg>
-<span style="font-size: 14px; color: #B34B43; font-weight: 400; line-height: 20px; white-space: nowrap;">End batch</span>
-</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</button>
-<button type="button" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; box-sizing: border-box; white-space: nowrap;width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: #111511; text-align: left;"><span style="display: flex; align-items: center; gap: 14px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M7 3h10v18H7ZM10 8h4m-4 4h4m-4 4h4"></path>
-</svg>
-<span style="font-size: 14px; color: #111511; font-weight: 400; line-height: 20px; white-space: nowrap;">Open batch report</span>
-</span>
-<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m9 5 7 7-7 7"></path>
-</svg>
-</button>
-</div>
-</section>
-</div>
+</div></section></div>
+<div id="breeding" style="width: 380px; scroll-margin-top: 24px;">
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">Batch 34 · Breeding · hover</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Hover a part → what it is · Click it → only those pens</div>
+<section aria-label="Batch 34 · Breeding · hover" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: -8px;">
+  <a href="#batches" style="display: inline-flex; align-items: center; height: 44px; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">‹ Batch 34</a>
+  <span aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -12px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px;">
+  <h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Breeding</h2><span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; background: #EAF1FC; flex-shrink: 0;"><span style="width: 6px; height: 6px; border-radius: 999px; background: #3972B7;"></span><span style="font-size: 13px; line-height: 20px; color: #3972B7; white-space: nowrap; font-weight: 500;">Day 2 of 5</span></span>
+</div><div style="margin-top: 2px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Gestation 1</span></div>
+<div style="display: flex; align-items: baseline; gap: 10px; margin-top: 20px;"><span style="font-size: 38px; line-height: 44px; font-weight: 600; letter-spacing: -.03em; white-space: nowrap;">29 of 48</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap;">sows bred</span></div>
+<div style="position: relative; width: 340px; height: 36px; margin-top: 20px;"><span title="" style="position: absolute; left: 0px; top: 0; width: 203px; height: 12px; background: #28734F; opacity: 1; border-radius: 999px 0 0 999px; box-shadow: none;"></span><span title="" style="position: absolute; left: 205px; top: 0; width: 76px; height: 12px; background: #3972B7; opacity: 1; border-radius: 0; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #3972B7;"></span><span title="" style="position: absolute; left: 283px; top: 0; width: 57px; height: 12px; background: #D3D8D0; opacity: 1; border-radius: 0 999px 999px 0; box-shadow: none;"></span><span style="position: absolute; top: 18px; font-size: 12px; line-height: 16px; white-space: nowrap; color: #6B726D; font-weight: 400;left: 0px;">29 bred</span><span style="position: absolute; top: 18px; font-size: 12px; line-height: 16px; white-space: nowrap; color: #3972B7; font-weight: 400;left: 205px;">11 in heat</span><span style="position: absolute; top: 18px; font-size: 12px; line-height: 16px; white-space: nowrap; color: #6B726D; font-weight: 400;right: 0px;">8 no heat</span><svg viewBox="0 0 16 22" aria-hidden="true" style="position: absolute; left: 242px; top: 4px; width: 16px; height: 22px; z-index: 5; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25));"><path d="M1 1v17l4.5-4.2 3 6.6 2.6-1.2-3-6.4H14L1 1Z" fill="#111511" stroke="#FFFFFF" stroke-width="1.2" stroke-linejoin="round"></path></svg><div role="tooltip" style="position: absolute; left: 74px; top: 40px; z-index: 6; padding: 8px 12px; border-radius: 10px; background: #111511; box-shadow: 0 6px 18px rgba(17,21,17,.18); white-space: nowrap;"><div style="font-size: 13px; line-height: 18px; color: #FFFFFF; font-weight: 500;">11 in heat · not bred yet</div><div style="font-size: 12px; line-height: 16px; color: #B9C2BB; font-weight: 400;">Click to show their pens</div></div></div>
+<h3 style="margin: 64px 0 4px; font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap;">Next</h3>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; color: inherit; text-decoration: none;"><span style="display: flex; align-items: center; gap: 12px; min-width: 0;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; width: 84px; display: inline-block;">Wed 2 Dec</span><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Pregnancy check</span></span><span style="display: flex; align-items: center; gap: 8px; color: #6B726D;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">in 4 weeks</span></span></div></section></div>
+<div id="actions" style="width: 380px; scroll-margin-top: 24px;">
+<div style="font-size: 13px; line-height: 20px; color: #111511; font-weight: 600; white-space: nowrap;">Actions for Batch 32</div>
+<div style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap; margin-bottom: 12px;">Opens from the bar · each opens its own page</div>
+<section aria-label="Actions for Batch 32" style="position: relative; width: 380px; max-height: 720px; padding: 20px; box-sizing: border-box; border-radius: 22px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(17,21,17,.03), 0 12px 28px rgba(17,21,17,.06);">
+<div style="opacity: 0.35; filter: blur(.3px);">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: -8px;">
+  <a href="#batches" style="display: inline-flex; align-items: center; height: 44px; color: #111511; text-decoration: none; font-size: 14px; white-space: nowrap;">‹ Batches</a>
+  <span aria-label="Close panel" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -12px; color: #6B726D;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m6 6 12 12M18 6 6 18"></path></svg></span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px;">
+  <h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap;">Batch 32</h2><span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; background: #EAF1FC; flex-shrink: 0;"><span style="width: 6px; height: 6px; border-radius: 999px; background: #3972B7;"></span><span style="font-size: 13px; line-height: 20px; color: #3972B7; white-space: nowrap; font-weight: 500;">Lactating</span></span>
+</div><div style="margin-top: 2px;"><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Line 1 · 50 sows · 580 piglets · Farrowing Room 2</span></div>
+<div style="display: flex; align-items: baseline; gap: 10px; margin-top: 20px;"><span style="font-size: 38px; line-height: 44px; font-weight: 600; letter-spacing: -.03em; white-space: nowrap;">Wean 16 Nov</span><span style="font-size: 14px; line-height: 20px; color: #6B726D; white-space: nowrap;">in 12 days</span></div>
+<div style="height: 120px;"></div>
+</div>
+<div style="position: absolute; left: 12px; right: 12px; bottom: 12px; padding: 8px 16px 12px; border-radius: 18px; background: #FFFFFF; box-shadow: 0 -2px 6px rgba(17,21,17,.04), 0 18px 40px rgba(17,21,17,.16);">
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 44px;"><span style="font-size: 15px; line-height: 20px; color: #111511; white-space: nowrap; font-weight: 600;">Actions</span><span style="font-size: 13px; line-height: 20px; color: #6B726D; white-space: nowrap;">Batch 32</span></div>
+  <div style="display: flex; align-items: center; gap: 14px; height: 44px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="m18 2 4 4m-6-2 4 4M14 6l4 4-9 9H5v-4l9-9Zm-5 5 2 2m1-5 2 2"></path></svg><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Treatment</span></div><div style="display: flex; align-items: center; gap: 14px; height: 44px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6l-7-3Z"></path></svg><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Vaccination</span></div><div style="display: flex; align-items: center; gap: 14px; height: 44px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M7.5 14h9"></path></svg><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Sampling</span></div><div style="display: flex; align-items: center; gap: 14px; height: 44px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M14 4h6v16h-6M4 12h11m-4-4 4 4-4 4"></path></svg><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Culling</span></div><div style="display: flex; align-items: center; gap: 14px; height: 44px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 12h16m-5-5 5 5-5 5"></path></svg><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Move</span></div><div style="display: flex; align-items: center; gap: 14px; height: 44px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 10h14l-2 10H7L5 10Zm3-6 1 6m7-6-1 6"></path></svg><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Feed</span></div><div style="display: flex; align-items: center; gap: 14px; height: 44px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 4h14v12l-4 4H5V4Zm10 12v4m0-4h4M8 9h8m-8 4h5"></path></svg><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Note</span></div>
+  <div style="height: 1px; background: #E6E9E3; margin: 6px 0;"></div>
+  <div style="display: flex; align-items: center; gap: 14px; height: 44px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M4 5h16v15H4V5Zm4-2v4m8-4v4M4 10h16"></path></svg><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Vaccination plan</span></div><div style="display: flex; align-items: center; gap: 14px; height: 44px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M7 3h10v18H7ZM10 8h4m-4 4h4m-4 4h4"></path></svg><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">Open batch report</span></div><div style="display: flex; align-items: center; gap: 14px; height: 44px;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;"><path d="M6 6h12v12H6z"></path></svg><span style="font-size: 14px; line-height: 20px; color: #111511; white-space: nowrap;">End batch</span></div>
+</div>
+<div style="height: 560px;"></div></section></div>
 </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script="" data-props='{"$preview":{"width":1760,"height":2608}}'>
+<script type="text/x-dc" data-dc-script="" data-props='{"$preview":{"width":1760,"height":2617}}'>
 class Component extends DCLogic {
   renderVals() { return {}; }
 }
