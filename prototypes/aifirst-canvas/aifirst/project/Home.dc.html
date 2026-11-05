@@ -351,7 +351,7 @@
 </div>
 <div style="position:relative;isolation:isolate" aria-label="Tasks this week">
 <sc-if value="{{week.isCurrent}}" hint-placeholder-val="{{true}}"><div aria-hidden="true" style="position:absolute;top:64px;bottom:0;left:calc(140px + (100% - 140px)*3/7);width:calc((100% - 140px)/7);background:#f5f9f5;z-index:-1"></div></sc-if>
-<div style="display:grid;grid-template-columns:140px repeat(7,minmax(0,1fr));height:64px;border-bottom:1px solid #efeeec;box-sizing:border-box">
+<div style="display:grid;grid-template-columns:140px repeat(7,minmax(0,1fr)) 6px;height:64px;border-bottom:1px solid #efeeec;box-sizing:border-box">
 <div style="display:flex;align-items:center;padding-left:14px;font-size:12px;color:#57534e;font-weight:500">Task</div>
 <sc-for list="{{week.days}}" as="day" hint-placeholder-count="7">
 <div style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;position:relative;border-left:1px solid #f1f0ee">
@@ -364,7 +364,7 @@
 <sc-for list="{{week.groups}}" as="group" hint-placeholder-count="3">
 <div style="height:40px;box-sizing:border-box;padding:6px 0 0 14px;display:flex;align-items:center;background:#fafaf9;border-bottom:1px solid #efeeec;font-size:12px;font-weight:600;color:#57534e">{{group.name}}</div>
 <sc-for list="{{group.rows}}" as="row" hint-placeholder-count="3">
-<div role="group" aria-label="{{row.name}}" onMouseEnter="{{row.preview}}" onMouseLeave="{{hidePreview}}" style="display:grid;grid-template-columns:140px repeat(7,minmax(0,1fr));height:56px;box-sizing:border-box;border-bottom:1px solid #f1f0ee;background:{{row.bg}}">
+<div role="group" aria-label="{{row.name}}" onMouseEnter="{{row.preview}}" onMouseLeave="{{hidePreview}}" style="display:grid;grid-template-columns:140px repeat(7,minmax(0,1fr)) 6px;height:56px;box-sizing:border-box;border-bottom:1px solid #f1f0ee;background:{{row.bg}}">
 <div style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;padding:0 8px 0 14px;border-right:1px solid #efeeec;min-width:0">
 <span style="font-size:13px;font-weight:500;line-height:16px;white-space:nowrap">{{row.name}}</span>
 <span tabIndex="0" onMouseEnter="{{row.showTag}}" onMouseLeave="{{hideTag}}" onFocus="{{row.showTag}}" onBlur="{{hideTag}}" aria-label="{{row.tagAria}}" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#44403c;background:#F1F3EE;border-radius:6px;padding:2px 7px;line-height:16px;font-variant-numeric:tabular-nums;cursor:default">
