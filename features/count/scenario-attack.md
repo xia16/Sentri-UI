@@ -4,6 +4,8 @@ Design review, not an implementation test. Read PRD → transfer flow → backen
 
 **Evidence:** screen copy in quotation marks is exact; proposed fixes are not existing copy. **Open** means the design gives no answer: the record outcome described is a risk, not a claim about implemented behaviour. Frequency and ranking are inferred from this simulated day, not farm observations. A **blocker** risks a wrong stock, identity, health, or closure record without a clear recovery; **confusing** invites a recoverable mistake or stalls work; **minor** costs attention without changing the record directly.
 
+**Owner answers (2026-11-05):** P1–P3 whole-pen counts that replace (a count is a state, offline-safe); P4 accepted as is; P5/P19 a pig not on this move is taken where scanned, with an amber chip, never gated; P6 moving clears untagged conditions; P7 the map names its unit; P8 reopen the pen and count again; P13 Move toast blue; P22 dead on the truck = Not arrived, lost. See the PRD, *Owner rulings on the scenario attack*.
+
 ## 1. Top 10
 
 Ranked by estimated frequency × harm. IDs follow this ranking; the timeline shows when they occur.

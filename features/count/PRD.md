@@ -37,6 +37,20 @@ Reviewed on the Claude Design canvas ([canvas.md](canvas.md)). Ruled and redrawn
 
 ---
 
+## Owner rulings on the scenario attack, 2026-11-05 ([scenario-attack.md](scenario-attack.md))
+
+- **A receiving pen count is the whole pen.** Pigs go in before anyone touches the phone, so nobody can tell who just came: the crew counts everything in the pen and scans its tagged pigs; arrivals are worked out against what the pen held (*6 arrived · 15 in C2 · 9 were here*, [12](mock/mock-12-receive-pen.png)). (P1)
+- **Count a pen once its pigs are all in**; counting it again replaces the count (the pen count says *Count once all its pigs are in.*). (P2)
+- **A count is a state, not an addition**, so two phones counting one pen, or an offline phone uploading later, can never add pigs: the uploads arrive in the order they were made (the offline ruling), and the later count of a pen stands. (P3)
+- **End task early ends it for everyone.** A crew that ends while another is still unloading has made a wrong call; the screen already says what has not arrived. No extra gate. (P4)
+- **A pig not on this move is taken where she is scanned**, never refused: pigs already in the pen are scanned too, so a gate would stop the wrong ones. She carries one amber chip on her row (*Should stay* for a pig the source kept back; a pig recorded elsewhere says where, as the recount does). (P5, P19)
+- **Wrong pen after a batch scan: reopen that pen and count it again.** No undo, no split. (P8)
+- **The receiving map names its unit** under the title (*Unit 9 · batch 25 from Farrowing room 3*), and the crew picks the unit from the task's overview. Pigs to move names both units and the split (*120 pigs to Units 9 and 10 · 90 to Unit 9 · 30 to Unit 10*). (P7)
+- **Move is blue, not green**, in the scan toast: green reads as saved, and Pigs to move records nothing. (P13)
+- **Moving clears the conditions on pigs without ear tags.** No sick-pig question at receiving; Inspection records them again. (P6)
+- **A piglet that dies on the truck is not received**: it is Not arrived and goes on the balancing sheet as lost. (P22)
+- The recount draws an empty pen as a pen you can tap, never disabled. (P28)
+
 ## 1. The old system, and what is complex about it
 
 From [old-system/NOTES.md](old-system/NOTES.md) (Figma frames by id) and [ux/research/checkin/pen-count.md](../../ux/research/checkin/pen-count.md).

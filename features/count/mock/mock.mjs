@@ -335,6 +335,7 @@ const PLAN_CSS = `
   .m-count .m-map .st-pen-tile .m-pc{font:600 13px var(--font-mono,'IBM Plex Mono',monospace);color:var(--muted,#657060)}
   .m-count .m-map .st-pen-tile .m-pn{font:600 20px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}
   .m-count .m-map .st-pen-tile[data-level="empty"] .m-pc{font-weight:500}
+  .m-count .m-map .st-pen-tile.m-quiet{background:var(--well,#eef0e8);border-color:transparent}.m-count .m-map .st-pen-tile.m-quiet .m-pc{color:var(--muted,#657060);font-weight:500}
   .m-count .m-map .st-pen-tile.m-done{background:var(--done-fill,#d5e8cc);border-color:transparent}
   .m-count .m-map .st-pen-tile.m-done .m-pc,.m-count .m-map .st-pen-tile.m-done .m-pn{color:var(--done-fill-ink,#1d4d2e)}
   .m-count .m-map .st-pen-tile.m-todo .m-pn,.m-count .m-map .st-pen-tile.m-free .m-pn{color:var(--muted,#657060);font-weight:500}
@@ -350,13 +351,13 @@ async function receiveMap(name, opts) {
   await prep(p);
   await p.evaluate(({ UNIT_CSS, LEDGER_CSS, PLAN_CSS, o }) => {
     const { U, ic, page, footer, primary } = window.M;
-    const pens = {}; for (const [c, v] of Object.entries(o.tiles)) if (v[1] !== 'm-word') pens[c] = 'plain';
+    const pens = {}; for (const c of Object.keys(o.tiles)) pens[c] = 'plain';
     let map = U.penMap({ lanes: o.lanes, depth: o.depth, pens, entrance: 'Entrance', key: 'recv' });
     const host = document.createElement('div'); host.innerHTML = map;
     host.querySelectorAll('.st-pen-tile').forEach((t) => {
       const c = t.dataset.pen, v = o.tiles[c];
       t.innerHTML = '<span class="m-pc">' + c + '</span>' + (!v ? '' : v[1] === 'm-word' ? '<span class="m-pw">' + v[0] + '</span>' : '<span class="m-pn">' + v[0] + '</span>');
-      if (v && v[1] && v[1] !== 'm-word') t.classList.add(...v[1].split(' '));
+      if (v && v[1] && v[1] !== 'm-word') t.classList.add(...v[1].split(' ')); if (v && v[1] === 'm-word') t.classList.add('m-quiet');
     });
     map = '<div class="m-map">' + host.innerHTML + '</div>';
     const top = o.facts ? '<section class="feature-section">' + U.facts(o.facts.map(([label, value]) => ({ label, value })), { columns: o.facts.length }) + '</section>' : o.top;
@@ -430,7 +431,7 @@ const unit9 = (over) => {
 // Unit 9 drawn from its Farm layout on the merged PenMap (PR 307): three lanes of four weaner pens and a row of three sick pens by
 // the door, met first; a sick pen is shorter than a weaner pen, so its tile is (56px against 94px).
 const WEANER = { runs: [{ n: 4, type: 'Weaner pen', size: 545 }] };
-const RECV = { title: 'Receive pigs', line: 'Batch 25 · from Farrowing room 3', lanes: [WEANER, WEANER, WEANER], depth: 4,
+const RECV = { title: 'Receive pigs', line: 'Unit 9 · batch 25 from Farrowing room 3', lanes: [WEANER, WEANER, WEANER], depth: 4,
   rows: [{ letter: 'D', at: 'door', runs: [{ n: 3, type: 'Sick pen', size: 250 }] }] };
 if (want('13-')) {
   await taskMap('mock-13-receive-plan.png', { ...RECV, tiles: unit9({}), key: keyOf(false),
@@ -454,19 +455,24 @@ if (want('10')) {
   });
 }
 
-// 12. Count one pen after putting pigs in: the same pen count, with the plan beside it.
+// 12. Count one pen after putting pigs in: the whole pen (owner, 2026-11-05), arrivals worked out against what it held (C2 had 9).
+//     A pig not on this move (000901 was to stay) is taken where she is, with one amber chip; no gate, so pigs already here scan as usual.
+//     Count once all its pigs are in; counting again replaces the count (a count is a state, so two phones or an offline replay never add).
 if (want('12')) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
   await p.evaluate((UNIT_CSS) => {
     const { U, ic, page, footer, primary } = window.M;
-    const pig = (id, ctx) => U.rowSelectDoor({ code: id, description: ctx, right: { kind: 'tags', tags: [] }, checked: true, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig selected', label: id });
-    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'How many pigs are in A3?', value: 14, min: 1, max: 80, action: 'x', reserveHint: false }) + '</section>';
+    const chip = (text) => '<span class="st-animal-tags m-chip">' + U.status({ variant: 'chip', kind: 'late', icon: '', text }) + '</span>';
+    const pig = (id, ctx, away) => { const h = U.rowSelectDoor({ code: id, description: ctx, right: { kind: 'tags', tags: [] }, checked: true, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig selected', label: id });
+      return away ? h.replace('</span><span class="st-row-chevron">', chip(away) + '</span><span class="st-row-chevron">') : h; };
+    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'How many pigs are in C2?', value: 15, min: 2, max: 80, action: 'x', reserveHint: false })
+      + '<p class="m-hint">Count once all its pigs are in.</p></section>';
     const search = U.choiceSearch({ label: 'Search ear tag', placeholder: 'Ear tag', value: '', clear: { action: 'x' }, scan: { action: 'x', label: 'Scan ear tags' } });
-    const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Which tagged pigs are here?', meta: '1 found', icon: ic('tag'), kind: 'section', level: 3 })
-      + '<div class="m-inline-bar">' + search + '</div>' + U.rowGroup(pig('000904', 'Gilt')) + '</section>';
-    const left = '<div class="m-left"><strong>13 without ear tags</strong><small>Batch 25</small></div>';
-    page('Count A3', 'Receive · Unit 9', count + tags, footer(left, primary('Done')));
+    const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Which tagged pigs are here?', meta: '2 found', icon: ic('tag'), kind: 'section', level: 3 })
+      + '<div class="m-inline-bar">' + search + '</div>' + U.rowGroup(pig('000904', 'Gilt') + pig('000901', 'Gilt · Room 3 A3', 'Should stay')) + '</section>';
+    const left = '<div class="m-left"><strong>6 arrived</strong><small>15 in C2 · 9 were here</small></div>';
+    page('Count C2', 'Receive · Unit 9', count + tags, footer(left, primary('Done')));
     const st = document.createElement('style'); st.textContent = UNIT_CSS + '.st-choice-trail input[type="checkbox"]{accent-color:#276640!important}.inspect-pig.selected,.roster-pig.selected{background:var(--paper,#fff)!important}'; document.head.append(st);
   }, UNIT_CSS);
   await shoot(p, 'mock-12-receive-pen.png');
@@ -490,7 +496,7 @@ async function moveMap(name, scan) {
       const c = t.dataset.pen, v = MOVE[c];
       t.innerHTML = '<span class="m-pc">' + c + '</span>' + (!v ? '' : v === 'all' ? '<span class="m-mv">All</span>' : '<span class="m-frac"><b>' + v.split('/')[0] + '</b>/' + v.split('/')[1] + '</span>');
     });
-    const head = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>120</strong><span>pigs to Unit 9</span></div><small>Today · into A1–A4, B1–B2</small></div>';
+    const head = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>120</strong><span>pigs to Units 9 and 10</span></div><small>Today · 90 to Unit 9 · 30 to Unit 10</small></div>';
     page('Pigs to move', 'Transfer · batch 25 · from Farrowing room 3', head + '<div class="m-map">' + host.innerHTML + '</div>', scan
       ? '<div class="sheet-footer st-scan-foot m-scanfoot" data-ds="Sheet">' + U.button({ label: 'Stop scanning', icon: ic('stop'), register: 'secondary', className: 'st-scan-toggle', action: 'x' })
         + '<div class="m-toast">' + U.toast(scan[0], { detail: scan[1] })
@@ -504,17 +510,17 @@ async function moveMap(name, scan) {
       .m-count .m-map .st-pen-tile .m-frac{font:500 14px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--muted,#657060)}
       .m-count .m-map .st-pen-tile .m-frac b{font:600 22px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}
       .m-scanfoot{position:relative}.m-toast{position:absolute;left:0;right:0;bottom:calc(100% + 12px);z-index:5;--toast-bottom:0px}
-      .m-toast .st-toast-glyph.m-g-move{background:var(--green,#2f7d4a);color:#fff}
+      .m-toast .st-toast-glyph.m-g-move{background:var(--progress-fill,#c1ddfd);color:var(--progress-fill-ink,#1f4470)}
       .m-toast .st-toast-glyph.m-g-stay{background:var(--amber-fill,#fede82);color:var(--amber-fill-ink,#5c3f00)}
-      .m-toast .m-vw-move{color:var(--done-fill,#d5e8cc)}.m-toast .m-vw-stay{color:var(--amber-fill,#fede82)}`;
+      .m-toast .m-vw-move{color:var(--progress-fill,#c1ddfd)}.m-toast .m-vw-stay{color:var(--amber-fill,#fede82)}`;
     document.head.append(st);
   }, { UNIT_CSS, PLAN_CSS, MOVE, scan });
   await shoot(p, name);
 }
 if (want('9-')) await moveMap('mock-9-transfer-out.png');
 const TOAST_CSS = '.m-scanfoot{position:relative}.m-toast{position:absolute;left:0;right:0;bottom:calc(100% + 12px);z-index:5;--toast-bottom:0px}'
-  + '.m-toast .st-toast-glyph.m-g-move{background:var(--green,#2f7d4a);color:#fff}.m-toast .st-toast-glyph.m-g-stay{background:var(--amber-fill,#fede82);color:var(--amber-fill-ink,#5c3f00)}'
-  + '.m-toast .m-vw-move{color:var(--done-fill,#d5e8cc)}.m-toast .m-vw-stay{color:var(--amber-fill,#fede82)}';
+  + '.m-toast .st-toast-glyph.m-g-move{background:var(--progress-fill,#c1ddfd);color:var(--progress-fill-ink,#1f4470)}.m-toast .st-toast-glyph.m-g-stay{background:var(--amber-fill,#fede82);color:var(--amber-fill-ink,#5c3f00)}'
+  + '.m-toast .m-vw-move{color:var(--progress-fill,#c1ddfd)}.m-toast .m-vw-stay{color:var(--amber-fill,#fede82)}';
 for (const [name, view, scan] of [['mock-9b-pen-move.png', 'move'], ['mock-9c-pen-stay.png', 'stay'], ['mock-9p-pen-scan.png', 'stay', ['Stay · 000901', 'Keep her in A3', 'stay']]]) {
   if (!want(name.slice(5, 7))) continue;
   const p = await open(INSPECT, 'inspection.walk');
