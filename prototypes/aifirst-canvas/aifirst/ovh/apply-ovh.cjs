@@ -5,7 +5,7 @@ const f = process.argv[2];
 let s = fs.readFileSync(f, 'utf8').replace(/\r/g, '');
 const lib = fs.readFileSync(path.join(S, 'ovh-lib.js'), 'utf8') + '\n' + fs.readFileSync(path.join(S, 'ovh-pages.js'), 'utf8') + (fs.existsSync(path.join(S, 'ovh-pages2.js')) ? '\n' + fs.readFileSync(path.join(S, 'ovh-pages2.js'), 'utf8') : '');
 let comp = fs.readFileSync(path.join(S, 'ovh-comp.js'), 'utf8');
-if (fs.existsSync(path.join(S, 'ovh-comp2.js'))) comp = comp.replace('  renderVals() {\n    const r = this.renderValsBase();', fs.readFileSync(path.join(S, 'ovh-comp2.js'), 'utf8') + '\n  renderVals() {\n    const r = this.renderValsBase();');
+if (fs.existsSync(path.join(S, 'ovh-comp2.js'))) comp = comp.replace('  renderVals() {\n    const r = this.renderValsBase();', fs.readFileSync(path.join(S, 'ovh-comp2.js'), 'utf8') + (fs.existsSync(path.join(S, 'ovh-comp3.js')) ? '\n' + fs.readFileSync(path.join(S, 'ovh-comp3.js'), 'utf8') : '') + '\n  renderVals() {\n    const r = this.renderValsBase();');
 const M1 = '// >>>OVH-LIB', M2 = '// <<<OVH-LIB', C1 = '  // >>>OVH-COMP', C2 = '  // <<<OVH-COMP';
 const need = (cond, what) => { if (!cond) { console.error('MISS ' + what); process.exit(1); } };
 // 1) the library, before the component class

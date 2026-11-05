@@ -14,7 +14,7 @@
     el.addEventListener('click', (e) => { const h = e.target.closest('[data-a]'); if (!h || !el.contains(h)) { if (this.ovS().pop && !e.target.closest('[data-pop]')) this.ovSet({ pop: '' }); return; } e.preventDefault(); e.stopPropagation(); this.ovAct(h.getAttribute('data-a'), h); });
     el.addEventListener('mouseover', (e) => { const h = e.target.closest('[data-tip]'); if (h && el.contains(h)) this.ovTip(h.getAttribute('data-tip'), h); const cr = e.target.closest('[data-crumb]'); if (cr && el.contains(cr) && this.ovS().crumb !== +cr.getAttribute('data-crumb')) { this.ovSet({ crumb: +cr.getAttribute('data-crumb'), loc: 'hover' }); return; } const lc = e.target.closest('[data-zone="loc"]'); if (lc && !this.ovS().loc) this.ovSet({ loc: 'hover' }); });
     el.addEventListener('mouseout', (e) => { const h = e.target.closest('[data-tip]'); if (h && (!e.relatedTarget || !h.contains(e.relatedTarget))) this.ovTipHide(); const lc = e.target.closest('[data-zone="loc"]'), to = e.relatedTarget; if (lc && this.ovS().loc && !(to && to.closest && to.closest('[data-zone="loc"]'))) this.ovSet({ loc: '', crumb: -1 }); });
-    if (!this.ovKey) { this.ovKey = (e) => { if (e.key !== 'Escape' || !this.ovOn()) return; const O = this.ovS(); if (O.pop) { this.ovSet({ pop: '' }); return; } if (O.picking) { this.ovAct('pickcancel'); return; } if (O.showing) { this.ovAct('showdone'); return; } if (O.panel) this.ovAct(O.hist.length ? 'back' : 'close'); }; window.addEventListener('keydown', this.ovKey); }
+    if (!this.ovKey) { this.ovKey = (e) => { if (e.key !== 'Escape' || !this.ovOn()) return; const O = this.ovS(); if (O.pop) { this.ovSet({ pop: '' }); return; } if (O.selecting || (O.ticks && O.ticks.length)) { this.ovAct('selcancel'); return; } if (O.picking) { this.ovAct('pickcancel'); return; } if (O.showing) { this.ovAct('showdone'); return; } if (O.panel) this.ovAct(O.hist.length ? 'back' : 'close'); }; window.addEventListener('keydown', this.ovKey); }
     this.ovPaint();
   }
   ovTip(key, h) {
@@ -34,6 +34,7 @@
     this.ovTipHide();
     const at = () => { if (!h || !this.ovEl) return null; const R = this.ovEl.getBoundingClientRect(), r = h.getBoundingClientRect(); return { x: r.left - R.left, y: r.top - R.top, w: r.width, h: r.height, bottom: R.height - (r.top - R.top) }; };
     if (k === 'noop') return;
+    if (this.ovAct3 && this.ovAct3(k, v, h, at)) return;
     if (k === 'batches') { if (O.panel && ['list', 'batch', 'task', 'dates', 'done', 'compare'].indexOf(O.panel) >= 0) { this.ovAct('close'); return; } if (u.bv) this.closeBatch(); this.ovSet({ panel: 'list', hist: [], pop: '' }); return; }
     if (k === 'close') { if (this.ui().ovCmp) this.put({ ovCmp: false }); if (this.ui().bv) { this.put({ bvOnly: '' }); this.closeBatch(); } this.ovSet({ panel: '', hist: [], only: '', pop: '' }); return; }
     if (k === 'back') {
@@ -177,6 +178,8 @@
   renderVals() {
     const r = this.renderValsBase();
     r.setOvh = (el) => this.setOvh(el);
+    this.ovVals = r;
+    if (this.ovOn()) r.camStyle = (r.camStyle || '') + ' display: none;';
     if (this.ovOn()) { r.showProf = false; r.showBatch = false; r.showCard = false; r.showBar = false; r.showCrumbMenu = false; }
     return r;
   }
