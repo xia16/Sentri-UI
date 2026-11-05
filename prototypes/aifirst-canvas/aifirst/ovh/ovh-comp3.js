@@ -262,12 +262,13 @@
   // the editor's place piece: ‹ up a level, the name switches places; it starts the tools bar
   ovEdLoc(u) {
     const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u), canSwitch = P.cur.kind !== 'farm' && P.cur.kind !== 'pen';
-    const hgt = Math.max(56, Math.min(66, (this.barEl && this.barEl.offsetHeight) || 66));
+    const hgt = this.ovEdTask ? 56 : Math.max(56, Math.min(66, (this.barEl && this.barEl.offsetHeight) || 66));
     const name = this.ovBtn(H.t(P.name, { fontSize: '17px', lineHeight: '22px', fontWeight: 600, letterSpacing: '-.01em' }) + (canSwitch ? H.icon(H.I.down, 16, { color: K.muted }) : ''), canSwitch ? 'switch' : 'noop', O.pop === 'switch', { cursor: canSwitch ? 'pointer' : 'default' });
-    return '<div data-zone="edloc" style="' + H.st({ position: 'absolute', left: '16px', top: '16px', height: hgt + 'px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: '2px', padding: '0 0 0 10px', background: '#FFFFFF', border: '1px solid #E3E6E1', borderRight: 0, borderRadius: '16px 0 0 16px', boxShadow: '0 1px 2px rgba(18, 24, 21, 0.05), -4px 10px 28px rgba(18, 24, 21, 0.10)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", color: K.ink, whiteSpace: 'nowrap', zIndex: 5 }) + '">' + (P.levels.length > 1 ? this.ovSq(H.I.back, 'up', 'Up one level') : '') + name + '<i style="' + H.st({ width: '1px', height: '28px', background: K.line, margin: '0 0 0 8px', flexShrink: 0 }) + '"></i>' + (O.pop === 'switch' ? this.ovSwitchHtml(u, P) : '') + '</div>';
+    return '<div data-zone="edloc" style="' + H.st({ position: 'absolute', left: '16px', top: '16px', height: hgt + 'px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: '2px', padding: '0 0 0 10px', background: '#FFFFFF', border: '1px solid #E3E6E1', borderRight: this.ovEdTask ? '1px solid #E3E6E1' : 0, borderRadius: this.ovEdTask ? '16px' : '16px 0 0 16px', paddingRight: this.ovEdTask ? '8px' : 0, boxShadow: '0 1px 2px rgba(18, 24, 21, 0.05), -4px 10px 28px rgba(18, 24, 21, 0.10)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", color: K.ink, whiteSpace: 'nowrap', zIndex: 5 }) + '">' + (P.levels.length > 1 ? this.ovSq(H.I.back, 'up', 'Up one level') : '') + name + (this.ovEdTask ? '' : '<i style="' + H.st({ width: '1px', height: '28px', background: K.line, margin: '0 0 0 8px', flexShrink: 0 }) + '"></i>') + (O.pop === 'switch' ? this.ovSwitchHtml(u, P) : '') + '</div>';
   }
   ovEdFit() {
     const el = this.ovBody && this.ovBody.querySelector('[data-zone="edloc"]'); if (!el) return;
     const w = Math.round(el.getBoundingClientRect().width);
+    if (this.ovEdTask) { if (this.barEl) { this.barEl.style.left = ''; this.barEl.style.maxWidth = ''; } this.ovEdW = 0; return; }
     if (w && w !== this.ovEdW) { this.ovEdW = w; if (this.barEl) { this.barEl.style.left = (16 + w) + 'px'; this.barEl.style.maxWidth = 'calc(100% - ' + (16 + w + 408) + 'px)'; } }
   }

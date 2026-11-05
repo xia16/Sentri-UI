@@ -555,7 +555,7 @@
               </sc-if>
             </div>
             <sc-if value="{{P.cTask}}" hint-placeholder-val="{{false}}">
-              <button type="button" onClick="{{P.close}}" aria-label="{{P.closeLabel}}" title="{{P.closeLabel}}" style="{{closeStyle}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.x}}"></path></svg></button>
+              <button type="button" onClick="{{P.close}}" aria-label="{{P.closeLabel}}" title="{{P.closeLabel}}" style="{{P.cStyle}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{P.cIco}}"></path></svg></button>
             </sc-if>
           </div>
         </sc-if>
@@ -9473,13 +9473,14 @@ class Component extends DCLogic {
   // the editor's place piece: ‹ up a level, the name switches places; it starts the tools bar
   ovEdLoc(u) {
     const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u), canSwitch = P.cur.kind !== 'farm' && P.cur.kind !== 'pen';
-    const hgt = Math.max(56, Math.min(66, (this.barEl && this.barEl.offsetHeight) || 66));
+    const hgt = this.ovEdTask ? 56 : Math.max(56, Math.min(66, (this.barEl && this.barEl.offsetHeight) || 66));
     const name = this.ovBtn(H.t(P.name, { fontSize: '17px', lineHeight: '22px', fontWeight: 600, letterSpacing: '-.01em' }) + (canSwitch ? H.icon(H.I.down, 16, { color: K.muted }) : ''), canSwitch ? 'switch' : 'noop', O.pop === 'switch', { cursor: canSwitch ? 'pointer' : 'default' });
-    return '<div data-zone="edloc" style="' + H.st({ position: 'absolute', left: '16px', top: '16px', height: hgt + 'px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: '2px', padding: '0 0 0 10px', background: '#FFFFFF', border: '1px solid #E3E6E1', borderRight: 0, borderRadius: '16px 0 0 16px', boxShadow: '0 1px 2px rgba(18, 24, 21, 0.05), -4px 10px 28px rgba(18, 24, 21, 0.10)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", color: K.ink, whiteSpace: 'nowrap', zIndex: 5 }) + '">' + (P.levels.length > 1 ? this.ovSq(H.I.back, 'up', 'Up one level') : '') + name + '<i style="' + H.st({ width: '1px', height: '28px', background: K.line, margin: '0 0 0 8px', flexShrink: 0 }) + '"></i>' + (O.pop === 'switch' ? this.ovSwitchHtml(u, P) : '') + '</div>';
+    return '<div data-zone="edloc" style="' + H.st({ position: 'absolute', left: '16px', top: '16px', height: hgt + 'px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: '2px', padding: '0 0 0 10px', background: '#FFFFFF', border: '1px solid #E3E6E1', borderRight: this.ovEdTask ? '1px solid #E3E6E1' : 0, borderRadius: this.ovEdTask ? '16px' : '16px 0 0 16px', paddingRight: this.ovEdTask ? '8px' : 0, boxShadow: '0 1px 2px rgba(18, 24, 21, 0.05), -4px 10px 28px rgba(18, 24, 21, 0.10)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", color: K.ink, whiteSpace: 'nowrap', zIndex: 5 }) + '">' + (P.levels.length > 1 ? this.ovSq(H.I.back, 'up', 'Up one level') : '') + name + (this.ovEdTask ? '' : '<i style="' + H.st({ width: '1px', height: '28px', background: K.line, margin: '0 0 0 8px', flexShrink: 0 }) + '"></i>') + (O.pop === 'switch' ? this.ovSwitchHtml(u, P) : '') + '</div>';
   }
   ovEdFit() {
     const el = this.ovBody && this.ovBody.querySelector('[data-zone="edloc"]'); if (!el) return;
     const w = Math.round(el.getBoundingClientRect().width);
+    if (this.ovEdTask) { if (this.barEl) { this.barEl.style.left = ''; this.barEl.style.maxWidth = ''; } this.ovEdW = 0; return; }
     if (w && w !== this.ovEdW) { this.ovEdW = w; if (this.barEl) { this.barEl.style.left = (16 + w) + 'px'; this.barEl.style.maxWidth = 'calc(100% - ' + (16 + w + 408) + 'px)'; } }
   }
 
@@ -9488,7 +9489,10 @@ class Component extends DCLogic {
     r.setOvh = (el) => this.setOvh(el);
     this.ovVals = r;
     if (this.ovOn()) r.camStyle = (r.camStyle || '') + ' display: none;';
-    if (this.ovEdOn && this.ovEdOn(this.ui())) { r.camStyle = (r.camStyle || '') + ' display: none;'; if (r.barStyle) { const lw = 16 + (this.ovEdW || 200); r.barStyle = r.barStyle.replace('left: 16px; right: 16px; bottom: 16px;', 'left: ' + lw + 'px; top: 16px; max-width: calc(100% - ' + (lw + 408) + 'px);').replace('border-radius: 16px;', 'border-radius: 0 16px 16px 0; border-left: 0;'); } if (r.P) r.P = Object.assign({}, r.P, { hasTopRow: false, canBack: false }); if (r.cardStyle) r.cardStyle = r.cardStyle.replace('left: 16px; top: 16px;', 'right: 16px; top: 16px;').replace(/max-height: calc\(100% - \d+px\);/, 'max-height: calc(100% - 104px);'); }
+    if (r.P) r.P = Object.assign({}, r.P, { cIco: r.P.cIco || (r.ic && r.ic.x), cStyle: r.P.cStyle || r.closeStyle });
+    this.ovEdTask = false;
+    if (this.ovEdOn && this.ovEdOn(this.ui()) && r.P && r.P.isTask && r.barStyle) { this.ovEdTask = true; r.barStyle = r.barStyle.replace('left: 16px; right: 16px; bottom: 16px;', 'right: 16px; top: 16px; width: 360px;').replace(/max-height: calc\(100% - \d+px\);/, 'max-height: calc(100% - 104px);'); r.cardStyle = (r.cardStyle || '') + '; display: none;'; r.camStyle = (r.camStyle || '') + ' display: none;'; r.P = Object.assign({}, r.P, { cIco: r.ic && r.ic.chevL, cStyle: (r.closeStyle || '').replace('margin: -6px -2px -6px auto;', 'margin: -6px 2px -6px -8px; order: -1;'), closeLabel: 'Back' }); }
+    if (this.ovEdOn && this.ovEdOn(this.ui()) && !this.ovEdTask) { r.camStyle = (r.camStyle || '') + ' display: none;'; if (r.barStyle) { const lw = 16 + (this.ovEdW || 200); r.barStyle = r.barStyle.replace('left: 16px; right: 16px; bottom: 16px;', 'left: ' + lw + 'px; top: 16px; max-width: calc(100% - ' + (lw + 408) + 'px);').replace('border-radius: 16px;', 'border-radius: 0 16px 16px 0; border-left: 0;'); } if (r.P) r.P = Object.assign({}, r.P, { hasTopRow: false, canBack: false }); if (r.cardStyle) r.cardStyle = r.cardStyle.replace('left: 16px; top: 16px;', 'right: 16px; top: 16px;').replace(/max-height: calc\(100% - \d+px\);/, 'max-height: calc(100% - 104px);'); }
     if (this.ovOn() && this.O && this.O.panel === 'devices' && /^cam:/.test(this.O.dev || '') && r.vidStyle) r.vidStyle = r.vidStyle.replace(/right: 16px; bottom: [^;]+;/, 'right: 32px; top: 92px;').replace('width: 360px;', 'width: 348px;').replace('z-index: 4;', 'z-index: 31;').replace(/animation: [^;]+;?/, '');
     if (this.ovOn()) { r.showProf = false; r.showBatch = false; r.showCard = false; r.showBar = false; r.showCrumbMenu = false; }
     return r;

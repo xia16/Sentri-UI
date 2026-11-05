@@ -99,3 +99,8 @@ fs.writeFileSync(f, s); console.log('applied 9');
 s = fs.readFileSync(f, 'utf8');
 if (!s.includes('/* ovEdIns */')) { s = s.split('bottom: calc(100% + 12px)').join('top: calc(100% + 12px)').split('bottom: calc(100% + 14px)').join('top: calc(100% + 14px)'); const a = "    if (this.ovOn && this.ovOn(u)) { const O = this.ovS(); /* ovInsets */"; if (!s.includes(a)) { console.error('MISS edins'); process.exit(1); } s = s.replace(a, "    if (this.ovEdOn && this.ovEdOn(u)) { /* ovEdIns */ ins.l = 28; ins.t = (u.bh || 70) + 32; ins.b = 92; ins.r = 16 + 360 + 16; return ins; }\n" + a); }
 fs.writeFileSync(f, s); console.log('applied 10');
+
+// 18) the task header's close: its icon and style come from P (a back arrow in Edit layout)
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('{{P.cIco}}')) { const a = '<button type="button" onClick="{{P.close}}" aria-label="{{P.closeLabel}}" title="{{P.closeLabel}}" style="{{closeStyle}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.x}}"></path></svg></button>'; if (!s.includes(a)) { console.error('MISS taskback'); process.exit(1); } s = s.replace(a, a.replace('{{closeStyle}}', '{{P.cStyle}}').replace('{{ic.x}}', '{{P.cIco}}')); } /* ovTaskBack */
+fs.writeFileSync(f, s); console.log('applied 11');
