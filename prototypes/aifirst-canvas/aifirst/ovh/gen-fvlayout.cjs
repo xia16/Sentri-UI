@@ -20,7 +20,7 @@ const chip = (ic, label, o) => { o = o || {}; return '<span style="' + st({ disp
 const sensors = (amber) => chip(I.temp, '22.4 °C') + chip(I.drop, '61 %') + (amber ? chip(I.air, 'NH₃ 9.4', { bg: K.amberT, color: K.amber }) : chip(I.air, 'NH₃ 6.8'));
 const sqBtn = (d, on) => '<span style="' + st({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', borderRadius: '12px', background: on ? K.press : K.tint, color: K.ink, flexShrink: 0 }) + '">' + icon(d, 18) + '</span>';
 // one connected bar across the top: ‹ (one level up), the place (click: switch), its sensors, then the panels, the view tools folded into 3D ▾, Actions
-const tab = (ic, label, on, count) => '<span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '7px', height: '40px', padding: '0 10px', borderRadius: '12px', background: on ? K.press : 'transparent', boxShadow: on ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '14px', fontWeight: on ? 600 : 500, whiteSpace: 'nowrap' }) + '">' + icon(ic, 18) + esc(label) + (count != null ? '<span style="' + st({ color: on ? K.ink : K.muted, fontWeight: 600 }) + '">' + count + '</span>' : '') + '</span>';
+const tab = (ic, label, on, count, warn) => '<span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '7px', height: '40px', padding: '0 10px', borderRadius: '12px', background: on ? K.press : 'transparent', boxShadow: on ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '14px', fontWeight: on ? 600 : 500, whiteSpace: 'nowrap' }) + '">' + icon(ic, 18) + esc(label) + (count != null ? '<span style="' + st({ color: on ? K.ink : K.muted, fontWeight: 600 }) + '">' + count + '</span>' : '') + (warn ? '<i style="' + st({ width: '8px', height: '8px', borderRadius: '999px', background: warn === true ? K.red : warn, flexShrink: 0, marginLeft: '-2px' }) + '"></i>' : '') + '</span>';
 const vline = '<i style="' + st({ width: '1px', height: '24px', background: K.line, margin: '0 6px', flexShrink: 0 }) + '"></i>';
 function top(o) {
   o = o || {};
@@ -28,7 +28,7 @@ function top(o) {
   const view = '<span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '6px', height: '40px', padding: '0 10px', borderRadius: '12px', background: o.viewOpen ? K.press : 'transparent', boxShadow: o.viewOpen ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '14px', fontWeight: 500 }) + '">' + icon(X.cube, 18) + '3D' + icon(I.down, 14, { color: K.muted }) + '</span>';
   const act = '<span style="' + st({ display: 'inline-flex', alignItems: 'center', height: '40px', padding: '0 16px', marginLeft: '6px', borderRadius: '12px', background: K.ink, color: '#FFFFFF', fontSize: '14px', fontWeight: 600 }) + '">Actions</span>';
   return '<div style="' + floatCard({ left: '16px', right: '16px', top: '16px', padding: '8px', display: 'flex', alignItems: 'center', gap: '2px' }) + '">' + sqBtn(I.back) + nameBtn + (o.chips ? '<span style="' + st({ display: 'inline-flex', gap: '6px', marginLeft: '4px' }) + '">' + o.chips + '</span>' : '') + '<span style="flex: 1; min-width: 14px;"></span>' +
-    tab(I.select, 'Select', o.on === 'select') + tab(I.layers, 'Batches', o.on === 'batches') + tab(I.pig, 'Pigs', o.on === 'pigs', o.pigs) + tab(I.tool, 'Equipment', o.on === 'equip') + vline + view + act + '</div>';
+    tab(I.select, 'Select', o.on === 'select') + tab(I.layers, 'Batches', o.on === 'batches') + tab(I.pig, 'Pigs', o.on === 'pigs', o.pigs) + tab(I.tool, 'Devices', o.on === 'equip', null, o.warn) + vline + view + act + '</div>';
 }
 // the view controls, opened from 3D ▾ (folded the rest of the time)
 function viewMenu() {
@@ -51,7 +51,7 @@ const callout = (x, y, n) => '<span style="' + st({ position: 'absolute', left: 
 (async () => {
   const B = { room: await bg('bgroom'), room960: await bg('bgroom', 960), panel: await bg('bgpanel'), task: await bg('bgtask'), pig: await bg('bgpig'), pen: await bg('bgpen') };
   const frame = (no, title, note, img, over, w) => { w = w || 1360; return '<div><div style="' + st({ display: 'flex', alignItems: 'baseline', gap: '12px', fontSize: '15px', lineHeight: '22px' }) + '"><b style="font-weight: 600;">' + no + ' · ' + esc(title) + '</b></div><div style="' + st({ marginTop: '4px', color: '#5D665F', fontSize: '14px', lineHeight: '21px', maxWidth: (w - 40) + 'px' }) + '">' + note + '</div><div style="' + st({ position: 'relative', width: w + 'px', height: '830px', marginTop: '14px', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 0 0 1px #DADFD5, 0 12px 32px rgba(17,21,17,.10)', background: '#E9EDE4' }) + '"><img alt="" src="' + img + '" style="position: absolute; left: 0; top: 0; width: ' + w + 'px; height: 830px; display: block;">' + over + '</div></div>'; };
-  const roomTop = (on, o) => top(Object.assign({ name: 'Gestation 2', dot: true, chips: sensors(true), on: on, pigs: 186 }, o || {}));
+  const roomTop = (on, o) => top(Object.assign({ name: 'Gestation 2', dot: true, warn: true, on: on, pigs: 186 }, o || {}));
 
   // panels from the live view, moved under the new top
   const pig = dump('pig'), task = dump('task'), eq = dump('eq'), room = dump('room');
@@ -66,10 +66,10 @@ const callout = (x, y, n) => '<span style="' + st({ position: 'absolute', left: 
   taskP = need(taskP, 'data-a="only:active" style="display: flex; align-items: center; gap: 10px; height: 36px; margin: 0 -8px; padding: 0 8px; border-radius: 8px; border-top: 1px solid #DFE4D8; background: transparent;', 'data-a="only:active" style="display: flex; align-items: center; gap: 10px; height: 36px; margin: 0; padding: 0 8px; border-radius: 8px; border-top: 1px solid #DFE4D8; background: #EEF0EA;');
   taskP = taskP.replace(/margin: 0 -8px; padding: 0 8px; border-radius: 8px;/g, 'margin: 0; padding: 0 8px; border-radius: 8px;');
   const eqPop = grab(eq, 'data-pop="1"'), eqTiles = eqPop.slice(eqPop.indexOf('<div style="display: grid;'), eqPop.lastIndexOf('</div>'));
-  const taskTop = (on) => top({ name: 'Farrowing Room 2', chips: sensors(false), on: on, pigs: 50 });
+  const taskTop = (on) => top({ name: 'Farrowing Room 2', on: on, pigs: 50 });
 
   // 1 · one connected bar
-  const f1 = frame(1, 'One bar across the top', 'Where you are on the left: ‹ goes one level up, the name switches between places at this level, then its sensors. What you can open on the right: Select, Batches, Pigs with how many there are, Equipment; the view tools folded into <b>3D ▾</b>; Actions. No breadcrumb and nothing that reacts to hover, so the bar never changes size under the mouse.', B.room,
+  const f1 = frame(1, 'One bar across the top', 'Where you are on the left: ‹ goes one level up, the name switches between places at this level. What you can open on the right: Select, Batches, Pigs with how many there are, Devices (the sensors live there now; a dot in the worst colour inside, red here because the feed line has stopped); the view tools folded into <b>3D ▾</b>; Actions. No breadcrumb and nothing that reacts to hover, so the bar never changes size under the mouse.', B.room,
     roomTop('') + callout(8, 64, 1) + callout(64, 64, 2) + callout(1000, 64, 3) + callout(1186, 64, 4));
   // 2 · view tools open
   const f2 = frame(2, '3D ▾ opened: the view tools', 'Click only; it stays open while you rotate or zoom and closes when you click the farm. Plan and 3D are one switch at the top. Edit layout leaves the farm view, so it sits apart at the bottom.', B.room, roomTop('', { viewOpen: true }) + viewMenu());
@@ -81,8 +81,11 @@ const callout = (x, y, n) => '<span style="' + st({ position: 'absolute', left: 
   const f5 = frame(4, 'Pigs 186: the count is the door to the filter', 'The number sits on the bar; clicking it opens Pigs on the right, like Batches. Pick a kind and only those pens keep their colour; <b>Clear</b> brings every pen back. The chosen row is a fill inside its box.', B.room,
     roomTop('pigs') + panel(pigsInner));
   // 5 · equipment on the right
-  const eqInner = H.head('Equipment', 'Gestation 2', '') + '<div style="margin-top: 16px;">' + eqTiles + '</div>';
-  const f6 = frame(5, 'Equipment opens on the right too', 'Same place and size as Batches and Pigs, so the bar behaves one way. The tiles are unchanged; a tile opens its card in the same panel, with Back.', B.panel,
+  const t0 = eqTiles.indexOf('<div data-a="trendt"'), tTile = eqTiles.slice(t0, eqTiles.indexOf('<div data-a', t0 + 10));
+  const hTile = tTile.replace('Temperature', 'Humidity').replace('22.4 °C', '61 %').replace(/<svg[\s\S]*?<\/svg>/, icon(I.drop, 16));
+  const eqTiles2 = eqTiles.replace(tTile, tTile + hTile);
+  const eqInner = H.head('Devices', 'Gestation 2', '') + '<div style="margin-top: 16px;">' + eqTiles2 + '</div>';
+  const f6 = frame(5, 'Devices: the sensors and the equipment, on the right', 'Equipment is renamed Devices and holds the room readings that used to sit on the bar: temperature, humidity, ammonia first, then climate, fans, lights, drinkers, cameras. Same place and size as Batches and Pigs; a tile opens its card in the same panel, with Back. Ammonia out of range is the amber tile; the stopped feed line is red, so the dot on Devices is red.', B.panel,
     roomTop('equip') + panel(eqInner));
   // 6 · the task: legend is the key, no tooltip
   const f7 = frame(6, 'A task: the legend is the key, so no tooltip', 'The ring has no hover card: the legend beside it already says the same. Clicking a legend row shows only those pens; the chosen row is a quiet fill that stays inside its card.', B.task,
@@ -91,8 +94,8 @@ const callout = (x, y, n) => '<span style="' + st({ position: 'absolute', left: 
   const f8 = frame(7, 'At a pen: no pig count; one Performance', 'At a pen the bar names the pen and Pigs has no count (her card is the panel, shown scrolled to the bottom). Her litters loses its “Performance ›” link; Performance is the button at the bottom, next to Log.', B.pig,
     top({ name: 'Pen A7' }) + pigP);
   // 8 · 960
-  const f9 = frame(8, 'At 960 wide: only the sensor that is out of range', 'One bar still fits: the in-range sensors step back (they stay in Equipment), the one out of range stays on the bar.', B.room960,
-    top({ name: 'Gestation 2', dot: true, chips: chip(I.air, 'NH₃ 9.4', { bg: K.amberT, color: K.amber }), pigs: 186 }), 960);
+  const f9 = frame(8, 'At 960 wide: the same bar', 'With the sensors in Devices the bar fits at 960 unchanged, labels and all.', B.room960,
+    top({ name: 'Gestation 2', dot: true, warn: true, pigs: 186 }), 960);
   // 10 · batch cards from the last round
   const tcard = (title, big, word, day, of, sub) => H.card('<div style="' + st({ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }) + '">' + t(title, { fontSize: '15px', fontWeight: 600 }) + H.chev + '</div><div style="' + st({ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '8px' }) + '">' + t(big, { fontSize: '28px', lineHeight: '32px', fontWeight: 600, letterSpacing: '-.02em' }) + mu(word, { fontSize: '15px' }) + (sub ? '<span style="margin-left: auto;">' + H.badge('amber', sub) + '</span>' : '') + '</div>' + strip(day, of) + '<div style="margin-top: 8px;">' + mu('Day ' + day + ' of ' + of) + '</div>', { pad: '14px 16px' });
   const up = (rows) => H.sec('Upcoming') + H.card(rows.map((x, i) => '<div style="' + st({ display: 'flex', alignItems: 'center', gap: '10px', minHeight: '48px', borderTop: i ? '1px solid ' + K.line : '0' }) + '">' + t(x[0], { width: '80px', fontSize: '13px', color: K.muted }) + t(x[1], { flex: 1, whiteSpace: 'normal' }) + mu(x[2]) + '</div>').join(''), { pad: '0 16px' });
