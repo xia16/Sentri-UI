@@ -126,7 +126,7 @@ svg{display:block;flex:none}
 
 .card h2{text-wrap:balance;margin:12px 0 0;font-size:17px;line-height:1.35;font-weight:600;letter-spacing:-.014em;color:var(--ink)}
 .card p{margin:6px 0 0;font-size:13.5px;line-height:1.52;color:var(--ink-2);text-wrap:pretty}
-.ref{display:flex;align-items:center;gap:7px;margin-top:12px;font-size:12.5px;font-weight:500;color:var(--ink-3)}
+.ref{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:3px 9px 3px 8px;border-radius:7px;background:var(--fill-2);font-size:12.5px;font-weight:600;color:var(--ink-2)}
 .ref svg{color:#8B9089}
 .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
 .btn{height:36px;padding:0 14px;border-radius:9px;font-size:13.5px;font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s,box-shadow .12s}
@@ -249,6 +249,21 @@ svg{display:block;flex:none}
 .toast button{height:30px;padding:0 10px;border-radius:7px;font-size:13px;font-weight:600;color:#BFE0CB}
 .toast button:hover{background:rgba(255,255,255,.1)}
 .toast button[hidden]{display:none}
+
+/* Owner 5 Nov: kind chip on Today tiles; action types expand in place */
+.tile .kind{align-self:flex-start;margin-bottom:8px;padding:2px 7px;border-radius:6px;font-size:11.5px;font-weight:600;line-height:1.5}
+.tile .kind.prod{background:var(--prod-bg);color:var(--prod)}
+.tile .kind.health{background:var(--vet-bg);color:var(--vet)}
+.sec-head .arrows{margin-left:2px}
+.agroup + .agroup{border-top:1px solid var(--line)}
+.agroups .agroup .drow + .aitems{border-top:0}
+.agrow .chev{transition:transform .2s}
+.agroup.open .agrow .chev{transform:rotate(90deg)}
+.agroup.open .agrow{background:var(--fill)}
+.aitems{display:flex;flex-wrap:wrap;gap:6px;padding:4px 12px 14px 52px;background:var(--fill)}
+.aitems[hidden]{display:none}
+.aitem{height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line-2);background:#fff;font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;transition:border-color .12s,background .12s}
+.aitem:hover{border-color:#C7CBC2;background:#FBFBFA}
 </style>
 </head>
 <body>
@@ -283,11 +298,11 @@ svg{display:block;flex:none}
       <section class="section" aria-labelledby="todayTitle">
         <div class="sec-head">
           <h3 class="sec-title" id="todayTitle">Today</h3>
-          <div class="spacer"></div>
           <div class="arrows">
             <button id="tPrev" aria-label="Scroll tasks left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
             <button id="tNext" aria-label="Scroll tasks right"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
           </div>
+          <div class="spacer"></div>
           <a href="#" class="link" data-open="Schedule">Schedule<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
         </div>
         <div class="hrow" id="today"></div>
@@ -298,17 +313,7 @@ svg{display:block;flex:none}
           <h3 class="sec-title" id="actTitle">Actions</h3>
           <span class="sec-hint">or type <kbd>/</kbd> in the chat</span>
         </div>
-        <div class="sub">Recent</div>
-        <div class="recent" id="recent"></div>
-        <div class="all" id="all">
-          <button class="all-row" id="allBtn" aria-expanded="false" aria-controls="groups">
-            <span class="sq sm neutral" data-icon="grid"></span>
-            <span class="t">All actions</span>
-            <span class="c">· 26 in 7 groups</span>
-            <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </button>
-          <div class="groups" id="groups" hidden></div>
-        </div>
+        <div class="list agroups" id="agroups"></div>
       </section>
 
       <section class="section" aria-labelledby="dashTitle">
@@ -417,8 +422,8 @@ svg{display:block;flex:none}
       '<span class="source">'+avatar(it.src)+'<span><b>'+esc(srcName(it.src))+'</b> · '+esc(it.when)+'</span></span>'+
       '<button class="x" data-dismiss aria-label="Dismiss" title="Dismiss">'+icon('x',16,2)+'</button></div>'+
       '<h2>'+esc(it.title)+'</h2>'+
+      (it.ref?'<div class="ref">'+icon('tag',13,1.9)+'<span>'+esc(it.ref)+'</span></div>':'')+
       (it.body?'<p>'+esc(it.body)+'</p>':'')+
-      (it.ref?'<div class="ref">'+icon('tag',14,1.9)+'<span>'+esc(it.ref)+'</span></div>':'')+
       '<div class="acts">'+it.acts.map(function(a,i){return '<button class="btn '+a.s+'" data-act="'+i+'">'+esc(a.l)+'</button>'}).join('')+'</div>'+
       '</div>';
     card.innerHTML=h;
@@ -465,10 +470,10 @@ svg{display:block;flex:none}
 
   /* ---------- Today ---------- */
   var today=[
-    {name:'Fostering checks',target:'Batch 32',num:'6',word:'of 8 checked',bar:[2,1,4],when:'Day 3 of 7'},
-    {name:'Amox treatment',target:'4 sows',num:'4',word:'due today',bar:[1,1,1],when:'Dose 2 of 3'},
-    {name:'PRRS top-up',target:'3 pigs',num:'3',word:'waiting',bar:[0,1,0],when:'Today'},
-    {name:'Farrowing',target:'Batch 33',num:'~6',word:'expected Fri',bar:[0,0,7],when:'Starts Fri'}
+    {kind:'Production',name:'Fostering checks',target:'Batch 32',num:'6',word:'of 8 checked',bar:[2,1,4],when:'Day 3 of 7'},
+    {kind:'Health',name:'Amox treatment',target:'4 sows',num:'4',word:'due today',bar:[1,1,1],when:'Dose 2 of 3'},
+    {kind:'Health',name:'PRRS top-up',target:'3 pigs',num:'3',word:'waiting',bar:[0,1,0],when:'Today'},
+    {kind:'Production',name:'Farrowing',target:'Batch 33',num:'~6',word:'expected Fri',bar:[0,0,7],when:'Starts Fri'}
   ];
   $('today').innerHTML=today.map(function(t){
     var segs='';var i;
@@ -476,6 +481,7 @@ svg{display:block;flex:none}
     for(i=0;i<t.bar[1];i++)segs+='<i class="today"></i>';
     for(i=0;i<t.bar[2];i++)segs+='<i></i>';
     return '<button class="tile" data-open="'+esc(t.name)+'">'+
+      '<span class="kind '+(t.kind==='Health'?'health':'prod')+'">'+t.kind+'</span>'+
       '<span class="name">'+esc(t.name)+'</span><span class="target">'+esc(t.target)+'</span>'+
       '<span class="fig"><span class="num">'+esc(t.num)+'</span><span class="word">'+esc(t.word)+'</span></span>'+
       '<span class="bar" aria-hidden="true">'+segs+'</span>'+
@@ -492,18 +498,24 @@ svg{display:block;flex:none}
   updArrows();
 
   /* ---------- Actions ---------- */
-  var recent=[['Pig list','pig','prod'],['Batches','layers','prod'],['Vaccination plans','syringe','health'],['Treatment orders','pill','health'],['Sampling plans','flask','health']];
-  $('recent').innerHTML=recent.map(function(r){
-    return '<button class="act" data-open="'+r[0]+'"><span class="sq '+r[2]+'">'+icon(r[1],20)+'</span><span class="lbl">'+r[0]+'</span></button>';
+  var agroups=[
+    ['Pigs','pig','prod',['Pig list','Move pigs','Ship out','Note']],
+    ['Batches','layers','prod',['Batches','New batch','Lines']],
+    ['Health','pulse','health',['Treatment','Treatment orders','Vaccination','Vaccination plans','Sampling','Sampling plans','Medicines']],
+    ['Production','chart','prod',['Culling','Schedule','Transfers']],
+    ['Feed','wheat','prod',['Feed change','Feed programme']],
+    ['People','users','neutral',['Staff','Guests','Invite']],
+    ['Setup','sliders','neutral',['Farm layout','Import','Automations','Settings']]
+  ];
+  $('agroups').innerHTML=agroups.map(function(g,i){
+    return '<div class="agroup"><button class="drow agrow" aria-expanded="false" data-g="'+i+'"><span class="sq sm '+g[2]+'">'+icon(g[1],16)+'</span><span class="t">'+g[0]+'</span><span class="v">'+g[3].length+' actions</span>'+icon('right',16,2).replace('<svg','<svg class="chev"')+'</button>'+
+      '<div class="aitems" hidden>'+g[3].map(function(x){return '<button class="aitem" data-open="'+x+'">'+x+'</button>'}).join('')+'</div></div>';
   }).join('');
-  var groups=[['Pigs','pig','prod'],['Batches','layers','prod'],['Health','pulse','health'],['Production','chart','prod'],['Feed','wheat','prod'],['People','users','neutral'],['Setup','sliders','neutral']];
-  $('groups').innerHTML=groups.map(function(g){
-    return '<button class="group" data-open="'+g[0]+'"><span class="sq sm '+g[2]+'">'+icon(g[1],16)+'</span>'+g[0]+icon('right',15,2)+'</button>';
-  }).join('');
-  $('groups').querySelectorAll('.group > svg:last-child').forEach(function(s){s.classList.add('chev')});
-  $('allBtn').addEventListener('click',function(){
-    var g=$('groups'),open=g.hidden;
-    g.hidden=!open;$('all').classList.toggle('open',open);this.setAttribute('aria-expanded',String(open));
+  $('agroups').addEventListener('click',function(e){
+    var r=e.target.closest('.agrow');if(!r)return;
+    var open=r.getAttribute('aria-expanded')!=='true';
+    $('agroups').querySelectorAll('.agrow').forEach(function(o){o.setAttribute('aria-expanded','false');o.nextElementSibling.hidden=true;o.parentNode.classList.remove('open')});
+    if(open){r.setAttribute('aria-expanded','true');r.nextElementSibling.hidden=false;r.parentNode.classList.add('open')}
   });
 
   /* ---------- Dashboards ---------- */
