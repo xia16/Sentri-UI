@@ -18,13 +18,16 @@ await new Promise((r) => setTimeout(r, 600));
 const fail = (e) => { console.error(e); server.kill(); process.exit(1); };
 process.on('uncaughtException', fail); process.on('unhandledRejection', fail);
 const b = await chromium.launch();
+// Fonts from vendor/fonts (as the gate renders), so a render never depends on the network.
+const fontRoute = fs.existsSync(path.join(root, 'scripts/font-route.mjs')) ? (await import(pathToFileURL(path.join(root, 'scripts/font-route.mjs')).href)).routeFonts : null;
+const newPage = async () => { const p = await b.newPage({ viewport: { width: 390, height: 844 } }); if (fontRoute) await fontRoute(p, root); return p; };
 
 // A tally glyph for Count (a proposed icon-registry addition: nothing in the registry draws a count yet).
 const TALLY = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 5v14M10 5v14M14 5v14M18 5v14M3.5 15.5l17-7"></path></svg>';
 const INSPECT = `http://localhost:${port}/ux/system/inspection-astra-concept.html?layout=focus`;
 
 async function open(url, screen, steps = []) {
-  const p = await b.newPage({ viewport: { width: 390, height: 844 } });
+  const p = await newPage();
   await p.goto(`${url}&screen=${screen}`);
   await p.waitForSelector('html.atlas-ready', { timeout: 15000 });
   for (const s of steps) { await p.locator(s).first().click(); await p.waitForTimeout(900); }
@@ -369,7 +372,7 @@ const bar = (n, of, word, segs) => `<div class="m-recv-bar"><div class="m-recv-f
 // capacity (0/15); the planned pens are outlined, a suggestion only; tap any pen to count it. Batch 25: 120 pigs to Unit 9 (planned
 // A1–A4, B1–B2) and Unit 10 (30, done). Run from a checkout that has Farrowing's room page.
 async function taskMap(name, o) {
-  const p = await b.newPage({ viewport: { width: 390, height: 844 } });
+  const p = await newPage();
   await p.goto(`http://localhost:${port}/ux/system/farrowing-astra-concept.html?layout=focus&screen=farrowing.room`);
   await p.waitForSelector('html.atlas-ready', { timeout: 15000 });
   await p.evaluate(({ PLAN_CSS, o }) => {
@@ -488,7 +491,7 @@ if (want('9-')) {
       t.innerHTML = '<span class="m-pc">' + c + '</span>' + (!v ? '' : v === 'all' ? '<span class="m-mv">All</span>' : '<span class="m-frac"><b>' + v.split('/')[0] + '</b>/' + v.split('/')[1] + '</span>');
     });
     const head = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>120</strong><span>pigs to Unit 9</span></div><small>Today · into A1–A4, B1–B2</small></div>';
-    page('Pigs to move', 'Transfer · batch 25 · from Farrowing room 3', head + '<div class="m-map">' + host.innerHTML + '</div>', '');
+    page('Pigs to move', 'Transfer · batch 25 · from Farrowing room 3', head + '<div class="m-map">' + host.innerHTML + '</div>', '<div class="sheet-footer st-scan-foot" data-ds="Sheet">' + U.button({ label: 'Scan', icon: ic('scan'), register: 'primary', action: 'x' }) + '</div>');
     const st = document.createElement('style'); st.textContent = UNIT_CSS + PLAN_CSS + `.m-count .m-map .st-pen-tile .m-pi svg{width:22px;height:22px;display:block;color:var(--ink,#20291f)}
       .m-count .m-map .st-pen-tile .m-pn.m-part{font-size:17px}
       .m-count .m-plankey .m-ki{display:inline-flex;align-items:center;gap:6px}.m-count .m-plankey .m-ki svg{width:16px;height:16px}
@@ -509,7 +512,7 @@ for (const [name, view] of [['mock-9b-pen-move.png', 'move'], ['mock-9c-pen-stay
     const rows = view === 'move'
       ? U.row({ icon: ic('tag-off'), title: '11 pigs', description: 'Without ear tags' }) + U.row({ code: '000904', description: 'Gilt', trail: 'chevron', action: 'x' })
       : U.row({ code: '000901', description: 'Gilt', trail: 'chevron', action: 'x' });
-    page('A3', 'Pigs to move · 12 of 13', '<section class="feature-section">' + toggle + '</section><section class="feature-section">' + U.rowGroup(rows) + '</section>', '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + '</div>');
+    page('A3', 'Pigs to move · 12 of 13', '<section class="feature-section">' + toggle + '</section><section class="feature-section">' + U.rowGroup(rows) + '</section>', '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Scan', icon: ic('scan'), register: 'primary', action: 'x' }) + '</div>');
     const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
   }, { UNIT_CSS, view });
   await shoot(p, name);
@@ -528,6 +531,44 @@ if (want('14t')) {
     unit: { name: 'Unit 9', value: '66', metric: 'Received', target: '6 pens counted' },
     task: { value: 96, total: 120, label: 'Received', statuses: { farrowed: 96, active: 0, awaiting: 24 } },
     scan: { bar: 'Scan, then tap a pen', read: [], toast: '3 pigs put in B2' } });
+}
+
+// 9s–9t. Move or stay? (owner, 2026-11-05): Scan on Pigs to move, or on a pen, opens Farrowing's Scan ear tags page; each read
+//    answers in one big word where the hint was, Move (and where to) or Stay (amber: she is the one to hold back), and the next read
+//    replaces it, so the crew sorts a pen without closing anything. Stop scanning stays in the footer.
+const VERDICT = { '9s': null,
+  '9m': { tag: '000904', ctx: 'Gilt · A3', word: 'Move', line: 'To Unit 9', tone: 'move' },
+  '9t': { tag: '000901', ctx: 'Gilt', word: 'Stay', line: 'Keep her in A3', tone: 'stay' } };
+for (const [k, v] of Object.entries(VERDICT)) {
+  if (!want(k)) continue;
+  const p = await open(INSPECT, 'inspection.walk');
+  await prep(p);
+  await p.evaluate(({ v }) => {
+    const { U } = window.M;
+    const bar = document.querySelector('.phone .statusbar')?.outerHTML || '';
+    document.querySelector('.phone').innerHTML = U.scanPage({ title: 'Scan ear tags', back: { action: 'x' }, read: 'open', connected: true, listening: true,
+      toggle: { action: 'x' }, empty: { text: 'Each pig shows Move or Stay as soon as her tag is read.' }, bar });
+    if (v) {
+      let hint = null; const w = document.createTreeWalker(document.querySelector('.phone'), NodeFilter.SHOW_TEXT);
+      while (w.nextNode()) if (w.currentNode.nodeValue.includes('Hold the reader')) hint = w.currentNode.parentElement;
+      let box = hint; while (box.parentElement && !/sheet-body/.test(box.parentElement.className)) box = box.parentElement;
+      box.innerHTML = '<div class="m-verdict m-' + v.tone + '"><strong>' + v.word + '</strong><span class="m-vtag">' + v.tag + '</span><small>' + v.ctx + '</small><em>' + v.line + '</em></div>'
+        + '<p class="m-vnext">Scan the next pig</p>';
+      box.classList.add('m-vbox');
+    }
+    const st = document.createElement('style');
+    st.textContent = '.phone .st-scan{font-family:var(--font-sans,"Plus Jakarta Sans",sans-serif)}.m-vbox{width:100%;padding:0 16px;box-sizing:border-box;display:flex;flex-direction:column;align-items:stretch;text-align:center}'
+      + '.m-verdict{display:flex;flex-direction:column;align-items:center;gap:6px;padding:32px 20px 28px;border-radius:16px;background:var(--paper,#fff);border:1px solid var(--line,#dfe3da);color:var(--ink,#20291f)}'
+      + '.m-verdict strong{font:700 56px/1 var(--font-sans,inherit);letter-spacing:-.01em;margin-bottom:14px}'
+      + '.m-verdict .m-vtag{font:600 20px/1.2 var(--font-mono,"IBM Plex Mono",monospace)}'
+      + '.m-verdict small{font-size:15px;color:var(--muted,#657060)}'
+      + '.m-verdict em{font-style:normal;font-size:17px;font-weight:600;margin-top:12px}'
+      + '.m-verdict.m-stay{background:var(--amber-fill,#fede82);border-color:transparent;color:var(--amber-fill-ink,#5c3f00)}'
+      + '.m-verdict.m-stay small{color:var(--amber-fill-ink,#5c3f00)}'
+      + '.m-vnext{margin:16px 0 0;font-size:13px;color:var(--muted,#657060)}';
+    document.head.append(st);
+  }, { v });
+  await shoot(p, 'mock-' + k + '-scan-' + (v ? v.word.toLowerCase() : 'listening') + '.png');
 }
 
 // 16. End the transfer (owner, 2026-11-03: "look at how we do it for the farrowing end task"): Farrowing's End task, its own parts.
@@ -553,7 +594,7 @@ const END = [
 ];
 for (const [name, screen, d] of END) {
   if (!want(name.slice(5, 8))) continue;
-  const p = await b.newPage({ viewport: { width: 390, height: 844 } });
+  const p = await newPage();
   await p.goto(`${FARROW}&screen=farrowing.${screen}`);
   await p.waitForSelector('html.atlas-ready', { timeout: 15000 });
   await p.evaluate((d) => {
