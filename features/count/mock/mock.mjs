@@ -287,24 +287,26 @@ const ARROW = '<svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg>'
 const CHEV = '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>';
 const hero = (fromLabel, from, toLabel, to, net) => `<div class="m-hero"><div class="m-k m-from"><small>${fromLabel}</small><strong>${from}</strong></div><span class="m-arrow">${ARROW}</span><div class="m-k m-to"><small>${toLabel}</small><strong>${to}</strong></div>${net ? `<span class="m-net">${net}</span>` : ''}</div>`;
 
-if (want('11-')) {
+async function ledger(name, L) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
-  await p.evaluate(({ UNIT_CSS, LEDGER_CSS }) => {
+  await p.evaluate(({ UNIT_CSS, LEDGER_CSS, L }) => {
     const { U, ic, page } = window.M;
     const fig = (n, cls = '') => '<span class="m-fig ' + cls + '">' + n + '</span>';
     const change = (icon, title, description, n, cls) => U.row({ variant: 'navigation', icon: ic(icon), title, description, trail: 'chevron', action: 'x' })
       .replace('<span class="st-row-chevron">', (n ? fig(n, cls) : '') + '<span class="st-row-chevron">');
     const end = (title, description, n, cls) => U.row({ title, description, trailing: n, className: 'm-end ' + cls });
-    const body = '<section class="feature-section m-ledger">' + U.rowGroup(end('Counted', 'This recount', '60', 'm-now')
-      + change('transfer', 'Found from other units', '000512 · 000733', '+2')
-      + change('alert', 'Not found', '000803 · balancing sheet', '−1', 'm-owe')
+    const body = '<section class="feature-section m-ledger">' + U.rowGroup(end('Counted', 'This recount', L.counted, 'm-now')
+      + change('transfer', 'Found from other units', L.found[0], L.found[1])
+      + change('alert', 'Not found', L.missed[0], L.missed[1], 'm-owe')
       + end('On record', 'Before the recount', '59', 'm-was')) + '</section>';
     page('Unit 7 balance sheet', 'Recount · 09:40 · L.M', body, '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Save recount', register: 'primary', action: 'x' }) + '</div>');
     const st = document.createElement('style'); st.textContent = UNIT_CSS + LEDGER_CSS; document.head.append(st);
-  }, { UNIT_CSS, LEDGER_CSS });
-  await shoot(p, 'mock-11-unit-balance.png');
+  }, { UNIT_CSS, LEDGER_CSS, L });
+  await shoot(p, name);
 }
+if (want('11-')) await ledger('mock-11-unit-balance.png', { counted: '60', found: ['000512 · 000733', '+2'], missed: ['000803 · balancing sheet', '−1'] });
+if (want('11s')) await ledger('mock-11s-swap.png', { counted: '59', found: ['000512', '+1'], missed: ['000803 · balancing sheet', '−1'] });
 // 11b–d. A line opened: its pigs, under the same figure.
 const DETAILS = [
   ['mock-11b-found.png', 'Found from other units', '+2', '', [['000512', 'Was Unit 9 · C3', '→ D4'], ['000733', 'Was Unit 6 · D2', '→ D4']], 'Saved, they move into D4 and leave their old units.'],
@@ -445,13 +447,13 @@ if (want('14-')) {
     task: { value: 93, total: 120, label: 'Received', statuses: { farrowed: 93, active: 0, awaiting: 27 } } });
 }
 if (want('10')) {
-  const tiles = { C1: ['3', 'm-done'], C2: ['2', 'm-done'], D4: ['16', 'm-done'], D5: ['38', 'm-todo'] };
+  const tiles = { C1: ['3', 'm-done'], C2: ['2', 'm-done'], D4: ['18', 'm-done'], D5: ['38', 'm-todo'] };
   for (const c of ['C3', 'C4', 'C5', 'D1', 'D2', 'D3']) tiles[c] = ['Empty', 'm-word'];
   await receiveMap('mock-10-unit-recount.png', {
     title: 'Recount', line: 'Unit 7', lanes: ['C', 'D'], depth: 5, tiles,
     top: bar('3', 'Started 09:05 · L.M', 'of 4 pens with pigs counted', '<i class="done" style="flex:1"></i>'.repeat(3) + '<i style="flex:1"></i>'),
-    key: '<p class="m-plankey"><span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span><span><b>38</b> On record</span></p>',
-    left: '<div class="m-left"><strong>D5 not counted</strong><small>Keeps 38 if you finish</small></div>', cta: 'Finish recount',
+    key: '<p class="m-plankey"><span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span><span><i style="background:#fff;box-shadow:inset 0 0 0 1px var(--line,#dfe3da)"></i>Not counted</span></p>',
+    left: '<div class="m-left"><strong>D5 not counted</strong><small>36 if you finish</small></div>', cta: 'Finish recount',
   });
 }
 
@@ -497,7 +499,7 @@ async function moveMap(name, scan) {
       t.innerHTML = '<span class="m-pc">' + c + '</span>' + (!v ? '' : v === 'all' ? '<span class="m-mv">All</span>' : '<span class="m-frac"><b>' + v.split('/')[0] + '</b>/' + v.split('/')[1] + '</span>');
     });
     const head = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>120</strong><span>pigs to Units 9 and 10</span></div><small>Today · 90 to Unit 9 · 30 to Unit 10</small></div>';
-    page('Pigs to move', 'Transfer · batch 25 · from Farrowing room 3', head + '<div class="m-map">' + host.innerHTML + '</div>', scan
+    page('Pigs to move', 'To Units 9 and 10', '<div class="m-map">' + host.innerHTML + '</div>', scan
       ? '<div class="sheet-footer st-scan-foot m-scanfoot" data-ds="Sheet">' + U.button({ label: 'Stop scanning', icon: ic('stop'), register: 'secondary', className: 'st-scan-toggle', action: 'x' })
         + '<div class="m-toast">' + U.toast(scan[0], { detail: scan[1] })
           .replace('<span class="st-toast-copy">', '<span class="st-toast-glyph m-g-' + scan[2] + '" aria-hidden="true">' + ic(scan[2] === 'move' ? 'transfer' : 'pen') + '</span><span class="st-toast-copy">')
