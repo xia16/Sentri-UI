@@ -185,6 +185,19 @@
 .task-batch.rooms svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .task-batch.rooms:hover:after,.task-batch.rooms:focus:after{content:attr(data-rooms);white-space:pre;position:absolute;left:0;bottom:calc(100% + 6px);z-index:5;background:#fff;color:var(--foreground);font-size:12px;font-weight:500;line-height:1.6;padding:8px 10px;border-radius:8px;box-shadow:0 4px 12px #0002,0 0 0 1px #0000000d}
 .calendar-page{padding:16px 16px 24px}.cal-week{font-weight:400;color:var(--muted-foreground);margin-left:8px;font-size:13px}
+
+/* More air (owner 5 Nov: "a bit cluttered") */
+.calendar-page{padding:24px}
+.cal-toolbar{padding:16px 20px;gap:8px}
+.days{height:64px}
+.today-band{top:64px}
+.days-corner{padding-left:20px!important}
+.section-band{height:40px;padding-left:20px!important;padding-top:6px!important}
+.task-row{height:56px}
+.row-label{padding:0 16px 0 20px}
+.task-row>.cell-slot{padding:0 3px}
+.week-cell{height:30px;font-size:13px}
+.calendar-page{--label:216px}
 </style></head><body><header class="board-header"><h1>Schedule · style B</h1><p>A timeline of tasks. A day opens the task's record: in the pane, or at panel width inside the farm view.</p><div class="view-toggle" role="group" aria-label="Board view"><button data-view="page" aria-pressed="true">Page only</button><button data-view="console" aria-pressed="false">Whole console</button></div></header><main class="board" id="board"></main><div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="Full-size Schedule screen"><div class="overlay-toolbar"><span id="overlay-title"></span><div><button id="previous" aria-label="Previous screen">←</button><button id="next" aria-label="Next screen">→</button><button id="close" aria-label="Close full-size screen">✕</button></div></div><div class="overlay-stage" id="overlay-stage"></div></div><script>
 if(navigator.onLine){const f=document.getElementById('google-fonts');f.href=f.dataset.href;}
 const variants=[{id:'B',xs:12,sm:13,ctl:14,base:14,h1:26,h2:17,stat:24,gap:18,gapLg:26,row:44,track:'-.7px',name:'Sentri green, sectioned',font:'Inter',text:14,control:40,pad:24,radius:'.75rem',grey:'#f5f5f4',primary:'#276640',foreground:'#1c1917',muted:'#57534e',border:'#e7e5e4',input:'#d6d3d1',shadow:'0 1px 3px #1c19170f,0 1px 2px #1c19170a',edge:'0px solid transparent',layout:'sectioned',spec:['Inter · 14 px','40 px controls · 24 px padding','0.75rem','No border · shadow-sm','Warm stone · #f5f5f4','Sentri green · #276640','240 px section label + fields']}];
