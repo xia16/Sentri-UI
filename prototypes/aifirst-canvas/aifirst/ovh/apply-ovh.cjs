@@ -89,3 +89,8 @@ if (!s.includes('/* ovDev */')) {
   r.forEach(([a, b]) => { if (!s.includes(a)) { console.error('MISS dev ' + a.slice(0, 60)); process.exit(1); } s = s.replace(a, b); });
 }
 fs.writeFileSync(f, s); console.log('applied 8');
+
+// 16) the open camera's view on the floor is easier to see
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('/* ovCone */')) { const a = "new T.MeshBasicMaterial({ color: '#4F8A6C', transparent: true, opacity: 0.2, depthWrite: false, side: T.DoubleSide })"; if (!s.includes(a)) { console.error('MISS cone'); process.exit(1); } s = s.replace(a, "new T.MeshBasicMaterial({ color: '#2F6B4C', transparent: true, opacity: 0.34, depthWrite: false, side: T.DoubleSide }) /* ovCone */"); }
+fs.writeFileSync(f, s); console.log('applied 9');

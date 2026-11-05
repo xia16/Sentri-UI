@@ -40,12 +40,12 @@
   // Devices: the room's readings first, then its equipment; a tile opens its card in the panel
   ovDevPanel(O, u) {
     const E = Object.assign(this.ovEqCtx(u), O.eqs || {});
-    const pg = this.ovDevPage(O, E); if (pg != null) return pg;
+    const pg = this.ovDevPage(O, E) || this.ovDevPage2(O, E); if (pg != null) return pg;
     if (O.dev === 'fan') return OVP2.fan(E);
     if (O.dev === 'lamps') return OVP2.lamps(E);
     if (O.dev === 'floor') return OVP2.floor(E);
     let t = OVP2.tiles(E); const i = t.indexOf('</div>'); if (t.indexOf('<div style="display: flex; justify-content: space-between; align-items: baseline; margin: 4px 4px 8px;">') === 0) t = t.slice(i + 6);
-    if (O.devShow) { const a = { feed: 'devshow:feed', lamps: 'dev:lamps', floor: 'dev:floor', climate: 'devshow:climate', nh3: 'trendt:nh3' }[O.devShow]; if (a) t = t.replace('data-a="' + a + '" style="', 'data-a="' + a + '" style="box-shadow: inset 0 0 0 2px ' + OVH.K.ink + '; '); }
+    if (O.devShow) { const a = { feed: 'devshow:feed', lamps: 'dev:lamps', floor: 'dev:floor', climate: 'devshow:climate', nh3: 'trendt:nh3', lights: 'devshow:lights', drinkers: 'devshow:drinkers' }[O.devShow]; if (a) t = t.replace('data-a="' + a + '" style="', 'data-a="' + a + '" style="box-shadow: inset 0 0 0 2px ' + OVH.K.ink + '; '); }
     return OVH.head('Devices', E.pen ? 'Pen ' + E.pen : E.room, '') + '<div style="margin-top: 16px;">' + t + '</div>';
   }
   // 3D: the camera tools, bottom left, opening upward
@@ -99,11 +99,12 @@
       if (u.bv) this.closeBatch(); this.ovSet({ panel: 'pigs', hist: [], pop: '' }); return true;
     }
     if (k === 'devshow') { this.ovSet({ dev: v, devShow: v }); return true; }
+    if (k === 'cam' && O.panel === 'devices') { this.ovSet({ dev: 'cam:' + (+v || 0), devShow: '', pop: '' }); try { this.put({ icam: { kind: 'room', i: +v || 0 } }); this.syncCamVis(); this.reframe(600); } catch (e) { /* ignore */ } return true; }
     if (k === 'dev') { O.devShow = v === 'lamp1' ? 'lamps' : v; return false; }
-    if (k === 'devback') { O.devShow = ''; return false; }
+    if (k === 'devback') { O.devShow = ''; if (this.ui().icam) { this.put({ icam: null }); this.syncCamVis(); } return false; }
     if (k === 'trendt' && O.panel === 'devices') { this.ovSet({ dev: 'r:' + v, devShow: v === 'nh3' ? 'nh3' : '', pop: '' }); return true; }
     if (k === 'devices' || k === 'equip') { if (O.panel === 'devices') { this.ovSet({ panel: '', dev: '', pop: '', devShow: '' }); return true; } if (u.bv) this.closeBatch(); this.ovSet({ panel: 'devices', dev: '', hist: [], pop: '' }); return true; }
-    if (k === 'popclose' && O.panel === 'devices') { this.ovSet({ panel: '', dev: '', pop: '', devShow: '' }); return true; }
+    if (k === 'popclose' && O.panel === 'devices') { if (this.ui().icam) { this.put({ icam: null }); this.syncCamVis(); } this.ovSet({ panel: '', dev: '', pop: '', devShow: '' }); return true; }
     if (k === 'kind') { const vf = u.vf && u.vf.kind === 'stage' ? u.vf.id : ''; if (vf === v) { this.put({ vf: null }); this.repaintBv(); this.ovPaint(); } else { this.locationFilter('stage', v); this.ovPaint(); } return true; }
     if (k === 'viewmenu') { this.ovSet({ pop: O.pop === 'view' ? '' : 'view' }); return true; }
     if (k === 'vw') { const R = this.ovVals, f = R && R[v]; if (v === 'modeToggle') this.ovSet({ pop: '' }); if (typeof f === 'function') { try { f({ preventDefault() {}, stopPropagation() {}, currentTarget: h, target: h }); } catch (e) { /* ignore */ } } setTimeout(() => this.ovPaint(), 30); return true; }
@@ -196,19 +197,23 @@
     if (id === 'feed') { const m = model('feeder'); return m ? { line: m.id, room: m.id } : { pens: lane('C').slice(0, 12), icon: I.feeder, draw: true }; }
     if (id === 'lamps') { const m = model('heat'); return m ? { line: m.id, room: m.id } : { pens: lane('A'), icon: I.lamp, draw: true }; }
     if (id === 'floor') return { pens: lane('C').slice(0, 12), icon: I.floor, draw: true };
+    if (id === 'temp') return { spot: 'far', icon: I.temp };
+    if (id === 'lights') return { spot: 'mid', icon: I.lamp };
+    if (id === 'drinkers') return { pens: lane('B'), icon: I.water, draw: true };
     if (id === 'climate') { const m = model('climate'); return m ? { room: m.id } : null; }
     if (id === 'nh3') { const m = model('nh3'); return m ? { room: m.id } : null; }
     return null;
   }
   ovDevWant(L) { const sp = this.ovDevCur; return !!sp && !!sp.room && L.key === 'dev:' + this.ui().roomId + ':' + sp.room; }
   ovDevApply(u) {
-    const O = this.ovS(), show = O.devShow || ({ floor: 'floor', lamps: 'lamps', feed: 'feed', climate: 'climate', 'r:nh3': 'nh3' })[O.dev] || '', key = (O.panel === 'devices' && show && u.view === 'room' ? u.roomId + ':' + show : '');
+    const O = this.ovS(), show = O.devShow || ({ floor: 'floor', lamps: 'lamps', feed: 'feed', climate: 'climate', 'r:nh3': 'nh3', 'r:temp': 'temp', 'r:hum': 'temp', lights: 'lights', drinkers: 'drinkers' })[O.dev] || '', key = (O.panel === 'devices' && show && u.view === 'room' ? u.roomId + ':' + show : '');
     if (key === (this.ovDevKey || '')) return;
     this.ovDevKey = key;
     this.labels.forEach((L, k) => { if (L.kind === 'odev') { L.el.remove(); this.labels.delete(k); } });
     (this.ovDevMs || []).forEach((m) => { if (m.parent) m.parent.remove(m); }); this.ovDevMs = [];
     this.ovDevCur = key ? this.ovDevSpec(show, u) : null;
     const sp = this.ovDevCur, rm = sp && this.rooms.find((x) => x.id === u.roomId);
+    if (sp && rm && sp.spot && rm.pens.length) { const xs = rm.pens.map((p) => p.x), zs = rm.pens.map((p) => p.z), cx = (Math.min(...xs) + Math.max(...xs)) / 2, cz = (Math.min(...zs) + Math.max(...zs)) / 2; this.label('odev:' + rm.id + ':spot', 'odev', sp.icon, sp.spot === 'mid' ? cx : Math.max(...xs) + 1.6, this.Y.YF + (sp.spot === 'mid' ? 2.4 : 1.4), sp.spot === 'mid' ? cz : Math.min(...zs) - 0.6, { rm: rm, roomId: rm.id }); }
     if (sp && rm && sp.pens) {
       const ps = sp.pens.map((c) => this.penByCode(rm, c)).filter(Boolean);
       if (ps.length) { const q0 = ps.slice().sort((a, b) => b.z - a.z)[0]; this.label('odev:' + rm.id + ':head', 'odev', sp.icon, q0.x + q0.sx / 2 + 0.35, this.Y.YF + 0.2, q0.z + q0.sz / 2 + 0.6, { rm: rm, roomId: rm.id }); }
@@ -221,7 +226,7 @@
       }
     }
     this.syncDevLines(); this.dirty = true;
-    if (key && sp && sp.room && !sp.line) this.reframe(600);
+    if (key && sp && (sp.spot || (sp.room && !sp.line))) this.reframe(600);
   }
   ovDevLines() {
     const sp = this.ovDevCur, u = this.ui(), rm = sp && sp.line && this.rooms && this.rooms.find((x) => x.id === u.roomId);
@@ -238,5 +243,16 @@
     if (d === 'r:nh3') return page('Ammonia', room + ' · sensor on the right wall', '<div style="margin-top: 16px;">' + trend('nh3') + '</div>' + H.sec('This sensor') + facts([['Limit', '8 ppm'], ['Above it for', '2 h', { color: K.amber }], ['Reading every', '5 min']]));
     if (d === 'climate') return page('Climate', room + ' · controller on the back wall', H.sec('Now', '', 18) + '<div style="' + H.st({ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }) + '">' + H.kpi('Set to', '22', '°C', '', 'Auto') + H.kpi('Room', '22.4', '°C', '', 'in range') + '</div>' + '<div style="height: 8px;"></div>' + trend('temp') + '<div style="height: 8px;"></div>' + trend('hum'));
     if (d === 'feed') return page('Feed line', room + ' · serves 12 pens on lane C', '<div style="margin-top: 16px;">' + H.card('<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '10px' }) + '">' + H.dot(K.red, 10) + H.t('Stopped', { fontSize: '17px', fontWeight: 600, color: K.red }) + '<span style="margin-left: auto;">' + H.mu('since 09:40') + '</span></div><div style="margin-top: 6px;">' + H.mu('Motor fault · the 10:00 feed did not run', { whiteSpace: 'normal' }) + '</div>', { pad: '14px 16px' }) + '</div>' + H.sec('Feeds today') + facts([['06:00', 'Ran · 12 pens'], ['10:00', 'Missed', { color: K.red }], ['14:00', 'Next']]));
+    return null;
+  }
+  // ----- more device pages: the cameras (the feed sits in the panel), lights, drinkers -----
+  ovDevPage2(O, E) {
+    const H = OVH, d = O.dev, room = E.room;
+    const page = (title, sub, body) => H.head(title, sub, 'devback', { close: 'popclose' }) + body;
+    const facts = (rows) => H.card(rows.map((r, i) => H.row(H.mu(r[0], { fontSize: '14px' }), H.t(r[1], Object.assign({ fontWeight: 600 }, r[2] || {})), !i)).join(''), { pad: '0 16px' });
+    const big = (v, sub) => '<div style="margin-top: 16px;">' + H.card('<div style="' + H.st({ display: 'flex', alignItems: 'baseline', gap: '8px' }) + '">' + H.t(v, { fontSize: '22px', fontWeight: 600 }) + H.mu(sub) + '</div>', { pad: '14px 16px' }) + '</div>';
+    if (d === 'cam:0' || d === 'cam:1') { const one = d === 'cam:0'; return page('Camera ' + (one ? 1 : 2), room + ' · ' + (one ? 'door end' : 'far end'), '<div data-camslot="1" style="' + H.st({ marginTop: '16px', aspectRatio: '16 / 9', borderRadius: '14px', background: '#0E1411' }) + '"></div>' + H.sec('This camera') + facts([['Sees', one ? 'Lanes A–D, door half' : 'Lanes A–D, far half'], ['Recording', 'Always'], ['Kept for', '14 days']])); }
+    if (d === 'lights') return page('Lights', room + ' · whole room', big('Off', 'on at 06:00') + H.sec('Schedule') + facts([['On', '06:00 – 18:00'], ['Level', '80 %']]));
+    if (d === 'drinkers') return page('Drinkers', room + ' · water line on lane B', big('On', '1.6 l/min a pen') + H.sec('Today') + facts([['Water used', '2,840 l'], ['Pens served', '50']]));
     return null;
   }

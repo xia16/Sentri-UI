@@ -1,0 +1,23 @@
+const fs = require('fs'), S = process.argv[2];
+let c = fs.readFileSync(S + '/ovh-comp3.js', 'utf8'), cm = fs.readFileSync(S + '/ovh-comp.js', 'utf8'), p = fs.readFileSync(S + '/ovh-pages2.js', 'utf8'), ap = fs.readFileSync(S + '/apply-ovh.cjs', 'utf8');
+const rep = (s, a, b) => { if (s.includes(b)) return s; if (!s.includes(a)) { console.log('MISS ' + a.slice(0, 80)); process.exit(1); } return s.split(a).join(b); };
+// pages
+c = rep(c, "    const pg = this.ovDevPage(O, E); if (pg != null) return pg;", "    const pg = this.ovDevPage(O, E) || this.ovDevPage2(O, E); if (pg != null) return pg;");
+// cameras open in the panel; the feed is the room camera view; leaving the page closes it
+c = rep(c, "    if (k === 'devshow') { this.ovSet({ dev: v, devShow: v }); return true; }",
+  "    if (k === 'devshow') { this.ovSet({ dev: v, devShow: v }); return true; }\n    if (k === 'cam' && O.panel === 'devices') { this.ovSet({ dev: 'cam:' + (+v || 0), devShow: '', pop: '' }); try { this.put({ icam: { kind: 'room', i: +v || 0 } }); this.syncCamVis(); } catch (e) { /* ignore */ } return true; }");
+c = rep(c, "    if (k === 'devback') { O.devShow = ''; return false; }", "    if (k === 'devback') { O.devShow = ''; if (this.ui().icam) { this.put({ icam: null }); this.syncCamVis(); } return false; }");
+c = rep(c, "    if (k === 'popclose' && O.panel === 'devices') { this.ovSet({ panel: '', dev: '', pop: '', devShow: '' }); return true; }", "    if (k === 'popclose' && O.panel === 'devices') { if (this.ui().icam) { this.put({ icam: null }); this.syncCamVis(); } this.ovSet({ panel: '', dev: '', pop: '', devShow: '' }); return true; }");
+// the shown spot and lines for the rest
+c = rep(c, "    if (id === 'climate') {", "    if (id === 'temp') return { spot: 'far', icon: I.temp };\n    if (id === 'lights') return { spot: 'mid', icon: I.lamp };\n    if (id === 'drinkers') return { pens: lane('B'), icon: I.water, draw: true };\n    if (id === 'climate') {");
+c = rep(c, "climate: 'climate', 'r:nh3': 'nh3' })[O.dev]", "climate: 'climate', 'r:nh3': 'nh3', 'r:temp': 'temp', 'r:hum': 'temp', lights: 'lights', drinkers: 'drinkers' })[O.dev]");
+c = rep(c, "    if (sp && rm && sp.pens) {", "    if (sp && rm && sp.spot && rm.pens.length) { const xs = rm.pens.map((p) => p.x), zs = rm.pens.map((p) => p.z), cx = (Math.min(...xs) + Math.max(...xs)) / 2, cz = (Math.min(...zs) + Math.max(...zs)) / 2; this.label('odev:' + rm.id + ':spot', 'odev', sp.icon, sp.spot === 'mid' ? cx : Math.max(...xs) + 1.6, this.Y.YF + (sp.spot === 'mid' ? 2.4 : 1.4), sp.spot === 'mid' ? cz : Math.min(...zs) - 0.6, { rm: rm, roomId: rm.id }); }\n    if (sp && rm && sp.pens) {");
+c = rep(c, "    if (key && sp && sp.room && !sp.line) this.reframe(600);", "    if (key && sp && (sp.spot || (sp.room && !sp.line))) this.reframe(600);");
+c = rep(c, "lamps: 'dev:lamps', floor: 'dev:floor', climate: 'devshow:climate', nh3: 'trendt:nh3' }[O.devShow]", "lamps: 'dev:lamps', floor: 'dev:floor', climate: 'devshow:climate', nh3: 'trendt:nh3', lights: 'devshow:lights', drinkers: 'devshow:drinkers' }[O.devShow]");
+// the camera feed sits in its slot in the panel while its page is open
+cm = rep(cm, "    if (this.ovOn()) r.camStyle = (r.camStyle || '') + ' display: none;';\n", "    if (this.ovOn()) r.camStyle = (r.camStyle || '') + ' display: none;';\n    if (this.ovOn() && this.O && this.O.panel === 'devices' && /^cam:/.test(this.O.dev || '') && r.vidStyle) r.vidStyle = r.vidStyle.replace(/right: 16px; bottom: [^;]+;/, 'right: 32px; top: 92px;').replace('width: 360px;', 'width: 348px;').replace('z-index: 4;', 'z-index: 31;').replace(/animation: [^;]+;?/, '');\n");
+p = rep(p, "etile(I.lamp, 'Lights', 'Off', { off: true })", "etile(I.lamp, 'Lights', 'Off', { off: true, a: 'devshow:lights' })");
+p = rep(p, "etile(I.water, 'Drinkers', 'On')", "etile(I.water, 'Drinkers', 'On', { a: 'devshow:drinkers' })");
+// the camera's view on the floor reads more clearly
+if (!ap.includes('ovCone')) ap += "\n// 16) the open camera's view on the floor is easier to see\ns = fs.readFileSync(f, 'utf8');\nif (!s.includes('/* ovCone */')) { const a = \"new T.MeshBasicMaterial({ color: '#4F8A6C', transparent: true, opacity: 0.2, depthWrite: false, side: T.DoubleSide })\"; if (!s.includes(a)) { console.error('MISS cone'); process.exit(1); } s = s.replace(a, \"new T.MeshBasicMaterial({ color: '#2F6B4C', transparent: true, opacity: 0.34, depthWrite: false, side: T.DoubleSide }) /* ovCone */\"); }\nfs.writeFileSync(f, s); console.log('applied 9');\n";
+fs.writeFileSync(S + '/ovh-comp3.js', c); fs.writeFileSync(S + '/ovh-comp.js', cm); fs.writeFileSync(S + '/ovh-pages2.js', p); fs.writeFileSync(S + '/apply-ovh.cjs', ap); console.log('ok');

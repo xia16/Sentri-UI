@@ -136,6 +136,7 @@
       pgpen: { O: {}, after: pick('n1', 'B7') },
       lcroom: { O: {}, after: () => this.goRoom('g2') },
       lctrend: { O: {}, after: () => { this.goRoom('g2'); setTimeout(() => { this.ovAct('devices'); this.ovAct('trendt:nh3'); }, 500); } },
+      eqcam: { O: {}, after: () => { this.goRoom('g2'); setTimeout(() => { this.ovAct('devices'); this.ovAct('cam:0'); }, 500); } },
       eqfeed: { O: {}, after: () => { this.goRoom('g2'); setTimeout(() => { this.ovAct('devices'); this.ovAct('devshow:feed'); }, 500); } },
       lcsiblings: { O: {}, after: () => { this.goRoom('fr2'); setTimeout(() => this.ovSet({ pop: 'switch' }), 500); } },
       lcview: { O: {}, after: () => { this.goRoom('g2'); setTimeout(() => this.ovSet({ pop: 'view' }), 500); } },
