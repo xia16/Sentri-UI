@@ -22,29 +22,31 @@ const sqBtn = (d, on) => '<span style="' + st({ display: 'inline-flex', alignIte
 // one connected bar across the top: ‹ (one level up), the place (click: switch), its sensors, then the panels, the view tools folded into 3D ▾, Actions
 const tab = (ic, label, on, count, warn) => '<span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '7px', height: '40px', padding: '0 10px', borderRadius: '12px', background: on ? K.press : 'transparent', boxShadow: on ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '14px', fontWeight: on ? 600 : 500, whiteSpace: 'nowrap' }) + '">' + icon(ic, 18) + esc(label) + (count != null ? '<span style="' + st({ color: on ? K.ink : K.muted, fontWeight: 600 }) + '">' + count + '</span>' : '') + (warn ? '<i style="' + st({ width: '8px', height: '8px', borderRadius: '999px', background: warn === true ? K.red : warn, flexShrink: 0, marginLeft: '-2px' }) + '"></i>' : '') + '</span>';
 const vline = '<i style="' + st({ width: '1px', height: '24px', background: K.line, margin: '0 6px', flexShrink: 0 }) + '"></i>';
+let POS = 'top';
+const edge = (v) => (POS === 'top' ? { top: v } : { bottom: v });
 function top(o) {
   o = o || {};
   const nameBtn = '<span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '6px', height: '40px', padding: '0 10px', borderRadius: '12px', background: o.open ? K.press : 'transparent', boxShadow: o.open ? 'inset 0 0 0 1.5px ' + K.ink : 'none', whiteSpace: 'nowrap' }) + '">' + t(o.name, { fontSize: '17px', lineHeight: '22px', fontWeight: 600, letterSpacing: '-.01em' }) + (o.dot ? '<i style="' + st({ width: '8px', height: '8px', borderRadius: '999px', background: K.red, flexShrink: 0 }) + '"></i>' : '') + icon(I.down, 16, { color: K.muted }) + '</span>';
   const view = '<span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '6px', height: '40px', padding: '0 10px', borderRadius: '12px', background: o.viewOpen ? K.press : 'transparent', boxShadow: o.viewOpen ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '14px', fontWeight: 500 }) + '">' + icon(X.cube, 18) + '3D' + icon(I.down, 14, { color: K.muted }) + '</span>';
   const act = '<span style="' + st({ display: 'inline-flex', alignItems: 'center', height: '40px', padding: '0 16px', marginLeft: '6px', borderRadius: '12px', background: K.ink, color: '#FFFFFF', fontSize: '14px', fontWeight: 600 }) + '">Actions</span>';
-  const menu = '<div style="' + floatCard({ right: '16px', top: '16px', padding: '8px' }) + '"><span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '8px', height: '40px', padding: '0 12px', borderRadius: '12px', background: o.viewOpen ? K.press : 'transparent', boxShadow: o.viewOpen ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '14px', fontWeight: 600 }) + '">' + icon(X.cube, 18) + '3D' + icon(I.down, 14, { color: K.muted }) + '</span></div>';
-  return '<div style="' + floatCard({ left: '16px', right: '16px', bottom: '16px', padding: '8px', display: 'flex', alignItems: 'center', gap: '2px' }) + '">' + sqBtn(I.back) + nameBtn + vline +
-    tab(I.select, 'Select', o.on === 'select') + (o.noBatch ? '' : tab(I.layers, 'Batches', o.on === 'batches')) + tab(I.pig, 'Pigs', o.on === 'pigs', o.pigs) + tab(I.tool, 'Devices', o.on === 'equip', null, o.warn) + '<span style="flex: 1;"></span>' + act + (o.under || '') + '</div>' + menu;
+  const menu = '<div style="' + floatCard(Object.assign({ right: '16px', width: '108px', padding: '8px', display: 'flex', justifyContent: 'center' }, edge('16px'))) + '"><span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '8px', height: '40px', padding: '0 12px', borderRadius: '12px', background: o.viewOpen ? K.press : 'transparent', boxShadow: o.viewOpen ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '14px', fontWeight: 600 }) + '">' + icon(X.cube, 18) + '3D' + icon(POS === 'top' ? I.down : 'm6 15 6-6 6 6', 14, { color: K.muted }) + '</span></div>';
+  return '<div style="' + floatCard(Object.assign({ right: '132px', padding: '8px', display: 'flex', alignItems: 'center', gap: '2px' }, edge('16px'))) + '">' + sqBtn(I.back) + nameBtn + vline +
+    tab(I.select, 'Select', o.on === 'select') + (o.noBatch ? '' : tab(I.layers, 'Batches', o.on === 'batches')) + tab(I.pig, 'Pigs', o.on === 'pigs', o.pigs) + tab(I.tool, 'Devices', o.on === 'equip', null, o.warn) + act + (o.under || '') + '</div>' + menu;
 }
 // the view controls, opened from 3D ▾ (folded the rest of the time)
 function viewMenu() {
   const seg = '<div style="' + st({ display: 'flex', padding: '3px', borderRadius: '12px', background: K.tint }) + '">' + ['3D', 'Plan'].map((x, i) => '<span style="' + st({ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '36px', borderRadius: '10px', background: i ? 'transparent' : K.paper, boxShadow: i ? 'none' : '0 1px 2px rgba(17,21,17,.08)', fontSize: '14px', fontWeight: i ? 500 : 600 }) + '">' + x + '</span>').join('') + '</div>';
   const line = (label, btns) => '<div style="' + st({ display: 'flex', alignItems: 'center', gap: '6px', height: '48px' }) + '">' + t(label, { flex: 1, color: K.muted, fontSize: '13px' }) + btns + '</div>';
   const hr = '<div style="' + st({ height: '1px', background: K.line, margin: '6px 0' }) + '"></div>';
-  return '<div style="' + floatCard({ right: '16px', top: '80px', width: '272px', padding: '12px' }) + '">' + seg + '<div style="margin-top: 6px;">' + line('Rotate', sqBtn(X.rotL) + sqBtn(X.rotR)) + line('Zoom', sqBtn(I.minus) + sqBtn(I.plus)) + line('Fit to view', sqBtn(X.fit)) + line('Night', sqBtn(X.moon)) + '</div>' + hr + '<div style="' + st({ display: 'flex', alignItems: 'center', gap: '10px', height: '44px', padding: '0 4px', fontSize: '14px', fontWeight: 500 }) + '">' + icon(X.edit, 18) + 'Edit layout</div></div>';
+  return '<div style="' + floatCard(Object.assign({ right: '16px', width: '272px', padding: '12px' }, edge('80px'))) + '">' + seg + '<div style="margin-top: 6px;">' + line('Rotate', sqBtn(X.rotL) + sqBtn(X.rotR)) + line('Zoom', sqBtn(I.minus) + sqBtn(I.plus)) + line('Fit to view', sqBtn(X.fit)) + line('Night', sqBtn(X.moon)) + '</div>' + hr + '<div style="' + st({ display: 'flex', alignItems: 'center', gap: '10px', height: '44px', padding: '0 4px', fontSize: '14px', fontWeight: 500 }) + '">' + icon(X.edit, 18) + 'Edit layout</div></div>';
 }
 // a list of choices: the fill sits inside the box; a red dot follows the name; counts line up on the right
 const choice = (r) => '<div style="' + st({ display: 'flex', alignItems: 'center', gap: '8px', height: '44px', padding: '0 10px', borderRadius: '10px', background: r.on ? K.press : 'transparent' }) + '">' + (r.sw ? '<i style="' + st({ width: '10px', height: '10px', borderRadius: '3px', background: r.sw, flexShrink: 0 }) + '"></i>' : '') + t(r.name, { fontWeight: r.on ? 600 : 400 }) + (r.dot ? '<i style="' + st({ width: '8px', height: '8px', borderRadius: '999px', background: K.red, flexShrink: 0 }) + '"></i>' : '') + '<span style="flex: 1;"></span>' + t(r.n, { color: r.on ? K.ink : K.muted, fontWeight: r.bold ? 600 : 400 }) + '<span style="' + st({ display: 'inline-flex', width: '16px', justifyContent: 'center' }) + '">' + (r.on ? icon(I.check, 16) : '') + '</span></div>';
 // the switcher: only the places at this level; ‹ on the bar is the way up
-const switcher = (rows) => '<div style="' + floatCard({ left: '48px', bottom: '60px', width: '280px', padding: '6px' }) + '">' + rows.map(choice).join('') + '</div>';
+const switcher = (rows) => '<div style="' + floatCard(Object.assign({ left: '48px', width: '280px', padding: '6px' }, edge('60px'))) + '">' + rows.map(choice).join('') + '</div>';
 // a main panel on the right, under the bar: grey with white cards
-const panel = (inner) => '<div style="' + floatCard({ right: '16px', top: '84px', width: '380px', maxHeight: 'calc(100% - 176px)', overflow: 'hidden', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint }) + '">' + inner + '</div>';
-const movePanel = (h) => need(need(h, 'top: 72px;', 'top: 84px;'), 'max-height: calc(100% - 164px);', 'max-height: calc(100% - 176px);');
+const panel = (inner) => '<div style="' + floatCard({ right: '16px', top: POS === 'top' ? '84px' : '16px', width: '380px', maxHeight: POS === 'top' ? 'calc(100% - 100px)' : 'calc(100% - 104px)', overflow: 'hidden', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint }) + '">' + inner + '</div>';
+const movePanel = (h) => need(need(h, 'top: 72px;', 'top: 84px;'), 'max-height: calc(100% - 164px);', 'max-height: calc(100% - 100px);');
 // the day strip, as on the phone's Home card
 const strip = (day, of) => '<div style="' + st({ display: 'flex', gap: '4px', marginTop: '12px' }) + '">' + Array.from({ length: of }, (_, i) => '<i style="' + st({ flex: 1, height: '6px', borderRadius: '999px', background: i < day - 1 ? K.green : i === day - 1 ? K.blue : '#E7EAE3' }) + '"></i>').join('') + '</div>';
 const callout = (x, y, n) => '<span style="' + st({ position: 'absolute', left: x + 'px', top: y + 'px', width: '26px', height: '26px', borderRadius: '999px', background: '#C2410C', color: '#FFFFFF', fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 3px #FFFFFF', zIndex: 5 }) + '">' + n + '</span>';
@@ -60,7 +62,7 @@ const callout = (x, y, n) => '<span style="' + st({ position: 'absolute', left: 
   const perfLink = pigP.slice(pigP.indexOf('<span data-a="pigperf"'), pigP.indexOf('</span>', pigP.indexOf('<span data-a="pigperf"') + 30) + 7);
   pigP = need(pigP, perfLink, '');
   // shown scrolled to the bottom, where the one Performance sits
-  pigP = need(pigP, 'max-height: calc(100% - 176px);', 'height: calc(100% - 176px);');
+  pigP = need(pigP, 'max-height: calc(100% - 100px);', 'height: calc(100% - 100px);');
   pigP = need(pigP, 'overflow-y: auto; overflow-x: hidden;', 'overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end;');
   let taskP = movePanel(grab(task, 'data-zone="panel"'));
   // the legend row chosen: a quiet fill inside the card, no outline running past it
@@ -69,43 +71,46 @@ const callout = (x, y, n) => '<span style="' + st({ position: 'absolute', left: 
   const eqPop = grab(eq, 'data-pop="1"'), eqTiles = eqPop.slice(eqPop.indexOf('<div style="display: grid;'), eqPop.lastIndexOf('</div>'));
   const taskTop = (on) => top({ name: 'Farrowing Room 2', on: on, pigs: 50 });
 
-  // 1 · one connected bar
-  const f1 = frame(1, 'The bar along the bottom, 3D top right', 'One full row along the bottom, like an action bar: ‹ goes one level up, the name switches between places at this level, then Select, Batches, Pigs with how many there are, Devices (the sensors live there; a dot in the worst colour inside, red here because the feed line has stopped), and Actions at the far right. The camera tools are one button top right, named by what you are looking at (3D or Plan). Panels open on the right, between the two.', B.room,
-    roomTop(''));
-  // 2 · view tools open
-  const f2 = frame(2, '3D opened: the camera tools', 'It opens downward. 3D and Plan are one switch at the top; rotate, zoom, fit and night below; Edit layout leaves the farm view, so it sits apart at the bottom. Click only: it stays open while you rotate or zoom and closes when you click the farm.', B.room, roomTop('', { viewOpen: true }) + viewMenu());
-  // 3 · the switcher
-  const f3 = frame(3, 'Click the name: switch rooms', 'Just the places at this level, the current one ticked, a red dot where something is wrong; it opens upward from the name. To go up, use ‹, then the name again. Click only: it stays open until you pick or click away.', B.room,
-    roomTop('', { open: true, under: switcher([{ name: 'Gestation 1', n: '152 pigs' }, { name: 'Gestation 2', n: '186 pigs', dot: true, on: true }, { name: 'Sick room', n: '3 pigs', dot: true }]) }));
-  // 4 · pigs is a main panel
-  const pigsInner = H.head('Pigs', 'Gestation 2', '') + H.sec('Show on the farm', '<span style="font-size: 13px; font-weight: 500;">Clear</span>', 20) + H.card([{ name: 'Sows', n: '182', sw: '#2F3A33', on: true, bold: true }, { name: 'Boars', n: '4', sw: '#718075', bold: true }].map(choice).join(''), { pad: '6px' });
-  const f5 = frame(4, 'Pigs 186: the count is the door to the filter', 'The number sits on the bar; clicking it opens Pigs on the right, like Batches. Pick a kind and only those pens keep their colour; <b>Clear</b> brings every pen back. The chosen row is a fill inside its box.', B.room,
-    roomTop('pigs') + panel(pigsInner));
+  // 1–8 · the bar and 3D as a pair: once on top, once at the bottom
+  const colHead = (h, sub) => '<div style="' + st({ marginBottom: '-36px' }) + '"><div style="' + st({ fontSize: '20px', lineHeight: '28px', fontWeight: 600 }) + '">' + h + '</div><div style="' + st({ color: '#5D665F', fontSize: '14px' }) + '">' + sub + '</div></div>';
+  const variant = (pos, n0, where) => {
+    POS = pos;
+    const pigsInner = H.head('Pigs', 'Gestation 2', '') + H.sec('Show on the farm', '<span style="font-size: 13px; font-weight: 500;">Clear</span>', 20) + H.card([{ name: 'Sows', n: '182', sw: '#2F3A33', on: true, bold: true }, { name: 'Boars', n: '4', sw: '#718075', bold: true }].map(choice).join(''), { pad: '6px' });
+    const out = [
+      frame(n0, 'The bar and 3D, ' + where, 'The bar: ‹ goes one level up, the name switches between places at this level, then Select, Batches, Pigs with how many there are, Devices (the sensors live there; a dot in the worst colour inside, red here because the feed line has stopped), and Actions. Just right of it, apart, the 3D button: named by what you are looking at (3D or Plan), it holds the camera tools.', B.room, roomTop('')),
+      frame(n0 + 1, '3D opened: the camera tools', 'It opens ' + (pos === 'top' ? 'downward' : 'upward') + '. 3D and Plan are one switch; rotate, zoom, fit and night; Edit layout sits apart. Click only: it stays open while you rotate or zoom and closes when you click the farm.', B.room, roomTop('', { viewOpen: true }) + viewMenu()),
+      frame(n0 + 2, 'Click the name: switch rooms', 'Just the places at this level, the current one ticked, a red dot where something is wrong; it opens ' + (pos === 'top' ? 'down' : 'up') + ' from the name. To go up, use ‹, then the name again.', B.room,
+        roomTop('', { open: true, under: switcher([{ name: 'Gestation 1', n: '152 pigs' }, { name: 'Gestation 2', n: '186 pigs', dot: true, on: true }, { name: 'Sick room', n: '3 pigs', dot: true }]) })),
+      frame(n0 + 3, 'Pigs 186 opens its panel', 'Panels open on the right, ' + (pos === 'top' ? 'under' : 'above') + ' the bar. Pick a kind and only those pens keep their colour; <b>Clear</b> brings every pen back.', B.room, roomTop('pigs') + panel(pigsInner)),
+    ];
+    POS = 'top'; return out;
+  };
+  const A = variant('top', 1, 'on top'), Bv = variant('bottom', 5, 'at the bottom');
   // 5 · equipment on the right
   const t0 = eqTiles.indexOf('<div data-a="trendt"'), tTile = eqTiles.slice(t0, eqTiles.indexOf('<div data-a', t0 + 10));
   const hTile = tTile.replace('Temperature', 'Humidity').replace('22.4 °C', '61 %').replace(/<svg[\s\S]*?<\/svg>/, icon(I.drop, 16));
   const eqTiles2 = eqTiles.replace(tTile, tTile + hTile);
   const eqInner = H.head('Devices', 'Gestation 2', '') + '<div style="margin-top: 16px;">' + eqTiles2 + '</div>';
-  const f6 = frame(5, 'Devices: the sensors and the equipment, on the right', 'Equipment is renamed Devices and holds the room readings that used to sit on the bar: temperature, humidity, ammonia first, then climate, fans, lights, drinkers, cameras. Same place and size as Batches and Pigs; a tile opens its card in the same panel, with Back. Ammonia out of range is the amber tile; the stopped feed line is red, so the dot on Devices is red.', B.panel,
+  const f6 = frame(9, 'Devices: the sensors and the equipment, on the right', 'Equipment is renamed Devices and holds the room readings that used to sit on the bar: temperature, humidity, ammonia first, then climate, fans, lights, drinkers, cameras. Same place and size as Batches and Pigs; a tile opens its card in the same panel, with Back. Ammonia out of range is the amber tile; the stopped feed line is red, so the dot on Devices is red.', B.panel,
     roomTop('equip') + panel(eqInner));
   // 6 · the task: legend is the key, no tooltip
-  const f7 = frame(6, 'A task: the legend is the key, so no tooltip', 'The ring has no hover card: the legend beside it already says the same. Clicking a legend row shows only those pens; the chosen row is a quiet fill that stays inside its card.', B.task,
+  const f7 = frame(10, 'A task: the legend is the key, so no tooltip', 'The ring has no hover card: the legend beside it already says the same. Clicking a legend row shows only those pens; the chosen row is a quiet fill that stays inside its card.', B.task,
     taskTop('batches') + taskP);
   // 7 · pig profile: one Performance
-  const f8 = frame(7, 'At a pen: no pig count; one Performance', 'At a pen there are no batches, so Batches leaves the bar (her batch is a link on her card); the bar names the pen and Pigs has no count (her card is the panel, shown scrolled to the bottom). Her litters loses its “Performance ›” link; Performance is the button at the bottom, next to Log.', B.pig,
+  const f8 = frame(11, 'At a pen: no pig count; one Performance', 'At a pen there are no batches, so Batches leaves the bar (her batch is a link on her card); the bar names the pen and Pigs has no count (her card is the panel, shown scrolled to the bottom). Her litters loses its “Performance ›” link; Performance is the button at the bottom, next to Log.', B.pig,
     top({ name: 'Pen A7', noBatch: true }) + pigP);
   // 8 · 960
-  const f9 = frame(8, 'At 960 wide: the same bar', 'The bottom row and the 3D button keep their size; Actions stays at the far right.', B.room960,
+  const f9 = frame(12, 'At 960 wide: the same bar', 'The bar and the 3D button keep their size; the farm gets the rest.', B.room960,
     top({ name: 'Gestation 2', dot: true, warn: true, pigs: 186 }), 960);
   // 10 · batch cards from the last round
   const tcard = (title, big, word, day, of, sub) => H.card('<div style="' + st({ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }) + '">' + t(title, { fontSize: '15px', fontWeight: 600 }) + H.chev + '</div><div style="' + st({ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '8px' }) + '">' + t(big, { fontSize: '28px', lineHeight: '32px', fontWeight: 600, letterSpacing: '-.02em' }) + mu(word, { fontSize: '15px' }) + (sub ? '<span style="margin-left: auto;">' + H.badge('amber', sub) + '</span>' : '') + '</div>' + strip(day, of) + '<div style="margin-top: 8px;">' + mu('Day ' + day + ' of ' + of) + '</div>', { pad: '14px 16px' });
   const up = (rows) => H.sec('Upcoming') + H.card(rows.map((x, i) => '<div style="' + st({ display: 'flex', alignItems: 'center', gap: '10px', minHeight: '48px', borderTop: i ? '1px solid ' + K.line : '0' }) + '">' + t(x[0], { width: '80px', fontSize: '13px', color: K.muted }) + t(x[1], { flex: 1, whiteSpace: 'normal' }) + mu(x[2]) + '</div>').join(''), { pad: '0 16px' });
   const b32 = H.head('Batch 32', 'Farrowing Room 2 · 50 sows', 'back') + H.sec('Running now', '', 20) + tcard('Farrowing', '4', 'farrowing', 3, 7, '1 past due') + '<div style="height: 8px;"></div>' + tcard('Post-farrowing check', '6', 'due today', 3, 7) + up([['Sat 7 Nov', 'Piglet processing', 'in 2 days'], ['Fri 27 Nov', 'Wean, to Nursery 1', 'in 3 weeks']]);
-  const f10 = frame(9, 'Batch page: the phone’s task card (from last round, for your call)', 'Each running task says what is happening now in one number (Home’s rules: farrowing underway, then past due, then due today, then the next date) and the days as the phone’s strip. No ring: the ring read as “% done” but counted days.', B.task,
+  const f10 = frame(13, 'Batch page: the phone’s task card (from last round, for your call)', 'Each running task says what is happening now in one number (Home’s rules: farrowing underway, then past due, then due today, then the next date) and the days as the phone’s strip. No ring: the ring read as “% done” but counted days.', B.task,
     taskTop('batches') + panel(b32));
   const quiet = H.card('<div style="' + st({ display: 'flex', alignItems: 'center', gap: '10px' }) + '">' + t('No task running', { fontWeight: 600 }) + '<span style="margin-left: auto;">' + mu('next: Weigh 10 pigs, in 3 days') + '</span></div>', { pad: '14px 16px' });
   const b31 = H.head('Batch 31', 'Nursery, day 24 of 42 · 488 weaners', 'back') + '<div style="margin: 20px 4px 0;">' + mu('No task running', { fontSize: '14px' }) + '</div>' + up([['Fri 6 Nov', 'Weigh 10 pigs', 'in 3 days'], ['Wed 2 Dec', 'End of nursery, to Finisher 2', 'in 4 weeks']]);
-  const f11 = frame(10, 'A batch in a stage: no card to fill', 'Nursery and Quarantine are stages, not tasks. The stage and its day live in the header; the page says plainly that no task is running, and Upcoming already says what comes next, so it is not said twice.', B.task,
+  const f11 = frame(14, 'A batch in a stage: no card to fill', 'Nursery and Quarantine are stages, not tasks. The stage and its day live in the header; the page says plainly that no task is running, and Upcoming already says what comes next, so it is not said twice.', B.task,
     taskTop('batches') + panel(b31));
 
   const shell = fs.readFileSync(path.join(path.dirname(OUT), 'LocationCard.dc.html'), 'utf8');
@@ -114,7 +119,9 @@ const callout = (x, y, n) => '<span style="' + st({ position: 'absolute', left: 
   const html = pre + '<div style="' + st({ width: W + 'px', padding: '40px 48px 64px', boxSizing: 'border-box', background: '#F3F4F1', fontFamily: "'Geist', system-ui, sans-serif", fontSize: '14px', lineHeight: '20px', color: '#111511', WebkitFontSmoothing: 'antialiased', fontVariantNumeric: 'tabular-nums' }) + '">' +
     '<h1 style="margin: 0; font-size: 28px; line-height: 36px; font-weight: 600; letter-spacing: -.025em;">Farm view, rearranged</h1>' +
     '<div style="margin-top: 6px; color: #5D665F; max-width: 1500px; font-size: 15px; line-height: 23px;">A proposal on the farm as it renders today; the 3D is untouched. One rule throughout: <b>nothing on the edges reacts to hover</b>. Hovers stay on the farm (a pen) and on charts where they add detail the screen does not already show. Everything else is a click, and every panel opens in the same place on the right.</div>' +
-    '<div style="' + st({ display: 'grid', gridTemplateColumns: 'repeat(2, 1360px)', gap: '64px 56px', marginTop: '36px', alignItems: 'start' }) + '">' + [f1, f2, f3, f5, f6, f7, f8, f9].join('\n') + '</div>' +
+    '<div style="' + st({ display: 'grid', gridTemplateColumns: 'repeat(2, 1360px)', gap: '64px 56px', marginTop: '36px', alignItems: 'start' }) + '">' + colHead('On top', 'The bar and 3D at the top right; panels open under them.') + colHead('At the bottom', 'The bar and 3D at the bottom right; panels open above them.') + [A[0], Bv[0], A[1], Bv[1], A[2], Bv[2], A[3], Bv[3]].join('\n') + '</div>' +
+    '<h2 style="margin: 64px 0 0; padding-top: 28px; border-top: 1px solid #DFE4D8; font-size: 22px; line-height: 28px; font-weight: 600;">The rest, shown with the pair on top</h2>' +
+    '<div style="' + st({ display: 'grid', gridTemplateColumns: 'repeat(2, 1360px)', gap: '64px 56px', marginTop: '24px', alignItems: 'start' }) + '">' + [f6, f7, f8, f9].join('\n') + '</div>' +
     '<h2 style="margin: 64px 0 0; padding-top: 28px; border-top: 1px solid #DFE4D8; font-size: 22px; line-height: 28px; font-weight: 600;">Batch cards</h2>' +
     '<div style="' + st({ display: 'grid', gridTemplateColumns: 'repeat(2, 1360px)', gap: '64px 56px', marginTop: '24px', alignItems: 'start' }) + '">' + [f10, f11].join('\n') + '</div></div>\n</x-dc>\n</body>\n</html>\n';
   fs.writeFileSync(OUT, html); console.log('wrote', OUT, html.length);
