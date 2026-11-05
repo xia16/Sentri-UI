@@ -493,7 +493,9 @@ async function moveMap(name, scan) {
     const head = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>120</strong><span>pigs to Unit 9</span></div><small>Today · into A1–A4, B1–B2</small></div>';
     page('Pigs to move', 'Transfer · batch 25 · from Farrowing room 3', head + '<div class="m-map">' + host.innerHTML + '</div>', scan
       ? '<div class="sheet-footer st-scan-foot m-scanfoot" data-ds="Sheet">' + U.button({ label: 'Stop scanning', icon: ic('stop'), register: 'secondary', className: 'st-scan-toggle', action: 'x' })
-        + '<div class="m-toast">' + U.toast(scan[0], { detail: scan[1] }) + '</div></div>'
+        + '<div class="m-toast">' + U.toast(scan[0], { detail: scan[1] })
+          .replace('<span class="st-toast-copy">', '<span class="st-toast-glyph m-g-' + scan[2] + '" aria-hidden="true">' + ic(scan[2] === 'move' ? 'transfer' : 'pen') + '</span><span class="st-toast-copy">')
+          .replace('>' + scan[0].split(' · ')[0] + ' · ', '><span class="m-vw-' + scan[2] + '">' + scan[0].split(' · ')[0] + '</span> · ') + '</div></div>'
       : '<div class="sheet-footer st-scan-foot" data-ds="Sheet">' + U.button({ label: 'Scan', icon: ic('scan'), register: 'primary', action: 'x' }) + '</div>');
     const st = document.createElement('style'); st.textContent = UNIT_CSS + PLAN_CSS + `.m-count .m-map .st-pen-tile .m-pi svg{width:22px;height:22px;display:block;color:var(--ink,#20291f)}
       .m-count .m-map .st-pen-tile .m-pn.m-part{font-size:17px}
@@ -501,7 +503,10 @@ async function moveMap(name, scan) {
       .m-count .m-map .st-pen-tile .m-mv{font:500 15px/1.2 var(--font-sans,inherit);color:var(--ink,#20291f)}
       .m-count .m-map .st-pen-tile .m-frac{font:500 14px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--muted,#657060)}
       .m-count .m-map .st-pen-tile .m-frac b{font:600 22px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}
-      .m-scanfoot{position:relative}.m-toast{position:absolute;left:0;right:0;bottom:calc(100% + 12px);z-index:5;--toast-bottom:0px}`;
+      .m-scanfoot{position:relative}.m-toast{position:absolute;left:0;right:0;bottom:calc(100% + 12px);z-index:5;--toast-bottom:0px}
+      .m-toast .st-toast-glyph.m-g-move{background:var(--progress-fill,#c1ddfd);color:var(--progress-fill-ink,#1f4470)}
+      .m-toast .st-toast-glyph.m-g-stay{background:var(--amber-fill,#fede82);color:var(--amber-fill-ink,#5c3f00)}
+      .m-toast .m-vw-move{color:var(--progress-fill,#c1ddfd)}.m-toast .m-vw-stay{color:var(--amber-fill,#fede82)}`;
     document.head.append(st);
   }, { UNIT_CSS, PLAN_CSS, MOVE, scan });
   await shoot(p, name);
@@ -540,8 +545,8 @@ if (want('14t')) {
 
 // 9m, 9t. Move or stay? by scan (owner, 2026-11-05: a toast, not a page). Scan keeps the map; Stop scanning takes the footer; each
 //    read is a toast over the map that leads with the answer, Move (and where to) or Stay (and the pen she keeps); the next read replaces it.
-if (want('9m')) await moveMap('mock-9m-scan-move.png', ['Move · 000904', 'To Unit 9']);
-if (want('9t')) await moveMap('mock-9t-scan-stay.png', ['Stay · 000901', 'Keep her in A3']);
+if (want('9m')) await moveMap('mock-9m-scan-move.png', ['Move · 000904', 'To Unit 9', 'move']);
+if (want('9t')) await moveMap('mock-9t-scan-stay.png', ['Stay · 000901', 'Keep her in A3', 'stay']);
 
 // 16. End the transfer (owner, 2026-11-03: "look at how we do it for the farrowing end task"): Farrowing's End task, its own parts.
 //     The heading answers whether the task can close; one bar over the batch's pigs, then a row per part (Received; Not arrived,
