@@ -49,7 +49,10 @@ async function overflow(page) {
       assert.deepEqual(await scope.locator('.picker-table tbody tr').evaluateAll(rows => rows.map(r => r.getBoundingClientRect().height)), Array(6).fill(48));
     }
     await load(url);
-    assert.equal(await page.locator('.screens').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length), 2);
+    assert.equal(await page.locator('.screens').first().evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length), 2);
+    assert.deepEqual(await page.locator('.board-group>h2').allTextContents(), ['Treatment','Pig list']);
+    assert.equal(await page.locator('.rule h2').textContent(), 'Pig list: the rule (console)');
+    assert.equal(await page.locator('.rule table').count(), 2);
     await page.screenshot({ path: path.join(shots, 'board.png'), fullPage: true });
     await page.locator('[data-open="pick"]').click();
     const overlay = page.locator('#overlay-stage');
@@ -86,9 +89,9 @@ async function overflow(page) {
     await page.getByRole('button', {name:'Whole console',exact:true}).click();
     overflows.push(...await overflow(page));
     await page.setViewportSize({width:1000,height:900});
-    assert.equal(await page.locator('.screens').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length), 1);
+    assert.equal(await page.locator('.screens').first().evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length), 1);
     await page.setViewportSize({ width: 1440, height: 900 });
-    for (const id of ['pick','form','filled','running']) {
+    for (const id of ['pick','form','filled','running','pick-filters','pick-agent','pick-none']) {
       await load(`${url}?frame=${id}`);
       if(id === 'filled') {
         assert(await page.locator('.agent-comment').evaluate(el => {const b=el.getBoundingClientRect();const scroll=el.closest('.page-scroll').getBoundingClientRect();return b.top>=scroll.top && b.bottom<=scroll.bottom}), 'Comment must be fully above the fold');
@@ -101,6 +104,42 @@ async function overflow(page) {
         assert.equal(await page.locator('.pig-source').textContent(), '4 sows · Gestation 2');
       }
       await page.screenshot({ path: path.join(shots, `${id}.png`) });
+      if (id.startsWith('pick')) {
+        assert.equal(await page.locator('.filters').evaluate(el => {
+          const boxes=[...el.children].map(c=>c.getBoundingClientRect());
+          return boxes.every(b=>Math.abs(b.top+ b.height/2-boxes[0].top-boxes[0].height/2)<1);
+        }), true, 'Filter controls must share one row');
+        assert.equal(await page.getByRole('button',{name:'Columns',exact:true}).count(),1);
+      }
+      if (id === 'pick-filters' || id === 'pick-none') {
+        if (id === 'pick-filters') {
+          assert.equal(await page.getByRole('menu').isVisible(),true);
+          assert.equal(await page.getByRole('menuitem').count(),6);
+          assert.equal(await page.getByRole('menu').evaluate(el=>el.getBoundingClientRect().width),280);
+        } else {
+          assert.equal(await page.locator('.picked-count').textContent(),'0 picked');
+          assert.equal(await page.locator('.continue-pigs').isDisabled(),true);
+          assert.equal(await page.locator('.picker-table').count(),0);
+        }
+        await page.locator('.ask-chat:visible').click();
+        assert.equal(await page.locator('.composer-placeholder').evaluate(el=>el===document.activeElement),true);
+        assert.equal(await page.locator('.filter-menu').isVisible(),false);
+        await page.locator('.add-filter').click();
+        assert.equal(await page.getByRole('menu').isVisible(),true);
+        await page.locator('.add-filter').click();
+      }
+      if (id === 'pick-agent') {
+        assert.equal(await page.locator('.picked-count').textContent(),'3 of 3 picked');
+        assert.equal(await page.locator('[data-pig]:checked').count(),3);
+        assert.deepEqual(await page.locator('td.number').allTextContents(),['39.8','39.8','39.6']);
+        assert.equal(await page.locator('th[aria-sort="descending"]').textContent(),'Temp °C');
+        await page.locator('.query-details').click();
+        assert.equal(await page.locator('.query-filters').isVisible(),true);
+        await page.locator('.query-details').click();
+        await page.getByRole('button',{name:"Remove Vet's search",exact:true}).click();
+        assert.equal(await page.locator('.query-chip').count(),0);
+        assert.equal(await page.getByText('Choose a room, batch or finding to see pigs.',{exact:true}).count(),1);
+      }
       if (id === 'pick') {
         await assertPicker(page);
         await page.getByRole('checkbox', {name:'Pick C07',exact:true}).check();
