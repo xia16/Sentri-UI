@@ -479,10 +479,10 @@ if (want('12')) {
 //    (owner, 2026-11-03: no icon, no key, no list of who stays): All, or 12/13 with the 12 that move big.
 //    Farrowing room 3: A1 12 · A2 11 · A3 12 of 13 · A4 10 · B1 13 · B2 11 · B3 12 · B4 9 of 10 · C1–C3 10 each = 120.
 const MOVE = { A1: 'all', A2: 'all', A3: '12/13', A4: 'all', B1: 'all', B2: 'all', B3: 'all', B4: '9/10', C1: 'all', C2: 'all', C3: 'all' };
-if (want('9-')) {
+async function moveMap(name, scan) {
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
-  await p.evaluate(({ UNIT_CSS, PLAN_CSS, MOVE }) => {
+  await p.evaluate(({ UNIT_CSS, PLAN_CSS, MOVE, scan }) => {
     const { U, ic, page } = window.M;
     const pens = {}; for (const c of Object.keys(MOVE)) pens[c] = 'plain';
     const host = document.createElement('div'); host.innerHTML = U.penMap({ lanes: ['A', 'B', 'C'], depth: 4, pens, key: 'move' });
@@ -491,17 +491,22 @@ if (want('9-')) {
       t.innerHTML = '<span class="m-pc">' + c + '</span>' + (!v ? '' : v === 'all' ? '<span class="m-mv">All</span>' : '<span class="m-frac"><b>' + v.split('/')[0] + '</b>/' + v.split('/')[1] + '</span>');
     });
     const head = '<div class="m-recv-bar"><div class="m-recv-figs"><strong>120</strong><span>pigs to Unit 9</span></div><small>Today · into A1–A4, B1–B2</small></div>';
-    page('Pigs to move', 'Transfer · batch 25 · from Farrowing room 3', head + '<div class="m-map">' + host.innerHTML + '</div>', '<div class="sheet-footer st-scan-foot" data-ds="Sheet">' + U.button({ label: 'Scan', icon: ic('scan'), register: 'primary', action: 'x' }) + '</div>');
+    page('Pigs to move', 'Transfer · batch 25 · from Farrowing room 3', head + '<div class="m-map">' + host.innerHTML + '</div>', scan
+      ? '<div class="sheet-footer st-scan-foot m-scanfoot" data-ds="Sheet">' + U.button({ label: 'Stop scanning', icon: ic('stop'), register: 'secondary', className: 'st-scan-toggle', action: 'x' })
+        + '<div class="m-toast">' + U.toast(scan[0], { detail: scan[1] }) + '</div></div>'
+      : '<div class="sheet-footer st-scan-foot" data-ds="Sheet">' + U.button({ label: 'Scan', icon: ic('scan'), register: 'primary', action: 'x' }) + '</div>');
     const st = document.createElement('style'); st.textContent = UNIT_CSS + PLAN_CSS + `.m-count .m-map .st-pen-tile .m-pi svg{width:22px;height:22px;display:block;color:var(--ink,#20291f)}
       .m-count .m-map .st-pen-tile .m-pn.m-part{font-size:17px}
       .m-count .m-plankey .m-ki{display:inline-flex;align-items:center;gap:6px}.m-count .m-plankey .m-ki svg{width:16px;height:16px}
       .m-count .m-map .st-pen-tile .m-mv{font:500 15px/1.2 var(--font-sans,inherit);color:var(--ink,#20291f)}
       .m-count .m-map .st-pen-tile .m-frac{font:500 14px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--muted,#657060)}
-      .m-count .m-map .st-pen-tile .m-frac b{font:600 22px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}`;
+      .m-count .m-map .st-pen-tile .m-frac b{font:600 22px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}
+      .m-scanfoot{position:relative}.m-toast{position:absolute;left:0;right:0;bottom:calc(100% + 12px);z-index:5;--toast-bottom:0px}`;
     document.head.append(st);
-  }, { UNIT_CSS, PLAN_CSS, MOVE });
-  await shoot(p, 'mock-9-transfer-out.png');
+  }, { UNIT_CSS, PLAN_CSS, MOVE, scan });
+  await shoot(p, name);
 }
+if (want('9-')) await moveMap('mock-9-transfer-out.png');
 for (const [name, view] of [['mock-9b-pen-move.png', 'move'], ['mock-9c-pen-stay.png', 'stay']]) {
   if (!want(name.slice(5, 7))) continue;
   const p = await open(INSPECT, 'inspection.walk');
@@ -533,43 +538,10 @@ if (want('14t')) {
     scan: { bar: 'Scan, then tap a pen', read: [], toast: '3 pigs put in B2' } });
 }
 
-// 9s–9t. Move or stay? (owner, 2026-11-05): Scan on Pigs to move, or on a pen, opens Farrowing's Scan ear tags page; each read
-//    answers in one big word where the hint was, Move (and where to) or Stay (amber: she is the one to hold back), and the next read
-//    replaces it, so the crew sorts a pen without closing anything. Stop scanning stays in the footer.
-const VERDICT = { '9s': null,
-  '9m': { tag: '000904', ctx: 'Gilt · A3', word: 'Move', line: 'To Unit 9', tone: 'move' },
-  '9t': { tag: '000901', ctx: 'Gilt', word: 'Stay', line: 'Keep her in A3', tone: 'stay' } };
-for (const [k, v] of Object.entries(VERDICT)) {
-  if (!want(k)) continue;
-  const p = await open(INSPECT, 'inspection.walk');
-  await prep(p);
-  await p.evaluate(({ v }) => {
-    const { U } = window.M;
-    const bar = document.querySelector('.phone .statusbar')?.outerHTML || '';
-    document.querySelector('.phone').innerHTML = U.scanPage({ title: 'Scan ear tags', back: { action: 'x' }, read: 'open', connected: true, listening: true,
-      toggle: { action: 'x' }, empty: { text: 'Each pig shows Move or Stay as soon as her tag is read.' }, bar });
-    if (v) {
-      let hint = null; const w = document.createTreeWalker(document.querySelector('.phone'), NodeFilter.SHOW_TEXT);
-      while (w.nextNode()) if (w.currentNode.nodeValue.includes('Hold the reader')) hint = w.currentNode.parentElement;
-      let box = hint; while (box.parentElement && !/sheet-body/.test(box.parentElement.className)) box = box.parentElement;
-      box.innerHTML = '<div class="m-verdict m-' + v.tone + '"><strong>' + v.word + '</strong><span class="m-vtag">' + v.tag + '</span><small>' + v.ctx + '</small><em>' + v.line + '</em></div>'
-        + '<p class="m-vnext">Scan the next pig</p>';
-      box.classList.add('m-vbox');
-    }
-    const st = document.createElement('style');
-    st.textContent = '.phone .st-scan{font-family:var(--font-sans,"Plus Jakarta Sans",sans-serif)}.m-vbox{width:100%;padding:0 16px;box-sizing:border-box;display:flex;flex-direction:column;align-items:stretch;text-align:center}'
-      + '.m-verdict{display:flex;flex-direction:column;align-items:center;gap:6px;padding:32px 20px 28px;border-radius:16px;background:var(--paper,#fff);border:1px solid var(--line,#dfe3da);color:var(--ink,#20291f)}'
-      + '.m-verdict strong{font:700 56px/1 var(--font-sans,inherit);letter-spacing:-.01em;margin-bottom:14px}'
-      + '.m-verdict .m-vtag{font:600 20px/1.2 var(--font-mono,"IBM Plex Mono",monospace)}'
-      + '.m-verdict small{font-size:15px;color:var(--muted,#657060)}'
-      + '.m-verdict em{font-style:normal;font-size:17px;font-weight:600;margin-top:12px}'
-      + '.m-verdict.m-stay{background:var(--amber-fill,#fede82);border-color:transparent;color:var(--amber-fill-ink,#5c3f00)}'
-      + '.m-verdict.m-stay small{color:var(--amber-fill-ink,#5c3f00)}'
-      + '.m-vnext{margin:16px 0 0;font-size:13px;color:var(--muted,#657060)}';
-    document.head.append(st);
-  }, { v });
-  await shoot(p, 'mock-' + k + '-scan-' + (v ? v.word.toLowerCase() : 'listening') + '.png');
-}
+// 9m, 9t. Move or stay? by scan (owner, 2026-11-05: a toast, not a page). Scan keeps the map; Stop scanning takes the footer; each
+//    read is a toast over the map that leads with the answer, Move (and where to) or Stay (and the pen she keeps); the next read replaces it.
+if (want('9m')) await moveMap('mock-9m-scan-move.png', ['Move · 000904', 'To Unit 9']);
+if (want('9t')) await moveMap('mock-9t-scan-stay.png', ['Stay · 000901', 'Keep her in A3']);
 
 // 16. End the transfer (owner, 2026-11-03: "look at how we do it for the farrowing end task"): Farrowing's End task, its own parts.
 //     The heading answers whether the task can close; one bar over the batch's pigs, then a row per part (Received; Not arrived,
