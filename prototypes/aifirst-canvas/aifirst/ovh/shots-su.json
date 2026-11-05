@@ -1,0 +1,10 @@
+{
+  "title": "Farm setup: every state",
+  "sub": "Screenshots of the setup flows, so this page stays fast. The live frame beside this board is day one with the General Manager: click around in it.",
+  "sections": [
+    ["Day one", [["su_FlowSetup", "Day one: the General Manager sets up the farm from your files"], ["su_FlowImport", "Import the herd: three quick fixes"], ["su_FlowGuideGap", "Layout not finished: the line waits, Home says why"], ["su_Line_NeedsLayout", "Production line opened too early: finish the layout first"]]],
+    ["The production line", [["su_FlowLine", "Layout done: Production proposes plans that fit your rooms"], ["su_FlowLinePicked", "One answer, and Line 1 opens filled from plan A"], ["su_FlowLinePlan", "The line page: status, calendar, five parts to change"], ["su_FlowLineChange", "Change the rhythm: one step, applies from Batch 38"]]],
+    ["A new line, step by step", [["su_LineStep_new1", "1 · What the line does"], ["su_LineStep_new2", "2 · How often a batch starts"], ["su_LineStep_new3", "3 · Rooms and moves"], ["su_LineStep_new4", "4 · When each job happens"], ["su_LineStep_new5", "5 · What each stage should achieve"], ["su_LineStep_review", "Review, then create Line 1"]]],
+    ["Farm settings", [["su_FlowSettings", "Farm settings: one change, plainly"]]]
+  ]
+}
