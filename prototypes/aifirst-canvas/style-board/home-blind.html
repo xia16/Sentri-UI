@@ -371,6 +371,10 @@ body{gap:24px}
 .pop-foot kbd{font:inherit;font-weight:600;color:var(--ink-2);background:var(--fill-2);border-radius:4px;padding:0 4px;margin-right:3px}
 .amain.searching .ablock{border:0;margin:0;padding:0}.amain.searching .aend{display:none}
 body{flex-wrap:wrap;align-content:center}
+.aindex .amain{padding:0 6px 6px}
+.atitle{position:sticky;top:0;z-index:1;background:#fff;font-size:12px;font-weight:600;color:var(--ink-3);padding:10px 10px 6px;letter-spacing:.01em}
+.ablock + .ablock{border-top:0;margin-top:0;padding-top:0}
+.amain.searching .atitle{display:none}
 </style>
 </head>
 <body>
@@ -381,7 +385,6 @@ body{flex-wrap:wrap;align-content:center}
   <div class="pop" role="dialog" aria-label="Actions">
     <div class="pop-search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="actSearch" placeholder="Search actions" aria-label="Search actions"></div>
     <div id="actions"></div>
-    <div class="pop-foot"><span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>Enter</kbd> open</span><span><kbd>Esc</kbd> close</span></div>
   </div>
   <div class="composer">
     <span class="looking">Looking at <b>Home</b></span>
@@ -638,10 +641,10 @@ body{flex-wrap:wrap;align-content:center}
   ];
   var actSel=0;
   $('actions').innerHTML='<div class="aindex"><div class="aside">'+agroups.map(function(x,i){return '<button class="aitem2'+(i===0?' on':'')+'" data-sel="'+i+'"><span class="sq xs '+x[2]+'">'+icon(x[1],14)+'</span>'+x[0]+'<span class="n">'+x[3].length+'</span></button>'}).join('')+'</div>'+
-    '<div class="amain" id="amain">'+agroups.map(function(g,i){return '<div class="ablock" data-block="'+i+'">'+g[3].map(function(a){return '<button class="arow" data-open="'+a[0]+'">'+icon(a[1],16)+'<span>'+a[0]+'</span>'+icon('right',14,2)+'</button>'}).join('')+'</div>'}).join('')+'<div class="aend">That’s every action</div></div></div>';
+    '<div class="amain" id="amain">'+agroups.map(function(g,i){return '<div class="ablock" data-block="'+i+'"><div class="atitle">'+g[0]+'</div>'+g[3].map(function(a){return '<button class="arow" data-open="'+a[0]+'">'+icon(a[1],16)+'<span>'+a[0]+'</span>'+icon('right',14,2)+'</button>'}).join('')+'</div>'}).join('')+'<div class="aend">That’s every action</div></div></div>';
   var amain=$('amain');
   function setSel(i){actSel=i;$('actions').querySelectorAll('.aitem2').forEach(function(b,k){b.classList.toggle('on',k===i)})}
-  $('actions').addEventListener('click',function(e){var t=e.target.closest('[data-sel]');if(!t)return;var i=+t.dataset.sel,blk=amain.querySelector('[data-block="'+i+'"]');amain.scrollTo({top:i?blk.offsetTop+5:0,behavior:'smooth'});setSel(i)});
+  $('actions').addEventListener('click',function(e){var t=e.target.closest('[data-sel]');if(!t)return;var i=+t.dataset.sel,blk=amain.querySelector('[data-block="'+i+'"]');amain.scrollTo({top:blk.offsetTop,behavior:'smooth'});setSel(i)});
   amain.addEventListener('scroll',function(){if(amain.classList.contains('searching'))return;var y=amain.scrollTop+12,cur=0;amain.querySelectorAll('.ablock').forEach(function(b,k){if(b.offsetTop<=y)cur=k});if(amain.scrollTop+amain.clientHeight>=amain.scrollHeight-2)cur=agroups.length-1;setSel(cur)},{passive:true});
   $('actSearch').addEventListener('input',function(){var q=this.value.trim().toLowerCase();amain.classList.toggle('searching',!!q);if(q){$('actions').querySelectorAll('.aitem2').forEach(function(b){b.classList.remove('on')});amain.scrollTop=0}else setSel(0);amain.querySelectorAll('.arow').forEach(function(r){r.hidden=!!q&&r.textContent.toLowerCase().indexOf(q)<0});amain.querySelectorAll('.ablock').forEach(function(b){b.hidden=![].some.call(b.querySelectorAll('.arow'),function(r){return !r.hidden})})});
 
