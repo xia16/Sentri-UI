@@ -40,10 +40,12 @@
   // Devices: the room's readings first, then its equipment; a tile opens its card in the panel
   ovDevPanel(O, u) {
     const E = Object.assign(this.ovEqCtx(u), O.eqs || {});
+    const pg = this.ovDevPage(O, E); if (pg != null) return pg;
     if (O.dev === 'fan') return OVP2.fan(E);
     if (O.dev === 'lamps') return OVP2.lamps(E);
     if (O.dev === 'floor') return OVP2.floor(E);
     let t = OVP2.tiles(E); const i = t.indexOf('</div>'); if (t.indexOf('<div style="display: flex; justify-content: space-between; align-items: baseline; margin: 4px 4px 8px;">') === 0) t = t.slice(i + 6);
+    if (O.devShow) { const a = { feed: 'devshow:feed', lamps: 'dev:lamps', floor: 'dev:floor', climate: 'devshow:climate', nh3: 'trendt:nh3' }[O.devShow]; if (a) t = t.replace('data-a="' + a + '" style="', 'data-a="' + a + '" style="box-shadow: inset 0 0 0 2px ' + OVH.K.ink + '; '); }
     return OVH.head('Devices', E.pen ? 'Pen ' + E.pen : E.room, '') + '<div style="margin-top: 16px;">' + t + '</div>';
   }
   // 3D: the camera tools, bottom left, opening upward
@@ -96,8 +98,12 @@
       if (O.panel === 'pigs') { this.ovAct('close'); return true; }
       if (u.bv) this.closeBatch(); this.ovSet({ panel: 'pigs', hist: [], pop: '' }); return true;
     }
-    if (k === 'devices' || k === 'equip') { if (O.panel === 'devices') { this.ovSet({ panel: '', dev: '', pop: '' }); return true; } if (u.bv) this.closeBatch(); this.ovSet({ panel: 'devices', dev: '', hist: [], pop: '' }); return true; }
-    if (k === 'popclose' && O.panel === 'devices') { this.ovSet({ panel: '', dev: '', pop: '' }); return true; }
+    if (k === 'devshow') { this.ovSet({ dev: v, devShow: v }); return true; }
+    if (k === 'dev') { O.devShow = v === 'lamp1' ? 'lamps' : v; return false; }
+    if (k === 'devback') { O.devShow = ''; return false; }
+    if (k === 'trendt' && O.panel === 'devices') { this.ovSet({ dev: 'r:' + v, devShow: v === 'nh3' ? 'nh3' : '', pop: '' }); return true; }
+    if (k === 'devices' || k === 'equip') { if (O.panel === 'devices') { this.ovSet({ panel: '', dev: '', pop: '', devShow: '' }); return true; } if (u.bv) this.closeBatch(); this.ovSet({ panel: 'devices', dev: '', hist: [], pop: '' }); return true; }
+    if (k === 'popclose' && O.panel === 'devices') { this.ovSet({ panel: '', dev: '', pop: '', devShow: '' }); return true; }
     if (k === 'kind') { const vf = u.vf && u.vf.kind === 'stage' ? u.vf.id : ''; if (vf === v) { this.put({ vf: null }); this.repaintBv(); this.ovPaint(); } else { this.locationFilter('stage', v); this.ovPaint(); } return true; }
     if (k === 'viewmenu') { this.ovSet({ pop: O.pop === 'view' ? '' : 'view' }); return true; }
     if (k === 'vw') { const R = this.ovVals, f = R && R[v]; if (v === 'modeToggle') this.ovSet({ pop: '' }); if (typeof f === 'function') { try { f({ preventDefault() {}, stopPropagation() {}, currentTarget: h, target: h }); } catch (e) { /* ignore */ } } setTimeout(() => this.ovPaint(), 30); return true; }
@@ -162,6 +168,7 @@
     if (this.ovStarted !== st0) { this.ovStarted = st0; this.ovStart(st0); }
     const ps = (u.psel || []).join(',');
     if (ps !== this.ovPsel) { this.ovPsel = ps; this.ovPicked(u); }
+    try { this.ovDevApply(u); } catch (e) { console.warn('ovDev', e); }
     const H = OVH, K = H.K;
     // the panel's own header stays put while its body scrolls
     let panel = O.panel ? this.ovPanelHtml(O, u) : '';
@@ -180,4 +187,56 @@
     this.ovBody.innerHTML = html; this.ovLast = html; this.ovLastPanel = O.panel;
     const p2 = this.ovBody.querySelector('[data-zone="panel"]'); if (p2 && samePanel) p2.scrollTop = keep;
     this.ovBody.querySelectorAll('[data-scroll]').forEach((x) => { const id = x.getAttribute('data-scroll'); if (sc[id] != null && samePanel) x.scrollTop = sc[id]; else if (x.getAttribute('data-scroll-to')) x.scrollTop = +x.getAttribute('data-scroll-to'); });
+  }
+  // ----- a device shown on the farm: its icon in every pen it serves, its line lit; a room device shows where it sits -----
+  ovDevSpec(id, u) {
+    const rid = u.roomId, dd = (this.Dv().room[rid] || { devices: [] }).devices, rm = this.rooms && this.rooms.find((x) => x.id === rid), I = OVH.I;
+    const model = (kind) => dd.find((x) => x.kind === kind);
+    const lane = (L) => rm ? rm.pens.filter((p) => String(p.code).charAt(0) === L).map((p) => p.code) : [];
+    if (id === 'feed') { const m = model('feeder'); return m ? { line: m.id, room: m.id } : { pens: lane('C').slice(0, 12), icon: I.feeder, draw: true }; }
+    if (id === 'lamps') { const m = model('heat'); return m ? { line: m.id, room: m.id } : { pens: lane('A'), icon: I.lamp, draw: true }; }
+    if (id === 'floor') return { pens: lane('C').slice(0, 12), icon: I.floor, draw: true };
+    if (id === 'climate') { const m = model('climate'); return m ? { room: m.id } : null; }
+    if (id === 'nh3') { const m = model('nh3'); return m ? { room: m.id } : null; }
+    return null;
+  }
+  ovDevWant(L) { const sp = this.ovDevCur; return !!sp && !!sp.room && L.key === 'dev:' + this.ui().roomId + ':' + sp.room; }
+  ovDevApply(u) {
+    const O = this.ovS(), show = O.devShow || ({ floor: 'floor', lamps: 'lamps', feed: 'feed', climate: 'climate', 'r:nh3': 'nh3' })[O.dev] || '', key = (O.panel === 'devices' && show && u.view === 'room' ? u.roomId + ':' + show : '');
+    if (key === (this.ovDevKey || '')) return;
+    this.ovDevKey = key;
+    this.labels.forEach((L, k) => { if (L.kind === 'odev') { L.el.remove(); this.labels.delete(k); } });
+    (this.ovDevMs || []).forEach((m) => { if (m.parent) m.parent.remove(m); }); this.ovDevMs = [];
+    this.ovDevCur = key ? this.ovDevSpec(show, u) : null;
+    const sp = this.ovDevCur, rm = sp && this.rooms.find((x) => x.id === u.roomId);
+    if (sp && rm && sp.pens) {
+      const ps = sp.pens.map((c) => this.penByCode(rm, c)).filter(Boolean);
+      if (ps.length) { const q0 = ps.slice().sort((a, b) => b.z - a.z)[0]; this.label('odev:' + rm.id + ':head', 'odev', sp.icon, q0.x + q0.sx / 2 + 0.35, this.Y.YF + 0.2, q0.z + q0.sz / 2 + 0.6, { rm: rm, roomId: rm.id }); }
+      // a lane-bound device with no line of its own: one dark line through the pens it serves, row by row
+      if (sp.draw && ps.length && this.mat.devLineOn) {
+        const rows = {}; ps.forEach((p) => { const r = String(p.code).charAt(0); (rows[r] = rows[r] || []).push(p); });
+        const bar = (x, z, sx, sz) => { const m = new this.T.Mesh(this.unitBox, this.mat.devLineOn); m.scale.set(sx, 0.012, sz); m.position.set(x, this.Y.YF + 0.012, z); m.renderOrder = 3; rm.g.add(m); this.ovDevMs.push(m); };
+        Object.keys(rows).forEach((r) => { const q = rows[r], sx = q[0].sx, xe = q[0].x + sx / 2 + 0.35, z0 = Math.min(...q.map((p) => p.z)), z1 = Math.max(...q.map((p) => p.z));
+          bar(xe, (z0 + z1) / 2 + 0.3, 0.07, z1 - z0 + 0.67); q.forEach((p) => bar(p.x + sx / 2 + 0.175, p.z, 0.35, 0.05)); });
+      }
+    }
+    this.syncDevLines(); this.dirty = true;
+    if (key && sp && sp.room && !sp.line) this.reframe(600);
+  }
+  ovDevLines() {
+    const sp = this.ovDevCur, u = this.ui(), rm = sp && sp.line && this.rooms && this.rooms.find((x) => x.id === u.roomId);
+    if (rm && rm.devLines && rm.devLines[sp.line]) rm.devLines[sp.line].forEach((m) => { m.visible = true; m.material = this.mat.devLineOn; });
+  }
+  // ----- a device's own page in the Devices panel: readings with their trend; the climate controller; the feed line -----
+  ovDevPage(O, E) {
+    const H = OVH, K = H.K, d = O.dev, room = E.room;
+    const page = (title, sub, body) => H.head(title, sub, 'devback', { close: 'popclose' }) + body;
+    const trend = (kind) => H.card(this.ovTrend(kind).replace('padding: 6px 14px 10px;', 'padding: 0;'), { pad: '14px 16px' });
+    const facts = (rows) => H.card(rows.map((r, i) => H.row(H.mu(r[0], { fontSize: '14px' }), H.t(r[1], Object.assign({ fontWeight: 600 }, r[2] || {})), !i)).join(''), { pad: '0 16px' });
+    if (d === 'r:temp') return page('Temperature', room + ' · sensor at the far wall', '<div style="margin-top: 16px;">' + trend('temp') + '</div>' + H.sec('This sensor') + facts([['Range', '18 – 24 °C'], ['Today', '20.4 – 23.6 °C'], ['Reading every', '5 min']]));
+    if (d === 'r:hum') return page('Humidity', room + ' · sensor at the far wall', '<div style="margin-top: 16px;">' + trend('hum') + '</div>' + H.sec('This sensor') + facts([['Range', '50 – 75 %'], ['Today', '58 – 66 %'], ['Reading every', '5 min']]));
+    if (d === 'r:nh3') return page('Ammonia', room + ' · sensor on the right wall', '<div style="margin-top: 16px;">' + trend('nh3') + '</div>' + H.sec('This sensor') + facts([['Limit', '8 ppm'], ['Above it for', '2 h', { color: K.amber }], ['Reading every', '5 min']]));
+    if (d === 'climate') return page('Climate', room + ' · controller on the back wall', H.sec('Now', '', 18) + '<div style="' + H.st({ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }) + '">' + H.kpi('Set to', '22', '°C', '', 'Auto') + H.kpi('Room', '22.4', '°C', '', 'in range') + '</div>' + '<div style="height: 8px;"></div>' + trend('temp') + '<div style="height: 8px;"></div>' + trend('hum'));
+    if (d === 'feed') return page('Feed line', room + ' · serves 12 pens on lane C', '<div style="margin-top: 16px;">' + H.card('<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '10px' }) + '">' + H.dot(K.red, 10) + H.t('Stopped', { fontSize: '17px', fontWeight: 600, color: K.red }) + '<span style="margin-left: auto;">' + H.mu('since 09:40') + '</span></div><div style="margin-top: 6px;">' + H.mu('Motor fault · the 10:00 feed did not run', { whiteSpace: 'normal' }) + '</div>', { pad: '14px 16px' }) + '</div>' + H.sec('Feeds today') + facts([['06:00', 'Ran · 12 pens'], ['10:00', 'Missed', { color: K.red }], ['14:00', 'Next']]));
+    return null;
   }

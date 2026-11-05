@@ -74,3 +74,18 @@ if (!s.includes('/* ovPick */')) {
   s = s.replace(b, "        if (L.kind === 'pen') on = L.big ? ((u.psel || []).indexOf(L.pen && L.pen.code) >= 0 ? 2 : true) : false;");
 }
 fs.writeFileSync(f, s); console.log('applied 7');
+// 15) a device shown from Devices: its icon sits in each pen it serves (odev pins), its line lights up
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('/* ovDev */')) {
+  const r = [
+    ["      else if (k === 'flag') want = roomView && !!this.IP && L.roomId === u.roomId && this.pk > 0.3;", "      else if (k === 'odev') want = roomView && L.roomId === u.roomId; /* ovDev */\n      else if (k === 'flag') want = roomView && !!this.IP && L.roomId === u.roomId && this.pk > 0.3;"],
+    ["      else if (k === 'device') want = roomView && !intro && L.roomId === u.roomId && (!this.IP || !!u.lens);", "      else if (k === 'device') want = roomView && !intro && L.roomId === u.roomId && (!this.IP || !!u.lens || (this.ovDevWant && this.ovDevWant(L)));"],
+    ["    else if (kind === 'flag') { if (L.text !== text)", "    else if (kind === 'odev') { if (L.text !== text) { L.text = text; L.el.innerHTML = '<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" style=\"width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round\"><path d=\"' + text + '\"></path></svg>'; L.w = 0; } }\n    else if (kind === 'flag') { if (L.text !== text)"],
+    ["    if (kind === 'flag') return base + ", "    if (kind === 'odev') return base + 'z-index:3; width:22px; height:22px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:11px; background:#121815; color:#FFFFFF; border:1.5px solid #FFFFFF; box-shadow:0 1px 3px rgba(18,24,21,0.3); pointer-events:none;';\n    if (kind === 'flag') return base + "],
+    ["    const flex = (L) => (L.kind === 'device' ||", "    const flex = (L) => (L.kind === 'odev' || L.kind === 'device' ||"],
+    ["      Object.keys(rm.devLines || {}).forEach((id) => rm.devLines[id].forEach((m) => { m.visible = on; m.material = id === sid || u.dp === id ? this.mat.devLineOn : this.mat.devLine; }));\n    });", "      Object.keys(rm.devLines || {}).forEach((id) => rm.devLines[id].forEach((m) => { m.visible = on; m.material = id === sid || u.dp === id ? this.mat.devLineOn : this.mat.devLine; }));\n    });\n    if (this.ovDevLines) this.ovDevLines();"],
+    ["        if (L.kind === 'device') on = roomView && !!(u.sel && u.sel.kind === 'device' && u.sel.id === L.devId);", "        if (L.kind === 'device') on = roomView && (!!(u.sel && u.sel.kind === 'device' && u.sel.id === L.devId) || !!(this.ovDevWant && this.ovDevWant(L)));"],
+  ];
+  r.forEach(([a, b]) => { if (!s.includes(a)) { console.error('MISS dev ' + a.slice(0, 60)); process.exit(1); } s = s.replace(a, b); });
+}
+fs.writeFileSync(f, s); console.log('applied 8');
