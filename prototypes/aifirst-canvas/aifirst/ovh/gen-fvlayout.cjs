@@ -22,7 +22,7 @@ const sqBtn = (d, on) => '<span style="' + st({ display: 'inline-flex', alignIte
 // one connected bar across the top: ‹ (one level up), the place (click: switch), its sensors, then the panels, the view tools folded into 3D ▾, Actions
 const tab = (ic, label, on, count, warn) => '<span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '7px', height: '40px', padding: '0 10px', borderRadius: '12px', background: on ? K.press : 'transparent', boxShadow: on ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '14px', fontWeight: on ? 600 : 500, whiteSpace: 'nowrap' }) + '">' + icon(ic, 18) + esc(label) + (count != null ? '<span style="' + st({ color: on ? K.ink : K.muted, fontWeight: 600 }) + '">' + count + '</span>' : '') + (warn ? '<i style="' + st({ width: '8px', height: '8px', borderRadius: '999px', background: warn === true ? K.red : warn, flexShrink: 0, marginLeft: '-2px' }) + '"></i>' : '') + '</span>';
 const vline = '<i style="' + st({ width: '1px', height: '24px', background: K.line, margin: '0 6px', flexShrink: 0 }) + '"></i>';
-let POS = 'top';
+let POS = 'top', SELPOS = 'br';
 const edge = (v) => (POS === 'top' ? { top: v } : { bottom: v });
 function top(o) {
   o = o || {};
@@ -30,8 +30,13 @@ function top(o) {
   const view = '<span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '6px', height: '40px', padding: '0 10px', borderRadius: '12px', background: o.viewOpen ? K.press : 'transparent', boxShadow: o.viewOpen ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '14px', fontWeight: 500 }) + '">' + icon(X.cube, 18) + '3D' + icon(I.down, 14, { color: K.muted }) + '</span>';
   const act = '<span style="' + st({ display: 'inline-flex', alignItems: 'center', height: '40px', padding: '0 16px', marginLeft: '6px', borderRadius: '12px', background: K.ink, color: '#FFFFFF', fontSize: '14px', fontWeight: 600 }) + '">Actions</span>';
   const menu = '<div style="' + floatCard(Object.assign({ right: '16px', width: '108px', padding: '8px', display: 'flex', justifyContent: 'center' }, edge('16px'))) + '"><span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '8px', height: '40px', padding: '0 12px', borderRadius: '12px', background: o.viewOpen ? K.press : 'transparent', boxShadow: o.viewOpen ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '14px', fontWeight: 600 }) + '">' + icon(X.cube, 18) + (o.plan ? 'Plan' : '3D') + icon(POS === 'top' ? I.down : 'm6 15 6-6 6 6', 14, { color: K.muted }) + '</span></div>';
-  return '<div style="' + floatCard(Object.assign({ left: '16px', right: '132px', padding: '8px', display: 'flex', alignItems: 'center', gap: '2px' }, edge('16px'))) + '">' + sqBtn(I.back) + nameBtn + vline +
-    tab(I.select, 'Select', o.on === 'select') + (o.noBatch ? '' : tab(I.layers, 'Batches', o.on === 'batches')) + tab(I.pig, 'Pigs', o.on === 'pigs', o.pigs) + tab(I.tool, 'Devices', o.on === 'equip', null, o.warn) + (o.under || '') + '</div>' + menu;
+  const selOn = o.on === 'select';
+  const selBtn = '<span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '8px', height: '40px', padding: '0 12px', borderRadius: '12px', background: selOn ? K.press : 'transparent', boxShadow: selOn ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap' }) + '">' + icon(selOn ? I.check : I.select, 18) + (selOn ? 'Done' : 'Select') + '</span>';
+  const selRow = { display: 'flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap', padding: '8px' };
+  const sel = SELPOS === 'tr' ? '<div style="' + floatCard(Object.assign({ right: '132px', top: '16px' }, selRow)) + '">' + selBtn + '</div>' + (o.sel ? '<div style="' + floatCard(Object.assign({ left: '50%', transform: 'translateX(-50%)', bottom: '16px' }, selRow)) + '">' + o.sel + '</div>' : '')
+    : '<div style="' + floatCard(Object.assign({ right: '16px', bottom: '16px' }, selRow)) + '">' + (o.sel ? o.sel + vline : '') + selBtn + '</div>';
+  return sel + '<div style="' + floatCard(Object.assign({ left: '16px', padding: '8px', display: 'flex', alignItems: 'center', gap: '2px' }, edge('16px'))) + '">' + sqBtn(I.back) + nameBtn + vline +
+    (o.noBatch ? '' : tab(I.layers, 'Batches', o.on === 'batches')) + tab(I.pig, 'Pigs', o.on === 'pigs', o.pigs) + tab(I.tool, 'Devices', o.on === 'equip', null, o.warn) + (o.under || '') + '</div>' + menu;
 }
 // the view controls, opened from 3D ▾ (folded the rest of the time)
 function viewMenu() {
@@ -45,8 +50,8 @@ const choice = (r) => '<div style="' + st({ display: 'flex', alignItems: 'center
 // the switcher: only the places at this level; ‹ on the bar is the way up
 const switcher = (rows) => '<div style="' + floatCard(Object.assign({ left: '48px', width: '280px', padding: '6px' }, edge('60px'))) + '">' + rows.map(choice).join('') + '</div>';
 // a main panel on the right, under the bar: grey with white cards
-const panel = (inner) => '<div style="' + floatCard({ right: '16px', top: POS === 'top' ? '84px' : '16px', width: '380px', maxHeight: POS === 'top' ? 'calc(100% - 100px)' : 'calc(100% - 104px)', overflow: 'hidden', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint }) + '">' + inner + '</div>';
-const movePanel = (h) => need(need(h, 'top: 72px;', 'top: 84px;'), 'max-height: calc(100% - 164px);', 'max-height: calc(100% - 100px);');
+const panel = (inner) => '<div style="' + floatCard({ right: '16px', top: POS === 'top' ? '84px' : '16px', width: '380px', maxHeight: POS === 'top' ? 'calc(100% - 172px)' : 'calc(100% - 104px)', overflow: 'hidden', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint }) + '">' + inner + '</div>';
+const movePanel = (h) => need(need(h, 'top: 72px;', 'top: 84px;'), 'max-height: calc(100% - 164px);', 'max-height: calc(100% - 172px);');
 // the day strip, as on the phone's Home card
 const strip = (day, of) => '<div style="' + st({ display: 'flex', gap: '4px', marginTop: '12px' }) + '">' + Array.from({ length: of }, (_, i) => '<i style="' + st({ flex: 1, height: '6px', borderRadius: '999px', background: i < day - 1 ? K.green : i === day - 1 ? K.blue : '#E7EAE3' }) + '"></i>').join('') + '</div>';
 const callout = (x, y, n) => '<span style="' + st({ position: 'absolute', left: x + 'px', top: y + 'px', width: '26px', height: '26px', borderRadius: '999px', background: '#C2410C', color: '#FFFFFF', fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 3px #FFFFFF', zIndex: 5 }) + '">' + n + '</span>';
@@ -62,7 +67,7 @@ const callout = (x, y, n) => '<span style="' + st({ position: 'absolute', left: 
   const perfLink = pigP.slice(pigP.indexOf('<span data-a="pigperf"'), pigP.indexOf('</span>', pigP.indexOf('<span data-a="pigperf"') + 30) + 7);
   pigP = need(pigP, perfLink, '');
   // shown scrolled to the bottom, where the one Performance sits
-  pigP = need(pigP, 'max-height: calc(100% - 100px);', 'height: calc(100% - 100px);');
+  pigP = need(pigP, 'max-height: calc(100% - 172px);', 'height: calc(100% - 172px);');
   pigP = need(pigP, 'overflow-y: auto; overflow-x: hidden;', 'overflow: hidden; display: flex; flex-direction: column;');
   { const o0 = pigP.indexOf('>') + 1, hd = outer(pigP, pigP.indexOf('<div', o0)), h1 = pigP.indexOf(hd) + hd.length, body = pigP.slice(h1, pigP.lastIndexOf('</section>'));
     pigP = pigP.slice(0, h1) + '<div style="' + st({ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', margin: '12px -16px 0', padding: '0 16px', borderTop: '1px solid ' + K.line, WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, #000 28px)', maskImage: 'linear-gradient(to bottom, transparent 0, #000 28px)' }) + '">' + body + '</div></section>'; }
@@ -79,7 +84,7 @@ const callout = (x, y, n) => '<span style="' + st({ position: 'absolute', left: 
     POS = pos;
     const pigsInner = H.head('Pigs', 'Gestation 2', '') + H.sec('Show on the farm', '<span style="font-size: 13px; font-weight: 500;">Clear</span>', 20) + H.card([{ name: 'Sows', n: '182', sw: '#2F3A33', on: true, bold: true }, { name: 'Boars', n: '4', sw: '#718075', bold: true }].map(choice).join(''), { pad: '6px' });
     const out = [
-      frame(n0, 'The bar and 3D, ' + where, 'A full-width bar with everything aligned left: ‹ goes one level up, the name switches between places at this level, then Select, Batches, Pigs with how many there are, Devices (the sensors live there; a dot in the worst colour inside, red here because the feed line has stopped). No Actions button: actions appear once you pick something (frames 9–11). Just right of it, apart, the 3D button: named by what you are looking at (3D or Plan), it holds the camera tools.', B.room, roomTop('')),
+      frame(n0, 'The bar, 3D and Select', 'Three things, each in its own place. Top left, the bar sized to what it holds: ‹ goes one level up, the name switches between places at this level, then the panels: Batches, Pigs with how many there are, Devices (a dot in the worst colour inside, red here because the feed line has stopped). Top right, 3D: the camera tools. Bottom right, Select: a mode, not a panel; its actions open beside it (frames 6–8).', B.room, roomTop('')),
       frame(n0 + 1, '3D opened: the camera tools', 'It opens ' + (pos === 'top' ? 'downward' : 'upward') + '. 3D and Plan are one switch; rotate, zoom, fit and night; Edit layout sits apart. Click only: it stays open while you rotate or zoom and closes when you click the farm.', B.room, roomTop('', { viewOpen: true }) + viewMenu()),
       frame(n0 + 2, 'Click the name: switch rooms', 'Just the places at this level, the current one ticked, a red dot where something is wrong; it opens ' + (pos === 'top' ? 'down' : 'up') + ' from the name. To go up, use ‹, then the name again.', B.room,
         roomTop('', { open: true, under: switcher([{ name: 'Gestation 1', n: '152 pigs' }, { name: 'Gestation 2', n: '186 pigs', dot: true, on: true }, { name: 'Sick room', n: '3 pigs', dot: true }]) })),
@@ -87,49 +92,50 @@ const callout = (x, y, n) => '<span style="' + st({ position: 'absolute', left: 
     ];
     POS = 'top'; return out;
   };
-  const A = variant('top', 1, 'on top'), Bv = variant('bottom', 5, 'at the bottom');
+  const A = variant('top', 1, 'on top');
+  SELPOS = 'tr'; const cmp = frame(5, 'Or: Select top right, beside 3D', 'The other place for it: both buttons that change how you work the farm sit together, top right. Its actions then open at the bottom, away from the button that started them, so bottom right is the pick.', B.room, roomTop('')); SELPOS = 'br';
   // 9–11 · select, then act: Actions only exists for what you picked
   const tick = (on) => '<span style="' + st({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '20px', height: '20px', borderRadius: '6px', flexShrink: 0, boxSizing: 'border-box', border: on ? '0' : '1.5px solid #B9C1B5', background: on ? K.ink : K.paper, color: '#FFFFFF' }) + '">' + (on ? icon(I.check, 14) : '') + '</span>';
   const ACTS = [[I.syringe, 'Treatment'], [I.shield, 'Vaccination'], [I.flask, 'Sampling'], [I.move, 'Move'], [I.feeder, 'Feed'], [I.note, 'Note']];
-  const selBar = (count, sub) => '<div style="' + floatCard({ left: '50%', transform: 'translateX(-50%)', bottom: '16px', padding: '8px', display: 'flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' }) + '"><span style="' + st({ display: 'inline-flex', flexDirection: 'column', padding: '0 12px 0 8px' }) + '">' + t(count, { fontSize: '15px', fontWeight: 600 }) + sm(sub) + '</span>' + vline + ACTS.map((a) => tab(a[0], a[1])).join('') + vline + tab(I.out, 'Culling') + vline + '<span style="' + st({ padding: '0 10px', fontSize: '14px', fontWeight: 500 }) + '">Clear</span>' + sqBtn(I.x) + '</div>';
-  const hint = '<div style="' + floatCard({ left: '50%', transform: 'translateX(-50%)', bottom: '16px', padding: '8px 8px 8px 18px', display: 'flex', alignItems: 'center', gap: '14px', whiteSpace: 'nowrap' }) + '">' + t('Click pens to select them', { color: K.muted }) + '<span style="' + st({ display: 'inline-flex', alignItems: 'center', height: '40px', padding: '0 16px', borderRadius: '12px', background: K.tint, fontSize: '14px', fontWeight: 600 }) + '">Done</span></div>';
+  const selBar = (count, sub) => '<span style="' + st({ display: 'inline-flex', flexDirection: 'column', padding: '0 12px 0 8px' }) + '">' + t(count, { fontSize: '15px', fontWeight: 600 }) + sm(sub) + '</span>' + vline + ACTS.map((a) => tab(a[0], a[1])).join('') + vline + tab(I.out, 'Culling') + vline + '<span style="' + st({ padding: '0 10px', fontSize: '14px', fontWeight: 500 }) + '">Clear</span>';
+  const hint = '<span style="' + st({ padding: '0 12px 0 10px' }) + '">' + t('Click pens to select them', { color: K.muted }) + '</span>';
   const B2 = { selplan: await bg('bgselplan'), pickplan: await bg('bgpickplan'), pen: await bg('bgpen') };
-  const s1 = frame(9, 'Select: the farm goes to Plan, nothing to act on yet', 'Actions is no longer a button: every action needs pigs or pens to act on. Select turns on select mode; the farm turns to Plan so pens are easy to hit, and a hint sits where the actions will appear. Done (or Esc) ends it.', B2.selplan,
-    top({ name: 'Gestation 2', dot: true, warn: true, pigs: 186, on: 'select', plan: true }) + hint);
-  const s2 = frame(10, 'Pens picked: their actions appear', 'Click pens to add or remove them. The bar along the bottom says what is picked and offers only what can be done to it: Treatment, Vaccination, Sampling, Move, Feed, Note, and Culling set apart. Clear empties the pick; ✕ leaves select mode. Batch-wide things (vaccination plan, batch report, end batch) leave this menu for the batch page.', B2.pickplan,
-    top({ name: 'Gestation 2', dot: true, warn: true, pigs: 186, on: 'select', plan: true }) + selBar('3 pens', '3 sows'));
+  const s1 = frame(6, 'Select: the farm goes to Plan, nothing to act on yet', 'Actions is no longer a button: every action needs pigs or pens to act on. Select, bottom right, turns on select mode and reads Done while it is on; the farm turns to Plan so pens are easy to hit, and a hint opens beside it, where the actions will appear. Done (or Esc) ends it.', B2.selplan,
+    top({ name: 'Gestation 2', dot: true, warn: true, pigs: 186, on: 'select', plan: true, sel: hint }));
+  const s2 = frame(7, 'Pens picked: their actions appear', 'Click pens to add or remove them. Beside Done, the card says what is picked and offers only what can be done to it: Treatment, Vaccination, Sampling, Move, Feed, Note, and Culling set apart. Clear empties the pick; Done leaves select mode. Batch-wide things (vaccination plan, batch report, end batch) leave this menu for the batch page.', B2.pickplan,
+    top({ name: 'Gestation 2', dot: true, warn: true, pigs: 186, on: 'select', plan: true, sel: selBar('3 pens', '3 sows') }));
   // a group pen: its pig list ticks pigs, and the same bar acts on them
   let penP = movePanel(grab(dump('pen'), 'data-zone="panel"'));
   const ticked = ['906660', '793326'];
   penP = penP.replace(/<div data-a="pigtag:(\d+)" style="display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 16px; border-top: ([^;]+); cursor: pointer;">/g, (m, id, bt) => '<div data-a="pigtag:' + id + '" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; border-top: ' + bt + '; cursor: pointer; background: ' + (ticked.includes(id) ? K.press : 'transparent') + ';">' + tick(ticked.includes(id)));
-  const s3 = frame(11, 'A pen with many pigs: tick them in its list', 'Click the pen and its pigs list on the right. Tick pigs (the box, not the row; the row still opens her card) and the same bar appears for them. Pigs without ID have no box: they can only be acted on with the whole pen, from select mode.', B2.pen,
-    top({ name: 'Pen B7', pigs: 9, noBatch: true, on: 'pigs' }) + penP + selBar('2 pigs', 'in Pen B7'));
+  const s3 = frame(8, 'A pen with many pigs: tick them in its list', 'Click the pen and its pigs list on the right. Tick pigs (the box, not the row; the row still opens her card) and the same actions open beside Select. Pigs without ID have no box: they can only be acted on with the whole pen, from select mode.', B2.pen,
+    top({ name: 'Pen B7', pigs: 9, noBatch: true, on: 'pigs', sel: selBar('2 pigs', 'in Pen B7') }) + penP);
 
   // 5 · equipment on the right
   const t0 = eqTiles.indexOf('<div data-a="trendt"'), tTile = eqTiles.slice(t0, eqTiles.indexOf('<div data-a', t0 + 10));
   const hTile = tTile.replace('Temperature', 'Humidity').replace('22.4 °C', '61 %').replace(/<svg[\s\S]*?<\/svg>/, icon(I.drop, 16));
   const eqTiles2 = eqTiles.replace(tTile, tTile + hTile);
   const eqInner = H.head('Devices', 'Gestation 2', '') + '<div style="margin-top: 16px;">' + eqTiles2 + '</div>';
-  const f6 = frame(12, 'Devices: the sensors and the equipment, on the right', 'Equipment is renamed Devices and holds the room readings that used to sit on the bar: temperature, humidity, ammonia first, then climate, fans, lights, drinkers, cameras. Same place and size as Batches and Pigs; a tile opens its card in the same panel, with Back. Ammonia out of range is the amber tile; the stopped feed line is red, so the dot on Devices is red.', B.panel,
+  const f6 = frame(9, 'Devices: the sensors and the equipment, on the right', 'Equipment is renamed Devices and holds the room readings that used to sit on the bar: temperature, humidity, ammonia first, then climate, fans, lights, drinkers, cameras. Same place and size as Batches and Pigs; a tile opens its card in the same panel, with Back. Ammonia out of range is the amber tile; the stopped feed line is red, so the dot on Devices is red.', B.panel,
     roomTop('equip') + panel(eqInner));
   // 6 · the task: legend is the key, no tooltip
-  const f7 = frame(13, 'A task: the legend is the key, so no tooltip', 'The ring has no hover card: the legend beside it already says the same. Clicking a legend row shows only those pens; the chosen row is a quiet fill that stays inside its card.', B.task,
+  const f7 = frame(10, 'A task: the legend is the key, so no tooltip', 'The ring has no hover card: the legend beside it already says the same. Clicking a legend row shows only those pens; the chosen row is a quiet fill that stays inside its card.', B.task,
     taskTop('batches') + taskP);
   // 7 · pig profile: one Performance
-  const f8 = frame(14, 'At a pen: no pig count; one Performance', 'At a pen there are no batches, so Batches leaves the bar (her batch is a link on her card); the bar names the pen and Pigs has no count (her card is the panel, shown scrolled to the bottom). Her litters loses its “Performance ›” link; Performance is the button at the bottom, next to Log.', B.pig,
+  const f8 = frame(11, 'At a pen: no pig count; one Performance', 'At a pen there are no batches, so Batches leaves the bar (her batch is a link on her card); the bar names the pen and Pigs has no count (her card is the panel, shown scrolled to the bottom). Her litters loses its “Performance ›” link; Performance is the button at the bottom, next to Log.', B.pig,
     top({ name: 'Pen A7', noBatch: true }) + pigP);
   // 8 · 960
-  const f9 = frame(15, 'At 960 wide: the same bar', 'The bar and the 3D button keep their size; the farm gets the rest.', B.room960,
+  const f9 = frame(12, 'At 960 wide: the same bar', 'The bar and the 3D button keep their size; the farm gets the rest.', B.room960,
     top({ name: 'Gestation 2', dot: true, warn: true, pigs: 186 }), 960);
   // 10 · batch cards from the last round
   const tcard = (title, big, word, day, of, sub) => H.card('<div style="' + st({ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }) + '">' + t(title, { fontSize: '15px', fontWeight: 600 }) + H.chev + '</div><div style="' + st({ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '8px' }) + '">' + t(big, { fontSize: '28px', lineHeight: '32px', fontWeight: 600, letterSpacing: '-.02em' }) + mu(word, { fontSize: '15px' }) + (sub ? '<span style="margin-left: auto;">' + H.badge('amber', sub) + '</span>' : '') + '</div>' + strip(day, of) + '<div style="margin-top: 8px;">' + mu('Day ' + day + ' of ' + of) + '</div>', { pad: '14px 16px' });
   const up = (rows) => H.sec('Upcoming') + H.card(rows.map((x, i) => '<div style="' + st({ display: 'flex', alignItems: 'center', gap: '10px', minHeight: '48px', borderTop: i ? '1px solid ' + K.line : '0' }) + '">' + t(x[0], { width: '80px', fontSize: '13px', color: K.muted }) + t(x[1], { flex: 1, whiteSpace: 'normal' }) + mu(x[2]) + '</div>').join(''), { pad: '0 16px' });
   const b32 = H.head('Batch 32', 'Farrowing Room 2 · 50 sows', 'back') + H.sec('Running now', '', 20) + tcard('Farrowing', '4', 'farrowing', 3, 7, '1 past due') + '<div style="height: 8px;"></div>' + tcard('Post-farrowing check', '6', 'due today', 3, 7) + up([['Sat 7 Nov', 'Piglet processing', 'in 2 days'], ['Fri 27 Nov', 'Wean, to Nursery 1', 'in 3 weeks']]);
-  const f10 = frame(16, 'Batch page: the phone’s task card (from last round, for your call)', 'Each running task says what is happening now in one number (Home’s rules: farrowing underway, then past due, then due today, then the next date) and the days as the phone’s strip. No ring: the ring read as “% done” but counted days.', B.task,
+  const f10 = frame(13, 'Batch page: the phone’s task card (from last round, for your call)', 'Each running task says what is happening now in one number (Home’s rules: farrowing underway, then past due, then due today, then the next date) and the days as the phone’s strip. No ring: the ring read as “% done” but counted days.', B.task,
     taskTop('batches') + panel(b32));
   const quiet = H.card('<div style="' + st({ display: 'flex', alignItems: 'center', gap: '10px' }) + '">' + t('No task running', { fontWeight: 600 }) + '<span style="margin-left: auto;">' + mu('next: Weigh 10 pigs, in 3 days') + '</span></div>', { pad: '14px 16px' });
   const b31 = H.head('Batch 31', 'Nursery, day 24 of 42 · 488 weaners', 'back') + '<div style="margin: 20px 4px 0;">' + mu('No task running', { fontSize: '14px' }) + '</div>' + up([['Fri 6 Nov', 'Weigh 10 pigs', 'in 3 days'], ['Wed 2 Dec', 'End of nursery, to Finisher 2', 'in 4 weeks']]);
-  const f11 = frame(17, 'A batch in a stage: no card to fill', 'Nursery and Quarantine are stages, not tasks. The stage and its day live in the header; the page says plainly that no task is running, and Upcoming already says what comes next, so it is not said twice.', B.task,
+  const f11 = frame(14, 'A batch in a stage: no card to fill', 'Nursery and Quarantine are stages, not tasks. The stage and its day live in the header; the page says plainly that no task is running, and Upcoming already says what comes next, so it is not said twice.', B.task,
     taskTop('batches') + panel(b31));
 
   const shell = fs.readFileSync(path.join(path.dirname(OUT), 'LocationCard.dc.html'), 'utf8');
@@ -138,10 +144,10 @@ const callout = (x, y, n) => '<span style="' + st({ position: 'absolute', left: 
   const html = pre + '<div style="' + st({ width: W + 'px', padding: '40px 48px 64px', boxSizing: 'border-box', background: '#F3F4F1', fontFamily: "'Geist', system-ui, sans-serif", fontSize: '14px', lineHeight: '20px', color: '#111511', WebkitFontSmoothing: 'antialiased', fontVariantNumeric: 'tabular-nums' }) + '">' +
     '<h1 style="margin: 0; font-size: 28px; line-height: 36px; font-weight: 600; letter-spacing: -.025em;">Farm view, rearranged</h1>' +
     '<div style="margin-top: 6px; color: #5D665F; max-width: 1500px; font-size: 15px; line-height: 23px;">A proposal on the farm as it renders today; the 3D is untouched. One rule throughout: <b>nothing on the edges reacts to hover</b>. Hovers stay on the farm (a pen) and on charts where they add detail the screen does not already show. Everything else is a click, and every panel opens in the same place on the right.</div>' +
-    '<div style="' + st({ display: 'grid', gridTemplateColumns: 'repeat(2, 1360px)', gap: '64px 56px', marginTop: '36px', alignItems: 'start' }) + '">' + colHead('On top', 'A full bar across the top, everything aligned left; 3D apart at the right end. Panels open under them.') + colHead('At the bottom', 'A full bar along the bottom, everything aligned left; 3D apart at the right end. Panels open above them.') + [A[0], Bv[0], A[1], Bv[1], A[2], Bv[2], A[3], Bv[3]].join('\n') + '</div>' +
+    '<div style="' + st({ display: 'grid', gridTemplateColumns: 'repeat(2, 1360px)', gap: '64px 56px', marginTop: '36px', alignItems: 'start' }) + '">' + [A[0], A[1], A[2], A[3], cmp].join('\n') + '</div>' +
     '<h2 style="margin: 64px 0 0; padding-top: 28px; border-top: 1px solid #DFE4D8; font-size: 22px; line-height: 28px; font-weight: 600;">Select, then act</h2>' +
     '<div style="' + st({ display: 'grid', gridTemplateColumns: 'repeat(2, 1360px)', gap: '64px 56px', marginTop: '24px', alignItems: 'start' }) + '">' + [s1, s2, s3].join('\n') + '</div>' +
-    '<h2 style="margin: 64px 0 0; padding-top: 28px; border-top: 1px solid #DFE4D8; font-size: 22px; line-height: 28px; font-weight: 600;">The rest, shown with the pair on top</h2>' +
+    '<h2 style="margin: 64px 0 0; padding-top: 28px; border-top: 1px solid #DFE4D8; font-size: 22px; line-height: 28px; font-weight: 600;">The rest</h2>' +
     '<div style="' + st({ display: 'grid', gridTemplateColumns: 'repeat(2, 1360px)', gap: '64px 56px', marginTop: '24px', alignItems: 'start' }) + '">' + [f6, f7, f8, f9].join('\n') + '</div>' +
     '<h2 style="margin: 64px 0 0; padding-top: 28px; border-top: 1px solid #DFE4D8; font-size: 22px; line-height: 28px; font-weight: 600;">Batch cards</h2>' +
     '<div style="' + st({ display: 'grid', gridTemplateColumns: 'repeat(2, 1360px)', gap: '64px 56px', marginTop: '24px', alignItems: 'start' }) + '">' + [f10, f11].join('\n') + '</div></div>\n</x-dc>\n</body>\n</html>\n';
