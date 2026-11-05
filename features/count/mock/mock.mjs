@@ -504,27 +504,36 @@ async function moveMap(name, scan) {
       .m-count .m-map .st-pen-tile .m-frac{font:500 14px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--muted,#657060)}
       .m-count .m-map .st-pen-tile .m-frac b{font:600 22px/1 var(--font-mono,'IBM Plex Mono',monospace);color:var(--ink,#20291f)}
       .m-scanfoot{position:relative}.m-toast{position:absolute;left:0;right:0;bottom:calc(100% + 12px);z-index:5;--toast-bottom:0px}
-      .m-toast .st-toast-glyph.m-g-move{background:var(--progress-fill,#c1ddfd);color:var(--progress-fill-ink,#1f4470)}
+      .m-toast .st-toast-glyph.m-g-move{background:var(--green,#2f7d4a);color:#fff}
       .m-toast .st-toast-glyph.m-g-stay{background:var(--amber-fill,#fede82);color:var(--amber-fill-ink,#5c3f00)}
-      .m-toast .m-vw-move{color:var(--progress-fill,#c1ddfd)}.m-toast .m-vw-stay{color:var(--amber-fill,#fede82)}`;
+      .m-toast .m-vw-move{color:var(--done-fill,#d5e8cc)}.m-toast .m-vw-stay{color:var(--amber-fill,#fede82)}`;
     document.head.append(st);
   }, { UNIT_CSS, PLAN_CSS, MOVE, scan });
   await shoot(p, name);
 }
 if (want('9-')) await moveMap('mock-9-transfer-out.png');
-for (const [name, view] of [['mock-9b-pen-move.png', 'move'], ['mock-9c-pen-stay.png', 'stay']]) {
+const TOAST_CSS = '.m-scanfoot{position:relative}.m-toast{position:absolute;left:0;right:0;bottom:calc(100% + 12px);z-index:5;--toast-bottom:0px}'
+  + '.m-toast .st-toast-glyph.m-g-move{background:var(--green,#2f7d4a);color:#fff}.m-toast .st-toast-glyph.m-g-stay{background:var(--amber-fill,#fede82);color:var(--amber-fill-ink,#5c3f00)}'
+  + '.m-toast .m-vw-move{color:var(--done-fill,#d5e8cc)}.m-toast .m-vw-stay{color:var(--amber-fill,#fede82)}';
+for (const [name, view, scan] of [['mock-9b-pen-move.png', 'move'], ['mock-9c-pen-stay.png', 'stay'], ['mock-9p-pen-scan.png', 'stay', ['Stay · 000901', 'Keep her in A3', 'stay']]]) {
   if (!want(name.slice(5, 7))) continue;
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
-  await p.evaluate(({ UNIT_CSS, view }) => {
+  await p.evaluate(({ UNIT_CSS, TOAST_CSS, view, scan }) => {
     const { U, ic, page } = window.M;
     const toggle = U.segment({ variant: 'view-switch', options: [['move', 'Move · 12'], ['stay', 'Stay · 1']], active: view, action: 'x', ariaLabel: 'Pigs in A3' });
     const rows = view === 'move'
       ? U.row({ icon: ic('tag-off'), title: '11 pigs', description: 'Without ear tags' }) + U.row({ code: '000904', description: 'Gilt', trail: 'chevron', action: 'x' })
       : U.row({ code: '000901', description: 'Gilt', trail: 'chevron', action: 'x' });
-    page('A3', 'Pigs to move · 12 of 13', '<section class="feature-section">' + toggle + '</section><section class="feature-section">' + U.rowGroup(rows) + '</section>', '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Scan', icon: ic('scan'), register: 'primary', action: 'x' }) + '</div>');
-    const st = document.createElement('style'); st.textContent = UNIT_CSS; document.head.append(st);
-  }, { UNIT_CSS, view });
+    page('A3', 'Pigs to move · 12 of 13', '<section class="feature-section">' + toggle + '</section><section class="feature-section">' + U.rowGroup(rows) + '</section>', scan
+      ? '<div class="sheet-footer st-scan-foot m-scanfoot" data-ds="Sheet">' + U.button({ label: 'Stop scanning', icon: ic('stop'), register: 'secondary', className: 'st-scan-toggle', action: 'x' })
+        + '<div class="m-toast">' + U.toast(scan[0], { detail: scan[1] })
+          .replace('<span class="st-toast-copy">', '<span class="st-toast-glyph m-g-' + scan[2] + '" aria-hidden="true">' + ic(scan[2] === 'move' ? 'transfer' : 'pen') + '</span><span class="st-toast-copy">')
+          .replace('>' + scan[0].split(' · ')[0] + ' · ', '><span class="m-vw-' + scan[2] + '">' + scan[0].split(' · ')[0] + '</span> · ') + '</div></div>'
+      : '<div class="sheet-footer" data-ds="Sheet">' + U.backButton({ action: 'x' }) + U.button({ label: 'Scan', icon: ic('scan'), register: 'primary', action: 'x' }) + '</div>');
+    if (scan) document.querySelector('.st-row[data-value="000901"], .st-row')?.closest('.st-row')?.setAttribute('data-arrival', 'on');
+    const st = document.createElement('style'); st.textContent = UNIT_CSS + TOAST_CSS; document.head.append(st);
+  }, { UNIT_CSS, TOAST_CSS, view, scan });
   await shoot(p, name);
 }
 
