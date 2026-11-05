@@ -361,198 +361,8 @@
   <div style="flex: 1; min-height: 0; overflow-y: auto; position: relative">
 
     <sc-if value="{{isHome}}" hint-placeholder-val="{{true}}">
-      <div style="max-width: 1040px; margin: 0 auto; padding: 16px 22px 32px; display: flex; flex-direction: column; gap: 24px">
-        <div style="position: relative">
-          <label for="home-search" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Find a page or action</label>
-          <svg viewBox="0 0 24 24" aria-hidden="true" style="position: absolute; left: 13px; top: 12px; width: 16px; height: 16px; fill: none; stroke: {{t.muted}}; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.search}}"></path></svg>
-          <input id="home-search" value="{{query}}" onChange="{{onQuery}}" placeholder="Find a page or action" style="width: 100%; box-sizing: border-box; height: 40px; border: 1px solid transparent; border-radius: {{t.r12}}; background: {{t.fill2}}; padding: 0 12px 0 38px; font: inherit; font-size: 14px; color: {{t.ink}}; outline: none">
-        </div>
-
-        <sc-if value="{{showHomeTop}}" hint-placeholder-val="{{true}}">
-          <div style="display: flex; flex-direction: column; gap: 14px">
-            <div style="display: flex; flex-direction: column; gap: 3px; padding: 0 2px; animation: {{t.rise}}">
-              <span style="font-family: {{t.monoFont}}; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}}">Fri 30 Oct · Hillside Sow Farm</span>
-              <h2 style="margin: 0; font-family: {{t.display}}; font-size: 26px; line-height: 1.15; font-weight: 600; letter-spacing: -0.025em">Good morning, Adam</h2>
-            </div>
-            <sc-if value="{{guideOpen}}" hint-placeholder-val="{{false}}">
-              <div style="display: flex; flex-direction: column; border: 1px solid {{t.line}}; border-radius: {{t.r18}}; background: {{t.surface}}; box-shadow: {{t.sh1}}; padding: 14px 14px 8px 16px; animation: {{t.rise}}; animation-delay: 40ms">
-                <div style="display: flex; align-items: center; gap: 12px">
-                  <svg viewBox="0 0 36 36" aria-hidden="true" style="width: 36px; height: 36px; flex-shrink: 0; transform: rotate(-90deg)"><circle cx="18" cy="18" r="15" fill="none" stroke="{{t.fill2}}" stroke-width="4"></circle><circle cx="18" cy="18" r="15" fill="none" stroke="#2F8F5B" stroke-width="4" stroke-linecap="round" stroke-dasharray="{{guide.dash}}"></circle></svg>
-                  <span style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
-                    <span style="font-size: 14px; font-weight: 600">{{guide.title}}</span>
-                    <span style="font-size: 12.5px; color: {{t.muted}}">{{guide.sub}}</span>
-                  </span>
-                  <button type="button" onClick="{{guideLaterGo}}" style="height: 32px; border: 0; border-radius: {{t.r9}}; background: transparent; padding: 0 10px; font: inherit; font-size: 13px; font-weight: 500; color: {{t.ink2}}; cursor: pointer">Later</button>
-                </div>
-                <div style="display: flex; flex-direction: column; margin-top: 10px">
-                  <sc-for list="{{guide.steps}}" as="st" hint-placeholder-count="6">
-                    <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid {{t.lineSoft}}; padding: 9px 0 9px 2px">
-                      <div style="display: flex; align-items: center; gap: 11px">
-                        <span style="width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: center; background: {{st.markBg}}; border: {{st.markBorder}}">
-                          <sc-if value="{{st.done}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 11px; height: 11px; fill: none; stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>
-                        </span>
-                        <span style="font-size: 13.5px; font-weight: {{st.weight}}; color: {{st.ink}}">{{st.title}}</span>
-                        <sc-if value="{{st.hasChip}}" hint-placeholder-val="{{false}}">
-                          <span style="font-size: 11.5px; font-weight: 500; color: {{st.chipInk}}; background: {{st.chipBg}}; border-radius: 999px; padding: 1px 8px">{{st.chip}}</span>
-                        </sc-if>
-                        <span style="flex: 1"></span>
-                        <span style="font-size: 12px; color: {{t.muted}}">{{st.who}}</span>
-                        <sc-if value="{{st.quiet}}" hint-placeholder-val="{{true}}">
-                          <button type="button" onClick="{{st.open}}" style="height: 30px; border: 0; border-radius: {{t.r9}}; background: transparent; padding: 0 8px; font: inherit; font-size: 13px; font-weight: 500; color: {{t.ink2}}; cursor: pointer">{{st.btn}}</button>
-                        </sc-if>
-                        <sc-if value="{{st.locked}}" hint-placeholder-val="{{false}}">
-                          <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: {{t.muted}}">
-                            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z"></path></svg>
-                            {{st.text}}
-                          </span>
-                        </sc-if>
-                      </div>
-                      <sc-if value="{{st.current}}" hint-placeholder-val="{{false}}">
-                        <div style="display: flex; align-items: center; gap: 12px; padding-left: 29px">
-                          <span style="font-size: 13px; line-height: 1.45; color: {{t.ink2}}; flex: 1">{{st.text}}</span>
-                          <button type="button" onClick="{{st.open}}" style="height: 36px; border: 0; border-radius: {{t.r9}}; background: {{t.ink}}; color: #FFFFFF; padding: 0 14px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap">{{st.btn}}</button>
-                        </div>
-                      </sc-if>
-                    </div>
-                  </sc-for>
-                </div>
-              </div>
-            </sc-if>
-            <sc-if value="{{guideLater}}" hint-placeholder-val="{{false}}">
-              <button type="button" onClick="{{guideOpenGo}}" style="display: flex; align-items: center; gap: 10px; min-height: 44px; border: 1px solid {{t.line}}; border-radius: {{t.r14}}; background: {{t.surface}}; padding: 6px 12px; font: inherit; text-align: left; cursor: pointer; color: {{t.ink}}">
-                <svg viewBox="0 0 36 36" aria-hidden="true" style="width: 22px; height: 22px; flex-shrink: 0; transform: rotate(-90deg)"><circle cx="18" cy="18" r="15" fill="none" stroke="{{t.fill2}}" stroke-width="5"></circle><circle cx="18" cy="18" r="15" fill="none" stroke="#2F8F5B" stroke-width="5" stroke-linecap="round" stroke-dasharray="{{guide.dash}}"></circle></svg>
-                <span style="font-size: 13px; font-weight: 600">Setup</span>
-                <span style="font-size: 12.5px; color: {{t.muted}}">{{guide.short}}</span>
-                <span style="flex: 1"></span>
-                <span style="font-size: 13px; font-weight: 500; color: {{t.ink2}}">Continue</span>
-                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: {{t.muted}}; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M9 6l6 6-6 6"></path></svg>
-              </button>
-            </sc-if>
-            <div style="display: flex; flex-direction: column; border: 1px solid {{t.line}}; border-radius: {{t.r18}}; background: {{t.surface}}; box-shadow: {{t.sh1}}; overflow: hidden; animation: {{t.rise}}; animation-delay: 60ms">
-              <div style="display: flex; align-items: center; gap: 8px; padding: 13px 14px 11px 16px">
-                <span style="font-size: 14px; font-weight: 600">For you</span>
-                <sc-if value="{{hasForYou}}" hint-placeholder-val="{{true}}">
-                  <span style="font-family: {{t.monoFont}}; font-size: 11px; font-weight: 500; background: {{t.badgeBg}}; color: {{t.badgeInk}}; border-radius: 999px; padding: 0 7px; line-height: 18px">{{forYouCount}}</span>
-                </sc-if>
-                <span style="flex: 1"></span>
-                <button type="button" onClick="{{openOthers}}" style="height: 28px; border: 0; background: transparent; padding: 0 6px; font: inherit; font-size: 12.5px; color: {{t.muted}}; cursor: pointer">{{othersLine}}</button>
-              </div>
-              <sc-for list="{{forYouRows}}" as="f" hint-placeholder-count="5">
-                <button type="button" onClick="{{f.open}}" style="display: flex; align-items: center; gap: 12px; width: 100%; min-height: 58px; border: 0; border-top: 1px solid {{t.lineSoft}}; background: {{f.bg}}; padding: 9px 14px 9px 16px; font: inherit; text-align: left; cursor: pointer; color: {{t.ink}}">
-                  <sc-if value="{{f.isTodo}}" hint-placeholder-val="{{false}}">
-                    <span style="width: 18px; height: 18px; flex-shrink: 0; box-sizing: border-box; border-radius: 5px; border: {{f.boxBorder}}; background: {{f.boxBg}}; display: flex; align-items: center; justify-content: center">
-                      <sc-if value="{{f.done}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 11px; height: 11px; fill: none; stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>
-                    </span>
-                  </sc-if>
-                  <sc-if value="{{f.isDecide}}" hint-placeholder-val="{{true}}">
-                    <span style="width: 18px; height: 18px; flex-shrink: 0; border-radius: {{t.orbRsm}}; background: {{f.av.mark}}"></span>
-                  </sc-if>
-                  <span style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
-                    <span style="font-size: 13.5px; font-weight: 500; line-height: 1.35; color: {{f.titleInk}}; text-decoration: {{f.strike}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{f.title}}</span>
-                    <span style="font-size: 12px; color: {{t.muted}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{f.meta}}</span>
-                  </span>
-                  <span style="font-size: 12px; font-weight: {{f.dueWeight}}; color: {{f.dueInk}}; white-space: nowrap">{{f.due}}</span>
-                </button>
-              </sc-for>
-              <sc-if value="{{hasMoreForYou}}" hint-placeholder-val="{{true}}">
-                <button type="button" onClick="{{openDecisions}}" style="display: flex; align-items: center; gap: 6px; width: 100%; min-height: 40px; border: 0; border-top: 1px solid {{t.lineSoft}}; background: transparent; padding: 0 16px; font: inherit; font-size: 13px; font-weight: 500; color: {{t.ink2}}; cursor: pointer">{{moreForYou}}<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: {{t.muted}}; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M9 6l6 6-6 6"></path></svg></button>
-              </sc-if>
-              <sc-if value="{{noForYou}}" hint-placeholder-val="{{false}}">
-                <span style="padding: 4px 16px 16px; font-size: 13px; color: {{t.muted}}">Nothing for you right now.</span>
-              </sc-if>
-            </div>
-          </div>
-        </sc-if>
-
-        <div style="display: flex; flex-direction: column; gap: 12px; animation: {{t.rise}}; animation-delay: 180ms">
-          <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 2px">
-            <h3 style="margin: 0; font-family: {{t.display}}; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Actions</h3>
-            <span style="font-size: 12px; color: {{t.muted}}">or type <span style="font-family: {{t.monoFont}}; background: {{t.fill2}}; border-radius: 5px; padding: 0 5px">/</span> in the chat</span>
-          </div>
-          <sc-if value="{{showHomeTop}}" hint-placeholder-val="{{true}}">
-            <span style="display: flex; align-items: center; gap: 7px; padding: 0 2px; margin-bottom: -6px"><span style="font-size: 12px; font-weight: 600; color: {{t.ink2}}">Recent</span></span>
-            <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; padding: 0 0 2px">
-              <sc-for list="{{pinned}}" as="a" hint-placeholder-count="5">
-                <button type="button" onClick="{{a.open}}" title="{{a.desc}}" style="display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 84px; padding: 8px 4px 6px; border: 0; border-radius: {{t.r12}}; background: transparent; font: inherit; text-align: center; cursor: pointer; color: {{t.ink}}">
-                  <span style="width: 44px; height: 44px; border-radius: {{t.r12}}; background: {{a.tileBg}}; color: {{a.tileInk}}; display: flex; align-items: center; justify-content: center">
-                    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{a.icon}}"></path></svg>
-                  </span>
-                  <span style="font-size: 12px; font-weight: 500; line-height: 1.3">{{a.name}}</span>
-                </button>
-              </sc-for>
-            </div>
-            <button type="button" onClick="{{toggleActions}}" style="display: flex; align-items: center; gap: 8px; width: 100%; min-height: 36px; border: 0; border-top: 1px solid {{t.lineSoft}}; background: transparent; padding: 10px 2px 0; font: inherit; text-align: left; cursor: pointer; color: {{t.ink2}}">
-              <span style="font-size: 13px; font-weight: 500">{{actionsToggle}}</span>
-              <span style="font-size: 12px; color: {{t.muted}}">{{actionsHint}}</span>
-              <span style="flex: 1"></span>
-              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: {{t.muted}}; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{actionsChevTurn}}; transition: transform 160ms ease"><path d="M6 9l6 6 6-6"></path></svg>
-            </button>
-          </sc-if>
-          <sc-if value="{{showAllActions}}" hint-placeholder-val="{{false}}">
-          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 16px; align-items: start; padding-top: 2px; animation: {{t.rise}}">
-            <sc-for list="{{groups}}" as="g" hint-placeholder-count="7">
-              <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
-                <span style="display: flex; align-items: center; gap: 7px; padding: 0 2px 4px">
-                  <span style="width: 7px; height: 7px; border-radius: 2px; background: {{g.dot}}"></span>
-                  <span style="font-size: 12px; font-weight: 600; color: {{t.ink2}}">{{g.name}}</span>
-                  <span style="font-size: 12px; color: {{t.muted}}">{{g.count}}</span>
-                </span>
-                <sc-for list="{{g.items}}" as="a" hint-placeholder-count="4">
-                  <button type="button" onClick="{{a.open}}" title="{{a.desc}}" style="display: flex; align-items: center; gap: 10px; min-height: 36px; background: transparent; border: 0; border-radius: {{t.r9}}; padding: 3px 4px 3px 2px; font: inherit; text-align: left; cursor: pointer; color: {{t.ink}}; min-width: 0">
-                    <span style="width: 28px; height: 28px; border-radius: {{t.r8}}; background: {{a.tileBg}}; color: {{a.tileInk}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
-                      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{a.icon}}"></path></svg>
-                    </span>
-                    <span style="font-size: 13px; font-weight: 500; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{a.name}}</span>
-                  </button>
-                </sc-for>
-              </div>
-            </sc-for>
-          </div>
-          </sc-if>
-          <sc-if value="{{noResults}}" hint-placeholder-val="{{false}}">
-            <p style="margin: 0; font-size: 14px; color: {{t.muted}}">Nothing matches “{{query}}”. Ask your team in the chat instead.</p>
-          </sc-if>
-        </div>
-
-        <sc-if value="{{hasDashRows}}" hint-placeholder-val="{{true}}">
-          <div style="display: flex; flex-direction: column; gap: 8px">
-            <h3 style="margin: 0; padding: 0 2px; font-family: {{t.display}}; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Dashboards</h3>
-            <div style="display: flex; flex-direction: column; border: 1px solid {{t.line}}; border-radius: {{t.r14}}; overflow: hidden">
-              <sc-for list="{{dashRows}}" as="r" hint-placeholder-count="3">
-                <button type="button" onClick="{{r.open}}" style="display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; background: {{t.surface}}; border: 0; border-top: {{r.topLine}}; padding: 8px 12px 8px 12px; font: inherit; text-align: left; cursor: pointer; color: {{t.ink}}">
-                  <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: {{t.ink2}}; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0"><path d="{{r.icon}}"></path></svg>
-                  <span style="font-size: 13.5px; font-weight: 500; flex: 1">{{r.name}}</span>
-                  <span style="font-size: 12px; color: {{t.muted}}">{{r.summary}}</span>
-                  <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: {{t.muted}}; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0"><path d="{{r.chev}}"></path></svg>
-                </button>
-              </sc-for>
-            </div>
-          </div>
-        </sc-if>
-
-        <sc-if value="{{showHomeTop}}" hint-placeholder-val="{{true}}">
-          <div style="display: flex; flex-direction: column; gap: 10px">
-            <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 2px">
-              <h3 style="margin: 0; font-family: {{t.display}}; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">{{teamTitle}}</h3>
-              <span style="font-family: {{t.monoFont}}; font-size: 11px; color: {{t.muted}}">{{teamSince}}</span>
-            </div>
-            <div style="display: flex; flex-direction: column">
-              <sc-for list="{{activity}}" as="ev" hint-placeholder-count="5">
-                <div style="display: grid; grid-template-columns: 40px 18px minmax(0, 1fr); gap: 10px; align-items: stretch">
-                  <span style="font-family: {{t.monoFont}}; font-size: 11px; color: {{t.muted}}; padding-top: 2px">{{ev.time}}</span>
-                  <span style="display: flex; flex-direction: column; align-items: center">
-                    <span style="width: 18px; height: 18px; border-radius: {{t.orbRsm}}; flex-shrink: 0; background: {{ev.av.mark}}; box-shadow: {{t.orbShade}}"></span>
-                    <span style="flex: 1; width: 1.5px; min-height: 10px; background: {{ev.line}}"></span>
-                  </span>
-                  <span style="display: flex; flex-direction: column; padding-bottom: 14px; min-width: 0">
-                    <span style="font-size: 13px; line-height: 1.45; color: {{t.body}}">{{ev.text}}</span>
-                    <span style="font-size: 12px; color: {{t.muted}}">{{ev.who}}</span>
-                  </span>
-                </div>
-              </sc-for>
-            </div>
-          </div>
-        </sc-if>
+      <div style="position: absolute; inset: 0">
+        <dc-import name="Home" embedded="{{true}}" hint-size="100%,100%"></dc-import>
       </div>
     </sc-if>
 
@@ -1295,7 +1105,7 @@ class Component extends DCLogic {
   }
 
   defaults(start) {
-    const base = { chatId: 'gm', tabs: ['home'], active: 'home', tabStart: {}, expanded: false, approved: false, cleared: false, vals: {}, edited: {}, draft: '', query: '', plusOpen: false, extra: {}, seen: {}, orderDrafted: false, askFirst: true };
+    const base = { chatId: 'gm', tabs: ['home', 'layout'], active: 'home', tabStart: { layout: 'view' }, expanded: false, approved: false, cleared: false, vals: {}, edited: {}, draft: '', query: '', plusOpen: false, extra: {}, seen: {}, orderDrafted: false, askFirst: true };
     if (start === 'canvas') return Object.assign(base, { tabs: ['home', 'vax'], active: 'vax' });
     if (start === 'dash') return Object.assign(base, { tabs: ['home', 'dash-prod'], active: 'dash-prod', expanded: true });
     if (start === 'group') return Object.assign(base, { chatId: 'g-farrow', seen: { 'g-farrow': true }, draft: '@' });
@@ -1869,12 +1679,12 @@ class Component extends DCLogic {
     const tabs = s.tabs.map((id) => {
       const p = pageInfo(id);
       const on = s.active === id;
-      const closable = id !== 'home';
+      const closable = id !== 'home' && id !== 'layout';
       return {
         title: p.title, icon: p.icon, xIcon: I.x,
         bg: on ? T.fill2 : 'transparent', weight: on ? 600 : 500, ink: on ? ink : T.muted,
         padR: closable ? '5px' : '0px', shrink: closable ? 1 : 0,
-        hasCount: forYouCount > 0 && (id === 'decisions' || (id === 'home' && s.tabs.indexOf('decisions') < 0)), count: forYouCount,
+        hasCount: forYouCount > 0 && (id === 'decisions' || (id === 'home' && s.tabs.indexOf('decisions') < 0)), count: id === 'home' ? 6 : forYouCount,
         closable,
         go: () => set({ active: id }),
         close: () => closeTab(id)
