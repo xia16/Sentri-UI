@@ -36,49 +36,94 @@ async function overflow(page) {
       await page.waitForTimeout(150);
       overflows.push(...await overflow(page));
     }
-    await load(url);
-    await page.screenshot({ path: path.join(shots, 'board.png'), fullPage: true });
     const assert = require('node:assert/strict');
+    async function assertPicker(scope) {
+      assert.equal(await scope.locator('.picker-table').count(), 1);
+      assert.equal(await scope.locator('.pick-all').evaluate(el => el.indeterminate), true);
+      assert.equal(await scope.locator('[data-pig]:checked').count(), 4);
+      assert.equal(await scope.locator('.picked-count').textContent(), '4 of 6 picked');
+      assert.equal(await scope.locator('.filters').evaluate(el => {
+        const boxes = [...el.children].map(c => c.getBoundingClientRect());
+        return boxes.every(b => Math.abs(b.top - boxes[0].top) < 1);
+      }), true, 'Filters must stay in one row');
+      assert.deepEqual(await scope.locator('.picker-table tbody tr').evaluateAll(rows => rows.map(r => r.getBoundingClientRect().height)), Array(6).fill(48));
+    }
+    await load(url);
+    assert.equal(await page.locator('.screens').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length), 2);
+    await page.screenshot({ path: path.join(shots, 'board.png'), fullPage: true });
     await page.locator('[data-open="pick"]').click();
-    await page.getByRole('checkbox', { name: 'Pick C07', exact: true }).last().check();
-    assert.equal(await page.locator('#overlay-stage .picked-count').textContent(), '5 of 6 picked');
+    const overlay = page.locator('#overlay-stage');
+    await assertPicker(overlay);
+    await overlay.getByRole('cell', { name: 'C07', exact: true }).click();
+    assert.equal(await overlay.locator('.picked-count').textContent(), '5 of 6 picked');
+    await overlay.getByRole('button', { name: 'Continue with 5 sows', exact: true }).click();
+    assert.equal(await overlay.locator('.frame').getAttribute('data-frame'), 'form');
+    assert.equal(await overlay.locator('.pig-source').textContent(), '5 sows · Gestation 2');
+    await overlay.getByRole('textbox', {name:'Notes',exact:true}).fill('Keep on straw');
+    await overlay.getByRole('button', {name:'Change pigs',exact:true}).click();
+    assert.equal(await overlay.locator('[data-pig]:checked').count(), 5);
+    await overlay.getByRole('checkbox', {name:'Pick C12',exact:true}).check();
+    await overlay.getByRole('button', {name:'Cancel',exact:true}).click();
+    assert.equal(await overlay.getByRole('textbox', {name:'Notes',exact:true}).inputValue(), 'Keep on straw');
+    assert.equal(await overlay.locator('.pig-chips .badge').count(), 5);
     await page.keyboard.press('ArrowRight');
-    assert.equal(await page.locator('#overlay-stage .frame').getAttribute('data-frame'), 'filled');
-    await page.locator('#overlay-stage .apply-method').click();
-    assert.equal(await page.locator('#overlay-stage .method-control span').textContent(), 'Intramuscular');
-    assert.equal(await page.locator('#overlay-stage .agent-comment').count(), 0);
+    assert.equal(await overlay.locator('.frame').getAttribute('data-frame'), 'filled');
+    await overlay.getByRole('button', {name:'Change pigs',exact:true}).click();
+    await assertPicker(overlay);
+    await overlay.getByRole('button', {name:'Continue with 4 sows',exact:true}).click();
+    assert.equal(await overlay.locator('.frame').getAttribute('data-frame'), 'filled');
+    await overlay.locator('.apply-method').click();
+    assert.equal(await overlay.locator('.method-control span').textContent(), 'Intramuscular');
+    assert.equal(await overlay.locator('.agent-comment').count(), 0);
     await page.keyboard.press('ArrowRight');
-    assert.equal(await page.locator('#overlay-stage .frame').getAttribute('data-frame'), 'running');
+    assert.equal(await overlay.locator('.frame').getAttribute('data-frame'), 'running');
     await page.keyboard.press('ArrowLeft');
-    assert.equal(await page.locator('#overlay-stage .frame').getAttribute('data-frame'), 'filled');
-    await page.locator('#overlay-stage .dismiss-comment').click();
-    assert.equal(await page.locator('#overlay-stage .method-control span').textContent(), 'In feed');
-    assert.equal(await page.locator('#overlay-stage .has-comment').count(), 0);
+    await overlay.locator('.dismiss-comment').click();
+    assert.equal(await overlay.locator('.method-control span').textContent(), 'In feed');
+    assert.equal(await overlay.locator('.has-comment').count(), 0);
     await page.keyboard.press('Escape');
     assert.equal(await page.locator('#overlay').evaluate(el => el.classList.contains('open')), false);
-    await page.getByRole('button', {name:'Whole console', exact:true}).click();
+    await page.getByRole('button', {name:'Whole console',exact:true}).click();
     overflows.push(...await overflow(page));
     await page.setViewportSize({width:1000,height:900});
     assert.equal(await page.locator('.screens').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length), 1);
     await page.setViewportSize({ width: 1440, height: 900 });
-    for (const id of ['pick','filled','running']) {
+    for (const id of ['pick','form','filled','running']) {
       await load(`${url}?frame=${id}`);
       if(id === 'filled') {
         assert(await page.locator('.agent-comment').evaluate(el => {const b=el.getBoundingClientRect();const scroll=el.closest('.page-scroll').getBoundingClientRect();return b.top>=scroll.top && b.bottom<=scroll.bottom}), 'Comment must be fully above the fold');
         assert.equal(await page.getByRole('button', {name:'Issue treatment',exact:true}).isEnabled(), true);
       }
+      if(id === 'form') {
+        assert.equal(await page.locator('.vet-credit,.agent-comment').count(), 0);
+        assert.equal(await page.locator('.method-control span').textContent(), 'Intramuscular');
+        assert.equal(await page.getByRole('spinbutton', {name:'Dose',exact:true}).inputValue(), '');
+        assert.equal(await page.locator('.pig-source').textContent(), '4 sows · Gestation 2');
+      }
       await page.screenshot({ path: path.join(shots, `${id}.png`) });
       if (id === 'pick') {
+        await assertPicker(page);
         await page.getByRole('checkbox', {name:'Pick C07',exact:true}).check();
         assert.equal(await page.locator('.picked-count').textContent(), '5 of 6 picked');
-        assert.equal(await page.locator('.save-picked').textContent(), '5 sows picked');
+        assert.equal(await page.locator('.continue-pigs').textContent(), 'Continue with 5 sows');
         await page.screenshot({path:path.join(shots,'pick-five.png')});
-        await page.getByRole('checkbox', {name:'Pick C07',exact:true}).uncheck();
-        assert.equal(await page.locator('.picked-count').textContent(), '4 of 6 picked');
-        await page.getByRole('button', {name:'Clear',exact:true}).click();
-        assert.equal(await page.locator('.save-picked').textContent(), '0 sows picked');
-        await page.getByRole('button', {name:'Pick all',exact:true}).click();
+        await page.locator('.pick-all').check();
         assert.equal(await page.locator('.picked-count').textContent(), '6 of 6 picked');
+        assert.equal(await page.locator('.pick-all').evaluate(el => el.indeterminate), false);
+        await page.locator('.pick-all').uncheck();
+        assert.equal(await page.locator('.picked-count').textContent(), '0 of 6 picked');
+        assert.equal(await page.locator('.continue-pigs').textContent(), 'Pick at least one pig');
+        assert.equal(await page.locator('.continue-pigs').isDisabled(), true);
+        await page.getByRole('cell', {name:'B15',exact:true}).click();
+        assert.equal(await page.locator('.continue-pigs').textContent(), 'Continue with 1 sow');
+        await page.locator('.continue-pigs').click();
+        assert.equal(new URL(page.url()).searchParams.get('frame'), 'form');
+        assert.equal(await page.locator('.pig-source').textContent(), '1 sow · Gestation 2');
+        await page.getByRole('button', {name:'Change pigs',exact:true}).click();
+        assert.equal(new URL(page.url()).searchParams.get('frame'), 'pick');
+        assert.equal(await page.locator('[data-pig]:checked').count(), 1);
+        await page.getByRole('button', {name:'New treatment',exact:true}).click();
+        assert.equal(await page.locator('.frame').getAttribute('data-frame'), 'form');
       }
       if (id === 'filled') {
         await page.getByRole('button', {name:'Use intramuscular',exact:true}).click();
@@ -89,6 +134,10 @@ async function overflow(page) {
         await page.getByRole('button', {name:'Dismiss',exact:true}).click();
         assert.equal(await page.locator('.method-control span').textContent(), 'In feed');
         assert.equal(await page.locator('.has-comment,.agent-comment').count(), 0);
+        await page.getByRole('button', {name:'Change pigs',exact:true}).click();
+        await assertPicker(page);
+        await page.getByRole('button', {name:'Cancel',exact:true}).click();
+        assert.equal(await page.locator('.frame').getAttribute('data-frame'), 'filled');
       }
       const scroller = page.locator('.right-pane .page-scroll');
       await scroller.evaluate(el => { el.scrollTop = el.scrollHeight; });
