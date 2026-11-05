@@ -1,0 +1,188 @@
+{
+ "title": "Step 2 · Farm layout",
+ "sub": "Every state of the layout editor. The live frame on the left is the first open.",
+ "cols": 6,
+ "sections": [
+  [
+   "First open and setting up",
+   [
+    [
+     "ly01",
+     "First open: a finished farm to explore"
+    ],
+    [
+     "ly02",
+     "Into a room: pigs fade in"
+    ],
+    [
+     "ly03",
+     "After Next: empty ground, + Zone"
+    ],
+    [
+     "ly04",
+     "From a plan photo: rooms drawn, waiting for pens"
+    ],
+    [
+     "ly05",
+     "Pens filled; the questions marked on the map"
+    ],
+    [
+     "ly06",
+     "All answered: save the layout"
+    ]
+   ]
+  ],
+  [
+   "Zones, sections and rooms",
+   [
+    [
+     "ly07",
+     "Edit layout at farm level: tools top left, the card on the right"
+    ],
+    [
+     "ly08",
+     "Into a zone: its sections, + Section"
+    ],
+    [
+     "ly09",
+     "A section: rooms, short code, + Room"
+    ],
+    [
+     "ly10",
+     "+ Room: click the ground, then name it"
+    ],
+    [
+     "ly11",
+     "A room: its details on the right, its tools top left"
+    ],
+    [
+     "ly12",
+     "Edit a room: name, size, door, lanes"
+    ],
+    [
+     "ly13",
+     "Box-select rooms: Duplicate, Group"
+    ],
+    [
+     "ly14",
+     "⌘D: a copy beside the original"
+    ],
+    [
+     "ly15",
+     "Grouped into a new section"
+    ],
+    [
+     "ly16",
+     "Drag a zone: a ghost shows where it lands"
+    ],
+    [
+     "ly17",
+     "Delete, asked in the tools bar; undo until you save"
+    ],
+    [
+     "ly18",
+     "Plan: straight down"
+    ]
+   ]
+  ],
+  [
+   "Lanes and pens",
+   [
+    [
+     "ly19",
+     "A lane selected: its runs in the tools bar"
+    ],
+    [
+     "ly20",
+     "Add pens: one line, the lane's last type"
+    ],
+    [
+     "ly21",
+     "The type picker"
+    ],
+    [
+     "ly22",
+     "A lane on one line from the door"
+    ],
+    [
+     "ly23",
+     "+ End row: a big pen across two lanes"
+    ],
+    [
+     "ly24",
+     "Doors: a main door and a second door"
+    ],
+    [
+     "ly25",
+     "Odd room: drag a wall corner"
+    ],
+    [
+     "ly26",
+     "Room made smaller: pens outside the wall, flagged"
+    ],
+    [
+     "ly27",
+     "Pen types"
+    ],
+    [
+     "ly28",
+     "New pen type: name, size, pigs per pen"
+    ]
+   ]
+  ],
+  [
+   "Devices",
+   [
+    [
+     "ly29",
+     "Add a device: each kind says where it goes"
+    ],
+    [
+     "ly30",
+     "An ammonia sensor on the wall"
+    ],
+    [
+     "ly31",
+     "A feeder line: its pens and its line on the floor"
+    ],
+    [
+     "ly32",
+     "Change a device's pens: click them"
+    ],
+    [
+     "ly33",
+     "Set up a device: bind it by the code on its label"
+    ]
+   ]
+  ],
+  [
+   "From the farm view, and real farms",
+   [
+    [
+     "ly34",
+     "+ Add: lane, row, door, device; menus open down from the tools"
+    ],
+    [
+     "ly35",
+     "A change made: Done saves, back to the farm"
+    ],
+    [
+     "ly36",
+     "Farrowing house: 11 rooms × 40 crates"
+    ],
+    [
+     "ly37",
+     "Group gestation barn"
+    ],
+    [
+     "ly38",
+     "Weaner unit"
+    ],
+    [
+     "ly39",
+     "The owner's sketch room"
+    ]
+   ]
+  ]
+ ]
+}

@@ -4,7 +4,7 @@ const [specFile, shotsDir, out, shell] = process.argv.slice(2);
 const spec = JSON.parse(fs.readFileSync(specFile, 'utf8'));
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 (async () => {
-  const W = 640, cols = 3, gap = 32, pad = 48, BW = cols * W + (cols - 1) * gap + 2 * pad;
+  const W = 640, cols = spec.cols || 3, gap = 32, pad = 48, BW = cols * W + (cols - 1) * gap + 2 * pad;
   let body = '', n = 0;
   for (const [head, items] of spec.sections) {
     let cells = '';

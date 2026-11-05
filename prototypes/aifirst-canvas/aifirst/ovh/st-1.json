@@ -1,0 +1,24 @@
+{
+ "title": "Step 1 · Day one",
+ "sub": "The other day-one screens. The live frame on the left is the first one.",
+ "cols": 3,
+ "sections": [
+  [
+   "Day one",
+   [
+    [
+     "su_FlowImport",
+     "Import the herd: three quick fixes"
+    ],
+    [
+     "su_FlowGuideGap",
+     "Layout not finished: the line waits, Home says why"
+    ],
+    [
+     "su_Line_NeedsLayout",
+     "Production line opened too early: finish the layout first"
+    ]
+   ]
+  ]
+ ]
+}
