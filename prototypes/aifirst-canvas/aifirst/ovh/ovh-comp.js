@@ -69,7 +69,7 @@
     const pen = r && ps.length === 1 ? ps[0] : '';
     const secId = r ? (r.section || '') : (u.secId || ''), sec = secId ? this.secById(secId) : null;
     const zoneId = r ? this.zoneOfRoom(r) : (sec ? (sec.zone || u.zoneId || '') : (u.zoneId || '')), zone = zoneId ? this.zoneById(zoneId) : null;
-    const levels = [{ kind: 'farm', label: M.name || 'Hillside Sow Farm', a: 'gofarm' }];
+    const levels = [{ kind: 'farm', label: M.name || 'Your farm', a: 'gofarm' }];
     if (zone) levels.push({ kind: 'zone', id: zone.id, label: zone.name, a: 'gozone:' + zone.id });
     if (sec) levels.push({ kind: 'section', id: sec.id, zoneId: zoneId, label: sec.name, a: 'gosec:' + sec.id });
     if (r) levels.push({ kind: 'room', id: r.id, secId: secId, zoneId: zoneId, label: r.name, a: 'goroom:' + r.id });
@@ -179,7 +179,7 @@
     const r = this.renderValsBase();
     r.setOvh = (el) => this.setOvh(el);
     this.ovVals = r;
-    if (this.ovOn()) r.camStyle = (r.camStyle || '') + ' display: none;';
+    if (this.ovOn() || (this.ui().ready && this.ui().mode === 'intro')) r.camStyle = (r.camStyle || '') + ' display: none;';
     if (r.P) r.P = Object.assign({}, r.P, { cIco: r.P.cIco || (r.ic && r.ic.x), cStyle: r.P.cStyle || r.closeStyle });
     this.ovEdTask = false;
     if (this.ovEdOn && this.ovEdOn(this.ui()) && r.P && r.P.isTask && r.barStyle) { this.ovEdTask = true; r.barStyle = r.barStyle.replace('left: 16px; right: 16px; bottom: 16px;', 'right: 16px; top: 16px; width: 360px;').replace(/max-height: calc\(100% - \d+px\);/, 'max-height: calc(100% - 104px);'); r.cardStyle = (r.cardStyle || '') + '; display: none;'; r.camStyle = (r.camStyle || '') + ' display: none;'; r.P = Object.assign({}, r.P, { cIco: r.ic && r.ic.chevL, cStyle: (r.closeStyle || '').replace('margin: -6px -2px -6px auto;', 'margin: -6px 2px -6px -8px; order: -1;'), closeLabel: 'Back' }); }

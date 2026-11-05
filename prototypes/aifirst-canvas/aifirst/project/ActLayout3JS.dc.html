@@ -8881,7 +8881,7 @@ class Component extends DCLogic {
     const pen = r && ps.length === 1 ? ps[0] : '';
     const secId = r ? (r.section || '') : (u.secId || ''), sec = secId ? this.secById(secId) : null;
     const zoneId = r ? this.zoneOfRoom(r) : (sec ? (sec.zone || u.zoneId || '') : (u.zoneId || '')), zone = zoneId ? this.zoneById(zoneId) : null;
-    const levels = [{ kind: 'farm', label: M.name || 'Hillside Sow Farm', a: 'gofarm' }];
+    const levels = [{ kind: 'farm', label: M.name || 'Your farm', a: 'gofarm' }];
     if (zone) levels.push({ kind: 'zone', id: zone.id, label: zone.name, a: 'gozone:' + zone.id });
     if (sec) levels.push({ kind: 'section', id: sec.id, zoneId: zoneId, label: sec.name, a: 'gosec:' + sec.id });
     if (r) levels.push({ kind: 'room', id: r.id, secId: secId, zoneId: zoneId, label: r.name, a: 'goroom:' + r.id });
@@ -9372,11 +9372,12 @@ class Component extends DCLogic {
     if (O.showing) h += '<div style="' + OVH.st({ position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: '80px', display: 'flex', alignItems: 'center', gap: '10px', height: '48px', padding: '0 6px 0 14px', borderRadius: '14px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', pointerEvents: 'auto', whiteSpace: 'nowrap', zIndex: 5 }) + '">' + OVH.icon(OVH.I.floor, 16) + OVH.t('Lane C · 10:00 run', { fontWeight: 600 }) + OVH.mu('9 ran · 3 skipped') + '<button type="button"' + OVH.A('showdone') + ' style="' + OVH.st({ display: 'inline-flex', alignItems: 'center', height: '36px', padding: '0 14px', borderRadius: '10px', border: 0, background: OVH.K.ink, color: '#FFFFFF', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }) + '">Done</button></div>';
     return h;
   }
-  ovEdOn(u) { return !!(u.ready && !u.err && u.vm === 'edit' && u.mode === 'saved' && !(this.props.start || '').match(/^intro/)); }
+  ovEdOn(u) { return !!(u.ready && !u.err && u.vm === 'edit' && ['saved', 'start', 'draft', 'pens', 'ready'].indexOf(u.mode) >= 0 && !(this.props.start || '').match(/^intro/)); }
   ovPaint() {
     if (!this.ovBody) return;
     const u = this.ui();
-    if (!this.ovOn(u) && this.ovEdOn(u)) { const O = this.ovS(), H = OVH, html = this.ovEdLoc(u) + this.ovViewHtml(O, u, true) + this.ovCard({ right: '16px', bottom: '16px' }, this.ovBtn(H.icon(H.I.check, 18) + 'Done', 'vw:modeToggle', false, { background: H.K.ink, color: '#FFFFFF', fontWeight: 600, padding: '0 16px' })); if (html !== this.ovLast) { this.ovBody.innerHTML = html; this.ovLast = html; } this.ovEdFit(); return; }
+    if (!this.ovOn(u) && u.ready && !u.err && u.mode === 'intro') { const html = this.ovViewHtml(this.ovS(), u, true); if (html !== this.ovLast) { this.ovBody.innerHTML = html; this.ovLast = html; } return; }
+    if (!this.ovOn(u) && this.ovEdOn(u)) { const O = this.ovS(), H = OVH, html = this.ovEdLoc(u) + this.ovViewHtml(O, u, true) + (this.ovVals && this.ovVals.showMode === false ? '' : this.ovCard({ right: '16px', bottom: '16px' }, this.ovBtn(H.icon(H.I.check, 18) + H.esc((this.ovVals && this.ovVals.modeLabel) || 'Done'), 'vw:modeToggle', false, { background: H.K.ink, color: '#FFFFFF', fontWeight: 600, padding: '0 16px' }))); if (html !== this.ovLast) { this.ovBody.innerHTML = html; this.ovLast = html; } this.ovEdFit(); return; }
     if (!this.ovOn(u)) { if (this.ovLast !== '') { this.ovBody.innerHTML = ''; this.ovLast = ''; this.ovTipHide(); } return; }
     const O = this.ovS(), st0 = this.props.start || 'saved';
     if (this.ovStarted !== st0) { this.ovStarted = st0; this.ovStart(st0); }
@@ -9488,7 +9489,7 @@ class Component extends DCLogic {
     const r = this.renderValsBase();
     r.setOvh = (el) => this.setOvh(el);
     this.ovVals = r;
-    if (this.ovOn()) r.camStyle = (r.camStyle || '') + ' display: none;';
+    if (this.ovOn() || (this.ui().ready && this.ui().mode === 'intro')) r.camStyle = (r.camStyle || '') + ' display: none;';
     if (r.P) r.P = Object.assign({}, r.P, { cIco: r.P.cIco || (r.ic && r.ic.x), cStyle: r.P.cStyle || r.closeStyle });
     this.ovEdTask = false;
     if (this.ovEdOn && this.ovEdOn(this.ui()) && r.P && r.P.isTask && r.barStyle) { this.ovEdTask = true; r.barStyle = r.barStyle.replace('left: 16px; right: 16px; bottom: 16px;', 'right: 16px; top: 16px; width: 360px;').replace(/max-height: calc\(100% - \d+px\);/, 'max-height: calc(100% - 104px);'); r.cardStyle = (r.cardStyle || '') + '; display: none;'; r.camStyle = (r.camStyle || '') + ' display: none;'; r.P = Object.assign({}, r.P, { cIco: r.ic && r.ic.chevL, cStyle: (r.closeStyle || '').replace('margin: -6px -2px -6px auto;', 'margin: -6px 2px -6px -8px; order: -1;'), closeLabel: 'Back' }); }
