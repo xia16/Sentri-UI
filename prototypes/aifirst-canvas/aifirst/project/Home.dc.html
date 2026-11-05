@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home with Schedule</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}a:hover{filter:brightness(.95)}</style>
+</helmet>
+<!-- Approved sources: style-board/home-blind.html (#frame) and schedule-b.html (week). -->
+<sc-if value="{{isHome}}" hint-placeholder-val="{{true}}">
+<section aria-label="Home" style="box-sizing: border-box; position: relative; width: 467px; height: 900px; flex: 0 0 auto; background: rgb(255, 255, 255); border-radius: 16px; overflow: hidden; box-shadow: none; font-family: Inter, sans-serif; color: rgb(27, 33, 28); font-feature-settings: &quot;cv11&quot;, &quot;ss01&quot;; -webkit-font-smoothing: antialiased;">
+  <div onScroll="{{paneScroll}}" style="box-sizing: border-box; position: absolute; inset: 0px; overflow: hidden auto; scrollbar-width: none; overscroll-behavior: contain;">
+    <header style="box-sizing: border-box; background: rgb(31, 74, 56); color: rgb(255, 255, 255); padding: 20px 20px 0px;">
+      <label style="box-sizing: border-box; position: relative; display: block;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="box-sizing: border-box; display: block; flex: 0 0 auto; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.72); transition: color 0.15s;">
+<circle cx="11" cy="11" r="7" style="box-sizing: border-box;">
+</circle>
+<path d="m20 20-3.5-3.5" style="box-sizing: border-box;">
+</path>
+</svg>
+        <input id="home-search" type="search" placeholder="" value="{{search}}" onChange="{{searchChange}}" aria-label="Find a page or action" autocomplete="off" style="box-sizing: border-box; width: 100%; height: 40px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.16); background: rgba(255, 255, 255, 0.09); color: rgb(255, 255, 255); font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; font-family: inherit; font-feature-settings: inherit; font-size: 14px; padding: 0px 12px 0px 38px; outline: none; transition: background 0.15s, border-color 0.15s;">
+<sc-if value="{{showSearchHint}}" hint-placeholder-val="{{true}}"><span aria-hidden="true" style="position:absolute;left:38px;top:0;height:40px;display:flex;align-items:center;font-size:14px;color:rgba(255,255,255,.7);pointer-events:none">Find a page or action</span></sc-if>
+      </label>
+      <div style="box-sizing: border-box; margin-top: 26px;">
+        <div style="box-sizing: border-box; font-size: 12.5px; font-weight: 500; color: rgba(255, 255, 255, 0.72); letter-spacing: 0.005em;">Thu 5 Nov · Hillside Sow Farm</div>
+        <h1 style="box-sizing: border-box; margin: 4px 0px 0px; font-size: 25px; line-height: 1.2; font-weight: 600; letter-spacing: -0.022em;">Good morning, Adam</h1>
+      </div>
+      <div style="box-sizing: border-box; display: flex; align-items: center; gap: 12px; margin-top: 26px; height: 30px;">
+        <div style="box-sizing: border-box; font-size: 13px; font-weight: 600; color: rgb(255, 255, 255); white-space: nowrap;">Inbox <span style="box-sizing: border-box; font-weight: 500; color: rgba(255, 255, 255, 0.72);">{{waiting}}</span>
+</div>
+        <div style="box-sizing: border-box; flex: 1 1 0%;">
+</div>
+        <sc-if value="{{hasMany}}" hint-placeholder-val="{{true}}">
+<div style="box-sizing: border-box; display: flex; align-items: center; height: 30px; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 8px; padding: 0px 1px; visibility: visible;">
+          <button aria-label="Previous item" disabled="{{prevDisabled}}" type="button" onClick="{{prev}}" style="box-sizing: border-box; font: inherit; color: rgba(255, 255, 255, 0.88); background: none; border: 0px; padding: 0px; margin: 0px; cursor: default; text-align: inherit; width: 28px; height: 26px; border-radius: 6px; display: grid; place-items: center; transition: background 0.12s, opacity 0.12s; opacity: 0.32;; opacity: {{prevOpacity}}; cursor:pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="box-sizing: border-box; display: block; flex: 0 0 auto;">
+<path d="m15 18-6-6 6-6" style="box-sizing: border-box;">
+</path>
+</svg>
+</button>
+          <span style="box-sizing: border-box; font-size: 12.5px; font-weight: 500; color: rgba(255, 255, 255, 0.9); min-width: 44px; text-align: center; font-variant-numeric: tabular-nums; white-space: nowrap;">{{position}}</span>
+          <button aria-label="Next item" type="button" onClick="{{next}}" disabled="{{nextDisabled}}" style="box-sizing: border-box; font: inherit; color: rgba(255, 255, 255, 0.88); background: none; border: 0px; padding: 0px; margin: 0px; cursor: pointer; text-align: inherit; width: 28px; height: 26px; border-radius: 6px; display: grid; place-items: center; transition: background 0.12s, opacity 0.12s;; opacity: {{nextOpacity}}; cursor:pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="box-sizing: border-box; display: block; flex: 0 0 auto;">
+<path d="m9 18 6-6-6-6" style="box-sizing: border-box;">
+</path>
+</svg>
+</button>
+        </div>
+</sc-if>
+        <a onClick="{{openInbox}}" style="box-sizing: border-box; color: rgb(255, 255, 255); text-decoration: none; display: flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 600; white-space: nowrap; padding: 6px 2px 6px 4px; border-radius: 6px; transition: background 0.12s; cursor: pointer;">Open inbox<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="box-sizing: border-box; display: block; flex: 0 0 auto; color: rgba(255, 255, 255, 0.8);">
+<path d="m9 18 6-6-6-6" style="box-sizing: border-box;">
+</path>
+</svg>
+</a>
+      </div>
+    </header>
+
+    <div style="box-sizing: border-box; position: relative; padding: 12px 20px 0px;">
+<div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:84px;background:#1F4A38">
+</div>
+      <article aria-live="polite" style="box-sizing: border-box; position: relative; background: rgb(255, 255, 255); border-radius: 14px; box-shadow: rgba(16, 30, 20, 0.08) 0px 1px 2px, rgba(16, 40, 28, 0.2) 0px 10px 28px -6px;">
+<sc-if value="{{hasInbox}}" hint-placeholder-val="{{true}}">
+<div style="box-sizing: border-box; padding: 16px 18px 18px;">
+<div style="box-sizing: border-box; display: flex; align-items: center; gap: 6px; min-height: 28px; margin-right: -6px;">
+<span style="box-sizing: border-box; display: inline-flex; align-items: center; height: 22px; padding: 0px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; letter-spacing: 0.005em; background: rgb(241, 230, 251); color: rgb(138, 63, 207);; background: {{item.kindBg}}; color: {{item.kindInk}}">{{item.kindLabel}}</span>
+<sc-if value="{{item.overdue}}" hint-placeholder-val="{{true}}">
+<span style="box-sizing: border-box; display: inline-flex; align-items: center; height: 22px; padding: 0px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; letter-spacing: 0.005em; background: rgb(241, 230, 251); color: rgb(138, 63, 207);; background: {{item.kindBg}}; color: {{item.kindInk}}; background:#F8E8E6;color:#B34B43">Overdue</span>
+</sc-if>
+<span style="box-sizing: border-box; display: flex; align-items: center; gap: 6px; margin-left: 6px; font-size: 12.5px; color: rgb(107, 113, 106); white-space: nowrap; min-width: 0px;">
+<span aria-hidden="true" style="box-sizing: border-box; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600; line-height: 1; flex: 0 0 auto; background: rgb(221, 241, 239); color: rgb(31, 111, 104);;background:{{item.markBg}};color:{{item.markInk}}">
+<sc-if value="{{item.phone}}" hint-placeholder-val="{{false}}">
+<svg viewBox="0 0 24 24" aria-hidden="true" style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+<rect x="6" y="2" width="12" height="20" rx="2.5">
+</rect>
+<path d="M11 18h2">
+</path>
+</svg>
+</sc-if>
+<sc-if value="{{item.bell}}" hint-placeholder-val="{{false}}">
+<svg viewBox="0 0 24 24" aria-hidden="true" style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0">
+</path>
+</svg>
+</sc-if>{{item.mark}}</span>
+<span style="box-sizing: border-box;">
+<b style="font-weight:600;color:#4F564F">{{item.source}}</b> · {{item.when}}</span>
+</span>
+<button aria-label="Dismiss" title="Dismiss" type="button" onClick="{{dismiss}}" style="box-sizing: border-box; font: inherit; color: rgb(107, 113, 106); background: none; border: 0px; padding: 0px; margin: 0px 0px 0px auto; cursor: pointer; text-align: inherit; width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; transition: background 0.12s, color 0.12s;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="box-sizing: border-box; display: block; flex: 0 0 auto;">
+<path d="M18 6 6 18M6 6l12 12" style="box-sizing: border-box;">
+</path>
+</svg>
+</button>
+</div>
+<h2 style="box-sizing: border-box; text-wrap: balance; margin: 12px 0px 0px; font-size: 17px; line-height: 1.35; font-weight: 600; letter-spacing: -0.014em; color: rgb(27, 33, 28);">{{item.title}}</h2>
+<sc-if value="{{item.ref}}" hint-placeholder-val="{{true}}">
+<div style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 3px 9px 3px 8px; border-radius: 7px; background: rgb(238, 240, 234); font-size: 12.5px; font-weight: 600; color: rgb(79, 86, 79);">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="box-sizing: border-box; display: block; flex: 0 0 auto; color: rgb(139, 144, 137);">
+<path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z" style="box-sizing: border-box;">
+</path>
+<path d="M7.5 7.5h.01" style="box-sizing: border-box;">
+</path>
+</svg>
+<span style="box-sizing: border-box;">{{item.ref}}</span>
+</div>
+</sc-if>
+<sc-if value="{{item.body}}" hint-placeholder-val="{{true}}">
+<p style="box-sizing: border-box; margin: 6px 0px 0px; font-size: 13.5px; line-height: 1.52; color: rgb(79, 86, 79); text-wrap: pretty;">{{item.body}}</p>
+</sc-if>
+<div style="box-sizing: border-box; display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+<sc-for list="{{item.actions}}" as="action" hint-placeholder-count="1">
+<button type="button" style="box-sizing: border-box; font-style: inherit; font-variant: inherit; font-weight: 600; font-stretch: inherit; font-size: 13.5px; line-height: inherit; font-family: inherit; font-feature-settings: inherit; color: rgb(27, 33, 28); background: rgb(255, 255, 255); border: 1px solid rgb(214, 217, 210); padding: 0px 14px; margin: 0px; cursor: pointer; text-align: inherit; height: 36px; border-radius: 9px; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;;background:{{action.bg}};color:{{action.ink}};border:{{action.border}};box-shadow:{{action.shadow}}" onClick="{{action.pick}}">{{action.l}}</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{emptyInbox}}" hint-placeholder-val="{{false}}">
+<div style="padding:46px 24px;text-align:center">
+<div style="margin:auto;width:40px;height:40px;border-radius:50%;background:#E6F2EA;color:#1F5F45;display:grid;place-items:center">✓</div>
+<h2 style="margin:12px 0 0;font-size:17px;font-weight:600">You’re all caught up</h2>
+<p style="margin:4px 0 0;font-size:13.5px;color:#4F564F">New items from your team land here.</p>
+</div>
+</sc-if>
+</article>
+    </div>
+
+    <main style="box-sizing: border-box; padding: 8px 0px 40px;">
+      <section aria-labelledby="todayTitle" style="box-sizing: border-box; margin-top: 30px;">
+        <div style="box-sizing: border-box; margin-left: 20px; margin-right: 20px; display: flex; align-items: center; gap: 10px; min-height: 30px; margin-bottom: 10px;">
+          <h3 id="todayTitle" style="box-sizing: border-box; margin: 0px; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: rgb(27, 33, 28); white-space: nowrap;">Today</h3>
+          <div style="box-sizing: border-box; display: flex; gap: 2px; margin-left: 2px;">
+            <button aria-label="Scroll tasks left" disabled="{{tilePrevDisabled}}" type="button" onClick="{{tilePrev}}" style="box-sizing: border-box; font: inherit; color: rgb(79, 86, 79); background: none; border: 0px; padding: 0px; margin: 0px; cursor: default; text-align: inherit; width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; transition: background 0.12s, opacity 0.12s; opacity: 0.3;; opacity: {{tilePrevOpacity}}; cursor:pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="box-sizing: border-box; display: block; flex: 0 0 auto;">
+<path d="m15 18-6-6 6-6" style="box-sizing: border-box;">
+</path>
+</svg>
+</button>
+            <button aria-label="Scroll tasks right" type="button" onClick="{{tileNext}}" disabled="{{tileNextDisabled}}" style="box-sizing: border-box; font: inherit; color: rgb(79, 86, 79); background: none; border: 0px; padding: 0px; margin: 0px; cursor: pointer; text-align: inherit; width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; transition: background 0.12s, opacity 0.12s;; opacity: {{tileNextOpacity}}; cursor:pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="box-sizing: border-box; display: block; flex: 0 0 auto;">
+<path d="m9 18 6-6-6-6" style="box-sizing: border-box;">
+</path>
+</svg>
+</button>
+          </div>
+          <div style="box-sizing: border-box; flex: 1 1 0%;">
+</div>
+          <a onClick="{{goSchedule}}" style="box-sizing: border-box; color: rgb(31, 95, 69); text-decoration: none; display: inline-flex; align-items: center; gap: 1px; font-size: 13px; font-weight: 600; white-space: nowrap; padding: 5px 2px 5px 6px; border-radius: 6px; transition: background 0.12s; cursor: pointer;">Schedule<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="box-sizing: border-box; display: block; flex: 0 0 auto;">
+<path d="m9 18 6-6-6-6" style="box-sizing: border-box;">
+</path>
+</svg>
+</a>
+        </div>
+        <div ref="{{todayRow}}" onScroll="{{tileScroll}}" style="box-sizing: border-box; margin-left: 0px; margin-right: 0px; display: flex; gap: 10px; padding: 0px 20px 2px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0px 20px; scrollbar-width: none; scroll-behavior: smooth;">
+<sc-for list="{{tiles}}" as="tile" hint-placeholder-count="1">
+<button data-open="Fostering checks" type="button" onClick="{{goSchedule}}" style="box-sizing: border-box; font: inherit; color: inherit; background: rgb(255, 255, 255); border: 1px solid rgb(228, 230, 224); padding: 13px 14px 12px; margin: 0px; cursor: pointer; text-align: inherit; flex: 0 0 196px; scroll-snap-align: start; display: flex; flex-direction: column; border-radius: 12px; transition: background 0.12s, border-color 0.12s;">
+<span style="box-sizing: border-box; align-self: flex-start; margin-bottom: 8px; padding: 2px 7px; border-radius: 6px; font-size: 11.5px; font-weight: 600; line-height: 1.5; background: rgb(252, 239, 214); color: rgb(138, 90, 18);;background:{{tile.kindBg}};color:{{tile.kindInk}}">{{tile.kind}}</span>
+<span style="box-sizing: border-box; font-size: 13.5px; font-weight: 600; color: rgb(27, 33, 28); white-space: nowrap;">{{tile.name}}</span>
+<span style="box-sizing: border-box; margin-top: 2px; font-size: 12px; color: rgb(107, 113, 106); white-space: nowrap;">{{tile.target}}</span>
+<span style="box-sizing: border-box; display: flex; align-items: baseline; gap: 6px; margin-top: 14px; white-space: nowrap;">
+<span style="box-sizing: border-box; font-variant-numeric: tabular-nums; font-size: 28px; line-height: 1; font-weight: 600; letter-spacing: -0.025em; color: rgb(27, 33, 28);">{{tile.num}}</span>
+<span style="box-sizing: border-box; font-size: 13px; color: rgb(79, 86, 79);">{{tile.word}}</span>
+</span>
+<span aria-hidden="true" style="box-sizing: border-box; display: flex; gap: 3px; margin-top: 14px; height: 5px;">
+<sc-for list="{{tile.segments}}" as="seg" hint-placeholder-count="1">
+<i style="box-sizing: border-box; flex: 1 1 0%; border-radius: 3px; background: rgb(93, 170, 116);;background:{{seg.color}}">
+</i>
+</sc-for>
+</span>
+<span style="box-sizing: border-box; margin-top: 8px; font-size: 12px; color: rgb(107, 113, 106); white-space: nowrap;">{{tile.when}}</span>
+</button>
+</sc-for>
+</div>
+      </section>
+
+      <section aria-labelledby="dashTitle" style="box-sizing: border-box; margin-top: 30px;">
+        <div style="box-sizing: border-box; margin-left: 20px; margin-right: 20px; display: flex; align-items: center; gap: 10px; min-height: 30px; margin-bottom: 10px;">
+<h3 id="dashTitle" style="box-sizing: border-box; margin: 0px; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: rgb(27, 33, 28); white-space: nowrap;">Dashboards</h3>
+</div>
+        <div style="box-sizing: border-box; margin-left: 20px; margin-right: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+<button type="button" style="box-sizing: border-box; font: inherit; color: inherit; background: rgb(255, 255, 255); border: 1px solid rgb(228, 230, 224); padding: 12px 14px 14px; margin: 0px; cursor: pointer; text-align: left; display: flex; flex-direction: column; align-items: stretch; border-radius: 12px; transition: background 0.12s, border-color 0.12s; min-width: 0px; grid-column: 1 / -1;" onClick="{{openDashboard}}">
+<span style="box-sizing: border-box; display: flex; align-items: center; gap: 10px;">
+<span style="box-sizing: border-box; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: rgb(252, 239, 214); color: rgb(138, 90, 18);">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="box-sizing: border-box; display: block; flex: 0 0 auto;">
+<path d="M3 3v18h18" style="box-sizing: border-box;">
+</path>
+<path d="M8 17v-5M13 17V8M18 17v-8" style="box-sizing: border-box;">
+</path>
+</svg>
+</span>
+<b style="box-sizing: border-box; font-size: 13.5px; font-weight: 600; color: rgb(27, 33, 28); white-space: nowrap;">Production</b>
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="box-sizing: border-box; display: block; flex: 0 0 auto; margin-left: auto; color: rgb(162, 167, 159);">
+<path d="m9 18 6-6-6-6" style="box-sizing: border-box;">
+</path>
+</svg>
+</span>
+<span style="box-sizing: border-box; display: flex; align-items: baseline; gap: 6px; margin-top: 14px; white-space: nowrap;">
+<span style="box-sizing: border-box; font-variant-numeric: tabular-nums; font-size: 26px; line-height: 1; font-weight: 600; letter-spacing: -0.02em; color: rgb(27, 33, 28);">6</span>
+<span style="box-sizing: border-box; font-size: 13px; color: rgb(79, 86, 79);">batches running</span>
+</span>
+<span aria-hidden="true" style="box-sizing: border-box; display: flex; gap: 3px; height: 6px; margin-top: 14px;">
+<i style="box-sizing: border-box; border-radius: 3px; background: rgb(231, 201, 143); flex: 3 1 0%;">
+</i>
+<i style="box-sizing: border-box; border-radius: 3px; background: rgb(201, 138, 46); flex: 1 1 0%;">
+</i>
+<i style="box-sizing: border-box; border-radius: 3px; background: rgb(138, 90, 18); flex: 2 1 0%;">
+</i>
+</span>
+<span style="box-sizing: border-box; display: flex; gap: 14px; margin-top: 8px; font-size: 12px; color: rgb(107, 113, 106); white-space: nowrap;">
+<span style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 6px;">
+<i style="box-sizing: border-box; background: rgb(231, 201, 143); width: 8px; height: 8px; border-radius: 2px; display: inline-block;">
+</i>Gestation 3</span>
+<span style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 6px;">
+<i style="box-sizing: border-box; background: rgb(201, 138, 46); width: 8px; height: 8px; border-radius: 2px; display: inline-block;">
+</i>Farrowing 1</span>
+<span style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 6px;">
+<i style="box-sizing: border-box; background: rgb(138, 90, 18); width: 8px; height: 8px; border-radius: 2px; display: inline-block;">
+</i>Nursery 2</span>
+</span>
+</button>
+<button type="button" style="box-sizing: border-box; font: inherit; color: inherit; background: rgb(255, 255, 255); border: 1px solid rgb(228, 230, 224); padding: 12px 14px 14px; margin: 0px; cursor: pointer; text-align: left; display: flex; flex-direction: column; align-items: stretch; border-radius: 12px; transition: background 0.12s, border-color 0.12s; min-width: 0px;" onClick="{{openDashboard}}">
+<span style="box-sizing: border-box; display: flex; align-items: center; gap: 10px;">
+<span style="box-sizing: border-box; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: rgb(221, 241, 239); color: rgb(31, 111, 104);">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="box-sizing: border-box; display: block; flex: 0 0 auto;">
+<path d="M22 12h-4l-3 9L9 3l-3 9H2" style="box-sizing: border-box;">
+</path>
+</svg>
+</span>
+<b style="box-sizing: border-box; font-size: 13.5px; font-weight: 600; color: rgb(27, 33, 28); white-space: nowrap;">Health</b>
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="box-sizing: border-box; display: block; flex: 0 0 auto; margin-left: auto; color: rgb(162, 167, 159);">
+<path d="m9 18 6-6-6-6" style="box-sizing: border-box;">
+</path>
+</svg>
+</span>
+<span style="box-sizing: border-box; display: flex; align-items: baseline; gap: 6px; margin-top: 14px; white-space: nowrap;">
+<span style="box-sizing: border-box; font-variant-numeric: tabular-nums; font-size: 26px; line-height: 1; font-weight: 600; letter-spacing: -0.02em; color: rgb(27, 33, 28);">3</span>
+<span style="box-sizing: border-box; font-size: 13px; color: rgb(79, 86, 79);">to treat</span>
+</span>
+<span style="box-sizing: border-box; margin-top: 6px; font-size: 12.5px; color: rgb(107, 113, 106); white-space: nowrap;">12 monitoring</span>
+</button>
+<button type="button" style="box-sizing: border-box; font: inherit; color: inherit; background: rgb(255, 255, 255); border: 1px solid rgb(228, 230, 224); padding: 12px 14px 14px; margin: 0px; cursor: pointer; text-align: left; display: flex; flex-direction: column; align-items: stretch; border-radius: 12px; transition: background 0.12s, border-color 0.12s; min-width: 0px;" onClick="{{openDashboard}}">
+<span style="box-sizing: border-box; display: flex; align-items: center; gap: 10px;">
+<span style="box-sizing: border-box; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: rgb(236, 232, 251); color: rgb(91, 74, 179);">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="box-sizing: border-box; display: block; flex: 0 0 auto;">
+<path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z" style="box-sizing: border-box;">
+</path>
+</svg>
+</span>
+<b style="box-sizing: border-box; font-size: 13.5px; font-weight: 600; color: rgb(27, 33, 28); white-space: nowrap;">Biosecurity</b>
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="box-sizing: border-box; display: block; flex: 0 0 auto; margin-left: auto; color: rgb(162, 167, 159);">
+<path d="m9 18 6-6-6-6" style="box-sizing: border-box;">
+</path>
+</svg>
+</span>
+<span style="box-sizing: border-box; display: flex; align-items: baseline; gap: 6px; margin-top: 14px; white-space: nowrap;">
+<span style="box-sizing: border-box; font-variant-numeric: tabular-nums; font-size: 19px; line-height: 1; font-weight: 600; letter-spacing: -0.02em; color: rgb(27, 33, 28);">Mon 9 Nov</span>
+</span>
+<span style="box-sizing: border-box; margin-top: 6px; font-size: 12.5px; color: rgb(107, 113, 106); white-space: nowrap;">Next sampling</span>
+</button>
+</div>
+      </section>
+
+      <section aria-labelledby="teamTitle" style="box-sizing: border-box; margin-top: 30px;">
+        <div style="box-sizing: border-box; margin-left: 20px; margin-right: 20px; display: flex; align-items: center; gap: 10px; min-height: 30px; margin-bottom: 10px;">
+<h3 id="teamTitle" style="box-sizing: border-box; margin: 0px; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: rgb(27, 33, 28); white-space: nowrap;">Your team today</h3>
+</div>
+        <div style="box-sizing: border-box; margin-left: 20px; margin-right: 20px; position: relative;">
+<sc-for list="{{events}}" as="event" hint-placeholder-count="1">
+<div style="box-sizing: border-box; position: relative; display: grid; grid-template-columns: 44px 24px 1fr; column-gap: 12px; padding: 8px 0px;">
+<span aria-hidden="true" style="position:absolute;left:67px;top:{{event.trackTop}};bottom:{{event.trackBottom}};height:{{event.trackHeight}};width:1px;background:#E4E6E0">
+</span>
+<span style="box-sizing: border-box; font-size: 12.5px; color: rgb(107, 113, 106); padding-top: 4px; font-variant-numeric: tabular-nums; white-space: nowrap;">{{event.time}}</span>
+<span aria-hidden="true" style="box-sizing: border-box; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600; line-height: 1; flex: 0 0 auto; background: rgb(251, 229, 227); color: rgb(162, 59, 51); box-shadow: rgb(255, 255, 255) 0px 0px 0px 3px; position: relative; z-index: 1;;background:{{event.bg}};color:{{event.ink}}">{{event.mark}}</span>
+<div style="box-sizing: border-box;">
+<div style="box-sizing: border-box; font-size: 13.5px; line-height: 1.4; color: rgb(27, 33, 28); padding-top: 2px;">{{event.line}}</div>
+<div style="box-sizing: border-box; margin-top: 1px; font-size: 12px; color: rgb(107, 113, 106);">{{event.who}}</div>
+</div>
+</div>
+</sc-for>
+<sc-for list="{{olderGroups}}" as="group" hint-placeholder-count="0">
+<div style="position:relative;display:grid;grid-template-columns:44px 24px 1fr;column-gap:12px;align-items:center;padding:14px 0 4px">
+<span style="position:absolute;left:67px;top:0;bottom:0;width:1px;background:#E4E6E0">
+</span>
+<span>
+</span>
+<span style="width:9px;height:9px;border-radius:50%;background:#fff;border:1.5px solid #C3C7BF;justify-self:center;position:relative;z-index:1;box-shadow:0 0 0 3px #fff">
+</span>
+<span style="font-size:12px;font-weight:600;color:#4F564F">{{group.day}}</span>
+</div>
+<sc-for list="{{group.rows}}" as="event" hint-placeholder-count="3">
+<div style="box-sizing: border-box; position: relative; display: grid; grid-template-columns: 44px 24px 1fr; column-gap: 12px; padding: 8px 0px;">
+<span aria-hidden="true" style="position:absolute;left:67px;top:{{event.trackTop}};bottom:{{event.trackBottom}};height:{{event.trackHeight}};width:1px;background:#E4E6E0">
+</span>
+<span style="box-sizing: border-box; font-size: 12.5px; color: rgb(107, 113, 106); padding-top: 4px; font-variant-numeric: tabular-nums; white-space: nowrap;">{{event.time}}</span>
+<span aria-hidden="true" style="box-sizing: border-box; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600; line-height: 1; flex: 0 0 auto; background: rgb(251, 229, 227); color: rgb(162, 59, 51); box-shadow: rgb(255, 255, 255) 0px 0px 0px 3px; position: relative; z-index: 1;;background:{{event.bg}};color:{{event.ink}}">{{event.mark}}</span>
+<div style="box-sizing: border-box;">
+<div style="box-sizing: border-box; font-size: 13.5px; line-height: 1.4; color: rgb(27, 33, 28); padding-top: 2px;">{{event.line}}</div>
+<div style="box-sizing: border-box; margin-top: 1px; font-size: 12px; color: rgb(107, 113, 106);">{{event.who}}</div>
+</div>
+</div>
+</sc-for>
+</sc-for>
+</div>
+        <div style="box-sizing: border-box; margin-left: 20px; margin-right: 20px;">
+<sc-if value="{{allOlder}}" hint-placeholder-val="{{false}}">
+<div style="display:flex;align-items:center;gap:12px;margin-top:10px;height:40px;font-size:12.5px;color:#6B716A;white-space:nowrap">
+<span style="flex:1;height:1px;background:#E4E6E0">
+</span>That’s everything since Monday<span style="flex:1;height:1px;background:#E4E6E0">
+</span>
+</div>
+</sc-if>
+</div>
+        <div style="box-sizing: border-box; margin-left: 20px; margin-right: 20px; height: 1px;">
+</div>
+      </section>
+    </main>
+  </div>
+
+  <sc-if value="{{toast}}" hint-placeholder-val="{{true}}">
+<div role="status" style="box-sizing: border-box; position: absolute; left: 50%; bottom: 18px; transform: translate(-50%, 0px); opacity: 1; pointer-events: auto; display: flex; align-items: center; gap: 14px; max-width: calc(100% - 40px); background: rgb(32, 41, 31); color: rgb(255, 255, 255); border-radius: 10px; padding: 0px 6px 0px 14px; height: 42px; font-size: 13px; font-weight: 500; box-shadow: rgba(10, 20, 12, 0.35) 0px 8px 24px -6px; transition: opacity 0.18s, transform 0.18s; white-space: nowrap; z-index: 5;">
+<span style="box-sizing: border-box; overflow: hidden; text-overflow: ellipsis;">{{toast}}</span>
+<sc-if value="{{canUndo}}" hint-placeholder-val="{{true}}">
+<button type="button" onClick="{{undo}}" style="box-sizing: border-box; font-style: inherit; font-variant: inherit; font-weight: 600; font-stretch: inherit; font-size: 13px; line-height: inherit; font-family: inherit; font-feature-settings: inherit; color: rgb(191, 224, 203); background: none; border: 0px; padding: 0px 10px; margin: 0px; cursor: pointer; text-align: inherit; height: 30px; border-radius: 7px;">Undo</button>
+</sc-if>
+</div>
+</sc-if>
+</section>
+</sc-if>
+<sc-if value="{{isSchedule}}" hint-placeholder-val="{{false}}">
+<section style="position:relative;width:467px;height:900px;box-sizing:border-box;background:#f5f5f4;color:#1c1917;font:14px Inter,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden">
+<div style="height:900px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none">
+<div style="display:flex;align-items:center;gap:12px;padding:20px 16px 16px">
+<button type="button" onClick="{{goHome}}" style="border:0;background:transparent;color:#57534e;font:500 13px Inter,sans-serif;padding:6px 0;cursor:pointer">‹ Home</button>
+<h1 style="font-size:17px;font-weight:600;margin:0;flex:1">Schedule</h1>
+<div role="tablist" aria-label="Calendar range" style="display:flex;background:#eaeae7;border-radius:8px;padding:3px">
+<sc-for list="{{ranges}}" as="range" hint-placeholder-count="2"><button type="button" role="tab" aria-selected="{{range.selected}}" onClick="{{range.pick}}" style="border:0;background:{{range.bg}};color:{{range.ink}};box-shadow:{{range.shadow}};border-radius:6px;padding:5px 10px;font:400 13px Inter,sans-serif;cursor:pointer">{{range.label}}</button></sc-for>
+</div>
+</div>
+<div style="padding:0 12px 24px">
+<sc-for list="{{weeks}}" as="week" hint-placeholder-count="1">
+<section style="margin-bottom:16px;background:#fff;border-radius:12px;box-shadow:0 1px 3px #1c19170f,0 1px 2px #1c19170a;overflow:hidden">
+<div style="display:flex;align-items:center;gap:4px;padding:14px 10px;border-bottom:1px solid #efeeec">
+<button type="button" onClick="{{todayWeek}}" style="height:32px;border:1px solid #d6d3d1;background:#fff;border-radius:9px;padding:0 9px;font:400 13px Inter,sans-serif;cursor:pointer">Today</button>
+<button type="button" aria-label="Previous week" onClick="{{previousWeek}}" style="height:32px;width:24px;border:0;background:transparent;font:600 18px Inter,sans-serif;cursor:pointer">‹</button>
+<button type="button" aria-label="Next week" onClick="{{nextWeek}}" style="height:32px;width:24px;border:0;background:transparent;font:600 18px Inter,sans-serif;cursor:pointer">›</button>
+<b style="font-size:13px;font-weight:600;white-space:nowrap;margin-left:4px">{{week.caption}}</b><span style="font-size:12px;color:#57534e;margin-left:auto;white-space:nowrap">Week {{week.number}}</span>
+</div>
+<div style="position:relative;isolation:isolate" aria-label="Tasks this week">
+<sc-if value="{{week.isCurrent}}" hint-placeholder-val="{{true}}"><div aria-hidden="true" style="position:absolute;top:64px;bottom:0;left:calc(140px + (100% - 140px)*3/7);width:calc((100% - 140px)/7);background:#f5f9f5;z-index:-1"></div></sc-if>
+<div style="display:grid;grid-template-columns:140px repeat(7,minmax(0,1fr));height:64px;border-bottom:1px solid #efeeec;box-sizing:border-box">
+<div style="display:flex;align-items:center;padding-left:14px;font-size:12px;color:#57534e;font-weight:500">Task</div>
+<sc-for list="{{week.days}}" as="day" hint-placeholder-count="7">
+<div style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;position:relative;border-left:1px solid #f1f0ee">
+<span style="font-size:10px;font-weight:500;color:#57534e;letter-spacing:.02em;text-transform:uppercase">{{day.name}}</span>
+<b style="display:grid;place-items:center;width:24px;height:24px;border-radius:999px;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;color:{{day.ink}};background:{{day.bg}}">{{day.date}}</b>
+<sc-if value="{{day.today}}" hint-placeholder-val="{{false}}"><span style="position:absolute;left:7px;right:7px;bottom:-1px;height:2px;background:#28734F;border-radius:2px"></span></sc-if>
+</div>
+</sc-for>
+</div>
+<sc-for list="{{week.groups}}" as="group" hint-placeholder-count="3">
+<div style="height:40px;box-sizing:border-box;padding:6px 0 0 14px;display:flex;align-items:center;background:#fafaf9;border-bottom:1px solid #efeeec;font-size:12px;font-weight:600;color:#57534e">{{group.name}}</div>
+<sc-for list="{{group.rows}}" as="row" hint-placeholder-count="3">
+<div role="group" aria-label="{{row.name}}" onMouseEnter="{{row.preview}}" onMouseLeave="{{hidePreview}}" style="display:grid;grid-template-columns:140px repeat(7,minmax(0,1fr));height:56px;box-sizing:border-box;border-bottom:1px solid #f1f0ee;background:{{row.bg}}">
+<div style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;padding:0 8px 0 14px;border-right:1px solid #efeeec;min-width:0">
+<span style="font-size:13px;font-weight:500;line-height:16px;white-space:nowrap">{{row.name}}</span>
+<span tabIndex="0" onMouseEnter="{{row.showTag}}" onMouseLeave="{{hideTag}}" onFocus="{{row.showTag}}" onBlur="{{hideTag}}" aria-label="{{row.tagAria}}" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#44403c;background:#F1F3EE;border-radius:6px;padding:2px 7px;line-height:16px;font-variant-numeric:tabular-nums;cursor:default">
+<sc-if value="{{row.pig}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="13" r="7.5"></circle><path d="M6.5 8 5 3.5 9.5 6M17.5 8 19 3.5 14.5 6"></path><ellipse cx="12" cy="15.5" rx="3.2" ry="2.3"></ellipse><path d="M11 15.5h.01M13 15.5h.01"></path></svg></sc-if>
+<sc-if value="{{row.room}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M3 10.5 12 3l9 7.5V21H3V10.5Z M9 21v-6h6v6"></path></svg></sc-if>
+{{row.tag}}</span>
+</div>
+<sc-for list="{{row.cells}}" as="cell" hint-placeholder-count="7">
+<div style="padding:0 2px;display:flex;align-items:center;justify-content:center;border-left:1px solid #f1f0ee;min-width:0">
+<sc-if value="{{cell.visible}}" hint-placeholder-val="{{true}}"><button type="button" aria-label="{{cell.aria}}" onMouseEnter="{{cell.preview}}" onFocus="{{cell.preview}}" onBlur="{{hidePreview}}" onClick="{{noAction}}" style="box-sizing:border-box;width:100%;min-width:0;height:30px;padding:0;border:{{cell.border}};border-radius:{{cell.radius}};background:{{cell.bg}};color:{{cell.ink}};box-shadow:{{cell.shadow}};font:600 12px Inter,sans-serif;font-variant-numeric:tabular-nums;cursor:pointer">{{cell.label}}</button></sc-if>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</sc-for>
+</div>
+</section>
+</sc-for>
+</div>
+</div>
+<sc-if value="{{tagTip}}" hint-placeholder-val="{{false}}"><div role="tooltip" style="position:absolute;z-index:10;left:26px;top:{{tagTop}};max-width:380px;box-sizing:border-box;white-space:pre-line;background:#fff;color:#1c1917;font-size:12px;font-weight:500;line-height:1.6;padding:8px 10px;border-radius:8px;box-shadow:0 4px 12px #0002,0 0 0 1px #0000000d;pointer-events:none">{{tagTip}}</div></sc-if>
+<sc-if value="{{preview}}" hint-placeholder-val="{{false}}"><div role="tooltip" style="position:absolute;left:{{previewLeft}};top:{{previewTop}};width:280px;box-sizing:border-box;z-index:9;padding:14px;background:#fff;border:1px solid #e7e5e4;border-radius:12px;box-shadow:0 4px 6px -1px #0000001a,0 2px 4px -2px #0000001a;font-size:13px;line-height:1.6;pointer-events:none">
+<strong style="font-size:13px;font-weight:600">{{preview.title}}</strong><p style="font-size:12px;color:#57534e;margin:0;line-height:1.6">{{preview.meta}}</p>
+<div style="display:flex;align-items:center;gap:10px;font-size:13px;margin:10px 0 6px"><div style="display:flex;gap:3px;flex:1;height:18px"><sc-if value="{{preview.done}}" hint-placeholder-val="{{true}}"><span style="flex:{{preview.done}};border-radius:4px;background:#28734F"></span></sc-if><sc-if value="{{preview.pending}}" hint-placeholder-val="{{true}}"><span style="flex:{{preview.pending}};border-radius:4px;background:#fff;border:1px solid #d6d3d1"></span></sc-if></div><span>{{preview.progress}}</span></div>
+<p style="font-size:12px;color:#57534e;margin:0">{{preview.note}}</p><p style="font-size:12px;color:#57534e;margin:8px 0 0">Click to open</p>
+</div></sc-if>
+</section>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":467,"height":900}}'>
+const HOME_DATA = {
+  "inbox": [
+    {
+      "kind": "approve",
+      "src": {
+        "agent": "vet"
+      },
+      "when": "3h ago",
+      "title": "Revaccinate Batch 29 against PRRS",
+      "body": "Antibodies came back low in 14 of 30 samples. I drafted a PRRS booster for all 470 pigs on Mon 9 Nov, the same plan as Batch 27.",
+      "ref": "Batch 29 · Nursery 2",
+      "acts": [
+        {
+          "l": "Review",
+          "s": "secondary",
+          "open": true
+        },
+        {
+          "l": "Approve",
+          "s": "primary",
+          "done": "Approved"
+        }
+      ]
+    },
+    {
+      "kind": "approve",
+      "src": {
+        "agent": "biosecurity"
+      },
+      "when": "3h ago",
+      "title": "5 visitors want to come in next week",
+      "body": "Dr. Chen’s team plus two feed reps, Tue–Thu. All have been away from other pigs for 3 days.",
+      "ref": "5 visitors · Tue–Thu",
+      "acts": [
+        {
+          "l": "Review",
+          "s": "secondary",
+          "open": true
+        },
+        {
+          "l": "Approve",
+          "s": "primary",
+          "done": "Approved"
+        }
+      ]
+    },
+    {
+      "kind": "question",
+      "src": {
+        "agent": "production"
+      },
+      "when": "2h ago",
+      "title": "Batch 33 farrowing room: keep Farrowing 1?",
+      "body": "2 crates in Farrowing 1 are down until Monday. Farrowing 2 is free from Thursday.",
+      "ref": "Batch 33 · farrows from Fri",
+      "acts": [
+        {
+          "l": "Keep Farrowing 1",
+          "s": "secondary",
+          "done": "Answered: Keep Farrowing 1"
+        },
+        {
+          "l": "Use Farrowing 2",
+          "s": "secondary",
+          "done": "Answered: Use Farrowing 2"
+        }
+      ]
+    },
+    {
+      "kind": "todo",
+      "src": {
+        "name": "Zhao Min",
+        "mark": "Z"
+      },
+      "when": "1h ago",
+      "title": "Sick room is full",
+      "body": "3 of 3 places taken. Two more sows were marked sick this morning.",
+      "ref": "2 sows waiting for a place",
+      "acts": [
+        {
+          "l": "Mark done",
+          "s": "primary",
+          "done": "Marked done"
+        }
+      ]
+    },
+    {
+      "kind": "todo",
+      "overdue": true,
+      "src": {
+        "name": "Phones",
+        "icon": "phone"
+      },
+      "when": "yesterday",
+      "title": "3 pigs missed in Batch 31’s PRRS round",
+      "acts": [
+        {
+          "l": "Plan top-up",
+          "s": "primary",
+          "open": true
+        }
+      ]
+    },
+    {
+      "kind": "todo",
+      "src": {
+        "name": "Reminder you set",
+        "icon": "bell"
+      },
+      "when": "Mon",
+      "title": "Call Hartland to confirm Dr. Chen’s visit time",
+      "acts": [
+        {
+          "l": "Mark done",
+          "s": "primary",
+          "done": "Marked done"
+        }
+      ]
+    }
+  ],
+  "today": [
+    {
+      "kind": "Production",
+      "name": "Fostering checks",
+      "target": "Batch 32",
+      "num": "6",
+      "word": "of 8 checked",
+      "bar": [
+        2,
+        1,
+        4
+      ],
+      "when": "Day 3 of 7"
+    },
+    {
+      "kind": "Health",
+      "name": "Amox treatment",
+      "target": "4 sows",
+      "num": "4",
+      "word": "due today",
+      "bar": [
+        1,
+        1,
+        1
+      ],
+      "when": "Dose 2 of 3"
+    },
+    {
+      "kind": "Health",
+      "name": "PRRS top-up",
+      "target": "3 pigs",
+      "num": "3",
+      "word": "waiting",
+      "bar": [
+        0,
+        1,
+        0
+      ],
+      "when": "Today"
+    },
+    {
+      "kind": "Production",
+      "name": "Farrowing",
+      "target": "Batch 33",
+      "num": "~6",
+      "word": "expected Fri",
+      "bar": [
+        0,
+        0,
+        7
+      ],
+      "when": "Starts Fri"
+    }
+  ],
+  "first": [
+    [
+      "08:12",
+      "equipment",
+      "Water line B pressure is back to normal"
+    ],
+    [
+      "07:55",
+      "gm",
+      "Logged Zhao Min’s note: the sick room is full"
+    ],
+    [
+      "06:10",
+      "production",
+      "Asked you about Batch 33’s farrowing room"
+    ],
+    [
+      "06:00",
+      "gm",
+      "Sent the morning report to the Farrowing team"
+    ],
+    [
+      "05:40",
+      "vet",
+      "Drafted a PRRS booster for Batch 29"
+    ]
+  ],
+  "older": [
+    {
+      "day": "Yesterday · Wed 4 Nov",
+      "rows": [
+        [
+          "16:20",
+          "production",
+          "Moved Batch 33 to Farrowing 1 on the schedule"
+        ],
+        [
+          "14:05",
+          "vet",
+          "Ordered 10 bottles of Amoxicillin"
+        ],
+        [
+          "11:30",
+          "equipment",
+          "Checked heat lamps in Farrowing 2"
+        ],
+        [
+          "06:00",
+          "gm",
+          "Sent the morning report to the Farrowing team"
+        ]
+      ]
+    },
+    {
+      "day": "Tue 3 Nov",
+      "rows": [
+        [
+          "15:45",
+          "biosecurity",
+          "Booked the next sampling for Mon 9 Nov"
+        ],
+        [
+          "09:20",
+          "equipment",
+          "Checked feed bin levels in Nursery 2"
+        ],
+        [
+          "06:00",
+          "gm",
+          "Sent the morning report to the Farrowing team"
+        ]
+      ]
+    },
+    {
+      "day": "Mon 2 Nov",
+      "rows": [
+        [
+          "13:10",
+          "production",
+          "Planned Batch 33’s farrowing week"
+        ],
+        [
+          "06:00",
+          "gm",
+          "Sent the morning report to the Farrowing team"
+        ]
+      ]
+    }
+  ],
+  "agents": {
+    "gm": {
+      "name": "General Manager",
+      "mark": "G",
+      "cls": "gm"
+    },
+    "production": {
+      "name": "Production",
+      "mark": "P",
+      "cls": "production"
+    },
+    "vet": {
+      "name": "Vet",
+      "mark": "V",
+      "cls": "vet"
+    },
+    "biosecurity": {
+      "name": "Biosecurity",
+      "mark": "B",
+      "cls": "biosecurity"
+    },
+    "equipment": {
+      "name": "Equipment",
+      "mark": "E",
+      "cls": "equipment"
+    }
+  }
+};
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {screen:'home', inbox: HOME_DATA.inbox, index:0, older:0, todayOffset:0, toast:'', removed:null, range:1, weekOffset:0, preview:null, tagTip:''};
+    this.todayRow = React.createRef();
+  }
+  componentWillUnmount() { clearTimeout(this.toastTimer); }
+  renderVals() {
+    const s=this.state;
+    const palette={gm:['#20291F','#FFFFFF'],production:['#FCEFD6','#8A5A12'],vet:['#DDF1EF','#1F6F68'],biosecurity:['#ECE8FB','#5B4AB3'],equipment:['#FBE5E3','#A23B33']};
+    const notice=(message,removed=null)=>{
+      clearTimeout(this.toastTimer);
+      this.setState({toast:message,removed});
+      this.toastTimer=setTimeout(()=>this.setState({toast:'',removed:null}),removed?5000:1800);
+    };
+    const resolve=message=>{
+      if(!s.inbox.length)return;
+      const inbox=s.inbox.slice(),item=inbox.splice(s.index,1)[0];
+      this.setState({inbox,index:Math.min(s.index,Math.max(0,inbox.length-1))});
+      const short=item.title.length>34?item.title.slice(0,32).replace(/\s+\S*$/,'')+'…':item.title;
+      notice(message+' · '+short,{item,at:s.index});
+    };
+    const active=s.inbox[s.index];
+    const kinds={approve:['Approve','#F1E6FB','#8A3FCF'],question:['Question','#E3EDFB','#2F6AC0'],todo:['To do','#EFEFEC','#55554F']};
+    let item={};
+    if(active){
+      const agent=HOME_DATA.agents[active.src.agent],k=kinds[active.kind],colors=palette[active.src.agent]||['#ECEDE9','#55554F'];
+      item={...active,kindLabel:k[0],kindBg:k[1],kindInk:k[2],source:agent?agent.name:active.src.name,mark:agent?agent.mark:active.src.mark||'',markBg:colors[0],markInk:colors[1],phone:active.src.icon==='phone',bell:active.src.icon==='bell',actions:active.acts.map(a=>({...a,bg:a.s==='primary'?'#1F5F45':'#fff',ink:a.s==='primary'?'#fff':'#1B211C',border:a.s==='primary'?'0':'1px solid #D6D9D2',shadow:a.s==='primary'?'inset 0 -1px 0 rgba(0,0,0,.12)':'none',pick:()=>a.done?resolve(a.done):notice('Opening '+a.l.toLowerCase()+'…')}))};
+    }
+    const goSchedule=()=>this.setState({screen:'schedule',preview:null,tagTip:''});
+    const event=r=>{const a=HOME_DATA.agents[r[1]],c=palette[r[1]];return {time:r[0],line:r[2],who:a.name,mark:a.mark,bg:c[0],ink:c[1],trackTop:'0',trackBottom:'0',trackHeight:'auto'}};
+    const tiles=HOME_DATA.today.map(t=>({...t,kindBg:t.kind==='Health'?'#DDF1EF':'#FCEFD6',kindInk:t.kind==='Health'?'#1F6F68':'#8A5A12',segments:t.bar.flatMap((n,i)=>Array.from({length:n},()=>({color:['#5DAA74','#7FA7E0','#E9ECE5'][i]})))}));
+    const scrollTiles=dir=>{const row=this.todayRow.current;if(row)row.scrollBy({left:dir*206,behavior:'smooth'})};
+    const rows=[
+      {name:'Production',rows:[['Farrowing','B33',['n','n','n','n','e6','e14','e12>']],['Fostering checks','B32',['d8','d8','w6','o8','p8','p8','p8>']],['Pregnancy check','B35',['','d24','d28','','','','']]]},
+      {name:'Health',rows:[['Amox treatment','4',['','','','o4','p4','p4',''],'pig','B15, B20, D40, D41\nBatch 32 · Gestation 2'],['PRRS vaccine','3',['','','','u','p3','',''],'pig','Missed in the B31 round:\n310412, 310418, 310455'],['PRRS sampling','B30',['d10','','','','','','']]]},
+      {name:'Other',rows:[['Move','3',['d48','','','','','',''],'room','Moving out: Gestation 2, Gestation 3\nReceiving: Farrowing 1'],['Wash','1',['','','','','p1','',''],'room','Farrowing 3']]}
+    ];
+    const dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const formatDate=d=>d.getUTCDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()];
+    const hidePreview=()=>this.setState({preview:null});
+    const weeks=Array.from({length:s.range},(_,wi)=>{
+      const offset=s.weekOffset+wi,start=new Date(Date.UTC(2026,10,2+offset*7)),end=new Date(Date.UTC(2026,10,8+offset*7));
+      const days=dayNames.map((name,i)=>{const date=new Date(+start+i*86400000),today=offset===0&&i===3,past=+date<Date.UTC(2026,10,5);return {name,date:date.getUTCDate(),today,bg:today?'#28734F':'transparent',ink:today?'#fff':past?'#a8a29e':'#1c1917'}});
+      return {caption:'Mon '+start.getUTCDate()+' – Sun '+formatDate(end),number:45+offset,isCurrent:offset===0,days,groups:rows.map(g=>({name:g.name,rows:g.rows.map(r=>{
+        const name=r[0],hover=s.preview&&s.preview.row===name,tagAria=r[4]?(r[1]+(r[3]==='pig'?' pigs: ':' rooms: ')+r[4]):r[1];
+        const model={name,tag:r[1],pig:r[3]==='pig',room:r[3]==='room',tagAria,bg:hover?'#fafaf9':'transparent',showTag:e=>{if(!r[4])return;this.setState({tagTip:r[4],tagTop:Math.max(8,e.currentTarget.getBoundingClientRect().top-64)+'px',preview:null})},cells:dayNames.map((day,i)=>{
+          const code=offset===0?r[2][i]:'',type=code[0],n=Number(code.replace(/[^0-9]/g,'')),visible=!!code&&code!=='n',on=c=>!!c&&c!=='n',prev=on(r[2][i-1]),next=on(r[2][i+1]),radius=(prev?'3px':'9px')+' '+(next||code.endsWith('>')?'3px':'9px')+' '+(next||code.endsWith('>')?'3px':'9px')+' '+(prev?'3px':'9px');
+          const done=type==='d'||type==='w',today=['o','u','v'].includes(type),label=type==='u'?'–':type==='e'?'~'+n:String(n);
+          const description=type==='w'?n+' of 8 done, past its plan':done?n+' done':today?type==='u'?'waiting':n+' today':type==='e'?'about '+n:n+' planned';
+          return {visible,label,radius,bg:done?'#E3F0E8':today?'#EAF1FC':type==='e'?'transparent':'#F1F3EE',ink:type==='w'?'#B34B43':done?'#28734F':today?'#3972B7':type==='e'?'#657060':'#20291F',border:type==='e'?'1px dashed #9CA59D':'0',shadow:today?'inset 0 0 0 1.5px #3972B7':'none',aria:name+' · '+r[1]+' · '+day+' '+(i+2)+' Nov · '+description,preview:e=>{
+            if(name!=='Amox treatment'&&!(name==='Fostering checks'&&i===2)){hidePreview();return}
+            const rect=e.currentTarget.getBoundingClientRect(),foster=name==='Fostering checks',total=foster?8:4,doneCount=done?n:0;
+            this.setState({tagTip:'',preview:{row:name,title:foster?'Fostering checks · B32':'Treatment · Amox',meta:day+' '+(i+2)+' Nov · '+(foster?'Farrowing 2':'Gestation 2')+' · Li Wei',done:doneCount,pending:total-doneCount,progress:doneCount+' of '+total,note:foster?'2 not reported: A5, B10':'RX-25G009 · Running'},previewLeft:Math.min(175,Math.max(8,rect.left-16))+'px',previewTop:Math.min(700,rect.bottom+8)+'px'});
+          }};
+        })};
+        model.preview=name==='Amox treatment'?model.cells[3].preview:()=>{};
+        return model;
+      })}))};
+    });
+    return {
+      search:s.search||'',showSearchHint:!s.search,searchChange:e=>this.setState({search:e.target.value}),
+      isHome:s.screen==='home',isSchedule:s.screen==='schedule',item,hasInbox:!!active,emptyInbox:!active,hasMany:s.inbox.length>1,waiting:s.inbox.length?'· '+s.inbox.length+' waiting':'· nothing waiting',position:(s.index+1)+' of '+s.inbox.length,
+      prevDisabled:s.index<=0,nextDisabled:s.index>=s.inbox.length-1,prevOpacity:s.index<=0?'.32':'1',nextOpacity:s.index>=s.inbox.length-1?'.32':'1',prev:()=>this.setState({index:Math.max(0,s.index-1)}),next:()=>this.setState({index:Math.min(s.inbox.length-1,s.index+1)}),dismiss:()=>resolve('Dismissed'),
+      toast:s.toast,canUndo:!!s.removed,undo:()=>{if(!s.removed)return;const inbox=s.inbox.slice();inbox.splice(s.removed.at,0,s.removed.item);clearTimeout(this.toastTimer);this.setState({inbox,index:s.removed.at,toast:'',removed:null})},
+      openInbox:()=>notice('Opening Inbox…'),openDashboard:e=>notice('Opening '+e.currentTarget.innerText.trim().split('\n')[0]+' dashboard…'),
+      tiles,todayRow:this.todayRow,tilePrev:()=>scrollTiles(-1),tileNext:()=>scrollTiles(1),tilePrevDisabled:s.todayOffset<4,tileNextDisabled:!!s.todayEnd,tilePrevOpacity:s.todayOffset<4?'.3':'1',tileNextOpacity:s.todayEnd?'.3':'1',tileScroll:e=>this.setState({todayOffset:e.currentTarget.scrollLeft,todayEnd:e.currentTarget.scrollLeft+e.currentTarget.clientWidth>=e.currentTarget.scrollWidth-4}),
+      goSchedule,goHome:()=>this.setState({screen:'home',preview:null,tagTip:''}),events:HOME_DATA.first.map((r,i)=>({...event(r),trackTop:i===0?'20px':'0',trackBottom:!s.older&&i===4?'auto':'0',trackHeight:!s.older&&i===4?'20px':'auto'})),olderGroups:HOME_DATA.older.slice(0,s.older).map((g,gi)=>({...g,rows:g.rows.map((r,i)=>({...event(r),trackBottom:gi===s.older-1&&i===g.rows.length-1?'auto':'0',trackHeight:gi===s.older-1&&i===g.rows.length-1?'20px':'auto'}))})),allOlder:s.older>=HOME_DATA.older.length,
+      paneScroll:e=>{const el=e.currentTarget;if(el.scrollTop+el.clientHeight>=el.scrollHeight-100&&s.older<3)this.setState({older:s.older+1})},
+      ranges:[{label:'Week',n:1},{label:'2 weeks',n:2}].map(r=>({...r,selected:s.range===r.n,bg:s.range===r.n?'#fff':'transparent',ink:s.range===r.n?'#1c1917':'#57534e',shadow:s.range===r.n?'0 1px 3px #0001':'none',pick:()=>this.setState({range:r.n,preview:null,tagTip:''})})),weeks,
+      todayWeek:()=>this.setState({weekOffset:0,preview:null,tagTip:''}),previousWeek:()=>this.setState({weekOffset:s.weekOffset-1,preview:null,tagTip:''}),nextWeek:()=>this.setState({weekOffset:s.weekOffset+1,preview:null,tagTip:''}),
+      hidePreview,preview:s.preview,previewLeft:s.previewLeft,previewTop:s.previewTop,noAction:()=>{},tagTip:s.tagTip,tagTop:s.tagTop,hideTag:()=>this.setState({tagTip:''})
+    };
+  }
+}
+
+</script>
+</body>
+</html>
