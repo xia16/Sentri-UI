@@ -8,7 +8,7 @@
     const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u);
     const kinds = P.pen ? this.ovPigs(P.r.id, P.pen) : this.ovPigsIn(P.rooms), fault = P.rooms.some((x) => this.ovFault(x.id, P.pen));
     this.ovKinds = kinds;
-    const total = kinds.reduce((a, x) => a + x[0], 0), canSwitch = P.cur.kind !== 'farm', pnl = O.panel;
+    const total = kinds.reduce((a, x) => a + x[0], 0), canSwitch = P.cur.kind !== 'farm' && P.cur.kind !== 'pen', pnl = O.panel;
     const name = this.ovBtn(H.t(P.name, { fontSize: '17px', lineHeight: '22px', fontWeight: 600, letterSpacing: '-.01em' }) + (fault ? H.dot(K.red, 8) : '') + (canSwitch ? H.icon(H.I.down, 16, { color: K.muted }) : ''), canSwitch ? 'switch' : 'noop', O.pop === 'switch', { cursor: canSwitch ? 'pointer' : 'default' });
     const isBatch = ['list', 'batch', 'task', 'dates', 'done', 'compare'].indexOf(pnl) >= 0, isPigs = ['pigs', 'pig', 'pigperf', 'piglog', 'pen'].indexOf(pnl) >= 0;
     const dd = P.r ? this.ovDevDot(u) : '';
@@ -49,7 +49,7 @@
     return OVH.head('Devices', E.pen ? 'Pen ' + E.pen : E.room, '') + '<div style="margin-top: 16px;">' + t + '</div>';
   }
   // 3D: the camera tools, bottom left, opening upward
-  ovViewHtml(O, u) {
+  ovViewHtml(O, u, ed) {
     const H = OVH, K = H.K, open = O.pop === 'view';
     const btn = this.ovCard({ left: '16px', bottom: '16px' }, this.ovBtn(H.icon('M12 3 4 7.5v9L12 21l8-4.5v-9L12 3Z M4 7.5 12 12l8-4.5 M12 12v9', 18) + (u.plan ? 'Plan' : '3D') + H.icon('m6 15 6-6 6 6', 14, { color: K.muted }), 'viewmenu', open, { fontWeight: 600, padding: '0 12px' }));
     if (!open) return btn;
@@ -58,7 +58,7 @@
     const I = { rl: 'M4 12a8 8 0 1 0 2.4-5.7 M4 4v4.5h4.5', rr: 'M20 12a8 8 0 1 1-2.4-5.7 M20 4v4.5h-4.5', fit: 'M4 9V4h5 M20 9V4h-5 M4 15v5h5 M20 15v5h-5', moon: 'M20 13.5A8 8 0 1 1 10.5 4a6.5 6.5 0 0 0 9.5 9.5Z', edit: 'M4 20h4L19 9l-4-4L4 16v4Z M13.5 6.5l4 4' };
     const menu = '<div data-pop="1" style="' + H.st({ position: 'absolute', left: '16px', bottom: '80px', width: '272px', padding: '12px', boxSizing: 'border-box', borderRadius: '16px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 14px 32px rgba(17,21,17,.16)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", zIndex: 6 }) + '">' + seg + '<div style="margin-top: 6px;">' +
       line('Rotate', this.ovSq(I.rl, 'vw:turnLeft', 'Turn left') + this.ovSq(I.rr, 'vw:turnRight', 'Turn right')) + line('Zoom', this.ovSq(H.I.minus, 'vw:zoomOut', 'Zoom out') + this.ovSq(H.I.plus, 'vw:zoomIn', 'Zoom in')) + line('Fit to view', this.ovSq(I.fit, 'vw:fit', 'Fit to the screen')) + line('Night', this.ovSq(I.moon, 'vw:toNight', 'Night')) +
-      '</div><div style="' + H.st({ height: '1px', background: K.line, margin: '6px 0' }) + '"></div>' + this.ovBtn(H.icon(I.edit, 18) + 'Edit layout', 'vw:modeToggle', false, { width: '100%', justifyContent: 'flex-start', padding: '0 4px' }) + '</div>';
+      '</div>' + (ed ? '' : '<div style="' + H.st({ height: '1px', background: K.line, margin: '6px 0' }) + '"></div>' + this.ovBtn(H.icon(I.edit, 18) + 'Edit layout', 'vw:modeToggle', false, { width: '100%', justifyContent: 'flex-start', padding: '0 4px' })) + '</div>';
     return btn + menu;
   }
   // what is picked, as the actions will count it: the pigs, and how many pens they come from
@@ -108,7 +108,7 @@
     if (k === 'kind') { const vf = u.vf && u.vf.kind === 'stage' ? u.vf.id : ''; if (vf === v) { this.put({ vf: null }); this.repaintBv(); this.ovPaint(); } else { this.locationFilter('stage', v); this.ovPaint(); } return true; }
     if (k === 'viewmenu') { this.ovSet({ pop: O.pop === 'view' ? '' : 'view' }); return true; }
     if (k === 'vw') { const R = this.ovVals, f = R && R[v]; if (v === 'modeToggle') this.ovSet({ pop: '' }); if (typeof f === 'function') { try { f({ preventDefault() {}, stopPropagation() {}, currentTarget: h, target: h }); } catch (e) { /* ignore */ } } setTimeout(() => this.ovPaint(), 30); return true; }
-    if (k === 'select') { if (O.selecting) { this.ovAct('selcancel'); return true; } if (O.panel === 'pen') O.ticks = []; this.ovPlanIn(); this.setSel([]); this.ovSet({ selecting: true, picked: [], pop: '', actOff: 0 }); return true; }
+    if (k === 'select') { if (O.selecting) { this.ovAct('selcancel'); return true; } const cur = ['pig', 'pen', 'pigperf', 'piglog'].indexOf(O.panel) >= 0 && (u.psel || []).length === 1 ? u.psel.slice() : []; if (cur.length) { O.panel = ''; O.hist = []; } O.ticks = []; this.ovPlanIn(); this.ovPsel = cur.join(','); this.setSel(cur); this.ovSet({ selecting: true, picked: cur.slice(), pop: '', actOff: 0 }); return true; }
     if (k === 'selcancel') { const was = O.selecting; this.ovSet({ selecting: false, picked: [], ticks: [], actOff: 0 }); if (was) { this.setSel([]); this.ovPlanOut(); } return true; }
     if (k === 'actstep') { this.ovSet({ actOff: (O.actOff || 0) + (+v || 1) }); return true; }
     if (k === 'act') { const c = this.ovPickCount(O, u); if (this.say) this.say(v + (c ? ' for ' + c[0] : '') + ' (preview: nothing is sent)'); this.ovAct('selcancel'); return true; }
@@ -161,9 +161,11 @@
     if (O.showing) h += '<div style="' + OVH.st({ position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: '80px', display: 'flex', alignItems: 'center', gap: '10px', height: '48px', padding: '0 6px 0 14px', borderRadius: '14px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', pointerEvents: 'auto', whiteSpace: 'nowrap', zIndex: 5 }) + '">' + OVH.icon(OVH.I.floor, 16) + OVH.t('Lane C · 10:00 run', { fontWeight: 600 }) + OVH.mu('9 ran · 3 skipped') + '<button type="button"' + OVH.A('showdone') + ' style="' + OVH.st({ display: 'inline-flex', alignItems: 'center', height: '36px', padding: '0 14px', borderRadius: '10px', border: 0, background: OVH.K.ink, color: '#FFFFFF', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }) + '">Done</button></div>';
     return h;
   }
+  ovEdOn(u) { return !!(u.ready && !u.err && u.vm === 'edit' && u.mode === 'saved' && !(this.props.start || '').match(/^intro/)); }
   ovPaint() {
     if (!this.ovBody) return;
     const u = this.ui();
+    if (!this.ovOn(u) && this.ovEdOn(u)) { const O = this.ovS(), H = OVH, html = this.ovViewHtml(O, u, true) + this.ovCard({ right: '16px', top: '16px' }, this.ovBtn(H.icon(H.I.check, 18) + 'Done', 'vw:modeToggle', false, { background: H.K.ink, color: '#FFFFFF', fontWeight: 600, padding: '0 16px' })); if (html !== this.ovLast) { this.ovBody.innerHTML = html; this.ovLast = html; } return; }
     if (!this.ovOn(u)) { if (this.ovLast !== '') { this.ovBody.innerHTML = ''; this.ovLast = ''; this.ovTipHide(); } return; }
     const O = this.ovS(), st0 = this.props.start || 'saved';
     if (this.ovStarted !== st0) { this.ovStarted = st0; this.ovStart(st0); }

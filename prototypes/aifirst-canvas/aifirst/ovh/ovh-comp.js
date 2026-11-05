@@ -180,6 +180,7 @@
     r.setOvh = (el) => this.setOvh(el);
     this.ovVals = r;
     if (this.ovOn()) r.camStyle = (r.camStyle || '') + ' display: none;';
+    if (this.ovEdOn && this.ovEdOn(this.ui())) { r.camStyle = (r.camStyle || '') + ' display: none;'; if (r.barStyle) r.barStyle = r.barStyle.replace('left: 16px; right: 16px; bottom: 16px;', 'left: 132px; right: 16px; bottom: 16px;'); }
     if (this.ovOn() && this.O && this.O.panel === 'devices' && /^cam:/.test(this.O.dev || '') && r.vidStyle) r.vidStyle = r.vidStyle.replace(/right: 16px; bottom: [^;]+;/, 'right: 32px; top: 92px;').replace('width: 360px;', 'width: 348px;').replace('z-index: 4;', 'z-index: 31;').replace(/animation: [^;]+;?/, '');
     if (this.ovOn()) { r.showProf = false; r.showBatch = false; r.showCard = false; r.showBar = false; r.showCrumbMenu = false; }
     return r;
