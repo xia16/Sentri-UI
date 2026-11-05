@@ -8,10 +8,13 @@ Style B tokens apply (Inter 14, 40 px controls, 0.75rem radius, warm stone grey,
 | Mode | Opened by | Checkbox | Bottom bar |
 |---|---|---|---|
 | Browse | the Pigs page | none | none |
+| Browse, scoped | a display page, e.g. a running treatment's Sows | none | none |
 | Pick | an Action ("Pick pigs" for Treatment, Vaccination, Culling…) | yes | "N of M picked" · Cancel · **Continue with N sows** |
 | Act | an agent's answer or a saved view | yes | "N picked" · **Actions ▾** (opens an Action with them filled in) |
 
 The farm view is the other way in: "Pick in the farm view" sits beside the title in Pick mode.
+
+A display page that lists pigs (a running treatment, a batch, a pen) uses this same list, scoped by the page: the scope is fixed and not shown as a filter; search, filters and Columns work inside it. Lists of any length get them, because a scope can hold hundreds of pigs. Its default filters fit the page (running treatment: dose status, pen).
 
 ## Base (always there)
 
