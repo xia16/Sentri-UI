@@ -1,0 +1,11 @@
+{
+  "title": "Farm view: every state",
+  "sub": "Screenshots of the live farm view, so this page stays fast. The live frame beside this board is the real thing: click around in it.",
+  "sections": [
+    ["Getting around", [["fv01", "The farm: the bar, 3D bottom left, Select bottom right"], ["fv02", "At a room: ‹ goes up, the name switches rooms"], ["fv03", "Click the name: the rooms at this level"], ["fv04", "3D opened: the camera tools and Edit layout"], ["fv05", "Plan: straight down"]]],
+    ["Batches", [["fv06", "Batches: each running batch"], ["fv07", "A batch: running now, upcoming"], ["fv08", "A running task: the legend filters the pens"], ["fv09", "All dates, opening on now"], ["fv10", "A finished task: outcomes and performance"], ["fv11", "Compare: pens below the batch tinted"]]],
+    ["Pigs", [["fv12", "Pigs: pick a kind, only those pens keep their colour"], ["fv13", "Her card: tags, tasks, details"], ["fv14", "Her performance"], ["fv15", "Her log"], ["fv16", "A group pen: its pigs, ticked one by one"]]],
+    ["Devices", [["fv17", "Devices: readings first, then equipment"], ["fv18", "Climate: set point and trends; the controller on the wall"], ["fv19", "Ammonia: its trend; the sensor marked on the farm"], ["fv20", "Feed line: one device, its line to the pens it serves"], ["fv21", "Camera: the feed in the panel, its view on the floor"], ["fv22", "Moving floor (demo): Auto, the lane it runs"], ["fv23", "Heat lamps: pens picked in Plan, the bar is the control"]]],
+    ["Select, then act", [["fv24", "Select: Plan, actions waiting for a pick"], ["fv25", "Pens picked: the count, the actions, Cancel"], ["fv26", "Pigs ticked in a pen: the same bar"], ["fv27", "At 960 wide: ‹ › step through the actions"]]]
+  ]
+}

@@ -94,3 +94,8 @@ fs.writeFileSync(f, s); console.log('applied 8');
 s = fs.readFileSync(f, 'utf8');
 if (!s.includes('/* ovCone */')) { const a = "new T.MeshBasicMaterial({ color: '#4F8A6C', transparent: true, opacity: 0.2, depthWrite: false, side: T.DoubleSide })"; if (!s.includes(a)) { console.error('MISS cone'); process.exit(1); } s = s.replace(a, "new T.MeshBasicMaterial({ color: '#2F6B4C', transparent: true, opacity: 0.34, depthWrite: false, side: T.DoubleSide }) /* ovCone */"); }
 fs.writeFileSync(f, s); console.log('applied 9');
+
+// 17) Edit layout: menus in the tools bar open downward (the bar sits at the top); the camera keeps clear of the card on the right
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('/* ovEdIns */')) { s = s.split('bottom: calc(100% + 12px)').join('top: calc(100% + 12px)').split('bottom: calc(100% + 14px)').join('top: calc(100% + 14px)'); const a = "    if (this.ovOn && this.ovOn(u)) { const O = this.ovS(); /* ovInsets */"; if (!s.includes(a)) { console.error('MISS edins'); process.exit(1); } s = s.replace(a, "    if (this.ovEdOn && this.ovEdOn(u)) { /* ovEdIns */ ins.l = 28; ins.t = (u.bh || 70) + 32; ins.b = 92; ins.r = 16 + 360 + 16; return ins; }\n" + a); }
+fs.writeFileSync(f, s); console.log('applied 10');

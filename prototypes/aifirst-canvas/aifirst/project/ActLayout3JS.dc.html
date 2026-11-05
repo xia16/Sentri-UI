@@ -984,7 +984,7 @@
                   </sc-if>
                 </button>
                 <sc-if value="{{P.addOpen}}" hint-placeholder-val="{{false}}">
-                  <div role="menu" aria-label="Add" style="position: absolute; left: 0; bottom: calc(100% + 12px); z-index: 6; width: 300px; box-sizing: border-box; padding: 6px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 12px 32px rgba(18, 24, 21, 0.14); animation: sentriRise 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both">
+                  <div role="menu" aria-label="Add" style="position: absolute; left: 0; top: calc(100% + 12px); z-index: 6; width: 300px; box-sizing: border-box; padding: 6px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 12px 32px rgba(18, 24, 21, 0.14); animation: sentriRise 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both">
                     <sc-for list="{{P.addItems}}" as="a" hint-placeholder-count="4">
                       <button type="button" role="menuitem" onClick="{{a.run}}" onMouseEnter="{{a.enter}}" onMouseLeave="{{a.leave}}" aria-label="{{a.aria}}" style="{{a.style}}">
                         <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex: none; margin-top: 2px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="{{a.icon}}"></path></svg>
@@ -1027,7 +1027,7 @@
                     <span>More</span>
                   </button>
                   <sc-if value="{{P.moreOpen}}" hint-placeholder-val="{{false}}">
-                    <div role="menu" aria-label="More actions" style="position: absolute; left: 0; bottom: calc(100% + 12px); z-index: 6; min-width: 220px; box-sizing: border-box; padding: 6px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 12px 32px rgba(18, 24, 21, 0.14); animation: sentriRise 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both">
+                    <div role="menu" aria-label="More actions" style="position: absolute; left: 0; top: calc(100% + 12px); z-index: 6; min-width: 220px; box-sizing: border-box; padding: 6px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 12px 32px rgba(18, 24, 21, 0.14); animation: sentriRise 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both">
                       <sc-for list="{{P.more}}" as="a" hint-placeholder-count="3">
                         <div>
                           <sc-if value="{{a.divTop}}" hint-placeholder-val="{{false}}">
@@ -1060,7 +1060,7 @@
                       </sc-if>
                     </button>
                     <sc-if value="{{P.selOpen}}" hint-placeholder-val="{{false}}">
-                      <div role="menu" aria-label="The pens picked" style="position: absolute; right: 0; bottom: calc(100% + 12px); z-index: 6; width: 340px; max-height: 320px; overflow-y: auto; box-sizing: border-box; padding: 6px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 12px 32px rgba(18, 24, 21, 0.14); animation: sentriRise 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both">
+                      <div role="menu" aria-label="The pens picked" style="position: absolute; right: 0; top: calc(100% + 12px); z-index: 6; width: 340px; max-height: 320px; overflow-y: auto; box-sizing: border-box; padding: 6px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 12px 32px rgba(18, 24, 21, 0.14); animation: sentriRise 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both">
                         <sc-for list="{{P.selRows}}" as="r" hint-placeholder-count="3">
                           <div style="display: flex; align-items: center; gap: 4px; min-height: 52px; border-radius: 10px">
                             <button type="button" onClick="{{r.untick}}" aria-label="{{r.untickAria}}" title="Take it out of the selection" style="flex: none; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; background: transparent; color: #121815; cursor: pointer">
@@ -5369,6 +5369,7 @@ class Component extends DCLogic {
     // View: the card is only the place's name, top left; the model takes the width, under it
     if (this.IP) { ins.l = 28; ins.t = Math.max(ins.t, 104); ins.r = prof ? pw : 28; }
     if (this.IP && u.view === 'room') ins.t = Math.max(ins.t, 128);
+    if (this.ovEdOn && this.ovEdOn(u)) { /* ovEdIns */ ins.l = 28; ins.t = (u.bh || 70) + 32; ins.b = 92; ins.r = 16 + 360 + 16; return ins; }
     if (this.ovOn && this.ovOn(u)) { const O = this.ovS(); /* ovInsets */ ins.l = 28; ins.t = 84; ins.b = 92; ins.r = O.panel ? 412 + (O.her && O.panel === 'compare' ? 376 : 0) : 28; return ins; }
     if (this.IP && u.mode === 'saved' && u.vm === 'view') {
       const hasPen = !u.bv && (u.psel || []).length === 1;
@@ -9233,7 +9234,7 @@ class Component extends DCLogic {
     const H = OVH, K = H.K;
     let rows;
     if (P.cur.kind === 'pen') { const cells = (this.IP && this.IP.cell[P.r.id]) || {}; rows = Object.keys(cells).filter((c) => cells[c] && cells[c].kind).sort((a, b) => a.localeCompare(b, 'en', { numeric: true })).map((c) => { const n = this.ovPigs(P.r.id, c).reduce((q, y) => q + y[0], 0); return { label: 'Pen ' + c, a: 'gopen:' + c, on: c === P.pen, n: n + (n === 1 ? ' pig' : ' pigs'), f: this.ovFault(P.r.id, c) }; }); }
-    else rows = this.ovSibs(P.cur).map((x) => { const k = this.ovPigsIn(x.rooms).reduce((q, y) => q + y[0], 0); return { label: x.label, a: x.a, on: x.id === P.cur.id, n: k ? k + ' pigs' : 'empty', f: x.rooms.some((y) => this.ovFault(y.id)) }; });
+    else rows = this.ovSibs(P.cur).map((x) => { const k = this.ovPigsIn(x.rooms).reduce((q, y) => q + y[0], 0); return { label: x.label, a: x.a, on: x.id === P.cur.id, n: this.ui().vm === 'edit' ? (P.cur.kind === 'room' ? '' : x.rooms.length + (x.rooms.length === 1 ? ' room' : ' rooms')) : (k ? k + ' pigs' : 'empty'), f: x.rooms.some((y) => this.ovFault(y.id)) }; });
     return '<div data-pop="1" style="' + H.st({ position: 'absolute', left: P.levels.length > 1 ? '48px' : '8px', top: '60px', width: '280px', maxHeight: '420px', overflowY: 'auto', padding: '6px', boxSizing: 'border-box', borderRadius: '16px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 14px 32px rgba(17,21,17,.16)', zIndex: 6 }) + '">' + rows.map((r) => '<div' + H.A(r.a) + ' style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', height: '44px', padding: '0 10px', borderRadius: '10px', background: r.on ? K.press : 'transparent', cursor: 'pointer' }) + '">' + H.t(r.label, { fontWeight: r.on ? 600 : 400 }) + (r.f ? H.dot(K.red, 8) : '') + '<span style="flex: 1;"></span>' + H.t(r.n, { color: r.on ? K.ink : K.muted }) + '<span style="' + H.st({ display: 'inline-flex', width: '16px', justifyContent: 'center' }) + '">' + (r.on ? H.icon(H.I.check, 16) : '') + '</span></div>').join('') + '</div>';
   }
   ovUp(u) {
@@ -9375,7 +9376,7 @@ class Component extends DCLogic {
   ovPaint() {
     if (!this.ovBody) return;
     const u = this.ui();
-    if (!this.ovOn(u) && this.ovEdOn(u)) { const O = this.ovS(), H = OVH, html = this.ovViewHtml(O, u, true) + this.ovCard({ right: '16px', top: '16px' }, this.ovBtn(H.icon(H.I.check, 18) + 'Done', 'vw:modeToggle', false, { background: H.K.ink, color: '#FFFFFF', fontWeight: 600, padding: '0 16px' })); if (html !== this.ovLast) { this.ovBody.innerHTML = html; this.ovLast = html; } return; }
+    if (!this.ovOn(u) && this.ovEdOn(u)) { const O = this.ovS(), H = OVH, html = this.ovEdLoc(u) + this.ovViewHtml(O, u, true) + this.ovCard({ right: '16px', bottom: '16px' }, this.ovBtn(H.icon(H.I.check, 18) + 'Done', 'vw:modeToggle', false, { background: H.K.ink, color: '#FFFFFF', fontWeight: 600, padding: '0 16px' })); if (html !== this.ovLast) { this.ovBody.innerHTML = html; this.ovLast = html; } this.ovEdFit(); return; }
     if (!this.ovOn(u)) { if (this.ovLast !== '') { this.ovBody.innerHTML = ''; this.ovLast = ''; this.ovTipHide(); } return; }
     const O = this.ovS(), st0 = this.props.start || 'saved';
     if (this.ovStarted !== st0) { this.ovStarted = st0; this.ovStart(st0); }
@@ -9469,12 +9470,25 @@ class Component extends DCLogic {
     return null;
   }
 
+  // the editor's place piece: ‹ up a level, the name switches places; it starts the tools bar
+  ovEdLoc(u) {
+    const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u), canSwitch = P.cur.kind !== 'farm' && P.cur.kind !== 'pen';
+    const hgt = Math.max(56, Math.min(66, (this.barEl && this.barEl.offsetHeight) || 66));
+    const name = this.ovBtn(H.t(P.name, { fontSize: '17px', lineHeight: '22px', fontWeight: 600, letterSpacing: '-.01em' }) + (canSwitch ? H.icon(H.I.down, 16, { color: K.muted }) : ''), canSwitch ? 'switch' : 'noop', O.pop === 'switch', { cursor: canSwitch ? 'pointer' : 'default' });
+    return '<div data-zone="edloc" style="' + H.st({ position: 'absolute', left: '16px', top: '16px', height: hgt + 'px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: '2px', padding: '0 0 0 10px', background: '#FFFFFF', border: '1px solid #E3E6E1', borderRight: 0, borderRadius: '16px 0 0 16px', boxShadow: '0 1px 2px rgba(18, 24, 21, 0.05), -4px 10px 28px rgba(18, 24, 21, 0.10)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", color: K.ink, whiteSpace: 'nowrap', zIndex: 5 }) + '">' + (P.levels.length > 1 ? this.ovSq(H.I.back, 'up', 'Up one level') : '') + name + '<i style="' + H.st({ width: '1px', height: '28px', background: K.line, margin: '0 0 0 8px', flexShrink: 0 }) + '"></i>' + (O.pop === 'switch' ? this.ovSwitchHtml(u, P) : '') + '</div>';
+  }
+  ovEdFit() {
+    const el = this.ovBody && this.ovBody.querySelector('[data-zone="edloc"]'); if (!el) return;
+    const w = Math.round(el.getBoundingClientRect().width);
+    if (w && w !== this.ovEdW) { this.ovEdW = w; if (this.barEl) { this.barEl.style.left = (16 + w) + 'px'; this.barEl.style.maxWidth = 'calc(100% - ' + (16 + w + 408) + 'px)'; } }
+  }
+
   renderVals() {
     const r = this.renderValsBase();
     r.setOvh = (el) => this.setOvh(el);
     this.ovVals = r;
     if (this.ovOn()) r.camStyle = (r.camStyle || '') + ' display: none;';
-    if (this.ovEdOn && this.ovEdOn(this.ui())) { r.camStyle = (r.camStyle || '') + ' display: none;'; if (r.barStyle) r.barStyle = r.barStyle.replace('left: 16px; right: 16px; bottom: 16px;', 'left: 132px; right: 16px; bottom: 16px;'); }
+    if (this.ovEdOn && this.ovEdOn(this.ui())) { r.camStyle = (r.camStyle || '') + ' display: none;'; if (r.barStyle) { const lw = 16 + (this.ovEdW || 200); r.barStyle = r.barStyle.replace('left: 16px; right: 16px; bottom: 16px;', 'left: ' + lw + 'px; top: 16px; max-width: calc(100% - ' + (lw + 408) + 'px);').replace('border-radius: 16px;', 'border-radius: 0 16px 16px 0; border-left: 0;'); } if (r.P) r.P = Object.assign({}, r.P, { hasTopRow: false, canBack: false }); if (r.cardStyle) r.cardStyle = r.cardStyle.replace('left: 16px; top: 16px;', 'right: 16px; top: 16px;').replace(/max-height: calc\(100% - \d+px\);/, 'max-height: calc(100% - 104px);'); }
     if (this.ovOn() && this.O && this.O.panel === 'devices' && /^cam:/.test(this.O.dev || '') && r.vidStyle) r.vidStyle = r.vidStyle.replace(/right: 16px; bottom: [^;]+;/, 'right: 32px; top: 92px;').replace('width: 360px;', 'width: 348px;').replace('z-index: 4;', 'z-index: 31;').replace(/animation: [^;]+;?/, '');
     if (this.ovOn()) { r.showProf = false; r.showBatch = false; r.showCard = false; r.showBar = false; r.showCrumbMenu = false; }
     return r;
@@ -9842,7 +9856,7 @@ class Component extends DCLogic {
         const open = u.moreOpen === 'act';
         return { hasActs: true, actsOpen: open, actsAria: 'Actions for ' + (tg.short || tg.label), actsToggle: () => this.put({ moreOpen: this.ui().moreOpen === 'act' ? false : 'act' }),
           actsStyle: 'height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 14px 0 16px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer',
-          actsMenuStyle: 'position: absolute; right: 0; bottom: calc(100% + 12px); z-index: 6; width: 268px; max-height: ' + Math.max(260, (this.H || 700) - (u.bh || 80) - 140) + 'px; overflow-y: auto; box-sizing: border-box; padding: 6px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 12px 32px rgba(18, 24, 21, 0.14); animation: sentriRise 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both',
+          actsMenuStyle: 'position: absolute; right: 0; top: calc(100% + 12px); z-index: 6; width: 268px; max-height: ' + Math.max(260, (this.H || 700) - (u.bh || 80) - 140) + 'px; overflow-y: auto; box-sizing: border-box; padding: 6px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 12px 32px rgba(18, 24, 21, 0.14); animation: sentriRise 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both',
           actsHasHead: true, actsHead: 'Opens the page beside the chat with ' + (tg.short || tg.label) + ' filled in.',
           actsItems: this.actionItems(tg.what).map((a) => ({ label: a.label, icon: a.icon, hint: a.hint || '', hasHint: !!a.hint, divTop: !!a.divTop, run: () => this.openAction(a.id, tg) })) };
       };
@@ -10078,7 +10092,7 @@ class Component extends DCLogic {
         lead: isRow ? 'Add a row' : 'Add to ' + this.rowWord(rcur, li0),
         hasWhere: isRow, where: [['far', 'Far end'], ['door', 'By the door']].map((w) => ({ label: w[1], on: a.at === w[0], style: segCss(a.at === w[0]), pick: () => setA({ at: w[0] }) })),
         sw: sw(a.type, 12), tName: t.name, tpOpen: tpOpen, tpList: !fInl, tpForm: fInl, tpAria: 'Pen type: ' + t.name + '. Change it',
-        tpBox: 'position: absolute; left: 0; bottom: calc(100% + 14px); z-index: 6; width: 360px; max-height: ' + Math.max(240, (this.H || u.avail || 700) - (u.bh || 80) - 48) + 'px; overflow-y: auto; box-sizing: border-box; padding: 6px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 12px 32px rgba(18, 24, 21, 0.14); animation: sentriRise 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both',
+        tpBox: 'position: absolute; left: 0; top: calc(100% + 14px); z-index: 6; width: 360px; max-height: ' + Math.max(240, (this.H || u.avail || 700) - (u.bh || 80) - 48) + 'px; overflow-y: auto; box-sizing: border-box; padding: 6px; background: #FFFFFF; border: 1px solid #E3E6E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(18, 24, 21, 0.05), 0 12px 32px rgba(18, 24, 21, 0.14); animation: sentriRise 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both',
         tpStyle: 'height: 44px; max-width: 240px; box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; padding: 0 10px 0 12px; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 600; color: #121815; cursor: pointer; background: ' + (tpOpen ? '#EEF0EC' : '#FFFFFF') + '; border: ' + (tpOpen ? '1.5px solid #121815' : '1px solid #DCE0DA'),
         tpToggle: () => { const uu = this.ui(); this.put({ moreOpen: uu.moreOpen === 'tp' ? false : 'tp', ptForm: null }); },
         tps: m.types.map((ty) => ({ name: ty.name, size: typeFact(this.typeOf(ty.id)), sw: sw(ty.id, 12), on: ty.id === a.type, style: tpRow(ty.id === a.type), pick: () => { this.put({ arT: Object.assign({}, this.ui().arT, { type: ty.id }), moreOpen: false }); this.pf = 'ar'; } })),

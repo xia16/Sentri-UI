@@ -23,7 +23,7 @@
     const H = OVH, K = H.K;
     let rows;
     if (P.cur.kind === 'pen') { const cells = (this.IP && this.IP.cell[P.r.id]) || {}; rows = Object.keys(cells).filter((c) => cells[c] && cells[c].kind).sort((a, b) => a.localeCompare(b, 'en', { numeric: true })).map((c) => { const n = this.ovPigs(P.r.id, c).reduce((q, y) => q + y[0], 0); return { label: 'Pen ' + c, a: 'gopen:' + c, on: c === P.pen, n: n + (n === 1 ? ' pig' : ' pigs'), f: this.ovFault(P.r.id, c) }; }); }
-    else rows = this.ovSibs(P.cur).map((x) => { const k = this.ovPigsIn(x.rooms).reduce((q, y) => q + y[0], 0); return { label: x.label, a: x.a, on: x.id === P.cur.id, n: k ? k + ' pigs' : 'empty', f: x.rooms.some((y) => this.ovFault(y.id)) }; });
+    else rows = this.ovSibs(P.cur).map((x) => { const k = this.ovPigsIn(x.rooms).reduce((q, y) => q + y[0], 0); return { label: x.label, a: x.a, on: x.id === P.cur.id, n: this.ui().vm === 'edit' ? (P.cur.kind === 'room' ? '' : x.rooms.length + (x.rooms.length === 1 ? ' room' : ' rooms')) : (k ? k + ' pigs' : 'empty'), f: x.rooms.some((y) => this.ovFault(y.id)) }; });
     return '<div data-pop="1" style="' + H.st({ position: 'absolute', left: P.levels.length > 1 ? '48px' : '8px', top: '60px', width: '280px', maxHeight: '420px', overflowY: 'auto', padding: '6px', boxSizing: 'border-box', borderRadius: '16px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 14px 32px rgba(17,21,17,.16)', zIndex: 6 }) + '">' + rows.map((r) => '<div' + H.A(r.a) + ' style="' + H.st({ display: 'flex', alignItems: 'center', gap: '8px', height: '44px', padding: '0 10px', borderRadius: '10px', background: r.on ? K.press : 'transparent', cursor: 'pointer' }) + '">' + H.t(r.label, { fontWeight: r.on ? 600 : 400 }) + (r.f ? H.dot(K.red, 8) : '') + '<span style="flex: 1;"></span>' + H.t(r.n, { color: r.on ? K.ink : K.muted }) + '<span style="' + H.st({ display: 'inline-flex', width: '16px', justifyContent: 'center' }) + '">' + (r.on ? H.icon(H.I.check, 16) : '') + '</span></div>').join('') + '</div>';
   }
   ovUp(u) {
@@ -165,7 +165,7 @@
   ovPaint() {
     if (!this.ovBody) return;
     const u = this.ui();
-    if (!this.ovOn(u) && this.ovEdOn(u)) { const O = this.ovS(), H = OVH, html = this.ovViewHtml(O, u, true) + this.ovCard({ right: '16px', top: '16px' }, this.ovBtn(H.icon(H.I.check, 18) + 'Done', 'vw:modeToggle', false, { background: H.K.ink, color: '#FFFFFF', fontWeight: 600, padding: '0 16px' })); if (html !== this.ovLast) { this.ovBody.innerHTML = html; this.ovLast = html; } return; }
+    if (!this.ovOn(u) && this.ovEdOn(u)) { const O = this.ovS(), H = OVH, html = this.ovEdLoc(u) + this.ovViewHtml(O, u, true) + this.ovCard({ right: '16px', bottom: '16px' }, this.ovBtn(H.icon(H.I.check, 18) + 'Done', 'vw:modeToggle', false, { background: H.K.ink, color: '#FFFFFF', fontWeight: 600, padding: '0 16px' })); if (html !== this.ovLast) { this.ovBody.innerHTML = html; this.ovLast = html; } this.ovEdFit(); return; }
     if (!this.ovOn(u)) { if (this.ovLast !== '') { this.ovBody.innerHTML = ''; this.ovLast = ''; this.ovTipHide(); } return; }
     const O = this.ovS(), st0 = this.props.start || 'saved';
     if (this.ovStarted !== st0) { this.ovStarted = st0; this.ovStart(st0); }
@@ -257,4 +257,17 @@
     if (d === 'lights') return page('Lights', room + ' · whole room', big('Off', 'on at 06:00') + H.sec('Schedule') + facts([['On', '06:00 – 18:00'], ['Level', '80 %']]));
     if (d === 'drinkers') return page('Drinkers', room + ' · water line on lane B', big('On', '1.6 l/min a pen') + H.sec('Today') + facts([['Water used', '2,840 l'], ['Pens served', '50']]));
     return null;
+  }
+
+  // the editor's place piece: ‹ up a level, the name switches places; it starts the tools bar
+  ovEdLoc(u) {
+    const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u), canSwitch = P.cur.kind !== 'farm' && P.cur.kind !== 'pen';
+    const hgt = Math.max(56, Math.min(66, (this.barEl && this.barEl.offsetHeight) || 66));
+    const name = this.ovBtn(H.t(P.name, { fontSize: '17px', lineHeight: '22px', fontWeight: 600, letterSpacing: '-.01em' }) + (canSwitch ? H.icon(H.I.down, 16, { color: K.muted }) : ''), canSwitch ? 'switch' : 'noop', O.pop === 'switch', { cursor: canSwitch ? 'pointer' : 'default' });
+    return '<div data-zone="edloc" style="' + H.st({ position: 'absolute', left: '16px', top: '16px', height: hgt + 'px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: '2px', padding: '0 0 0 10px', background: '#FFFFFF', border: '1px solid #E3E6E1', borderRight: 0, borderRadius: '16px 0 0 16px', boxShadow: '0 1px 2px rgba(18, 24, 21, 0.05), -4px 10px 28px rgba(18, 24, 21, 0.10)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", color: K.ink, whiteSpace: 'nowrap', zIndex: 5 }) + '">' + (P.levels.length > 1 ? this.ovSq(H.I.back, 'up', 'Up one level') : '') + name + '<i style="' + H.st({ width: '1px', height: '28px', background: K.line, margin: '0 0 0 8px', flexShrink: 0 }) + '"></i>' + (O.pop === 'switch' ? this.ovSwitchHtml(u, P) : '') + '</div>';
+  }
+  ovEdFit() {
+    const el = this.ovBody && this.ovBody.querySelector('[data-zone="edloc"]'); if (!el) return;
+    const w = Math.round(el.getBoundingClientRect().width);
+    if (w && w !== this.ovEdW) { this.ovEdW = w; if (this.barEl) { this.barEl.style.left = (16 + w) + 'px'; this.barEl.style.maxWidth = 'calc(100% - ' + (16 + w + 408) + 'px)'; } }
   }
