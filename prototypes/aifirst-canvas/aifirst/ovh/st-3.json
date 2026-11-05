@@ -1,0 +1,24 @@
+{
+ "title": "Step 3 · The production line",
+ "sub": "The rest of the line. The live frame on the left is the first one.",
+ "cols": 3,
+ "sections": [
+  [
+   "The production line",
+   [
+    [
+     "su_FlowLinePicked",
+     "One answer, and Line 1 opens filled from plan A"
+    ],
+    [
+     "su_FlowLinePlan",
+     "The line page: status, calendar, five parts to change"
+    ],
+    [
+     "su_FlowLineChange",
+     "Change the rhythm: one step, applies from Batch 38"
+    ]
+   ]
+  ]
+ ]
+}

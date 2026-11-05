@@ -1,0 +1,2485 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "ActApply.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Review and apply (shared)",
+      "w": 1360,
+      "x": 7760,
+      "y": 1320
+    },
+    "ActAutomations.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Automations",
+      "w": 680,
+      "x": 2440,
+      "y": 0
+    },
+    "ActBarn3JS.dc.html": {
+      "h": 830,
+      "page": "barn",
+      "title": "Barn view component",
+      "w": 1360,
+      "x": 10320,
+      "y": 0
+    },
+    "ActBarns.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Rooms and pens",
+      "w": 680,
+      "x": 3960,
+      "y": 1320
+    },
+    "ActBatches.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Batches",
+      "w": 680,
+      "x": 7760,
+      "y": 0
+    },
+    "ActCameras.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Cameras",
+      "w": 680,
+      "x": 4720,
+      "y": 1320
+    },
+    "ActDecisions.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Decisions",
+      "w": 680,
+      "x": 1680,
+      "y": 0
+    },
+    "ActDisinfection.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Disinfection",
+      "w": 680,
+      "x": 9960,
+      "y": 1320
+    },
+    "ActFeed.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Feed plans",
+      "w": 680,
+      "x": 1680,
+      "y": 1320
+    },
+    "ActImport.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Import pigs",
+      "w": 680,
+      "x": 4720,
+      "y": 0
+    },
+    "ActLayout.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Farm layout, 2D (superseded by the three.js page)",
+      "w": 680,
+      "x": 3960,
+      "y": 0
+    },
+    "ActLayout3D.dc.html": {
+      "h": 900,
+      "page": "layout",
+      "w": 680,
+      "x": 15360,
+      "y": 0
+    },
+    "ActLayout3JS.dc.html": {
+      "h": 830,
+      "page": "layout",
+      "w": 1360,
+      "x": 16120,
+      "y": 0
+    },
+    "ActLine.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Production line (editor)",
+      "w": 680,
+      "x": 5480,
+      "y": 0
+    },
+    "ActMedicines.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Medicines",
+      "w": 680,
+      "x": 6240,
+      "y": 1320
+    },
+    "ActOffsite.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Pigs off site",
+      "w": 680,
+      "x": 2440,
+      "y": 1320
+    },
+    "ActPeople.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "People and invite",
+      "w": 680,
+      "x": 7000,
+      "y": 0
+    },
+    "ActPigs.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Pigs",
+      "w": 680,
+      "x": 3200,
+      "y": 1320
+    },
+    "ActSampling.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Sampling and results",
+      "w": 680,
+      "x": 9200,
+      "y": 1320
+    },
+    "ActSchedule.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Task schedule",
+      "w": 680,
+      "x": 8520,
+      "y": 0
+    },
+    "ActSettings.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Farm settings",
+      "w": 680,
+      "x": 6240,
+      "y": 0
+    },
+    "ActSetup.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Farm setup",
+      "w": 680,
+      "x": 3200,
+      "y": 0
+    },
+    "ActTransfers.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Transfers",
+      "w": 680,
+      "x": 9280,
+      "y": 0
+    },
+    "ActTreatment.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Treatment orders",
+      "w": 680,
+      "x": 5480,
+      "y": 1320
+    },
+    "ActVaccination.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "actions",
+      "title": "Vaccination plan and round",
+      "w": 680,
+      "x": 7000,
+      "y": 1320
+    },
+    "Barn_Farm.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "barn",
+      "title": "The barn view: today's 1,953 pigs, roofs off, counts on every room",
+      "w": 1360,
+      "x": 1680,
+      "y": 0
+    },
+    "Barn_Farrowing.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "barn",
+      "title": "Farrowing Room 2: Batch 32, sows on their side, piglets suckling or under the lamp",
+      "w": 1360,
+      "x": 4560,
+      "y": 0
+    },
+    "Barn_Gestation.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "barn",
+      "title": "Gestation 2: sows mostly lying, 14 stalls empty, five \"!\" to look at",
+      "w": 1360,
+      "x": 3120,
+      "y": 0
+    },
+    "Barn_Nursery.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "barn",
+      "title": "Nursery 1: Batch 30, weaners huddled and at the feeder",
+      "w": 1360,
+      "x": 6000,
+      "y": 0
+    },
+    "Barn_Pen.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "barn",
+      "title": "Crate A3 clicked: Sow 204518, 12 piglets, 9 days",
+      "w": 1360,
+      "x": 7440,
+      "y": 0
+    },
+    "BatchPages.dc.html": {
+      "h": 4841,
+      "page": "farm-view",
+      "title": "Batches and the pig profile, end to end: grey/white, shadcn-style charts, the breakdown in the hover",
+      "w": 1760,
+      "x": 18720,
+      "y": 0
+    },
+    "BlendCanvas.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "health",
+      "title": "6 · Page first: a plan the Vet filled in",
+      "w": 1440,
+      "x": 4720,
+      "y": 0
+    },
+    "BlendDash.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "overview",
+      "title": "12 · Production dashboard (to be redesigned separately)",
+      "w": 1440,
+      "x": 6240,
+      "y": 1320
+    },
+    "BlendGroup.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "overview",
+      "title": "16 · Group chat, @ to bring someone in",
+      "w": 1440,
+      "x": 3200,
+      "y": 1320
+    },
+    "BlendKnowledge.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "overview",
+      "title": "17 · Knowledge base and sign-ins",
+      "w": 1440,
+      "x": 4720,
+      "y": 1320
+    },
+    "BlendSlash.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "overview",
+      "title": "18 · Type / to open an action",
+      "w": 1440,
+      "x": 13840,
+      "y": 0
+    },
+    "BlendTeammate.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "overview",
+      "title": "15 · Talking to one AI teammate",
+      "w": 1440,
+      "x": 1680,
+      "y": 1320
+    },
+    "ConvOptions.dc.html": {
+      "h": 3040,
+      "page": "farm-view",
+      "title": "Convention study: four ways to show a sow, a room and a batch without the tall panel (pick one)",
+      "w": 1680,
+      "x": 15200,
+      "y": 0
+    },
+    "ConvRef.dc.html": {
+      "h": 2096,
+      "page": "farm-view",
+      "title": "Card language, drawn to your references: one hero, few things, satellite cards, soft pills",
+      "w": 1680,
+      "x": 16960,
+      "y": 0
+    },
+    "FlowActionOpened.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "farm-view",
+      "title": "Treatment opened from the farm view: one line names the 3 sows, Back to the farm",
+      "w": 1440,
+      "x": 13120,
+      "y": 0
+    },
+    "FlowApply.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "health",
+      "title": "5 · \"This is the plan\": review and apply, full width",
+      "w": 1440,
+      "x": 7760,
+      "y": 0
+    },
+    "FlowAutos.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "overview",
+      "title": "\"What do you all do on your own?\"",
+      "w": 1440,
+      "x": 12320,
+      "y": 0
+    },
+    "FlowBatchChange.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "production",
+      "title": "N4 · Change one batch: Batch 37 to Room 4",
+      "w": 1440,
+      "x": 6240,
+      "y": 0
+    },
+    "FlowBatchGilts.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "production",
+      "title": "N6 · An extra batch for 24 gilts, asked in chat",
+      "w": 1440,
+      "x": 9280,
+      "y": 0
+    },
+    "FlowBatchNew.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "production",
+      "title": "N5 · New batch, page first: Production suggests",
+      "w": 1440,
+      "x": 7760,
+      "y": 0
+    },
+    "FlowBatchPlanned.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "production",
+      "title": "N3 · A planned batch: its basics, then Change this batch",
+      "w": 1440,
+      "x": 4720,
+      "y": 0
+    },
+    "FlowBatches.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "production",
+      "title": "10 · Batches: what needs a look",
+      "w": 1440,
+      "x": 1680,
+      "y": 0
+    },
+    "FlowCamera.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "pigs",
+      "title": "\"Who was in Gestation 2 at 06:12?\"",
+      "w": 1440,
+      "x": 6240,
+      "y": 0
+    },
+    "FlowCull.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "production",
+      "title": "\"Which sows should I cull at Batch 32 weaning?\"",
+      "w": 1440,
+      "x": 13840,
+      "y": 0
+    },
+    "FlowDecide.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "overview",
+      "title": "\"What needs me?\" opens For you",
+      "w": 1440,
+      "x": 3200,
+      "y": 0
+    },
+    "FlowDisinfect.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "biosecurity",
+      "title": "\"Is Farrowing Room 3 ready for Batch 33?\"",
+      "w": 1440,
+      "x": 4720,
+      "y": 0
+    },
+    "FlowFeed.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "production",
+      "title": "Production sets up a feed order",
+      "w": 1440,
+      "x": 12320,
+      "y": 0
+    },
+    "FlowGuide.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "overview",
+      "title": "N1 · First week: the setup guide on Home",
+      "w": 1440,
+      "x": 9280,
+      "y": 0
+    },
+    "FlowGuideGap.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "Layout not finished: the line waits, Home says why",
+      "w": 1440,
+      "x": 1680,
+      "y": 1320
+    },
+    "FlowGuideLater.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "overview",
+      "title": "N2 · Later: the guide folds to one line",
+      "w": 1440,
+      "x": 10800,
+      "y": 0
+    },
+    "FlowHandoff.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "overview",
+      "title": "\"Let Li Wei know\": sent to their agent, waiting on others",
+      "w": 1440,
+      "x": 4720,
+      "y": 0
+    },
+    "FlowImport.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "S3 · Import the herd: three quick fixes",
+      "w": 1440,
+      "x": 3200,
+      "y": 0
+    },
+    "FlowInvite.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "biosecurity",
+      "title": "13 · Invite a visitor: the form goes to them",
+      "w": 1440,
+      "x": 1680,
+      "y": 0
+    },
+    "FlowLayout.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "layout",
+      "title": "First open: a picture of how Sentri sees a farm, then Next",
+      "w": 1440,
+      "x": 1680,
+      "y": 0
+    },
+    "FlowLayoutDraft.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "layout",
+      "title": "From a plan photo: the farm drawn as a map, rooms waiting for pens",
+      "w": 1440,
+      "x": 3200,
+      "y": 0
+    },
+    "FlowLayoutEdit.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "layout",
+      "title": "Later: “Add 4 stalls to Gestation 2” drafts lane E",
+      "w": 1440,
+      "x": 7760,
+      "y": 0
+    },
+    "FlowLayoutPens.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "layout",
+      "title": "Pens filled; two questions with answer buttons, marked on the map",
+      "w": 1440,
+      "x": 4720,
+      "y": 0
+    },
+    "FlowLayoutReady.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "layout",
+      "title": "All answered: totals by use, the person saves",
+      "w": 1440,
+      "x": 6240,
+      "y": 0
+    },
+    "FlowLine.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "Layout done: Production proposes plans that fit your rooms",
+      "w": 1440,
+      "x": 3960,
+      "y": 1320
+    },
+    "FlowLineChange.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "Change the rhythm: one step, applies from Batch 38",
+      "w": 1440,
+      "x": 6240,
+      "y": 0
+    },
+    "FlowLinePicked.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "One answer, and Line 1 opens filled from plan A",
+      "w": 1440,
+      "x": 5480,
+      "y": 1320
+    },
+    "FlowLinePlan.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "The line page: status, calendar, five parts to change",
+      "w": 1440,
+      "x": 4720,
+      "y": 0
+    },
+    "FlowMeds.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "health",
+      "title": "\"What are we low on?\"",
+      "w": 1440,
+      "x": 3200,
+      "y": 0
+    },
+    "FlowPigRecord.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "pigs",
+      "title": "9 · One pig: findings, last events, a small proposal",
+      "w": 1440,
+      "x": 3200,
+      "y": 0
+    },
+    "FlowPigs.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "pigs",
+      "title": "8 · \"Show me the lame sows in Gestation 2\"",
+      "w": 1440,
+      "x": 1680,
+      "y": 0
+    },
+    "FlowProgramme.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "health",
+      "title": "4 · Conversation first: plan the programme in chat",
+      "w": 1440,
+      "x": 6240,
+      "y": 0
+    },
+    "FlowRoom.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "pigs",
+      "title": "\"Which pens need a look in Gestation 2?\"",
+      "w": 1440,
+      "x": 4720,
+      "y": 0
+    },
+    "FlowRound.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "health",
+      "title": "7 · A vaccination round: vaccinate, catch up, sample, result",
+      "w": 1440,
+      "x": 9280,
+      "y": 0
+    },
+    "FlowSampling.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "biosecurity",
+      "title": "14 · A lab result: check the match, file it",
+      "w": 1440,
+      "x": 3200,
+      "y": 0
+    },
+    "FlowSchedule.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "production",
+      "title": "\"What is everyone doing today?\"",
+      "w": 1440,
+      "x": 10800,
+      "y": 0
+    },
+    "FlowSettings.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "Farm settings: one change, plainly",
+      "w": 1440,
+      "x": 7760,
+      "y": 0
+    },
+    "FlowSetup.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "Day one: the General Manager sets up the farm from your files",
+      "w": 1440,
+      "x": 1680,
+      "y": 0
+    },
+    "FlowTransfer.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "moves",
+      "title": "Production finds a clash five weeks ahead and proposes a fix in chat",
+      "w": 1440,
+      "x": 1680,
+      "y": 0
+    },
+    "FlowTreat.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "health",
+      "title": "The Vet sets up a treatment for 204518",
+      "w": 1440,
+      "x": 1680,
+      "y": 0
+    },
+    "FlowVisitors.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "overview",
+      "title": "3 · Five visitors, one decision: untick, approve",
+      "w": 1440,
+      "x": 7760,
+      "y": 0
+    },
+    "FlowWeek.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "production",
+      "title": "11 · Next week, on demand, with the clash flagged",
+      "w": 1440,
+      "x": 3200,
+      "y": 0
+    },
+    "FlowWhoDecides.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "overview",
+      "title": "\"From now on, feed orders go to Gao Feng\"",
+      "w": 1440,
+      "x": 6240,
+      "y": 0
+    },
+    "L3D_Dup.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "⌘D: a copy lifted mid-drag, snapping to the grid",
+      "w": 1360,
+      "x": 11760,
+      "y": 0
+    },
+    "L3D_Grouped.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "Grouped: name the section, code FAR",
+      "w": 1360,
+      "x": 10320,
+      "y": 0
+    },
+    "L3D_Grow.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "Building a room: a new pen rises",
+      "w": 1360,
+      "x": 16080,
+      "y": 0
+    },
+    "L3D_Plan.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "Flat plan of the same site",
+      "w": 1360,
+      "x": 17520,
+      "y": 0
+    },
+    "L3D_Room.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "Into a room: + at each lane, door on any wall",
+      "w": 1360,
+      "x": 13200,
+      "y": 0
+    },
+    "L3D_Select.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "Four rooms picked: Group into section · Duplicate",
+      "w": 1360,
+      "x": 8880,
+      "y": 0
+    },
+    "L3D_Sick.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "The sketch room: C1 across A and B",
+      "w": 1360,
+      "x": 14640,
+      "y": 0
+    },
+    "L3D_Site.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "Hillside as it stands on the site",
+      "w": 1360,
+      "x": 7440,
+      "y": 0
+    },
+    "L3JS_ActionsMenu.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "farm-view",
+      "title": "3 sows picked: Actions opens the console's own pages with them filled in",
+      "w": 960,
+      "x": 11040,
+      "y": 0
+    },
+    "L3JS_AddMenu.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "+ Add: Lane, Row, Door, Device (one place for every add)",
+      "w": 960,
+      "x": 15200,
+      "y": 0
+    },
+    "L3JS_AddPens.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Add pens: one line, the lane's last type, count 1",
+      "w": 960,
+      "x": 16240,
+      "y": 0
+    },
+    "L3JS_BatchList.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "farm-view",
+      "title": "Batches, from the bar: each running batch, what it is doing, what is next",
+      "w": 960,
+      "x": 13120,
+      "y": 1204
+    },
+    "L3JS_Confirm.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "Delete Gestation 1? asked in the bar; undo until you save",
+      "w": 960,
+      "x": 8960,
+      "y": 0
+    },
+    "L3JS_Device.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "An ammonia sensor: it hangs where it reads the air, never for a pen; the card says where and whether it is bound",
+      "w": 960,
+      "x": 15200,
+      "y": 0
+    },
+    "L3JS_DeviceFeeder.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "A feeder line: it serves C1–C12, its line runs on the floor along the aisle, never across a pen",
+      "w": 960,
+      "x": 19360,
+      "y": 0
+    },
+    "L3JS_DeviceNew.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Add a device: each kind says where it goes (a wall, a spot, or the first pen it serves)",
+      "w": 960,
+      "x": 14160,
+      "y": 0
+    },
+    "L3JS_DevicePens.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Change pens: click pens to add or take them out (the camera over B20–B23 and C20–C23)",
+      "w": 960,
+      "x": 20400,
+      "y": 0
+    },
+    "L3JS_DeviceSetup.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Set up a device: the code on its label binds this place to the real device (Bind later is fine)",
+      "w": 960,
+      "x": 21440,
+      "y": 0
+    },
+    "L3JS_DoneAsk.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "farm-view",
+      "title": "Edit layout with a change: Done saves and goes back to View, nothing to ask",
+      "w": 960,
+      "x": 6880,
+      "y": 0
+    },
+    "L3JS_Doors.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Doors: a main door (pens numbered from it) and a second door; drag along the walls",
+      "w": 960,
+      "x": 11040,
+      "y": 0
+    },
+    "L3JS_Draft.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-steps",
+      "title": "From a plan photo: rooms drawn, waiting for pens",
+      "w": 960,
+      "x": 3760,
+      "y": 0
+    },
+    "L3JS_Draw.dc.html": {
+      "h": 900,
+      "w": 1360,
+      "x": 22480,
+      "y": 0
+    },
+    "L3JS_Drawing.dc.html": {
+      "h": 900,
+      "w": 1360,
+      "x": 23920,
+      "y": 0
+    },
+    "L3JS_Drawn.dc.html": {
+      "h": 900,
+      "w": 1360,
+      "x": 25360,
+      "y": 0
+    },
+    "L3JS_Dup.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "⌘D: Farrowing Room 5 beside the original",
+      "w": 960,
+      "x": 7920,
+      "y": 0
+    },
+    "L3JS_Edit.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "Later: 4 stalls added to Gestation 2, kept at once (Undo in the bar)",
+      "w": 960,
+      "x": 11040,
+      "y": 0
+    },
+    "L3JS_EditFromView.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "farm-view",
+      "title": "Edit layout from View: the editor, Done",
+      "w": 960,
+      "x": 5840,
+      "y": 0
+    },
+    "L3JS_EndRow.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "+ End row: a big pen across the end of lanes A and B (C1)",
+      "w": 960,
+      "x": 12080,
+      "y": 0
+    },
+    "L3JS_Farm.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-steps",
+      "title": "Saved, Farm level: totals and pen types in the card, + Zone at the bottom",
+      "w": 960,
+      "x": 6880,
+      "y": 0
+    },
+    "L3JS_FarmAcres.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Island Acres farrowing house: 11 rooms × 40 crates, 6 tool calls",
+      "w": 960,
+      "x": 1680,
+      "y": 1200
+    },
+    "L3JS_FarmGroupgest.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Group gestation barn: 20 pens of 14 sows + 24 stalls, 6 tool calls",
+      "w": 960,
+      "x": 2720,
+      "y": 1200
+    },
+    "L3JS_FarmSketch.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "The owner's sketch room, from 12 tool calls",
+      "w": 960,
+      "x": 4800,
+      "y": 1200
+    },
+    "L3JS_FarmWeaner.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Weaner unit: 6 rooms × 8 pens × 25 piglets, 6 tool calls",
+      "w": 960,
+      "x": 3760,
+      "y": 1200
+    },
+    "L3JS_Fit.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Sections hug their rooms",
+      "w": 960,
+      "x": 6880,
+      "y": 0
+    },
+    "L3JS_Grouped.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "Grouped into a new section, Farrowing B (code FAB)",
+      "w": 960,
+      "x": 6880,
+      "y": 0
+    },
+    "L3JS_Intro.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-steps",
+      "title": "First open: a finished farm to explore, turning slowly; Start my farm",
+      "w": 960,
+      "x": 1680,
+      "y": 0
+    },
+    "L3JS_IntroCam.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-view",
+      "title": "Room camera: a live-looking feed from the end wall",
+      "w": 960,
+      "x": 5840,
+      "y": 0
+    },
+    "L3JS_IntroGest.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-view",
+      "title": "Gestation 2: sows in stalls, 14 empty, \"!\" on B14 and B17",
+      "w": 960,
+      "x": 2720,
+      "y": 0
+    },
+    "L3JS_IntroList.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-view",
+      "title": "Need a look: the list folds to a pill, rows fly to their pen",
+      "w": 960,
+      "x": 3760,
+      "y": 0
+    },
+    "L3JS_IntroNight.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-steps",
+      "title": "The finished farm at night: lamps along the road, warm barn doors",
+      "w": 960,
+      "x": 10000,
+      "y": 0
+    },
+    "L3JS_IntroPen.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-view",
+      "title": "Crate A3: Sow 204518, 12 piglets, Watch this pen",
+      "w": 960,
+      "x": 4800,
+      "y": 0
+    },
+    "L3JS_IntroRoom.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-view",
+      "title": "Into a room: pigs fade in, smaller, pens and codes readable",
+      "w": 960,
+      "x": 1680,
+      "y": 0
+    },
+    "L3JS_Lane.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Lane C selected: its runs edit in the bottom bar",
+      "w": 960,
+      "x": 1680,
+      "y": 0
+    },
+    "L3JS_MoveZone.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "Drag a zone: everything in it moves; a ghost shows where it lands",
+      "w": 960,
+      "x": 14160,
+      "y": 0
+    },
+    "L3JS_NewSection.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "+ Section: named in the bar; a dashed patch waits for rooms",
+      "w": 960,
+      "x": 3760,
+      "y": 0
+    },
+    "L3JS_NewTypeInline.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "New pen type, step 2 of 3: who lives in the group pen",
+      "w": 960,
+      "x": 18320,
+      "y": 0
+    },
+    "L3JS_Night.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-steps",
+      "title": "The saved farm at night",
+      "w": 960,
+      "x": 11040,
+      "y": 0
+    },
+    "L3JS_PenType.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "New pen type, last step: name, size and one pigs-per-pen number, filled in",
+      "w": 960,
+      "x": 2720,
+      "y": 0
+    },
+    "L3JS_Pens.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-steps",
+      "title": "Pens filled; GM marks the two rooms it asks about in chat",
+      "w": 960,
+      "x": 4800,
+      "y": 0
+    },
+    "L3JS_Picked.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "farm-view",
+      "title": "3 pens picked: the list opens from the bar; Clear; Actions",
+      "w": 960,
+      "x": 7920,
+      "y": 0
+    },
+    "L3JS_PigWaiting.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "farm-view",
+      "title": "Crate A3: Waiting on someone (phone tasks, the decision she is in), folded sections that say what is inside",
+      "w": 960,
+      "x": 12080,
+      "y": 0
+    },
+    "L3JS_Place.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "+ Room: click the ground, then type its name",
+      "w": 960,
+      "x": 4800,
+      "y": 0
+    },
+    "L3JS_Plan.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "Plan: straight down",
+      "w": 960,
+      "x": 12080,
+      "y": 0
+    },
+    "L3JS_Ready.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-steps",
+      "title": "All answered: save the layout",
+      "w": 960,
+      "x": 5840,
+      "y": 0
+    },
+    "L3JS_Removed.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "Lane removed: letters close up, Undo",
+      "w": 960,
+      "x": 10000,
+      "y": 0
+    },
+    "L3JS_Repeat.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Lane C on one line from the door: gilt × 3, a stall, a gilt pen, + Add pens",
+      "w": 960,
+      "x": 10000,
+      "y": 0
+    },
+    "L3JS_Room.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-steps",
+      "title": "Room: details card on the left, actions in the bottom bar",
+      "w": 960,
+      "x": 8960,
+      "y": 0
+    },
+    "L3JS_RoomEdit.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "Edit a room: the pencil opens name, size, door and lane A in the bottom bar",
+      "w": 960,
+      "x": 13120,
+      "y": 0
+    },
+    "L3JS_RoomSize.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Room made smaller: 4 pens outside the wall, flagged",
+      "w": 960,
+      "x": 8960,
+      "y": 0
+    },
+    "L3JS_Section.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "A section: rooms, short code FAR, photo, + Room",
+      "w": 960,
+      "x": 2720,
+      "y": 0
+    },
+    "L3JS_Select.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "Box-select three rooms: Duplicate, Group into section or zone",
+      "w": 960,
+      "x": 5840,
+      "y": 0
+    },
+    "L3JS_Shape.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Odd room: drag a wall corner; + adds one (an L-shape)",
+      "w": 960,
+      "x": 3760,
+      "y": 0
+    },
+    "L3JS_Sick.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-steps",
+      "title": "The sick room: lanes A and B, end row C (one large pen)",
+      "w": 960,
+      "x": 7920,
+      "y": 0
+    },
+    "L3JS_Start.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-steps",
+      "title": "After Next: empty ground, + Zone in the bar",
+      "w": 960,
+      "x": 2720,
+      "y": 0
+    },
+    "L3JS_TypeManager.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Pen types: one row of types, + New pen type at the end",
+      "w": 960,
+      "x": 13120,
+      "y": 0
+    },
+    "L3JS_TypePicker.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-pens",
+      "title": "Add pens: the type picker opens upward, + New pen type at the end",
+      "w": 960,
+      "x": 17280,
+      "y": 0
+    },
+    "L3JS_UngroupSel.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "A whole section picked: Ungroup (⇧⌘G) is about the group",
+      "w": 960,
+      "x": 16240,
+      "y": 0
+    },
+    "L3JS_View.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "farm-view",
+      "title": "View: the saved farm opens here; 1,953 pigs, 5 urgent, 8 watch",
+      "w": 960,
+      "x": 1680,
+      "y": 0
+    },
+    "L3JS_ViewBatch.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "farm-view",
+      "title": "Batch 32: running now (click one to see it on the pens), coming up, compared with earlier batches",
+      "w": 960,
+      "x": 8960,
+      "y": 0
+    },
+    "L3JS_ViewBatchTask.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "farm-view",
+      "title": "A running task opened: Batch 34 breeding, each pen in its sow's colour, hover for the details",
+      "w": 960,
+      "x": 10000,
+      "y": 0
+    },
+    "L3JS_ViewCam.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "farm-view",
+      "title": "Room cameras with ‹ ›, the view wedge on the floor",
+      "w": 960,
+      "x": 4800,
+      "y": 0
+    },
+    "L3JS_ViewPen.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "farm-view",
+      "title": "Click a pen: the pig panel with its batch chip; Actions opens the console's pages",
+      "w": 960,
+      "x": 3760,
+      "y": 0
+    },
+    "L3JS_ViewRoom.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "farm-view",
+      "title": "Gestation 2 in View: quiet pens, \"186 sows · ! 5\", Cameras (2)",
+      "w": 960,
+      "x": 2720,
+      "y": 0
+    },
+    "L3JS_Zone.dc.html": {
+      "h": 830,
+      "is_interactive": true,
+      "page": "layout-hand",
+      "title": "Into a zone: its sections as chips, + Section",
+      "w": 960,
+      "x": 1680,
+      "y": 0
+    },
+    "L4_Canvas.dc.html": {
+      "h": 1200,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "The farm canvas: zones, sections, rooms; Farrowing section selected",
+      "w": 1360,
+      "x": 1680,
+      "y": 0
+    },
+    "L4_Merge.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "Merge cells into one group pen",
+      "w": 1360,
+      "x": 4560,
+      "y": 0
+    },
+    "L4_Paint.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "Paint pens: pick a pen type, drag down a lane",
+      "w": 1360,
+      "x": 3120,
+      "y": 0
+    },
+    "L4_Room.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "A painted room: lanes A–E, lane A selected",
+      "w": 1360,
+      "x": 6000,
+      "y": 0
+    },
+    "Layout_PenTypes.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "Drawing it yourself: a new room, its first pen type made as you go",
+      "w": 680,
+      "x": 2440,
+      "y": 1600
+    },
+    "Layout_Room.dc.html": {
+      "h": 1040,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "A room is its own drawing: + / − pens, + Lane, door on any wall, A on the left or right",
+      "w": 680,
+      "x": 3960,
+      "y": 1600
+    },
+    "Layout_Saved.dc.html": {
+      "h": 1300,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "The saved layout",
+      "w": 680,
+      "x": 4720,
+      "y": 1600
+    },
+    "Layout_Sick.dc.html": {
+      "h": 1030,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "From a sketch: two lanes and a group pen across the end (C1)",
+      "w": 680,
+      "x": 3200,
+      "y": 1600
+    },
+    "Layout_Start.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "archive",
+      "title": "After Next: an empty map; the General Manager says how to start",
+      "w": 680,
+      "x": 1680,
+      "y": 1600
+    },
+    "LineStep_new1.dc.html": {
+      "h": 1200,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "1 · What the line does",
+      "w": 680,
+      "x": 7000,
+      "y": 1320
+    },
+    "LineStep_new2.dc.html": {
+      "h": 1200,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "2 · How often a batch starts",
+      "w": 680,
+      "x": 7760,
+      "y": 1320
+    },
+    "LineStep_new3.dc.html": {
+      "h": 2620,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "3 · Rooms and moves",
+      "w": 680,
+      "x": 8520,
+      "y": 1320
+    },
+    "LineStep_new4.dc.html": {
+      "h": 1200,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "4 · When each job happens",
+      "w": 680,
+      "x": 9280,
+      "y": 1320
+    },
+    "LineStep_new5.dc.html": {
+      "h": 1200,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "5 · What each stage should achieve",
+      "w": 680,
+      "x": 10040,
+      "y": 1320
+    },
+    "LineStep_review.dc.html": {
+      "h": 1200,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "Review, then create Line 1",
+      "w": 680,
+      "x": 10800,
+      "y": 1320
+    },
+    "Line_NeedsLayout.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "setup",
+      "title": "Production line opened too early: finish the layout first",
+      "w": 680,
+      "x": 3200,
+      "y": 1320
+    },
+    "Main.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "overview",
+      "title": "Morning: the report in chat, For you on Home",
+      "w": 1440,
+      "x": 1664,
+      "y": 0
+    },
+    "Move_Clash.dc.html": {
+      "h": 940,
+      "is_interactive": true,
+      "page": "moves",
+      "title": "The clash: a rule breaks, two one-tap fixes",
+      "w": 680,
+      "x": 4640,
+      "y": 0
+    },
+    "Move_Clashfix.dc.html": {
+      "h": 1000,
+      "is_interactive": true,
+      "page": "moves",
+      "title": "Production's fix, as an edited form",
+      "w": 680,
+      "x": 5400,
+      "y": 0
+    },
+    "Move_Clean.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "moves",
+      "title": "Rooms: needs cleaning, drying, ready (ticked in the app)",
+      "w": 680,
+      "x": 6920,
+      "y": 0
+    },
+    "Move_EditRooms.dc.html": {
+      "h": 2580,
+      "is_interactive": true,
+      "page": "moves",
+      "title": "Later: drying time 24 → 48 h, a status, not a block",
+      "w": 680,
+      "x": 8440,
+      "y": 0
+    },
+    "Move_List.dc.html": {
+      "h": 1000,
+      "is_interactive": true,
+      "page": "moves",
+      "title": "Saved: every move with its room status, Set or Planned",
+      "w": 680,
+      "x": 6160,
+      "y": 0
+    },
+    "Move_Plan.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "moves",
+      "title": "The room plan: rooms by week, drying, the Nursery 2 clash",
+      "w": 1360,
+      "x": 3200,
+      "y": 0
+    },
+    "Move_Room3.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "moves",
+      "title": "Farrowing Room 3: washed 08:40, ready Sat 08:40",
+      "w": 680,
+      "x": 7680,
+      "y": 0
+    },
+    "PigKit.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "barn",
+      "title": "Every kind of pig, to scale: sows, piglets, weaners, finishers; a crate and a nursery pen",
+      "w": 1360,
+      "x": 8880,
+      "y": 0
+    },
+    "ProductMap.dc.html": {
+      "h": 3140,
+      "page": "overview",
+      "title": "The product map: every Action and how you reach it",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "LocationCard.dc.html": {
+      "x": 20680,
+      "y": 0,
+      "w": 1760,
+      "h": 6231,
+      "title": "Location card and equipment: chips, tiles, device cards, pens in Plan, moving floors and their decisions",
+      "page": "farm-view"
+    },
+    "L3JS_BxList.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1360,
+      "h": 830,
+      "title": "Batches: the list (open from the bar)",
+      "page": "overhaul",
+      "is_interactive": true
+    },
+    "L3JS_BxBatch.dc.html": {
+      "x": 1460,
+      "y": 0,
+      "w": 1360,
+      "h": 830,
+      "title": "Batch 32: running tasks as rings, upcoming",
+      "page": "overhaul",
+      "is_interactive": true
+    },
+    "L3JS_BxTask.dc.html": {
+      "x": 2920,
+      "y": 0,
+      "w": 1360,
+      "h": 830,
+      "title": "Farrowing running: half ring, legend filters the farm, KPIs",
+      "page": "overhaul",
+      "is_interactive": true
+    },
+    "L3JS_BxFilter.dc.html": {
+      "x": 4380,
+      "y": 0,
+      "w": 1360,
+      "h": 830,
+      "title": "The parity filter, open",
+      "page": "overhaul",
+      "is_interactive": true
+    },
+    "L3JS_BxDates.dc.html": {
+      "x": 0,
+      "y": 1000,
+      "w": 1360,
+      "h": 830,
+      "title": "All dates, opens on now",
+      "page": "overhaul",
+      "is_interactive": true
+    },
+    "L3JS_BxDone.dc.html": {
+      "x": 1460,
+      "y": 1000,
+      "w": 1360,
+      "h": 830,
+      "title": "A done task: outcomes, performance, piglets born",
+      "page": "overhaul",
+      "is_interactive": true
+    },
+    "L3JS_BxCompare.dc.html": {
+      "x": 2920,
+      "y": 1000,
+      "w": 1360,
+      "h": 830,
+      "title": "Compare: stacked bars; the farm tints pens below the batch",
+      "page": "overhaul",
+      "is_interactive": true
+    },
+    "L3JS_BxHer.dc.html": {
+      "x": 4380,
+      "y": 1000,
+      "w": 1360,
+      "h": 830,
+      "title": "Her card beside Compare",
+      "page": "overhaul",
+      "is_interactive": true
+    },
+    "L3JS_PgProfile.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1360,
+      "h": 830,
+      "title": "Pig profile from a pen: tags, cycle, tasks, litters, details",
+      "page": "overhaul-pig",
+      "is_interactive": true
+    },
+    "L3JS_PgFlagged.dc.html": {
+      "x": 1460,
+      "y": 0,
+      "w": 1360,
+      "h": 830,
+      "title": "Pig profile: a flagged sow",
+      "page": "overhaul-pig",
+      "is_interactive": true
+    },
+    "L3JS_PgPerf.dc.html": {
+      "x": 2920,
+      "y": 0,
+      "w": 1360,
+      "h": 830,
+      "title": "Her performance",
+      "page": "overhaul-pig",
+      "is_interactive": true
+    },
+    "L3JS_PgLog.dc.html": {
+      "x": 4380,
+      "y": 0,
+      "w": 1360,
+      "h": 830,
+      "title": "Her log",
+      "page": "overhaul-pig",
+      "is_interactive": true
+    },
+    "L3JS_PgPen.dc.html": {
+      "x": 0,
+      "y": 1000,
+      "w": 1360,
+      "h": 830,
+      "title": "A group pen: its pigs, scrolling, without ID",
+      "page": "overhaul-pig",
+      "is_interactive": true
+    },
+    "L3JS_LcRoom.dc.html": {
+      "x": 2972,
+      "y": 0,
+      "w": 1360,
+      "h": 830,
+      "title": "Live: at a room (the new layout)",
+      "page": "rearranged",
+      "is_interactive": true
+    },
+    "L3JS_LcTrend.dc.html": {
+      "x": 2920,
+      "y": 1000,
+      "w": 1360,
+      "h": 830,
+      "title": "A sensor chip: its trend",
+      "page": "overhaul-pig",
+      "is_interactive": true
+    },
+    "L3JS_LcSiblings.dc.html": {
+      "x": 4380,
+      "y": 1000,
+      "w": 1360,
+      "h": 830,
+      "title": "Location card: breadcrumb and siblings",
+      "page": "overhaul-pig",
+      "is_interactive": true
+    },
+    "L3JS_EqTiles.dc.html": {
+      "x": 4432,
+      "y": 2000,
+      "w": 1360,
+      "h": 830,
+      "title": "Live: Devices panel",
+      "page": "rearranged",
+      "is_interactive": true
+    },
+    "L3JS_EqFan.dc.html": {
+      "x": 1460,
+      "y": 0,
+      "w": 1360,
+      "h": 830,
+      "title": "A tile opened: the fan",
+      "page": "overhaul-eq",
+      "is_interactive": true
+    },
+    "L3JS_EqPick.dc.html": {
+      "x": 2920,
+      "y": 0,
+      "w": 1360,
+      "h": 830,
+      "title": "Heat lamps: pens picked in Plan, the bar is the control",
+      "page": "overhaul-eq",
+      "is_interactive": true
+    },
+    "L3JS_FlAuto.dc.html": {
+      "x": 4380,
+      "y": 0,
+      "w": 1360,
+      "h": 830,
+      "title": "Moving floor (demo): Auto",
+      "page": "overhaul-eq",
+      "is_interactive": true
+    },
+    "L3JS_FlPinned.dc.html": {
+      "x": 0,
+      "y": 1000,
+      "w": 1360,
+      "h": 830,
+      "title": "Moving floor: a run pinned, Show pens",
+      "page": "overhaul-eq",
+      "is_interactive": true
+    },
+    "L3JS_FlManual.dc.html": {
+      "x": 1460,
+      "y": 1000,
+      "w": 1360,
+      "h": 830,
+      "title": "Moving floor: Manual",
+      "page": "overhaul-eq",
+      "is_interactive": true
+    },
+    "L3JS_FlShow.dc.html": {
+      "x": 2920,
+      "y": 1000,
+      "w": 1360,
+      "h": 830,
+      "title": "Show pens: Plan with the pens that ran, task pill",
+      "page": "overhaul-eq",
+      "is_interactive": true
+    },
+    "FarmViewLayout.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 2872,
+      "h": 7260,
+      "title": "Farm view, rearranged: bar top left, 3D bottom left, Select bottom right with an actions bar",
+      "page": "rearranged",
+      "is_interactive": false
+    },
+    "L3JS_LcView.dc.html": {
+      "x": 4432,
+      "y": 0,
+      "w": 1360,
+      "h": 830,
+      "title": "Live: 3D opened",
+      "page": "rearranged",
+      "is_interactive": true
+    },
+    "L3JS_LcSelect.dc.html": {
+      "x": 2972,
+      "y": 1000,
+      "w": 1360,
+      "h": 830,
+      "title": "Live: Select, pens picked, actions bar",
+      "page": "rearranged",
+      "is_interactive": true
+    },
+    "L3JS_LcTicks.dc.html": {
+      "x": 4432,
+      "y": 1000,
+      "w": 1360,
+      "h": 830,
+      "title": "Live: pigs ticked in a pen list",
+      "page": "rearranged",
+      "is_interactive": true
+    },
+    "L3JS_LcPigs.dc.html": {
+      "x": 2972,
+      "y": 2000,
+      "w": 1360,
+      "h": 830,
+      "title": "Live: Pigs panel",
+      "page": "rearranged",
+      "is_interactive": true
+    },
+    "L3JS_EqFeed.dc.html": {
+      "x": 4432,
+      "y": 3000,
+      "w": 1360,
+      "h": 830,
+      "title": "Live: a device shown on the farm (feed line)",
+      "page": "rearranged",
+      "is_interactive": true
+    },
+    "L3JS_EqCam.dc.html": {
+      "x": 2972,
+      "y": 4000,
+      "w": 1360,
+      "h": 830,
+      "title": "Live: a camera opened in Devices, its view on the farm",
+      "page": "rearranged",
+      "is_interactive": true
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-30T09:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "page": "overview",
+    "view": "canvas"
+  },
+  "noteOrder": [
+    "map",
+    "row0",
+    "row1",
+    "row2",
+    "row3",
+    "row4",
+    "row5",
+    "row6",
+    "row7",
+    "row8",
+    "linesteps",
+    "moves",
+    "v5",
+    "v5states",
+    "v5hand",
+    "shape-lmmr80",
+    "shape-rqzyoq",
+    "shape-sbn0rf",
+    "shape-eig9c3",
+    "shape-au0fnr",
+    "barn",
+    "v5pens",
+    "v5farms",
+    "archive",
+    "archive2",
+    "viewnote",
+    "fvnote"
+  ],
+  "notes": {
+    "archive": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "archive",
+      "text": "Earlier Farm layout explorations, superseded by v5 (three.js): 2D canvas, 2.5D model",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "archive2": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "archive",
+      "text": "Earlier Farm layout v3 (2D pages)",
+      "w": 240,
+      "x": 1680,
+      "y": 1300
+    },
+    "barn": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "barn",
+      "text": "Barn view (after setup): the same 3D farm with today's pigs in it; no editing tools",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "fvnote": {
+      "kind": "title1",
+      "maxW": 7000,
+      "page": "farm-view",
+      "text": "Farm view: View is for pigs (directions, treatments, notes); Edit layout changes the farm",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "linesteps": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "setup",
+      "text": "Setting up the line: layout first, then plans that fit your rooms (in chat), then five steps",
+      "w": 240,
+      "x": 1680,
+      "y": 1020
+    },
+    "map": {
+      "kind": "title1",
+      "maxW": 1440,
+      "page": "overview",
+      "text": "Sentri, AI-first: the whole product",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "moves": {
+      "kind": "title1",
+      "maxW": 7440,
+      "page": "moves",
+      "text": "Moving pigs: Production plans every room by your rules, and speaks up only when the plan breaks",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "row0": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "overview",
+      "text": "Home: what reaches you, who decides, and when",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "row1": {
+      "kind": "title1",
+      "maxW": 6000,
+      "page": "overview",
+      "text": "Your AI team, group chats and knowledge",
+      "w": 240,
+      "x": 1680,
+      "y": 1020
+    },
+    "row2": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "setup",
+      "text": "Setting up the farm, and changing it later",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "row3": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "production",
+      "text": "Production: batches and the work they make",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "row4": {
+      "kind": "title1",
+      "maxW": 6000,
+      "page": "pigs",
+      "text": "Pigs and places",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "row5": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "health",
+      "text": "Health: treat, stock, vaccinate",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "row6": {
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "biosecurity",
+      "text": "Biosecurity: visitors, samples, cleaning",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "row7": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "actions",
+      "text": "Every Action on its own, as it opens beside the chat (1 of 2)",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "row8": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "actions",
+      "text": "Every Action on its own (2 of 2)",
+      "w": 240,
+      "x": 1680,
+      "y": 1020
+    },
+    "shape-au0fnr": {
+      "d": "M0 7 C7.5 51.9 10.9 96.1 10.9 141.6 C18.3 136.4 21.1 125.8 29.1 121.6 C39.7 115.9 51.7 113.8 64.4 113.8 C103.4 113.8 148.9 134.3 181.9 138 C177.4 98.5 164.7 13.9 119.1 1.5 C115.1 0.5 110.7 0 105.9 0 C85.9 0 60.8 8.1 43.7 10.6",
+      "h": 141.6,
+      "kind": "pen",
+      "page": "layout",
+      "w": 181.9,
+      "x": 3267.3,
+      "y": -680
+    },
+    "shape-eig9c3": {
+      "d": "M21.8 0 C12 46.9 7.3 94.6 0 141.9 C53.6 141.9 95.2 107.3 127.3 72.8 C105.6 47.4 84.6 24.2 58.2 3.6",
+      "h": 141.9,
+      "kind": "pen",
+      "page": "layout",
+      "w": 127.3,
+      "x": 3056.3,
+      "y": -669.2999999999993
+    },
+    "shape-lmmr80": {
+      "d": "M10.9 0 C4.6 79.3 1.7 160.5 0 240.1",
+      "h": 240.1,
+      "kind": "pen",
+      "page": "layout",
+      "w": 10.9,
+      "x": 3078.2,
+      "y": -996.7999999999993
+    },
+    "shape-rqzyoq": {
+      "d": "M0 2.1 C12 0.7 28.7 0 48.2 0 C136.7 0 283.1 15.5 314.7 61.2 C325.3 76.5 329.4 94.1 329.4 112.6 C329.4 156.2 306.5 204.6 291 238.6",
+      "h": 238.6,
+      "kind": "pen",
+      "page": "layout",
+      "w": 329.4,
+      "x": 3121.8,
+      "y": -1020.7000000000007
+    },
+    "shape-sbn0rf": {
+      "d": "M0 0 C68.9 44 163.1 44.6 243.7 50.9",
+      "h": 50.9,
+      "kind": "pen",
+      "page": "layout",
+      "w": 243.7,
+      "x": 3143.6,
+      "y": -796.7000000000007
+    },
+    "v5": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "layout",
+      "text": "Farm layout v5 (three.js): full screen beside the chat; hide the chat for the whole width",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "v5farms": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "layout-pens",
+      "text": "Real farms, built by the agent's tools (ops on one layout document; three.js only draws it)",
+      "w": 240,
+      "x": 1680,
+      "y": 900
+    },
+    "v5hand": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "layout-hand",
+      "text": "Building by hand: details float on the left, actions and every edit at the bottom",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "v5pens": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "layout-pens",
+      "text": "Pens: mixed lanes, pen types, odd room shapes, drawn pens",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "v5states": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "layout-steps",
+      "text": "Setting up with the General Manager (960 wide, beside the chat)",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    },
+    "viewnote": {
+      "kind": "title1",
+      "maxW": 6000,
+      "page": "layout-view",
+      "text": "The preview is the farm view: pigs inside rooms, status, the pig list, pen cards, cameras",
+      "w": 240,
+      "x": 1680,
+      "y": -300
+    }
+  },
+  "order": [
+    "FlowSetup.dc.html",
+    "FlowLayout.dc.html",
+    "FlowLayoutEdit.dc.html",
+    "FlowImport.dc.html",
+    "FlowLine.dc.html",
+    "FlowLinePlan.dc.html",
+    "FlowLineChange.dc.html",
+    "FlowSettings.dc.html",
+    "FlowBatches.dc.html",
+    "FlowWeek.dc.html",
+    "FlowBatchPlanned.dc.html",
+    "FlowBatchChange.dc.html",
+    "FlowBatchNew.dc.html",
+    "FlowBatchGilts.dc.html",
+    "FlowSchedule.dc.html",
+    "FlowTransfer.dc.html",
+    "FlowFeed.dc.html",
+    "FlowCull.dc.html",
+    "FlowPigs.dc.html",
+    "FlowPigRecord.dc.html",
+    "FlowRoom.dc.html",
+    "FlowCamera.dc.html",
+    "FlowTreat.dc.html",
+    "FlowMeds.dc.html",
+    "BlendCanvas.dc.html",
+    "FlowProgramme.dc.html",
+    "FlowApply.dc.html",
+    "FlowRound.dc.html",
+    "FlowInvite.dc.html",
+    "FlowSampling.dc.html",
+    "FlowDisinfect.dc.html",
+    "ActDecisions.dc.html",
+    "ActAutomations.dc.html",
+    "ActSetup.dc.html",
+    "ActLayout.dc.html",
+    "ActImport.dc.html",
+    "ActLine.dc.html",
+    "ActSettings.dc.html",
+    "ActPeople.dc.html",
+    "ActBatches.dc.html",
+    "ActSchedule.dc.html",
+    "ActTransfers.dc.html",
+    "ActFeed.dc.html",
+    "ActOffsite.dc.html",
+    "ActPigs.dc.html",
+    "ActBarns.dc.html",
+    "ActCameras.dc.html",
+    "ActTreatment.dc.html",
+    "ActMedicines.dc.html",
+    "ActVaccination.dc.html",
+    "ActApply.dc.html",
+    "ActSampling.dc.html",
+    "ActDisinfection.dc.html",
+    "LineStep_new1.dc.html",
+    "LineStep_new2.dc.html",
+    "LineStep_new3.dc.html",
+    "LineStep_new4.dc.html",
+    "LineStep_new5.dc.html",
+    "LineStep_review.dc.html",
+    "Move_Plan.dc.html",
+    "Move_Clash.dc.html",
+    "Move_Clashfix.dc.html",
+    "Move_List.dc.html",
+    "Move_Clean.dc.html",
+    "Move_Room3.dc.html",
+    "Move_EditRooms.dc.html",
+    "FlowGuideGap.dc.html",
+    "Line_NeedsLayout.dc.html",
+    "FlowLinePicked.dc.html",
+    "FlowLayoutDraft.dc.html",
+    "Layout_PenTypes.dc.html",
+    "FlowLayoutPens.dc.html",
+    "Layout_Sick.dc.html",
+    "Layout_Room.dc.html",
+    "FlowLayoutReady.dc.html",
+    "Layout_Saved.dc.html",
+    "Layout_Start.dc.html",
+    "L4_Canvas.dc.html",
+    "L4_Paint.dc.html",
+    "L4_Merge.dc.html",
+    "L4_Room.dc.html",
+    "L3D_Site.dc.html",
+    "L3D_Select.dc.html",
+    "L3D_Grouped.dc.html",
+    "L3D_Dup.dc.html",
+    "L3D_Room.dc.html",
+    "L3D_Sick.dc.html",
+    "L3D_Grow.dc.html",
+    "L3D_Plan.dc.html",
+    "L3JS_Farm.dc.html",
+    "L3JS_Plan.dc.html",
+    "L3JS_Room.dc.html",
+    "L3JS_Sick.dc.html",
+    "L3JS_Intro.dc.html",
+    "L3JS_Start.dc.html",
+    "L3JS_Draft.dc.html",
+    "L3JS_Pens.dc.html",
+    "L3JS_Ready.dc.html",
+    "L3JS_Place.dc.html",
+    "L3JS_Select.dc.html",
+    "L3JS_Grouped.dc.html",
+    "L3JS_Dup.dc.html",
+    "L3JS_Section.dc.html",
+    "L3JS_PenType.dc.html",
+    "L3JS_Edit.dc.html",
+    "ActLayout3D.dc.html",
+    "ActLayout3JS.dc.html",
+    "Barn_Farm.dc.html",
+    "Barn_Gestation.dc.html",
+    "Barn_Farrowing.dc.html",
+    "Barn_Nursery.dc.html",
+    "Barn_Pen.dc.html",
+    "PigKit.dc.html",
+    "L3JS_Zone.dc.html",
+    "L3JS_NewSection.dc.html",
+    "L3JS_Confirm.dc.html",
+    "L3JS_Removed.dc.html",
+    "L3JS_Lane.dc.html",
+    "L3JS_Shape.dc.html",
+    "L3JS_Fit.dc.html",
+    "L3JS_FarmAcres.dc.html",
+    "L3JS_FarmGroupgest.dc.html",
+    "L3JS_FarmWeaner.dc.html",
+    "L3JS_FarmSketch.dc.html",
+    "L3JS_RoomSize.dc.html",
+    "L3JS_RoomEdit.dc.html",
+    "L3JS_Repeat.dc.html",
+    "L3JS_IntroNight.dc.html",
+    "L3JS_Night.dc.html",
+    "L3JS_MoveZone.dc.html",
+    "L3JS_Doors.dc.html",
+    "L3JS_IntroRoom.dc.html",
+    "L3JS_IntroGest.dc.html",
+    "L3JS_IntroList.dc.html",
+    "L3JS_IntroPen.dc.html",
+    "L3JS_IntroCam.dc.html",
+    "ActBarn3JS.dc.html",
+    "L3JS_EndRow.dc.html",
+    "L3JS_AddMenu.dc.html",
+    "L3JS_UngroupSel.dc.html",
+    "L3JS_TypeManager.dc.html",
+    "L3JS_DeviceNew.dc.html",
+    "L3JS_Device.dc.html",
+    "L3JS_AddPens.dc.html",
+    "L3JS_TypePicker.dc.html",
+    "L3JS_NewTypeInline.dc.html",
+    "L3JS_DeviceFeeder.dc.html",
+    "L3JS_DevicePens.dc.html",
+    "L3JS_DeviceSetup.dc.html",
+    "ProductMap.dc.html",
+    "Main.dc.html",
+    "FlowDecide.dc.html",
+    "FlowHandoff.dc.html",
+    "FlowWhoDecides.dc.html",
+    "FlowVisitors.dc.html",
+    "FlowGuide.dc.html",
+    "FlowGuideLater.dc.html",
+    "FlowAutos.dc.html",
+    "BlendSlash.dc.html",
+    "BlendTeammate.dc.html",
+    "BlendGroup.dc.html",
+    "BlendKnowledge.dc.html",
+    "BlendDash.dc.html",
+    "L3JS_Draw.dc.html",
+    "L3JS_Drawing.dc.html",
+    "L3JS_Drawn.dc.html",
+    "L3JS_View.dc.html",
+    "L3JS_ViewRoom.dc.html",
+    "L3JS_ViewPen.dc.html",
+    "L3JS_ViewCam.dc.html",
+    "L3JS_EditFromView.dc.html",
+    "L3JS_DoneAsk.dc.html",
+    "L3JS_Picked.dc.html",
+    "L3JS_BatchList.dc.html",
+    "L3JS_ViewBatch.dc.html",
+    "L3JS_ViewBatchTask.dc.html",
+    "L3JS_ActionsMenu.dc.html",
+    "L3JS_PigWaiting.dc.html",
+    "FlowActionOpened.dc.html",
+    "ConvOptions.dc.html",
+    "ConvRef.dc.html",
+    "BatchPages.dc.html",
+    "LocationCard.dc.html",
+    "L3JS_BxList.dc.html",
+    "L3JS_BxBatch.dc.html",
+    "L3JS_BxTask.dc.html",
+    "L3JS_BxFilter.dc.html",
+    "L3JS_BxDates.dc.html",
+    "L3JS_BxDone.dc.html",
+    "L3JS_BxCompare.dc.html",
+    "L3JS_BxHer.dc.html",
+    "L3JS_PgProfile.dc.html",
+    "L3JS_PgFlagged.dc.html",
+    "L3JS_PgPerf.dc.html",
+    "L3JS_PgLog.dc.html",
+    "L3JS_PgPen.dc.html",
+    "L3JS_LcRoom.dc.html",
+    "L3JS_LcTrend.dc.html",
+    "L3JS_LcSiblings.dc.html",
+    "L3JS_EqTiles.dc.html",
+    "L3JS_EqFan.dc.html",
+    "L3JS_EqPick.dc.html",
+    "L3JS_FlAuto.dc.html",
+    "L3JS_FlPinned.dc.html",
+    "L3JS_FlManual.dc.html",
+    "L3JS_FlShow.dc.html",
+    "FarmViewLayout.dc.html",
+    "L3JS_LcView.dc.html",
+    "L3JS_LcSelect.dc.html",
+    "L3JS_LcTicks.dc.html",
+    "L3JS_LcPigs.dc.html",
+    "L3JS_EqFeed.dc.html",
+    "L3JS_EqCam.dc.html"
+  ],
+  "pages": [
+    {
+      "id": "overview",
+      "name": "Start here: Home and your AI team"
+    },
+    {
+      "id": "setup",
+      "name": "Farm setup and the production line"
+    },
+    {
+      "id": "layout",
+      "name": "Farm layout: setup with the General Manager"
+    },
+    {
+      "id": "layout-view",
+      "name": "Farm layout: the preview is the farm view"
+    },
+    {
+      "id": "farm-view",
+      "name": "Farm view: View and Edit layout"
+    },
+    {
+      "id": "rearranged",
+      "name": "Farm view rearranged (proposal)"
+    },
+    {
+      "id": "overhaul",
+      "name": "Farm view overhaul: batches"
+    },
+    {
+      "id": "overhaul-pig",
+      "name": "Farm view overhaul: pig and location"
+    },
+    {
+      "id": "overhaul-eq",
+      "name": "Farm view overhaul: equipment and floor"
+    },
+    {
+      "id": "layout-steps",
+      "name": "Farm layout: every step"
+    },
+    {
+      "id": "layout-hand",
+      "name": "Farm layout: building by hand"
+    },
+    {
+      "id": "layout-pens",
+      "name": "Farm layout: pens, shapes, real farms"
+    },
+    {
+      "id": "barn",
+      "name": "Barn view and pigs"
+    },
+    {
+      "id": "moves",
+      "name": "Moving pigs and cleaning rooms"
+    },
+    {
+      "id": "production",
+      "name": "Production: batches"
+    },
+    {
+      "id": "pigs",
+      "name": "Pigs and places"
+    },
+    {
+      "id": "health",
+      "name": "Health"
+    },
+    {
+      "id": "biosecurity",
+      "name": "Biosecurity"
+    },
+    {
+      "id": "actions",
+      "name": "Every Action on its own"
+    },
+    {
+      "id": "archive",
+      "name": "Earlier explorations"
+    }
+  ],
+  "title": "Sentri AI-first desktop"
+}

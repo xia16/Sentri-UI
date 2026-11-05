@@ -14,7 +14,7 @@
     el.addEventListener('click', (e) => { const h = e.target.closest('[data-a]'); if (!h || !el.contains(h)) { if (this.ovS().pop && !e.target.closest('[data-pop]')) this.ovSet({ pop: '' }); return; } e.preventDefault(); e.stopPropagation(); this.ovAct(h.getAttribute('data-a'), h); });
     el.addEventListener('mouseover', (e) => { const h = e.target.closest('[data-tip]'); if (h && el.contains(h)) this.ovTip(h.getAttribute('data-tip'), h); const cr = e.target.closest('[data-crumb]'); if (cr && el.contains(cr) && this.ovS().crumb !== +cr.getAttribute('data-crumb')) { this.ovSet({ crumb: +cr.getAttribute('data-crumb'), loc: 'hover' }); return; } const lc = e.target.closest('[data-zone="loc"]'); if (lc && !this.ovS().loc) this.ovSet({ loc: 'hover' }); });
     el.addEventListener('mouseout', (e) => { const h = e.target.closest('[data-tip]'); if (h && (!e.relatedTarget || !h.contains(e.relatedTarget))) this.ovTipHide(); const lc = e.target.closest('[data-zone="loc"]'), to = e.relatedTarget; if (lc && this.ovS().loc && !(to && to.closest && to.closest('[data-zone="loc"]'))) this.ovSet({ loc: '', crumb: -1 }); });
-    if (!this.ovKey) { this.ovKey = (e) => { if (e.key !== 'Escape' || !this.ovOn()) return; const O = this.ovS(); if (O.pop) { this.ovSet({ pop: '' }); return; } if (O.picking) { this.ovAct('pickcancel'); return; } if (O.showing) { this.ovAct('showdone'); return; } if (O.panel) this.ovAct(O.hist.length ? 'back' : 'close'); }; window.addEventListener('keydown', this.ovKey); }
+    if (!this.ovKey) { this.ovKey = (e) => { if (e.key !== 'Escape' || !this.ovOn()) return; const O = this.ovS(); if (O.pop) { this.ovSet({ pop: '' }); return; } if (O.selecting || (O.ticks && O.ticks.length)) { this.ovAct('selcancel'); return; } if (O.picking) { this.ovAct('pickcancel'); return; } if (O.showing) { this.ovAct('showdone'); return; } if (O.panel) this.ovAct(O.hist.length ? 'back' : 'close'); }; window.addEventListener('keydown', this.ovKey); }
     this.ovPaint();
   }
   ovTip(key, h) {
@@ -34,6 +34,7 @@
     this.ovTipHide();
     const at = () => { if (!h || !this.ovEl) return null; const R = this.ovEl.getBoundingClientRect(), r = h.getBoundingClientRect(); return { x: r.left - R.left, y: r.top - R.top, w: r.width, h: r.height, bottom: R.height - (r.top - R.top) }; };
     if (k === 'noop') return;
+    if (this.ovAct3 && this.ovAct3(k, v, h, at)) return;
     if (k === 'batches') { if (O.panel && ['list', 'batch', 'task', 'dates', 'done', 'compare'].indexOf(O.panel) >= 0) { this.ovAct('close'); return; } if (u.bv) this.closeBatch(); this.ovSet({ panel: 'list', hist: [], pop: '' }); return; }
     if (k === 'close') { if (this.ui().ovCmp) this.put({ ovCmp: false }); if (this.ui().bv) { this.put({ bvOnly: '' }); this.closeBatch(); } this.ovSet({ panel: '', hist: [], only: '', pop: '' }); return; }
     if (k === 'back') {
@@ -68,7 +69,7 @@
     const pen = r && ps.length === 1 ? ps[0] : '';
     const secId = r ? (r.section || '') : (u.secId || ''), sec = secId ? this.secById(secId) : null;
     const zoneId = r ? this.zoneOfRoom(r) : (sec ? (sec.zone || u.zoneId || '') : (u.zoneId || '')), zone = zoneId ? this.zoneById(zoneId) : null;
-    const levels = [{ kind: 'farm', label: M.name || 'Hillside Sow Farm', a: 'gofarm' }];
+    const levels = [{ kind: 'farm', label: M.name || 'Your farm', a: 'gofarm' }];
     if (zone) levels.push({ kind: 'zone', id: zone.id, label: zone.name, a: 'gozone:' + zone.id });
     if (sec) levels.push({ kind: 'section', id: sec.id, zoneId: zoneId, label: sec.name, a: 'gosec:' + sec.id });
     if (r) levels.push({ kind: 'room', id: r.id, secId: secId, zoneId: zoneId, label: r.name, a: 'goroom:' + r.id });
@@ -177,6 +178,13 @@
   renderVals() {
     const r = this.renderValsBase();
     r.setOvh = (el) => this.setOvh(el);
+    this.ovVals = r;
+    if (this.ovOn() || (this.ui().ready && this.ui().mode === 'intro')) r.camStyle = (r.camStyle || '') + ' display: none;';
+    if (r.P) r.P = Object.assign({}, r.P, { cIco: r.P.cIco || (r.ic && r.ic.x), cStyle: r.P.cStyle || r.closeStyle });
+    this.ovEdTask = false;
+    if (this.ovEdOn && this.ovEdOn(this.ui()) && r.P && (r.P.isTask || r.P.bAdd) && r.barStyle) { this.ovEdTask = true; r.barStyle = r.barStyle.replace('left: 16px; right: 16px; bottom: 16px;', 'right: 16px; top: 16px; width: 360px;').replace(/max-height: calc\(100% - \d+px\);/, 'max-height: calc(100% - 104px);'); r.cardStyle = (r.cardStyle || '') + '; display: none;'; if (r.P.add && r.P.add.tpBox) r.P = Object.assign({}, r.P, { add: Object.assign({}, r.P.add, { tpBox: r.P.add.tpBox.replace(/position: absolute; left: 0; top: calc\(100% \+ \d+px\); z-index: \d+; width: \d+px;/, 'position: relative; margin-top: 10px; width: 326px;').replace(/box-shadow: [^;]+;/, 'box-shadow: none;').replace(/max-height: \d+px;/, 'max-height: 360px;') }) }); r.camStyle = (r.camStyle || '') + ' display: none;'; r.P = Object.assign({}, r.P, { cIco: r.ic && r.ic.chevL, cStyle: (r.closeStyle || '').replace('margin: -6px -2px -6px auto;', 'margin: -6px 2px -6px -8px; order: -1;'), closeLabel: 'Back' }); }
+    if (this.ovEdOn && this.ovEdOn(this.ui()) && !this.ovEdTask) { r.camStyle = (r.camStyle || '') + ' display: none;'; if (r.barStyle) { const lw = 16 + (this.ovEdW || 200); r.barStyle = r.barStyle.replace('left: 16px; right: 16px; bottom: 16px;', 'left: ' + lw + 'px; top: 16px; max-width: calc(100% - ' + (lw + 408) + 'px);').replace('border-radius: 16px;', 'border-radius: 0 16px 16px 0; border-left: 0;'); } if (r.P) r.P = Object.assign({}, r.P, { hasTopRow: false, canBack: false }); if (r.cardStyle) r.cardStyle = r.cardStyle.replace('left: 16px; top: 16px;', 'right: 16px; top: 16px;').replace(/max-height: calc\(100% - \d+px\);/, 'max-height: calc(100% - 104px);'); }
+    if (this.ovOn() && this.O && this.O.panel === 'devices' && /^cam:/.test(this.O.dev || '') && r.vidStyle) r.vidStyle = r.vidStyle.replace(/right: 16px; bottom: [^;]+;/, 'right: 32px; top: 92px;').replace('width: 360px;', 'width: 348px;').replace('z-index: 4;', 'z-index: 31;').replace(/animation: [^;]+;?/, '');
     if (this.ovOn()) { r.showProf = false; r.showBatch = false; r.showCard = false; r.showBar = false; r.showCrumbMenu = false; }
     return r;
   }

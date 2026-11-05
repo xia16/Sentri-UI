@@ -1,0 +1,32 @@
+{
+ "title": "Step 4 · A new line, step by step",
+ "sub": "Steps 2 to 5 and the review. The live frame on the left is step 1.",
+ "cols": 5,
+ "sections": [
+  [
+   "A new line",
+   [
+    [
+     "su_LineStep_new2",
+     "2 · How often a batch starts"
+    ],
+    [
+     "su_LineStep_new3",
+     "3 · Rooms and moves"
+    ],
+    [
+     "su_LineStep_new4",
+     "4 · When each job happens"
+    ],
+    [
+     "su_LineStep_new5",
+     "5 · What each stage should achieve"
+    ],
+    [
+     "su_LineStep_review",
+     "Review, then create Line 1"
+    ]
+   ]
+  ]
+ ]
+}

@@ -56,7 +56,7 @@
   }
   ovEqCtx(u) { const r = u.view === 'room' ? this.roomById(u.roomId) : null, ps = u.psel || []; return { room: r ? r.name : '', roomId: r ? r.id : '', pen: r && ps.length === 1 ? ps[0] : '' }; }
   ovPop2(O, u, at, box) {
-    if (O.pop === 'trend') return box(this.ovTrend(O.trendKind || 'nh3', u), { left: at.x + 'px', top: (at.y + at.h + 8) + 'px' }, 292);
+    if (O.pop === 'trend') return box(this.ovTrend(O.trendKind || 'nh3', u), { left: Math.max(16, Math.min(at.x, ((this.ovEl && this.ovEl.clientWidth) || 1360) - 308)) + 'px', top: (at.y + at.h + 8) + 'px' }, 292);
     if (O.pop === 'kinds') { const H = OVH, K = H.K, ks = this.ovKinds || [], vf = u.vf && u.vf.kind === 'stage' ? u.vf.id : '', SW = ['2F3A33', '4F5D53', '718075', '93A096', 'B4BFB6', 'D3DBD4']; return box('<div style="' + H.st({ padding: '4px 14px 6px', fontSize: '12px', color: K.muted }) + '">Show on the farm</div>' + ks.map((x, j) => { const id = this.ovKindId(x[1]), on = vf === id; return '<div' + H.A('kind:' + id) + ' style="' + H.st({ display: 'flex', alignItems: 'center', gap: '10px', height: '40px', padding: '0 14px', fontSize: '14px', fontWeight: on ? 600 : 400, background: on ? K.press : 'transparent', cursor: 'pointer' }) + '"><i style="' + H.st({ width: '10px', height: '10px', borderRadius: '3px', background: '#' + SW[Math.min(j, 5)] }) + '"></i><span style="flex: 1;">' + H.esc(x[1].charAt(0).toUpperCase() + x[1].slice(1)) + '</span>' + H.t(String(x[0]), { fontWeight: 600 }) + (on ? H.icon(H.I.check, 15) : '') + '</div>'; }).join('') + (vf ? '<div style="' + H.st({ height: '1px', background: K.line, margin: '6px 0' }) + '"></div><div' + H.A('kindall') + ' style="' + H.st({ display: 'flex', alignItems: 'center', height: '40px', padding: '0 14px', fontSize: '14px', cursor: 'pointer' }) + '">Show all pigs</div>' : ''), { left: at.x + 'px', top: (at.y + at.h + 8) + 'px' }, 240); }
     if (O.pop === 'eq') {
       const E = Object.assign(this.ovEqCtx(u), O.eqs || {}), inner = O.dev === 'fan' ? OVP2.fan(E) : O.dev === 'lamps' ? OVP2.lamps(E) : O.dev === 'floor' ? OVP2.floor(E) : OVP2.tiles(E);
@@ -124,7 +124,7 @@
   ovStart2(st) {
     const L = { panel: 'list' }, B = { panel: 'batch', batchId: '32' }, D = { panel: 'dates', batchId: '32' };
     const pick = (room, code, after) => () => { if (this.ui().roomId !== room || this.ui().view !== 'room') this.goRoom(room); setTimeout(() => { this.setSel([code]); if (after) setTimeout(after, 120); }, 400); };
-    const eq = (room, o) => () => { if (this.ui().roomId !== room || this.ui().view !== 'room') this.goRoom(room); setTimeout(() => { const h = this.ovBody && this.ovBody.querySelector('[data-a="equip"]'); if (h) this.ovAct('equip', h); if (o) this.ovSet(o); }, 400); };
+    const eq = (room, o) => () => { if (this.ui().roomId !== room || this.ui().view !== 'room') this.goRoom(room); setTimeout(() => { this.ovAct('devices'); if (o) this.ovSet(o); }, 400); };
     return {
       bxdone: { O: { panel: 'done', batchId: '32', hist: [L, B, D] }, b: '32' },
       bxcompare: { O: { panel: 'compare', batchId: '32', hist: [L, B, D, { panel: 'done' }] }, b: '32', after: () => this.put({ ovCmp: true }) },
@@ -135,8 +135,14 @@
       pglog: { O: {}, after: pick('fr2', 'A7', () => { this.ovPush(); this.ovSet({ panel: 'piglog' }); }) },
       pgpen: { O: {}, after: pick('n1', 'B7') },
       lcroom: { O: {}, after: () => this.goRoom('g2') },
-      lctrend: { O: {}, after: () => { this.goRoom('g2'); setTimeout(() => { const h = this.ovBody && this.ovBody.querySelector('[data-a="trend"]'); if (h) this.ovAct('trend', h); }, 500); } },
-      lcsiblings: { O: {}, after: () => { this.goRoom('fr2'); setTimeout(() => this.ovSet({ loc: 'hover', crumb: 1 }), 500); } },
+      lctrend: { O: {}, after: () => { this.goRoom('g2'); setTimeout(() => { this.ovAct('devices'); this.ovAct('trendt:nh3'); }, 500); } },
+      eqcam: { O: {}, after: () => { this.goRoom('g2'); setTimeout(() => { this.ovAct('devices'); this.ovAct('cam:0'); }, 500); } },
+      eqfeed: { O: {}, after: () => { this.goRoom('g2'); setTimeout(() => { this.ovAct('devices'); this.ovAct('devshow:feed'); }, 500); } },
+      lcsiblings: { O: {}, after: () => { this.goRoom('fr2'); setTimeout(() => this.ovSet({ pop: 'switch' }), 500); } },
+      lcview: { O: {}, after: () => { this.goRoom('g2'); setTimeout(() => this.ovSet({ pop: 'view' }), 500); } },
+      lcselect: { O: {}, after: () => { this.goRoom('g2'); setTimeout(() => { this.ovPlanIn(); this.ovSet({ selecting: true, picked: ['B15', 'B20', 'D40'], actOff: 0 }); this.ovPsel = 'B15,B20,D40'; this.setSel(['B15', 'B20', 'D40']); }, 400); } },
+      lcticks: { O: {}, after: pick('n1', 'B7', () => { const O = this.ovS(), q = this.ovPenData('n1', 'B7'); this.ovSet({ ticks: q.tagged.slice(0, 2).map((x) => x[0]) }); }) },
+      lcpigs: { O: {}, after: () => { this.goRoom('g2'); setTimeout(() => this.ovAct('pigspanel'), 500); } },
       eqtiles: { O: {}, after: eq('g2') },
       eqfan: { O: {}, after: eq('g2', { dev: 'fan' }) },
       eqpick: { O: {}, after: () => { this.goRoom('fr2'); setTimeout(() => { this.ovPlanIn(); this.ovSet({ picking: true, pickWhat: 'lamps', picked: ['A3', 'A7', 'B2', 'B3'] }); this.ovPsel = 'A3,A7,B2,B3'; this.setSel(['A3', 'A7', 'B2', 'B3']); }, 400); } },
@@ -185,7 +191,7 @@
     return H.head(t.title, b.name + ' · day ' + d[0] + (d[1] !== d[0] ? ' of ' + d[1] : ''), 'back') +
       '<div style="' + H.st({ display: 'flex', gap: '8px', marginTop: '16px' }) + '">' + H.field(O.parity || 'All parities', 'filter', { on: O.pop === 'filter' }) + H.field('All rooms', 'noop') + '</div>' +
       H.sec('Whole-task progress', H.meta(tot + ' ' + unit)) +
-      H.card('<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '20px' }) + '">' + H.radial({ size: 132, sw: 16, parts: P.map((x) => [x.n, x.label, x.col, x.skip]), total: tot, half: true, center: H.centre(String(goal ? goal.n : 0), 'of ' + tot + ' ' + (t.goalWord || '')), tip: 'ring-task' }) + H.legend(P, { a: 'only', only: O.only }) + '</div>') +
+      H.card('<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '20px' }) + '">' + H.radial({ size: 132, sw: 16, parts: P.map((x) => [x.n, x.label, x.col, x.skip]), total: tot, half: true, center: H.centre(String(goal ? goal.n : 0), 'of ' + tot + ' ' + (t.goalWord || '')) }) + H.legend(P, { a: 'only', only: O.only }) + '</div>') +
       (id === '32' && tid === 'farrow' ? H.sec('Performance so far', H.meta('31 finished litters')) + '<div style="' + H.st({ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }) + '">' + H.kpi('Born alive / litter', '11.8', '', H.badge('amber', '0.2 under target'), 'Target 12') + H.kpi('Stillborn rate', '6.1', '%', '', '', 'kpi-still') + '</div>' : '');
   }
   ovDatesHtml(id) {

@@ -5,7 +5,7 @@ const f = process.argv[2];
 let s = fs.readFileSync(f, 'utf8').replace(/\r/g, '');
 const lib = fs.readFileSync(path.join(S, 'ovh-lib.js'), 'utf8') + '\n' + fs.readFileSync(path.join(S, 'ovh-pages.js'), 'utf8') + (fs.existsSync(path.join(S, 'ovh-pages2.js')) ? '\n' + fs.readFileSync(path.join(S, 'ovh-pages2.js'), 'utf8') : '');
 let comp = fs.readFileSync(path.join(S, 'ovh-comp.js'), 'utf8');
-if (fs.existsSync(path.join(S, 'ovh-comp2.js'))) comp = comp.replace('  renderVals() {\n    const r = this.renderValsBase();', fs.readFileSync(path.join(S, 'ovh-comp2.js'), 'utf8') + '\n  renderVals() {\n    const r = this.renderValsBase();');
+if (fs.existsSync(path.join(S, 'ovh-comp2.js'))) comp = comp.replace('  renderVals() {\n    const r = this.renderValsBase();', fs.readFileSync(path.join(S, 'ovh-comp2.js'), 'utf8') + (fs.existsSync(path.join(S, 'ovh-comp3.js')) ? '\n' + fs.readFileSync(path.join(S, 'ovh-comp3.js'), 'utf8') : '') + '\n  renderVals() {\n    const r = this.renderValsBase();');
 const M1 = '// >>>OVH-LIB', M2 = '// <<<OVH-LIB', C1 = '  // >>>OVH-COMP', C2 = '  // <<<OVH-COMP';
 const need = (cond, what) => { if (!cond) { console.error('MISS ' + what); process.exit(1); } };
 // 1) the library, before the component class
@@ -52,3 +52,55 @@ fs.writeFileSync(f, s); console.log('applied 4');
 s = fs.readFileSync(f, 'utf8');
 if (!s.includes('/* ovDay */')) { const a = "    if (s === 'night' || s === 'intronight') return true;"; if (!s.includes(a)) { console.error('MISS night'); process.exit(1); } s = s.replace(a, a + "\n    if (/^(bx|pg|lc|eq|fl)[a-z]+$/.test(s)) return false; /* ovDay */"); }
 fs.writeFileSync(f, s); console.log('applied 5');
+// 13) a picked pen reads at a glance: a thick dark frame inside the pen, a white halo just outside it
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('/* ovSel */')) {
+  const a = "const selIM = new T.InstancedMesh(this.unitBox, new T.MeshBasicMaterial({ color: '#121815' }), 1200);";
+  const b = "      const put = (x, z, sx, sz) => { pos.set(x, y, z); sc.set(sx, 0.03, sz); m.compose(pos, q, sc); rm.selIM.setMatrixAt(n++, m); };\n      put(p.x, p.z + p.sz / 2 - t / 2, p.sx, t); put(p.x, p.z - p.sz / 2 + t / 2, p.sx, t);\n      put(p.x - p.sx / 2 + t / 2, p.z, t, p.sz - 2 * t); put(p.x + p.sx / 2 - t / 2, p.z, t, p.sz - 2 * t);";
+  const c = "    rm.selIM.count = n; rm.selIM.instanceMatrix.needsUpdate = true;\n  }";
+  if (!s.includes(a) || !s.includes(b) || !s.includes(c)) { console.error('MISS sel'); process.exit(1); }
+  s = s.replace(a, "const selIM = new T.InstancedMesh(this.unitBox, new T.MeshBasicMaterial({ color: '#FFFFFF' }), 2400); /* ovSel */");
+  s = s.replace(b, "      const ring = (w, out, col, yy) => { const o = out ? w : 0, X = p.sx + 2 * o, Z = p.sz + 2 * o, put = (x, z, sx, sz) => { if (n >= 2400) return; pos.set(x, yy, z); sc.set(sx, 0.03, sz); m.compose(pos, q, sc); rm.selIM.setMatrixAt(n, m); rm.selIM.setColorAt(n++, col); };\n        put(p.x, p.z + Z / 2 - w / 2, X, w); put(p.x, p.z - Z / 2 + w / 2, X, w); put(p.x - X / 2 + w / 2, p.z, w, Z - 2 * w); put(p.x + X / 2 - w / 2, p.z, w, Z - 2 * w); };\n      ring(t * 1.6, true, this.ovSelW || (this.ovSelW = new T.Color('#FFFFFF')), y); ring(t * 2.4, false, this.ovSelK || (this.ovSelK = new T.Color('#121815')), y + 0.01);");
+  s = s.replace(c, "    rm.selIM.count = n; rm.selIM.instanceMatrix.needsUpdate = true; if (rm.selIM.instanceColor) rm.selIM.instanceColor.needsUpdate = true;\n  }");
+}
+fs.writeFileSync(f, s); console.log('applied 6');
+// 14) a picked pen's code turns into a dark chip, so the pick reads even where the crate is thin
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('/* ovPick */')) {
+  const a = "    if (kind === 'pen' && this.IP) return base + \"font-family: 'Geist Mono', ui-monospace, monospace; font-size:\" + (on ? '12.5px' : '11px') + '; line-height:15px; height:17px; padding:0 5px; font-weight:600; color:#1E2A22; background:rgba(255,255,255,0.93); border:1px solid #D5DAD2;";
+  const b = "        if (L.kind === 'pen') on = !!L.big;";
+  if (!s.includes(a) || !s.includes(b)) { console.error('MISS pick label'); process.exit(1); }
+  s = s.replace(a, "    if (kind === 'pen' && this.IP && on === 2) return base + \"font-family: 'Geist Mono', ui-monospace, monospace; font-size:12.5px; line-height:15px; height:19px; padding:0 6px; font-weight:700; color:#FFFFFF; background:#121815; border:1.5px solid #FFFFFF; border-radius:6px; box-shadow:0 1px 4px rgba(18,24,21,0.35); pointer-events:none; z-index:4;\"; /* ovPick */\n" + a);
+  s = s.replace(b, "        if (L.kind === 'pen') on = L.big ? ((u.psel || []).indexOf(L.pen && L.pen.code) >= 0 ? 2 : true) : false;");
+}
+fs.writeFileSync(f, s); console.log('applied 7');
+// 15) a device shown from Devices: its icon sits in each pen it serves (odev pins), its line lights up
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('/* ovDev */')) {
+  const r = [
+    ["      else if (k === 'flag') want = roomView && !!this.IP && L.roomId === u.roomId && this.pk > 0.3;", "      else if (k === 'odev') want = roomView && L.roomId === u.roomId; /* ovDev */\n      else if (k === 'flag') want = roomView && !!this.IP && L.roomId === u.roomId && this.pk > 0.3;"],
+    ["      else if (k === 'device') want = roomView && !intro && L.roomId === u.roomId && (!this.IP || !!u.lens);", "      else if (k === 'device') want = roomView && !intro && L.roomId === u.roomId && (!this.IP || !!u.lens || (this.ovDevWant && this.ovDevWant(L)));"],
+    ["    else if (kind === 'flag') { if (L.text !== text)", "    else if (kind === 'odev') { if (L.text !== text) { L.text = text; L.el.innerHTML = '<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" style=\"width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round\"><path d=\"' + text + '\"></path></svg>'; L.w = 0; } }\n    else if (kind === 'flag') { if (L.text !== text)"],
+    ["    if (kind === 'flag') return base + ", "    if (kind === 'odev') return base + 'z-index:3; width:22px; height:22px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:11px; background:#121815; color:#FFFFFF; border:1.5px solid #FFFFFF; box-shadow:0 1px 3px rgba(18,24,21,0.3); pointer-events:none;';\n    if (kind === 'flag') return base + "],
+    ["    const flex = (L) => (L.kind === 'device' ||", "    const flex = (L) => (L.kind === 'odev' || L.kind === 'device' ||"],
+    ["      Object.keys(rm.devLines || {}).forEach((id) => rm.devLines[id].forEach((m) => { m.visible = on; m.material = id === sid || u.dp === id ? this.mat.devLineOn : this.mat.devLine; }));\n    });", "      Object.keys(rm.devLines || {}).forEach((id) => rm.devLines[id].forEach((m) => { m.visible = on; m.material = id === sid || u.dp === id ? this.mat.devLineOn : this.mat.devLine; }));\n    });\n    if (this.ovDevLines) this.ovDevLines();"],
+    ["        if (L.kind === 'device') on = roomView && !!(u.sel && u.sel.kind === 'device' && u.sel.id === L.devId);", "        if (L.kind === 'device') on = roomView && (!!(u.sel && u.sel.kind === 'device' && u.sel.id === L.devId) || !!(this.ovDevWant && this.ovDevWant(L)));"],
+  ];
+  r.forEach(([a, b]) => { if (!s.includes(a)) { console.error('MISS dev ' + a.slice(0, 60)); process.exit(1); } s = s.replace(a, b); });
+}
+fs.writeFileSync(f, s); console.log('applied 8');
+
+// 16) the open camera's view on the floor is easier to see
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('/* ovCone */')) { const a = "new T.MeshBasicMaterial({ color: '#4F8A6C', transparent: true, opacity: 0.2, depthWrite: false, side: T.DoubleSide })"; if (!s.includes(a)) { console.error('MISS cone'); process.exit(1); } s = s.replace(a, "new T.MeshBasicMaterial({ color: '#2F6B4C', transparent: true, opacity: 0.34, depthWrite: false, side: T.DoubleSide }) /* ovCone */"); }
+fs.writeFileSync(f, s); console.log('applied 9');
+
+// 17) Edit layout: menus in the tools bar open downward (the bar sits at the top); the camera keeps clear of the card on the right
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('/* ovEdIns */')) { s = s.split('bottom: calc(100% + 12px)').join('top: calc(100% + 12px)').split('bottom: calc(100% + 14px)').join('top: calc(100% + 14px)'); const a = "    if (this.ovOn && this.ovOn(u)) { const O = this.ovS(); /* ovInsets */"; if (!s.includes(a)) { console.error('MISS edins'); process.exit(1); } s = s.replace(a, "    if (this.ovEdOn && this.ovEdOn(u)) { /* ovEdIns */ ins.l = 28; ins.t = (u.bh || 70) + 32; ins.b = 92; ins.r = 16 + 360 + 16; return ins; }\n" + a); }
+fs.writeFileSync(f, s); console.log('applied 10');
+
+// 18) the task header's close: its icon and style come from P (a back arrow in Edit layout)
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('{{P.cIco}}')) { const a = '<button type="button" onClick="{{P.close}}" aria-label="{{P.closeLabel}}" title="{{P.closeLabel}}" style="{{closeStyle}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.x}}"></path></svg></button>'; if (!s.includes(a)) { console.error('MISS taskback'); process.exit(1); } s = s.replace(a, a.replace('{{closeStyle}}', '{{P.cStyle}}').replace('{{ic.x}}', '{{P.cIco}}')); } /* ovTaskBack */
+fs.writeFileSync(f, s); console.log('applied 11');
