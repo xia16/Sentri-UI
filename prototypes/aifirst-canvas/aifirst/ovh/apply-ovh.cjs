@@ -52,3 +52,25 @@ fs.writeFileSync(f, s); console.log('applied 4');
 s = fs.readFileSync(f, 'utf8');
 if (!s.includes('/* ovDay */')) { const a = "    if (s === 'night' || s === 'intronight') return true;"; if (!s.includes(a)) { console.error('MISS night'); process.exit(1); } s = s.replace(a, a + "\n    if (/^(bx|pg|lc|eq|fl)[a-z]+$/.test(s)) return false; /* ovDay */"); }
 fs.writeFileSync(f, s); console.log('applied 5');
+// 13) a picked pen reads at a glance: a thick dark frame inside the pen, a white halo just outside it
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('/* ovSel */')) {
+  const a = "const selIM = new T.InstancedMesh(this.unitBox, new T.MeshBasicMaterial({ color: '#121815' }), 1200);";
+  const b = "      const put = (x, z, sx, sz) => { pos.set(x, y, z); sc.set(sx, 0.03, sz); m.compose(pos, q, sc); rm.selIM.setMatrixAt(n++, m); };\n      put(p.x, p.z + p.sz / 2 - t / 2, p.sx, t); put(p.x, p.z - p.sz / 2 + t / 2, p.sx, t);\n      put(p.x - p.sx / 2 + t / 2, p.z, t, p.sz - 2 * t); put(p.x + p.sx / 2 - t / 2, p.z, t, p.sz - 2 * t);";
+  const c = "    rm.selIM.count = n; rm.selIM.instanceMatrix.needsUpdate = true;\n  }";
+  if (!s.includes(a) || !s.includes(b) || !s.includes(c)) { console.error('MISS sel'); process.exit(1); }
+  s = s.replace(a, "const selIM = new T.InstancedMesh(this.unitBox, new T.MeshBasicMaterial({ color: '#FFFFFF' }), 2400); /* ovSel */");
+  s = s.replace(b, "      const ring = (w, out, col, yy) => { const o = out ? w : 0, X = p.sx + 2 * o, Z = p.sz + 2 * o, put = (x, z, sx, sz) => { if (n >= 2400) return; pos.set(x, yy, z); sc.set(sx, 0.03, sz); m.compose(pos, q, sc); rm.selIM.setMatrixAt(n, m); rm.selIM.setColorAt(n++, col); };\n        put(p.x, p.z + Z / 2 - w / 2, X, w); put(p.x, p.z - Z / 2 + w / 2, X, w); put(p.x - X / 2 + w / 2, p.z, w, Z - 2 * w); put(p.x + X / 2 - w / 2, p.z, w, Z - 2 * w); };\n      ring(t * 1.6, true, this.ovSelW || (this.ovSelW = new T.Color('#FFFFFF')), y); ring(t * 2.4, false, this.ovSelK || (this.ovSelK = new T.Color('#121815')), y + 0.01);");
+  s = s.replace(c, "    rm.selIM.count = n; rm.selIM.instanceMatrix.needsUpdate = true; if (rm.selIM.instanceColor) rm.selIM.instanceColor.needsUpdate = true;\n  }");
+}
+fs.writeFileSync(f, s); console.log('applied 6');
+// 14) a picked pen's code turns into a dark chip, so the pick reads even where the crate is thin
+s = fs.readFileSync(f, 'utf8');
+if (!s.includes('/* ovPick */')) {
+  const a = "    if (kind === 'pen' && this.IP) return base + \"font-family: 'Geist Mono', ui-monospace, monospace; font-size:\" + (on ? '12.5px' : '11px') + '; line-height:15px; height:17px; padding:0 5px; font-weight:600; color:#1E2A22; background:rgba(255,255,255,0.93); border:1px solid #D5DAD2;";
+  const b = "        if (L.kind === 'pen') on = !!L.big;";
+  if (!s.includes(a) || !s.includes(b)) { console.error('MISS pick label'); process.exit(1); }
+  s = s.replace(a, "    if (kind === 'pen' && this.IP && on === 2) return base + \"font-family: 'Geist Mono', ui-monospace, monospace; font-size:12.5px; line-height:15px; height:19px; padding:0 6px; font-weight:700; color:#FFFFFF; background:#121815; border:1.5px solid #FFFFFF; border-radius:6px; box-shadow:0 1px 4px rgba(18,24,21,0.35); pointer-events:none; z-index:4;\"; /* ovPick */\n" + a);
+  s = s.replace(b, "        if (L.kind === 'pen') on = L.big ? ((u.psel || []).indexOf(L.pen && L.pen.code) >= 0 ? 2 : true) : false;");
+}
+fs.writeFileSync(f, s); console.log('applied 7');

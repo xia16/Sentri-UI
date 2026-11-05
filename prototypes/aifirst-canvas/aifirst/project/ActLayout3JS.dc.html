@@ -4990,6 +4990,7 @@ class Component extends DCLogic {
     if (kind === 'pend') return base + 'z-index:2; pointer-events:none; width:18px; height:18px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:9px; color:#4A544E; background:rgba(255,255,255,0.94); border:1px dashed #6F7973;';
     if (kind === 'flag') return base + 'z-index:3; width:22px; height:22px; border-radius:6px; background:' + (L && L.lvl === 'urgent' ? '#B3261E' : '#A35F00') + '; color:#FFFFFF; font-size:13px; line-height:22px; font-weight:700; text-align:center; box-shadow:0 1px 3px rgba(18,24,21,0.3); pointer-events:none;';
     if (kind === 'cam') return base + 'z-index:3; pointer-events:auto; cursor:pointer; width:30px; height:30px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:9px; background:' + (on ? '#121815' : '#FFFFFF') + '; color:' + (on ? '#FFFFFF' : '#121815') + '; border:1px solid ' + (on ? '#121815' : '#CDD3CA') + '; box-shadow:0 1px 3px rgba(18,24,21,0.18);';
+    if (kind === 'pen' && this.IP && on === 2) return base + "font-family: 'Geist Mono', ui-monospace, monospace; font-size:12.5px; line-height:15px; height:19px; padding:0 6px; font-weight:700; color:#FFFFFF; background:#121815; border:1.5px solid #FFFFFF; border-radius:6px; box-shadow:0 1px 4px rgba(18,24,21,0.35); pointer-events:none; z-index:4;"; /* ovPick */
     if (kind === 'pen' && this.IP) return base + "font-family: 'Geist Mono', ui-monospace, monospace; font-size:" + (on ? '12.5px' : '11px') + '; line-height:15px; height:17px; padding:0 5px; font-weight:600; color:#1E2A22; background:rgba(255,255,255,0.93); border:1px solid #D5DAD2; border-radius:6px; box-shadow:0 1px 2px rgba(18,24,21,0.10); pointer-events:none;';
     if (kind === 'pen') return base + "font-family: 'Geist Mono', ui-monospace, monospace; font-size:" + (on ? '13px; line-height:16px;' : '11px; line-height:14px;') + " font-weight:500; color:#1E2A22;" + halo;
     const sm = this.W && this.W < 900;
@@ -5172,7 +5173,7 @@ class Component extends DCLogic {
         if (!L.shown) { L.el.style.display = flex(L); L.shown = true; }
         let on = false;
         if (L.kind === 'room') on = this.hoverRoom === L.roomId || !!sel[L.roomId] || (u.fresh && u.fresh.id === L.roomId);
-        if (L.kind === 'pen') on = !!L.big;
+        if (L.kind === 'pen') on = L.big ? ((u.psel || []).indexOf(L.pen && L.pen.code) >= 0 ? 2 : true) : false;
         if (L.kind === 'tick') on = u.dp ? this.dpHas(L.pen.code) : (u.psel || []).indexOf(L.pen.code) >= 0;
         if (L.kind === 'lane') on = !!(u.sel && u.sel.kind === 'lane' && u.sel.i === L.lane && roomView);
         if (L.kind === 'corner') on = roomView && u.corner === L.corner;
@@ -7253,7 +7254,7 @@ class Component extends DCLogic {
       f.userData.ownMat = true; g.add(f); g.visible = false; g.renderOrder = 4; vg.add(g); return g;
     };
     rm.hlH = mkFrame('#2E3832', 0.14); rm.hlS = null; rm.hlKey = '';
-    const selIM = new T.InstancedMesh(this.unitBox, new T.MeshBasicMaterial({ color: '#121815' }), 1200); selIM.userData.ownMat = true; selIM.count = 0; selIM.frustumCulled = false; selIM.renderOrder = 4; vg.add(selIM); rm.selIM = selIM;
+    const selIM = new T.InstancedMesh(this.unitBox, new T.MeshBasicMaterial({ color: '#FFFFFF' }), 2400); /* ovSel */ selIM.userData.ownMat = true; selIM.count = 0; selIM.frustumCulled = false; selIM.renderOrder = 4; vg.add(selIM); rm.selIM = selIM;
     // the "!" marks: one per pen that needs a look, coloured by how soon
     rm.pens.concat(rm.spens || []).forEach((p) => {
       const c = cell[p.code];
@@ -7633,11 +7634,11 @@ class Component extends DCLogic {
     (u.psel || []).slice(0, 300).forEach((c) => {
       const p = this.penByCode(rm, c);
       if (!p) return;
-      const put = (x, z, sx, sz) => { pos.set(x, y, z); sc.set(sx, 0.03, sz); m.compose(pos, q, sc); rm.selIM.setMatrixAt(n++, m); };
-      put(p.x, p.z + p.sz / 2 - t / 2, p.sx, t); put(p.x, p.z - p.sz / 2 + t / 2, p.sx, t);
-      put(p.x - p.sx / 2 + t / 2, p.z, t, p.sz - 2 * t); put(p.x + p.sx / 2 - t / 2, p.z, t, p.sz - 2 * t);
+      const ring = (w, out, col, yy) => { const o = out ? w : 0, X = p.sx + 2 * o, Z = p.sz + 2 * o, put = (x, z, sx, sz) => { if (n >= 2400) return; pos.set(x, yy, z); sc.set(sx, 0.03, sz); m.compose(pos, q, sc); rm.selIM.setMatrixAt(n, m); rm.selIM.setColorAt(n++, col); };
+        put(p.x, p.z + Z / 2 - w / 2, X, w); put(p.x, p.z - Z / 2 + w / 2, X, w); put(p.x - X / 2 + w / 2, p.z, w, Z - 2 * w); put(p.x + X / 2 - w / 2, p.z, w, Z - 2 * w); };
+      ring(t * 1.6, true, this.ovSelW || (this.ovSelW = new T.Color('#FFFFFF')), y); ring(t * 2.4, false, this.ovSelK || (this.ovSelK = new T.Color('#121815')), y + 0.01);
     });
-    rm.selIM.count = n; rm.selIM.instanceMatrix.needsUpdate = true;
+    rm.selIM.count = n; rm.selIM.instanceMatrix.needsUpdate = true; if (rm.selIM.instanceColor) rm.selIM.instanceColor.needsUpdate = true;
   }
   // only the camera that is open stands in the room, with a faint cone for what it sees
   syncCamVis() {
