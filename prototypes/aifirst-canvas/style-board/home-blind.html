@@ -264,9 +264,80 @@ svg{display:block;flex:none}
 .aitems[hidden]{display:none}
 .aitem{height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line-2);background:#fff;font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;transition:border-color .12s,background .12s}
 .aitem:hover{border-color:#C7CBC2;background:#FBFBFA}
+
+/* ---- Variant switch (board only, outside the pane) ---- */
+.variant-switch{position:fixed;top:16px;left:16px;z-index:50;display:flex;align-items:center;gap:4px;padding:4px;border-radius:10px;background:#fff;border:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.06);font-size:12.5px}
+.variant-switch span{padding:0 8px 0 6px;color:var(--ink-3);font-weight:500;white-space:nowrap}
+.variant-switch button{height:28px;padding:0 10px;border-radius:7px;font-weight:600;color:var(--ink-2);white-space:nowrap}
+.variant-switch button[aria-pressed="true"]{background:var(--ink);color:#fff}
+
+/* ---- Dashboards as cards (flat) ---- */
+.dcards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dcard{display:flex;flex-direction:column;align-items:stretch;text-align:left;border:1px solid var(--line);border-radius:12px;padding:12px 14px 14px;background:#fff;transition:background .12s,border-color .12s;min-width:0}
+.dcard:hover{background:var(--fill);border-color:var(--line-2)}
+.dcard.wide{grid-column:1/-1}
+.dcard .dh{display:flex;align-items:center;gap:10px}
+.dcard .dh b{font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap}
+.dcard .dh > svg{margin-left:auto;color:#A2A79F}
+.dcard .dfig{display:flex;align-items:baseline;gap:6px;margin-top:14px;white-space:nowrap}
+.dcard .dfig .num{font-size:26px;line-height:1;font-weight:600;letter-spacing:-.02em;color:var(--ink)}
+.dcard .dfig .num.sm{font-size:19px}
+.dcard .dfig .word{font-size:13px;color:var(--ink-2)}
+.dcard .dsub{margin-top:6px;font-size:12.5px;color:var(--ink-3);white-space:nowrap}
+.stages{display:flex;gap:3px;height:6px;margin-top:14px}
+.stages i{border-radius:3px}
+.s1{background:#E7C98F}.s2{background:#C98A2E}.s3{background:#8A5A12}
+.slegend{display:flex;gap:14px;margin-top:8px;font-size:12px;color:var(--ink-3);white-space:nowrap}
+.slegend span{display:inline-flex;align-items:center;gap:6px}
+.slegend i{width:8px;height:8px;border-radius:2px;display:inline-block}
+
+/* ---- Actions A · Tabs ---- */
+.atabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.atabs::-webkit-scrollbar{display:none}
+.atab{flex:none;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;font-weight:600;color:var(--ink-2);white-space:nowrap;transition:background .12s}
+.atab span{font-size:11.5px;font-weight:600;color:var(--ink-3)}
+.atab:hover{background:var(--fill)}
+.atab.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.atab.on span{color:rgba(255,255,255,.65)}
+.apanel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-top:10px;padding:8px;border-radius:14px;background:var(--fill)}
+.atile{display:flex;flex-direction:column;align-items:center;gap:7px;padding:10px 4px 9px;border-radius:10px;transition:background .12s}
+.atile:hover{background:#fff}
+.atile .sq{width:38px;height:38px;border-radius:11px}
+.atile .al{font-size:12.5px;line-height:1.25;font-weight:500;color:var(--ink);text-align:center;min-height:2.5em}
+
+/* ---- Actions B · Folders ---- */
+.folders{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.folder{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:11px 10px 10px;border-radius:12px;border:1px solid var(--line);background:#fff;text-align:left;min-width:0;transition:background .12s,border-color .12s}
+.folder:hover{background:var(--fill)}
+.folder.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.folder .sq{width:32px;height:32px;border-radius:9px}
+.folder .fn{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap}
+.folder .fc{font-size:11.5px;color:var(--ink-3);white-space:nowrap}
+.fpanel{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;padding:10px;border-radius:12px;background:var(--fill)}
+.fpanel[hidden]{display:none}
+.apill{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 12px 0 10px;border-radius:8px;border:1px solid var(--line-2);background:#fff;font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap}
+.apill svg{color:var(--ink-3)}
+.apill:hover{border-color:#C7CBC2}
+
+/* ---- Actions C · Index ---- */
+.aindex{display:grid;grid-template-columns:150px minmax(0,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.aindex .aside{background:var(--fill);padding:6px;border-right:1px solid var(--line)}
+.aitem2{width:100%;display:flex;align-items:center;gap:9px;height:36px;padding:0 8px;border-radius:8px;font-size:13px;font-weight:500;color:var(--ink-2);white-space:nowrap}
+.aitem2 .n{margin-left:auto;font-size:11.5px;color:var(--ink-3)}
+.aitem2:hover{background:#fff}
+.aitem2.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.sq.xs{width:22px;height:22px;border-radius:6px}
+.aindex .amain{padding:6px 6px 8px}
+.aindex .ah{font-size:12px;font-weight:600;color:var(--ink-3);padding:8px 10px 6px}
+.arow{width:100%;display:flex;align-items:center;gap:10px;height:36px;padding:0 10px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--ink);white-space:nowrap}
+.arow svg:first-child{color:var(--ink-3)}
+.arow svg:last-child{margin-left:auto;color:#B5B9B2;opacity:0;transition:opacity .12s}
+.arow:hover{background:var(--fill)}
+.arow:hover svg:last-child{opacity:1}
 </style>
 </head>
 <body>
+<div class="variant-switch" role="group" aria-label="Actions layout"><span>Actions layout</span><button data-v="tabs" aria-pressed="true">A · Tabs</button><button data-v="folders" aria-pressed="false">B · Folders</button><button data-v="index" aria-pressed="false">C · Index</button></div>
 <div class="frame" id="frame">
   <div class="scroll" id="scroll">
     <header class="header">
@@ -313,12 +384,12 @@ svg{display:block;flex:none}
           <h3 class="sec-title" id="actTitle">Actions</h3>
           <span class="sec-hint">or type <kbd>/</kbd> in the chat</span>
         </div>
-        <div class="list agroups" id="agroups"></div>
+        <div id="actions"></div>
       </section>
 
       <section class="section" aria-labelledby="dashTitle">
         <div class="sec-head"><h3 class="sec-title" id="dashTitle">Dashboards</h3></div>
-        <div class="list" id="dash"></div>
+        <div id="dash"></div>
       </section>
 
       <section class="section" aria-labelledby="teamTitle">
@@ -354,7 +425,22 @@ svg{display:block;flex:none}
     bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',
     x:'<path d="M18 6 6 18M6 6l12 12"/>',
     check:'<path d="M20 6 9 17l-5-5"/>',
-    right:'<path d="m9 18 6-6-6-6"/>'
+    right:'<path d="m9 18 6-6-6-6"/>',
+    move:'<path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/>',
+    truck:'<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.6a1 1 0 0 0-.2-.6l-3.5-4.4A1 1 0 0 0 17.5 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>',
+    note:'<path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    scissors:'<circle cx="6" cy="6" r="3"/><path d="M8.1 8.1 12 12"/><path d="M20 4 8.1 15.9"/><circle cx="6" cy="18" r="3"/><path d="M14.8 14.8 20 20"/>',
+    box:'<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/>',
+    map:'<path d="M14.1 4.1 9.9 2.1a2 2 0 0 0-1.8 0L3.6 4.3A1 1 0 0 0 3 5.2v14.2a1 1 0 0 0 1.4.9l3.7-1.9a2 2 0 0 1 1.8 0l4.2 2.1a2 2 0 0 0 1.8 0l4.5-2.2a1 1 0 0 0 .6-.9V4.6a1 1 0 0 0-1.4-.9l-3.7 1.9a2 2 0 0 1-1.8 0Z"/><path d="M15 5.8v15M9 3.2v15"/>',
+    upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/>',
+    zap:'<path d="M4 14a1 1 0 0 1-.8-1.6l9.9-10.2a.5.5 0 0 1 .9.5l-1.9 6A1 1 0 0 0 13 10h7a1 1 0 0 1 .8 1.6l-9.9 10.2a.5.5 0 0 1-.9-.5l1.9-6A1 1 0 0 0 11 14z"/>',
+    cog:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>',
+    userplus:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
+    badge:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2M15 12h2M7 16h10"/>',
+    rows:'<path d="M3 6h18M3 12h18M3 18h18"/>',
+    list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>'
   };
   function icon(name,size,sw){
     size=size||20;sw=sw||1.8;
@@ -499,30 +585,48 @@ svg{display:block;flex:none}
 
   /* ---------- Actions ---------- */
   var agroups=[
-    ['Pigs','pig','prod',['Pig list','Move pigs','Ship out','Note']],
-    ['Batches','layers','prod',['Batches','New batch','Lines']],
-    ['Health','pulse','health',['Treatment','Treatment orders','Vaccination','Vaccination plans','Sampling','Sampling plans','Medicines']],
-    ['Production','chart','prod',['Culling','Schedule','Transfers']],
-    ['Feed','wheat','prod',['Feed change','Feed programme']],
-    ['People','users','neutral',['Staff','Guests','Invite']],
-    ['Setup','sliders','neutral',['Farm layout','Import','Automations','Settings']]
+    ['Pigs','pig','prod',[['Pig list','list'],['Move pigs','move'],['Ship out','truck'],['Note','note']]],
+    ['Batches','layers','prod',[['Batches','layers'],['New batch','plus'],['Lines','rows']]],
+    ['Health','pulse','health',[['Treatment','pill'],['Treatment orders','note'],['Vaccination','syringe'],['Vaccination plans','calendar'],['Sampling','flask'],['Sampling plans','calendar'],['Medicines','box']]],
+    ['Production','chart','prod',[['Culling','scissors'],['Schedule','calendar'],['Transfers','move']]],
+    ['Feed','wheat','prod',[['Feed change','wheat'],['Feed programme','calendar']]],
+    ['People','users','neutral',[['Staff','users'],['Guests','badge'],['Invite','userplus']]],
+    ['Setup','sliders','neutral',[['Farm layout','map'],['Import','upload'],['Automations','zap'],['Settings','cog']]]
   ];
-  $('agroups').innerHTML=agroups.map(function(g,i){
-    return '<div class="agroup"><button class="drow agrow" aria-expanded="false" data-g="'+i+'"><span class="sq sm '+g[2]+'">'+icon(g[1],16)+'</span><span class="t">'+g[0]+'</span><span class="v">'+g[3].length+' actions</span>'+icon('right',16,2).replace('<svg','<svg class="chev"')+'</button>'+
-      '<div class="aitems" hidden>'+g[3].map(function(x){return '<button class="aitem" data-open="'+x+'">'+x+'</button>'}).join('')+'</div></div>';
-  }).join('');
-  $('agroups').addEventListener('click',function(e){
-    var r=e.target.closest('.agrow');if(!r)return;
-    var open=r.getAttribute('aria-expanded')!=='true';
-    $('agroups').querySelectorAll('.agrow').forEach(function(o){o.setAttribute('aria-expanded','false');o.nextElementSibling.hidden=true;o.parentNode.classList.remove('open')});
-    if(open){r.setAttribute('aria-expanded','true');r.nextElementSibling.hidden=false;r.parentNode.classList.add('open')}
-  });
+  var actV=(function(){try{return localStorage.getItem('actV')||'tabs'}catch(e){return 'tabs'}})(), actSel=2;
+  function aTile(g,a){return '<button class="atile" data-open="'+a[0]+'"><span class="sq '+g[2]+'">'+icon(a[1],18)+'</span><span class="al">'+a[0]+'</span></button>'}
+  function renderActions(){
+    var el=$('actions'),g=agroups[actSel],h='';
+    if(actV==='tabs'){
+      h='<div class="atabs" role="tablist">'+agroups.map(function(x,i){return '<button role="tab" class="atab'+(i===actSel?' on':'')+'" data-sel="'+i+'" aria-selected="'+(i===actSel)+'">'+x[0]+'<span>'+x[3].length+'</span></button>'}).join('')+'</div>'+
+        '<div class="apanel">'+g[3].map(function(a){return aTile(g,a)}).join('')+'</div>';
+    } else if(actV==='folders'){
+      var cells=agroups.map(function(x,i){return '<button class="folder'+(i===actSel?' on':'')+'" data-sel="'+i+'"><span class="sq '+x[2]+'">'+icon(x[1],18)+'</span><span class="fn">'+x[0]+'</span><span class="fc">'+x[3].length+' actions</span></button>'});
+      var rowEnd=actSel<4?4:7, pane='<div class="fpanel">'+g[3].map(function(a){return '<button class="apill" data-open="'+a[0]+'">'+icon(a[1],15)+a[0]+'</button>'}).join('')+'</div>';
+      cells.splice(rowEnd,0,pane);
+      h='<div class="folders">'+cells.join('')+'</div>';
+    } else {
+      h='<div class="aindex"><div class="aside">'+agroups.map(function(x,i){return '<button class="aitem2'+(i===actSel?' on':'')+'" data-sel="'+i+'"><span class="sq xs '+x[2]+'">'+icon(x[1],14)+'</span>'+x[0]+'<span class="n">'+x[3].length+'</span></button>'}).join('')+'</div>'+
+        '<div class="amain"><div class="ah">'+g[0]+'</div>'+g[3].map(function(a){return '<button class="arow" data-open="'+a[0]+'">'+icon(a[1],16)+'<span>'+a[0]+'</span>'+icon('right',14,2)+'</button>'}).join('')+'</div></div>';
+    }
+    el.className='actions-'+actV;el.innerHTML=h;
+  }
+  $('actions').addEventListener('click',function(e){var t=e.target.closest('[data-sel]');if(!t)return;var i=+t.dataset.sel;if(actV==='folders'&&i===actSel&&t.classList.contains('on')){actSel=-1}else actSel=i;if(actSel<0){actSel=i;$('actions').querySelector('.fpanel')&&($('actions').querySelector('.fpanel').hidden=!$('actions').querySelector('.fpanel').hidden);return}renderActions()});
+  document.querySelectorAll('.variant-switch [data-v]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.v===actV));b.addEventListener('click',function(){actV=b.dataset.v;try{localStorage.setItem('actV',actV)}catch(e){}document.querySelectorAll('.variant-switch [data-v]').forEach(function(o){o.setAttribute('aria-pressed',String(o===b))});renderActions()})});
+  var qv=new URLSearchParams(location.search).get('actions');if(qv){actV=qv;document.querySelectorAll('.variant-switch [data-v]').forEach(function(o){o.setAttribute('aria-pressed',String(o.dataset.v===actV))})}
+  renderActions();
 
   /* ---------- Dashboards ---------- */
-  var dash=[['Production','chart','prod','6 batches running'],['Health','pulse','health','3 to treat · 12 monitoring'],['Biosecurity','shield','bio','Next sampling Mon 9 Nov']];
-  $('dash').innerHTML=dash.map(function(d){
-    return '<button class="drow" data-open="'+d[0]+' dashboard"><span class="sq sm '+d[2]+'">'+icon(d[1],16)+'</span><span class="t">'+d[0]+'</span><span class="v">'+d[3]+'</span>'+icon('right',16,2).replace('<svg','<svg class="chev"')+'</button>';
-  }).join('');
+  $('dash').className='dcards';
+  $('dash').innerHTML=
+    '<button class="dcard wide" data-open="Production dashboard"><span class="dh"><span class="sq sm prod">'+icon('chart',16)+'</span><b>Production</b>'+icon('right',15,2)+'</span>'+
+      '<span class="dfig"><span class="num">6</span><span class="word">batches running</span></span>'+
+      '<span class="stages" aria-hidden="true"><i style="flex:3" class="s1"></i><i style="flex:1" class="s2"></i><i style="flex:2" class="s3"></i></span>'+
+      '<span class="slegend"><span><i class="s1"></i>Gestation 3</span><span><i class="s2"></i>Farrowing 1</span><span><i class="s3"></i>Nursery 2</span></span></button>'+
+    '<button class="dcard" data-open="Health dashboard"><span class="dh"><span class="sq sm health">'+icon('pulse',16)+'</span><b>Health</b>'+icon('right',15,2)+'</span>'+
+      '<span class="dfig"><span class="num">3</span><span class="word">to treat</span></span><span class="dsub">12 monitoring</span></button>'+
+    '<button class="dcard" data-open="Biosecurity dashboard"><span class="dh"><span class="sq sm bio">'+icon('shield',16)+'</span><b>Biosecurity</b>'+icon('right',15,2)+'</span>'+
+      '<span class="dfig"><span class="num sm">Mon 9 Nov</span></span><span class="dsub">Next sampling</span></button>';
 
   /* ---------- Team timeline ---------- */
   var first=[
