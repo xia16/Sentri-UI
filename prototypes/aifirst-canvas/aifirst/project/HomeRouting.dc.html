@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home as a routing page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}.hr-card:hover{box-shadow:0 0 0 1px #D5DAD0,0 2px 6px rgba(17,21,17,.06)}</style>
+</helmet>
+<div style="width: 1078px; height: 1150px; box-sizing: border-box; padding: 48px; background: #F3F4F1; font-family: 'Geist', system-ui, sans-serif; color: #1B211C; -webkit-font-smoothing: antialiased">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">Home as a routing page</h1>
+  <p style="margin: 8px 0 0; font-size: 14px; line-height: 21px; color: #5D665F; max-width: 940px">Home only sends you somewhere. Each entrance shows one live figure and opens its page. You act on that page, never here: no item text, no buttons, no carousels. The Farm view is already a tab, so it gets a card only when something there needs a look. Shown at the real pane width (467&nbsp;px).</p>
+  <div style="display: grid; grid-template-columns: 467px 467px; gap: 48px; margin-top: 28px">
+    <sc-for list="{{panes}}" as="pn" hint-placeholder-count="2">
+      <div>
+        <div style="font-size: 17px; font-weight: 600">{{pn.label}}</div>
+        <div style="font-size: 13px; line-height: 20px; color: #5D665F; margin: 2px 0 14px">{{pn.note}}</div>
+        <div style="width: 467px; height: 860px; border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 1px #DADFD5, 0 12px 32px rgba(17,21,17,.10); background: #F6F7F1; display: flex; flex-direction: column">
+
+          <!-- tab bar, as in the console -->
+          <div style="height: 52px; flex: none; box-sizing: border-box; display: flex; align-items: center; gap: 2px; padding: 0 10px; background: #FFFFFF; border-bottom: 1px solid #ECEEE8">
+            <span style="display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 10px; border-radius: 10px; background: #EEF0EA; font-size: 13px; font-weight: 600">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"></path></svg>
+              Home
+              <sc-if value="{{pn.hasBadge}}" hint-placeholder-val="{{true}}">
+                <span style="font-size: 11px; font-weight: 500; background: #1B211C; color: #FFFFFF; border-radius: 999px; padding: 0 7px; line-height: 18px">{{pn.badge}}</span>
+              </sc-if>
+            </span>
+            <span style="display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 10px; font-size: 13px; color: #3B4540">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3ZM9 3v15M15 6v15"></path></svg>
+              Farm view
+            </span>
+            <span style="flex: 1"></span>
+            <span style="width: 34px; height: 34px; display: grid; place-items: center; color: #3B4540">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M15 3h6v6M21 3l-7 7M9 21H3v-6M3 21l7-7"></path></svg>
+            </span>
+          </div>
+
+          <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px 16px 28px">
+            <!-- search -->
+            <div style="display: flex; align-items: center; gap: 9px; height: 40px; padding: 0 12px; border-radius: 10px; background: #FFFFFF; box-shadow: 0 0 0 1px #E3E6DF; font-size: 14px; color: #5D665F">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="m21 21-4.3-4.3M11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16"></path></svg>
+              Find a page or action
+            </div>
+
+            <!-- the two daily entrances -->
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px">
+              <sc-for list="{{pn.main}}" as="m" hint-placeholder-count="2">
+                <div class="hr-card" style="display: flex; flex-direction: column; min-height: 168px; box-sizing: border-box; padding: 16px; border-radius: 16px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2, 0 1px 2px rgba(17,21,17,.04)">
+                  <div style="display: flex; align-items: center; gap: 10px">
+                    <span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 9px; background: #F3F4F1; color: #3B4540">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{m.icon}}"></path></svg>
+                    </span>
+                    <span style="flex: 1; font-size: 15px; font-weight: 600">{{m.title}}</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #5D665F; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 18 6-6-6-6"></path></svg>
+                  </div>
+                  <div style="margin-top: auto; display: flex; align-items: baseline; gap: 7px">
+                    <span style="font-size: 34px; font-weight: 600; line-height: 40px; letter-spacing: -0.03em">{{m.n}}</span>
+                    <span style="font-size: 14px; color: #3B4540">{{m.word}}</span>
+                  </div>
+                  <div style="margin-top: 2px; font-size: 12.5px; line-height: 18px; color: {{m.subInk}}">{{m.sub}}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <!-- the farm, only when something needs a look -->
+            <sc-if value="{{pn.hasFarm}}" hint-placeholder-val="{{true}}">
+              <div class="hr-card" style="display: flex; align-items: center; gap: 12px; margin-top: 10px; padding: 14px 16px; border-radius: 16px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2, 0 1px 2px rgba(17,21,17,.04)">
+                <span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 9px; background: #F3F4F1; color: #3B4540">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3ZM9 3v15M15 6v15"></path></svg>
+                </span>
+                <div style="flex: 1; min-width: 0">
+                  <div style="font-size: 14px; font-weight: 600">5 pigs need a look</div>
+                  <div style="font-size: 12.5px; color: #5D665F">Gestation 2 · opens the Farm view there</div>
+                </div>
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #5D665F; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 18 6-6-6-6"></path></svg>
+              </div>
+            </sc-if>
+
+            <!-- dashboards -->
+            <h2 style="margin: 26px 2px 10px; font-size: 15px; font-weight: 600">Dashboards</h2>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+              <sc-for list="{{dashboards}}" as="d" hint-placeholder-count="3">
+                <div class="hr-card" style="display: flex; flex-direction: column; min-height: 124px; box-sizing: border-box; padding: 14px 12px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2, 0 1px 2px rgba(17,21,17,.04)">
+                  <div style="display: flex; align-items: center; gap: 8px">
+                    <span style="width: 26px; height: 26px; display: grid; place-items: center; border-radius: 8px; background: #F3F4F1; color: #3B4540">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{d.icon}}"></path></svg>
+                    </span>
+                    <span style="font-size: 13.5px; font-weight: 600">{{d.title}}</span>
+                  </div>
+                  <div style="margin-top: auto; font-size: {{d.size}}; font-weight: 600; line-height: 1.2; letter-spacing: -0.02em">{{d.n}}</div>
+                  <div style="margin-top: 2px; font-size: 12px; line-height: 17px; color: #5D665F">{{d.word}}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1078,"height":1150}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const inbox = 'M22 12h-6l-2 3h-4l-2-3H2M5.5 5h13l3.5 7v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6Z';
+    const cal = 'M8 2v4M16 2v4M3 9h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z';
+    return {
+      panes: [
+        {
+          label: 'A busy morning', note: 'Six things wait for you; five pigs in Gestation 2 need a look.', hasBadge: true, badge: '6', hasFarm: true,
+          main: [
+            { title: 'Inbox', icon: inbox, n: '6', word: 'waiting', sub: '2 before 10:00', subInk: '#B34B43' },
+            { title: 'Today', icon: cal, n: '6', word: 'of 10 jobs done', sub: '4 still to do', subInk: '#5D665F' }
+          ]
+        },
+        {
+          label: 'A quiet morning', note: 'Nothing waits and nothing on the farm needs a look, so the farm card is gone.', hasBadge: false, badge: '', hasFarm: false,
+          main: [
+            { title: 'Inbox', icon: inbox, n: '0', word: 'waiting', sub: "You're all caught up", subInk: '#5D665F' },
+            { title: 'Today', icon: cal, n: '10', word: 'of 10 jobs done', sub: 'All done for today', subInk: '#5D665F' }
+          ]
+        }
+      ],
+      dashboards: [
+        { title: 'Production', n: '6', size: '24px', word: 'batches running', icon: 'M4 20V10M10 20V4M16 20v-7M22 20H2' },
+        { title: 'Health', n: '4', size: '24px', word: 'sows on treatment', icon: 'M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z' },
+        { title: 'Biosecurity', n: 'Mon 9 Nov', size: '17px', word: 'next sampling', icon: 'M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6Z' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
