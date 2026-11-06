@@ -667,6 +667,14 @@
       "w": 2052,
       "h": 2515,
       "title": "Proposal · Home with the daily report in place of the dashboards: C1 a busy morning, C2 a quiet one"
+    },
+    "EditLayoutRebuilt.dc.html": {
+      "page": "home",
+      "x": 480,
+      "y": 9800,
+      "w": 2752,
+      "h": 8568,
+      "title": "Proposal · Edit layout rebuilt: one panel, pages, the map only for placing; Farm view Schedule scoped to where you are"
     }
   },
   "createdOnFiles": {
@@ -919,7 +927,8 @@
     "TreatFarmRunning.dc.html",
     "TreatFarmQuery.dc.html",
     "HomeBesideChat.dc.html",
-    "HomeReport.dc.html"
+    "HomeReport.dc.html",
+    "EditLayoutRebuilt.dc.html"
   ],
   "pages": [
     {

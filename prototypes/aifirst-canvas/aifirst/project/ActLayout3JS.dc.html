@@ -5369,7 +5369,7 @@ class Component extends DCLogic {
     // View: the card is only the place's name, top left; the model takes the width, under it
     if (this.IP) { ins.l = 28; ins.t = Math.max(ins.t, 104); ins.r = prof ? pw : 28; }
     if (this.IP && u.view === 'room') ins.t = Math.max(ins.t, 128);
-    if (this.ovEdOn && this.ovEdOn(u)) { /* ovEdIns */ ins.l = 28; ins.t = (u.bh || 70) + 32; ins.b = 92; ins.r = 16 + 360 + 16; return ins; }
+    if (this.ovEdOn && this.ovEdOn(u)) { /* ovEdIns */ ins.l = 28; ins.t = 88; const nw = (this.W || 950) < 760; ins.b = nw ? Math.round((this.H || 830) * 0.5) + 40 : 92; ins.r = nw ? 28 : 412; return ins; }
     if (this.ovOn && this.ovOn(u)) { const O = this.ovS(); /* ovInsets */ ins.l = 28; ins.t = 84; ins.b = 92; ins.r = O.panel ? 412 + (O.her && O.panel === 'compare' ? 376 : 0) : 28; return ins; }
     if (this.IP && u.mode === 'saved' && u.vm === 'view') {
       const hasPen = !u.bv && (u.psel || []).length === 1;
@@ -5699,6 +5699,8 @@ class Component extends DCLogic {
   syncGhost() {
     const u = this.ui();
     if (!this.ghost) return;
+    const zs = (u.tool === 'zone' || u.tool === 'sec') ? u.tool : (u.nn && u.nn.gat ? (u.nn.kind === 'zone' ? 'zone' : 'sec') : '');
+    if (zs && u.view === 'farm') { const at = (u.tool === 'zone' || u.tool === 'sec') ? this.ghostAt : u.nn.gat; if (!at) { this.ghost.visible = false; this.ghostOn = false; return; } const sz = this.edGhostSize(zs), o = this.off; this.ghost.visible = true; this.ghostOn = true; this.ghost.position.set(at.x + sz[0] / 2 + o.x, 0.02, at.z + sz[1] / 2 + o.z); this.ghost.scale.set(sz[0], 0.35, sz[1]); this.label('ghost', 'ghost', (u.nn && u.nn.name) || (zs === 'zone' ? 'New zone' : 'New section'), at.x + sz[0] / 2 + o.x, 1.2, at.z + sz[1] / 2 + o.z, {}); this.dirty = true; return; }
     if (u.tool !== 'room' || !this.ghostAt || u.view !== 'farm') { this.ghost.visible = false; this.ghostOn = false; return; }
     const gm = this.geom(this.newRoomShell()), o = this.off;
     this.ghost.visible = true; this.ghostOn = true;
@@ -5709,10 +5711,11 @@ class Component extends DCLogic {
   }
 
   // ---------- new zone, new section: the name is asked for in the bar ----------
+  edGhostSize(k) { return k === 'zone' ? [48, 32] : [24, 16]; }
   startNew(kind) {
     const u = this.ui();
-    this.hideGhost();
-    this.put({ nn: { kind: kind, zone: u.zoneId, name: '', code: '', codeT: false }, tool: '', selKind: '', selIds: [], fresh: null, cf: null, dupT: null, mvT: false, chT: false, ptList: false, devT: null, ed: null, arT: null, ptForm: null, moreOpen: false });
+    this.hideGhost(); this.ghostAt = null;
+    this.put({ nn: null, tool: kind === 'zone' ? 'zone' : 'sec', selKind: '', selIds: [], fresh: null, cf: null, dupT: null, mvT: false, chT: false, ptList: false, devT: null, ed: null, arT: null, ptForm: null, moreOpen: false });
     this.pf = 'nn';
     this.sizeGrid();
   }
@@ -5723,7 +5726,8 @@ class Component extends DCLogic {
     if (!nn || !nn.name.trim()) return;
     const name = nn.name.trim();
     if (nn.kind === 'zone') {
-      this.op({ op: 'add_zone', name: name, at: this.freeSpot(4800, 3200, '') });
+      this.hideGhost();
+      this.op({ op: 'add_zone', name: name, at: nn.at || this.freeSpot(4800, 3200, '') });
       const z = m.zones[m.zones.length - 1];
       this.sync();
       this.goScope(z.id, '', { ms: 800 });
@@ -5732,7 +5736,8 @@ class Component extends DCLogic {
     const zid = nn.zone || '';
     const code = (nn.code || '').trim().toUpperCase().slice(0, 3);
     const zr = zid && this.hull && this.hull.zone[zid] && this.hull.zone[zid].empty ? this.hull.zone[zid] : null;
-    this.op({ op: 'add_section', name: name, code: code || undefined, zone: zid || undefined, at: zr ? { x: this.mm((zr.x0 + zr.x1) / 2), z: this.mm((zr.z0 + zr.z1) / 2) } : this.freeSpot(2400, 1600, zid) });
+    this.hideGhost();
+    this.op({ op: 'add_section', name: name, code: code || undefined, zone: zid || undefined, at: nn.at ? nn.at : zr ? { x: this.mm((zr.x0 + zr.x1) / 2), z: this.mm((zr.z0 + zr.z1) / 2) } : this.freeSpot(2400, 1600, zid) });
     const s = m.sections[m.sections.length - 1];
     if (!code) this.autoCode.add(s.id);
     this.sync();
@@ -5960,7 +5965,7 @@ class Component extends DCLogic {
     if (u.view === 'room' && lvl === 'room') ed = this.makeEd('room', u.roomId);
     else if (u.view === 'farm') ed = u.secId ? this.makeEd('sec', u.secId) : (u.zoneId ? this.makeEd('zone', u.zoneId) : this.makeEd('farm', ''));
     if (!ed) return;
-    if (isNew) { ed.isNew = true; ed.title = 'New ' + (ed.kind === 'zone' ? 'zone' : 'section'); }
+    if (isNew) { ed.isNew = true; ed.title = 'New ' + (ed.kind === 'zone' ? 'zone' : ed.kind === 'room' ? 'room' : 'section'); }
     this.hideGhost();
     this.put({ ed: ed, ptForm: null, nn: null, cf: null, dupT: null, mvT: false, chT: false, ptList: false, devT: null, arT: null, tool: '', moreOpen: false });
     this.pf = 'ed';
@@ -7923,6 +7928,8 @@ class Component extends DCLogic {
     const placeGhost = (e) => {
       const g = ground(e);
       if (!g) return;
+      const t0 = this.ui().tool;
+      if (t0 === 'zone' || t0 === 'sec') { const sz = this.edGhostSize(t0); this.ghostAt = { x: Math.round(g.x - sz[0] / 2), z: Math.round(g.z - sz[1] / 2) }; this.syncGhost(); return; }
       const gm = this.geom(this.newRoomShell());
       const x = Math.round(g.x - gm.fw / 2), z = Math.round(g.z - gm.fl / 2);
       const s = this.freeShift([], 0, 0, [{ x0: x, z0: z, x1: x + gm.fw, z1: z + gm.fl }]);
@@ -7951,7 +7958,7 @@ class Component extends DCLogic {
       else if (e.button === 0) {
         if (inRoom && u.addDoor) d0.kind = 'adddoor';
         else if (inRoom && u.devT && u.devT.kind) d0.kind = 'adddevice';
-        else if (farm && u.tool === 'room') d0.kind = 'place';
+        else if (farm && (u.tool === 'room' || u.tool === 'zone' || u.tool === 'sec')) d0.kind = 'place';
         else if (farm && force && force.patch) { d0.kind = 'patch'; d0.pk = force.patch; d0.pid = force.id; d0.g0 = ground(e); d0.label = true; }
         else if (farm) {
           const hit = pick(e);
@@ -7993,8 +8000,8 @@ class Component extends DCLogic {
       }
       if (e.target !== c) return;
       if (u.view === 'room' && u.addDoor) { this.doorGhostAt(e); c.style.cursor = 'crosshair'; return; }
-      if (u.view === 'room' && u.devT && u.devT.kind) { c.style.cursor = 'crosshair'; return; }
-      if (u.view === 'farm' && u.tool === 'room') { placeGhost(e); c.style.cursor = 'crosshair'; return; }
+      if (u.view === 'room' && u.devT && u.devT.kind) { c.style.cursor = this.edCursor(u.devT.kind); return; }
+      if (u.view === 'farm' && (u.tool === 'room' || u.tool === 'zone' || u.tool === 'sec')) { placeGhost(e); c.style.cursor = 'crosshair'; return; }
       const hit = pick(e);
       this.tipAt(hit, e);
       let hv = null;
@@ -8176,6 +8183,8 @@ class Component extends DCLogic {
   }
   // the room goes where the person clicked, in the section they are in; its name is the bar's header until Enter
   dropNew() {
+    const u0 = this.ui();
+    if ((u0.tool === 'zone' || u0.tool === 'sec') && this.ghostAt) { const k = u0.tool, sz = this.edGhostSize(k), at = { x: this.ghostAt.x, z: this.ghostAt.z }; this.put({ tool: '', nn: { kind: k === 'zone' ? 'zone' : 'sec', zone: u0.zoneId, name: '', code: '', codeT: false, gat: at, at: { x: this.mm(at.x + sz[0] / 2), z: this.mm(at.z + sz[1] / 2) } } }); this.pf = 'nn'; this.syncGhost(); return; }
     this.say('Add a room');
     const u = this.ui();
     if (!this.ghostAt || !u.secId) return;
@@ -8186,6 +8195,7 @@ class Component extends DCLogic {
     this.put({ tool: '' });
     this.goRoom(r.id);
     this.put({ fresh: { id: r.id, focus: true }, rev: (u.rev || 0) + 1 });
+    setTimeout(() => { if (this.ui().roomId === r.id && this.ui().view === 'room') this.openEdit(true); }, 700);
   }
   panBy(dx, dy) {
     const cm = this.cam;
@@ -8442,7 +8452,8 @@ class Component extends DCLogic {
     const u = this.ui(), rm = this.rooms.find((x) => x.id === u.roomId);
     if (!rm || !u.devT || !u.devT.kind) return;
     const spot = this.deviceSpotAt(e, rm, u.devT.kind);
-    if (!spot) { if (this.devServes(u.devT.kind) === 'pens') this.showToast('Click a pen it serves', true, true); return; }
+    if (!spot) { if (this.devServes(u.devT.kind) === 'pens') this.showToast('Click the lane it runs along', true, true); return; }
+    if (spot.pens) { const dd0 = this.Dv().room[rm.id], L0 = String(spot.pens[0]).replace(/\d+$/, ''), all = dd0 ? dd0.pens.filter((p) => p.shape == null && String(p.code).replace(/\d+$/, '') === L0).map((p) => p.code) : []; if (all.length) spot.pens = all; }
     const kd = this.devKinds().find((x) => x.id === u.devT.kind);
     this.say('Add a ' + (kd ? kd.name.toLowerCase() : 'device'));
     const res = this.op(Object.assign({ op: 'add_device', room: rm.id, kind: u.devT.kind }, spot));
@@ -8824,6 +8835,10 @@ class Component extends DCLogic {
     el.appendChild(body); el.appendChild(tip);
     this.ovBody = body; this.ovTipEl = tip;
     el.addEventListener('click', (e) => { const h = e.target.closest('[data-a]'); if (!h || !el.contains(h)) { if (this.ovS().pop && !e.target.closest('[data-pop]')) this.ovSet({ pop: '' }); return; } e.preventDefault(); e.stopPropagation(); this.ovAct(h.getAttribute('data-a'), h); });
+    const edIn = (e) => { const h = e.target && e.target.closest && e.target.closest('[data-in]'); return h && this.edI ? this.edI[h.getAttribute('data-in')] : null; };
+    el.addEventListener('input', (e) => { if (e.target.tagName === 'SELECT') return; const r = edIn(e); if (r && r.input) r.input(e); });
+    el.addEventListener('change', (e) => { if (e.target.tagName !== 'SELECT') return; const r = edIn(e); if (r && r.input) r.input(e); });
+    el.addEventListener('keydown', (e) => { const r = edIn(e); if (r && r.key) r.key(e); });
     el.addEventListener('mouseover', (e) => { const h = e.target.closest('[data-tip]'); if (h && el.contains(h)) this.ovTip(h.getAttribute('data-tip'), h); const cr = e.target.closest('[data-crumb]'); if (cr && el.contains(cr) && this.ovS().crumb !== +cr.getAttribute('data-crumb')) { this.ovSet({ crumb: +cr.getAttribute('data-crumb'), loc: 'hover' }); return; } const lc = e.target.closest('[data-zone="loc"]'); if (lc && !this.ovS().loc) this.ovSet({ loc: 'hover' }); });
     el.addEventListener('mouseout', (e) => { const h = e.target.closest('[data-tip]'); if (h && (!e.relatedTarget || !h.contains(e.relatedTarget))) this.ovTipHide(); const lc = e.target.closest('[data-zone="loc"]'), to = e.relatedTarget; if (lc && this.ovS().loc && !(to && to.closest && to.closest('[data-zone="loc"]'))) this.ovSet({ loc: '', crumb: -1 }); });
     if (!this.ovKey) { this.ovKey = (e) => { if (e.key !== 'Escape' || !this.ovOn()) return; const O = this.ovS(); if (O.pop) { this.ovSet({ pop: '' }); return; } if (O.selecting || (O.ticks && O.ticks.length)) { this.ovAct('selcancel'); return; } if (O.picking) { this.ovAct('pickcancel'); return; } if (O.showing) { this.ovAct('showdone'); return; } if (O.panel) this.ovAct(O.hist.length ? 'back' : 'close'); }; window.addEventListener('keydown', this.ovKey); }
@@ -8846,6 +8861,10 @@ class Component extends DCLogic {
     this.ovTipHide();
     const at = () => { if (!h || !this.ovEl) return null; const R = this.ovEl.getBoundingClientRect(), r = h.getBoundingClientRect(); return { x: r.left - R.left, y: r.top - R.top, w: r.width, h: r.height, bottom: R.height - (r.top - R.top) }; };
     if (k === 'noop') return;
+    if (k === 'ed') { const f = this.edF && this.edF[v]; if (f) f(); return; }
+    if (k === 'sched') { if (['sched', 'rx', 'list', 'batch', 'task', 'dates', 'done', 'compare'].indexOf(O.panel) >= 0) { this.ovAct('close'); return; } if (u.bv) this.closeBatch(); this.ovSet({ panel: 'sched', hist: [], pop: '', swk: 0 }); return; }
+    if (k === 'swk') { this.ovSet({ swk: v === '0' ? 0 : (O.swk || 0) + (+v) }); return; }
+    if (k === 'srow') { const t = (this.ovSchedT || [])[+v]; if (!t) return; if (t.rx) { this.ovPush(); this.ovSet({ panel: 'rx', pop: '' }); return; } if (t.task && this.batchData()[t.b] && this.bvTask(t.b, t.task)) { this.ovAct('task:' + t.b + '/' + t.task); return; } if (t.b && this.batchData()[t.b]) this.ovAct('open:' + t.b); return; }
     if (this.ovAct3 && this.ovAct3(k, v, h, at)) return;
     if (k === 'batches') { if (O.panel && ['list', 'batch', 'task', 'dates', 'done', 'compare'].indexOf(O.panel) >= 0) { this.ovAct('close'); return; } if (u.bv) this.closeBatch(); this.ovSet({ panel: 'list', hist: [], pop: '' }); return; }
     if (k === 'close') { if (this.ui().ovCmp) this.put({ ovCmp: false }); if (this.ui().bv) { this.put({ bvOnly: '' }); this.closeBatch(); } this.ovSet({ panel: '', hist: [], only: '', pop: '' }); return; }
@@ -8854,7 +8873,7 @@ class Component extends DCLogic {
       if (O.panel === 'compare' && this.ui().ovCmp) { this.put({ ovCmp: false }); this.repaintBv(); }
       if (!prev) { this.ovAct('close'); return; }
       if (O.panel === 'task' && prev.panel !== 'task') { this.put({ bvOnly: '' }); this.closeBatchTask(); }
-      if (prev.panel === 'list' && this.ui().bv) { this.put({ bvOnly: '' }); this.closeBatch(); }
+      if ((prev.panel === 'list' || prev.panel === 'sched') && this.ui().bv) { this.put({ bvOnly: '' }); this.closeBatch(); }
       this.ovSet(Object.assign({}, prev, { only: '', pop: '' }));
       return;
     }
@@ -9221,10 +9240,10 @@ class Component extends DCLogic {
     this.ovKinds = kinds;
     const total = kinds.reduce((a, x) => a + x[0], 0), canSwitch = P.cur.kind !== 'farm' && P.cur.kind !== 'pen', pnl = O.panel;
     const name = this.ovBtn(H.t(P.name, { fontSize: '17px', lineHeight: '22px', fontWeight: 600, letterSpacing: '-.01em' }) + (fault ? H.dot(K.red, 8) : '') + (canSwitch ? H.icon(H.I.down, 16, { color: K.muted }) : ''), canSwitch ? 'switch' : 'noop', O.pop === 'switch', { cursor: canSwitch ? 'pointer' : 'default' });
-    const isBatch = ['list', 'batch', 'task', 'dates', 'done', 'compare'].indexOf(pnl) >= 0, isPigs = ['pigs', 'pig', 'pigperf', 'piglog', 'pen'].indexOf(pnl) >= 0;
+    const isBatch = ['sched', 'rx', 'list', 'batch', 'task', 'dates', 'done', 'compare'].indexOf(pnl) >= 0, isPigs = ['pigs', 'pig', 'pigperf', 'piglog', 'pen'].indexOf(pnl) >= 0;
     const dd = P.r ? this.ovDevDot(u) : '';
-    const tabs = (P.pen ? '' : this.ovBtn(H.icon(H.I.layers, 18) + 'Batches', 'batches', isBatch)) +
-      (total ? this.ovBtn(H.icon(H.I.pig, 18) + 'Pigs' + (P.pen && total < 2 ? '' : '<span style="' + H.st({ color: isPigs ? K.ink : K.muted, fontWeight: 600 }) + '">' + total + '</span>'), 'pigspanel', isPigs) : '') +
+    const tabs = this.ovBtn(H.icon(H.I.cal, 18) + 'Schedule', 'sched', isBatch) +
+      (total && !P.pen ? this.ovBtn(H.icon(H.I.pig, 18) + 'Pigs' + (P.pen && total < 2 ? '' : '<span style="' + H.st({ color: isPigs ? K.ink : K.muted, fontWeight: 600 }) + '">' + total + '</span>'), 'pigspanel', isPigs) : '') +
       (P.r ? this.ovBtn(H.icon(H.I.tool, 18) + 'Devices' + (dd ? H.dot(dd, 8) : ''), 'devices', pnl === 'devices') : '');
     const menu = O.pop === 'switch' ? this.ovSwitchHtml(u, P) : '';
     return this.ovCard({ left: '16px', top: '16px' }, (P.levels.length > 1 ? this.ovSq(H.I.back, 'up', 'Up one level') : '') + name + '<i style="' + H.st({ width: '1px', height: '24px', background: K.line, margin: '0 6px', flexShrink: 0 }) + '"></i>' + tabs + menu, { display: 'flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' });
@@ -9347,6 +9366,8 @@ class Component extends DCLogic {
     O.panel = group ? 'pen' : 'pig';
   }
   ovPanel3(p, O, u) {
+    if (p === 'sched') return this.ovSchedHtml(u);
+    if (p === 'rx') return this.ovRxHtml();
     if (p === 'pigs') return this.ovPigsPanel(u);
     if (p === 'devices') return this.ovDevPanel(O, u);
     if (p === 'pen') {
@@ -9377,7 +9398,7 @@ class Component extends DCLogic {
     if (!this.ovBody) return;
     const u = this.ui();
     if (!this.ovOn(u) && u.ready && !u.err && u.mode === 'intro') { const html = this.ovViewHtml(this.ovS(), u, true); if (html !== this.ovLast) { this.ovBody.innerHTML = html; this.ovLast = html; } return; }
-    if (!this.ovOn(u) && this.ovEdOn(u)) { const O = this.ovS(), H = OVH, html = (this.ovEdTask ? '<style>[aria-label^="Add pens to"] div[style*="min-height: 44px"], [aria-label="Add a row"] div[style*="min-height: 44px"] { flex-wrap: wrap; } [aria-label^="Add pens to"] div[style*="min-height: 44px"] > div:first-child, [aria-label="Add a row"] div[style*="min-height: 44px"] > div:first-child { flex-basis: 100%; }</style>' : '') + this.ovEdLoc(u) + this.ovViewHtml(O, u, true) + (this.ovVals && this.ovVals.showMode === false ? '' : this.ovCard({ right: '16px', bottom: '16px' }, this.ovBtn(H.icon(H.I.check, 18) + H.esc((this.ovVals && this.ovVals.modeLabel) || 'Done'), 'vw:modeToggle', false, { background: H.K.ink, color: '#FFFFFF', fontWeight: 600, padding: '0 16px' }))); if (html !== this.ovLast) { this.ovBody.innerHTML = html; this.ovLast = html; } this.ovEdFit(); return; }
+    if (!this.ovOn(u) && this.ovEdOn(u)) { const O = this.ovS(), H = OVH; if (!(u.tool === 'zone' || u.tool === 'sec' || u.tool === 'room' || (u.nn && u.nn.gat)) && this.ghostOn) this.hideGhost(); if (u.nn && u.nn.gat) this.syncGhost(); const html = this.ovEdLoc(u) + this.ovViewHtml(O, u, true) + this.edHtml(u) + this.edUndoHtml() + (this.ovVals && this.ovVals.showMode === false ? '' : this.ovCard({ right: '16px', bottom: '16px' }, this.ovBtn(H.icon(H.I.check, 18) + H.esc((this.ovVals && this.ovVals.modeLabel) || 'Done'), 'vw:modeToggle', false, { background: H.K.ink, color: '#FFFFFF', fontWeight: 600, padding: '0 16px' }))); this.edSwap(html); this.ovEdFit(); return; }
     if (!this.ovOn(u)) { if (this.ovLast !== '') { this.ovBody.innerHTML = ''; this.ovLast = ''; this.ovTipHide(); } return; }
     const O = this.ovS(), st0 = this.props.start || 'saved';
     if (this.ovStarted !== st0) { this.ovStarted = st0; this.ovStart(st0); }
@@ -9485,6 +9506,310 @@ class Component extends DCLogic {
     if (w && w !== this.ovEdW) { this.ovEdW = w; if (this.barEl) { this.barEl.style.left = (16 + w) + 'px'; this.barEl.style.maxWidth = 'calc(100% - ' + (16 + w + 408) + 'px)'; } }
   }
 
+  // ===================== Edit layout, rebuilt (canvas: Edit layout, one column) =====================
+  // Top left: only the place. Right: one panel, the same as the Farm view's, with every action and form as a page.
+  // The map is only for placing and picking: then the panel steps aside and a guide names the task.
+  // swap the layer, keeping the field you type in, the panel's scroll, and focusing a new page's first field
+  edSwap(html) {
+    if (html === this.ovLast) return;
+    const b = this.ovBody, ae = document.activeElement, fid = ae && b.contains(ae) && ae.id ? ae.id : '', sel = fid && ae.selectionStart != null ? [ae.selectionStart, ae.selectionEnd] : null;
+    const col = b.querySelector('[data-zone="edbody"]'), top = col ? col.scrollTop : 0, m = /data-zone="edcol"[\s\S]*?font-size: 19px[^>]*>([^<]*)/.exec(html), key = m ? m[1] : '';
+    b.innerHTML = html; this.ovLast = html;
+    const c2 = b.querySelector('[data-zone="edbody"]'); if (c2 && key === this.edKey) c2.scrollTop = top;
+    if (fid) { const n = b.querySelector('#' + fid); if (n) { n.focus(); if (sel && n.setSelectionRange) { try { n.setSelectionRange(sel[0], sel[1]); } catch (e) { /* number fields */ } } } }
+    else if (key && key !== this.edKey) { const af = b.querySelector('[data-af]'); if (af) setTimeout(() => { try { af.focus(); } catch (e) { /* gone */ } }, 40); }
+    this.edKey = key;
+  }
+  // ===================== Schedule in the Farm view (replaces Batches): Home's timeline, scoped to where you are =====================
+  ovSchedTasks() {
+    return [
+      { b: '33', name: 'Farrowing', cells: ['n', 'n', 'n', 'n', 'e6', 'e14', 'e12>'], room: /^Farrowing Room 1$/ },
+      { b: '32', name: 'Fostering checks', cells: ['d8', 'd8', 'w6', 'o8', 'p8', 'p8', 'p8>'], room: /^Farrowing Room 2$/, task: 'farrow' },
+      { b: '35', name: 'Pregnancy check', cells: ['', 'd24', 'd28', '', '', '', ''], room: /^Gestation 1$/ },
+      { b: '30', name: 'PRRS sampling', cells: ['d10', '', '', '', '', '', ''], room: /^Nursery/ },
+      { g: 'Health', name: 'Amox treatment', cells: ['', '', '', 'o4', 'p4', 'p4', ''], tag: '4', pig: true, room: /^Gestation 2$/, pens: ['B15', 'B20', 'D40', 'D41'], rx: true },
+      { g: 'Health', name: 'PRRS vaccine', cells: ['', '', '', 'u', 'p3', '', ''], tag: '3', pig: true, room: /^Nursery/ },
+      { g: 'Other', name: 'Move', cells: ['d48', '', '', '', '', '', ''], tag: '3', roomTag: true, room: /^(Gestation 2|Gestation 3|Farrowing Room 1)$/ },
+      { g: 'Other', name: 'Wash', cells: ['', '', '', '', 'p1', '', ''], tag: '1', roomTag: true, room: /^Farrowing Room 3$/ }
+    ];
+  }
+  // a task is here when one of its rooms is; a batch's rooms come from where its pigs are; in a pen, only what touches that pen
+  ovSchedHere(t, P) {
+    const cells = (rid) => (this.IP && this.IP.cell[rid]) || {};
+    const inRoom = (r) => { if (t.b) { const c = cells(r.id); const has = Object.keys(c).some((k) => c[k] && String(c[k].batch) === t.b); return has || t.room.test(r.name || ''); } return t.room.test(r.name || ''); };
+    if (P.cur.kind === 'farm') return true;
+    if (P.pen) {
+      const r = P.r; if (!r || !inRoom(r)) return false;
+      if (t.pens) return t.pens.indexOf(P.pen) >= 0;
+      if (t.b) { const c = cells(r.id)[P.pen]; return !c || !c.batch || String(c.batch) === t.b; }
+      return !t.pig;
+    }
+    return (P.rooms || []).some(inRoom);
+  }
+  ovSchedHtml(u) {
+    const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u), wk = O.swk || 0, B = this.batchData();
+    const all = this.ovSchedTasks(), here = all.map((t, i) => Object.assign({ i: i }, t)).filter((t) => this.ovSchedHere(t, P));
+    this.ovSchedT = all;
+    const start = new Date(Date.UTC(2026, 10, 2 + wk * 7)), end = new Date(Date.UTC(2026, 10, 8 + wk * 7)), mon = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const DN = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], cols = '112px repeat(7, minmax(0, 1fr))';
+    const nav = (lab, a, sq) => '<button type="button"' + H.A(a) + (sq ? ' aria-label="' + lab + '"' : '') + ' style="' + H.st({ height: '36px', minWidth: sq ? '36px' : '0', padding: sq ? '0' : '0 12px', border: '1px solid ' + K.line, borderRadius: '10px', background: '#FFFFFF', color: K.ink, fontFamily: 'inherit', fontSize: '13.5px', fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }) + '">' + (sq ? H.icon(lab === 'Previous week' ? H.I.back : H.I.chev, 16) : lab) + '</button>';
+    const head = H.head('Schedule', P.name, '') +
+      '<div style="' + H.st({ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '14px' }) + '">' + nav('Today', 'swk:0') + nav('Previous week', 'swk:-1', true) + nav('Next week', 'swk:1', true) + H.t(start.getUTCDate() + ' – ' + end.getUTCDate() + ' ' + mon[end.getUTCMonth()], { fontWeight: 600, marginLeft: '6px' }) + '<span style="flex: 1;"></span>' + H.mu('Week ' + (45 + wk)) + '</div>';
+    const days = '<div style="' + H.st({ display: 'grid', gridTemplateColumns: cols, height: '48px', borderBottom: '1px solid ' + K.line }) + '"><span></span>' + DN.map((d, i) => { const dt = new Date(+start + i * 864e5), today = wk === 0 && i === 3, past = +dt < Date.UTC(2026, 10, 5); return '<span style="' + H.st({ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px', borderLeft: '1px solid #F1F2EE' }) + '"><span style="' + H.st({ fontSize: '10.5px', fontWeight: 500, color: K.muted, letterSpacing: '.02em', textTransform: 'uppercase' }) + '">' + d + '</span><span style="' + H.st({ display: 'grid', placeItems: 'center', width: '22px', height: '22px', borderRadius: '999px', fontSize: '13px', fontWeight: 600, background: today ? K.green : 'transparent', color: today ? '#FFFFFF' : past ? K.faint : K.ink }) + '">' + dt.getUTCDate() + '</span></span>'; }).join('') + '</div>';
+    const cell = (code, prev, next) => {
+      if (!code || code === 'n') return '<span style="border-left: 1px solid #F1F2EE;"></span>';
+      const ty = code[0], n = (code.match(/\d+/) || [''])[0], on = (c) => !!c && c !== 'n', open = code.slice(-1) === '>', lr = (on(prev) ? '3px' : '8px'), rr = (on(next) || open ? '3px' : '8px');
+      const done = ty === 'd' || ty === 'w', today = ty === 'o' || ty === 'u', est = ty === 'e';
+      const bg = done ? K.greenT : today ? K.blueT : est ? 'transparent' : '#F1F3EE', ink = ty === 'w' ? K.red : done ? K.green : today ? K.blue : est ? K.muted : K.ink;
+      return '<span style="' + H.st({ display: 'flex', alignItems: 'center', padding: '0 1.5px', borderLeft: '1px solid #F1F2EE' }) + '"><span style="' + H.st({ flex: 1, height: '26px', display: 'grid', placeItems: 'center', borderRadius: lr + ' ' + rr + ' ' + rr + ' ' + lr, background: bg, boxShadow: today ? 'inset 0 0 0 1.5px ' + K.blue : 'none', border: est ? '1px dashed ' + K.faint : '0', boxSizing: 'border-box', fontSize: '11.5px', fontWeight: 600, color: ink }) + '">' + (ty === 'u' ? '–' : est ? '~' + n : n) + '</span></span>';
+    };
+    const groups = [];
+    here.forEach((t) => { const g = t.b ? 'Batch ' + t.b : t.g; let x = groups.find((q) => q.name === g); if (!x) { x = { name: g, b: t.b, rows: [] }; groups.push(x); } x.rows.push(t); });
+    const order = (g) => g.b ? 0 : g.name === 'Health' ? 1 : 2;
+    groups.sort((a, b) => order(a) - order(b) || (b.b || '').localeCompare(a.b || ''));
+    const tagH = (t) => t.tag ? '<span style="' + H.st({ display: 'inline-flex', alignItems: 'center', gap: '3px', alignSelf: 'flex-start', height: '18px', padding: '0 6px', borderRadius: '5px', background: '#F1F3EE', color: K.muted, fontSize: '11.5px', fontWeight: 600 }) + '">' + H.icon(t.pig ? H.I.pig : (H.I.home || H.I.grid), 12) + t.tag + '</span>' : '';
+    const body = !here.length ? '<div style="' + H.st({ padding: '28px 16px', textAlign: 'center', color: K.muted, fontSize: '13.5px' }) + '">Nothing planned here this week.</div>' :
+      groups.map((g) => '<div' + (g.b && B[g.b] ? H.A('open:' + g.b) : '') + ' style="' + H.st({ display: 'flex', alignItems: 'center', gap: '4px', height: '32px', padding: '0 12px', background: '#FAFAF7', borderBottom: '1px solid ' + K.line, fontSize: '12.5px', fontWeight: 600, color: K.muted, cursor: g.b && B[g.b] ? 'pointer' : 'default' }) + '">' + g.name + (g.b && B[g.b] ? H.icon(H.I.chev, 14) : '') + '</div>' +
+        g.rows.map((t) => { const cs = wk === 0 ? t.cells : ['', '', '', '', '', '', ''], opens = t.rx || (t.b && B[t.b]); return '<div' + (opens ? H.A('srow:' + t.i) : '') + ' style="' + H.st({ display: 'grid', gridTemplateColumns: cols, minHeight: '52px', borderBottom: '1px solid #F1F2EE', cursor: opens ? 'pointer' : 'default' }) + '"><span style="' + H.st({ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4px', padding: '6px 8px 6px 12px' }) + '"><span style="' + H.st({ fontSize: '13px', lineHeight: '16px', fontWeight: 500 }) + '">' + t.name + '</span>' + tagH(t) + '</span>' + cs.map((c, i) => cell(c, cs[i - 1], cs[i + 1])).join('') + '</div>'; }).join('')).join('');
+    const todayCol = wk === 0 ? '<div style="' + H.st({ position: 'absolute', top: '48px', bottom: 0, left: 'calc(112px + (100% - 112px) * 3 / 7)', width: 'calc((100% - 112px) / 7)', background: '#F4F8F4', zIndex: 0, pointerEvents: 'none' }) + '"></div>' : '';
+    const key = '<div style="' + H.st({ display: 'flex', flexWrap: 'wrap', gap: '6px 14px', margin: '12px 4px 0', fontSize: '12px', color: K.muted }) + '">' + [[K.greenT, 'none', 'Done'], [K.blueT, 'inset 0 0 0 1.5px ' + K.blue, 'Today'], ['#F1F3EE', 'none', 'Planned'], ['transparent', 'inset 0 0 0 1px ' + K.faint, 'Expected']].map((x) => '<span style="display: inline-flex; align-items: center; gap: 6px;"><i style="' + H.st({ width: '14px', height: '10px', borderRadius: '3px', background: x[0], boxShadow: x[1] }) + '"></i>' + x[2] + '</span>').join('') + '</div>';
+    return head + '<div style="' + H.st({ position: 'relative', marginTop: '14px', background: '#FFFFFF', border: '1px solid ' + K.line, borderRadius: '16px', overflow: 'hidden' }) + '">' + todayCol + '<div style="position: relative; z-index: 1;">' + days + body + '</div></div>' + key;
+  }
+  // a running treatment, opened from its row: the record in the Farm view's own panel
+  ovRxHtml() {
+    const H = OVH, K = H.K;
+    const chip = (t, o) => '<span style="' + H.st(Object.assign({ display: 'inline-flex', alignItems: 'center', height: '24px', padding: '0 8px', borderRadius: '7px', fontSize: '12px', fontWeight: 500, background: '#FFFFFF', boxShadow: 'inset 0 0 0 1px ' + K.line }, o || {})) + '">' + t + '</span>';
+    const mark = (k) => ({ done: '<span role="img" aria-label="given" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 999px; background: ' + K.greenT + '; color: ' + K.green + '; font-size: 12px; font-weight: 700;">✓</span>', skip: '<span role="img" aria-label="skipped" style="display: grid; place-items: center; width: 22px; height: 22px; border-radius: 999px; background: ' + K.amberT + '; color: ' + K.amber + '; font-size: 11px; font-weight: 700;">–</span>', due: '<span role="img" aria-label="due today" style="width: 14px; height: 14px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px ' + K.blue + ';"></span>', later: '<span role="img" aria-label="waiting" style="width: 14px; height: 14px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px #C9CEC4;"></span>' })[k];
+    const sows = [['B15', ['done', 'done', 'later']], ['B20', ['done', 'done', 'later']], ['D40', ['done', 'due', 'later']], ['D41', ['skip', 'due', 'later'], 'Dose 1 skipped: could not stand']];
+    const seg = (n, k) => '<span style="' + H.st({ flex: 1, height: '6px', borderRadius: '3px', background: k === 'done' ? '#5FAE6E' : 'transparent', boxShadow: k === 'done' ? 'none' : 'inset 0 0 0 1.5px #6F9FDC' }) + '"></span>';
+    return H.head('Treatment RX-25G009', 'Amoxicillin 15% LA · 4 sows · Batch 32', 'back') +
+      '<div style="' + H.st({ display: 'flex', gap: '6px', marginTop: '10px' }) + '">' + chip('Running', { background: K.blueT, color: K.blue, boxShadow: 'none' }) + chip('Lameness') + chip('Fever') + '</div>' +
+      H.sec('Now') + H.card('<div style="' + H.st({ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }) + '">' + H.t('Dose 2 of 3', { fontSize: '17px', fontWeight: 600 }) + H.mu('Fri 6 Nov') + '</div>' + H.mu('2 of 4 sows given') + '<div style="' + H.st({ display: 'flex', gap: '3px', marginTop: '10px' }) + '">' + seg(1, 'done') + seg(2, 'done') + seg(3, '') + seg(4, '') + '</div><div style="margin-top: 10px;">' + H.mu('Next dose Sat 7 Nov 08:30 · every 24 hours') + '</div>', { pad: '14px 16px' }) +
+      H.sec('Sows', '<span style="' + H.st({ display: 'grid', gridTemplateColumns: 'repeat(3, 28px)', textAlign: 'center', fontSize: '11.5px', color: K.muted, paddingRight: '12px' }) + '"><span>1</span><span>2</span><span>3</span></span>') +
+      H.card(sows.map((s, i) => '<div style="' + H.st({ display: 'flex', alignItems: 'center', minHeight: '44px', borderTop: i ? '1px solid ' + K.line : '0' }) + '"><span style="' + H.st({ flex: 1, display: 'flex', flexDirection: 'column', padding: s[2] ? '6px 0' : '0' }) + '">' + H.t(s[0], { fontWeight: 600 }) + (s[2] ? H.t(s[2], { fontSize: '12px', color: K.amber, whiteSpace: 'normal' }) : '') + '</span><span style="' + H.st({ display: 'grid', gridTemplateColumns: 'repeat(3, 28px)', justifyItems: 'center', alignItems: 'center' }) + '">' + s[1].map(mark).join('') + '</span></div>').join(''), { pad: '0 16px' }) +
+      H.sec('Prescription') + H.card('<div style="font-weight: 600;">Amoxicillin 15% LA</div>' + H.t('Intramuscular · 15 mL a sow · 3 doses, 24 h apart', { display: 'block', whiteSpace: 'normal' }) + H.mu('Withdrawal 14 days · Keep D40 and D41 on straw'), { pad: '12px 16px' }) +
+      '<div style="' + H.st({ display: 'flex', gap: '8px', marginTop: '16px' }) + '">' + H.wbtn(H.I.log, 'Log', 'noop') + H.wbtn(H.I.more || H.I.dots || H.I.log, 'Actions', 'noop') + '</div>';
+  }
+  edMapTask(u) { return !!(u.tool === 'room' || u.tool === 'zone' || u.tool === 'sec' || u.addDoor || u.reshape || (u.devT && u.devT.kind) || u.dp); }
+  edDevGroups() {
+    return [
+      ['Climate', [['climate', 'Runs the fans and heat for the room'], ['fan', 'Moves air through the room'], ['temp', 'Reads temperature and humidity where it hangs'], ['nh3', 'Reads ammonia where it hangs']]],
+      ['Feed and water', [['feeder', 'Feeds the pens along its line'], ['water', 'Drinkers for the pens along its line']]],
+      ['Comfort', [['heat', 'Warms the pens it hangs over'], ['floor', 'Clears the floor under its pens']]],
+      ['Other', [['camera', 'Watches the pens in view'], ['scale', 'Weighs pigs from the pens it serves']]]
+    ];
+  }
+  edCursor(kind) {
+    const d = (this.devPaths && this.devPaths()[kind]) || '';
+    if (!d) return 'crosshair';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#20291F"/><g transform="translate(6 6) scale(.8333)" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' + d + '"/></g></svg>';
+    return 'url("data:image/svg+xml;utf8,' + encodeURIComponent(svg) + '") 16 16, crosshair';
+  }
+  edHtml(u) {
+    const V = this.ovVals || {}, P = V.P;
+    this.edF = {}; this.edI = {}; this.edN = 0;
+    if (!P) return '';
+    const H = OVH, K = H.K, esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+    const A = (fn) => { if (!fn) return ''; const k = 'f' + (this.edN++); this.edF[k] = fn; return ' data-a="ed:' + k + '"'; };
+    const IN = (id, onIn, onKey) => { this.edI[id] = { input: onIn, key: onKey }; return ' id="ed-' + id + '" data-in="' + id + '"'; };
+    const sv = (d, s, w) => d ? '<svg viewBox="0 0 24 24" aria-hidden="true" style="width: ' + (s || 18) + 'px; height: ' + (s || 18) + 'px; flex: none; fill: none; stroke: currentColor; stroke-width: ' + (w || 1.8) + '; stroke-linecap: round; stroke-linejoin: round;"><path d="' + d + '"></path></svg>' : '';
+    const I = H.I, ic = V.ic || {};
+    const PEN = 'M4 20h4L19 9l-4-4L4 16v4Z', CHK = 'm5 12 5 5 9-10', X = 'M18 6 6 18M6 6l12 12';
+    // ----- the parts -----
+    const iconBtn = (d, fn, label) => '<button type="button"' + A(fn) + ' aria-label="' + esc(label) + '" title="' + esc(label) + '" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex: none; border: 0; border-radius: 12px; background: transparent; color: ' + K.muted + '; cursor: pointer; padding: 0;">' + sv(d, 18) + '</button>';
+    const backBtn = (fn) => '<button type="button"' + A(fn) + ' aria-label="Back" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex: none; border: 1px solid ' + K.line + '; border-radius: 12px; background: #FFFFFF; color: ' + K.ink + '; cursor: pointer; padding: 0; box-sizing: border-box;">' + sv(I.back, 18) + '</button>';
+    const hdr = (title, sub, o) => { o = o || {}; return '<!--H--><div style="display: flex; align-items: flex-start; gap: 10px; flex: none; padding: 16px 16px 10px;">' + (o.back ? backBtn(o.back) : '') +
+      '<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding-top: ' + (o.back ? '0' : '6px') + ';"><span style="font-size: 19px; line-height: 24px; font-weight: 600; letter-spacing: -.015em; color: ' + K.ink + ';">' + esc(title) + '</span>' +
+      (sub ? '<span style="font-size: 13px; line-height: 18px; color: ' + K.muted + ';">' + esc(sub) + '</span>' : '') + (o.tag ? '<span style="align-self: flex-start; margin-top: 4px; display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 6px; background: #ECEEE8; color: ' + K.muted + '; font-size: 12px; font-weight: 500;">' + esc(o.tag) + '</span>' : '') + '</span>' +
+      (o.edit ? iconBtn(PEN, o.edit, o.editLabel || 'Edit') : '') + (o.close ? iconBtn(X, o.close, o.closeLabel || 'Close') : '') + '</div><!--/H-->'; };
+    const sec = (label, meta) => '<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 16px 4px 8px; font-size: 13px; line-height: 18px; font-weight: 600; color: ' + K.muted + ';"><span>' + esc(label) + '</span>' + (meta ? '<span style="font-weight: 400;">' + esc(meta) + '</span>' : '') + '</div>';
+    const box = (rows) => rows.length ? '<div style="background: #FFFFFF; border: 1px solid ' + K.line + '; border-radius: 16px; padding: 0 4px; overflow: hidden;">' + rows.join('') + '</div>' : '';
+    // one row: a lead (icon or swatch), a name with an optional line under it, a fact, and a check or a chevron
+    const row = (o, i) => {
+      const lead = o.sw ? '<span style="display: inline-flex; width: 20px; justify-content: center; flex: none;"><span style="' + o.sw + '"></span></span>' : o.ico ? '<span style="display: inline-flex; color: ' + (o.red ? K.red : K.ink) + ';">' + sv(o.ico, 18) + '</span>' : '';
+      const tail = (o.fact ? '<span style="flex: none; font-size: 13px; color: ' + K.muted + '; white-space: nowrap;">' + esc(o.fact) + '</span>' : '') + (o.on ? '<span style="display: inline-flex; color: ' + K.ink + ';">' + sv(CHK, 16, 2.4) + '</span>' : o.chev ? '<span style="display: inline-flex; color: ' + K.faint + ';' + (o.down ? ' transform: rotate(90deg);' : '') + '">' + sv(I.chev, 16) + '</span>' : '');
+      const tag = o.fn ? 'button type="button"' + A(o.fn) : 'div';
+      return '<' + tag + (o.aria ? ' aria-label="' + esc(o.aria) + '"' : '') + (o.pressed != null ? ' aria-pressed="' + !!o.pressed + '"' : '') + ' style="width: 100%; display: flex; align-items: center; gap: 12px; min-height: ' + (o.sub ? 60 : 48) + 'px; padding: ' + (o.sub ? '9px' : '0') + ' 12px; box-sizing: border-box; border: 0; border-top: ' + (i ? '1px solid ' + K.line : '0') + '; border-radius: ' + (o.on ? '12px' : '0') + '; background: ' + (o.on ? K.press : 'transparent') + '; font: inherit; font-size: 14.5px; color: ' + (o.red ? K.red : K.ink) + '; text-align: left; cursor: ' + (o.fn ? 'pointer' : 'default') + ';">' + lead +
+        '<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: ' + (o.on ? 600 : 500) + '; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + esc(o.name) + '</span>' + (o.sub ? '<span style="font-size: 13px; line-height: 18px; color: ' + K.muted + '; font-weight: 400;">' + esc(o.sub) + '</span>' : '') + '</span>' + tail + '</' + (o.fn ? 'button' : 'div') + '>';
+    };
+    const label = (id, text, opt) => '<label for="ed-' + id + '" style="display: block; margin: 0 2px 6px; font-size: 13px; font-weight: 500; color: ' + K.muted + ';">' + esc(text) + (opt ? ' <span style="font-weight: 400;">(optional)</span>' : '') + '</label>';
+    const inputCss = (o) => 'width: 100%; box-sizing: border-box; height: 44px; padding: 0 12px; border: 1px solid #D5DACF; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 15px; color: ' + K.ink + '; outline-color: ' + K.ink + ';' + (o && o.mono ? " font-family: 'Geist Mono', ui-monospace, monospace;" : '');
+    const field = (id, text, value, onIn, onKey, o) => { o = o || {}; return '<div style="margin-top: ' + (o.mt == null ? 14 : o.mt) + 'px;' + (o.flex ? ' flex: ' + o.flex + '; min-width: 0;' : '') + '">' + label(id, text, o.opt) + '<input' + IN(id, onIn, onKey) + ' value="' + esc(value) + '"' + (o.ph ? ' placeholder="' + esc(o.ph) + '"' : '') + (o.num ? ' inputmode="numeric"' : '') + (o.max ? ' maxlength="' + o.max + '"' : '') + (o.af ? ' data-af="1"' : '') + ' autocomplete="off" spellcheck="false" style="' + inputCss(o) + '">' + (o.hint ? '<div style="margin: 6px 2px 0; font-size: 13px; line-height: 18px; color: ' + (o.warn ? K.red : K.muted) + ';">' + esc(o.hint) + '</div>' : '') + '</div>'; };
+    const sq = (d, fn, lab) => '<button type="button"' + A(fn) + ' aria-label="' + esc(lab) + '" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex: none; border: 1px solid #D5DACF; border-radius: 10px; background: #FFFFFF; color: ' + K.ink + '; cursor: pointer; padding: 0;">' + sv(d, 16, 2.2) + '</button>';
+    const stepper = (id, less, n, onN, onKey, more, lab) => '<span style="display: inline-flex; align-items: center; gap: 4px; flex: none;">' + sq(I.minus, less, 'One fewer') + '<input' + IN(id, onN, onKey) + ' aria-label="' + esc(lab) + '" inputmode="numeric" value="' + esc(n) + '" style="' + inputCss() + ' width: 48px; height: 40px; padding: 0; text-align: center; font-weight: 600;">' + sq(I.plus, more, 'One more') + '</span>';
+    const seg = (items) => '<div role="group" style="display: flex; gap: 2px; padding: 4px; border-radius: 12px; background: #E9ECE4;">' + items.map((o) => '<button type="button"' + A(o.pick) + ' aria-pressed="' + !!o.on + '" style="flex: 1; height: 36px; border: 0; border-radius: 9px; background: ' + (o.on ? '#FFFFFF' : 'transparent') + '; box-shadow: ' + (o.on ? '0 1px 2px rgba(17,21,17,.12)' : 'none') + '; font: inherit; font-size: 14px; font-weight: ' + (o.on ? 600 : 500) + '; color: ' + K.ink + '; cursor: pointer;">' + esc(o.label) + '</button>').join('') + '</div>';
+    const btn = (text, fn, kind, off) => '<button type="button"' + (off ? ' aria-disabled="true"' : A(fn)) + ' style="flex: ' + (kind === 'sec' ? '1' : '1.4') + '; height: 48px; border-radius: 12px; font: inherit; font-size: 15px; font-weight: 600; cursor: ' + (off ? 'not-allowed' : 'pointer') + '; ' + (kind === 'sec' ? 'background: #FFFFFF; color: ' + K.ink + '; border: 1px solid #D5DACF;' : off ? 'background: #E7E9E4; color: #7C857F; border: 0;' : kind === 'red' ? 'background: #8E2F28; color: #FFFFFF; border: 0;' : 'background: ' + K.ink + '; color: #FFFFFF; border: 0;') + '">' + esc(text) + '</button>';
+    const foot = (inner) => inner ? '<!--F--><div style="flex: none; display: flex; gap: 8px; padding: 12px 16px 16px; border-top: 1px solid ' + K.line + ';">' + inner + '</div><!--/F-->' : '';
+    const note = (text, warn) => text ? '<div style="margin: 10px 4px 0; font-size: 13.5px; line-height: 20px; color: ' + (warn ? K.red : K.muted) + ';">' + esc(text) + '</div>' : '';
+    const panel = (inner) => { const cut = (src, a, b) => { const i = src.indexOf(a), j = i < 0 ? -1 : src.indexOf(b, i); return i < 0 || j < 0 ? [null, src] : [[null, src.slice(i + a.length, j)], src.slice(0, i) + src.slice(j + b.length)]; };
+      const c1 = cut(inner, '<!--H-->', '<!--/H-->'), c2 = cut(c1[1], '<!--F-->', '<!--/F-->'), hm = c1[0], fm = c2[0], body = c2[1]; return panelBox((hm ? hm[1] : '') + '<div data-zone="edbody" style="flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 0 16px ' + (fm ? 12 : 18) + 'px;">' + body + '</div>' + (fm ? fm[1] : '')); };
+    const narrow = (this.W || 950) < 760, place = narrow ? 'left: 16px; right: 16px; bottom: 84px; max-height: calc(50% - 60px);' : 'right: 16px; top: 16px; width: 380px; max-height: calc(100% - 104px);';
+    const panelBox = (inner) => '<section data-zone="edcol" aria-label="Edit" style="position: absolute; ' + place + ' max-width: calc(100% - 32px); box-sizing: border-box; display: flex; flex-direction: column; border-radius: 22px; background: ' + K.tint + '; box-shadow: 0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12); overflow: hidden; pointer-events: auto; font-family: \'Geist\', system-ui, sans-serif; color: ' + K.ink + '; font-size: 14px; line-height: 20px; font-variant-numeric: tabular-nums;">' + inner + '</section>';
+    const isRed = (s) => /#7A2C2C/i.test(s || '');
+
+    // ----- on the map: placing, a door, the walls, a device, its pens -----
+    if (this.edMapTask(u)) {
+      let title = P.taskTitle || '', sub = P.taskSub || '', act = P.cancelLabel || 'Cancel', fn = P.cancel, ico = '';
+      if (u.tool === 'zone' || u.tool === 'sec') { const z = u.tool === 'zone'; title = z ? 'Place the new zone' : 'Place the new section'; sub = 'Its outline follows your pointer. Click the ground to put it down; you name it next.'; act = 'Cancel'; fn = () => this.setTool(''); ico = z ? 'M4 4h16v16H4z' : 'M4 4h16v16H4zM4 12h16'; }
+      else if (u.tool === 'room') { sub = 'Its outline follows your pointer. Click the ground to put it down.'; ico = I.home || ''; }
+      else if (u.devT && u.devT.kind) {
+        const kd = this.devKinds().find((x) => x.id === u.devT.kind), sv0 = this.devServes(u.devT.kind);
+        title = 'Place the ' + (kd ? kd.name.toLowerCase() : 'device'); sub = sv0 === 'pens' ? 'Click the lane it runs along. You pick its pens next.' : sv0 === 'room' ? 'Click a wall. It serves the whole room.' : 'Click where it hangs: a wall or the ceiling.';
+        act = 'Back'; fn = () => this.pickDeviceKind(u.devT.kind); ico = (this.devPaths && this.devPaths()[u.devT.kind]) || '';
+      } else if (u.dp) { act = 'Done'; }
+      else if (u.addDoor) { sub = 'Click a wall to put it there.'; ico = ic.door || ''; }
+      const pill = '<div data-zone="edguide" role="status" style="position: absolute; ' + ((this.W || 950) < 760 ? 'left: 16px; right: 16px; top: 84px;' : 'right: 16px; top: 16px; width: 380px; max-width: calc(100% - 290px); min-width: 260px;') + ' box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 16px; border-radius: 18px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(17,21,17,.06), 0 12px 30px rgba(17,21,17,.16); pointer-events: auto; font-family: \'Geist\', system-ui, sans-serif; color: ' + K.ink + '; z-index: 6;">' +
+        (ico ? '<span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; border-radius: 10px; background: ' + K.ink + '; color: #FFFFFF;">' + sv(ico, 18) + '</span>' : '') +
+        '<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; line-height: 20px; font-weight: 600;">' + esc(title) + '</span>' + (sub ? '<span style="font-size: 13px; line-height: 18px; color: ' + K.muted + ';">' + esc(sub) + '</span>' : '') + '</span>' +
+        '<button type="button"' + A(fn) + ' style="flex: none; height: 40px; padding: 0 14px; border-radius: 10px; border: ' + (act === 'Done' ? '0' : '1px solid #D5DACF') + '; background: ' + (act === 'Done' ? K.ink : '#FFFFFF') + '; color: ' + (act === 'Done' ? '#FFFFFF' : K.ink) + '; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">' + esc(act) + '</button></div>';
+      return pill;
+    }
+
+    const F = V.form || {};
+    // ----- a page inside the add-pens task: the pen types, or a new pen type -----
+    const typeForm = (back, backLabel, next, nextLabel, nextOff, title) => {
+      let b = hdr(title || 'New pen type', F.stepText || '');
+      if (F.showKind) { b += sec('What it is'); const KD = { 'Gestation stall': 'One sow, in a row of stalls', 'Farrowing crate': 'A sow and her litter', 'Nursery pen': 'Weaners together after weaning', 'Group pen': 'Several pigs: sows, gilts, boars or finishers' }; b += box((F.kinds || []).map((k, i) => row({ name: k.name, sub: KD[k.name] || '', on: k.on, pressed: k.on, fn: k.pick }, i))); }
+      if (F.showWho) { b += sec('Who lives here', 'one or more'); b += box((F.whos || []).map((w, i) => row({ name: w.label, on: w.on, pressed: w.on, fn: w.pick }, i))); }
+      if (F.showDetails) {
+        b += '<div style="margin-top: 4px;">' + field('pt-name', 'Name', F.name, F.onName, null, { ph: 'For example: Gilt pen', af: !F.showKind, hint: F.nameTaken ? 'You already have a pen type with this name' : '', warn: F.nameTaken }) + '</div>';
+        b += '<div style="display: flex; gap: 10px;">' + field('pt-w', 'Width, cm', F.w, F.onW, null, { num: true, flex: 1 }) + field('pt-l', 'Length, cm', F.l, F.onL, null, { num: true, flex: 1 }) + (F.hasPer ? field('pt-per', 'Pigs per pen', F.perOne, F.onPerOne, null, { num: true, flex: 1 }) : '') + '</div>';
+        if (F.hasFixed) b += note(F.fixedText);
+      }
+      if (F.usedDel) { b += note(F.usedText); b += box((F.reps || []).map((c, i) => row({ name: c.name, fn: c.pick, chev: true }, i))); }
+      return b + foot(btn(backLabel || 'Back', back, 'sec') + btn(nextLabel || 'Next', next, 'pri', nextOff));
+    };
+
+    let h = '';
+    if (P.bAdd && P.add) {
+      // add pens (or a row): what, how many, where; every choice is a page, never a popover
+      const a = P.add;
+      if (a.tpOpen && a.tpForm) return panel(typeForm(a.formBack, F.backLabel, F.next, F.nextLabel, F.nextOff));
+      if (a.tpOpen) {
+        h = hdr('Pen type', a.lead || '', { back: a.tpToggle });
+        h += box((a.tps || []).map((t, i) => row({ name: t.name, fact: t.size, sw: t.sw, on: t.on, pressed: t.on, fn: t.pick }, i)));
+        h += '<div style="margin-top: 10px;">' + box([row({ name: 'New pen type', ico: I.plus, fn: a.newType, chev: true }, 0)]) + '</div>';
+        return panel(h);
+      }
+      h = hdr(a.lead || 'Add pens', '');
+      if (a.hasWhere) h += sec('Where') + seg((a.where || []).map((w) => ({ label: w.label, on: w.on, pick: w.pick })));
+      h += sec('Pen type') + box([row({ name: a.tName, sw: a.sw, fn: a.tpToggle, chev: true, aria: a.tpAria }, 0)]);
+      h += sec('How many', a.hint ? 'New: ' + a.hint : '') + '<div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF; border: 1px solid ' + K.line + '; border-radius: 16px;"><span style="flex: 1; font-weight: 500;">Pens</span>' + stepper('ar-n', a.less, a.n, a.onN, a.onKey, a.more, 'How many pens') + '</div>';
+      h += foot(btn('Cancel', a.cancel, 'sec') + btn(a.goLabel || 'Add', a.go, 'pri', a.off));
+      return panel(h);
+    }
+    if (P.isTask) {
+      const f = this.ui().ptForm;
+      if (P.bForm && f) return panel(typeForm(P.cancel, P.cancelLabel, P.confirm, P.confirmLabel, P.confirmOff, P.taskTitle) + (P.foot && P.foot.length ? '<div style="margin-top: 12px;">' + box(P.foot.map((d, i) => row({ name: d.label, ico: ic.trash || I.x, red: true, fn: d.off ? null : d.run }, i))) + '</div>' : ''));
+      const devPick = u.devT && !u.devT.kind;
+      h = hdr(devPick ? 'Add a device' : P.taskTitle, devPick ? 'Pick what it is. You place it on the map next.' : (P.hasTaskSub ? P.taskSub : ''), { tag: P.hasTag ? P.tag : '' });
+      if (P.bNote && P.note) h += note(P.note);
+      if (devPick) {
+        const paths = this.devPaths ? this.devPaths() : {}, kinds = this.devKinds();
+        this.edDevGroups().forEach((g) => { h += sec(g[0]) + box(g[1].map((x, i) => { const kd = kinds.find((k) => k.id === x[0]); return row({ name: kd ? kd.name : x[0], sub: x[1], ico: paths[x[0]] || '', fn: () => this.pickDeviceKind(x[0]), chev: true }, i); })); });
+      } else if (P.bList) {
+        if (P.hasListLabel) h += sec(P.listLabel); else h += '<div style="height: 6px;"></div>';
+        h += box((P.list || []).filter((c) => c.name !== 'New pen type').map((c, i) => row({ name: c.name, fact: c.fact, sw: c.hasSw ? c.sw : '', ico: c.hasIco ? c.ico : '', on: c.on, pressed: c.on, fn: c.pick, aria: c.aria }, i)));
+        const nt = (P.list || []).find((c) => c.name === 'New pen type'); if (nt) h += '<div style="margin-top: 10px;">' + box([row({ name: 'New pen type', ico: I.plus, fn: nt.pick, chev: true }, 0)]) + '</div>';
+      }
+      if (P.bText && P.tx) h += field('vt-text', P.tx.label, P.tx.value, P.tx.onInput, P.tx.onKey, { ph: P.tx.placeholder, af: true });
+      if (P.bName && P.nn) {
+        h += field('nn-name', 'Name', P.nn.name, P.nn.onName, P.nn.onKey, { ph: P.nn.placeholder, af: true, mt: 6 });
+        if (P.nn.hasCode) h += field('nn-code', 'Short code', P.nn.code, P.nn.onCode, P.nn.onKey, { ph: P.nn.codeHint, max: 3, mono: true, hint: 'Three letters on its labels and records' });
+        if (P.nn.hasZoneCode) h += note('Its code is ' + P.nn.zoneCode + ', set for you.');
+      }
+      if (P.bDev && P.dv) {
+        const e = this.ui().dvE || {}, dd = this.Dv().room[this.ui().roomId], others = dd ? dd.devices.filter((x) => x.id !== e.id && (x.kind === 'climate' || x.kind === 'feeder')) : [];
+        h += field('dv-code', 'Device code', P.dv.code, P.dv.onCode, P.dv.onKey, { ph: 'As printed on its label', af: true, mono: true, mt: 6, hint: 'On its label. Leave it empty to bind it later.' });
+        h += field('dv-model', 'Model', P.dv.model, P.dv.onModel, P.dv.onKey, { ph: 'As on the label', opt: true });
+        const opts = [['', 'Nothing']].concat(others.map((x) => [x.id, x.name])).concat([['hub', 'Farm hub']]);
+        this.edI['dv-conn'] = { input: (ev) => this.put({ dvE: Object.assign({}, this.ui().dvE, { conn: ev.target.value }) }) };
+        h += '<div style="margin-top: 14px;">' + label('dv-conn', 'Connects to', true) + '<select id="ed-dv-conn" data-in="dv-conn" style="' + inputCss() + ' appearance: auto;">' + opts.map((o) => '<option value="' + esc(o[0]) + '"' + ((e.conn || '') === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>').join('') + '</select></div>';
+      }
+      if (P.bDup && P.dup) {
+        h += sec('Copies') + '<div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF; border: 1px solid ' + K.line + '; border-radius: 16px;"><span style="flex: 1; font-weight: 500;">How many</span>' + stepper('dup-n', P.dup.less, P.dup.n, P.dup.onN, P.dup.onKey, P.dup.more, 'How many copies') + '</div>';
+        h += '<div style="margin-top: 10px;">' + box([row({ name: 'Rooms share a wall', sub: 'Copies sit against each other, no gap', on: !!P.dup.touch, pressed: !!P.dup.touch, fn: P.dup.toggleTouch }, 0)]) + '</div>' + note(P.dup.hint);
+      }
+      if (P.bEd && P.ed) {
+        const e = P.ed;
+        h += field('ed-name', 'Name', e.name, e.onName, e.onKey, { af: true, mt: 6 });
+        if (e.isRoom && e.rect) h += '<div style="display: flex; gap: 10px;">' + field('ed-w', 'Width, m', e.w, e.onW, e.onKey, { flex: 1 }) + field('ed-l', 'Length, m', e.l, e.onL, e.onKey, { flex: 1 }) + '</div>';
+        if (e.isRoom && e.irregular) h += note(e.areaText);
+        if (e.hasSide) h += sec(e.sideLabel) + seg((e.sides || []).map((o) => ({ label: o.label, on: o.on, pick: o.pick })));
+        if (e.isSec) h += field('ed-code', 'Short code', e.code, e.onCode, e.onKey, { max: 3, mono: true });
+        if (e.hasNote) h += note(e.note);
+      }
+      if (P.foot && P.foot.length) h += '<div style="margin-top: 14px;">' + box(P.foot.map((d, i) => row({ name: d.label, ico: ic.trash || I.x, red: true, fn: d.off ? null : d.run }, i))) + '</div>';
+      const cl = P.cancelLabel || 'Cancel';
+      h += foot((P.hasCancel ? btn(cl, P.cancel, 'sec') : '') + (P.hasConfirm ? btn(P.confirmLabel, P.confirm, isRed(P.confirmStyle) ? 'red' : 'pri', P.confirmOff) : ''));
+      return panel(h);
+    }
+
+    // ----- the place you are on, or the thing picked: what it is, what is inside, what you can do -----
+    const closer = (P.cRuns || P.cHead || P.cNote) ? P.close : null;
+    if (P.cNote && P.note) {
+      const ix = P.note.indexOf(','), t1 = ix > 0 ? P.note.slice(0, ix) : P.note, t2 = ix > 0 ? P.note.slice(ix + 1).trim() : '';
+      h = hdr(t1, t2.charAt(0).toUpperCase() + t2.slice(1), { close: closer, closeLabel: P.closeLabel });
+      const da = [], dd = [];
+      (P.actions || []).forEach((a) => (a.danger ? dd : da).push({ name: a.label, ico: a.icon, fn: a.run, red: a.danger, aria: a.aria }));
+      if (da.length) h += sec('Actions') + box(da.map((a, i) => row(a, i)));
+      if (dd.length) h += '<div style="margin-top: 10px;">' + box(dd.map((a, i) => row(a, i))) + '</div>';
+      return panel(h);
+    }
+    h = hdr(P.title || '', P.hasKindLine ? P.kind : '', { edit: P.hasEdit ? P.edit : null, editLabel: P.editTitle || 'Edit', close: closer, closeLabel: P.closeLabel });
+    if (P.bNote && P.note && !P.hasRows) h += note(P.note);
+    if (P.hasRows) {
+      let facts = [], grp = [];
+      const flush = () => { if (grp.length) { h += box(grp); grp = []; } };
+      const actNames = (P.actions || []).map((a) => a.label).concat(P.hasLead && P.lead ? [P.lead.label] : []);
+      (P.rows || []).filter((r) => !(r.isFold && actNames.indexOf(r.label) >= 0)).forEach((r) => {
+        if (r.isFact) { flush(); h += '<div style="margin: 2px 4px 10px; font-size: 13.5px; line-height: 20px; color: ' + K.ink + ';">' + esc(r.text) + '</div>'; }
+        else if (r.isNote) { flush(); h += note(r.text); }
+        else if (r.isWarn) { flush(); h += note(r.text, true); }
+        else if (r.isHead) { flush(); h += sec(r.label); }
+        else if (r.isText) grp.push(row({ name: r.label, fact: r.value, sw: r.hasSw ? r.sw : '' }, grp.length));
+        else if (r.isFold) grp.push(row({ name: r.label, fn: r.toggle, chev: true, down: !!r.open }, grp.length));
+        else if (r.isGrid) { flush(); h += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 6px 0 4px;">' + (r.items || []).map((g) => '<div style="padding: 10px 12px; background: #FFFFFF; border: 1px solid ' + K.line + '; border-radius: 12px;"><div style="font-size: 12.5px; color: ' + K.muted + ';">' + esc(g.label) + '</div><div style="font-size: 15px; font-weight: 600;">' + esc(g.value) + '</div></div>').join('') + '</div>'; }
+        else if (r.isLinks) { flush(); h += box((r.items || []).map((t, i) => row({ name: t.label, fact: t.fact, fn: t.pick, chev: true, aria: t.aria }, i))); }
+        void facts;
+      });
+      flush();
+    }
+    if (P.hasHead && P.headTitle && P.headTitle !== P.title) h += note(P.headTitle + (P.headSub ? ' · ' + P.headSub : ''));
+    if (P.hasRuns) {
+      h += sec('Pens', 'from the door');
+      h += box((P.runs || []).map((r, i) => '<div style="display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 8px 8px 8px 12px; border-top: ' + (i ? '1px solid ' + K.line : '0') + ';"><button type="button"' + A(r.pick) + ' aria-label="' + esc(r.pickLabel || 'Change type') + '" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; border: 0; background: transparent; padding: 0; font: inherit; text-align: left; cursor: pointer; color: ' + K.ink + ';"><span style="' + r.sw + '"></span><span style="display: flex; flex-direction: column; min-width: 0;"><span style="font-size: 14.5px; line-height: 19px; font-weight: 500;">' + esc(r.name) + '</span><span style="font-size: 13px; color: ' + K.muted + ';">' + esc(r.range) + '</span></span></button>' + stepper('run-' + i, r.less, r.n, r.onN, null, r.more, r.nLabel || 'How many') + (r.canX ? iconBtn(X, r.remove, r.removeLabel || 'Remove') : '') + '</div>'));
+    }
+    if (P.hasInside && (P.inside || []).length) {
+      h += sec(P.insideLabel || 'Inside');
+      h += box(P.inside.map((c, i) => row({ name: c.name, fact: c.fact, ico: c.hasIco ? c.ico : '', sw: c.hasSw ? c.sw : '', fn: c.pick, chev: true, aria: c.aria }, i)));
+    }
+    // the actions: add first, then the rest; the one that deletes stands alone at the end
+    const acts = [], danger = [];
+    if (P.hasAdd) {
+      if (P.addMenu) (P.addItems || []).forEach((a) => acts.push({ name: 'Add ' + String(a.label).toLowerCase(), sub: String(a.hint || '').replace(/\.?\s*Not ready yet\.?/, ''), ico: a.icon, fn: a.run }));
+      else acts.push({ name: P.addLabel, ico: I.plus, fn: P.addClick });
+    }
+    if (P.hasLead && P.lead) acts.push({ name: P.lead.label, ico: P.lead.icon, fn: P.lead.run });
+    (P.actions || []).forEach((a) => (a.danger ? danger : acts).push({ name: a.label, ico: a.icon, fn: a.run, fact: a.hasKey ? a.key : '', red: a.danger, aria: a.aria }));
+    if (P.hasMore) (P.more || []).forEach((a) => (a.danger ? danger : acts).push({ name: a.label, ico: a.icon, fn: a.run, red: a.danger, aria: a.aria }));
+    if (acts.length) h += sec('Actions') + box(acts.map((a, i) => row(a, i)));
+    if (danger.length) h += '<div style="margin-top: 10px;">' + box(danger.map((a, i) => row(a, i))) + '</div>';
+    return panel(h);
+  }
+  // undo and redo, and the draft's save while setting up: bottom left, beside the 3D control
+  edUndoHtml() {
+    const V = this.ovVals || {}, hs = V.hist, H = OVH, K = H.K, P = V.P || {}, d = P.draft || {};
+    if (!hs) return '';
+    this.edF = this.edF || {};
+    const A = (fn, off) => { if (!fn || off) return ' aria-disabled="true"'; const k = 'f' + (this.edN = (this.edN || 0) + 1); this.edF[k] = fn; return ' data-a="ed:' + k + '"'; };
+    const b = (path, fn, off, lab) => '<button type="button"' + A(fn, off) + ' aria-label="' + lab + '" title="' + lab + '" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 0; border-radius: 12px; background: transparent; color: ' + (off ? '#B5BCB3' : K.ink) + '; cursor: ' + (off ? 'default' : 'pointer') + '; padding: 0;"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;"><path d="' + path + '"></path></svg></button>';
+    const ic = V.ic || {};
+    let inner = b(ic.undo || 'M9 14L4 9l5-5 M4 9h10.5a5.5 5.5 0 0 1 0 11H11', hs.undo, hs.undoOff, hs.undoLabel) + b(ic.redo || 'M15 14l5-5-5-5 M20 9H9.5a5.5 5.5 0 0 0 0 11H13', hs.redo, hs.redoOff, hs.redoLabel);
+    if (d.hasText) inner += '<i style="width: 1px; height: 24px; background: ' + K.line + '; margin: 0 6px;"></i><span style="font-size: 13.5px; color: ' + K.ink + '; white-space: nowrap; padding: 0 6px;">' + String(d.text || '').replace(/</g, '&lt;') + '</span><button type="button"' + A(d.save, d.saveOff) + ' style="height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: ' + (d.saveOff ? '#E7E9E4' : K.ink) + '; color: ' + (d.saveOff ? '#7C857F' : '#FFFFFF') + '; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">' + String(d.saveLabel || 'Save').replace(/</g, '&lt;') + '</button>';
+    return this.ovCard({ left: '120px', bottom: '16px' }, inner, { display: 'flex', alignItems: 'center', gap: '2px', padding: '6px' });
+  }
+
   renderVals() {
     const r = this.renderValsBase();
     r.setOvh = (el) => this.setOvh(el);
@@ -9496,6 +9821,7 @@ class Component extends DCLogic {
     if (this.ovEdOn && this.ovEdOn(this.ui()) && !this.ovEdTask) { r.camStyle = (r.camStyle || '') + ' display: none;'; if (r.barStyle) { const lw = 16 + (this.ovEdW || 200); r.barStyle = r.barStyle.replace('left: 16px; right: 16px; bottom: 16px;', 'left: ' + lw + 'px; top: 16px; max-width: calc(100% - ' + (lw + 408) + 'px);').replace('border-radius: 16px;', 'border-radius: 0 16px 16px 0; border-left: 0;'); } if (r.P) r.P = Object.assign({}, r.P, { hasTopRow: false, canBack: false }); if (r.cardStyle) r.cardStyle = r.cardStyle.replace('left: 16px; top: 16px;', 'right: 16px; top: 16px;').replace(/max-height: calc\(100% - \d+px\);/, 'max-height: calc(100% - 104px);'); }
     if (this.ovOn() && this.O && this.O.panel === 'devices' && /^cam:/.test(this.O.dev || '') && r.vidStyle) r.vidStyle = r.vidStyle.replace(/right: 16px; bottom: [^;]+;/, 'right: 32px; top: 92px;').replace('width: 360px;', 'width: 348px;').replace('z-index: 4;', 'z-index: 31;').replace(/animation: [^;]+;?/, '');
     if (this.ovOn()) { r.showProf = false; r.showBatch = false; r.showCard = false; r.showBar = false; r.showCrumbMenu = false; }
+    if (this.ovEdOn && this.ovEdOn(this.ui()) && !this.ovOn()) { const hide = (x) => (x || '') + '; display: none;'; r.cardStyle = hide(r.cardStyle); r.barStyle = hide(r.barStyle); r.sbarStyle = hide(r.sbarStyle); r.vidStyle = r.vidStyle; this.ovEdTask = true; }
     return r;
   }
   // <<<OVH-COMP
@@ -9977,12 +10303,12 @@ class Component extends DCLogic {
     } else if (taskOn && u.dvE && isRoom && rcur && !VV) {
       const e = u.dvE, dd1 = D.room[rcur.id], dv = dd1 ? dd1.devices.find((x) => x.id === e.id) : null;
       const nm = dv ? dv.name.toLowerCase() : 'device';
-      task('Set up the ' + nm, 'Its device code is on its label. The code binds this place to the real ' + nm + '.', () => this.put({ dvE: null }), e.isNew ? 'Bind later' : 'Cancel');
+      task('Set up the ' + nm, '', () => this.put({ dvE: null }), 'Cancel');
       P.hasTag = true; P.tag = 'Not ready yet';
       P.bDev = true;
       const setE = (p) => this.put({ dvE: Object.assign({}, this.ui().dvE, p) });
       P.dv = { code: e.code, model: e.model, onCode: (ev) => setE({ code: ev.target.value }), onModel: (ev) => setE({ model: ev.target.value }), onKey: (ev) => { if (ev.key === 'Enter') this.saveDevEdit(); } };
-      footer(e.isNew ? 'Bind' : 'Save', () => this.saveDevEdit(), e.isNew && !String(e.code || '').trim());
+      footer('Save', () => this.saveDevEdit(), false);
     } else if (taskOn && u.dp && isRoom && rcur && !VV) {
       const dd0 = D.room[rcur.id], dv = dd0 ? dd0.devices.find((x) => x.id === u.dp) : null;
       task(dv ? 'Pens for the ' + dv.name.toLowerCase() : 'Pens', (dv && dv.pens.length ? dv.where + '. ' : '') + 'Click pens to add them or take them out.', () => this.endDevPens(), 'Done');

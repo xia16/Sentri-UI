@@ -1,0 +1,63 @@
+{
+ "title": "Edit layout rebuilt: every flow",
+ "sub": "One panel on the right, the same as the Farm view's: what you are on, what is inside, then the actions, with Delete alone at the end. Every step is a page in that panel with Cancel and the next step at the bottom. The map is only for placing: the panel steps aside and a guide names the task. The camera keeps the same margins, so opening a page never moves it. Beside a narrow chat the panel becomes a bottom sheet.",
+ "cols": 4,
+ "sections": [
+  ["Before: what was broken", [
+   ["b_room", "The bar ran into the room card: Delete sat on the room title"],
+   ["b_zone", "Undo and redo sat on Delete"],
+   ["b_addpens", "Add pens: a sentence squeezed into a small card"],
+   ["b_newtype", "A new pen type: choices as chips in a popover"]
+  ]],
+  ["Add a zone: place it, then name it", [
+   ["fz1", "Add zone: its outline follows the pointer"],
+   ["fz2", "Clicked: the name page opens, the outline stays"],
+   ["fz3", "Named"],
+   ["fz4", "Added where it was placed"]
+  ]],
+  ["Add a section, then a room", [
+   ["fs1", "Add section: place it in the zone"],
+   ["fs2", "Name and short code"],
+   ["fs3", "The new section"],
+   ["fr1", "Add room: place it"],
+   ["fr2", "The name page opens straight away, with its size"],
+   ["fr3", "The room, ready for lanes"]
+  ]],
+  ["A lane and its pens", [
+   ["lane", "A lane: its pens from the door, steppers to change them"],
+   ["gp2", "Add pens › Pen type: a list, not a popover"],
+   ["gp3", "New pen type, step 1: what it is"],
+   ["gp4", "Step 2: who lives here"],
+   ["gp5", "Step 3: name and size"],
+   ["gp6", "Back on Add pens with the new type picked"],
+   ["gp7", "Added to the lane"]
+  ]],
+  ["Add a device", [
+   ["fd1", "Add device: grouped, each with one line on what it does"],
+   ["hd3", "A feeder: click the lane, the whole lane is ticked; click pens to change it"],
+   ["hd4", "Set up: device code, model, what it connects to"],
+   ["hd5", "Saved"],
+   ["devicenew", "A sensor: the guide says where it goes"]
+  ]],
+  ["The rest", [
+   ["doors", "A door picked: the panel is about the door"],
+   ["roomedit", "Edit a room"],
+   ["endrow", "Add a row"],
+   ["dup", "Duplicate"],
+   ["confirm", "Delete asks first"],
+   ["select", "Rooms picked: what you can do with them"],
+   ["ungroupsel", "A whole section picked"],
+   ["typemanager", "Pen types"]
+  ]],
+  ["Beside a narrow chat", [
+   ["lane570", "The panel becomes a bottom sheet; the lane stays in view above it"],
+   ["room570", "A room"]
+  ]],
+  ["Farm view: Schedule replaces Batches, scoped to where you are", [
+   ["schedfarm", "The farm: every batch, then Health and Other"],
+   ["schedroom", "Gestation 2: only its treatment and its move"],
+   ["schedpen", "Pen A3: only what touches that pen. No Pigs pill in a pen"],
+   ["rx", "A task row opens its record: the running treatment"]
+  ]]
+ ]
+}
