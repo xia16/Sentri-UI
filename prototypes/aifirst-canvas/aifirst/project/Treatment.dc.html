@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Treatment</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}.tx-ghost:hover{background:#f5f5f4}.tx-item:hover{background:#f5f5f4}.tx-row:hover{background:#fafaf9}</style>
+</helmet>
+<div style="width: 100%; height: {{h}}; box-sizing: border-box; display: flex; flex-direction: column; background: #ffffff; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.5; color: #1c1917; -webkit-font-smoothing: antialiased; position: relative; overflow: hidden">
+
+<!-- ============================ PICK PIGS ============================ -->
+<sc-if value="{{isPick}}" hint-placeholder-val="{{true}}">
+  <div style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column">
+    <div style="padding: 24px; display: flex; flex-direction: column; flex: 1; min-height: 0">
+      <button type="button" class="tx-ghost" onClick="{{pickBack}}" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 7px; height: 40px; margin: 0 0 12px; padding: 0 12px 0 0; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 14px; font-weight: 500; color: #1c1917; cursor: pointer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.back}}"></path></svg>
+        New treatment
+      </button>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px">
+        <h1 style="margin: 0; font-size: 26px; font-weight: 600; line-height: 1.25; letter-spacing: -0.7px">Pick pigs</h1>
+        <button type="button" class="tx-ghost" onClick="{{pickInFarm}}" style="display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 4px 9px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; font-weight: 500; color: #1c1917; cursor: pointer; flex: none">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.map}}"></path></svg>
+          Pick in the farm view
+        </button>
+      </div>
+
+      <!-- filter row: the page's filters (or Vet's query chip), + Filter, Reset -->
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; position: relative">
+        <sc-if value="{{showQuery}}" hint-placeholder-val="{{false}}">
+          <div style="position: relative">
+            <span style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 6px; border-radius: 8px; background: #f5f5f4; font-size: 12px; font-weight: 500; white-space: nowrap">
+              <button type="button" aria-expanded="{{queryOpen}}" onClick="{{toggleQuery}}" style="display: flex; align-items: center; gap: 6px; border: 0; background: transparent; padding: 0; font: inherit; color: inherit; cursor: pointer">
+                <span style="width: 20px; height: 20px; display: grid; place-items: center; border-radius: 6px; background: #e7e5e4; color: #44403c; font-size: 9px; font-weight: 600">VT</span>
+                Vet · lame in Gestation 2, fever this week
+              </button>
+              <button type="button" aria-label="Remove Vet's search" onClick="{{clearFilters}}" style="display: flex; align-items: center; border: 0; background: transparent; padding: 0; color: inherit; cursor: pointer">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.close}}"></path></svg>
+              </button>
+            </span>
+            <sc-if value="{{queryOpen}}" hint-placeholder-val="{{false}}">
+              <div style="position: absolute; top: 40px; left: 0; z-index: 6; width: max-content; max-width: 420px; padding: 12px; background: #ffffff; border: 1px solid #e7e5e4; border-radius: 12px; box-shadow: 0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a; font-size: 13px">Room: Gestation 2 · Finding: Lameness · Temperature: Fever · Date: This week</div>
+            </sc-if>
+          </div>
+        </sc-if>
+        <sc-for list="{{filters}}" as="f" hint-placeholder-count="3">
+          <button type="button" aria-label="{{f.aria}}" aria-haspopup="listbox" style="display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 9px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: {{f.ink}}; cursor: pointer; flex: none; white-space: nowrap">
+            {{f.value}}
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.down}}"></path></svg>
+          </button>
+        </sc-for>
+        <div style="position: relative; flex: none">
+          <button type="button" class="tx-ghost" aria-expanded="{{filterOpen}}" aria-haspopup="menu" onClick="{{toggleFilter}}" style="display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 8px; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 14px; font-weight: 500; color: #1c1917; cursor: pointer; white-space: nowrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.plus}}"></path></svg>
+            Filter
+          </button>
+          <sc-if value="{{filterOpen}}" hint-placeholder-val="{{false}}">
+            <div role="menu" aria-label="Add a filter" style="position: absolute; top: 46px; right: 0; width: 280px; box-sizing: border-box; padding: 4px; background: #ffffff; border: 1px solid #e7e5e4; border-radius: 12px; box-shadow: 0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a; z-index: 5">
+              <div style="font-size: 12px; color: #57534e; padding: 8px">Add a filter</div>
+              <sc-for list="{{catalogue}}" as="c" hint-placeholder-count="6">
+                <button type="button" role="menuitem" class="tx-item" onClick="{{c.pick}}" style="display: block; width: 100%; height: 36px; padding: 0 8px; border: 0; border-radius: 6px; background: transparent; text-align: left; font: inherit; font-size: 14px; color: #1c1917; cursor: pointer">{{c.label}}</button>
+              </sc-for>
+              <div role="separator" style="height: 1px; background: #e7e5e4; margin: 4px -4px"></div>
+              <button type="button" onClick="{{askVet}}" style="display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%; padding: 10px 0; border: 0; background: transparent; font: inherit; font-size: 13px; color: #57534e; cursor: pointer; white-space: nowrap">
+                <span style="width: 20px; height: 20px; display: grid; place-items: center; border-radius: 6px; background: #e7e5e4; color: #44403c; font-size: 9px; font-weight: 600; margin-right: 2px">VT</span>
+                <span>Need something else? <strong style="font-weight: 500; color: #1c1917">Ask Vet in chat</strong>.</span>
+              </button>
+            </div>
+          </sc-if>
+        </div>
+        <span style="flex: 1"></span>
+        <button type="button" class="tx-ghost" onClick="{{resetFilters}}" style="height: 40px; padding: 0 8px; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 14px; font-weight: 500; color: #1c1917; cursor: pointer; flex: none">Reset</button>
+      </div>
+
+      <!-- search inside the results + Columns -->
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px">
+        <div style="position: relative; flex: 1; min-width: 0">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="position: absolute; left: 11px; top: 11px; width: 18px; height: 18px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.search}}"></path></svg>
+          <input value="{{q}}" onChange="{{onSearch}}" aria-label="Find a pig in these results" placeholder="Find a pig in these results" style="width: 100%; box-sizing: border-box; height: 40px; padding: 0 11px 0 36px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: #1c1917; outline-color: #276640">
+        </div>
+        <button type="button" class="tx-ghost" style="display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 10px; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 14px; font-weight: 500; color: #1c1917; cursor: pointer; flex: none">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.columns}}"></path></svg>
+          Columns
+        </button>
+      </div>
+
+      <!-- the pig list -->
+      <sc-if value="{{hasRows}}" hint-placeholder-val="{{true}}">
+        <div role="table" aria-label="Pigs" style="font-size: 14px">
+          <div role="row" style="display: grid; grid-template-columns: {{cols}}; align-items: center; height: 32px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e">
+            <span role="columnheader" style="padding-left: 8px; display: flex"><input type="checkbox" aria-label="Pick all pigs" checked="{{allChecked}}" ref="{{allRef}}" onChange="{{toggleAll}}" style="width: 16px; height: 16px; margin: 0; accent-color: #276640; cursor: pointer"></span>
+            <span role="columnheader">Pig</span>
+            <span role="columnheader">Pen</span>
+            <span role="columnheader">Finding</span>
+            <sc-if value="{{agentMode}}" hint-placeholder-val="{{false}}">
+              <span role="columnheader" aria-sort="descending" style="display: flex; align-items: center; justify-content: flex-end; gap: 4px; padding-right: 28px; white-space: nowrap">Temp °C<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.sortDown}}"></path></svg></span>
+            </sc-if>
+            <span role="columnheader">Status</span>
+          </div>
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+            <div role="row" class="{{r.cls}}" onClick="{{r.rowClick}}" style="display: grid; grid-template-columns: {{cols}}; align-items: center; height: 48px; border-bottom: {{r.line}}; background: {{r.bg}}; cursor: pointer">
+              <span role="cell" style="padding-left: 8px; display: flex"><input type="checkbox" aria-label="{{r.aria}}" checked="{{r.checked}}" onChange="{{r.toggle}}" style="width: 16px; height: 16px; margin: 0; accent-color: #276640; cursor: pointer"></span>
+              <span role="cell" style="font-weight: 600">{{r.tag}}</span>
+              <span role="cell">Pen {{r.pen}}</span>
+              <span role="cell" style="font-size: 12px; color: #57534e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px">{{r.finding}}</span>
+              <sc-if value="{{agentMode}}" hint-placeholder-val="{{false}}">
+                <span role="cell" style="text-align: right; padding-right: 28px; font-variant-numeric: tabular-nums; color: #b91c1c">{{r.temp}}</span>
+              </sc-if>
+              <span role="cell"><span style="display: inline-flex; align-items: center; border-radius: 8px; padding: 3px 8px; font-size: 12px; font-weight: 500; line-height: 1.4; background: {{r.badgeBg}}; color: {{r.badgeInk}}; box-shadow: {{r.badgeRing}}">{{r.status}}</span></span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{noRows}}" hint-placeholder-val="{{false}}">
+        <div style="flex: 1; min-height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center">
+          <p style="margin: 0; font-size: 15px; font-weight: 500">{{emptyText}}</p>
+          <sc-if value="{{emptyAsk}}" hint-placeholder-val="{{true}}">
+            <button type="button" onClick="{{askVet}}" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 4px; border: 0; background: transparent; font: inherit; font-size: 13px; color: #57534e; cursor: pointer; white-space: nowrap">
+              <span style="width: 20px; height: 20px; display: grid; place-items: center; border-radius: 6px; background: #e7e5e4; color: #44403c; font-size: 9px; font-weight: 600">VT</span>
+              <span>Need something else? <strong style="font-weight: 500; color: #1c1917">Ask Vet in chat</strong>.</span>
+            </button>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+  <footer style="flex: none; display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: #ffffff; border-top: 1px solid #e7e5e4">
+    <div style="flex: 1; min-width: 0; font-size: 14px; line-height: 1.6">
+      <span style="font-weight: 600">{{pickedLine}}</span>
+      <sc-if value="{{hasPickedSub}}" hint-placeholder-val="{{true}}">
+        <p style="margin: 0; font-size: 12px; color: #57534e">{{pickedSub}}</p>
+      </sc-if>
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center">
+      <button type="button" class="tx-ghost" onClick="{{pickCancel}}" style="height: 40px; padding: 0 10px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; font-weight: 500; color: #1c1917; cursor: pointer">Cancel</button>
+      <button type="button" onClick="{{continuePigs}}" disabled="{{cannotContinue}}" style="height: 40px; padding: 0 10px; border: 0; border-radius: 10px; background: #276640; opacity: {{continueOpacity}}; font: inherit; font-size: 14px; font-weight: 500; color: #ffffff; cursor: {{continueCursor}}">{{continueLabel}}</button>
+    </div>
+  </footer>
+</sc-if>
+
+<!-- ============================ NEW TREATMENT ============================ -->
+<sc-if value="{{isForm}}" hint-placeholder-val="{{false}}">
+  <div style="flex: 1; min-height: 0; overflow-y: auto">
+    <div style="padding: {{formPad}}">
+      <h1 style="margin: 0 0 {{h1Gap}}; font-size: 26px; font-weight: 600; line-height: 1.25; letter-spacing: -0.7px">New treatment</h1>
+      <sc-if value="{{filled}}" hint-placeholder-val="{{false}}">
+        <p style="display: flex; align-items: center; gap: 8px; margin: 0 0 22px; font-size: 13px; color: #57534e">
+          <span style="width: 20px; height: 20px; display: grid; place-items: center; border-radius: 6px; background: #e7e5e4; color: #44403c; font-size: 9px; font-weight: 600">VT</span>
+          Vet filled this in at 08:41. Check it before you issue.
+        </p>
+      </sc-if>
+
+      <!-- Pigs -->
+      <section style="display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 16px; padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid #e7e5e4">
+        <div>
+          <h2 style="margin: 0; font-size: 17px; font-weight: 600; line-height: 1.4; letter-spacing: -0.15px">Pigs</h2>
+          <p style="margin: 6px 0 0; font-size: 13px; color: #57534e">Who gets it</p>
+        </div>
+        <div style="min-width: 0">
+          <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #57534e">{{pigSource}}</p>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px">
+            <div style="display: flex; gap: 6px; flex-wrap: wrap">
+              <sc-for list="{{chips}}" as="c" hint-placeholder-count="4">
+                <button type="button" aria-label="{{c.aria}}" onClick="{{c.remove}}" style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border: 1px solid #e7e5e4; border-radius: 8px; background: #ffffff; font: inherit; font-size: 12px; font-weight: 500; line-height: 1.4; color: #1c1917; cursor: pointer">
+                  {{c.tag}}
+                  <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.close}}"></path></svg>
+                </button>
+              </sc-for>
+            </div>
+            <button type="button" class="tx-ghost" onClick="{{changePigs}}" style="min-height: 32px; padding: 0 4px; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #1c1917; cursor: pointer">{{changeLabel}}</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Why -->
+      <section style="display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 16px; padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid #e7e5e4">
+        <div>
+          <h2 style="margin: 0; font-size: 17px; font-weight: 600; line-height: 1.4; letter-spacing: -0.15px">Why</h2>
+          <p style="margin: 6px 0 0; font-size: 13px; color: #57534e">What it is for</p>
+        </div>
+        <div style="min-width: 0">
+          <div style="font-size: 13px; font-weight: 500; margin-bottom: 7px">Diseases and symptoms<span style="font-weight: 400; color: #57534e; font-size: 12px; margin-left: 5px">optional</span></div>
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-height: 40px; box-sizing: border-box; padding: 7px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff">
+            <sc-for list="{{diseases}}" as="d" hint-placeholder-count="1">
+              <span style="display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 8px; background: #f5f5f4; font-size: 12px; font-weight: 500; line-height: 1.4">{{d.label}}</span>
+            </sc-for>
+            <input value="{{diseaseDraft}}" onChange="{{onDisease}}" onKeyDown="{{onDiseaseKey}}" aria-label="Add a disease or symptom" placeholder="{{diseaseHint}}" style="flex: 1 1 {{diseaseBasis}}; min-width: 20px; height: 26px; border: 0; padding: 0 3px; font: inherit; font-size: 14px; color: #1c1917; background: transparent; outline: none">
+          </div>
+        </div>
+      </section>
+
+      <!-- Prescription -->
+      <section style="position: relative; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 16px; padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid #e7e5e4">
+        <div>
+          <h2 style="margin: 0; font-size: 17px; font-weight: 600; line-height: 1.4; letter-spacing: -0.15px">Prescription</h2>
+          <p style="margin: 6px 0 0; font-size: 13px; color: #57534e">What is given and how often</p>
+        </div>
+        <button type="button" class="tx-ghost" style="position: absolute; top: 0; left: 256px; display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 4px 9px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; font-weight: 500; color: #1c1917; cursor: pointer">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.history}}"></path></svg>
+          From an earlier prescription
+        </button>
+        <div style="min-width: 0; padding-top: 48px">
+          <div style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px">
+            <div>
+              <div style="font-size: 13px; font-weight: 500; margin-bottom: 7px">Medicine</div>
+              <button type="button" aria-label="Medicine: {{medicine}}" aria-haspopup="listbox" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: {{medInk}}; text-align: left; cursor: pointer">
+                <span>{{medicine}}</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.down}}"></path></svg>
+              </button>
+            </div>
+            <div>
+              <div style="font-size: 13px; font-weight: 500; margin-bottom: 7px">Brand or form</div>
+              <button type="button" aria-label="Brand or form: {{brand}}" aria-haspopup="listbox" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: {{medInk}}; text-align: left; cursor: pointer">
+                <span>{{brand}}</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.down}}"></path></svg>
+              </button>
+            </div>
+            <div>
+              <div style="font-size: 13px; font-weight: 500; margin-bottom: 7px">Method</div>
+              <button type="button" aria-label="Method: {{method}}" aria-haspopup="listbox" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; height: 40px; padding: 0 11px; border: 1px solid {{methodLine}}; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: #1c1917; text-align: left; cursor: pointer">
+                <span>{{method}}</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.down}}"></path></svg>
+              </button>
+              <sc-if value="{{showComment}}" hint-placeholder-val="{{false}}">
+                <aside aria-label="Vet comment on Method" style="margin-top: 10px; padding: 12px; border-radius: 10px; background: #fdf6e7">
+                  <div style="display: flex; align-items: center; gap: 8px; font-size: 13px">
+                    <span style="width: 20px; height: 20px; display: grid; place-items: center; border-radius: 6px; background: #ffffff; color: #44403c; font-size: 9px; font-weight: 600">VT</span>
+                    <strong style="font-weight: 600">Vet</strong>
+                    <span style="font-size: 12px; color: #57534e">08:44</span>
+                  </div>
+                  <p style="margin: 8px 0 0; font-size: 14px; line-height: 1.5">Not recommended for these sows. D41 has been off feed since Wednesday, so in feed will not reach her. Intramuscular reaches all four.</p>
+                  <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 12px">
+                    <button type="button" class="tx-ghost" onClick="{{applyMethod}}" style="min-height: 30px; padding: 4px 9px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 12px; font-weight: 500; color: #1c1917; cursor: pointer">Use intramuscular</button>
+                    <button type="button" class="tx-ghost" onClick="{{dismissComment}}" style="min-height: 30px; padding: 4px 9px; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 12px; font-weight: 500; color: #1c1917; cursor: pointer">Dismiss</button>
+                    <span style="flex: 1"></span>
+                    <button type="button" class="tx-ghost" aria-label="Reply in chat" onClick="{{replyComment}}" style="width: 32px; height: 32px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 10px; background: transparent; color: #1c1917; cursor: pointer">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.quote}}"></path></svg>
+                    </button>
+                  </div>
+                </aside>
+              </sc-if>
+            </div>
+            <div style="max-width: 280px">
+              <div style="font-size: 13px; font-weight: 500; margin-bottom: 7px">Dose</div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) 90px; gap: 8px">
+                <input type="number" min="0" step="0.5" aria-label="Dose" value="{{dose}}" onChange="{{onDose}}" style="width: 100%; box-sizing: border-box; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; font: inherit; font-size: 14px; color: #1c1917; outline-color: #276640">
+                <button type="button" aria-label="Dose unit: mL" style="display: flex; align-items: center; justify-content: space-between; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: #1c1917; cursor: pointer">mL<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.down}}"></path></svg></button>
+              </div>
+            </div>
+            <div style="max-width: 280px">
+              <div style="font-size: 13px; font-weight: 500; margin-bottom: 7px">Start</div>
+              <div style="position: relative">
+                <input type="date" aria-label="Start date" value="2026-11-05" style="width: 100%; box-sizing: border-box; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; font: inherit; font-size: 14px; color: transparent; background: #ffffff">
+                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 14px">{{startText}}</span>
+              </div>
+            </div>
+            <div style="max-width: 280px; display: flex; align-items: center; gap: 10px; min-height: 40px">
+              <button type="button" role="switch" aria-checked="{{several}}" aria-label="Several doses" onClick="{{toggleSeveral}}" style="width: 36px; height: 20px; padding: 2px; border: 0; border-radius: 999px; background: {{switchBg}}; display: flex; justify-content: {{switchJustify}}; cursor: pointer; flex: none">
+                <span style="width: 16px; height: 16px; border-radius: 50%; background: #ffffff"></span>
+              </button>
+              <span style="font-size: 13px; font-weight: 500">Several doses</span>
+            </div>
+            <sc-if value="{{several}}" hint-placeholder-val="{{false}}">
+              <div style="max-width: 140px">
+                <div style="font-size: 13px; font-weight: 500; margin-bottom: 7px">Doses</div>
+                <input type="number" min="2" step="1" aria-label="Doses" value="{{doses}}" onChange="{{onDoses}}" style="width: 100%; box-sizing: border-box; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; font: inherit; font-size: 14px; color: #1c1917; outline-color: #276640">
+              </div>
+              <div style="max-width: 280px">
+                <div style="font-size: 13px; font-weight: 500; margin-bottom: 7px">Every</div>
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) 90px; gap: 8px">
+                  <input type="number" min="1" step="1" aria-label="Interval" value="{{every}}" onChange="{{onEvery}}" style="width: 100%; box-sizing: border-box; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; font: inherit; font-size: 14px; color: #1c1917; outline-color: #276640">
+                  <button type="button" aria-label="Interval unit: hours" style="display: flex; align-items: center; justify-content: space-between; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: #1c1917; cursor: pointer">hours<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.down}}"></path></svg></button>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center; margin: 15px 0 5px">
+            <p style="flex: 1; margin: 0; font-size: 12px; color: #57534e; display: flex; align-items: center; gap: 4px">
+              <sc-if value="{{filled}}" hint-placeholder-val="{{false}}">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><circle cx="12" cy="12" r="9"></circle><path d="{{I.info}}"></path></svg>
+                Withdrawal 14 days, from the medicine record
+              </sc-if>
+            </p>
+            <button type="button" disabled="{{true}}" aria-label="Delete medicine" style="width: 32px; height: 32px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 10px; background: transparent; color: #1c1917; opacity: 0.4">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.trash}}"></path></svg>
+            </button>
+          </div>
+          <div style="height: 1px; background: #e7e5e4"></div>
+          <button type="button" class="tx-ghost" style="display: inline-flex; align-items: center; gap: 7px; height: 40px; margin-top: 8px; padding: 0 12px 0 0; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 14px; font-weight: 500; color: #1c1917; cursor: pointer">
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.plus}}"></path></svg>
+            Add medicine
+          </button>
+        </div>
+      </section>
+
+      <!-- Notes -->
+      <section style="display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 16px; padding-bottom: 6px">
+        <div>
+          <h2 style="margin: 0; font-size: 17px; font-weight: 600; line-height: 1.4; letter-spacing: -0.15px">Notes</h2>
+          <p style="margin: 6px 0 0; font-size: 13px; color: #57534e">For the team</p>
+        </div>
+        <div style="min-width: 0">
+          <textarea aria-label="Notes" placeholder="Anything the team should know" style="display: block; width: 100%; box-sizing: border-box; height: 88px; resize: none; padding: 10px 12px; border: 1px solid #d6d3d1; border-radius: 10px; font: inherit; font-size: 14px; color: #1c1917; outline-color: #276640"></textarea>
+        </div>
+      </section>
+    </div>
+  </div>
+  <footer style="flex: none; display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: #ffffff; border-top: 1px solid #e7e5e4">
+    <div style="flex: 1; min-width: 0; font-size: 14px; font-weight: 500; line-height: 1.6">
+      {{formLine}}
+      <p style="margin: 0; font-size: 12px; font-weight: 400; color: #57534e">{{formSub}}</p>
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center">
+      <button type="button" class="tx-ghost" onClick="{{formCancel}}" style="height: 40px; padding: 0 10px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; font-weight: 500; color: #1c1917; cursor: pointer">Cancel</button>
+      <button type="button" onClick="{{issue}}" disabled="{{cannotIssue}}" style="height: 40px; padding: 0 10px; border: 0; border-radius: 10px; background: #276640; opacity: {{issueOpacity}}; font: inherit; font-size: 14px; font-weight: 500; color: #ffffff; cursor: {{issueCursor}}">Issue treatment</button>
+    </div>
+  </footer>
+</sc-if>
+
+<!-- ============================ RUNNING TREATMENT ============================ -->
+<sc-if value="{{isRunning}}" hint-placeholder-val="{{false}}">
+  <div style="flex: 1; min-height: 0; overflow-y: auto; background: #f5f5f4">
+    <div style="padding: 24px; display: flex; flex-direction: column; gap: 18px">
+      <header style="padding: 2px 0 4px">
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 8px">
+          <h1 style="margin: 0; font-size: 26px; font-weight: 600; line-height: 1.25; letter-spacing: -0.7px">Treatment RX-25G009</h1>
+          <span style="display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 8px; background: #e8effb; color: #24518c; font-size: 12px; font-weight: 500; line-height: 1.4">Running</span>
+        </div>
+        <p style="margin: 0; font-size: 12px; line-height: 1.7; color: #57534e">{{runLine}}</p>
+        <div style="display: flex; gap: 6px; margin-top: 12px">
+          <sc-for list="{{runDiseases}}" as="d" hint-placeholder-count="2">
+            <span style="display: inline-flex; align-items: center; padding: 3px 8px; border: 1px solid #e7e5e4; border-radius: 8px; background: #ffffff; font-size: 12px; font-weight: 500; line-height: 1.4">{{d.label}}</span>
+          </sc-for>
+        </div>
+      </header>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1.15fr; gap: 18px">
+        <section style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a; min-width: 0">
+          <h2 style="margin: 0; padding: 16px 16px 6px; font-size: 12px; font-weight: 500; color: #57534e">Current dose</h2>
+          <div style="padding: 0 16px 16px">
+            <strong style="display: block; font-size: 24px; font-weight: 600; line-height: 1.3; letter-spacing: -0.5px; margin-bottom: 6px">2 of 3</strong>
+            <p style="margin: 0; font-size: 12px; color: #57534e">since Fri 6 Nov 08:30</p>
+          </div>
+        </section>
+        <section style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a; min-width: 0">
+          <h2 style="margin: 0; padding: 16px 16px 6px; font-size: 12px; font-weight: 500; color: #57534e">Dose 2 given</h2>
+          <div style="padding: 0 16px 16px">
+            <strong style="display: block; font-size: 24px; font-weight: 600; line-height: 1.3; letter-spacing: -0.5px; margin-bottom: 6px">2 of 4 sows</strong>
+            <div role="progressbar" aria-label="Dose 2 given" aria-valuenow="2" aria-valuemin="0" aria-valuemax="4" style="height: 5px; border-radius: 99px; background: #f5f5f4; margin-top: 13px; overflow: hidden"><span style="display: block; width: 50%; height: 100%; background: #276640"></span></div>
+          </div>
+        </section>
+        <section style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a; min-width: 0">
+          <h2 style="margin: 0; padding: 16px 16px 6px; font-size: 12px; font-weight: 500; color: #57534e">Next dose</h2>
+          <div style="padding: 0 16px 16px">
+            <strong style="display: block; font-size: 17px; font-weight: 600; line-height: 1.5; letter-spacing: -0.2px; margin-bottom: 6px">Sat 7 Nov 08:30</strong>
+            <p style="margin: 0; font-size: 12px; color: #57534e">every 24 hours</p>
+          </div>
+        </section>
+      </div>
+
+      <section style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+        <h2 style="margin: 0; padding: 24px 24px 16px; font-size: 17px; font-weight: 600">Doses</h2>
+        <div style="padding: 0 24px 24px">
+          <div role="img" aria-label="Dose 1: 3 done, 1 skipped. Dose 2: 2 done, 2 pending. Dose 3: 4 pending." style="display: flex; flex-direction: column; gap: 12px">
+            <sc-for list="{{doseRows}}" as="d" hint-placeholder-count="3">
+              <div style="display: grid; grid-template-columns: 132px minmax(0, 1fr) 76px; gap: 14px; align-items: center">
+                <span style="font-size: 13px; white-space: nowrap">{{d.label}}</span>
+                <div style="display: flex; gap: 3px; height: 22px">
+                  <sc-for list="{{d.parts}}" as="p" hint-placeholder-count="2">
+                    <span style="flex: {{p.n}}; display: grid; place-items: center; min-width: 0; box-sizing: border-box; border-radius: 5px; background: {{p.bg}}; border: {{p.line}}; color: {{p.ink}}; font-size: 12px; font-weight: 600">{{p.n}}</span>
+                  </sc-for>
+                </div>
+                <span style="justify-self: start; display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 8px; background: {{d.bg}}; color: {{d.ink}}; box-shadow: {{d.ring}}; font-size: 12px; font-weight: 500; line-height: 1.4">{{d.state}}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 12px; color: #57534e; margin-top: 12px">
+            <span style="display: flex; gap: 6px; align-items: center"><i style="width: 9px; height: 9px; border-radius: 2px; background: #276640"></i>Done</span>
+            <span style="display: flex; gap: 6px; align-items: center"><i style="width: 9px; height: 9px; border-radius: 2px; background: #8a570e"></i>Skipped</span>
+            <span style="display: flex; gap: 6px; align-items: center"><i style="width: 9px; height: 9px; border-radius: 2px; background: #71717a"></i>Removed</span>
+            <span style="display: flex; gap: 6px; align-items: center"><i style="width: 9px; height: 9px; box-sizing: border-box; border-radius: 2px; background: #ffffff; border: 1px solid #a1a1aa"></i>Pending</span>
+          </div>
+        </div>
+      </section>
+
+      <section style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+        <h2 style="margin: 0; padding: 24px 24px 16px; font-size: 17px; font-weight: 600">Sows</h2>
+        <div style="padding: 0 24px">
+          <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px">
+            <div style="position: relative; flex: 1; min-width: 0">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="position: absolute; left: 11px; top: 11px; width: 18px; height: 18px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.search}}"></path></svg>
+              <input value="{{sq}}" onChange="{{onSowSearch}}" aria-label="Find a sow in this treatment" placeholder="Find a sow" style="width: 100%; box-sizing: border-box; height: 40px; padding: 0 11px 0 36px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: #1c1917; outline-color: #276640">
+            </div>
+            <button type="button" aria-label="Dose status: Any dose status" aria-haspopup="listbox" style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: #1c1917; cursor: pointer; flex: none; white-space: nowrap">Any dose status<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.down}}"></path></svg></button>
+            <button type="button" aria-label="Pen: All pens" aria-haspopup="listbox" style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: #1c1917; cursor: pointer; flex: none; white-space: nowrap">All pens<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.down}}"></path></svg></button>
+            <button type="button" class="tx-ghost" style="display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 10px; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 14px; font-weight: 500; color: #1c1917; cursor: pointer; flex: none">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.columns}}"></path></svg>
+              Columns
+            </button>
+          </div>
+          <div role="table" aria-label="Sows" style="font-size: 14px">
+            <div role="row" style="display: grid; grid-template-columns: 17% 23% repeat(3, minmax(0, 1fr)); align-items: center; height: 32px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e">
+              <span role="columnheader">Sow</span><span role="columnheader">Pen</span><span role="columnheader">Dose 1</span><span role="columnheader">Dose 2</span><span role="columnheader">Dose 3</span>
+            </div>
+            <sc-for list="{{sows}}" as="r" hint-placeholder-count="4">
+              <div role="row" style="display: grid; grid-template-columns: 17% 23% repeat(3, minmax(0, 1fr)); align-items: center; height: 44px; border-bottom: {{r.line}}">
+                <span role="cell" style="font-weight: 500">{{r.tag}}</span>
+                <span role="cell">Pen {{r.pen}}</span>
+                <sc-for list="{{r.marks}}" as="m" hint-placeholder-count="3">
+                  <span role="cell" style="display: flex">
+                    <span role="img" aria-label="{{m.label}}" style="display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: {{m.size}}; height: {{m.size}}; margin: {{m.margin}}; border-radius: 50%; background: {{m.bg}}; border: {{m.line}}; color: {{m.ink}}; font-size: 14px; line-height: 1">
+                      <sc-if value="{{m.done}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
+                      <sc-if value="{{m.skipped}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px"><path d="m5 5 10 7-10 7Z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path><path d="M19 5v14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2.5"></path></svg></sc-if>
+                      {{m.text}}
+                    </span>
+                  </span>
+                </sc-for>
+              </div>
+            </sc-for>
+            <sc-if value="{{noSows}}" hint-placeholder-val="{{false}}">
+              <p style="margin: 0; padding: 14px 0; font-size: 13px; color: #57534e">No sow in this treatment matches “{{sq}}”.</p>
+            </sc-if>
+          </div>
+        </div>
+        <div style="padding: 0 24px 24px">
+          <p style="margin: 0; padding-top: 12px; border-top: 1px solid #e7e5e4; font-size: 12px; line-height: 1.7; color: #57534e">D41 · dose 1 skipped: could not stand (Wang Fang, Thu 5 Nov 08:52)</p>
+        </div>
+      </section>
+
+      <section style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+        <h2 style="margin: 0; padding: 24px 24px 16px; font-size: 17px; font-weight: 600">Prescription</h2>
+        <div style="padding: 0 24px 24px; font-size: 14px; line-height: 1.9">
+          <strong style="font-weight: 600">Amoxicillin 15% LA</strong>
+          <p style="margin: 0">Injectable suspension · Intramuscular · 15 mL a sow</p>
+          <p style="margin: 0">3 doses, every 24 hours</p>
+          <p style="margin: 0; color: #57534e">Withdrawal 14 days (from the medicine record)</p>
+          <div style="height: 1px; background: #e7e5e4; margin: 14px 0"></div>
+          <p style="margin: 0"><span style="color: #57534e">Notes:</span> Keep D40 and D41 on straw</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["pick","pick-agent","pick-none","form","proposal","running"],"default":"pick"},"farmPigs":{"editor":null,"default":null},"paneHeight":{"editor":null,"default":900},"onAsk":{"editor":null,"default":null},"onFarm":{"editor":null,"default":null},"onClose":{"editor":null,"default":null},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  // Data: the same six sows as the approved board (Gestation 2, lameness this week).
+  pigs() {
+    return [
+      { tag: 'B15', pen: '14', finding: 'Lame, hind legs · since Wed', status: 'Priority' },
+      { tag: 'B20', pen: '14', finding: 'Lame, hind legs · since Thu', status: 'Priority' },
+      { tag: 'D40', pen: '22', finding: 'Lame · 39.8 °C this morning', status: 'Urgent' },
+      { tag: 'D41', pen: '22', finding: 'Lame, off feed · 39.8 °C', status: 'Urgent' },
+      { tag: 'C07', pen: '18', finding: 'Lame, front left · since Mon', status: 'Watch' },
+      { tag: 'C12', pen: '18', finding: 'Stiff gait · since Tue', status: 'Watch' }
+    ];
+  }
+  agentPigs() {
+    return [
+      { tag: 'D40', pen: '22', finding: 'Lame', status: 'Urgent', temp: '39.8' },
+      { tag: 'D41', pen: '22', finding: 'Lame, off feed', status: 'Urgent', temp: '39.8' },
+      { tag: 'B20', pen: '14', finding: 'Lame, hind legs', status: 'Priority', temp: '39.6' }
+    ];
+  }
+  // Where a given start lands. Pigs sent from the farm view open the form with those pigs.
+  initial(start, farm) {
+    const four = ['B15', 'B20', 'D40', 'D41'];
+    const s = { screen: 'pick', mode: 'default', picked: four.slice(), formPicked: four.slice(), source: 'picker', filled: false, comment: false, method: 'Intramuscular', several: false, dose: '', doses: '3', every: '24', diseases: ['Lameness'], diseaseDraft: '', q: '', sq: '', filterOpen: false, queryOpen: false, fromForm: false };
+    if (farm) return farm.length ? Object.assign(s, { screen: 'form', formPicked: farm.slice(), source: 'farm' }) : s;
+    if (start === 'pick-agent') return Object.assign(s, { mode: 'agent', picked: ['D40', 'D41', 'B20'] });
+    if (start === 'pick-none') return Object.assign(s, { mode: 'none', picked: [] });
+    if (start === 'form') return Object.assign(s, { screen: 'form' });
+    if (start === 'proposal' || start === 'filled') return Object.assign(s, { screen: 'form', source: 'farm-batch', filled: true, comment: true, method: 'In feed', several: true, dose: '15', diseases: ['Lameness', 'Fever'] });
+    if (start === 'running') return Object.assign(s, { screen: 'running' });
+    return s;
+  }
+  farmKey() { const f = this.props.farmPigs; return f ? 'farm:' + f.join(',') : ''; }
+  // A new start or a new set of farm pigs while the page is open resets it to that start.
+  componentDidUpdate() {
+    const k = this.farmKey() + '|' + (this.props.start || '');
+    if (k !== this._key) { this._key = k; this.setState(this.initial(this.props.start, this.props.farmPigs)); }
+  }
+  componentDidMount() { this._key = this.farmKey() + '|' + (this.props.start || ''); }
+
+  renderVals() {
+    const s = Object.assign(this.initial(this.props.start, this.props.farmPigs), this.state || {});
+    const set = (p) => this.setState(Object.assign({}, s, p));
+    const I = {
+      back: 'm15 18-6-6 6-6', map: 'm3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3ZM9 3v15M15 6v15', down: 'm6 9 6 6 6-6', close: 'm18 6-12 12M6 6l12 12', plus: 'M12 5v14M5 12h14',
+      search: 'm21 21-4.3-4.3M11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16', columns: 'M9 3v18M15 3v18M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2',
+      sortDown: 'M12 5v14m-5-5 5 5 5-5', history: 'M3 12a9 9 0 1 0 2.6-6.4L3 8M3 3v5h5M12 7v5l3 2', info: 'M12 8h.01M12 11v5',
+      trash: 'M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7', quote: 'M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4ZM8 8v4h3V8ZM14 8v4h3V8M8 12l-1 2M14 12l-1 2'
+    };
+    const ask = (text) => { if (this.props.onAsk) this.props.onAsk(text || ''); else { const el = document.getElementById('composer'); if (el) el.focus(); } };
+    const close = () => { if (this.props.onClose) this.props.onClose(); else set(this.initial('pick')); };
+    const plural = (n) => n + ' ' + (n === 1 ? 'sow' : 'sows');
+
+    // ---------- Pick pigs ----------
+    const mode = s.mode;
+    const all = mode === 'agent' ? this.agentPigs() : mode === 'default' ? this.pigs() : [];
+    const q = (s.q || '').trim().toLowerCase();
+    const shown = q ? all.filter((p) => (p.tag + ' ' + p.finding).toLowerCase().indexOf(q) >= 0) : all;
+    const pickedIn = all.filter((p) => s.picked.indexOf(p.tag) >= 0).map((p) => p.tag);
+    const toggle = (tag) => set({ picked: s.picked.indexOf(tag) >= 0 ? s.picked.filter((t) => t !== tag) : s.picked.concat([tag]) });
+    const tone = { Urgent: ['#fee2e2', '#b91c1c', 'none'], Priority: ['#fef3c7', '#92400e', 'none'], Watch: ['#ffffff', '#57534e', 'inset 0 0 0 1px #d6d3d1'] };
+    const rows = shown.map((p, i) => {
+      const on = s.picked.indexOf(p.tag) >= 0;
+      return Object.assign({}, p, {
+        checked: on, aria: 'Pick ' + p.tag, cls: on ? '' : 'tx-row',
+        bg: on ? '#f0f6f1' : 'transparent', line: i === shown.length - 1 ? '0' : '1px solid #e7e5e4',
+        badgeBg: tone[p.status][0], badgeInk: tone[p.status][1], badgeRing: tone[p.status][2],
+        toggle: () => toggle(p.tag),
+        rowClick: (e) => { if (e && e.target && e.target.tagName === 'INPUT') return; toggle(p.tag); }
+      });
+    });
+    const n = pickedIn.length, total = all.length;
+    const filters = mode === 'agent' ? [] : mode === 'none'
+      ? [{ value: 'Gestation 2', aria: 'Room or pen: Gestation 2' }, { value: 'Fever', aria: 'Disease or symptom: Fever' }, { value: 'Watch', aria: 'Status: Watch' }]
+      : mode === 'cleared'
+        ? [{ value: 'Room or pen', aria: 'Room or pen: none' }, { value: 'Disease or symptom', aria: 'Disease or symptom: none' }, { value: 'Status', aria: 'Status: none' }]
+        : [{ value: 'Gestation 2', aria: 'Room or pen: Gestation 2' }, { value: 'Lameness', aria: 'Disease or symptom: Lameness' }, { value: 'All statuses', aria: 'Status: All statuses' }];
+    const emptyText = mode === 'cleared' ? 'Choose a room, batch or finding to see pigs.' : mode === 'none' ? 'No pigs match these filters.' : 'No pig in these results matches “' + s.q.trim() + '”.';
+    const toForm = (apply) => set(Object.assign({ screen: 'form', filterOpen: false, queryOpen: false, q: '' }, apply ? { formPicked: pickedIn, source: s.source === 'farm' || s.source === 'farm-batch' ? 'picker' : s.source } : {}));
+
+    // ---------- New treatment ----------
+    const fp = s.formPicked;
+    const sourceText = s.source === 'farm-batch' ? plural(fp.length) + ' · Batch 32 · Gestation 2'
+      : s.source === 'farm' ? plural(fp.length) + ' from the farm view · Gestation 2' : plural(fp.length) + ' · Gestation 2';
+    const several = !!s.several;
+    const doses = Math.max(2, parseInt(s.doses, 10) || 2), every = Math.max(1, parseInt(s.every, 10) || 24);
+    const canIssue = s.filled && fp.length > 0;
+    const formLine = s.filled ? plural(fp.length) + ' · Amoxicillin · ' + (several ? doses + ' doses, every ' + every + ' hours' : 'one dose') : (fp.length ? plural(fp.length) + ' picked' : 'No pigs picked');
+    const formSub = s.filled ? (fp.length ? 'Tasks go to the phones once issued.' : 'Pick at least one pig to issue.') : 'Add a medicine to issue.';
+
+    // ---------- Running ----------
+    const sowData = [['B15', '14', 'done', 'done'], ['B20', '14', 'done', 'done'], ['D40', '22', 'done', 'pending'], ['D41', '22', 'skipped', 'pending']];
+    const sq = (s.sq || '').trim().toLowerCase();
+    const sowShown = sowData.filter((r) => !sq || r[0].toLowerCase().indexOf(sq) >= 0 || ('pen ' + r[1]).indexOf(sq) >= 0);
+    const mark = (k) => ({
+      done: { label: 'done', done: true, skipped: false, text: '', size: '25px', margin: '0', bg: '#e5f0e8', ink: '#276640', line: '0' },
+      skipped: { label: 'skipped', done: false, skipped: true, text: '', size: '25px', margin: '0', bg: '#fff0d4', ink: '#8a570e', line: '0' },
+      pending: { label: 'pending', done: false, skipped: false, text: '', size: '15px', margin: '0 5px', bg: 'transparent', ink: '#57534e', line: '1.5px solid #a1a1aa' },
+      waiting: { label: 'waiting', done: false, skipped: false, text: '—', size: '25px', margin: '0', bg: 'transparent', ink: '#57534e', line: '0' }
+    })[k];
+    const part = (k, nn) => ({ n: nn, bg: { done: '#276640', skipped: '#8a570e', removed: '#71717a', pending: '#ffffff' }[k], ink: k === 'pending' ? '#57534e' : '#ffffff', line: k === 'pending' ? '1px solid #a1a1aa' : '0' });
+    const doseRows = [
+      { label: 'Dose 1 · Thu 5 Nov', parts: [part('done', 3), part('skipped', 1)], state: 'Given', bg: '#e5f0e8', ink: '#276640', ring: 'none' },
+      { label: 'Dose 2 · Fri 6 Nov', parts: [part('done', 2), part('pending', 2)], state: 'Now', bg: '#e8effb', ink: '#24518c', ring: 'none' },
+      { label: 'Dose 3 · Sat 7 Nov', parts: [part('pending', 4)], state: 'Waiting', bg: '#ffffff', ink: '#57534e', ring: 'inset 0 0 0 1px #d6d3d1' }
+    ];
+
+    return {
+      I, h: (this.props.paneHeight || 900) + 'px',
+      isPick: s.screen === 'pick', isForm: s.screen === 'form', isRunning: s.screen === 'running',
+
+      // pick
+      pickBack: () => toForm(false),
+      pickCancel: () => (s.fromForm ? toForm(false) : close()),
+      pickInFarm: () => { if (this.props.onFarm) this.props.onFarm(); },
+      showQuery: mode === 'agent', queryOpen: !!s.queryOpen, toggleQuery: () => set({ queryOpen: !s.queryOpen }),
+      filters: filters.map((f) => Object.assign({ ink: mode === 'cleared' ? '#57534e' : '#1c1917' }, f)),
+      filterOpen: !!s.filterOpen, toggleFilter: () => set({ filterOpen: !s.filterOpen, queryOpen: false }),
+      catalogue: ['Batch', 'Stage', 'Parity', 'Days in stage', 'Temperature', 'Return-to-heat count'].map((label) => ({ label, pick: () => set({ filterOpen: false }) })),
+      askVet: () => { set({ filterOpen: false }); ask(''); },
+      clearFilters: () => set({ mode: 'cleared', q: '', queryOpen: false, filterOpen: false }),
+      resetFilters: () => set({ mode: 'cleared', q: '', queryOpen: false, filterOpen: false }),
+      q: s.q, onSearch: (e) => set({ q: e.target.value }),
+      cols: mode === 'agent' ? '36px 62px 76px minmax(0, 1fr) 112px 84px' : '36px 62px 76px minmax(0, 1fr) 84px',
+      agentMode: mode === 'agent', rows, hasRows: rows.length > 0, noRows: rows.length === 0,
+      emptyText, emptyAsk: mode !== 'cleared' && !q,
+      allChecked: total > 0 && n === total,
+      allRef: (el) => { if (el) el.indeterminate = n > 0 && n < total; },
+      toggleAll: () => set({ picked: n === total ? s.picked.filter((t) => !all.some((p) => p.tag === t)) : s.picked.concat(all.map((p) => p.tag).filter((t) => s.picked.indexOf(t) < 0)) }),
+      pickedLine: total ? n + ' of ' + total + ' picked' : '0 picked',
+      hasPickedSub: mode === 'default' || mode === 'agent',
+      pickedSub: mode === 'agent' ? "Vet's search" : 'Gestation 2 · Lameness',
+      cannotContinue: n === 0, continueOpacity: n === 0 ? '0.45' : '1', continueCursor: n === 0 ? 'default' : 'pointer',
+      continueLabel: n ? 'Continue with ' + plural(n) : 'Pick at least one pig',
+      continuePigs: () => { if (n) toForm(true); },
+
+      // form
+      formPad: s.filled ? '18px 24px 24px' : '24px', h1Gap: s.filled ? '8px' : '26px', filled: !!s.filled,
+      pigSource: sourceText,
+      chips: fp.map((t) => ({ tag: t, aria: 'Remove ' + t, remove: () => set({ formPicked: fp.filter((x) => x !== t) }) })),
+      changeLabel: fp.length ? 'Change pigs' : 'Pick pigs',
+      changePigs: () => set({ screen: 'pick', fromForm: true, picked: fp.slice(), mode: s.mode === 'cleared' || s.mode === 'none' ? 'default' : s.mode, q: '' }),
+      diseases: s.diseases.map((label) => ({ label })),
+      diseaseDraft: s.diseaseDraft, diseaseHint: s.filled ? '' : 'Add a disease or symptom', diseaseBasis: s.filled ? '30px' : '100%',
+      onDisease: (e) => set({ diseaseDraft: e.target.value }),
+      onDiseaseKey: (e) => { const v = (s.diseaseDraft || '').trim(); if (e.key === 'Enter' && v) { e.preventDefault(); set({ diseases: s.diseases.concat([v]), diseaseDraft: '' }); } },
+      medicine: s.filled ? 'Veterinary drug › Amoxicillin 15% LA' : 'Choose a medicine',
+      brand: s.filled ? 'Injectable suspension · 100 mL bottle' : 'Choose',
+      medInk: s.filled ? '#1c1917' : '#57534e',
+      method: s.method, methodLine: s.comment ? '#b45309' : '#d6d3d1', showComment: !!s.comment,
+      applyMethod: () => set({ method: 'Intramuscular', comment: false }),
+      dismissComment: () => set({ comment: false }),
+      replyComment: () => ask('Reply to Vet about Method: '),
+      dose: s.dose, onDose: (e) => set({ dose: e.target.value }),
+      startText: s.filled ? 'Thu 5 Nov' : 'Today, Thu 5 Nov',
+      several, toggleSeveral: () => set({ several: !several }),
+      switchBg: several ? '#276640' : '#d6d3d1', switchJustify: several ? 'flex-end' : 'flex-start',
+      doses: s.doses, onDoses: (e) => set({ doses: e.target.value }),
+      every: s.every, onEvery: (e) => set({ every: e.target.value }),
+      formLine, formSub,
+      formCancel: close,
+      cannotIssue: !canIssue, issueOpacity: canIssue ? '1' : '0.45', issueCursor: canIssue ? 'pointer' : 'default',
+      issue: () => { if (canIssue) set({ screen: 'running', sq: '' }); },
+
+      // running
+      runLine: '4 sows · Gestation 2 · Batch 32 · issued Thu 5 Nov 08:30 by Li Wei',
+      runDiseases: [{ label: 'Lameness' }, { label: 'Fever' }],
+      doseRows,
+      sq: s.sq, onSowSearch: (e) => set({ sq: e.target.value }),
+      sows: sowShown.map((r, i) => ({ tag: r[0], pen: r[1], line: i === sowShown.length - 1 ? '0' : '1px solid #e7e5e4', marks: [mark(r[2]), mark(r[3]), mark('waiting')] })),
+      noSows: sowShown.length === 0
+    };
+  }
+}
+</script>
+</body>
+</html>

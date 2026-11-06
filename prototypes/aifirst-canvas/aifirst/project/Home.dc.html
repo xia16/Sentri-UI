@@ -374,7 +374,7 @@
 </div>
 <sc-for list="{{row.cells}}" as="cell" hint-placeholder-count="7">
 <div style="padding:0 2px;display:flex;align-items:center;justify-content:center;border-left:1px solid #f1f0ee;min-width:0">
-<sc-if value="{{cell.visible}}" hint-placeholder-val="{{true}}"><button type="button" aria-label="{{cell.aria}}" onMouseEnter="{{cell.preview}}" onFocus="{{cell.preview}}" onBlur="{{hidePreview}}" onClick="{{noAction}}" style="box-sizing:border-box;width:100%;min-width:0;height:30px;padding:0;border:{{cell.border}};border-radius:{{cell.radius}};background:{{cell.bg}};color:{{cell.ink}};box-shadow:{{cell.shadow}};font:600 12px Inter,sans-serif;font-variant-numeric:tabular-nums;cursor:pointer">{{cell.label}}</button></sc-if>
+<sc-if value="{{cell.visible}}" hint-placeholder-val="{{true}}"><button type="button" aria-label="{{cell.aria}}" onMouseEnter="{{cell.preview}}" onFocus="{{cell.preview}}" onBlur="{{hidePreview}}" onClick="{{cell.open}}" style="box-sizing:border-box;width:100%;min-width:0;height:30px;padding:0;border:{{cell.border}};border-radius:{{cell.radius}};background:{{cell.bg}};color:{{cell.ink}};box-shadow:{{cell.shadow}};font:600 12px Inter,sans-serif;font-variant-numeric:tabular-nums;cursor:pointer">{{cell.label}}</button></sc-if>
 </div>
 </sc-for>
 </div>
@@ -738,7 +738,7 @@ class Component extends DCLogic {
           const code=offset===0?r[2][i]:'',type=code[0],n=Number(code.replace(/[^0-9]/g,'')),visible=!!code&&code!=='n',on=c=>!!c&&c!=='n',prev=on(r[2][i-1]),next=on(r[2][i+1]),radius=(prev?'3px':'9px')+' '+(next||code.endsWith('>')?'3px':'9px')+' '+(next||code.endsWith('>')?'3px':'9px')+' '+(prev?'3px':'9px');
           const done=type==='d'||type==='w',today=['o','u','v'].includes(type),label=type==='u'?'–':type==='e'?'~'+n:String(n);
           const description=type==='w'?n+' of 8 done, past its plan':done?n+' done':today?type==='u'?'waiting':n+' today':type==='e'?'about '+n:n+' planned';
-          return {visible,label,radius,bg:done?'#E3F0E8':today?'#EAF1FC':type==='e'?'transparent':'#F1F3EE',ink:type==='w'?'#B34B43':done?'#28734F':today?'#3972B7':type==='e'?'#657060':'#20291F',border:type==='e'?'1px dashed #9CA59D':'0',shadow:today?'inset 0 0 0 1.5px #3972B7':'none',aria:name+' · '+r[1]+' · '+day+' '+(i+2)+' Nov · '+description,preview:e=>{
+          return {open:name==='Amox treatment'?()=>window.dispatchEvent(new CustomEvent('sentri:open',{detail:{action:'treatrun'}})):()=>{},visible,label,radius,bg:done?'#E3F0E8':today?'#EAF1FC':type==='e'?'transparent':'#F1F3EE',ink:type==='w'?'#B34B43':done?'#28734F':today?'#3972B7':type==='e'?'#657060':'#20291F',border:type==='e'?'1px dashed #9CA59D':'0',shadow:today?'inset 0 0 0 1.5px #3972B7':'none',aria:name+' · '+r[1]+' · '+day+' '+(i+2)+' Nov · '+description,preview:e=>{
             if(name!=='Amox treatment'&&!(name==='Fostering checks'&&i===2)){hidePreview();return}
             const rect=e.currentTarget.getBoundingClientRect(),foster=name==='Fostering checks',total=foster?8:4,doneCount=done?n:0;
             this.setState({tagTip:'',preview:{row:name,title:foster?'Fostering checks · B32':'Treatment · Amox',meta:day+' '+(i+2)+' Nov · '+(foster?'Farrowing 2':'Gestation 2')+' · Li Wei',done:doneCount,pending:total-doneCount,progress:doneCount+' of '+total,note:foster?'2 not reported: A5, B10':'RX-25G009 · Running'},previewLeft:Math.min(175,Math.max(8,rect.left-16))+'px',previewTop:Math.min(700,rect.bottom+8)+'px'});
