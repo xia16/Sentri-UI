@@ -30,31 +30,31 @@
 
   <!-- the results card: the query's rendering, in the right panel -->
   <div style="position: absolute; left: 1035px; top: 77px; width: 380px; box-sizing: border-box; padding-bottom: 14px; border-radius: 22px; background: #F6F7F1; box-shadow: 0 12px 32px rgba(17,21,17,.14), 0 0 0 1px rgba(17,21,17,.04)">
-    <div style="padding: 16px 14px 4px 16px; display: flex; align-items: center; gap: 8px">
-      <span style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 10px 0 6px; border-radius: 10px; background: #FFFFFF; box-shadow: 0 0 0 1px #E3E6DF; font-size: 13px; font-weight: 500">
-        <span style="width: 22px; height: 22px; display: grid; place-items: center; border-radius: 6px; background: #DDF1EF; color: #1F6F68; font-size: 9px; font-weight: 600">VT</span>
-        <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Vet · fever this week</span>
-        <svg viewBox="0 0 24 24" aria-label="Remove Vet's search" style="width: 14px; height: 14px; fill: none; stroke: #3B4540; stroke-width: 2; stroke-linecap: round"><path d="m18 6-12 12M6 6l12 12"></path></svg>
-      </span>
-    </div>
-    <div style="padding: 10px 20px 0">
-      <div style="font-size: 19px; font-weight: 700; letter-spacing: -0.02em">9 pigs in 4 rooms</div>
-      <div style="margin-top: 2px; font-size: 12.5px; color: #5D665F">Temperature °C · hottest first in each room</div>
-    </div>
-    <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
-      <div>
-        <div style="display: flex; justify-content: space-between; padding: 12px 20px 6px; font-size: 13px; font-weight: 600"><span>{{g.room}}</span><span style="font-weight: 500; color: #5D665F">{{g.n}}</span></div>
-        <div style="margin: 0 12px; padding: 0 14px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2">
-          <sc-for list="{{g.pigs}}" as="p" hint-placeholder-count="2">
-            <div style="display: flex; align-items: center; gap: 10px; height: 38px; border-bottom: {{p.line}}">
-              <span style="font-size: 13.5px; font-weight: 600; white-space: nowrap">{{p.tag}}</span>
-              <span style="flex: 1; min-width: 0; font-size: 12px; color: #5D665F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.finding}}</span>
-              <span style="font-size: 13.5px; font-variant-numeric: tabular-nums; color: #B91C1C">{{p.temp}}</span>
-            </div>
-          </sc-for>
+    <div style="padding: 18px 18px 14px 20px; display: flex; align-items: flex-start; gap: 10px">
+      <div style="flex: 1; min-width: 0">
+        <div style="font-size: 19px; font-weight: 700; letter-spacing: -0.02em">Fever this week</div>
+        <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 12.5px; color: #5D665F">
+          <span style="width: 18px; height: 18px; display: grid; place-items: center; border-radius: 5px; background: #DDF1EF; color: #1F6F68; font-size: 8px; font-weight: 600">VT</span>
+          Vet's search · 9 pigs · hottest first
         </div>
       </div>
-    </sc-for>
+      <span role="button" aria-label="Remove Vet's search" style="width: 32px; height: 32px; display: grid; place-items: center; color: #3B4540">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="m18 6-12 12M6 6l12 12"></path></svg>
+      </span>
+    </div>
+    <div role="table" aria-label="Pigs with a fever this week" style="margin: 0 12px; padding: 0 14px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2">
+      <div role="row" style="display: grid; grid-template-columns: 70px 90px minmax(0, 1fr) 40px; align-items: center; height: 34px; border-bottom: 1px solid #E6E9E2; font-size: 12px; font-weight: 500; color: #5D665F">
+        <span role="columnheader">Pig</span><span role="columnheader">Room</span><span role="columnheader">Finding</span><span role="columnheader" aria-sort="descending" style="text-align: right">°C</span>
+      </div>
+      <sc-for list="{{rows}}" as="p" hint-placeholder-count="9">
+        <div role="row" style="display: grid; grid-template-columns: 70px 90px minmax(0, 1fr) 40px; align-items: center; height: 40px; border-bottom: {{p.line}}">
+          <span role="cell" style="font-size: 13.5px; font-weight: 600">{{p.tag}}</span>
+          <span role="cell" style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px">{{p.room}}</span>
+          <span role="cell" style="font-size: 12.5px; color: #5D665F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px">{{p.finding}}</span>
+          <span role="cell" style="text-align: right; font-size: 13.5px; font-variant-numeric: tabular-nums; color: #B91C1C">{{p.temp}}</span>
+        </div>
+      </sc-for>
+    </div>
     <div style="display: flex; gap: 8px; padding: 14px 12px 0">
       <span style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border-radius: 22px; background: #FFFFFF; box-shadow: 0 0 0 1px #E3E6DF; font-size: 14px; font-weight: 500">
         <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg>See as a list
@@ -72,7 +72,7 @@
       <span style="width: 26px; height: 26px; flex: none; display: grid; place-items: center; border-radius: 7px; background: #DDF1EF; color: #1F6F68; font-size: 9.5px; font-weight: 600">VT</span>
       <div style="min-width: 0">
         <div style="font-size: 13px"><strong style="font-weight: 600">Vet</strong><span style="margin-left: 8px; font-size: 11.5px; color: #5D665F">09:02</span></div>
-        <div style="margin-top: 4px">Nine, in four rooms. I've lit them on the farm, hottest first in each room. D40 and D41 are already on Amoxicillin (RX-25G009). The two in the sick room are new since yesterday.</div>
+        <div style="margin-top: 4px">Nine, in four rooms. I've lit them on the farm and listed them hottest first. D40 and D41 are already on Amoxicillin (RX-25G009). The two in the sick room are new since yesterday.</div>
       </div>
     </div>
   </div>
@@ -81,12 +81,7 @@
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
   renderVals() {
-    const groups = [
-      { room: 'Gestation 1', pigs: [['D40', 'Lame', '39.8'], ['D41', 'Lame, off feed', '39.8'], ['B20', 'Lame, hind legs', '39.6'], ['C12', 'Stiff gait', '39.4']] },
-      { room: 'Sick room', pigs: [['S3', 'Off feed', '40.1'], ['S5', 'Coughing', '39.7']] },
-      { room: 'Gestation 2', pigs: [['207118', 'Pen 14 · lame', '39.5'], ['207342', 'Pen 22', '39.3']] },
-      { room: 'Farrowing 1', pigs: [['F1-08', 'Off feed after farrowing', '39.4']] }
-    ];
+    const data = [['S3', 'Sick room', 'Off feed', '40.1'], ['D40', 'Gestation 1', 'Lame', '39.8'], ['D41', 'Gestation 1', 'Lame, off feed', '39.8'], ['S5', 'Sick room', 'Coughing', '39.7'], ['B20', 'Gestation 1', 'Lame, hind legs', '39.6'], ['207118', 'Gestation 2', 'Lame', '39.5'], ['C12', 'Gestation 1', 'Stiff gait', '39.4'], ['F1-08', 'Farrowing 1', 'Off feed', '39.4'], ['207342', 'Gestation 2', 'Coughing', '39.3']];
     return {
       rooms: [
         { x: '150px', y: '300px', n: '4', name: 'Gestation 1' },
@@ -94,7 +89,7 @@ class Component extends DCLogic {
         { x: '322px', y: '403px', n: '2', name: 'Sick room' },
         { x: '462px', y: '357px', n: '1', name: 'Farrowing 1' }
       ],
-      groups: groups.map((g) => ({ room: g.room, n: g.pigs.length + (g.pigs.length === 1 ? ' pig' : ' pigs'), pigs: g.pigs.map((p, i) => ({ tag: p[0], finding: p[1], temp: p[2], line: i === g.pigs.length - 1 ? '0' : '1px solid #EEF0EA' })) }))
+      rows: data.map((r, i) => ({ tag: r[0], room: r[1], finding: r[2], temp: r[3], line: i === data.length - 1 ? '0' : '1px solid #EEF0EA' }))
     };
   }
 }
