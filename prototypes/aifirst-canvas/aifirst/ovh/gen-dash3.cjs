@@ -33,10 +33,18 @@ function herdW(hv) {
 }
 // 2 · small: PSY as a gauge against target
 function psyW() {
-  const r = 38, c = Math.PI * r, val = 28.5, lo = 20, hi = 32, f = (val - lo) / (hi - lo), tf = (28 - lo) / (hi - lo);
-  const tx = 60 - r * Math.cos(Math.PI * tf), ty = 58 - r * Math.sin(Math.PI * tf);
-  const g = '<svg viewBox="0 0 120 66" style="display: block; width: 150px; height: 82px;"><path d="M22 58 A38 38 0 0 1 98 58" fill="none" stroke="#EDEFE9" stroke-width="10" stroke-linecap="round"></path><path d="M22 58 A38 38 0 0 1 98 58" fill="none" stroke="#C99A3B" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + (c * f).toFixed(1) + ' 999"></path><circle cx="' + tx.toFixed(1) + '" cy="' + ty.toFixed(1) + '" r="2.6" fill="' + K.ink + '"></circle></svg>';
-  return W(199, 150, '<div style="padding: 14px 16px;">' + title(I.litter, 'PSY', K.amber) + '</div><div style="' + st({ position: 'absolute', left: 0, right: 0, bottom: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center' }) + '">' + g + '<div style="' + st({ marginTop: '-34px', fontSize: '26px', lineHeight: '30px', fontWeight: 600, letterSpacing: '-.02em' }) + '">28.5</div>' + t('target 28 · 12 months', { fontSize: '11.5px', lineHeight: '15px', color: K.muted }) + '</div>');
+  // a half ring, scale 20–32 PSY; the number sits inside the bowl; the target is a short tick across the ring
+  const cx = 70, cy = 66, r = 52, sw = 9, lo = 20, hi = 32, val = 28.5, tgt = 28;
+  const at = (v) => Math.PI * (1 - (v - lo) / (hi - lo)), pt = (a, rr) => [cx + rr * Math.cos(a), cy - rr * Math.sin(a)];
+  const arc = (v0, v1) => { const p0 = pt(at(v0), r), p1 = pt(at(v1), r); return 'M' + p0[0].toFixed(1) + ' ' + p0[1].toFixed(1) + ' A' + r + ' ' + r + ' 0 0 1 ' + p1[0].toFixed(1) + ' ' + p1[1].toFixed(1); };
+  const ta = at(tgt), t0 = pt(ta, r - sw / 2 - 3), t1 = pt(ta, r + sw / 2 + 3);
+  const g = '<svg viewBox="0 0 140 74" style="display: block; width: 140px; height: 74px; overflow: visible;">' +
+    '<path d="' + arc(lo, hi) + '" fill="none" stroke="#EDEFE9" stroke-width="' + sw + '" stroke-linecap="round"></path>' +
+    '<path d="' + arc(lo, val) + '" fill="none" stroke="#C99A3B" stroke-width="' + sw + '" stroke-linecap="round"></path>' +
+    '<line x1="' + t0[0].toFixed(1) + '" y1="' + t0[1].toFixed(1) + '" x2="' + t1[0].toFixed(1) + '" y2="' + t1[1].toFixed(1) + '" stroke="' + K.ink + '" stroke-width="2" stroke-linecap="round"></line>' +
+    '<text x="' + cx + '" y="' + (cy - 4) + '" text-anchor="middle" font-family="Geist, system-ui" font-size="26" font-weight="600" letter-spacing="-0.5" fill="' + K.ink + '">' + val + '</text>' +
+    '</svg>';
+  return W(199, 150, '<div style="padding: 14px 16px;">' + title(I.litter, 'PSY', K.amber) + '</div><div style="' + st({ position: 'absolute', left: 0, right: 0, bottom: '14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }) + '">' + g + t('target 28 · last 12 months', { fontSize: '11.5px', lineHeight: '15px', color: K.muted }) + '</div>');
 }
 // 3 · small: born alive per litter, stock-widget style: figure, change, line along the bottom edge
 function bornW() {
