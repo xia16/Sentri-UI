@@ -261,8 +261,10 @@ Home's own cards never act. Pages reached from Home (Schedule, the Inbox) can: S
   - Matching pigs light up and everything else fades. The count shows in the results card.
   - Each lit pig's label carries **at most one value** the agent picks ("D40 · 39.8").
   - A **results card** in the right panel:
-    - Its title is the question in plain words ("Fever this week"). The agent, the count and the sort sit under it.
-    - Below that is one compact table: Pig, Room, then the agent's columns, sorted by its value.
+    - Its title is the question in plain words ("Fever this week"). The agent and the count sit under it.
+    - Below that is one table, with a divider row per room (the room's name and pig count) and roomy rows (about 50 px). The columns are Pig, then the agent's columns (here Finding and °C).
+    - The table is sorted hottest first within each room. Rooms are ordered by their first value.
+    - The table scrolls inside the card, so the buttons stay put.
     - Clicking a row flies the camera to that pig.
   - The results card is the query's rendering, not a record page.
   - **"See as a list"** opens a Custom page with the same query and all its columns.
@@ -271,7 +273,7 @@ Home's own cards never act. Pages reached from Home (Schedule, the Inbox) can: S
   - the future (moves, next week);
   - ranking and comparison.
 - **Scale:**
-  - Zoomed out, rooms show a count badge, and the results card's Room column says where each pig is.
+  - Zoomed out, rooms show a count badge, and the results card's table is divided by room.
   - Group pens light up as a fraction ("12 of 30"), because a pen is a grouping.
 - **A highlight is a view, not a task.** To make the barn act, use Select → Actions, which creates a record that reaches the phones.
 - **Highlights stay until removed.** The chip is visible the whole time.
