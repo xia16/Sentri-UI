@@ -675,6 +675,14 @@
       "w": 2752,
       "h": 9878,
       "title": "Proposal · Edit layout rebuilt: one panel, pages, the map only for placing; Farm view Schedule scoped to where you are"
+    },
+    "FarmViewDocked.dc.html": {
+      "page": "home",
+      "x": 6720,
+      "y": 0,
+      "w": 4016,
+      "h": 2392,
+      "title": "Proposal · Farm view and Edit layout on one set of rules: the panel docks full height, the bar says where you are"
     }
   },
   "createdOnFiles": {
@@ -928,7 +936,8 @@
     "TreatFarmQuery.dc.html",
     "HomeBesideChat.dc.html",
     "HomeReport.dc.html",
-    "EditLayoutRebuilt.dc.html"
+    "EditLayoutRebuilt.dc.html",
+    "FarmViewDocked.dc.html"
   ],
   "pages": [
     {
