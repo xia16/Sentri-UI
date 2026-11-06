@@ -8876,6 +8876,7 @@ class Component extends DCLogic {
     if (k === 'batches') { if (O.panel && ['list', 'batch', 'task', 'dates', 'done', 'compare'].indexOf(O.panel) >= 0) { this.ovAct('close'); return; } if (u.bv) this.closeBatch(); this.ovSet({ panel: 'list', hist: [], pop: '' }); return; }
     if (k === 'close') { if (O.focus) { O.focus = null; this.setSel([]); } if (this.ui().ovCmp) this.put({ ovCmp: false }); if (this.ui().bv) { this.put({ bvOnly: '' }); this.closeBatch(); } this.ovSet({ panel: '', hist: [], only: '', pop: '' }); return; }
     if (k === 'back') {
+      if (O.focus) { O.focus = null; this.setSel([]); }
       const prev = O.hist.pop();
       if (O.panel === 'compare' && this.ui().ovCmp) { this.put({ ovCmp: false }); this.repaintBv(); }
       if (!prev) { this.ovAct('close'); return; }
@@ -9001,7 +9002,7 @@ class Component extends DCLogic {
     const panel = O.panel ? this.ovPanelHtml(O, u) : '';
     const H = OVH, K = H.K;
     const html = this.ovLoc(u) +
-      (panel ? '<section data-zone="panel" aria-label="Panel" style="' + H.st({ position: 'absolute', right: '16px', top: '72px', maxHeight: 'calc(100% - 164px)', width: '380px', boxSizing: 'border-box', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint, boxShadow: '0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12)', overflowY: 'auto', overflowX: 'hidden', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums', color: K.ink, fontSize: '14px', lineHeight: '20px' }) + '">' + panel + '</section>' : '') +
+      (panel ? '<section data-zone="panel" aria-label="Panel" style="' + H.st({ position: 'absolute', right: '16px', top: '72px', maxHeight: 'calc(100% - 164px)', width: '380px', boxSizing: 'border-box', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint, boxShadow: '0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12)', overflowY: 'auto', overflowX: 'hidden', scrollbarWidth: 'none', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums', color: K.ink, fontSize: '14px', lineHeight: '20px' }) + '">' + panel + '</section>' : '') +
       (this.ovSide ? this.ovSide(O, u) : '') +
       '<div data-zone="bar" role="toolbar" aria-label="Actions bar" style="' + H.st({ position: 'absolute', left: '16px', right: '16px', bottom: '16px', height: '60px', padding: '0 8px', boxSizing: 'border-box', borderRadius: '18px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', display: 'flex', alignItems: 'center', gap: '6px', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif" }) + '">' + OVP.bar(Object.assign({}, O, { barCtl: O.picking && this.ovBarCtl ? this.ovBarCtl(O) : '', eqOk: u.view === 'room' })) + '</div>' +
       this.ovPopHtml(O, u) + (this.ovExtra ? this.ovExtra(O, u) : '');
@@ -9422,7 +9423,7 @@ class Component extends DCLogic {
       : acting ? this.ovActsHtml(O, u)
       : this.ovViewHtml(O, u) + this.ovCard({ right: '16px', bottom: '16px' }, this.ovBtn(H.icon(H.I.select, 18) + 'Select', 'select', false, { fontWeight: 600, padding: '0 12px' }));
     const html = this.ovLoc(u) +
-      (panel ? '<section data-zone="panel" aria-label="Panel" style="' + H.st({ position: 'absolute', right: '16px', top: '16px', maxHeight: 'calc(100% - 104px)', width: '380px', boxSizing: 'border-box', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint, boxShadow: '0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12)', overflowY: 'auto', overflowX: 'hidden', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums', color: K.ink, fontSize: '14px', lineHeight: '20px' }) + '">' + panel + '</section>' : '') +
+      (panel ? '<section data-zone="panel" aria-label="Panel" style="' + H.st({ position: 'absolute', right: '16px', top: '16px', maxHeight: 'calc(100% - 104px)', width: '380px', boxSizing: 'border-box', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint, boxShadow: '0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12)', overflowY: 'auto', overflowX: 'hidden', scrollbarWidth: 'none', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums', color: K.ink, fontSize: '14px', lineHeight: '20px' }) + '">' + panel + '</section>' : '') +
       this.ovSide(O, u) + bottom + this.ovPopHtml(O, u) + (this.ovExtra ? this.ovExtra(O, u) : '');
     if (html === this.ovLast) return;
     const pEl = this.ovBody.querySelector('[data-zone="panel"]'), keep = pEl ? pEl.scrollTop : 0, sc = {};
@@ -9745,7 +9746,7 @@ class Component extends DCLogic {
     const foot = (inner) => inner ? '<!--F--><div style="flex: none; display: flex; gap: 8px; padding: 12px 16px 16px; border-top: 1px solid ' + K.line + ';">' + inner + '</div><!--/F-->' : '';
     const note = (text, warn) => text ? '<div style="margin: 10px 4px 0; font-size: 13.5px; line-height: 20px; color: ' + (warn ? K.red : K.muted) + ';">' + esc(text) + '</div>' : '';
     const panel = (inner) => { const cut = (src, a, b) => { const i = src.indexOf(a), j = i < 0 ? -1 : src.indexOf(b, i); return i < 0 || j < 0 ? [null, src] : [[null, src.slice(i + a.length, j)], src.slice(0, i) + src.slice(j + b.length)]; };
-      const c1 = cut(inner, '<!--H-->', '<!--/H-->'), c2 = cut(c1[1], '<!--F-->', '<!--/F-->'), hm = c1[0], fm = c2[0], body = c2[1]; return panelBox((hm ? hm[1] : '') + '<div data-zone="edbody" style="flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 0 16px ' + (fm ? 12 : 18) + 'px;">' + body + '</div>' + (fm ? fm[1] : '')); };
+      const c1 = cut(inner, '<!--H-->', '<!--/H-->'), c2 = cut(c1[1], '<!--F-->', '<!--/F-->'), hm = c1[0], fm = c2[0], body = c2[1]; return panelBox((hm ? hm[1] : '') + '<div data-zone="edbody" style="flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; padding: 0 16px ' + (fm ? 12 : 18) + 'px;">' + body + '</div>' + (fm ? fm[1] : '')); };
     const narrow = (this.W || 950) < 760, place = narrow ? 'left: 16px; right: 16px; bottom: 84px; max-height: calc(50% - 60px);' : 'right: 16px; top: 16px; width: 380px; max-height: calc(100% - 104px);';
     const panelBox = (inner) => '<section data-zone="edcol" aria-label="Edit" style="position: absolute; ' + place + ' max-width: calc(100% - 32px); box-sizing: border-box; display: flex; flex-direction: column; border-radius: 22px; background: ' + K.tint + '; box-shadow: 0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12); overflow: hidden; pointer-events: auto; font-family: \'Geist\', system-ui, sans-serif; color: ' + K.ink + '; font-size: 14px; line-height: 20px; font-variant-numeric: tabular-nums;">' + inner + '</section>';
     const isRed = (s) => /#7A2C2C/i.test(s || '');
