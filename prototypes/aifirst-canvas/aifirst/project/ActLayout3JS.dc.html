@@ -5369,6 +5369,7 @@ class Component extends DCLogic {
     // View: the card is only the place's name, top left; the model takes the width, under it
     if (this.IP) { ins.l = 28; ins.t = Math.max(ins.t, 104); ins.r = prof ? pw : 28; }
     if (this.IP && u.view === 'room') ins.t = Math.max(ins.t, 128);
+    if (this.ovEdOn && this.ovEdOn(u) && u.view === 'room' && this.edMapTask && this.edMapTask(u)) { ins.l = 20; ins.r = 20; ins.t = 96; ins.b = 80; return ins; }
     if (this.ovEdOn && this.ovEdOn(u)) { /* ovEdIns */ ins.l = 28; ins.t = 88; const nw = (this.W || 950) < 760; ins.b = nw ? Math.round((this.H || 830) * 0.5) + 40 : 92; ins.r = nw ? 28 : 412; return ins; }
     if (this.ovOn && this.ovOn(u)) { const O = this.ovS(); /* ovInsets */ ins.l = 28; ins.t = 84; ins.b = 92; ins.r = O.panel ? 412 + (O.her && O.panel === 'compare' ? 376 : 0) : 28; return ins; }
     if (this.IP && u.mode === 'saved' && u.vm === 'view') {
@@ -9403,7 +9404,7 @@ class Component extends DCLogic {
     if (!this.ovBody) return;
     const u = this.ui();
     if (!this.ovOn(u) && u.ready && !u.err && u.mode === 'intro') { const html = this.ovViewHtml(this.ovS(), u, true); if (html !== this.ovLast) { this.ovBody.innerHTML = html; this.ovLast = html; } return; }
-    if (!this.ovOn(u) && this.ovEdOn(u)) { const O = this.ovS(), H = OVH; if (!(u.tool === 'zone' || u.tool === 'sec' || u.tool === 'room' || (u.nn && u.nn.gat)) && this.ghostOn) this.hideGhost(); if (u.nn && u.nn.gat) this.syncGhost(); if (!(u.tool === 'lane' || u.tool === 'row')) this.edHideGhost(); const placing = u.view === 'room' && (u.tool === 'lane' || u.tool === 'row' || u.addDoor || (u.devT && u.devT.kind)); if (this.labelsEl) this.labelsEl.classList.toggle('edplacing', !!placing); const html = (placing ? '<style>.edplacing, .edplacing * { pointer-events: none !important; }</style>' : '') + this.ovEdLoc(u) + this.ovViewHtml(O, u, true) + this.edHtml(u) + this.edUndoHtml() + (this.ovVals && this.ovVals.showMode === false ? '' : this.ovCard({ right: '16px', bottom: '16px' }, this.ovBtn(H.icon(H.I.check, 18) + H.esc((this.ovVals && this.ovVals.modeLabel) || 'Done'), 'vw:modeToggle', false, { background: H.K.ink, color: '#FFFFFF', fontWeight: 600, padding: '0 16px' }))); this.edSwap(html); this.ovEdFit(); return; }
+    if (!this.ovOn(u) && this.ovEdOn(u)) { const O = this.ovS(), H = OVH; if (!(u.tool === 'zone' || u.tool === 'sec' || u.tool === 'room' || (u.nn && u.nn.gat)) && this.ghostOn) this.hideGhost(); if (u.nn && u.nn.gat) this.syncGhost(); const roomTask = u.view === 'room' && this.edMapTask(u); if (roomTask !== !!this.edRT) { this.edRT = roomTask; this.reframe(550); } if (!(u.tool === 'lane' || u.tool === 'row')) this.edHideGhost(); const placing = u.view === 'room' && (u.tool === 'lane' || u.tool === 'row' || u.addDoor || (u.devT && u.devT.kind)); if (this.labelsEl) this.labelsEl.classList.toggle('edplacing', !!placing); const html = (placing ? '<style>.edplacing, .edplacing * { pointer-events: none !important; }</style>' : '') + this.ovEdLoc(u) + this.ovViewHtml(O, u, true) + this.edHtml(u) + this.edUndoHtml() + (this.ovVals && this.ovVals.showMode === false ? '' : this.ovCard({ right: '16px', bottom: '16px' }, this.ovBtn(H.icon(H.I.check, 18) + H.esc((this.ovVals && this.ovVals.modeLabel) || 'Done'), 'vw:modeToggle', false, { background: H.K.ink, color: '#FFFFFF', fontWeight: 600, padding: '0 16px' }))); this.edSwap(html); this.ovEdFit(); return; }
     if (!this.ovOn(u)) { if (this.ovLast !== '') { this.ovBody.innerHTML = ''; this.ovLast = ''; this.ovTipHide(); } return; }
     const O = this.ovS(), st0 = this.props.start || 'saved';
     if (this.ovStarted !== st0) { this.ovStarted = st0; this.ovStart(st0); }
@@ -9499,7 +9500,7 @@ class Component extends DCLogic {
 
   // the editor's place piece: ‹ up a level, the name switches places; it starts the tools bar
   ovEdLoc(u) {
-    const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u), canSwitch = P.cur.kind !== 'farm' && P.cur.kind !== 'pen';
+    const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u), canSwitch = false;
     const hgt = this.ovEdTask ? 56 : Math.max(56, Math.min(66, (this.barEl && this.barEl.offsetHeight) || 66));
     const name = this.ovBtn(H.t(P.name, { fontSize: '17px', lineHeight: '22px', fontWeight: 600, letterSpacing: '-.01em' }) + (canSwitch ? H.icon(H.I.down, 16, { color: K.muted }) : ''), canSwitch ? 'switch' : 'noop', O.pop === 'switch', { cursor: canSwitch ? 'pointer' : 'default' });
     return '<div data-zone="edloc" style="' + H.st({ position: 'absolute', left: '16px', top: '16px', height: hgt + 'px', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: '2px', padding: '0 0 0 10px', background: '#FFFFFF', border: '1px solid #E3E6E1', borderRight: this.ovEdTask ? '1px solid #E3E6E1' : 0, borderRadius: this.ovEdTask ? '16px' : '16px 0 0 16px', paddingRight: this.ovEdTask ? '8px' : 0, boxShadow: '0 1px 2px rgba(18, 24, 21, 0.05), -4px 10px 28px rgba(18, 24, 21, 0.10)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", color: K.ink, whiteSpace: 'nowrap', zIndex: 5 }) + '">' + (P.levels.length > 1 ? this.ovSq(H.I.back, 'up', 'Up one level') : '') + name + (this.ovEdTask ? '' : '<i style="' + H.st({ width: '1px', height: '28px', background: K.line, margin: '0 0 0 8px', flexShrink: 0 }) + '"></i>') + (O.pop === 'switch' ? this.ovSwitchHtml(u, P) : '') + '</div>';
@@ -10212,7 +10213,7 @@ class Component extends DCLogic {
           const cornerAct = u.corner != null && this.cornersOf(rcur, rmCur ? rmCur.gm : this.geom(rcur)).length > 3 ? [aRow('rmcorner', 'Remove corner', ic.x, () => this.removeCorner(rcur.id, u.corner), { aria: 'Remove this corner' })] : [];
           const empty = !rcur.lanes.length && !(rcur.ends || []).length && !(rcur.pens || []).length;
           setAdd([
-            { id: 'lane', word: 'lane', label: 'Lane', hint: 'Pens running away from the door', icon: addIcons.lane, run: () => this.edStartPlace('lane') },
+            { id: 'lane', word: 'lane', label: 'Lane', hint: 'Pens running away from the door', icon: addIcons.lane, run: () => this.addLane(rcur.id) },
             { id: 'row', word: 'row', label: 'Row', hint: 'Pens side by side across the room', icon: addIcons.row, run: () => this.edStartPlace('row') },
             { id: 'door', word: 'door', label: 'Door', hint: 'Another way in or out', icon: ic.door, run: () => this.startAddDoor() },
             { id: 'device', word: 'device', label: 'Device', hint: 'A sensor, feeder or lamp. Not ready yet', icon: addIcons.device, run: () => this.openDevice() }
