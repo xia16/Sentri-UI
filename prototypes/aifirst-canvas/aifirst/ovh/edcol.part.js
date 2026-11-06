@@ -1,7 +1,7 @@
   // ===================== Edit layout, rebuilt (canvas: Edit layout, one column) =====================
   // Top left: only the place. Right: one panel, the same as the Farm view's, with every action and form as a page.
   // The map is only for placing and picking: then the panel steps aside and a guide names the task.
-  edMapTask(u) { return !!(u.tool === 'room' || u.tool === 'zone' || u.tool === 'sec' || u.addDoor || u.reshape || (u.devT && u.devT.kind) || u.dp); }
+  edMapTask(u) { return !!(u.tool === 'room' || u.tool === 'zone' || u.tool === 'sec' || u.tool === 'lane' || u.tool === 'row' || u.addDoor || u.reshape || (u.devT && u.devT.kind) || u.dp); }
   edDevGroups() {
     return [
       ['Climate', [['climate', 'Runs the fans and heat for the room'], ['fan', 'Moves air through the room'], ['temp', 'Reads temperature and humidity where it hangs'], ['nh3', 'Reads ammonia where it hangs']]],
@@ -61,14 +61,13 @@
     // ----- on the map: placing, a door, the walls, a device, its pens -----
     if (this.edMapTask(u)) {
       let title = P.taskTitle || '', sub = P.taskSub || '', act = P.cancelLabel || 'Cancel', fn = P.cancel, ico = '';
-      if (u.tool === 'zone' || u.tool === 'sec') { const z = u.tool === 'zone'; title = z ? 'Place the new zone' : 'Place the new section'; sub = 'Its outline follows your pointer. Click the ground to put it down; you name it next.'; act = 'Cancel'; fn = () => this.setTool(''); ico = z ? 'M4 4h16v16H4z' : 'M4 4h16v16H4zM4 12h16'; }
-      else if (u.tool === 'room') { sub = 'Its outline follows your pointer. Click the ground to put it down.'; ico = I.home || ''; }
-      else if (u.devT && u.devT.kind) {
-        const kd = this.devKinds().find((x) => x.id === u.devT.kind), sv0 = this.devServes(u.devT.kind);
-        title = 'Place the ' + (kd ? kd.name.toLowerCase() : 'device'); sub = sv0 === 'pens' ? 'Click the lane it runs along. You pick its pens next.' : sv0 === 'room' ? 'Click a wall. It serves the whole room.' : 'Click where it hangs: a wall or the ceiling.';
-        act = 'Back'; fn = () => this.pickDeviceKind(u.devT.kind); ico = (this.devPaths && this.devPaths()[u.devT.kind]) || '';
-      } else if (u.dp) { act = 'Done'; }
-      else if (u.addDoor) { sub = 'Click a wall to put it there.'; ico = ic.door || ''; }
+      const gd = this.edGuide(u, P); if (gd) { title = gd[0]; sub = gd[1]; }
+      if (u.tool === 'zone' || u.tool === 'sec') { act = 'Cancel'; fn = () => this.setTool(''); ico = u.tool === 'zone' ? 'M4 4h16v16H4z' : 'M4 4h16v16H4zM4 12h16'; }
+      else if (u.tool === 'lane' || u.tool === 'row') { act = 'Cancel'; fn = () => { this.edHideGhost(); this.put({ tool: '' }); }; ico = u.tool === 'lane' ? 'M7 4v16M12 4v16M17 4v16' : 'M4 7h16M4 12h16M4 17h16'; }
+      else if (u.tool === 'room') { ico = 'M4 10 12 4l8 6v10H4V10Z'; }
+      else if (u.devT && u.devT.kind) { act = 'Cancel'; fn = () => this.put({ devT: null }); ico = (this.devPaths && this.devPaths()[u.devT.kind]) || ''; }
+      else if (u.dp) { act = 'Done'; }
+      else if (u.addDoor) { ico = ic.door || ''; }
       const pill = '<div data-zone="edguide" role="status" style="position: absolute; ' + ((this.W || 950) < 760 ? 'left: 16px; right: 16px; top: 84px;' : 'right: 16px; top: 16px; width: 380px; max-width: calc(100% - 290px); min-width: 260px;') + ' box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 16px; border-radius: 18px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(17,21,17,.06), 0 12px 30px rgba(17,21,17,.16); pointer-events: auto; font-family: \'Geist\', system-ui, sans-serif; color: ' + K.ink + '; z-index: 6;">' +
         (ico ? '<span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; border-radius: 10px; background: ' + K.ink + '; color: #FFFFFF;">' + sv(ico, 18) + '</span>' : '') +
         '<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; line-height: 20px; font-weight: 600;">' + esc(title) + '</span>' + (sub ? '<span style="font-size: 13px; line-height: 18px; color: ' + K.muted + ';">' + esc(sub) + '</span>' : '') + '</span>' +
@@ -103,7 +102,7 @@
         return panel(h);
       }
       h = hdr(a.lead || 'Add pens', '');
-      if (a.hasWhere) h += sec('Where') + seg((a.where || []).map((w) => ({ label: w.label, on: w.on, pick: w.pick })));
+      if (a.hasWhere && !(u.arT && u.arT.placed)) h += sec('Where') + seg((a.where || []).map((w) => ({ label: w.label, on: w.on, pick: w.pick })));
       h += sec('Pen type') + box([row({ name: a.tName, sw: a.sw, fn: a.tpToggle, chev: true, aria: a.tpAria }, 0)]);
       h += sec('How many', a.hint ? 'New: ' + a.hint : '') + '<div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF; border: 1px solid ' + K.line + '; border-radius: 16px;"><span style="flex: 1; font-weight: 500;">Pens</span>' + stepper('ar-n', a.less, a.n, a.onN, a.onKey, a.more, 'How many pens') + '</div>';
       h += foot(btn('Cancel', a.cancel, 'sec') + btn(a.goLabel || 'Add', a.go, 'pri', a.off));
