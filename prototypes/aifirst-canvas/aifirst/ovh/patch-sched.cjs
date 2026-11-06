@@ -15,8 +15,9 @@ once("    if (k === 'ed') { const f = this.edF && this.edF[v]; if (f) f(); retur
   "    if (k === 'ed') { const f = this.edF && this.edF[v]; if (f) f(); return; }\n" +
   "    if (k === 'sched') { if (['sched', 'rx', 'list', 'batch', 'task', 'dates', 'done', 'compare'].indexOf(O.panel) >= 0) { this.ovAct('close'); return; } if (u.bv) this.closeBatch(); this.ovSet({ panel: 'sched', hist: [], pop: '', swk: 0 }); return; }\n" +
   "    if (k === 'swk') { this.ovSet({ swk: v === '0' ? 0 : (O.swk || 0) + (+v) }); return; }\n" +
-  "    if (k === 'srow') { const t = (this.ovSchedT || [])[+v]; if (!t) return; if (t.rx) { this.ovPush(); this.ovSet({ panel: 'rx', pop: '' }); return; } if (t.task && this.batchData()[t.b] && this.bvTask(t.b, t.task)) { this.ovAct('task:' + t.b + '/' + t.task); return; } if (t.b && this.batchData()[t.b]) this.ovAct('open:' + t.b); return; }\n");
+  "    if (k === 'srow') { this.ovSchedOpen(+v); return; }\n");
 once("      if (prev.panel === 'list' && this.ui().bv) { this.put({ bvOnly: '' }); this.closeBatch(); }", "      if ((prev.panel === 'list' || prev.panel === 'sched') && this.ui().bv) { this.put({ bvOnly: '' }); this.closeBatch(); }");
+once("    if (k === 'close') { if (this.ui().ovCmp) this.put({ ovCmp: false });", "    if (k === 'close') { if (O.focus) { O.focus = null; this.setSel([]); } if (this.ui().ovCmp) this.put({ ovCmp: false });");
 // the panels
 once("  ovPanel3(p, O, u) {\n", "  ovPanel3(p, O, u) {\n    if (p === 'sched') return this.ovSchedHtml(u);\n    if (p === 'rx') return this.ovRxHtml();\n");
 fs.writeFileSync(F, s);

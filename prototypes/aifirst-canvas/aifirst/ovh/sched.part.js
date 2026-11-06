@@ -1,28 +1,45 @@
   // ===================== Schedule in the Farm view (replaces Batches): Home's timeline, scoped to where you are =====================
+  // every row is a real task of this farm: its batch, its task, its rooms; pens only where the task names them
   ovSchedTasks() {
     return [
-      { b: '33', name: 'Farrowing', cells: ['n', 'n', 'n', 'n', 'e6', 'e14', 'e12>'], room: /^Farrowing Room 1$/ },
-      { b: '32', name: 'Fostering checks', cells: ['d8', 'd8', 'w6', 'o8', 'p8', 'p8', 'p8>'], room: /^Farrowing Room 2$/, task: 'farrow' },
-      { b: '35', name: 'Pregnancy check', cells: ['', 'd24', 'd28', '', '', '', ''], room: /^Gestation 1$/ },
-      { b: '30', name: 'PRRS sampling', cells: ['d10', '', '', '', '', '', ''], room: /^Nursery/ },
-      { g: 'Health', name: 'Amox treatment', cells: ['', '', '', 'o4', 'p4', 'p4', ''], tag: '4', pig: true, room: /^Gestation 2$/, pens: ['B15', 'B20', 'D40', 'D41'], rx: true },
-      { g: 'Health', name: 'PRRS vaccine', cells: ['', '', '', 'u', 'p3', '', ''], tag: '3', pig: true, room: /^Nursery/ },
-      { g: 'Other', name: 'Move', cells: ['d48', '', '', '', '', '', ''], tag: '3', roomTag: true, room: /^(Gestation 2|Gestation 3|Farrowing Room 1)$/ },
-      { g: 'Other', name: 'Wash', cells: ['', '', '', '', 'p1', '', ''], tag: '1', roomTag: true, room: /^Farrowing Room 3$/ }
+      { b: '33', name: 'Move into Farrowing Room 4', cells: ['', '', 'd9', 'o8', 'p9', '', ''], rooms: ['fr4'], task: 'move' },
+      { b: '33', name: 'Farrowing', cells: ['', '', '', '', 'e6', 'e14', 'e12>'], rooms: ['fr4'] },
+      { b: '32', name: 'Post-farrowing check', cells: ['d8', 'd8', 'w6', 'o8', 'p8', 'p8', 'p8>'], rooms: ['fr2'], task: 'post' },
+      { b: '34', name: 'Breeding', cells: ['', 'd24', 'd28', 'o12', '', '', ''], rooms: ['g1'], task: 'breed' },
+      { b: '30', name: 'PRRS sampling', cells: ['d10', '', '', '', '', '', ''], rooms: ['n1'] },
+      { g: 'Health', name: 'Amox treatment', cells: ['', '', '', 'o4', 'p4', 'p4', ''], tag: '4', pig: true, rooms: ['g2'], pens: ['B15', 'B20', 'D40', 'D41'], rx: true },
+      { g: 'Health', name: 'PRRS vaccine', cells: ['', '', '', 'u', 'p3', '', ''], tag: '3', pig: true, rooms: ['n2'], pick: 3 },
+      { g: 'Other', name: 'Wash', cells: ['', '', '', '', 'p1', '', ''], tag: '1', roomTag: true, rooms: ['fr3'] }
     ];
   }
-  // a task is here when one of its rooms is; a batch's rooms come from where its pigs are; in a pen, only what touches that pen
+  // a task is here when one of its rooms is; in a pen, only what touches that pen
   ovSchedHere(t, P) {
-    const cells = (rid) => (this.IP && this.IP.cell[rid]) || {};
-    const inRoom = (r) => { if (t.b) { const c = cells(r.id); const has = Object.keys(c).some((k) => c[k] && String(c[k].batch) === t.b); return has || t.room.test(r.name || ''); } return t.room.test(r.name || ''); };
     if (P.cur.kind === 'farm') return true;
-    if (P.pen) {
-      const r = P.r; if (!r || !inRoom(r)) return false;
-      if (t.pens) return t.pens.indexOf(P.pen) >= 0;
-      if (t.b) { const c = cells(r.id)[P.pen]; return !c || !c.batch || String(c.batch) === t.b; }
-      return !t.pig;
-    }
+    const inRoom = (r) => t.rooms.indexOf(r.id) >= 0;
+    if (P.pen) { const r = P.r; if (!r || !inRoom(r)) return false; if (t.pens) return t.pens.indexOf(P.pen) >= 0; if (t.b) { const c = ((this.IP && this.IP.cell[r.id]) || {})[P.pen]; return !c || !c.batch || String(c.batch) === t.b; } return !t.pig; }
     return (P.rooms || []).some(inRoom);
+  }
+  // the pens a task touches in its room: named ones, the batch's pigs, or the first few pigs for a short list
+  ovSchedPens(t) {
+    const rid = t.rooms[0], cells = (this.IP && this.IP.cell[rid]) || {}, codes = Object.keys(cells).filter((c) => cells[c] && cells[c].kind).sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
+    if (t.pens) return t.pens.slice();
+    if (t.b) return codes.filter((c) => String(cells[c].batch) === t.b);
+    if (t.pick) return codes.slice(0, t.pick);
+    return [];
+  }
+  // a row clicked: the map goes to the task's room and lights its pens; a batch task opens itself, a treatment its record
+  ovSchedOpen(i) {
+    const t = this.ovSchedTasks()[i], B = this.batchData(); if (!t) return;
+    const rid = t.rooms[0], O = this.ovS(), go = () => {
+      const pens = this.ovSchedPens(t);
+      if (t.task && B[t.b] && this.bvTask(t.b, t.task)) { O.focus = { roomId: rid, codes: pens }; this.ovAct('task:' + t.b + '/' + t.task); return; }
+      if (t.rx) { this.ovPush(); O.focus = { roomId: rid, codes: pens }; this.ovSet({ panel: 'rx', pop: '' }); }
+      else if (t.b && B[t.b]) { O.focus = { roomId: rid, codes: pens }; this.ovAct('open:' + t.b); return; }
+      else { O.focus = { roomId: rid, codes: pens }; this.ovPaint(); }
+      if (!t.b && pens.length) setTimeout(() => this.setSel(pens), 30);
+      this.reframe(650);
+    };
+    if (this.ui().view !== 'room' || this.ui().roomId !== rid) { this.goRoom(rid); setTimeout(go, 650); } else go();
   }
   ovSchedHtml(u) {
     const H = OVH, K = H.K, O = this.ovS(), P = this.ovPlace(u), wk = O.swk || 0, B = this.batchData();
@@ -48,7 +65,7 @@
     const tagH = (t) => t.tag ? '<span style="' + H.st({ display: 'inline-flex', alignItems: 'center', gap: '3px', alignSelf: 'flex-start', height: '18px', padding: '0 6px', borderRadius: '5px', background: '#F1F3EE', color: K.muted, fontSize: '11.5px', fontWeight: 600 }) + '">' + H.icon(t.pig ? H.I.pig : (H.I.home || H.I.grid), 12) + t.tag + '</span>' : '';
     const body = !here.length ? '<div style="' + H.st({ padding: '28px 16px', textAlign: 'center', color: K.muted, fontSize: '13.5px' }) + '">Nothing planned here this week.</div>' :
       groups.map((g) => '<div' + (g.b && B[g.b] ? H.A('open:' + g.b) : '') + ' style="' + H.st({ display: 'flex', alignItems: 'center', gap: '4px', height: '32px', padding: '0 12px', background: '#FAFAF7', borderBottom: '1px solid ' + K.line, fontSize: '12.5px', fontWeight: 600, color: K.muted, cursor: g.b && B[g.b] ? 'pointer' : 'default' }) + '">' + g.name + (g.b && B[g.b] ? H.icon(H.I.chev, 14) : '') + '</div>' +
-        g.rows.map((t) => { const cs = wk === 0 ? t.cells : ['', '', '', '', '', '', ''], opens = t.rx || (t.b && B[t.b]); return '<div' + (opens ? H.A('srow:' + t.i) : '') + ' style="' + H.st({ display: 'grid', gridTemplateColumns: cols, minHeight: '52px', borderBottom: '1px solid #F1F2EE', cursor: opens ? 'pointer' : 'default' }) + '"><span style="' + H.st({ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4px', padding: '6px 8px 6px 12px' }) + '"><span style="' + H.st({ fontSize: '13px', lineHeight: '16px', fontWeight: 500 }) + '">' + t.name + '</span>' + tagH(t) + '</span>' + cs.map((c, i) => cell(c, cs[i - 1], cs[i + 1])).join('') + '</div>'; }).join('')).join('');
+        g.rows.map((t) => { const cs = wk === 0 ? t.cells : ['', '', '', '', '', '', ''], opens = true; return '<div' + (opens ? H.A('srow:' + t.i) : '') + ' style="' + H.st({ display: 'grid', gridTemplateColumns: cols, minHeight: '52px', borderBottom: '1px solid #F1F2EE', cursor: opens ? 'pointer' : 'default' }) + '"><span style="' + H.st({ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4px', padding: '6px 8px 6px 12px' }) + '"><span style="' + H.st({ fontSize: '13px', lineHeight: '16px', fontWeight: 500 }) + '">' + t.name + '</span>' + tagH(t) + '</span>' + cs.map((c, i) => cell(c, cs[i - 1], cs[i + 1])).join('') + '</div>'; }).join('')).join('');
     const todayCol = wk === 0 ? '<div style="' + H.st({ position: 'absolute', top: '48px', bottom: 0, left: 'calc(112px + (100% - 112px) * 3 / 7)', width: 'calc((100% - 112px) / 7)', background: '#F4F8F4', zIndex: 0, pointerEvents: 'none' }) + '"></div>' : '';
     const key = '<div style="' + H.st({ display: 'flex', flexWrap: 'wrap', gap: '6px 14px', margin: '12px 4px 0', fontSize: '12px', color: K.muted }) + '">' + [[K.greenT, 'none', 'Done'], [K.blueT, 'inset 0 0 0 1.5px ' + K.blue, 'Today'], ['#F1F3EE', 'none', 'Planned'], ['transparent', 'inset 0 0 0 1px ' + K.faint, 'Expected']].map((x) => '<span style="display: inline-flex; align-items: center; gap: 6px;"><i style="' + H.st({ width: '14px', height: '10px', borderRadius: '3px', background: x[0], boxShadow: x[1] }) + '"></i>' + x[2] + '</span>').join('') + '</div>';
     return head + '<div style="' + H.st({ position: 'relative', marginTop: '14px', background: '#FFFFFF', border: '1px solid ' + K.line, borderRadius: '16px', overflow: 'hidden' }) + '">' + todayCol + '<div style="position: relative; z-index: 1;">' + days + body + '</div></div>' + key;
