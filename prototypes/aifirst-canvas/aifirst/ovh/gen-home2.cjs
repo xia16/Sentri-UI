@@ -1,0 +1,70 @@
+// Home beside the chat: Inbox and Today lead, the dashboards step back. Two looks: quiet colour, and shadcn black and white.
+const fs = require('fs'), sharp = require('sharp');
+const [consolePng, out, shell] = process.argv.slice(2);
+const st = (o) => Object.entries(o).map(([k, v]) => k.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase()) + ': ' + v).join('; ') + ';';
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const icon = (d, n, sw) => '<svg viewBox="0 0 24 24" aria-hidden="true" style="width: ' + (n || 16) + 'px; height: ' + (n || 16) + 'px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: ' + (sw || 1.8) + '; stroke-linecap: round; stroke-linejoin: round;"><path d="' + d + '"></path></svg>';
+const I = { search: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14Z M20 20l-4-4', chev: 'm9 5 7 7-7 7', home: 'M4 11 12 4l8 7v9H4z', map: 'M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z M9 4v14 M15 6v14', expand: 'M14 4h6v6 M10 20H4v-14 M20 4l-7 7', inbox: 'M4 13h4l2 3h4l2-3h4 M4 13l2-8h12l2 8v6H4z', cal: 'M4 6h16v14H4z M4 10h16 M8 3v4 M16 3v4' };
+
+const THEMES = {
+  colour: { bg: '#F6F7F1', card: '#FFFFFF', line: '#E4E6E0', ink: '#1B211C', muted: '#6B726D', faint: '#A3AAA5', red: '#B34B43', prod: '#2F7A55', health: '#3972B7', fin: '#946015', area: (c) => c, areaOp: 0.12, wshadow: '0 1px 2px rgba(17,21,17,.04)', wborder: '1px solid #ECEEE8', radius: '16px', titleCol: true, strip: ['#2F7A55', '#3972B7', '#E3E6E0'] },
+  mono: { bg: '#FAFAFA', card: '#FFFFFF', line: '#E4E4E7', ink: '#09090B', muted: '#71717A', faint: '#A1A1AA', red: '#DC2626', prod: '#18181B', health: '#18181B', fin: '#18181B', area: () => '#18181B', areaOp: 0.06, wshadow: '0 1px 2px rgba(0,0,0,.04)', wborder: '1px solid #E4E4E7', radius: '12px', titleCol: false, strip: ['#18181B', '#71717A', '#E4E4E7'] },
+};
+let K = THEMES.colour;
+const t = (s, o) => '<span style="' + st(Object.assign({ fontSize: '14px', lineHeight: '20px', color: K.ink, whiteSpace: 'nowrap' }, o || {})) + '">' + esc(s) + '</span>';
+
+// ----- small charts -----
+let gid = 0;
+function line(vals, w, h, col, o) {
+  o = o || {}; const lo = Math.min(...vals), hi = Math.max(...vals), id = 'a' + (gid++);
+  const pts = vals.map((v, i) => [(i / (vals.length - 1)) * w, 3 + (1 - (v - lo) / ((hi - lo) || 1)) * (h - 6)]), d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' '), e = pts[pts.length - 1];
+  return '<svg viewBox="0 0 ' + w + ' ' + h + '" style="display: block; width: ' + w + 'px; height: ' + h + 'px; overflow: visible;"><path d="' + d + ' L' + w + ' ' + h + ' L0 ' + h + ' Z" fill="' + K.area(col) + '" fill-opacity="' + K.areaOp + '"></path><path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="1.6" stroke-linejoin="round"></path><circle cx="' + e[0].toFixed(1) + '" cy="' + e[1].toFixed(1) + '" r="2.5" fill="' + col + '"></circle></svg>';
+}
+function bars(vals, w, h, col) { const hi = Math.max(...vals), bw = w / vals.length; return '<svg viewBox="0 0 ' + w + ' ' + h + '" style="display: block; width: ' + w + 'px; height: ' + h + 'px;">' + vals.map((v, i) => { const bh = Math.max(2, (v / hi) * h); return '<rect x="' + (i * bw + 1.5).toFixed(1) + '" y="' + (h - bh).toFixed(1) + '" width="' + (bw - 3).toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="1.5" fill="' + col + '" fill-opacity="' + (i === vals.length - 1 ? 1 : 0.28) + '"></rect>'; }).join('') + '</svg>'; }
+function meter(f, w, col) { return '<div style="' + st({ width: w + 'px', height: '6px', borderRadius: '3px', background: K.line }) + '"><i style="' + st({ display: 'block', width: (f * 100).toFixed(0) + '%', height: '100%', borderRadius: '3px', background: col }) + '"></i></div>'; }
+
+// ----- the lead: Inbox and Today, full width, bigger than anything below -----
+function inboxCard() {
+  const rows = [['VT', 'Revaccinate Batch 29 against PRRS', 'due 10:00', true], ['BS', '5 visitors want to come in next week', '3h ago'], ['PR', 'Batch 33: keep Farrowing 1?', '2h ago']];
+  const av = (s) => '<span style="' + st({ display: 'inline-flex', width: '22px', height: '22px', alignItems: 'center', justifyContent: 'center', borderRadius: '6px', background: K.bg, border: '1px solid ' + K.line, fontSize: '10px', fontWeight: 600, color: K.muted, flexShrink: 0 }) + '">' + s + '</span>';
+  return '<div style="' + st({ background: K.card, border: '1px solid ' + K.line, borderRadius: K.radius, padding: '14px 16px 8px' }) + '"><div style="' + st({ display: 'flex', alignItems: 'center', gap: '8px' }) + '">' + icon(I.inbox, 17) + t('Inbox', { fontSize: '15px', fontWeight: 600 }) + '<span style="flex: 1;"></span>' + t('Open', { fontSize: '13px', color: K.muted }) + '<span style="color: ' + K.faint + '; display: inline-flex;">' + icon(I.chev, 14) + '</span></div>' +
+    '<div style="' + st({ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '8px 0 6px' }) + '">' + t('6', { fontSize: '34px', lineHeight: '40px', fontWeight: 600, letterSpacing: '-.03em' }) + t('waiting for you', { fontSize: '14px', color: K.muted }) + '<span style="flex: 1;"></span>' + t('2 before 10:00', { fontSize: '13px', fontWeight: 600, color: K.red }) + '</div>' +
+    rows.map((r) => '<div style="' + st({ display: 'flex', alignItems: 'center', gap: '10px', height: '36px', borderTop: '1px solid ' + K.line }) + '">' + av(r[0]) + t(r[1], { flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '13.5px' }) + t(r[2], { fontSize: '12px', color: r[3] ? K.red : K.faint }) + '</div>').join('') + '</div>';
+}
+function todayCard() {
+  const segs = '<div style="' + st({ display: 'flex', gap: '3px', marginTop: '10px' }) + '">' + Array.from({ length: 10 }, (_, i) => '<i style="' + st({ flex: 1, height: '6px', borderRadius: '3px', background: i < 6 ? K.strip[0] : i < 7 ? K.strip[1] : K.strip[2] }) + '"></i>').join('') + '</div>';
+  return '<div style="' + st({ background: K.card, border: '1px solid ' + K.line, borderRadius: K.radius, padding: '14px 16px' }) + '"><div style="' + st({ display: 'flex', alignItems: 'center', gap: '8px' }) + '">' + icon(I.cal, 17) + t('Today', { fontSize: '15px', fontWeight: 600 }) + '<span style="flex: 1;"></span>' + t('Schedule', { fontSize: '13px', color: K.muted }) + '<span style="color: ' + K.faint + '; display: inline-flex;">' + icon(I.chev, 14) + '</span></div>' +
+    '<div style="' + st({ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '8px' }) + '">' + t('6', { fontSize: '34px', lineHeight: '40px', fontWeight: 600, letterSpacing: '-.03em' }) + t('of 10 jobs done', { fontSize: '14px', color: K.muted }) + '<span style="flex: 1;"></span>' + t('next: Amox, 4 sows', { fontSize: '13px', color: K.muted }) + '</div>' + segs + '</div>';
+}
+
+// ----- the dashboards: smaller, quieter, two across; a module is a small caption, not a heading -----
+const herd = [1872, 1891, 1905, 1898, 1922, 1931, 1918, 1944, 1951, 1936, 1960, 1971, 1958, 1955, 1970, 1959, 1946, 1953];
+const psy = [26.1, 26.4, 26.9, 27.2, 27.0, 27.5, 27.8, 28.1, 27.9, 28.2, 28.4, 28.5];
+const sick = [6, 7, 9, 11, 12, 10, 9, 8, 7, 9, 10, 8, 7, 6, 8, 11, 12, 10, 9, 9];
+const loss = [10.4, 9.9, 10.8, 9.6, 9.2, 9.8, 8.9, 9.4, 8.7, 9.1, 8.8, 9.0, 9.8];
+const feed = [172, 168, 181, 176, 179, 183, 188, 185, 190, 184, 192, 186];
+const cost = [436, 431, 428, 433, 425, 421, 418, 422, 416, 414, 415, 412];
+const CW = 188;
+const tile = (label, fig, unit, chart, col) => '<div style="' + st({ boxSizing: 'border-box', height: '104px', padding: '11px 12px', background: K.card, border: K.wborder, boxShadow: K.wshadow, borderRadius: K.radius, display: 'flex', flexDirection: 'column' }) + '">' + t(label, { fontSize: '12px', lineHeight: '16px', color: K.titleCol ? col : K.muted, fontWeight: K.titleCol ? 600 : 500 }) + '<div style="' + st({ display: 'flex', alignItems: 'baseline', gap: '4px', marginTop: '2px' }) + '">' + t(fig, { fontSize: '19px', lineHeight: '24px', fontWeight: 600, letterSpacing: '-.01em' }) + (unit ? t(unit, { fontSize: '11.5px', color: K.muted }) : '') + '</div><span style="flex: 1;"></span>' + chart + '</div>';
+const mod = (name, a, b) => '<div style="' + st({ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', margin: '14px 2px 7px' }) + '">' + t(name, { fontSize: '12px', fontWeight: 600, color: K.muted, letterSpacing: '.02em' }) + '</div><div style="' + st({ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }) + '">' + a + b + '</div>';
+const dash = () => '<div style="' + st({ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', margin: '22px 2px 0' }) + '">' + t('Dashboards', { fontSize: '15px', fontWeight: 600 }) + t('Farm-wide', { fontSize: '12px', color: K.faint }) + '</div>' +
+  mod('PRODUCTION', tile('Pigs on hand', '1,953', '', line(herd, CW, 32, K.prod), K.prod), tile('PSY, 12 months', '28.5', 'target 28', line(psy, CW, 32, K.prod), K.prod)) +
+  mod('HEALTH', tile('On treatment', '9', 'pigs', line(sick, CW, 32, K.health), K.health), tile('Piglet losses', '9.8%', 'plan 8%', line(loss, CW, 32, K.health), K.health)) +
+  mod('FINANCE', tile('Feed spend, this month', '¥186,400', '', bars(feed, CW, 32, K.fin), K.fin), tile('Medicines, of ¥24,000', '¥18,400', '', '<div style="padding-bottom: 6px;">' + meter(18.4 / 24, CW, K.fin) + '</div>', K.fin));
+
+const tabs = () => '<div style="' + st({ display: 'flex', alignItems: 'center', gap: '4px', height: '52px', padding: '0 10px', background: K.card, borderBottom: '1px solid ' + K.line }) + '"><span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '6px', height: '32px', padding: '0 10px', borderRadius: '8px', background: K.bg, fontSize: '13px', fontWeight: 600, color: K.ink }) + '">' + icon(I.home, 15) + 'Home<span style="' + st({ minWidth: '18px', height: '18px', borderRadius: '9px', background: K.ink, color: '#FFF', fontSize: '11px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }) + '">6</span></span><span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '6px', height: '32px', padding: '0 10px', fontSize: '13px', color: K.muted }) + '">' + icon(I.map, 15) + 'Farm view</span><span style="flex: 1;"></span><span style="' + st({ color: K.muted, display: 'inline-flex', width: '32px', height: '32px', alignItems: 'center', justifyContent: 'center' }) + '">' + icon(I.expand, 15) + '</span></div>';
+const paneBody = () => tabs() + '<div style="padding: 14px 16px 24px;"><div style="' + st({ display: 'flex', alignItems: 'center', gap: '8px', height: '38px', padding: '0 12px', borderRadius: '10px', background: K.card, border: '1px solid ' + K.line, color: K.muted, fontSize: '14px' }) + '">' + icon(I.search, 16) + 'Find a page or action</div><div style="' + st({ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }) + '">' + inboxCard() + todayCard() + '</div>' + dash() + '</div>';
+const pane = (theme, h) => { K = THEMES[theme]; return '<div style="' + st({ width: '468px', height: h + 'px', overflow: 'hidden', background: K.bg, fontFamily: "'Geist', system-ui, sans-serif", color: K.ink, fontVariantNumeric: 'tabular-nums', borderRadius: '16px', boxShadow: '0 0 0 1px #E2E5DE' }) + '">' + paneBody() + '</div>'; };
+
+(async () => {
+  const left = await sharp(consolePng).extract({ left: 0, top: 0, width: 964, height: 900 }).jpeg({ quality: 82 }).toBuffer();
+  const img = 'data:image/jpeg;base64,' + left.toString('base64');
+  const consoleFrame = (theme) => '<div style="' + st({ position: 'relative', width: '1440px', height: '900px', background: '#EEF0EA', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 0 0 1px #DADFD5, 0 12px 32px rgba(17,21,17,.10)', flexShrink: 0 }) + '"><img alt="" src="' + img + '" style="position: absolute; left: 0; top: 0; width: 964px; height: 900px;"><div style="position: absolute; left: 964px; top: 8px;">' + pane(theme, 884) + '</div></div>';
+  const full = (theme) => pane(theme, 1060);
+  const row = (n, label, note, theme) => '<div style="margin-top: 40px;"><div style="' + st({ fontSize: '19px', fontWeight: 600, lineHeight: '26px' }) + '">' + n + ' · ' + label + '</div><div style="' + st({ fontSize: '14px', lineHeight: '21px', color: '#5D665F', margin: '4px 0 16px', maxWidth: '1400px' }) + '">' + note + '</div><div style="' + st({ display: 'flex', gap: '48px', alignItems: 'flex-start' }) + '">' + consoleFrame(theme) + '<div><div style="' + st({ fontSize: '13px', color: '#5D665F', marginBottom: '8px' }) + '">The pane, scrolled to the end</div>' + full(theme) + '</div></div></div>';
+  const body = row('A', 'Inbox and Today lead, quiet colour', 'Inbox and Today are full-width and the biggest type on the pane; the Inbox shows its top three, the deadline in red. The dashboards drop to small tiles, two per module, with a muted module caption, a hairline border and the module\'s colour only on the title and the line.', 'colour') +
+    row('B', 'The same, shadcn black and white', 'One ink colour for every chart and figure, zinc greys, 12px corners, hairline borders. Red stays only on the deadline, the one thing that needs you.', 'mono');
+  const sh = fs.readFileSync(shell, 'utf8'), pre = sh.slice(0, sh.indexOf('<div style="width: 1760px;')).replace(/<title>[^<]*<\/title>/, '<title>Home beside the chat</title>');
+  const html = pre + '<div style="' + st({ width: '2052px', padding: '40px 48px 56px', boxSizing: 'border-box', background: '#F3F4F1', fontFamily: "'Geist', system-ui, sans-serif", color: '#111511', WebkitFontSmoothing: 'antialiased' }) + '"><h1 style="margin: 0; font-size: 26px; line-height: 34px; font-weight: 600; letter-spacing: -.02em;">Home beside the chat: Inbox and Today first</h1><div style="margin-top: 6px; font-size: 15px; color: #5D665F;">Two looks for the same layout, in the console as you would see it. The chat on the left is today\'s console.</div>' + body + '</div>\n</x-dc>\n</body>\n</html>\n';
+  fs.writeFileSync(out, html); console.log('wrote', out, Math.round(html.length / 1024) + ' KB');
+})();
