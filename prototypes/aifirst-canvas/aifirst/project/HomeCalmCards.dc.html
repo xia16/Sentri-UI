@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home, calmer, with cards</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}.hc-card:hover{box-shadow:0 0 0 1px #D5DAD0,0 2px 6px rgba(17,21,17,.06)}.hc-quiet:hover{background:#F3F4F1}</style>
+</helmet>
+<div style="width: 1078px; height: 1150px; box-sizing: border-box; padding: 48px; background: #F3F4F1; font-family: 'Geist', system-ui, sans-serif; color: #1B211C; -webkit-font-smoothing: antialiased">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">Home, calmer, with cards</h1>
+  <p style="margin: 8px 0 0; font-size: 14px; line-height: 21px; color: #5D665F; max-width: 900px">The same calm as the list version: tint, no green band, no greeting, every button quiet. Here each thing is its own white card. The newest item waiting for you is a little bigger, and the next two sit beside each other. Today is a 2 × 2 grid, and the dashboards are three cards in a row. The pane is shown at its real width (467 px).</p>
+  <div style="display: grid; grid-template-columns: 467px 467px; gap: 48px; margin-top: 28px">
+    <sc-for list="{{panes}}" as="pn" hint-placeholder-count="2">
+      <div>
+        <div style="font-size: 17px; font-weight: 600">{{pn.label}}</div>
+        <div style="font-size: 13px; line-height: 20px; color: #5D665F; margin: 2px 0 14px">{{pn.note}}</div>
+        <div style="width: 467px; height: 860px; border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 1px #DADFD5, 0 12px 32px rgba(17,21,17,.10); background: #F6F7F1; display: flex; flex-direction: column">
+
+          <!-- tab bar, as in the console -->
+          <div style="height: 52px; flex: none; box-sizing: border-box; display: flex; align-items: center; gap: 2px; padding: 0 10px; background: #FFFFFF; border-bottom: 1px solid #ECEEE8">
+            <span style="display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 10px; border-radius: 10px; background: #EEF0EA; font-size: 13px; font-weight: 600">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"></path></svg>
+              Home
+              <span style="font-size: 11px; font-weight: 500; background: #1B211C; color: #FFFFFF; border-radius: 999px; padding: 0 7px; line-height: 18px">6</span>
+            </span>
+            <span style="display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 10px; font-size: 13px; color: #3B4540">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3ZM9 3v15M15 6v15"></path></svg>
+              Farm view
+            </span>
+            <span style="flex: 1"></span>
+            <span style="width: 34px; height: 34px; display: grid; place-items: center; color: #3B4540">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M15 3h6v6M21 3l-7 7M9 21H3v-6M3 21l7-7"></path></svg>
+            </span>
+          </div>
+
+          <div ref="{{pn.ref}}" style="flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none">
+            <div style="padding: 16px 16px 28px">
+
+              <!-- search -->
+              <div style="display: flex; align-items: center; gap: 9px; height: 40px; padding: 0 12px; border-radius: 10px; background: #FFFFFF; box-shadow: 0 0 0 1px #E3E6DF; font-size: 14px; color: #5D665F">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="m21 21-4.3-4.3M11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16"></path></svg>
+                Find a page or action
+              </div>
+
+              <!-- waiting for you -->
+              <div style="display: flex; align-items: baseline; justify-content: space-between; margin: 24px 2px 10px">
+                <h2 style="margin: 0; font-size: 15px; font-weight: 600">Waiting for you</h2>
+                <span style="display: inline-flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 500; color: #3B4540">All 6<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 18 6-6-6-6"></path></svg></span>
+              </div>
+              <div class="hc-card" style="padding: 16px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2, 0 1px 2px rgba(17,21,17,.04)">
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #5D665F">
+                  <span style="width: 24px; height: 24px; display: grid; place-items: center; border-radius: 7px; background: #DDF1EF; color: #1F6F68; font-size: 10px; font-weight: 600">VT</span>
+                  Vet · 3h ago
+                </div>
+                <div style="margin-top: 10px; font-size: 16px; font-weight: 600; line-height: 22px">Revaccinate Batch 29 against PRRS</div>
+                <p style="margin: 6px 0 0; font-size: 13.5px; line-height: 20px; color: #3B4540">Antibodies came back low in 14 of 30 samples. I drafted a booster for all 470 pigs on Mon 9 Nov, the same plan as Batch 27.</p>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 14px">
+                  <span style="display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 9px; border-radius: 8px; background: #F3F4F1; font-size: 12.5px; color: #3B4540">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M12 2H2v10l9.3 9.3a1 1 0 0 0 1.4 0l8.6-8.6a1 1 0 0 0 0-1.4ZM7 7h.01"></path></svg>
+                    Batch 29 · Nursery 2
+                  </span>
+                  <span style="flex: 1"></span>
+                  <span class="hc-quiet" style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 10px; box-shadow: inset 0 0 0 1px #DDE1DA; font-size: 13.5px; font-weight: 500">Review</span>
+                  <span class="hc-quiet" style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 10px; box-shadow: inset 0 0 0 1px #DDE1DA; font-size: 13.5px; font-weight: 600; color: #28734F">Approve</span>
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px">
+                <sc-for list="{{waiting}}" as="w" hint-placeholder-count="2">
+                  <div class="hc-card" style="display: flex; flex-direction: column; padding: 14px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2, 0 1px 2px rgba(17,21,17,.04)">
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #5D665F">
+                      <span style="width: 22px; height: 22px; display: grid; place-items: center; border-radius: 7px; background: {{w.bg}}; color: {{w.ink}}; font-size: 9.5px; font-weight: 600">{{w.who}}</span>
+                      {{w.meta}}
+                    </div>
+                    <div style="margin: 9px 0 12px; font-size: 14px; font-weight: 600; line-height: 20px">{{w.title}}</div>
+                    <span class="hc-quiet" style="margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 9px; box-shadow: inset 0 0 0 1px #DDE1DA; font-size: 13px; font-weight: 600; color: {{w.btnInk}}">{{w.action}}</span>
+                  </div>
+                </sc-for>
+              </div>
+
+              <!-- today -->
+              <div style="display: flex; align-items: baseline; justify-content: space-between; margin: 26px 2px 10px">
+                <h2 style="margin: 0; font-size: 15px; font-weight: 600">Today</h2>
+                <span style="display: inline-flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 500; color: #3B4540">Schedule<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 18 6-6-6-6"></path></svg></span>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+                <sc-for list="{{today}}" as="t" hint-placeholder-count="4">
+                  <div class="hc-card" style="display: flex; flex-direction: column; padding: 14px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2, 0 1px 2px rgba(17,21,17,.04)">
+                    <div style="font-size: 12px; color: #5D665F">{{t.kind}}</div>
+                    <div style="margin-top: 4px; font-size: 14px; font-weight: 600; line-height: 19px">{{t.title}}</div>
+                    <div style="font-size: 12.5px; line-height: 18px; color: #5D665F">{{t.sub}}</div>
+                    <div style="display: flex; align-items: baseline; gap: 6px; margin-top: 12px">
+                      <span style="font-size: 26px; font-weight: 600; line-height: 30px; letter-spacing: -0.02em">{{t.n}}</span>
+                      <span style="font-size: 12.5px; color: #3B4540">{{t.word}}</span>
+                    </div>
+                    <div style="display: flex; gap: 3px; height: 4px; margin-top: 10px">
+                      <sc-for list="{{t.segs}}" as="g" hint-placeholder-count="3">
+                        <span style="flex: 1; border-radius: 2px; background: {{g.bg}}"></span>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <!-- dashboards -->
+              <div style="margin: 26px 2px 10px">
+                <h2 style="margin: 0; font-size: 15px; font-weight: 600">Dashboards</h2>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+                <sc-for list="{{dashboards}}" as="d" hint-placeholder-count="3">
+                  <div class="hc-card" style="padding: 14px 12px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2, 0 1px 2px rgba(17,21,17,.04)">
+                    <span style="width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: #F3F4F1; color: #3B4540">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{d.icon}}"></path></svg>
+                    </span>
+                    <div style="margin-top: 10px; font-size: 13.5px; font-weight: 600">{{d.title}}</div>
+                    <div style="margin-top: 2px; font-size: 12px; line-height: 17px; color: #5D665F">{{d.sub}}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1078,"height":1150}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const G = '#28734F', B = '#3972B7', L = '#DDE1DA';
+    const segs = (list) => list.map((bg) => ({ bg }));
+    return {
+      panes: [
+        { label: 'Top', note: 'What you see when Home opens.', ref: () => {} },
+        { label: 'Scrolled down', note: 'The rest of the same pane.', ref: (el) => { if (el) el.scrollTop = el.scrollHeight; } }
+      ],
+      waiting: [
+        { who: 'BS', bg: '#ECE8FB', ink: '#5B4AB3', meta: 'Biosecurity · 3h ago', title: '5 visitors want to come in next week', action: 'Approve', btnInk: G },
+        { who: 'PR', bg: '#FCEFD6', ink: '#8A5A12', meta: 'Production · 2h ago', title: 'Batch 33: keep Farrowing 1?', action: 'Answer', btnInk: '#1B211C' }
+      ],
+      today: [
+        { kind: 'Production', title: 'Fostering checks', sub: 'Batch 32 · day 3 of 7', n: '6', word: 'of 8 checked', segs: segs([G, G, B, L, L, L, L]) },
+        { kind: 'Health', title: 'Amox treatment', sub: '4 sows · dose 2 of 3', n: '4', word: 'due today', segs: segs([G, B, L]) },
+        { kind: 'Health', title: 'PRRS top-up', sub: '3 pigs missed in Batch 31', n: '3', word: 'waiting', segs: [] },
+        { kind: 'Production', title: 'Farrowing', sub: 'Batch 33 · starts Fri', n: '~6', word: 'expected', segs: [] }
+      ],
+      dashboards: [
+        { title: 'Production', sub: '6 batches running', icon: 'M4 20V10M10 20V4M16 20v-7M22 20H2' },
+        { title: 'Health', sub: '4 sows on treatment', icon: 'M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z' },
+        { title: 'Biosecurity', sub: 'Next sampling Mon 9 Nov', icon: 'M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6Z' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
