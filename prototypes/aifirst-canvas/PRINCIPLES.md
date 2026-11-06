@@ -20,7 +20,7 @@ These are the rules every feature follows. If a feature's design and this doc di
 | **Farm view** | The always-open tab with the 3D farm | A Custom page |
 | **Location card** | The Farm view's card, top left: where you are (farm › zone › section › room › pen › pig) | — |
 | **Right panel** | The Farm view's panel on the right: batches, a batch, a running task | — |
-| **Bottom bar** | The Farm view's bar: Select · Batches · Equipment · Actions | — |
+| **Bottom bar** | The Farm view's bar: Select · Schedule · Equipment · Actions | — |
 | **Record** (noun) | A thing that exists and has an ID: a pig, pen, room, batch, task, running treatment, device | "record" (verb), meaning to log an event on the phone |
 | **Action** | A form that creates or changes something (New treatment, Vaccination plan) | — |
 | **Ways into an Action** | / Actions in chat · ··· Actions on a record · Actions in the bottom bar · Actions ▾ in a pig list | All of them open the same Action tab |
@@ -352,7 +352,7 @@ Home's own cards never act. Pages reached from Home (Schedule, the Inbox) can: S
 Normative detail is in `PLAN.md`. The parts other features touch:
 
 - **Levels:** farm › zone › section › room › pen (› pig). Back goes up one level; clicking empty ground goes up one level.
-- **Bottom bar:** Select · Batches · Equipment · Actions ("the left shows, the bottom does").
+- **Bottom bar:** Select · Schedule · Equipment · Actions ("the left shows, the bottom does").
   - Select ticks pigs or pens.
   - Actions opens an Action with them (§3.2).
 - **3D | Plan:**
@@ -360,6 +360,27 @@ Normative detail is in `PLAN.md`. The parts other features touch:
   - Plan (bird's-eye) is a tool a task switches to (show, pick or pick-rows of pens). When the task ends, the camera returns to where it was.
 - **Running task:** pens and crates take the task-status colours. Clicking a bar segment or a legend row highlights only those pigs.
 - **Queries and highlights:** §5.3.
+
+**Decided (6 Nov 2026):**
+
+- **Schedule replaces Batches.**
+  - The bar's Schedule opens Home's Schedule timeline, scoped to the level you're on (farm › zone › section › room › pen) and grouped by batch.
+  - A task row opens its record in the right panel. A batch name opens the batch.
+  - There is no separate batch calendar.
+- **A pen opens its contents.** One pig opens that pig; several pigs open the pig list. A pen has no "Pigs" pill.
+- **Adding anything places first:** zone, section, room, lane, row, door, device.
+  1. Choose what to add.
+  2. The pointer carries its shape: a room's box, a zone's outline, a device's icon. One line says where to click.
+  3. Click to put it down.
+  4. Then name it.
+
+  Add room is the model. The camera stays where you are and never zooms out.
+- **Add → Device** starts the device flow:
+  1. a grouped list (Climate, Feed and water, Comfort, Other), each with its icon, its name and what it serves;
+  2. placing it;
+  3. an optional "Connects to";
+  4. Save.
+- *Open:* moving a room's edit actions (Add lane, Add device, Reshape walls, Delete) from the top bar into the room card, as click-in pages.
 
 ---
 
