@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>An agent's query in the Farm view</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #1B211C; -webkit-font-smoothing: antialiased">
+  <img src="/_blob/9d8de934a0b5ec79c5ee377e57a95dde" alt="The console with the Vet chat and the whole farm in the Farm view" style="position: absolute; left: 0; top: 0; width: 1440px; height: 900px">
+
+  <!-- the farm faded; rooms with matching pigs carry a count -->
+  <div style="position: absolute; left: 481px; top: 61px; width: 950px; height: 829px; overflow: hidden; border-bottom-right-radius: 14px">
+    <div style="position: absolute; inset: 0; background: rgba(246,247,241,0.55)"></div>
+    <sc-for list="{{rooms}}" as="r" hint-placeholder-count="4">
+      <div style="position: absolute; left: {{r.x}}; top: {{r.y}}; transform: translate(-50%, -100%); display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px 0 8px; border-radius: 9px; background: #FFFFFF; box-shadow: 0 0 0 1.5px #B34B43, 0 3px 8px rgba(17,21,17,.18); font-size: 12.5px; font-weight: 600; white-space: nowrap">
+        <span style="min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; display: grid; place-items: center; border-radius: 9px; background: #B34B43; color: #FFFFFF; font-size: 11px; font-weight: 700">{{r.n}}</span>
+        {{r.name}}
+      </div>
+    </sc-for>
+  </div>
+  <div style="position: absolute; left: 497px; top: 77px; width: 358px; height: 56px; border-radius: 16px; background: url(/_blob/9d8de934a0b5ec79c5ee377e57a95dde) -497px -77px / 1440px 900px"></div>
+  <div style="position: absolute; left: 497px; top: 819px; width: 106px; height: 57px; border-radius: 16px; background: url(/_blob/9d8de934a0b5ec79c5ee377e57a95dde) -497px -819px / 1440px 900px"></div>
+  <div style="position: absolute; left: 1305px; top: 819px; width: 111px; height: 57px; border-radius: 16px; background: url(/_blob/9d8de934a0b5ec79c5ee377e57a95dde) -1305px -819px / 1440px 900px"></div>
+
+  <!-- the results card: the query's rendering, in the right panel -->
+  <div style="position: absolute; left: 1035px; top: 77px; width: 380px; box-sizing: border-box; padding-bottom: 14px; border-radius: 22px; background: #F6F7F1; box-shadow: 0 12px 32px rgba(17,21,17,.14), 0 0 0 1px rgba(17,21,17,.04)">
+    <div style="padding: 16px 14px 4px 16px; display: flex; align-items: center; gap: 8px">
+      <span style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 10px 0 6px; border-radius: 10px; background: #FFFFFF; box-shadow: 0 0 0 1px #E3E6DF; font-size: 13px; font-weight: 500">
+        <span style="width: 22px; height: 22px; display: grid; place-items: center; border-radius: 6px; background: #DDF1EF; color: #1F6F68; font-size: 9px; font-weight: 600">VT</span>
+        <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Vet · fever this week</span>
+        <svg viewBox="0 0 24 24" aria-label="Remove Vet's search" style="width: 14px; height: 14px; fill: none; stroke: #3B4540; stroke-width: 2; stroke-linecap: round"><path d="m18 6-12 12M6 6l12 12"></path></svg>
+      </span>
+    </div>
+    <div style="padding: 10px 20px 0">
+      <div style="font-size: 19px; font-weight: 700; letter-spacing: -0.02em">9 pigs in 4 rooms</div>
+      <div style="margin-top: 2px; font-size: 12.5px; color: #5D665F">Temperature °C · hottest first in each room</div>
+    </div>
+    <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+      <div>
+        <div style="display: flex; justify-content: space-between; padding: 12px 20px 6px; font-size: 13px; font-weight: 600"><span>{{g.room}}</span><span style="font-weight: 500; color: #5D665F">{{g.n}}</span></div>
+        <div style="margin: 0 12px; padding: 0 14px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2">
+          <sc-for list="{{g.pigs}}" as="p" hint-placeholder-count="2">
+            <div style="display: flex; align-items: center; gap: 10px; height: 38px; border-bottom: {{p.line}}">
+              <span style="font-size: 13.5px; font-weight: 600; white-space: nowrap">{{p.tag}}</span>
+              <span style="flex: 1; min-width: 0; font-size: 12px; color: #5D665F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.finding}}</span>
+              <span style="font-size: 13.5px; font-variant-numeric: tabular-nums; color: #B91C1C">{{p.temp}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+    <div style="display: flex; gap: 8px; padding: 14px 12px 0">
+      <span style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border-radius: 22px; background: #FFFFFF; box-shadow: 0 0 0 1px #E3E6DF; font-size: 14px; font-weight: 500">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg>See as a list
+      </span>
+      <span style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border-radius: 22px; background: #FFFFFF; box-shadow: 0 0 0 1px #E3E6DF; font-size: 14px; font-weight: 500">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>Select all 9
+      </span>
+    </div>
+  </div>
+
+  <!-- the chat: the question and the Vet's answer -->
+  <div style="position: absolute; left: 74px; top: 70px; width: 396px; height: 636px; box-sizing: border-box; padding: 0 22px 18px; background: #FCFCFA; display: flex; flex-direction: column; justify-content: flex-end; gap: 22px; font-size: 14.5px; line-height: 23px">
+    <div style="align-self: flex-end; max-width: 280px; padding: 10px 14px; border-radius: 14px; background: #EEF0EA">Which pigs had a fever this week?</div>
+    <div style="display: flex; gap: 12px">
+      <span style="width: 26px; height: 26px; flex: none; display: grid; place-items: center; border-radius: 7px; background: #DDF1EF; color: #1F6F68; font-size: 9.5px; font-weight: 600">VT</span>
+      <div style="min-width: 0">
+        <div style="font-size: 13px"><strong style="font-weight: 600">Vet</strong><span style="margin-left: 8px; font-size: 11.5px; color: #5D665F">09:02</span></div>
+        <div style="margin-top: 4px">Nine, in four rooms. I've lit them on the farm, hottest first in each room. D40 and D41 are already on Amoxicillin (RX-25G009). The two in the sick room are new since yesterday.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const groups = [
+      { room: 'Gestation 1', pigs: [['D40', 'Lame', '39.8'], ['D41', 'Lame, off feed', '39.8'], ['B20', 'Lame, hind legs', '39.6'], ['C12', 'Stiff gait', '39.4']] },
+      { room: 'Sick room', pigs: [['S3', 'Off feed', '40.1'], ['S5', 'Coughing', '39.7']] },
+      { room: 'Gestation 2', pigs: [['207118', 'Pen 14 · lame', '39.5'], ['207342', 'Pen 22', '39.3']] },
+      { room: 'Farrowing 1', pigs: [['F1-08', 'Off feed after farrowing', '39.4']] }
+    ];
+    return {
+      rooms: [
+        { x: '150px', y: '300px', n: '4', name: 'Gestation 1' },
+        { x: '269px', y: '337px', n: '2', name: 'Gestation 2' },
+        { x: '322px', y: '403px', n: '2', name: 'Sick room' },
+        { x: '462px', y: '357px', n: '1', name: 'Farrowing 1' }
+      ],
+      groups: groups.map((g) => ({ room: g.room, n: g.pigs.length + (g.pigs.length === 1 ? ' pig' : ' pigs'), pigs: g.pigs.map((p, i) => ({ tag: p[0], finding: p[1], temp: p[2], line: i === g.pigs.length - 1 ? '0' : '1px solid #EEF0EA' })) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Running treatment in the Farm view</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #1B211C; -webkit-font-smoothing: antialiased">
+  <img src="/_blob/4d63609bf90d716a88d5f7b4716df84d" alt="The console with the Vet chat and the Farm view of Gestation 1" style="position: absolute; left: 0; top: 0; width: 1440px; height: 900px">
+
+  <!-- the map, framed so the treatment's crates sit left of the panel, everything else faded -->
+  <div style="position: absolute; left: 481px; top: 61px; width: 950px; height: 829px; overflow: hidden; background: #E3E4D5; border-bottom-right-radius: 14px">
+    <img src="/_blob/4d63609bf90d716a88d5f7b4716df84d" alt="" style="position: absolute; left: -481px; top: -61px; width: 1440px; height: 900px">
+    <div style="position: absolute; inset: 0; background: rgba(246,247,241,0.58)"></div>
+    <sc-for list="{{crates}}" as="c" hint-placeholder-count="4">
+      <div style="position: absolute; left: {{c.x}}; top: {{c.y}}; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 7px; background: {{c.bg}}; box-shadow: {{c.ring}}; color: {{c.ink}}; font-size: 12px; font-weight: 700; white-space: nowrap">{{c.label}}</div>
+    </sc-for>
+  </div>
+  <!-- bar, 3D and Select, shown above the faded map as they are -->
+  <div style="position: absolute; left: 497px; top: 77px; width: 526px; height: 56px; border-radius: 16px; background: url(/_blob/4d63609bf90d716a88d5f7b4716df84d) -497px -77px / 1440px 900px"></div>
+  <div style="position: absolute; left: 497px; top: 819px; width: 106px; height: 57px; border-radius: 16px; background: url(/_blob/4d63609bf90d716a88d5f7b4716df84d) -497px -819px / 1440px 900px"></div>
+  <div style="position: absolute; left: 1305px; top: 819px; width: 111px; height: 57px; border-radius: 16px; background: url(/_blob/4d63609bf90d716a88d5f7b4716df84d) -1305px -819px / 1440px 900px"></div>
+
+  <!-- the record: the right panel in the Farm view's own language -->
+  <div style="position: absolute; left: 1035px; top: 77px; width: 380px; box-sizing: border-box; padding-bottom: 14px; border-radius: 22px; background: #F6F7F1; box-shadow: 0 12px 32px rgba(17,21,17,.14), 0 0 0 1px rgba(17,21,17,.04)">
+    <div style="padding: 18px 18px 6px 20px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="flex: 1; font-size: 19px; font-weight: 700; letter-spacing: -0.02em">Treatment RX-25G009</span>
+        <span style="width: 32px; height: 32px; display: grid; place-items: center; color: #3B4540">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="m18 6-12 12M6 6l12 12"></path></svg>
+        </span>
+      </div>
+      <div style="margin-top: 2px; font-size: 13px; color: #5D665F">Amoxicillin 15% LA · 4 sows · Batch 32</div>
+      <div style="display: flex; gap: 6px; margin-top: 10px">
+        <span style="padding: 3px 8px; border-radius: 8px; background: #E8EFFB; color: #24518C; font-size: 12px; font-weight: 500">Running</span>
+        <span style="padding: 3px 8px; border-radius: 8px; box-shadow: inset 0 0 0 1px #DDE1DA; background: #FFFFFF; font-size: 12px; font-weight: 500">Lameness</span>
+        <span style="padding: 3px 8px; border-radius: 8px; box-shadow: inset 0 0 0 1px #DDE1DA; background: #FFFFFF; font-size: 12px; font-weight: 500">Fever</span>
+      </div>
+    </div>
+
+    <div style="padding: 14px 20px 8px; font-size: 14px; font-weight: 600">Now</div>
+    <div style="margin: 0 12px; padding: 14px 16px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2">
+      <div style="display: flex; align-items: baseline; justify-content: space-between">
+        <span style="font-size: 18px; font-weight: 600">Dose 2 of 3</span>
+        <span style="font-size: 12.5px; color: #5D665F">Fri 6 Nov</span>
+      </div>
+      <div style="margin-top: 2px; font-size: 13px; color: #3B4540">2 of 4 sows given</div>
+      <div style="display: flex; gap: 3px; height: 6px; margin-top: 10px">
+        <span style="flex: 1; border-radius: 3px; background: #5FAE6E"></span><span style="flex: 1; border-radius: 3px; background: #5FAE6E"></span><span style="flex: 1; border-radius: 3px; box-shadow: inset 0 0 0 1.5px #6F9FDC"></span><span style="flex: 1; border-radius: 3px; box-shadow: inset 0 0 0 1.5px #6F9FDC"></span>
+      </div>
+      <div style="margin-top: 10px; font-size: 12.5px; color: #5D665F">Next dose Sat 7 Nov 08:30 · every 24 hours</div>
+    </div>
+
+    <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 16px 20px 8px">
+      <span style="font-size: 14px; font-weight: 600">Sows</span>
+      <span style="display: grid; grid-template-columns: repeat(3, 28px); text-align: center; font-size: 11.5px; color: #5D665F; padding-right: 16px">
+        <span>1</span><span>2</span><span>3</span>
+      </span>
+    </div>
+    <div style="margin: 0 12px; padding: 4px 16px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2">
+      <sc-for list="{{sows}}" as="s" hint-placeholder-count="4">
+        <div style="display: flex; align-items: center; min-height: 42px; border-bottom: {{s.line}}">
+          <div style="flex: 1; min-width: 0">
+            <div style="font-size: 14px; font-weight: 600">{{s.tag}}</div>
+            <sc-if value="{{s.hasNote}}" hint-placeholder-val="{{false}}">
+              <div style="font-size: 12px; color: #8A5A12; margin: -1px 0 6px">{{s.note}}</div>
+            </sc-if>
+          </div>
+          <span style="display: grid; grid-template-columns: repeat(3, 28px); justify-items: center">
+            <sc-for list="{{s.marks}}" as="m" hint-placeholder-count="3">
+              <span role="img" aria-label="{{m.label}}" style="width: {{m.size}}; height: {{m.size}}; box-sizing: border-box; border-radius: 50%; display: grid; place-items: center; background: {{m.bg}}; box-shadow: {{m.ring}}; color: {{m.ink}}; font-size: 12px; font-weight: 700"><sc-if value="{{m.skip}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px"><path d="m5 5 10 7-10 7Z" fill="currentColor"></path><path d="M19 5v14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></path></svg></sc-if>{{m.text}}</span>
+            </sc-for>
+          </span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="padding: 16px 20px 8px; font-size: 14px; font-weight: 600">Prescription</div>
+    <div style="margin: 0 12px; padding: 12px 16px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2; font-size: 13px; line-height: 20px">
+      <div style="font-weight: 600">Amoxicillin 15% LA</div>
+      <div style="color: #3B4540">Intramuscular · 15 mL a sow · 3 doses, 24 h apart</div>
+      <div style="color: #5D665F">Withdrawal 14 days · Keep D40 and D41 on straw</div>
+    </div>
+
+    <div style="display: flex; gap: 8px; padding: 14px 12px 0">
+      <span style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border-radius: 22px; background: #FFFFFF; box-shadow: 0 0 0 1px #E3E6DF; font-size: 14px; font-weight: 500">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg>Log
+      </span>
+      <span style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border-radius: 22px; background: #FFFFFF; box-shadow: 0 0 0 1px #E3E6DF; font-size: 14px; font-weight: 500">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: currentColor"><circle cx="5" cy="12" r="1.6"></circle><circle cx="12" cy="12" r="1.6"></circle><circle cx="19" cy="12" r="1.6"></circle></svg>Actions
+      </span>
+    </div>
+  </div>
+
+  <!-- the chat telling the same story -->
+  <div style="position: absolute; left: 74px; top: 70px; width: 396px; height: 636px; box-sizing: border-box; padding: 0 22px 18px; background: #FCFCFA; display: flex; flex-direction: column; justify-content: flex-end; gap: 22px; font-size: 14.5px; line-height: 23px">
+    <div style="align-self: flex-end; max-width: 280px; padding: 10px 14px; border-radius: 14px; background: #EEF0EA">Treat the four lame sows I picked</div>
+    <sc-for list="{{chat}}" as="m" hint-placeholder-count="2">
+      <div>
+        <sc-if value="{{m.hasDivider}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 22px; font-size: 12px; color: #5D665F"><span style="flex: 1; height: 1px; background: #E6E9E2"></span>{{m.divider}}<span style="flex: 1; height: 1px; background: #E6E9E2"></span></div>
+        </sc-if>
+        <div style="display: flex; gap: 12px">
+          <span style="width: 26px; height: 26px; flex: none; display: grid; place-items: center; border-radius: 7px; background: #DDF1EF; color: #1F6F68; font-size: 9.5px; font-weight: 600">VT</span>
+          <div style="min-width: 0">
+            <div style="font-size: 13px"><strong style="font-weight: 600">Vet</strong><span style="margin-left: 8px; font-size: 11.5px; color: #5D665F">{{m.time}}</span></div>
+            <div style="margin-top: 4px">{{m.text}}</div>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+    <div style="margin-left: 38px; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E3E6DF">
+      <span style="width: 34px; height: 34px; display: grid; place-items: center; border-radius: 9px; background: #E9F6EE; color: #28734F">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M9 4H5v17h14V4h-4M9 2h6v4H9ZM8 11h8M8 15h5"></path></svg>
+      </span>
+      <div style="flex: 1; min-width: 0">
+        <div style="font-size: 14px; font-weight: 600">Treatment RX-25G009</div>
+        <div style="font-size: 12.5px; color: #28734F">Running · dose 2 of 3</div>
+      </div>
+      <span style="display: inline-flex; align-items: center; height: 34px; padding: 0 12px; border-radius: 9px; box-shadow: inset 0 0 0 1px #DDE1DA; background: #FFFFFF; font-size: 13.5px; font-weight: 500">Open</span>
+    </div>
+  </div>
+  <div style="position: absolute; left: 116px; top: 721px; height: 28px; display: flex; align-items: center; gap: 6px; padding: 0 9px; border-radius: 8px; background: #F0F2EE; font-size: 12.5px; color: #3B4540; box-shadow: 0 0 0 4px #FFFFFF">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M9 4H5v17h14V4h-4M9 2h6v4H9ZM8 11h8M8 15h5"></path></svg>
+    Looking at <strong style="font-weight: 600; color: #1B211C">Treatment RX-25G009</strong>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const done = { bg: '#E3F0E8', ink: '#28734F', ring: '0 0 0 1.5px #5FAE6E, 0 2px 6px rgba(17,21,17,.15)' };
+    const due = { bg: '#FFFFFF', ink: '#1F4F8C', ring: '0 0 0 2px #3972B7, 0 2px 6px rgba(17,21,17,.15)' };
+    const mark = (k) => ({
+      done: { label: 'given', skip: false, text: '✓', size: '22px', bg: '#E3F0E8', ink: '#28734F', ring: 'none' },
+      skipped: { label: 'skipped', skip: true, text: '', size: '22px', bg: '#FCEFD6', ink: '#8A5A12', ring: 'none' },
+      due: { label: 'due today', skip: false, text: '', size: '14px', bg: 'transparent', ink: '#3972B7', ring: 'inset 0 0 0 1.5px #3972B7' },
+      later: { label: 'waiting', skip: false, text: '', size: '14px', bg: 'transparent', ink: '#5D665F', ring: 'inset 0 0 0 1.5px #C9CEC4' }
+    })[k];
+    const sows = [['B15', ['done', 'done', 'later'], ''], ['B20', ['done', 'done', 'later'], ''], ['D40', ['done', 'due', 'later'], ''], ['D41', ['skipped', 'due', 'later'], 'Dose 1 skipped: could not stand']];
+    return {
+      crates: [
+        Object.assign({ x: '200px', y: '400px', label: 'B15 ✓' }, done),
+        Object.assign({ x: '268px', y: '364px', label: 'B20 ✓' }, done),
+        Object.assign({ x: '420px', y: '386px', label: 'D40' }, due),
+        Object.assign({ x: '440px', y: '414px', label: 'D41' }, due)
+      ],
+      sows: sows.map((r, i) => ({ tag: r[0], marks: r[1].map(mark), hasNote: !!r[2], note: r[2], line: i === sows.length - 1 ? '0' : '1px solid #EEF0EA' })),
+      chat: [
+        { time: '08:41', text: 'I filled in the treatment page: Amoxicillin 15% LA, 15 mL into the neck muscle, 3 doses a day apart. Check it and issue it.', hasDivider: false, divider: '' },
+        { time: '16:20', text: 'Dose 2 is half done: D40 and D41 are still waiting. D41 was skipped on dose 1, she could not stand.', hasDivider: true, divider: 'Fri 6 Nov' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -93,7 +93,8 @@ These are the rules every feature follows. If a feature's design and this doc di
 | What do I decide? | **Inbox** | Approve / Answer / To do items |
 | When? | **Schedule** (a page reached from Home) | Today, the week, what's coming, as a timeline |
 | Where, and which pig? | **Farm view** | Rooms, pens and pigs now, and every record |
-| How are we doing? | **Dashboards** | Trends (Custom pages we designed) |
+| How are we doing? | **Dashboards** | A fixed baseline of farm-wide charts; never batch-level, never commentary |
+| What changed today, and why? | **Daily report** (in the general group chat) | Day-to-day changes, problems, comparisons against plan (3.6) |
 | Show me something specific | **Custom page** tab | A list or chart an agent built, or a saved one |
 | Change or create something | **Action** tab | A form |
 | Help, explain, do it for me | **Chat** | Conversation; its cards open any of the above |
@@ -147,7 +148,7 @@ Home's own cards never act. Pages reached from Home (Schedule, the Inbox) can: S
   - **Note:** short plain text from the agent; at most one.
 - Agents compose Custom pages from these blocks, never a custom layout or a new block.
 - Every row, bar or figure links to a record or another Custom page.
-- Dashboards are Custom pages we designed.
+- Dashboards are Custom pages we designed: a stable baseline of farm-wide charts, never batch-level and never commentary. Anything dynamic belongs in the daily report (3.6).
 - A Custom page can be saved and reopened.
 
 ### 3.4 Decision → the Inbox
@@ -159,6 +160,17 @@ Home's own cards never act. Pages reached from Home (Schedule, the Inbox) can: S
 - A timeline: task rows × days, with bars for done, today, planned and estimate.
 - A cell or row opens the task's record (§3.1). A row's place opens the Farm view there. **"+"** opens the Action, prefilled.
 - Schedule and the Farm view reach the same task record by time or by place. Neither is a second task UI.
+
+### 3.6 Daily report → the general group chat
+**Decided (6 Nov 2026).**
+
+- **Who writes it:** the agents draft and generate a daily report each day.
+- **Where it lands:** it is posted in the farm's general group chat, and everyone in that chat sees it.
+- **One link, two sections:** everyone gets the same link. Opening it shows a section just for the viewer, plus a shared section for everyone.
+- **What goes in it:** everything dynamic about the farm: day-to-day changes, problems, comparisons against plan.
+- **Versus dashboards:** dashboards are the same farm-wide charts every day. The report is what changed and why.
+- **Versus the Inbox:** the report informs and asks for nothing. A decision it raises is its own Inbox item (§4), and the report links to it.
+- **Default:** the report opens as its own tab, built from the Custom page blocks (Note, Figures, Chart, List). Everything in it links out to records.
 
 ---
 
@@ -246,7 +258,7 @@ Home's own cards never act. Pages reached from Home (Schedule, the Inbox) can: S
   - One agent query at a time: a new one replaces the old.
 - **In a list:** rows and columns.
 - **In the Farm view (a highlight):**
-  - Matching pigs light up and everything else fades. The count shows in the bar.
+  - Matching pigs light up and everything else fades. The count shows in the results card.
   - Each lit pig's label carries **at most one value** the agent picks ("D40 · 39.8").
   - A **results card** in the right panel shows the chip, the count, and one line per pig with that value. Clicking a line flies the camera to that pig.
   - The results card is the query's rendering, not a record page.
@@ -435,7 +447,11 @@ Canvas: the Treatment page (top frame live; Farm view mock-ups beside it).
   - Today's next jobs;
   - per-area attention lines that say why ("D40, D41 · 39.8 °C, lame · Gestation 2"), each opening its page.
 - **The Inbox page.**
-- **Dashboards** (they will be Custom pages, §3.3).
+- **Dashboards:** which charts make up the fixed baseline set. A proposal based on the old web Home is on the canvas's Home page.
+- **Daily report:**
+  - timing (after the day ends, or in the morning);
+  - what goes in each person's section (by role, by what they own, or by what they asked about);
+  - where past reports are kept.
 - **Page-level agent comments, and the 3-comment limit** (§5.4).
 - **Form pickers:** the medicine, method and similar dropdowns don't open in the prototype. Use the design system's pickers.
 - **Records with no place** (§3.1): the rule is set, but no screen is designed.
