@@ -8,7 +8,7 @@
   const rules = [
     ['Words from the task', 'Treatment says Given, Due, Skipped. No generic labels (To do, Needs a look). Colours follow the mobile convention: green done, blue today, amber skipped; tonal fills for shapes, marks for thin parts, ink for words.'],
     ['Hover: one glance', 'Who, and the one state line in this task (Dose 2 due 08:30). Reasons, counts and history are behind the click.'],
-    ['Click: this task, for her', 'Who she is, then one bar: a segment per dose, so 3 or 30 read the same. Hover a segment for that dose. No legend, no task details, no log for a treatment; withdrawal is a chip. Profile pushes her profile in the pane; Back returns.'],
+    ['Click: this task, for her', 'Her whole course in one line, then a circle per dose: days across, the doses of each day down, so 3 or 30 read the same. Hover a circle for that dose. No legend, no task details, no log; withdrawal is a chip. Profile pushes her profile in the pane.'],
     ['Group pens', 'No pen card: the pane stays on the task. Zooming into the pen lines its pigs up in sections by state; tagged pigs click through to their view, untagged ones are counted. Crowded pens shrink the figures; zooming out puts them back']
   ];
   const body = '<h1 style="margin: 0; font-size: 28px; line-height: 36px; font-weight: 600; letter-spacing: -.02em;">Treatment on the Farm view</h1><div style="margin-top: 6px; font-size: 15px; line-height: 22px; color: #5D665F;">What the hover says and what the task-pig view holds, for a sow and for a group pen. Panes are 320 wide (display). The chat stays on the left.</div>' +

@@ -394,6 +394,57 @@ frames.k1.html = () => tabsStrip('Farm view') + fbar() + rxFull('chips') + chips
 frames.k4.html = () => tabsStrip('Farm view') + fbar() + rxFull('chips') + chips(five, 'rx', '+2', ovMenu) + vctl;
 frames.k1.cap = 'Open a second task and it is added as a chip, never replacing the first. The active task\'s card is about the whole course: 5 of 12 doses, then the prescription as set fields (medicine, dose, schedule, withdrawal, who prescribed), and at most one free-text note. The arrow collapses, × closes.';
 if (frames.r1) { frames.r1.html = () => tabsStrip('Farm view') + fbar() + rxFull() + vctl + hovOne(420, 434, 'D41 · 205901', mini('due'), 'Dose 2 due 08:30'); frames.r1.cap = 'The task on the map: the card is the whole course (5 of 12 doses) and the prescription as set fields. Hover a sow: one line, where she is now.'; }
+// ===== task tabs sit on top of the card, left to right; × lives only on the tab =====
+const chipsR = (list, on, more, menu) => card({ right: '12px', top: LT + 'px', width: PS + 'px' }, list.map((x) => '<span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '6px', height: '32px', padding: '0 4px 0 9px', borderRadius: '9px', background: x[0] === on ? '#FFFFFF' : 'transparent', boxShadow: x[0] === on ? 'inset 0 0 0 1.5px ' + K.ink : 'none', fontSize: '13px', fontWeight: x[0] === on ? 600 : 500, color: K.ink, whiteSpace: 'nowrap', minWidth: 0 }) + '"><span style="display: inline-flex; color: ' + (x[2] === 'vax' ? K.green : K.blue) + ';">' + ic(TI[x[2]], 14) + '</span>' + x[1] + '<span style="display: inline-flex; color: ' + K.muted + '; padding: 3px;">' + ic(I.x, 12, 2.2) + '</span></span>').join('') + '<span style="flex: 1;"></span>' + (more ? '<span style="' + st({ display: 'inline-flex', alignItems: 'center', gap: '3px', height: '32px', padding: '0 8px', borderRadius: '9px', background: menu ? K.press : 'transparent', fontSize: '13px', fontWeight: 500 }) + '">' + more + ic(I.down, 13, 2) + '</span>' : '') + (menu || ''), { display: 'flex', alignItems: 'center', gap: '2px', padding: '5px', background: 'rgba(255,255,255,.94)', boxSizing: 'border-box' });
+// the card: collapse only
+const collapseOnly = (h) => h.replace('<span title="Close" style="display: inline-flex; color: ' + K.muted + '; padding: 4px;">' + ic(I.x, 17) + '</span>', '');
+const menu4 = '<div style="' + st({ position: 'absolute', right: '6px', top: '46px', width: '240px', padding: '6px', borderRadius: '12px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 12px 30px rgba(17,21,17,.16)', zIndex: 8 }) + '">' + [['move', 'Move · Batch 33'], ['rx', 'RX-25G014'], ['rx', 'RX-25G011'], ['vax', 'Sampling · Batch 30']].map((x) => '<div style="display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 8px; border-radius: 8px; font-size: 13px;"><span style="display: inline-flex; color: ' + (x[0] === 'vax' ? K.green : K.blue) + ';">' + ic(TI[x[0]], 14) + '</span><span style="flex: 1;">' + x[1] + '</span><span style="display: inline-flex; color: ' + K.muted + ';">' + ic(I.x, 12, 2.2) + '</span></div>').join('') + '</div>';
+frames.k1.html = () => tabsStrip('Farm view') + fbar() + collapseOnly(rxFull('chips')) + chipsR(two, 'rx') + vctl;
+frames.k1.cap = 'Open a second task and it is added as a tab on top of the card, left to right, never replacing the first. The active tab is outlined; its card shows the whole course and the prescription as set fields. The card only collapses; a task closes from its tab.';
+frames.k2.html = () => tabsStrip('Farm view') + fbar() + chipsR(two, '') + vctl;
+frames.k2.cap = 'Collapse (the arrow on the card, a click on empty map, or Esc): the card and colours go, the map is plain again. The tabs stay where the card was; one click brings either back. Coming back to the Farm view later opens like this.';
+frames.k3.html = () => tabsStrip('Farm view') + fadeAll + penSvg() + nbar() + collapseOnly(vaxCard()) + chipsR(two, 'vax') + vctl;
+frames.k4.html = () => tabsStrip('Farm view') + fbar() + collapseOnly(rxFull('chips')) + chipsR(two, 'rx', '+4', menu4) + vctl;
+frames.k4.cap = 'Many open: the tabs that fit the card\'s width, then +4 with the rest. × on a tab, or in its menu row, closes that task; nothing else does.';
+frames.k5.html = () => tabsStrip('Farm view') + fbar() + chipsR(two, 'rx') + vctl + collapseOnly(d41under());
+// ===== circles, not bars: one circle per dose, columns are days, rows are the day's doses; the headline is the whole course =====
+const DOTC = { done: [DM, 'none'], skip: [LM, 'none'], due: ['#FFFFFF', 'inset 0 0 0 2.5px ' + PM], plan: ['#FFFFFF', 'inset 0 0 0 1.5px ' + HANDLE] };
+const dot = (s, hot) => '<span style="' + st({ display: 'inline-block', width: '18px', height: '18px', borderRadius: '99px', background: DOTC[s][0], boxShadow: [DOTC[s][1] === 'none' ? '' : DOTC[s][1], hot ? '0 0 0 2px #FFFFFF, 0 0 0 3.5px ' + K.ink : ''].filter(Boolean).join(', ') || 'none', boxSizing: 'border-box' }) + '"></span>';
+// grid: days across, doses per day down; hot = [col,row]; the tip sits under the grid, anchored to the nearer side
+const doseGrid = (days, rowsLbl, cells, hot, tipHead, tipLine) => {
+  const cols = days.length, tmpl = (rowsLbl ? '30px ' : '') + 'repeat(' + cols + ', 1fr)';
+  let h = '<div style="display: grid; grid-template-columns: ' + tmpl + '; row-gap: 8px; align-items: center; justify-items: center; margin-top: 12px;">' + (rowsLbl ? '<span></span>' : '') + days.map((d) => t(d, { fontSize: '11.5px', color: K.muted })).join('');
+  cells.forEach((row, r) => { if (rowsLbl) h += t(rowsLbl[r], { fontSize: '11.5px', color: K.muted, justifySelf: 'start' }); row.forEach((s, c) => { h += s ? dot(s, hot && hot[0] === c && hot[1] === r) : '<span></span>'; }); });
+  h += '</div>';
+  const tip = hot ? '<div style="' + st(Object.assign({ position: 'absolute', top: 'calc(100% + 6px)', padding: '7px 10px', borderRadius: '10px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.08), 0 8px 22px rgba(17,21,17,.16)', whiteSpace: 'nowrap', zIndex: 3 }, hot[0] < cols / 2 ? { left: 0 } : { right: 0 })) + '">' + t(tipHead, { display: 'block', fontSize: '13px', fontWeight: 600 }) + mu(tipLine, { display: 'block', fontSize: '12px' }) + '</div>' : '';
+  return '<div style="position: relative;">' + h + tip + '</div>';
+};
+const courseHead = (title, side) => '<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px;">' + t(title, { fontSize: '15px', fontWeight: 600 }) + mu(side, { fontSize: '12.5px' }) + '</div>';
+const pigCourse = (title, side, grid, chip) => card2(courseHead(title, side) + grid + (chip || ''));
+
+const d41d = () => paneSlim(backHead('Treatment RX-25G009'), who('D41 · 205901', 'Sow · P4 · Pen D41', I.pig, profBtn) +
+  pigCourse('1 skipped · 2 to go', 'Thu – Sat', doseGrid(['Thu', 'Fri', 'Sat'], null, [['skip', 'due', 'plan']], [0, 0], 'Dose 1 · Skipped', 'Thu 08:40 · could not stand · G.H'), wChip('Withdrawal ends 21 Nov')));
+const c30d = () => paneSlim(backHead('Treatment RX-25G014'), who('C30 · 207118', 'Sow · P2 · Pen C30', I.pig, profBtn) +
+  pigCourse('7 given · 1 skipped · 6 to go', 'Mon – Sun', doseGrid(['M', 'T', 'W', 'T', 'F', 'S', 'S'], ['AM', 'PM'], [['done', 'done', 'done', 'done', 'due', 'plan', 'plan'], ['done', 'done', 'skip', 'done', 'plan', 'plan', 'plan']], [2, 1], 'Dose 6 · Skipped', 'Wed 20:10 · off feed, vet called · L.W'), wChip('Withdrawal ends 28 Nov')));
+const p422d = () => paneSlim(backHead('Treatment RX-25G011'), who('310422', 'Weaner · Pen B12', I.pig, profBtn) +
+  pigCourse('1 given · 2 skipped', 'Wed – Fri', doseGrid(['Wed', 'Thu', 'Fri'], null, [['done', 'skip', 'skip']], [1, 0], 'Day 2 · Skipped', 'Thu 08:14 · could not catch · G.H'), wChip('Withdrawal ends 25 Nov')));
+// the task card: the course, then one ring per dose round across the sows
+const ringR = (g, a, d, n) => { const C = 2 * Math.PI * 15, seg = (v, off, col) => v ? '<circle cx="20" cy="20" r="15" fill="none" stroke="' + col + '" stroke-width="6" stroke-dasharray="' + (C * v / n).toFixed(1) + ' ' + C.toFixed(1) + '" stroke-dashoffset="' + (-C * off / n).toFixed(1) + '" transform="rotate(-90 20 20)"></circle>' : ''; return '<svg viewBox="0 0 40 40" style="width: 40px; height: 40px;"><circle cx="20" cy="20" r="15" fill="none" stroke="' + HANDLE + '" stroke-width="6"></circle>' + seg(g, 0, DM) + seg(a, g, LM) + seg(d, g + a, PM) + '</svg>'; };
+const rounds = (list) => '<div style="display: grid; grid-template-columns: repeat(' + list.length + ', 1fr); gap: 4px; margin-top: 12px;">' + list.map((x) => '<div style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;">' + ringR(x[1], x[2], x[3], x[4]) + t(x[0], { fontSize: '12.5px', fontWeight: 600 }) + x[5].split(' · ').map((z) => t(z, { fontSize: '11.5px', lineHeight: '15px', color: K.muted })).join('') + '</div>').join('') + '</div>';
+const rxFull2 = (top) => { const h = paneSlim(theadC({ title: 'Treatment RX-25G009', sub: '4 sows · Batch 32 · Gestation 2' }),
+  statusChips(['Running', 'Lameness', 'Fever']) +
+  card2(courseHead('3 doses · Thu 5 – Sat 7 Nov', 'day 2') + rounds([['Dose 1', 3, 1, 0, 4, '3 given · 1 skipped'], ['Dose 2', 2, 0, 2, 4, '2 given · 2 due'], ['Dose 3', 0, 0, 0, 4, 'Sat']])) +
+  sec('Prescription') + factsBox([['Medicine', 'Amoxicillin 15% LA'], ['Dose', '15 mL a sow', 'Intramuscular, neck'], ['Schedule', '3 doses, every 24 h'], ['Withdrawal', '14 days', 'Ends 21 Nov, if the last dose is Sat'], ['Prescribed', 'Vet', 'Wed 4 Nov 16:10'], ['Note', 'Keep D40 and D41 on straw']]) +
+  '<div style="display: flex; gap: 8px; margin-top: 12px;">' + fbtn(ic(SC2.ext, 15) + '&nbsp; Open page') + '</div>');
+  return top === 'chips' ? under(h) : h; };
+
+if (frames.r1) { frames.r1.html = () => tabsStrip('Farm view') + fbar() + rxFull2() + vctl + hovOne(420, 434, 'D41 · 205901', dot('due'), 'Dose 2 due 08:30'); frames.r1.cap = 'The task card is the whole course: its dates, then a ring per dose round across the four sows (Dose 1: 3 given, 1 skipped). Then the prescription as set fields. Hover a sow: one line.'; }
+if (frames.r2) { frames.r2.html = () => tabsStrip('Farm view') + fbar() + vctl + d41d(); frames.r2.cap = 'Click D41: her whole course in one line (1 skipped, 2 to go) and a circle per dose under its day. Hover a circle for that dose: what, when, who.'; }
+if (frames.r3) { frames.r3.html = () => tabsStrip('Farm view').replace('Treatment RX-25G009', 'Treatment RX-25G014') + fbar() + vctl + c30d(); frames.r3.cap = 'Fourteen doses, twice a day: days across, morning and evening down. The skipped evening dose stands out; hover it for the reason.'; }
+if (frames.p2) { frames.p2.html = () => tabsStrip('Farm view').replace('Treatment RX-25G009', 'Treatment RX-25G011') + penBar('9', 'Pen B12') + penSections(QB12, B12secs, { hot: '310422' }) + vctl + p422d(); }
+if (frames.k1) { frames.k1.html = () => tabsStrip('Farm view') + fbar() + collapseOnly(rxFull2('chips')) + chipsR(two, 'rx') + vctl; }
+if (frames.k4) { frames.k4.html = () => tabsStrip('Farm view') + fbar() + collapseOnly(rxFull2('chips')) + chipsR(two, 'rx', '+4', menu4) + vctl; }
+if (frames.k5) { frames.k5.html = () => tabsStrip('Farm view') + fbar() + chipsR(two, 'rx') + vctl + collapseOnly(under(d41d())); }
 (async () => {
   const W = 950, Hh = 830, gap = 40, pad = 48;
   const frame = async (k, n) => {
@@ -404,7 +455,7 @@ if (frames.r1) { frames.r1.html = () => tabsStrip('Farm view') + fbar() + rxFull
   const rules = [
     ['Words from the task', 'Treatment says Given, Due, Skipped. No generic labels (To do, Needs a look). Colours follow the mobile convention: green done, blue today, amber skipped; tonal fills for shapes, marks for thin parts, ink for words.'],
     ['Hover: one glance', 'Who, and the one state line in this task (Dose 2 due 08:30). Reasons, counts and history are behind the click.'],
-    ['Click: this task, for her', 'Who she is, then one bar: a segment per dose, so 3 or 30 read the same. Hover a segment for that dose. No legend, no task details, no log for a treatment; withdrawal is a chip. Profile pushes her profile in the pane; Back returns.'],
+    ['Click: this task, for her', 'Her whole course in one line, then a circle per dose: days across, the doses of each day down, so 3 or 30 read the same. Hover a circle for that dose. No legend, no task details, no log; withdrawal is a chip. Profile pushes her profile in the pane.'],
     ['Group pens', 'No pen card: the pane stays on the task. Zooming into the pen lines its pigs up in sections by state; tagged pigs click through to their view, untagged ones are counted. Crowded pens shrink the figures; zooming out puts them back']
   ];
   const body = '<h1 style="margin: 0; font-size: 28px; line-height: 36px; font-weight: 600; letter-spacing: -.02em;">Treatment on the Farm view</h1><div style="margin-top: 6px; font-size: 15px; line-height: 22px; color: #5D665F;">What the hover says and what the task-pig view holds, for a sow and for a group pen. Panes are 320 wide (display). The chat stays on the left.</div>' +
