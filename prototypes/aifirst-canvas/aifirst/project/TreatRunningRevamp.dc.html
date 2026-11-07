@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>body{margin:0}</style>
 </helmet>
-<div style="width: 1520px; height: 1760px; box-sizing: border-box; padding: 48px; background: #EEEFEB; font-family: Inter, system-ui, sans-serif; color: #1c1917; -webkit-font-smoothing: antialiased">
+<div style="width: 2248px; height: 1760px; box-sizing: border-box; padding: 48px; background: #EEEFEB; font-family: Inter, system-ui, sans-serif; color: #1c1917; -webkit-font-smoothing: antialiased">
   <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">Running treatment page, revamped</h1>
   <p style="margin: 8px 0 0; max-width: 1100px; font-size: 14px; line-height: 21px; color: #57534e">The page the Farm view's "Open page" opens, brought in line with the treatment card: one number with its unit, the course as a track of doses in order (a ring across the pigs while a dose is partial, a solid dot once every pig has it), the counts in words under each dose, the mobile status colours, and the prescription as set fields. The Pigs list stays as the page's working list, grouped by pen, with only circles in it (small dots when there are many doses), and pages when it runs long. Hover states are shown held.</p>
 
@@ -211,10 +211,111 @@
         </div>
       </section>
     </div>
+
+    <!-- many doses, and two medicines -->
+    <div style="width: 680px">
+      <div style="font-size: 15px; font-weight: 600">Many doses, and two medicines</div>
+      <div style="font-size: 13px; color: #57534e; margin: 2px 0 12px">Past a month, finished weeks fold into one line. Medicine in feed or water counts days for the room. Two medicines in one treatment get one track each, on shared dates.</div>
+
+      <section style="margin-bottom: 24px; padding: 20px 24px 22px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">One sow · twice a day for 6 weeks</div>
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; line-height: 1">60</span>
+            <span style="font-size: 15px; color: #44403c">of 84 doses given</span>
+            <span style="flex: 1"></span>
+            <span style="font-size: 13px; color: #57534e">2 Nov – 13 Dec · every 12 h</span>
+          </div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 18px; padding: 12px 14px; border-radius: 10px; background: #fafaf9; box-shadow: inset 0 0 0 1px #efeeec">
+          <span style="display: block; width: 18px; height: 18px; border-radius: 50%; background: conic-gradient(#5fae6e 4deg 350deg, transparent 350deg 352deg, #e8b33c 352deg 358deg, transparent 358deg 360deg); -webkit-mask: radial-gradient(circle, transparent 5px, #000 5.5px); mask: radial-gradient(circle, transparent 5px, #000 5.5px)"></span>
+          <span style="flex: 1; font-size: 13.5px"><strong style="font-weight: 600">Weeks 1–4</strong><span style="color: #57534e"> · 2 – 29 Nov · 55 given · 1 skipped</span></span>
+          <span style="display: inline-flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 500">Show<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="m9 18 6-6-6-6"></path></svg></span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); row-gap: 14px; margin-top: 16px">
+          <sc-for list="{{longDays}}" as="it" hint-placeholder-count="14">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 7px">
+              <span style="font-size: 11.5px; font-weight: {{it.weight}}; color: {{it.ink}}">{{it.date}}</span>
+              <span style="display: flex; gap: 3px; align-items: center; height: 22px">
+                <sc-for list="{{it.marks}}" as="m" hint-placeholder-count="2"><span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span></sc-for>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section style="margin-bottom: 24px; padding: 20px 24px 22px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">Nursery 2 · medicated water for 14 days · 412 pigs</div>
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; line-height: 1">Day 9</span>
+            <span style="font-size: 15px; color: #44403c">of 14</span>
+            <span style="flex: 1"></span>
+            <span style="font-size: 13px; color: #57534e">30 Oct – 12 Nov</span>
+          </div>
+        <div style="margin-top: 6px; font-size: 13px; color: #57534e">One mark a day for the room, not a dose per pig.</div>
+        <div style="display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); margin-top: 16px">
+          <sc-for list="{{waterDays}}" as="it" hint-placeholder-count="14">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 7px">
+              <span style="font-size: 11.5px; font-weight: {{it.weight}}; color: {{it.ink}}">{{it.date}}</span>
+              <span style="display: flex; align-items: center; height: 22px">
+                <sc-for list="{{it.marks}}" as="m" hint-placeholder-count="1"><span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span></sc-for>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section style="padding: 20px 24px 22px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">RX-25G011 · 6 sows · Amoxicillin for 3 days + Meloxicam for 5 days</div>
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; line-height: 1">18</span>
+            <span style="font-size: 15px; color: #44403c">of 48 doses given</span>
+            <span style="flex: 1"></span>
+            <span style="font-size: 13px; color: #57534e">Thu 5 – Mon 9 Nov</span>
+          </div>
+        <div style="display: grid; grid-template-columns: 160px repeat(5, minmax(0, 1fr)); align-items: center; row-gap: 12px; margin-top: 20px">
+          <span></span>
+          <sc-for list="{{twoHeads}}" as="h" hint-placeholder-count="5"><span style="text-align: center; font-size: 12px; font-weight: {{h.weight}}; color: {{h.ink}}">{{h.d}}</span></sc-for>
+          <sc-for list="{{twoMeds}}" as="md" hint-placeholder-count="2">
+            <span><span style="display: block; font-size: 14px; font-weight: 600">{{md.name}}</span><span style="display: block; font-size: 12.5px; color: #57534e">{{md.count}}</span></span>
+            <sc-for list="{{md.days}}" as="it" hint-placeholder-count="5">
+              <span style="display: flex; justify-content: center; align-items: center; height: 40px">
+                <sc-for list="{{it.marks}}" as="m" hint-placeholder-count="1"><span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span></sc-for>
+              </span>
+            </sc-for>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 24px; padding-top: 18px; border-top: 1px solid #f0efed">
+          <span style="font-size: 15px; font-weight: 600">Pigs</span>
+          <span style="display: inline-flex; padding: 3px; border-radius: 10px; background: #f5f5f4">
+            <span style="padding: 6px 12px; border-radius: 8px; background: #ffffff; box-shadow: 0 1px 2px #1c19171a; font-size: 13px; font-weight: 600">Amoxicillin</span>
+            <span style="padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #57534e">Meloxicam</span>
+          </span>
+        </div>
+        <sc-for list="{{twoPigs}}" as="r" hint-placeholder-count="3">
+          <div style="display: grid; grid-template-columns: minmax(0, 1fr) 132px; align-items: center; height: 46px; border-top: {{r.line}}">
+            <span style="font-size: 14px; font-weight: 600">{{r.tag}}</span>
+            <span style="display: flex">
+              <sc-for list="{{r.doses}}" as="m" hint-placeholder-count="3"><span style="width: 44px; display: flex; justify-content: center"><span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span></span></sc-for>
+            </span>
+          </div>
+        </sc-for>
+        <div style="margin-top: 4px; font-size: 13px; color: #57534e">6 pigs · showing the medicine due today</div>
+
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0efed">
+          <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 600">Prescription</span><span style="font-size: 13px; color: #57534e">Withdrawal ends <strong style="color: #1c1917; font-weight: 600">Mon 7 Dec</strong>, the later of the two</span></div>
+          <sc-for list="{{twoRx}}" as="f" hint-placeholder-count="2">
+            <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; padding: 12px 0; border-bottom: {{f.line}}">
+              <span style="font-size: 14px; font-weight: 600">{{f.k}}</span>
+              <span><span style="display: block; font-size: 14px">{{f.v}}</span><span style="display: block; margin-top: 2px; font-size: 13px; color: #57534e">{{f.sub}}</span></span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </div>
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1520,"height":1760}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2248,"height":1760}}'>
 class Component extends DCLogic {
   renderVals() {
     const C = { done: '#5fae6e', due: '#6f9fdc', skip: '#e8b33c', plan: '#dce0d4' };
@@ -322,7 +423,28 @@ class Component extends DCLogic {
       for (let h = 0; h < 2; h++) { const sl = d * 2 + h; const k = sl < 19 ? 'done' : sl === 19 ? 'skip' : sl === 20 ? 'due' : 'plan'; marks.push(dot(k, 12, sl === 19)); }
       oneDays.push({ date: String(2 + d), weight: d === 10 ? 700 : 500, ink: d === 10 ? '#1c1917' : '#78716c', marks });
     }
-    return { rxTrack, tracks, oneDays, pens, longPens, fields };
+
+    // six weeks twice a day: weeks 1-4 folded; weeks 5-6 open, today Wed 2 Dec (AM due)
+    const longDays = [];
+    for (let d = 0; d < 14; d++) { const marks = []; for (let h = 0; h < 2; h++) { const sl = d * 2 + h; const k = sl < 4 ? 'done' : sl === 4 ? 'done' : sl === 5 ? 'due' : 'plan'; marks.push(dot(k, 12)); } longDays.push({ date: String(d < 1 ? 30 : d), weight: d === 3 ? 700 : 500, ink: d === 3 ? '#1c1917' : '#78716c', marks }); }
+    ['30', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'].forEach((x, i) => { longDays[i].date = x; });
+    longDays.forEach((d, i) => { d.weight = i === 2 ? 700 : 500; d.ink = i === 2 ? '#1c1917' : '#78716c'; d.marks = [0, 1].map((h) => { const sl = i * 2 + h; return dot(sl < 4 ? 'done' : sl === 4 ? 'done' : sl === 5 ? 'due' : 'plan', 12); }); });
+    // medicated water: one mark a day for the room; today day 9
+    const waterDays = [];
+    ['30', '31', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].forEach((x, i) => waterDays.push({ date: x, weight: i === 8 ? 700 : 500, ink: i === 8 ? '#1c1917' : '#78716c', marks: [i < 8 ? dot('done', 16) : i === 8 ? ring([['done', 1], ['due', 1]], 20, 4) : plannedRing(18, 2.5)] }));
+    // two medicines, shared dates Thu-Mon, today Fri
+    const twoHeads = ['Thu 5', 'Fri 6', 'Sat 7', 'Sun 8', 'Mon 9'].map((d, i) => ({ d, weight: i === 1 ? 700 : 500, ink: i === 1 ? '#1c1917' : '#57534e' }));
+    const empty = { wst: '', st: 'width: 4px; height: 4px; background: #dce0d4' };
+    const twoMeds = [
+      { name: 'Amoxicillin', count: '10 of 18 · daily, 3 days', days: [[ring([['done', 6]], 30, 4)], [ring([['done', 4], ['due', 2]], 30, 4)], [plannedRing(30, 3)], [empty], [empty]].map((marks) => ({ marks })) },
+      { name: 'Meloxicam', count: '8 of 30 · daily, 5 days', days: [[ring([['done', 6]], 30, 4)], [ring([['done', 2], ['due', 4]], 30, 4)], [plannedRing(30, 3)], [plannedRing(30, 3)], [plannedRing(30, 3)]].map((marks) => ({ marks })) }
+    ];
+    const twoPigs = [['C03', ['done', 'done', 'plan']], ['C04', ['done', 'due', 'plan']], ['C09', ['done', 'done', 'plan']]].map((r, i) => ({ tag: r[0], line: i === 0 ? '1px solid #e7e5e4' : '1px solid #f0efed', doses: r[1].map((k) => dot(k, 16)) }));
+    const twoRx = [
+      { k: 'Amoxicillin 15% LA', v: '15 mL a sow · intramuscular, neck', sub: '3 doses, every 24 h · withdrawal 14 days' },
+      { k: 'Meloxicam 2%', v: '2 mL a sow · intramuscular', sub: '5 doses, every 24 h · withdrawal 28 days' }
+    ].map((f, i, a) => Object.assign(f, { line: i === a.length - 1 ? '0' : '1px solid #f0efed' }));
+    return { rxTrack, tracks, oneDays, pens, longPens, fields, longDays, waterDays, twoHeads, twoMeds, twoPigs, twoRx };
   }
 }
 </script>
