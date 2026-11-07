@@ -699,6 +699,14 @@
       "w": 4016,
       "h": 2447,
       "title": "Proposal C · Everything at the top: the place by its kind and name, the actions, then one main pane for everything"
+    },
+    "FarmViewLens.dc.html": {
+      "page": "home",
+      "x": 6720,
+      "y": -1390,
+      "w": 4016,
+      "h": 1230,
+      "title": "Proposal · Pages in tabs, the Farm view for where, joined by a lens (task progress on the map, pig detail in the pane)"
     }
   },
   "createdOnFiles": {
@@ -955,7 +963,8 @@
     "EditLayoutRebuilt.dc.html",
     "FarmViewDocked.dc.html",
     "FarmViewEdges.dc.html",
-    "FarmViewTop.dc.html"
+    "FarmViewTop.dc.html",
+    "FarmViewLens.dc.html"
   ],
   "pages": [
     {
