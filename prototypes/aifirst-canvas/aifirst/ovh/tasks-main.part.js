@@ -8,9 +8,9 @@
   const row = async (title, keys, base) => '<h2 style="margin: 44px 0 18px; font-size: 21px; line-height: 28px; font-weight: 600;">' + title + '</h2><div style="display: flex; gap: ' + gap + 'px; align-items: flex-start;">' + (await Promise.all(keys.map((k, i) => frame(k, base + i + 1)))).join('') + '</div>';
   const rules = [
     ['The map helps you find the pens', 'A task opened on the map answers where the work is and what is left. The full list of pigs stays on the task page.'],
-    ['The pane, under a task', 'Header (icon, title, one line), progress, the status filters. Rooms only when the task spans more than one. Open page.'],
-    ['The pen is the unit', 'Each pen carries one state. Hover shows its numbers; click opens it: one pig opens her page, a group pen opens the pen.'],
-    ['Untagged pigs', 'They count toward their pen. A group pen lists its tagged pigs as rows and the rest as one counted row.']
+    ['The pane, under a task', 'Slim: the task, the half circle with its parts as filters, Rooms only when the task spans more than one, Open page.'],
+    ['The pen is the unit', 'One fill per pen. Hover tells its part of the task, all a pen or sow needs here. Click leaves the task: a sow opens her profile, a group pen opens the pen on the map.'],
+    ['Untagged pigs', 'They count toward their pen; the numbers in its hover include them']
   ];
   const legend = [[ST.done[0], 'Done', 'all of the pen'], [ST.part[0], 'Under way', 'some done, only group pens'], [ST.todo[0], 'To do', 'none done yet'], [ST.look[0], 'Needs a look', 'skipped, recheck, sick: wins over the rest'], ['#E9E8E2', 'Not in this task', 'steps back']];
   const body = '<h1 style="margin: 0; font-size: 28px; line-height: 36px; font-weight: 600; letter-spacing: -.02em;">A task on the Farm view</h1><div style="margin-top: 6px; font-size: 15px; line-height: 22px; color: #5D665F;">What the map is for when a task is open, the pane it shows, and one quiet rule for pen colours. The chat stays on the left; these frames are the console\'s right pane.</div>' +
