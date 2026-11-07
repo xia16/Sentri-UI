@@ -329,6 +329,11 @@
         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 8px">
           <h1 style="margin: 0; font-size: 26px; font-weight: 600; line-height: 1.25; letter-spacing: -0.7px">Treatment RX-25G009</h1>
           <span style="display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 8px; background: #e8effb; color: #24518c; font-size: 12px; font-weight: 500; line-height: 1.4">Running</span>
+          <span style="flex: 1"></span>
+          <button type="button" class="tx-ghost" onClick="{{showInFarm}}" style="display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 12px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; font-weight: 500; color: #1c1917; cursor: pointer; flex: none">
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.map}}"></path></svg>
+            Show in Farm view
+          </button>
         </div>
         <p style="margin: 0; font-size: 12px; line-height: 1.7; color: #57534e">{{runLine}}</p>
         <div style="display: flex; gap: 6px; margin-top: 12px">
@@ -614,6 +619,7 @@ class Component extends DCLogic {
 
       // running
       runLine: '4 sows · Gestation 2 · Batch 32 · issued Thu 5 Nov 08:30 by Li Wei',
+      showInFarm: () => { if (this.props.onFarm) this.props.onFarm('rx09'); },
       runDiseases: [{ label: 'Lameness' }, { label: 'Fever' }],
       doseRows,
       sq: s.sq, onSowSearch: (e) => set({ sq: e.target.value }),

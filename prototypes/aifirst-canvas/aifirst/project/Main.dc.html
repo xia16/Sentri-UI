@@ -1300,7 +1300,7 @@ class Component extends DCLogic {
     this.onOpen = (e) => {
       const d = (e && e.detail) || {}, from = d.from || {};
       const bn = String(from.batch || '').replace('Batch ', '');
-      const map = { treat: ['treatment', 'proposal'], treatrun: ['treatment', 'running'], vax: ['vax', ''], sampling: ['sampling', 'list'], cull: ['offsite', 'cull'], move: ['transfers', 'move'], ship: ['transfers', 'move'], batch: ['batches', 'new'], feed: ['feed', 'change'],
+      const map = { treat: ['treatment', 'proposal'], treatrun: ['treatment', 'running'], rxpage: ['treatment', 'running'], vaxpage: ['vax', ''], vax: ['vax', ''], sampling: ['sampling', 'list'], cull: ['offsite', 'cull'], move: ['transfers', 'move'], ship: ['transfers', 'move'], batch: ['batches', 'new'], feed: ['feed', 'change'],
         vaxplan: ['vax', ''], cullplan: ['batches', 'planned'], keepplan: ['batches', 'planned'], endbatch: ['batches', 'change'], report: [bn ? 'batch-' + bn : 'batches', bn ? '' : 'list'], decisions: ['decisions', 'list'] };
       const go = map[d.action];
       if (!go) return;
@@ -1309,7 +1309,7 @@ class Component extends DCLogic {
       const tabStart = Object.assign({}, s0.tabStart || {});
       if (go[1]) tabStart[go[0]] = go[1];
       const pigs = d.action === 'decisions' || d.action === 'report' || from.many ? [] : (d.pigs || []).map((p) => ({ code: p.code, room: p.room }));
-      this.setState({ tabs: tabs, active: go[0], tabStart: tabStart, plusOpen: false, fromFarm: d.action === 'report' || d.action === 'treatrun' ? null : { tab: go[0], title: from.title || from.label || '', pigs: pigs } });
+      this.setState({ tabs: tabs, active: go[0], tabStart: tabStart, plusOpen: false, fromFarm: d.action === 'report' || d.action === 'treatrun' || d.action === 'rxpage' || d.action === 'vaxpage' ? null : { tab: go[0], title: from.title || from.label || '', pigs: pigs } });
     };
     window.addEventListener('sentri:open', this.onOpen);
   }
@@ -1500,6 +1500,10 @@ class Component extends DCLogic {
             { label: 'Draft the order', primary: true, fn: () => set({ orderDrafted: true, extra: push('vet', [{ k: 'user', text: 'Draft the order' }, { k: 'agent', who: 'vet', time: 'Just now', text: "Drafted: 10 × 100 ml from your usual supplier. It's in your decisions. Nothing is sent until you approve it." }]) }) },
             { label: 'Not now', fn: () => set({ orderDrafted: true, extra: push('vet', [{ k: 'user', text: 'Not now' }, { k: 'agent', who: 'vet', time: 'Just now', text: "OK. I'll ask again when it's 2 days from running out." }]) }) }
           ]
+        },
+        {
+          k: 'agent', who: 'vet', time: '07:45', text: "Dose 2 of RX-25G009 is due today for B15, B20, D40 and D41. D41 was skipped on dose 1; she could not stand.",
+          card: Object.assign({ icon: I.clipboard, title: 'Treatment RX-25G009', sub: 'Running · dose 2 of 3', subInk: T.aiInk, open: () => openTab('layout', 'task:rx09@' + Date.now()) }, aiCard)
         },
         {
           k: 'agent', who: 'vet', time: '08:41', text: "Six sows in Gestation 2 have new lameness findings since Monday. B15, B20, D40 and D41 are worst; D40 and D41 were 39.8 °C this morning. I filled in a treatment for those four: Amoxicillin 15% LA, 15 mL into the neck muscle, 3 doses a day apart. Check it and issue it.",
@@ -1819,7 +1823,7 @@ class Component extends DCLogic {
       treatPigs: s.fromFarm && s.fromFarm.tab === 'treatment' ? s.fromFarm.pigs.map((p) => p.code) : null,
       treatH: 900 - 2 * (parseInt(T.gap, 10) || 0) - 52 - 2,
       treatAsk: (text) => { set({ chatId: 'vet', expanded: false, chatHidden: false, plusOpen: false, draft: text || '', seen: Object.assign({}, s.seen, { vet: true }) }); setTimeout(() => { const el = document.getElementById('composer'); if (el) el.focus(); }, 80); },
-      treatFarm: () => set({ active: 'layout', expanded: false }),
+      treatFarm: (id) => (id ? openTab('layout', 'task:' + id + '@' + Date.now()) : set({ active: 'layout', expanded: false })),
       treatClose: () => closeTab('treatment'),
       fromFarm: s.fromFarm ? { title: s.fromFarm.pigs.length ? s.fromFarm.pigs.length + (s.fromFarm.title.replace(/^\d+/, '')) : s.fromFarm.title,
         pigs: s.fromFarm.pigs.map((p) => ({ code: p.code, aria: 'Take ' + p.code + ' out', remove: () => set({ fromFarm: Object.assign({}, s.fromFarm, { pigs: s.fromFarm.pigs.filter((q) => q.code !== p.code) }) }) })),
