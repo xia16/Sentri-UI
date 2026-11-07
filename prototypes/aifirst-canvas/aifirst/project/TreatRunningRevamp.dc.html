@@ -215,7 +215,7 @@
     <!-- many doses, and two medicines -->
     <div style="width: 680px">
       <div style="font-size: 15px; font-weight: 600">Many doses, and two medicines</div>
-      <div style="font-size: 13px; color: #57534e; margin: 2px 0 12px">Past a month, finished weeks fold into one line. Day numbers carry their month only where a month starts. Medicine in feed or water counts days for the room. Two medicines in one treatment get one track each, on shared dates.</div>
+      <div style="font-size: 13px; color: #57534e; margin: 2px 0 12px">Six weeks twice a day is only three rows, so nothing folds. Day numbers carry their month only where a month starts. Medicine in feed or water counts days for the room. Two medicines in one treatment get one track each, on shared dates.</div>
 
       <section style="margin-bottom: 24px; padding: 20px 24px 22px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
         <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">One sow · twice a day for 6 weeks</div>
@@ -225,11 +225,6 @@
             <span style="flex: 1"></span>
             <span style="font-size: 13px; color: #57534e">2 Nov – 13 Dec · every 12 h</span>
           </div>
-        <div style="display: flex; align-items: center; gap: 12px; margin-top: 18px; padding: 12px 14px; border-radius: 10px; background: #fafaf9; box-shadow: inset 0 0 0 1px #efeeec">
-          <span style="display: block; width: 18px; height: 18px; border-radius: 50%; background: conic-gradient(#5fae6e 4deg 350deg, transparent 350deg 352deg, #e8b33c 352deg 358deg, transparent 358deg 360deg); -webkit-mask: radial-gradient(circle, transparent 5px, #000 5.5px); mask: radial-gradient(circle, transparent 5px, #000 5.5px)"></span>
-          <span style="flex: 1; font-size: 13.5px"><strong style="font-weight: 600">Weeks 1–4</strong><span style="color: #57534e"> · 2 – 29 Nov · 55 given · 1 skipped</span></span>
-          <span style="display: inline-flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 500">Show<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="m9 18 6-6-6-6"></path></svg></span>
-        </div>
         <div style="display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); row-gap: 14px; margin-top: 16px">
           <sc-for list="{{longDays}}" as="it" hint-placeholder-count="14">
             <div style="display: flex; flex-direction: column; align-items: center; gap: 7px">
@@ -426,9 +421,11 @@ class Component extends DCLogic {
 
     // six weeks twice a day: weeks 1-4 folded; weeks 5-6 open, today Wed 2 Dec (AM due)
     const longDays = [];
-    for (let d = 0; d < 14; d++) { const marks = []; for (let h = 0; h < 2; h++) { const sl = d * 2 + h; const k = sl < 4 ? 'done' : sl === 4 ? 'done' : sl === 5 ? 'due' : 'plan'; marks.push(dot(k, 12)); } longDays.push({ date: String(d < 1 ? 30 : d), weight: d === 3 ? 700 : 500, ink: d === 3 ? '#1c1917' : '#78716c', marks }); }
-    ['30', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'].forEach((x, i) => { longDays[i].date = x; });
-    longDays.forEach((d, i) => { d.month = i === 0 ? 'Nov' : i === 1 ? 'Dec' : ''; d.weight = i === 2 ? 700 : 500; d.ink = i === 2 ? '#1c1917' : '#78716c'; d.marks = [0, 1].map((h) => { const sl = i * 2 + h; return dot(sl < 4 ? 'done' : sl === 4 ? 'done' : sl === 5 ? 'due' : 'plan', 12); }); });
+    for (let d = 0; d < 42; d++) {
+      const date = new Date(2026, 10, 2 + d), day = date.getDate();
+      const marks = [0, 1].map((h) => { const sl = d * 2 + h; return dot(sl === 19 ? 'skip' : sl < 61 ? 'done' : sl === 61 ? 'due' : 'plan', 12, false); });
+      longDays.push({ month: d === 0 ? 'Nov' : day === 1 ? 'Dec' : '', date: String(day), weight: d === 30 ? 700 : 500, ink: d === 30 ? '#1c1917' : '#78716c', marks });
+    }
     // medicated water: one mark a day for the room; today day 9
     const waterDays = [];
     ['30', '31', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].forEach((x, i) => waterDays.push({ month: i === 0 ? 'Oct' : i === 2 ? 'Nov' : '', date: x, weight: i === 8 ? 700 : 500, ink: i === 8 ? '#1c1917' : '#78716c', marks: [i < 8 ? dot('done', 16) : i === 8 ? ring([['done', 1], ['due', 1]], 20, 4) : plannedRing(18, 2.5)] }));
