@@ -9695,7 +9695,7 @@ class Component extends DCLogic {
     const a = this.ui().arT; if (a) this.put({ arT: Object.assign({}, a, { at: s.at || a.at, placed: true }) });
   }
   // ===================== Proposal C, built: one bar across the top, one main pane under it, 3D/Plan and zoom at the bottom left =====================
-  ovPaneW(p) { return p === 'sched' ? 440 : 320; }
+  ovPaneW(p) { return 320; }
   ovKindPath(kind) { return ({ farm: 'M4 21V9m5 12V9m5 12V9m5 12V9M2 12h20M2 17h20', zone: 'M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20V6.5Zm6-2.5v13.5m6-11v13.5', section: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', sec: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', room: 'M4 10 12 4l8 6v10H4V10Z', pen: 'M5 5h14v14H5zM9.7 5v14M14.3 5v14' })[kind] || 'M4 10 12 4l8 6v10H4V10Z'; }
   // the place: ‹ up, its kind as an icon, its name
   ovWhere(P, o) {
@@ -9713,7 +9713,7 @@ class Component extends DCLogic {
     const total = kinds.reduce((a, x) => a + x[0], 0), pnl = O.panel;
     const isBatch = ['sched', 'rx', 'list', 'batch', 'task', 'dates', 'done', 'compare'].indexOf(pnl) >= 0, isPigs = ['pigs', 'pig', 'pigperf', 'piglog', 'pen'].indexOf(pnl) >= 0, dd = P.r ? this.ovDevDot(u) : '';
     const nw = (this.W || 950) < 760, L = (x) => nw ? '' : x;
-    const tabs = this.ovBtn(H.icon(H.I.cal, 18) + L('Schedule'), 'sched', isBatch) +
+    const tabs = '' +
       (total && !P.pen ? this.ovBtn(H.icon(H.I.pig, 18) + L('Pigs') + '<span style="' + H.st({ color: isPigs ? K.ink : K.muted, fontWeight: 600 }) + '">' + total.toLocaleString('en-GB') + '</span>', 'pigspanel', isPigs) : '') +
       (P.r ? this.ovBtn(H.icon(H.I.tool, 18) + L('Devices') + (dd ? H.dot(dd, 8) : ''), 'devices', pnl === 'devices') : '');
     return this.ovTopCard(this.ovWhere(P, { fault: fault }) + this.ovBarSep() + tabs + '<span style="flex: 1;"></span>' + this.ovBtn(H.icon(H.I.select, 18) + L('Select'), 'select', !!O.selecting, { fontWeight: 600, padding: nw ? '0 10px' : '0 12px' }));
