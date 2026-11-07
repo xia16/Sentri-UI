@@ -691,6 +691,14 @@
       "w": 4016,
       "h": 2371,
       "title": "Proposal B · Card left, bar bottom, window right: the earlier layout kept and made strict, for the Farm view and Edit layout"
+    },
+    "FarmViewTop.dc.html": {
+      "page": "home",
+      "x": 6720,
+      "y": 5083,
+      "w": 4016,
+      "h": 2447,
+      "title": "Proposal C · Everything at the top: the place by its kind and name, the actions, then one main pane for everything"
     }
   },
   "createdOnFiles": {
@@ -946,7 +954,8 @@
     "HomeReport.dc.html",
     "EditLayoutRebuilt.dc.html",
     "FarmViewDocked.dc.html",
-    "FarmViewEdges.dc.html"
+    "FarmViewEdges.dc.html",
+    "FarmViewTop.dc.html"
   ],
   "pages": [
     {

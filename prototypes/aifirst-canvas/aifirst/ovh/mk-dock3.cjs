@@ -1,0 +1,10 @@
+const fs=require('fs');let s=fs.readFileSync('gen-dock.cjs','utf8');
+const a=s.indexOf('const frames = {'),b=s.indexOf('(async () => {');
+s=s.slice(0,a)+fs.readFileSync('dock3-frames.part.js','utf8')+s.slice(b);
+const r1=s.indexOf('  const rules = ['),r2=s.indexOf('  const ruleHtml');
+s=s.slice(0,r1)+fs.readFileSync('dock3-rules.part.js','utf8')+s.slice(r2);
+s=s.replace('Farm view and Edit layout: one set of rules</h1>','Farm view and Edit layout: everything at the top, one pane</h1>');
+s=s.replace('A proposal, drawn over real Farm view screens. The same bar, panel and bottom edge in the Farm view and in Edit layout.','Proposal C. No location card: the bar names the place by its kind and name, and every action opens the one main pane. Drawn over real Farm view screens.');
+s=s.replace(' + ruleHtml + checks +',' + ruleHtml + legend + checks +');
+s=s.replace("<title>Farm view: one set of rules</title>","<title>Farm view: everything at the top</title>");
+fs.writeFileSync('gen-dock3.cjs',s);console.log('ok');
