@@ -27,11 +27,7 @@
             <div>
               <!-- A: a tinted pen band -->
               <sc-if value="{{r.isBand}}" hint-placeholder-val="{{false}}">
-                <div style="display: flex; align-items: center; gap: 8px; height: 34px; margin-top: 8px; padding: 0 10px; border-radius: 8px; background: #f5f5f4; font-size: 13px; font-weight: 600; color: #44403c">
-                  <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M3 3h18v18H3zM3 12h18M12 3v18"></path></svg>
-                  <span style="flex: 1">{{r.pen}}</span>
-                  <span style="font-weight: 500; color: #57534e">{{r.count}}</span>
-                </div>
+                <div style="display: flex; align-items: center; height: 44px; border-top: 1px solid #e7e5e4"><span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 10px; border-radius: 8px; background: #f5f5f4; font-size: 13px; font-weight: 600; color: #44403c"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M3 3h18v18H3zM3 12h18M12 3v18"></path></svg>{{r.pen}}<span style="font-weight: 500; color: #78716c">· {{r.count}}</span></span></div>
               </sc-if>
               <sc-if value="{{r.isRow}}" hint-placeholder-val="{{true}}">
                 <div style="display: grid; grid-template-columns: minmax(0, 1fr) 84px 132px; align-items: center; height: 48px; margin: {{r.margin}}; padding: {{r.pad}}; border-top: {{r.line}}; background: {{r.bg}}; border-radius: {{r.radius}}; box-shadow: {{r.edge}}">
@@ -83,10 +79,10 @@ class Component extends DCLogic {
     // A: a tinted pen band above the pen's pigs, its pigs indented under it
     const a = [];
     data.forEach((g, gi) => {
-      if (g.noId) { a.push(row({ isBand: true, isRow: false, pen: 'Pen ' + g.pen, count: g.noId + ' pigs · no IDs' })); a.push(row({ isId: false, isWords: true, tag: g.noId + ' pigs without an ID', line: '0', pad: '0 0 0 20px', doses: noIdDoses })); return; }
+      if (g.noId) { a.push(row({ isBand: true, isRow: false, pen: 'Pen ' + g.pen, count: g.noId + ' pigs · no IDs' })); a.push(row({ isId: false, isWords: true, tag: g.noId + ' pigs without an ID', line: '0', doses: noIdDoses })); return; }
       if (g.pigs.length === 1) { a.push(row({ tag: g.pigs[0][0], penText: g.pen, doses: g.pigs[0][1].map(dot), line: gi === 0 ? '0' : '1px solid #f0efed' })); return; }
       a.push(row({ isBand: true, isRow: false, pen: 'Pen ' + g.pen, count: g.pigs.length + ' sows' }));
-      g.pigs.forEach((p, i) => a.push(row({ tag: p[0], doses: p[1].map(dot), line: i === 0 ? '0' : '1px solid #f0efed', pad: '0 0 0 20px' })));
+      g.pigs.forEach((p, i) => a.push(row({ tag: p[0], doses: p[1].map(dot), line: i === 0 ? '0' : '1px solid #f0efed' })));
     });
 
     // B: the pen lives in the Pen column for everyone; a group pen names itself once and a bracket holds its pigs
@@ -113,7 +109,7 @@ class Component extends DCLogic {
     });
 
     return { variants: [
-      { title: 'A · A tinted pen band', note: 'The pen gets a soft grey band with the pen icon; its pigs indent under it. Clear, but the band is a second kind of row.', rows: a },
+      { title: 'A · A pen tag (chosen)', note: 'The pen is a short grey tag with the pen icon and its count, not a band across the list; its pigs follow without indenting.', rows: a },
       { title: 'B · The pen column brackets its pigs', note: 'No header row. Every pig names its pen in the same column; a group pen names itself once and a thin bracket holds its pigs.', rows: b },
       { title: 'C · One soft block per pen', note: 'A group pen’s pigs share one light block, the pen named once in the Pen column. Pigs alone in their pen stay plain.', rows: c }
     ] };
