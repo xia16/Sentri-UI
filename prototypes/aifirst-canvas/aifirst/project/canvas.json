@@ -709,12 +709,20 @@
       "title": "Proposal · Pages in tabs, the Farm view for where, joined by a lens (task progress on the map, pig detail in the pane)"
     },
     "FarmViewTasks.dc.html": {
+      "page": "archive",
+      "x": 25204,
+      "y": 46200,
+      "w": 3026,
+      "h": 3278,
+      "title": "Superseded · A task on the Farm view (zoom into a pen, generic state words)"
+    },
+    "FarmViewTreatment.dc.html": {
       "page": "home",
       "x": 480,
       "y": 2300,
       "w": 3026,
-      "h": 3278,
-      "title": "Proposal · A task on the Farm view: the pane names the task, the pens carry its state (one fill per pen)"
+      "h": 1209,
+      "title": "Proposal · Treatment on the Farm view: hover says where she is now; click shows this treatment for her (track and log)"
     }
   },
   "createdOnFiles": {
@@ -983,7 +991,8 @@
     "FarmViewEdges.dc.html",
     "FarmViewTop.dc.html",
     "FarmViewLens.dc.html",
-    "FarmViewTasks.dc.html"
+    "FarmViewTasks.dc.html",
+    "FarmViewTreatment.dc.html"
   ],
   "pages": [
     {
