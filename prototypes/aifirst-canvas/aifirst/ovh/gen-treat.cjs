@@ -489,6 +489,16 @@ if (frames.p2) { frames.p2.html = () => tabsStrip('Farm view').replace('Treatmen
 if (frames.k1) { frames.k1.html = () => tabsStrip('Farm view') + fbar() + collapseOnly(rxFull3('chips')) + chipsR(two, 'rx') + vctl; }
 if (frames.k4) { frames.k4.html = () => tabsStrip('Farm view') + fbar() + collapseOnly(rxFull3('chips')) + chipsR(two, 'rx', '+4', menu4) + vctl; }
 if (frames.k5) { frames.k5.html = () => tabsStrip('Farm view') + fbar() + chipsR(two, 'rx') + vctl + collapseOnly(under(d41e())); }
+// ===== the task card at a group pen: tabs on top, one number for this pen, its days as rings; details on hover =====
+const tabs11 = [['g11', 'RX-25G011', 'rx'], ['vax', 'PRRS vaccine', 'vax']];
+const penCard = (pen, n, of, days, hot, th, tl, whole) => collapseOnly(under(paneSlim(theadC({ title: 'Treatment RX-25G011', sub: 'Florfenicol · 63 weaners · Nursery 1' }),
+  scopeRow('pen', pen) + card2(bigHead(n, of, '4 – 6 Nov') + cal([['2 Nov', [_, _, days[0], days[1], days[2], _, _]]], hot, th, tl)) + wholeRow(whole) +
+  '<div style="display: flex; gap: 8px; margin-top: 12px;">' + fbtn(ic(SC2.ext, 15) + '&nbsp; Open page') + '</div>')));
+frames.p1.html = () => tabsStrip('Farm view').replace('Treatment RX-25G009', 'Treatment RX-25G011') + penBar('9', 'Pen B12') + penSections(QB12, B12secs) + penCard('Pen B12', 21, 27, [{ r: [9, 0, 0, 9] }, { r: [7, 2, 0, 9] }, { r: [5, 2, 2, 9] }], [0, 4], 'Fri 6 Nov · Day 3', '5 given · 2 skipped · 2 due', '164 of 189 doses') + chipsR(tabs11, 'g11') + vctl;
+frames.p1.cap = 'Click a group pen: the card scopes to it. One number for this pen (21 of 27 doses given), its days as rings; hover a day for its split. Whole task is a click away. The pigs line up in sections by state.';
+frames.p3.html = () => tabsStrip('Farm view').replace('Treatment RX-25G009', 'Treatment RX-25G011') + penBar('30', 'Pen B12') + penSections(QZ, crowd2, { scale: 2.1, maxScale: 1.7 }) + penCard('Pen B12', 82, 90, [{ r: [30, 0, 0, 30] }, { r: [29, 1, 0, 30] }, { r: [23, 1, 6, 30] }], null, '', '', '164 of 189 doses') + chipsR(tabs11, 'g11') + vctl + more;
+frames.p2.html = () => tabsStrip('Farm view').replace('Treatment RX-25G009', 'Treatment RX-25G011') + penBar('9', 'Pen B12') + penSections(QB12, B12secs, { hot: '310422' }) + under(p422e()) + chipsR(tabs11, 'g11') + vctl;
+frames.p2.cap = 'Click a tagged pig: her view in this task, one number and her doses on the calendar; hover a dose for what happened. Untagged pigs only say "Untagged · counted at the pen" on hover.';
 (async () => {
   const W = 950, Hh = 830, gap = 40, pad = 48;
   const frame = async (k, n) => {
