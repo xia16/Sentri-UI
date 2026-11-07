@@ -5370,7 +5370,7 @@ class Component extends DCLogic {
     if (this.IP) { ins.l = 28; ins.t = Math.max(ins.t, 104); ins.r = prof ? pw : 28; }
     if (this.IP && u.view === 'room') ins.t = Math.max(ins.t, 128);
     if (this.ovEdOn && this.ovEdOn(u) && u.view === 'room' && this.edMapTask && this.edMapTask(u)) { ins.l = 20; ins.r = 20; ins.t = 96; ins.b = 80; return ins; }
-    if (this.ovEdOn && this.ovEdOn(u)) { /* ovEdIns */ ins.l = 28; ins.t = 96; const nw = (this.W || 950) < 760, po = this.edPaneOpen && this.edPaneOpen(u); ins.b = nw && po ? Math.round((this.H || 830) * 0.55) + 20 : 84; ins.r = nw || !po ? 28 : 344; return ins; }
+    if (this.ovEdOn && this.ovEdOn(u)) { /* ovEdIns */ ins.l = 28; ins.t = 96; const nw = (this.W || 950) < 760, po = this.edPaneOpen && this.edPaneOpen(u); ins.b = nw && po ? Math.round((this.H || 830) * 0.55) + 20 : 84; ins.r = nw || !po ? 28 : 424; return ins; }
     if (this.ovOn && this.ovOn(u)) { const O = this.ovS(); /* ovInsets */ ins.l = 28; ins.t = 96; ins.b = 84; ins.r = O.panel ? this.ovPaneW(O.panel) + 24 + (O.her && O.panel === 'compare' ? 376 : 0) : 28; return ins; }
     if (this.IP && u.mode === 'saved' && u.vm === 'view') {
       const hasPen = !u.bv && (u.psel || []).length === 1;
@@ -9817,7 +9817,7 @@ class Component extends DCLogic {
     const note = (text, warn) => text ? '<div style="margin: 10px 4px 0; font-size: 13.5px; line-height: 20px; color: ' + (warn ? K.red : K.muted) + ';">' + esc(text) + '</div>' : '';
     const panel = (inner) => { const cut = (src, a, b) => { const i = src.indexOf(a), j = i < 0 ? -1 : src.indexOf(b, i); return i < 0 || j < 0 ? [null, src] : [[null, src.slice(i + a.length, j)], src.slice(0, i) + src.slice(j + b.length)]; };
       const c1 = cut(inner, '<!--H-->', '<!--/H-->'), c2 = cut(c1[1], '<!--F-->', '<!--/F-->'), hm = c1[0], fm = c2[0], body = c2[1]; return panelBox((hm ? hm[1] : '') + '<div data-zone="edbody" style="flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; padding: 0 16px ' + (fm ? 12 : 18) + 'px;">' + body + '</div>' + (fm ? fm[1] : '')); };
-    const narrow = (this.W || 950) < 760, place = narrow ? 'left: 12px; right: 12px; bottom: 12px; max-height: calc(55% - 20px);' : 'right: 12px; top: 84px; max-height: calc(100% - 96px); width: 320px;';
+    const narrow = (this.W || 950) < 760, place = narrow ? 'left: 12px; right: 12px; bottom: 12px; max-height: calc(55% - 20px);' : 'right: 12px; top: 84px; max-height: calc(100% - 96px); width: 400px;';
     const panelBox = (inner) => '<section data-zone="edcol" aria-label="Edit" style="position: absolute; ' + place + ' max-width: calc(100% - 32px); box-sizing: border-box; display: flex; flex-direction: column; border-radius: 22px; background: ' + K.tint + '; box-shadow: 0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12); overflow: hidden; pointer-events: auto; font-family: \'Geist\', system-ui, sans-serif; color: ' + K.ink + '; font-size: 14px; line-height: 20px; font-variant-numeric: tabular-nums;">' + inner + '</section>';
     const isRed = (s) => /#7A2C2C/i.test(s || '');
 
