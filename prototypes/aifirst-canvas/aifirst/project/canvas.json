@@ -717,12 +717,20 @@
       "title": "Superseded · A task on the Farm view (zoom into a pen, generic state words)"
     },
     "FarmViewTreatment.dc.html": {
-      "page": "home",
-      "x": 480,
-      "y": 2300,
+      "page": "treatment",
+      "x": 3706,
+      "y": 5200,
       "w": 3026,
       "h": 3049,
       "title": "Proposal · Treatment on the Farm view: hover says where she is now; click shows this treatment for her (track and log)"
+    },
+    "FarmViewTaskTabs.dc.html": {
+      "page": "treatment",
+      "x": 480,
+      "y": 5200,
+      "w": 3026,
+      "h": 2108,
+      "title": "Proposal · Open tasks in the Farm view: chips under the bar, one active, collapse to step out, × to close"
     }
   },
   "createdOnFiles": {
@@ -751,7 +759,8 @@
     "arch-barn",
     "arch-actions",
     "arch-other",
-    "arch-homefv"
+    "arch-homefv",
+    "treat-fv"
   ],
   "notes": {
     "arch-actions": {
@@ -904,6 +913,15 @@
       "w": 240,
       "x": 0,
       "y": 45900
+    },
+    "treat-fv": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "treatment",
+      "text": "Treatment on the Farm view: open tasks as chips, the task on the map, her view, group pens",
+      "w": 240,
+      "x": 0,
+      "y": 4900
     }
   },
   "order": [
@@ -992,7 +1010,8 @@
     "FarmViewTop.dc.html",
     "FarmViewLens.dc.html",
     "FarmViewTasks.dc.html",
-    "FarmViewTreatment.dc.html"
+    "FarmViewTreatment.dc.html",
+    "FarmViewTaskTabs.dc.html"
   ],
   "pages": [
     {
