@@ -4851,7 +4851,7 @@ class Component extends DCLogic {
       const vt = rm.vt || 0, vp = this.IPfull;
       const amt = Math.max(rm.dim * 0.86, (rm.fd || 0) * 0.65, vt > 0.5 ? 0 : this.penDim(hl, p), this.hlType && p.t !== this.hlType ? 0.84 : 0);
       if (amt > 0) c.lerp(paper, amt);
-      if (vt > 0 && vp) { const cc = (vp.cell[rm.id] || {})[p.code], bvc = this.bvColor(rm.id, p.code, cc); c.lerp(from.set(bvc || (cc && cc.flag ? (cc.flag.lvl === 'urgent' ? '#E7A196' : '#EFCF8C') : (cc && cc.kind ? '#F3D9D2' : '#F2F1EC'))), vt); }
+      if (vt > 0 && vp) { const cc = (vp.cell[rm.id] || {})[p.code], bvc = this.bvColor(rm.id, p.code, cc); c.lerp(from.set(bvc || (cc && cc.flag ? this.penAmber() : (cc && cc.kind ? '#dce0d4' : '#eef1e7'))), vt); }
       if (this.IP && u.vm === 'view' && u.vf && !this.locationMatches((this.IP.cell[rm.id] || {})[p.code], u.vf)) c.set('#F4F3EE');
       { const tc = this.tkCol ? this.tkCol(rm.id, p.code) : undefined; if (tc) c.set(tc); }
       rm.im.setColorAt(i, c);
@@ -6854,13 +6854,14 @@ class Component extends DCLogic {
     return n;
   }
   // a pen while a batch is shown: one calm colour, or its pig's state in the task opened; flags keep theirs; the rest steps back
+  penAmber() { return (this.nt || 0) > 0.5 ? '#e8b33c' : '#fede82'; }
   bvColor(roomId, code, cell) {
     const u = this.ui(), bv = u.bv, vf = u.vm === 'view' ? u.vf : null;
     if (vf && !this.locationMatches(cell, vf)) return '#F4F3EE';
     if (!bv) return null;
     if (!cell || cell.batch == null || String(cell.batch) !== String(bv.id)) return '#F4F3EE';
     if (u.ovCmp && this.ovOn(u)) return (this.hs(roomId + code) % 4 === 0) ? '#EBC27E' : '#E6EAE2';
-    if (cell.flag) return cell.flag.lvl === 'urgent' ? '#E7A196' : '#EFCF8C';
+    if (cell.flag) return this.penAmber();
     if (bv.task) { const sx = this.bvState(String(bv.id), roomId, code, bv.task); if (u.bvOnly && sx !== u.bvOnly) return '#F4F3EE'; const d = this.bvStateDef(String(bv.id), sx, bv.task); if (d) return d.col; }
     return '#E8B9AC';
   }
