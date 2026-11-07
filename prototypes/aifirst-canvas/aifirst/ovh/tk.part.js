@@ -7,7 +7,7 @@
       rx09: { kind: 'rx', tab: 'RX-25G009', title: 'Treatment RX-25G009', sub: '4 sows · Batch 32 · Gestation 2', chips: ['Running', 'Lameness', 'Fever'], go: { room: 'g2' }, rooms: ['g2'],
         state: (rid, c) => rid === 'g2' ? ({ B15: 'done', B20: 'done', D40: 'due', D41: 'skip' })[c] : undefined,
         num: [5, 12, 'doses given'], dates: '5 – 7 Nov', week: '2 Nov', days: [null, null, null, { r: [3, 1, 0, 4], tip: ['Thu 5 Nov · Dose 1', '3 given · 1 skipped'] }, { r: [2, 0, 2, 4], tip: ['Fri 6 Nov · Dose 2', '2 given · 2 due'] }, { r: [0, 0, 0, 4], tip: ['Sat 7 Nov · Dose 3', 'Planned'] }, null],
-        facts: [['Medicine', 'Amoxicillin 15% LA'], ['Dose', '15 mL a sow', 'Intramuscular, neck'], ['Schedule', '3 doses, every 24 h'], ['Withdrawal', '14 days', 'Ends 21 Nov, if the last dose is Sat'], ['Prescribed', 'Vet', 'Wed 4 Nov 16:10'], ['Note', 'Keep D40 and D41 on straw']],
+        facts: [['Medicine', 'Amoxicillin 15% LA'], ['Dose', '15 mL a sow', 'Intramuscular, neck'], ['Schedule', '3 doses, every 24 h'], ['Withdrawal', '14 days', 'Ends 21 Nov, if the last dose is Sat'], ['Prescribed', 'Dr. Chen', 'Wed 4 Nov 16:10'], ['Note', 'Keep D40 and D41 on straw']],
         pig: { D41: [['skip', 'Dose 1 · Skipped', 'Thu 08:40 · could not stand · G.H'], ['due', 'Dose 2 · Due', 'Today 08:30'], ['plan', 'Dose 3 · Planned', 'Sat 08:30']], D40: [['done', 'Dose 1 · Given', 'Thu 08:35 · G.H'], ['due', 'Dose 2 · Due', 'Today 08:30'], ['plan', 'Dose 3 · Planned', 'Sat 08:30']], B15: [['done', 'Dose 1 · Given', 'Thu 08:20 · G.H'], ['done', 'Dose 2 · Given', 'Today 08:12 · G.H'], ['plan', 'Dose 3 · Planned', 'Sat 08:30']], B20: [['done', 'Dose 1 · Given', 'Thu 08:24 · G.H'], ['done', 'Dose 2 · Given', 'Today 08:15 · G.H'], ['plan', 'Dose 3 · Planned', 'Sat 08:30']] },
         pigDays: [3, 4, 5], withdraw: 'Withdrawal ends 21 Nov',
         hover: { D41: 'Dose 2 due 08:30', D40: 'Dose 2 due 08:30', B15: 'Dose 2 given 08:12', B20: 'Dose 2 given 08:15' } },
@@ -15,7 +15,7 @@
         state: (rid, c) => rid === 'n1' ? n1(c) : rid === 'n2' ? n2(c) : undefined,
         num: [44, 104, 'pens done'], dates: 'Fri 6 Nov', week: '2 Nov', days: [null, null, null, null, { r: [44, 1, 59, 104], tip: ['Fri 6 Nov', '44 done · 1 skipped · 59 due'] }, null, null],
         roomsLeft: [['n1', 'Nursery 1', '16 left'], ['n2', 'Nursery 2', '44 left']],
-        facts: [['Vaccine', 'PRRS MLV'], ['Dose', '2 mL a weaner', 'Intramuscular'], ['Schedule', 'Once'], ['Withdrawal', '21 days'], ['Planned', 'Vet', 'Mon 2 Nov']],
+        facts: [['Vaccine', 'PRRS MLV'], ['Dose', '2 mL a weaner', 'Intramuscular'], ['Schedule', 'Once'], ['Withdrawal', '21 days'], ['Planned', 'Dr. Chen', 'Mon 2 Nov']],
         group: { B11: [6, 0, 3, 9], B12: [7, 2, 0, 9], A9: [5, 0, 4, 9] } }
     };
   }
@@ -72,7 +72,8 @@
     O.tkPig = { roomId: u.roomId, code: code }; O.panel = 'tkpig'; this.tkFocus([code]); return true;
   }
   // ----- parts -----
-  tkRing(r, hot) { const C = this.tkC(), L = 2 * Math.PI * 7, n = r[3], seg = (v, off, col) => v ? '<circle cx="10" cy="10" r="7" fill="none" stroke="' + col + '" stroke-width="4" stroke-dasharray="' + (L * v / n).toFixed(1) + ' ' + L.toFixed(1) + '" stroke-dashoffset="' + (-L * off / n).toFixed(1) + '" transform="rotate(-90 10 10)"></circle>' : ''; return '<svg viewBox="0 0 20 20" style="width: 20px; height: 20px; flex: none;"><circle cx="10" cy="10" r="7" fill="none" stroke="' + C.handle + '" stroke-width="4"></circle>' + seg(r[0], 0, C.dm) + seg(r[1], r[0], C.lm) + seg(r[2], r[0] + r[1], C.pm) + '</svg>'; }
+  // a ring only while the dose is partial; once every pig has it, a solid green dot
+  tkRing(r, hot) { if (r[3] > 0 && r[0] === r[3]) return '<span style="display: inline-block; width: 16px; height: 16px; border-radius: 99px; background: ' + this.tkC().dm + ';"></span>'; const C = this.tkC(), L = 2 * Math.PI * 7, n = r[3], seg = (v, off, col) => v ? '<circle cx="10" cy="10" r="7" fill="none" stroke="' + col + '" stroke-width="4" stroke-dasharray="' + (L * v / n).toFixed(1) + ' ' + L.toFixed(1) + '" stroke-dashoffset="' + (-L * off / n).toFixed(1) + '" transform="rotate(-90 10 10)"></circle>' : ''; return '<svg viewBox="0 0 20 20" style="width: 20px; height: 20px; flex: none;"><circle cx="10" cy="10" r="7" fill="none" stroke="' + C.handle + '" stroke-width="4"></circle>' + seg(r[0], 0, C.dm) + seg(r[1], r[0], C.lm) + seg(r[2], r[0] + r[1], C.pm) + '</svg>'; }
   tkDot(s) { const C = this.tkC(), m = { done: [C.dm, 'none'], skip: [C.lm, 'none'], due: ['#FFFFFF', 'inset 0 0 0 2px ' + C.pm], plan: ['#FFFFFF', 'inset 0 0 0 1.5px ' + C.handle] }[s]; return '<span style="display: inline-block; width: 16px; height: 16px; border-radius: 99px; box-sizing: border-box; background: ' + m[0] + '; box-shadow: ' + m[1] + ';"></span>'; }
   // the week calendar; each cell carries its own hover line (title attribute)
   tkCal(week, cells) {
