@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
 <style>body{margin:0}</style>
 </helmet>
-<div style="width: 2248px; height: 2290px; box-sizing: border-box; padding: 48px; background: #EEEFEB; font-family: Inter, system-ui, sans-serif; color: #1c1917; -webkit-font-smoothing: antialiased">
+<div style="width: 2248px; height: 2340px; box-sizing: border-box; padding: 48px; background: #EEEFEB; font-family: Inter, system-ui, sans-serif; color: #1c1917; -webkit-font-smoothing: antialiased">
   <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">Running treatment page, revamped</h1>
   <p style="margin: 8px 0 0; max-width: 1100px; font-size: 14px; line-height: 21px; color: #57534e">The page the Farm view's "Open page" opens, brought in line with the treatment card: one number with its unit, the course as a track of doses in order (a ring across the pigs while a dose is partial, a solid dot once every pig has it), the counts in words under each dose, the mobile status colours, and the prescription as set fields. The Pigs list stays as the page's working list, one row per pig with its pen, only circles in it (small dots when there are many doses), and pages when it runs long. Hover states are shown held.</p>
 
@@ -271,8 +271,9 @@
       </section>
       <section style="margin-top: 24px; padding: 20px 24px 6px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
         <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">RX-25G014 · 28 pigs across 4 rooms in 2 sections</div>
-        <div style="font-size: 13px; color: #57534e; margin-bottom: 12px">Within one room the list is flat, the pen a column. When the pigs span rooms, the room becomes a short tag above its pigs, with the same rows under it; a section is never named, since room names are unique on a farm.</div>
+        <div style="font-size: 13px; color: #57534e; margin-bottom: 12px">Within one room the list is flat, the pen a column. When the pigs span rooms, the room becomes a short tag above its pigs and the place filter turns from All pens to All rooms; a section is never named, since room names are unique on a farm.</div>
         <h3 style="margin: 0 0 12px; font-size: 17px; font-weight: 600">Pigs</h3>
+        <div style="display: flex; gap: 8px; margin-bottom: 8px"><span style="flex: 1; display: flex; align-items: center; gap: 9px; height: 40px; padding: 0 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px #d6d3d1; font-size: 14px; color: #57534e">Find a pig</span><span style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px #d6d3d1; font-size: 14px">Any dose status<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round"><path d="m6 9 6 6 6-6"></path></svg></span><span style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px #d6d3d1; font-size: 14px">All rooms<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round"><path d="m6 9 6 6 6-6"></path></svg></span></div>
         <div style="display: grid; grid-template-columns: minmax(0, 1fr) 90px 132px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e"><span>Pig</span><span>Pen</span><span style="padding-left: 14px">Doses</span></div>
         <sc-for list="{{roomGroups}}" as="g" hint-placeholder-count="4">
           <div>
@@ -288,7 +289,7 @@
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2248,"height":2290}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2248,"height":2340}}'>
 class Component extends DCLogic {
   renderVals() {
     const C = { done: '#5fae6e', due: '#6f9fdc', skip: '#e8b33c', plan: '#dce0d4' };

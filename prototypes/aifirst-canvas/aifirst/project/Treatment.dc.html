@@ -8,7 +8,7 @@
 <body>
 <x-dc>
 <helmet>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
 <style>body{margin:0}.tx-ghost:hover{background:#f5f5f4}.tx-item:hover{background:#f5f5f4}.tx-row:hover{background:#fafaf9}</style>
 </helmet>
 <div style="width: 100%; height: {{h}}; box-sizing: border-box; display: flex; flex-direction: column; background: #ffffff; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.5; color: #1c1917; -webkit-font-smoothing: antialiased; position: relative; overflow: hidden">
@@ -104,7 +104,7 @@
           <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
             <div role="row" class="{{r.cls}}" onClick="{{r.rowClick}}" style="display: grid; grid-template-columns: {{cols}}; align-items: center; height: 48px; border-bottom: {{r.line}}; background: {{r.bg}}; cursor: pointer">
               <span role="cell" style="padding-left: 8px; display: flex"><input type="checkbox" aria-label="{{r.aria}}" checked="{{r.checked}}" onChange="{{r.toggle}}" style="width: 16px; height: 16px; margin: 0; accent-color: #276640; cursor: pointer"></span>
-              <span role="cell" style="font-weight: 600">{{r.tag}}</span>
+              <span role="cell" style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 14.5px; font-weight: 600; letter-spacing: -0.2px">{{r.tag}}</span>
               <span role="cell">Pen {{r.pen}}</span>
               <span role="cell" style="font-size: 12px; color: #57534e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px">{{r.finding}}</span>
               <sc-if value="{{agentMode}}" hint-placeholder-val="{{false}}">
@@ -325,127 +325,98 @@
 <sc-if value="{{isRunning}}" hint-placeholder-val="{{false}}">
   <div style="flex: 1; min-height: 0; overflow-y: auto; background: #f5f5f4">
     <div style="padding: 24px; display: flex; flex-direction: column; gap: 18px">
-      <header style="padding: 2px 0 4px">
-        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 8px">
+      <header>
+        <div style="display: flex; align-items: center; gap: 12px">
           <h1 style="margin: 0; font-size: 26px; font-weight: 600; line-height: 1.25; letter-spacing: -0.7px">Treatment RX-25G009</h1>
-          <span style="display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 8px; background: #e8effb; color: #24518c; font-size: 12px; font-weight: 500; line-height: 1.4">Running</span>
+          <span style="display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 8px; background: #c1ddfd; color: #1f4470; font-size: 12px; font-weight: 500; line-height: 1.4">Running</span>
           <span style="flex: 1"></span>
           <button type="button" class="tx-ghost" onClick="{{showInFarm}}" style="display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 12px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; font-weight: 500; color: #1c1917; cursor: pointer; flex: none">
             <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.map}}"></path></svg>
             Show in Farm view
           </button>
         </div>
-        <p style="margin: 0; font-size: 12px; line-height: 1.7; color: #57534e">{{runLine}}</p>
-        <div style="display: flex; gap: 6px; margin-top: 12px">
-          <sc-for list="{{runDiseases}}" as="d" hint-placeholder-count="2">
-            <span style="display: inline-flex; align-items: center; padding: 3px 8px; border: 1px solid #e7e5e4; border-radius: 8px; background: #ffffff; font-size: 12px; font-weight: 500; line-height: 1.4">{{d.label}}</span>
-          </sc-for>
+        <p style="margin: 6px 0 0; font-size: 13px; color: #57534e">4 sows · Batch 32 · Gestation 2</p>
+        <div style="display: flex; gap: 6px; margin-top: 10px">
+          <span style="padding: 3px 8px; border-radius: 8px; box-shadow: inset 0 0 0 1px #e7e5e4; background: #ffffff; font-size: 12px; font-weight: 500">Lameness</span>
+          <span style="padding: 3px 8px; border-radius: 8px; box-shadow: inset 0 0 0 1px #e7e5e4; background: #ffffff; font-size: 12px; font-weight: 500">Fever</span>
         </div>
       </header>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1.15fr; gap: 18px">
-        <section style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a; min-width: 0">
-          <h2 style="margin: 0; padding: 16px 16px 6px; font-size: 12px; font-weight: 500; color: #57534e">Current dose</h2>
-          <div style="padding: 0 16px 16px">
-            <strong style="display: block; font-size: 24px; font-weight: 600; line-height: 1.3; letter-spacing: -0.5px; margin-bottom: 6px">2 of 3</strong>
-            <p style="margin: 0; font-size: 12px; color: #57534e">since Fri 6 Nov 08:30</p>
-          </div>
-        </section>
-        <section style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a; min-width: 0">
-          <h2 style="margin: 0; padding: 16px 16px 6px; font-size: 12px; font-weight: 500; color: #57534e">Dose 2 given</h2>
-          <div style="padding: 0 16px 16px">
-            <strong style="display: block; font-size: 24px; font-weight: 600; line-height: 1.3; letter-spacing: -0.5px; margin-bottom: 6px">2 of 4 sows</strong>
-            <div role="progressbar" aria-label="Dose 2 given" aria-valuenow="2" aria-valuemin="0" aria-valuemax="4" style="height: 5px; border-radius: 99px; background: #f5f5f4; margin-top: 13px; overflow: hidden"><span style="display: block; width: 50%; height: 100%; background: #276640"></span></div>
-          </div>
-        </section>
-        <section style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a; min-width: 0">
-          <h2 style="margin: 0; padding: 16px 16px 6px; font-size: 12px; font-weight: 500; color: #57534e">Next dose</h2>
-          <div style="padding: 0 16px 16px">
-            <strong style="display: block; font-size: 17px; font-weight: 600; line-height: 1.5; letter-spacing: -0.2px; margin-bottom: 6px">Sat 7 Nov 08:30</strong>
-            <p style="margin: 0; font-size: 12px; color: #57534e">every 24 hours</p>
-          </div>
-        </section>
-      </div>
-
-      <section style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
-        <h2 style="margin: 0; padding: 24px 24px 16px; font-size: 17px; font-weight: 600">Doses</h2>
-        <div style="padding: 0 24px 24px">
-          <div role="img" aria-label="Dose 1: 3 done, 1 skipped. Dose 2: 2 done, 2 pending. Dose 3: 4 pending." style="display: flex; flex-direction: column; gap: 12px">
-            <sc-for list="{{doseRows}}" as="d" hint-placeholder-count="3">
-              <div style="display: grid; grid-template-columns: 132px minmax(0, 1fr) 76px; gap: 14px; align-items: center">
-                <span style="font-size: 13px; white-space: nowrap">{{d.label}}</span>
-                <div style="display: flex; gap: 3px; height: 22px">
-                  <sc-for list="{{d.parts}}" as="p" hint-placeholder-count="2">
-                    <span style="flex: {{p.n}}; display: grid; place-items: center; min-width: 0; box-sizing: border-box; border-radius: 5px; background: {{p.bg}}; border: {{p.line}}; color: {{p.ink}}; font-size: 12px; font-weight: 600">{{p.n}}</span>
-                  </sc-for>
-                </div>
-                <span style="justify-self: start; display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 8px; background: {{d.bg}}; color: {{d.ink}}; box-shadow: {{d.ring}}; font-size: 12px; font-weight: 500; line-height: 1.4">{{d.state}}</span>
+      <!-- the course: doses in order on one line, counts in words under each -->
+      <section aria-label="Course" style="padding: 20px 24px 22px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+        <div style="display: flex; align-items: baseline; gap: 8px">
+          <h2 style="margin: 0; font-size: 17px; font-weight: 600">Course</h2>
+          <span style="font-size: 14px; color: #57534e">5 of 12 doses given</span>
+          <span style="flex: 1"></span>
+          <span style="font-size: 13px; color: #57534e">Thu 5 – Sat 7 Nov · every 24 h</span>
+        </div>
+        <div style="position: relative; display: flex; align-items: flex-start; margin-top: 20px">
+          <span style="position: absolute; left: {{lineInset}}; right: {{lineInset}}; top: 41px; height: 1.5px; background: #e7e5e4"></span>
+          <sc-for list="{{course}}" as="it" hint-placeholder-count="3">
+            <div style="flex: 1; display: flex; justify-content: center">
+              <div style="width: 112px; display: flex; flex-direction: column; align-items: center; text-align: center">
+                <span style="height: 22px; display: flex; align-items: center"><sc-if value="{{it.today}}" hint-placeholder-val="{{false}}"><span style="padding: 1px 7px; border-radius: 6px; background: #c1ddfd; color: #1f4470; font-size: 11.5px; font-weight: 600">Today</span></sc-if></span>
+                <span onMouseEnter="{{it.enter}}" onMouseLeave="{{leave}}" style="position: relative; height: 40px; display: flex; align-items: center; justify-content: center; cursor: default">
+                  <span style="position: relative; display: block; border-radius: 50%; background: #ffffff; box-shadow: 0 0 0 5px #ffffff{{it.mark.ring}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{it.mark.st}}"></span></span>
+                  <sc-if value="{{it.tipOn}}" hint-placeholder-val="{{false}}"><div role="tooltip" style="position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 6; padding: 10px 12px; border-radius: 12px; background: #ffffff; box-shadow: 0 6px 20px rgba(17,21,17,.16), 0 0 0 1px #ECEEE8; white-space: nowrap; text-align: left; pointer-events: none"><div style="font-size: 13px; font-weight: 600; color: #1c1917">{{it.tipT}}</div><div style="margin-top: 2px; font-size: 12.5px; color: #57534e">{{it.tipS}}</div></div></sc-if>
+                </span>
+                <span style="margin-top: 8px; font-size: 13px; font-weight: 600">{{it.title}}</span>
+                <span style="font-size: 12.5px; color: #57534e">{{it.date}}</span>
+                <span style="margin-top: 4px; font-size: 12.5px; color: #44403c">{{it.count}}</span>
               </div>
-            </sc-for>
-          </div>
-          <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 12px; color: #57534e; margin-top: 12px">
-            <span style="display: flex; gap: 6px; align-items: center"><i style="width: 9px; height: 9px; border-radius: 2px; background: #276640"></i>Done</span>
-            <span style="display: flex; gap: 6px; align-items: center"><i style="width: 9px; height: 9px; border-radius: 2px; background: #8a570e"></i>Skipped</span>
-            <span style="display: flex; gap: 6px; align-items: center"><i style="width: 9px; height: 9px; border-radius: 2px; background: #71717a"></i>Removed</span>
-            <span style="display: flex; gap: 6px; align-items: center"><i style="width: 9px; height: 9px; box-sizing: border-box; border-radius: 2px; background: #ffffff; border: 1px solid #a1a1aa"></i>Pending</span>
-          </div>
+            </div>
+          </sc-for>
         </div>
       </section>
 
-      <section style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
-        <h2 style="margin: 0; padding: 24px 24px 16px; font-size: 17px; font-weight: 600">Sows</h2>
-        <div style="padding: 0 24px">
-          <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px">
-            <div style="position: relative; flex: 1; min-width: 0">
-              <svg viewBox="0 0 24 24" aria-hidden="true" style="position: absolute; left: 11px; top: 11px; width: 18px; height: 18px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.search}}"></path></svg>
-              <input value="{{sq}}" onChange="{{onSowSearch}}" aria-label="Find a sow in this treatment" placeholder="Find a sow" style="width: 100%; box-sizing: border-box; height: 40px; padding: 0 11px 0 36px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: #1c1917; outline-color: #276640">
-            </div>
-            <button type="button" aria-label="Dose status: Any dose status" aria-haspopup="listbox" style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: #1c1917; cursor: pointer; flex: none; white-space: nowrap">Any dose status<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.down}}"></path></svg></button>
-            <button type="button" aria-label="Pen: All pens" aria-haspopup="listbox" style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: #1c1917; cursor: pointer; flex: none; white-space: nowrap">All pens<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.down}}"></path></svg></button>
-            <button type="button" class="tx-ghost" style="display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 10px; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 14px; font-weight: 500; color: #1c1917; cursor: pointer; flex: none">
-              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.columns}}"></path></svg>
-              Columns
-            </button>
+      <!-- the pigs: one row per ID, the pen a column, only circles -->
+      <section aria-label="Pigs" style="padding: 20px 24px 6px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+        <h2 style="margin: 0 0 14px; font-size: 17px; font-weight: 600">Pigs</h2>
+        <div style="display: flex; gap: 8px; margin-bottom: 8px">
+          <div style="position: relative; flex: 1; min-width: 0">
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="position: absolute; left: 11px; top: 11px; width: 18px; height: 18px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.search}}"></path></svg>
+            <input value="{{sq}}" onChange="{{onSowSearch}}" aria-label="Find a pig in this treatment" placeholder="Find a pig" style="width: 100%; box-sizing: border-box; height: 40px; padding: 0 11px 0 36px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: #1c1917; outline-color: #276640">
           </div>
-          <div role="table" aria-label="Sows" style="font-size: 14px">
-            <div role="row" style="display: grid; grid-template-columns: 17% 23% repeat(3, minmax(0, 1fr)); align-items: center; height: 32px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e">
-              <span role="columnheader">Sow</span><span role="columnheader">Pen</span><span role="columnheader">Dose 1</span><span role="columnheader">Dose 2</span><span role="columnheader">Dose 3</span>
-            </div>
-            <sc-for list="{{sows}}" as="r" hint-placeholder-count="4">
-              <div role="row" style="display: grid; grid-template-columns: 17% 23% repeat(3, minmax(0, 1fr)); align-items: center; height: 44px; border-bottom: {{r.line}}">
-                <span role="cell" style="font-weight: 500">{{r.tag}}</span>
-                <span role="cell">Pen {{r.pen}}</span>
-                <sc-for list="{{r.marks}}" as="m" hint-placeholder-count="3">
-                  <span role="cell" style="display: flex">
-                    <span role="img" aria-label="{{m.label}}" style="display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: {{m.size}}; height: {{m.size}}; margin: {{m.margin}}; border-radius: 50%; background: {{m.bg}}; border: {{m.line}}; color: {{m.ink}}; font-size: 14px; line-height: 1">
-                      <sc-if value="{{m.done}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
-                      <sc-if value="{{m.skipped}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px"><path d="m5 5 10 7-10 7Z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path><path d="M19 5v14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2.5"></path></svg></sc-if>
-                      {{m.text}}
-                    </span>
+          <button type="button" aria-label="Dose status: Any dose status" aria-haspopup="listbox" style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: #1c1917; cursor: pointer; flex: none; white-space: nowrap">Any dose status<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.down}}"></path></svg></button>
+          <button type="button" aria-label="{{placeFilterLabel}}" aria-haspopup="listbox" style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 11px; border: 1px solid #d6d3d1; border-radius: 10px; background: #ffffff; font: inherit; font-size: 14px; color: #1c1917; cursor: pointer; flex: none; white-space: nowrap">{{placeFilter}}<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{I.down}}"></path></svg></button>
+        </div>
+        <div role="table" aria-label="Pigs in this treatment">
+          <div role="row" style="display: grid; grid-template-columns: minmax(0, 1fr) 90px 132px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e">
+            <span role="columnheader">Pig</span><span role="columnheader">Pen</span><span role="columnheader" style="padding-left: 14px">Doses</span>
+          </div>
+          <sc-for list="{{pigRows}}" as="r" hint-placeholder-count="4">
+            <div role="row" style="display: grid; grid-template-columns: minmax(0, 1fr) 90px 132px; align-items: center; height: 48px; border-top: {{r.line}}">
+              <span role="cell" style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 15px; font-weight: 600; letter-spacing: -0.2px">{{r.tag}}</span>
+              <span role="cell" style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: #57534e">{{r.pen}}</span>
+              <span role="cell" style="display: flex">
+                <sc-for list="{{r.doses}}" as="m" hint-placeholder-count="3">
+                  <span onMouseEnter="{{m.enter}}" onMouseLeave="{{leave}}" style="position: relative; width: 44px; height: 32px; display: flex; align-items: center; justify-content: center">
+                    <span role="img" aria-label="{{m.tipT}}" style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span>
+                    <sc-if value="{{m.tipOn}}" hint-placeholder-val="{{false}}"><div role="tooltip" style="position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 6; padding: 10px 12px; border-radius: 12px; background: #ffffff; box-shadow: 0 6px 20px rgba(17,21,17,.16), 0 0 0 1px #ECEEE8; white-space: nowrap; text-align: left; pointer-events: none"><div style="font-size: 13px; font-weight: 600; color: #1c1917">{{m.tipT}}</div><div style="margin-top: 2px; font-size: 12.5px; color: #57534e">{{m.tipS}}</div></div></sc-if>
                   </span>
                 </sc-for>
-              </div>
-            </sc-for>
-            <sc-if value="{{noSows}}" hint-placeholder-val="{{false}}">
-              <p style="margin: 0; padding: 14px 0; font-size: 13px; color: #57534e">No sow in this treatment matches “{{sq}}”.</p>
-            </sc-if>
-          </div>
+              </span>
+            </div>
+          </sc-for>
+          <sc-if value="{{noSows}}" hint-placeholder-val="{{false}}">
+            <p style="margin: 0; padding: 14px 0; border-top: 1px solid #f0efed; font-size: 13px; color: #57534e">No pig in this treatment matches “{{sq}}”.</p>
+          </sc-if>
         </div>
-        <div style="padding: 0 24px 24px">
-          <p style="margin: 0; padding-top: 12px; border-top: 1px solid #e7e5e4; font-size: 12px; line-height: 1.7; color: #57534e">D41 · dose 1 skipped: could not stand (Wang Fang, Thu 5 Nov 08:52)</p>
-        </div>
+        <div style="display: flex; align-items: center; height: 46px; border-top: 1px solid #e7e5e4; font-size: 13px; color: #57534e">4 pigs in 2 pens</div>
       </section>
 
-      <section style="background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
-        <h2 style="margin: 0; padding: 24px 24px 16px; font-size: 17px; font-weight: 600">Prescription</h2>
-        <div style="padding: 0 24px 24px; font-size: 14px; line-height: 1.9">
-          <strong style="font-weight: 600">Amoxicillin 15% LA</strong>
-          <p style="margin: 0">Injectable suspension · Intramuscular · 15 mL a sow</p>
-          <p style="margin: 0">3 doses, every 24 hours</p>
-          <p style="margin: 0; color: #57534e">Withdrawal 14 days (from the medicine record)</p>
-          <div style="height: 1px; background: #e7e5e4; margin: 14px 0"></div>
-          <p style="margin: 0"><span style="color: #57534e">Notes:</span> Keep D40 and D41 on straw</p>
-        </div>
+      <!-- the prescription as set fields -->
+      <section aria-label="Prescription" style="padding: 20px 24px 8px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+        <h2 style="margin: 0 0 6px; font-size: 17px; font-weight: 600">Prescription</h2>
+        <sc-for list="{{rxFields}}" as="f" hint-placeholder-count="6">
+          <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; padding: 12px 0; border-bottom: {{f.line}}">
+            <span style="font-size: 14px; color: #57534e">{{f.k}}</span>
+            <span>
+              <span style="display: block; font-size: 14px; font-weight: 600">{{f.v}}</span>
+              <sc-if value="{{f.hasSub}}" hint-placeholder-val="{{true}}"><span style="display: block; margin-top: 2px; font-size: 13px; color: #57534e">{{f.sub}}</span></sc-if>
+            </span>
+          </div>
+        </sc-for>
       </section>
     </div>
   </div>
@@ -544,21 +515,42 @@ class Component extends DCLogic {
     const formSub = s.filled ? (fp.length ? 'Tasks go to the phones once issued.' : 'Pick at least one pig to issue.') : 'Add a medicine to issue.';
 
     // ---------- Running ----------
-    const sowData = [['B15', '14', 'done', 'done'], ['B20', '14', 'done', 'done'], ['D40', '22', 'done', 'pending'], ['D41', '22', 'skipped', 'pending']];
-    const sq = (s.sq || '').trim().toLowerCase();
-    const sowShown = sowData.filter((r) => !sq || r[0].toLowerCase().indexOf(sq) >= 0 || ('pen ' + r[1]).indexOf(sq) >= 0);
-    const mark = (k) => ({
-      done: { label: 'done', done: true, skipped: false, text: '', size: '25px', margin: '0', bg: '#e5f0e8', ink: '#276640', line: '0' },
-      skipped: { label: 'skipped', done: false, skipped: true, text: '', size: '25px', margin: '0', bg: '#fff0d4', ink: '#8a570e', line: '0' },
-      pending: { label: 'pending', done: false, skipped: false, text: '', size: '15px', margin: '0 5px', bg: 'transparent', ink: '#57534e', line: '1.5px solid #a1a1aa' },
-      waiting: { label: 'waiting', done: false, skipped: false, text: '—', size: '25px', margin: '0', bg: 'transparent', ink: '#57534e', line: '0' }
-    })[k];
-    const part = (k, nn) => ({ n: nn, bg: { done: '#276640', skipped: '#8a570e', removed: '#71717a', pending: '#ffffff' }[k], ink: k === 'pending' ? '#57534e' : '#ffffff', line: k === 'pending' ? '1px solid #a1a1aa' : '0' });
-    const doseRows = [
-      { label: 'Dose 1 · Thu 5 Nov', parts: [part('done', 3), part('skipped', 1)], state: 'Given', bg: '#e5f0e8', ink: '#276640', ring: 'none' },
-      { label: 'Dose 2 · Fri 6 Nov', parts: [part('done', 2), part('pending', 2)], state: 'Now', bg: '#e8effb', ink: '#24518c', ring: 'none' },
-      { label: 'Dose 3 · Sat 7 Nov', parts: [part('pending', 4)], state: 'Waiting', bg: '#ffffff', ink: '#57534e', ring: 'inset 0 0 0 1px #d6d3d1' }
+    const C = { done: '#5fae6e', due: '#6f9fdc', skip: '#e8b33c', plan: '#dce0d4' };
+    const ring = (parts, size, w) => {
+      if (parts.length === 1 && parts[0][0] === 'done') return { ring: '', st: 'width: ' + Math.round(size * 0.72) + 'px; height: ' + Math.round(size * 0.72) + 'px; background: ' + C.done };
+      const total = parts.reduce((x, q) => x + q[1], 0); let at = 0;
+      const stops = parts.map(([k, n]) => { const p0 = at, p1 = at + (n / total) * 360; at = p1; return C[k] + ' ' + (p0 + 2) + 'deg ' + (p1 - 2) + 'deg, transparent ' + (p1 - 2) + 'deg ' + p1 + 'deg'; }).join(', ');
+      return { ring: '', st: 'width: ' + size + 'px; height: ' + size + 'px; background: conic-gradient(' + stops + '); -webkit-mask: radial-gradient(circle, transparent ' + (size / 2 - w) + 'px, #000 ' + (size / 2 - w + 0.5) + 'px); mask: radial-gradient(circle, transparent ' + (size / 2 - w) + 'px, #000 ' + (size / 2 - w + 0.5) + 'px)' };
+    };
+    const planned = (size, w) => ({ ring: '', st: 'width: ' + size + 'px; height: ' + size + 'px; border: ' + w + 'px solid ' + C.plan });
+    const hov = s.hov || '';
+    const outline = ', 0 0 0 7px #ffffff, 0 0 0 8.5px #1c1917';
+    const leave = () => set({ hov: '' });
+    const courseData = [
+      { key: 'c0', mark: ring([['done', 3], ['skip', 1]], 36, 5), title: 'Dose 1', date: 'Thu 5 Nov', count: '3 given · 1 skipped', today: false, tipT: 'Thu 5 Nov · Dose 1', tipS: 'Skipped: D41, could not stand' },
+      { key: 'c1', mark: ring([['done', 2], ['due', 2]], 36, 5), title: 'Dose 2', date: 'Fri 6 Nov', count: '2 given · 2 due', today: true, tipT: 'Fri 6 Nov · Dose 2', tipS: 'Still due: D40, D41' },
+      { key: 'c2', mark: planned(36, 4), title: 'Dose 3', date: 'Sat 7 Nov', count: '4 to give', today: false, tipT: 'Sat 7 Nov · Dose 3', tipS: 'Planned for 08:30' }
     ];
+    const course = courseData.map((d) => Object.assign({}, d, { mark: Object.assign({}, d.mark, { ring: hov === d.key ? outline : '' }), tipOn: hov === d.key, enter: () => set({ hov: d.key }) }));
+    const pigData = [
+      ['B15', '14', [['done', 'Thu 5 Nov · Given', '08:31 · Wang Fang'], ['done', 'Fri 6 Nov · Given', '08:40 · Wang Fang'], ['plan', 'Sat 7 Nov · Planned', '08:30']]],
+      ['B20', '14', [['done', 'Thu 5 Nov · Given', '08:33 · Wang Fang'], ['done', 'Fri 6 Nov · Given', '08:42 · Wang Fang'], ['plan', 'Sat 7 Nov · Planned', '08:30']]],
+      ['D40', '22', [['done', 'Thu 5 Nov · Given', '08:49 · Wang Fang'], ['due', 'Fri 6 Nov · Due today', 'Not given yet'], ['plan', 'Sat 7 Nov · Planned', '08:30']]],
+      ['D41', '22', [['skip', 'Thu 5 Nov · Skipped', '08:52 · could not stand · Wang Fang'], ['due', 'Fri 6 Nov · Due today', 'Not given yet'], ['plan', 'Sat 7 Nov · Planned', '08:30']]]
+    ];
+    const sq = (s.sq || '').trim().toLowerCase();
+    const shownPigs = pigData.filter((r) => !sq || r[0].toLowerCase().indexOf(sq) >= 0 || r[1].indexOf(sq) >= 0);
+    const pdot = (k, key) => { const ring2 = hov === key ? 'box-shadow: 0 0 0 2px #ffffff, 0 0 0 3.5px #1c1917' : ''; return (k === 'done' || k === 'skip') ? { wst: ring2, st: 'width: 16px; height: 16px; background: ' + C[k] } : { wst: ring2, st: 'width: 16px; height: 16px; border: 1.75px solid ' + C[k] }; };
+    const pigRows = shownPigs.map((r, i) => ({ tag: r[0], pen: r[1], line: i === 0 ? '0' : '1px solid #f0efed', doses: r[2].map((d, j) => { const key = 'p' + r[0] + j; return Object.assign(pdot(d[0], key), { tipT: d[1], tipS: d[2], tipOn: hov === key, enter: () => set({ hov: key }) }); }) }));
+    const rooms = 1;
+    const rxFields = [
+      { k: 'Medicine', v: 'Amoxicillin 15% LA', sub: 'Injectable suspension · 100 mL bottle' },
+      { k: 'Dose and route', v: '15 mL a sow', sub: 'Intramuscular, neck' },
+      { k: 'Schedule', v: '3 doses, every 24 h', sub: 'Thu 5 – Sat 7 Nov' },
+      { k: 'Withdrawal', v: '14 days', sub: 'Ends Sat 21 Nov, if the last dose is Sat' },
+      { k: 'Prescribed by', v: 'Dr. Chen', sub: 'Wed 4 Nov 16:10 · issued by Li Wei, Thu 5 Nov 08:30' },
+      { k: 'Note', v: 'Keep D40 and D41 on straw', sub: '' }
+    ].map((f, i, arr) => Object.assign(f, { hasSub: !!f.sub, line: i === arr.length - 1 ? '0' : '1px solid #f0efed' }));
 
     return {
       I, h: (this.props.paneHeight || 900) + 'px',
@@ -618,13 +610,11 @@ class Component extends DCLogic {
       issue: () => { if (canIssue) set({ screen: 'running', sq: '' }); },
 
       // running
-      runLine: '4 sows · Gestation 2 · Batch 32 · issued Thu 5 Nov 08:30 by Li Wei',
       showInFarm: () => { if (this.props.onFarm) this.props.onFarm('rx09'); },
-      runDiseases: [{ label: 'Lameness' }, { label: 'Fever' }],
-      doseRows,
+      course, leave, pigRows, rxFields, lineInset: (100 / (2 * course.length)) + '%',
+      placeFilter: rooms > 1 ? 'All rooms' : 'All pens', placeFilterLabel: rooms > 1 ? 'Room: All rooms' : 'Pen: All pens',
       sq: s.sq, onSowSearch: (e) => set({ sq: e.target.value }),
-      sows: sowShown.map((r, i) => ({ tag: r[0], pen: r[1], line: i === sowShown.length - 1 ? '0' : '1px solid #e7e5e4', marks: [mark(r[2]), mark(r[3]), mark('waiting')] })),
-      noSows: sowShown.length === 0
+      noSows: shownPigs.length === 0
     };
   }
 }
