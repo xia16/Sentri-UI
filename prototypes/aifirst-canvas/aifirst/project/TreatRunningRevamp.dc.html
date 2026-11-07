@@ -11,9 +11,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
 <style>body{margin:0}</style>
 </helmet>
-<div style="width: 2248px; height: 2340px; box-sizing: border-box; padding: 48px; background: #EEEFEB; font-family: Inter, system-ui, sans-serif; color: #1c1917; -webkit-font-smoothing: antialiased">
+<div style="width: 2248px; height: 2120px; box-sizing: border-box; padding: 48px; background: #EEEFEB; font-family: Inter, system-ui, sans-serif; color: #1c1917; -webkit-font-smoothing: antialiased">
   <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">Running treatment page, revamped</h1>
-  <p style="margin: 8px 0 0; max-width: 1100px; font-size: 14px; line-height: 21px; color: #57534e">The page the Farm view's "Open page" opens, brought in line with the treatment card: one number with its unit, the course as a track of doses in order (a ring across the pigs while a dose is partial, a solid dot once every pig has it), the counts in words under each dose, the mobile status colours, and the prescription as set fields. The Pigs list stays as the page's working list, grouped by pen, with only circles in it (small dots when there are many doses), and pages when it runs long. Hover states are shown held.</p>
+  <p style="margin: 8px 0 0; max-width: 1100px; font-size: 14px; line-height: 21px; color: #57534e">The page the Farm view's "Open page" opens, brought in line with the treatment card: one number with its unit, the course as a track of doses in order (a ring across the pigs while a dose is partial, a solid dot once every pig has it), the counts in words under each dose, the mobile status colours, and the prescription as set fields. The Pigs list stays as the page's working list, one row per pig with its pen, only circles in it (small dots when there are many doses), and pages when it runs long. Hover states are shown held.</p>
 
   <div style="display: flex; gap: 48px; margin-top: 28px; align-items: flex-start">
     <!-- the page, at the pane's 680 width, shown at full scroll length -->
@@ -79,27 +79,10 @@
               <span style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px #d6d3d1; font-size: 14px">Any dose status<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round"><path d="m6 9 6 6 6-6"></path></svg></span>
               <span style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px #d6d3d1; font-size: 14px">All pens<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round"><path d="m6 9 6 6 6-6"></path></svg></span>
             </div>
-            <div style="display: grid; grid-template-columns: minmax(0, 1fr) 132px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e">
-              <span>Pig</span>
-              <span style="padding-left: 14px">Doses</span>
-            </div>
-            <sc-for list="{{pens}}" as="g" hint-placeholder-count="2">
-              <div>
-                <div style="display: flex; align-items: center; height: 44px; border-top: {{g.top}}"><span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 10px; border-radius: 8px; background: #f5f5f4; font-size: 13px; font-weight: 600; color: #44403c"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M3 3h18v18H3zM3 12h18M12 3v18"></path></svg>{{g.pen}}<span style="font-weight: 500; color: #78716c">· {{g.n}}</span></span></div>
-                <sc-for list="{{g.pigs}}" as="r" hint-placeholder-count="2">
-                  <div style="display: grid; grid-template-columns: minmax(0, 1fr) 132px; align-items: center; height: 48px; border-top: {{r.line}}">
-                    <span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 15px; font-weight: 600; letter-spacing: -0.2px">{{r.tag}}</span>
-                    <span style="display: flex">
-                      <sc-for list="{{r.doses}}" as="m" hint-placeholder-count="3">
-                        <span style="width: 44px; display: flex; justify-content: center"><span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span></span>
-                      </sc-for>
-                    </span>
-                  </div>
-                </sc-for>
-              </div>
-            </sc-for>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) 90px 132px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e"><span>Pig</span><span>Pen</span><span style="padding-left: 14px">Doses</span></div>
+            <sc-for list="{{rxRows}}" as="r" hint-placeholder-count="6"><div style="display: grid; grid-template-columns: minmax(0, 1fr) 90px 132px; align-items: center; height: 48px; border-top: {{r.line}}"><span><sc-if value="{{r.isId}}" hint-placeholder-val="{{true}}"><span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: #1c1917">{{r.tag}}</span></sc-if><sc-if value="{{r.isWords}}" hint-placeholder-val="{{false}}"><span style="font-size: 14px; font-weight: 500; color: #44403c">{{r.tag}}</span></sc-if></span><span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: #57534e">{{r.pen}}</span><span style="display: flex"><sc-for list="{{r.doses}}" as="m" hint-placeholder-count="3"><span style="width: 44px; display: flex; justify-content: center"><span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span></span></sc-for></span></div></sc-for>
             <div style="display: flex; align-items: center; height: 46px; border-top: 1px solid #e7e5e4; font-size: 13px; color: #57534e">4 pigs in 2 pens</div>
-            <div style="position: absolute; left: 236px; top: 362px; padding: 10px 12px; border-radius: 12px; background: #ffffff; box-shadow: 0 6px 20px rgba(17,21,17,.16), 0 0 0 1px #ECEEE8; white-space: nowrap; z-index: 2">
+            <div style="position: absolute; left: 240px; top: 285px; padding: 10px 12px; border-radius: 12px; background: #ffffff; box-shadow: 0 6px 20px rgba(17,21,17,.16), 0 0 0 1px #ECEEE8; white-space: nowrap; z-index: 2">
               <div style="font-size: 13px; font-weight: 600">Thu 5 Nov · Skipped</div>
               <div style="margin-top: 2px; font-size: 12.5px; color: #57534e">08:52 · could not stand · Wang Fang</div>
             </div>
@@ -181,28 +164,10 @@
         </div>
       </section>
       <section style="padding: 20px 24px 6px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
-        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">Batch 34 · twice a day for 2 weeks: its Pigs list, page 1 (tagged pens, then a pen without IDs)</div>
+        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">Batch 34 · twice a day for 2 weeks: its Pigs list, page 1</div>
         <h3 style="margin: 0 0 12px; font-size: 17px; font-weight: 600">Pigs</h3>
-        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 330px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e">
-          <span>Pig</span><span>Doses</span>
-        </div>
-        <sc-for list="{{longPens}}" as="g" hint-placeholder-count="2">
-          <div>
-            <div style="display: flex; align-items: center; height: 44px; border-top: {{g.top}}"><span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 10px; border-radius: 8px; background: #f5f5f4; font-size: 13px; font-weight: 600; color: #44403c"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M3 3h18v18H3zM3 12h18M12 3v18"></path></svg>{{g.pen}}<span style="font-weight: 500; color: #78716c">· {{g.n}}</span></span></div>
-            <sc-for list="{{g.pigs}}" as="r" hint-placeholder-count="4">
-              <div style="display: grid; grid-template-columns: minmax(0, 1fr) 330px; align-items: center; height: 42px; border-top: {{r.line}}">
-                <span><sc-if value="{{r.isId}}" hint-placeholder-val="{{true}}"><span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: #1c1917">{{r.tag}}</span></sc-if><sc-if value="{{r.isWords}}" hint-placeholder-val="{{false}}"><span style="font-size: 14px; font-weight: 500; color: #44403c">{{r.tag}}</span></sc-if></span>
-                <span style="display: flex; justify-content: space-between; align-items: center">
-                  <sc-for list="{{r.days}}" as="d" hint-placeholder-count="14">
-                    <span style="display: flex; gap: 2px; align-items: center">
-                      <sc-for list="{{d.dots}}" as="m" hint-placeholder-count="2"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></sc-for>
-                    </span>
-                  </sc-for>
-                </span>
-              </div>
-            </sc-for>
-          </div>
-        </sc-for>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 56px 330px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e"><span>Pig</span><span>Pen</span><span>Doses</span></div>
+        <sc-for list="{{longRows}}" as="r" hint-placeholder-count="6"><div style="display: grid; grid-template-columns: minmax(0, 1fr) 56px 330px; align-items: center; height: 42px; border-top: {{r.line}}"><span><sc-if value="{{r.isId}}" hint-placeholder-val="{{true}}"><span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: #1c1917">{{r.tag}}</span></sc-if><sc-if value="{{r.isWords}}" hint-placeholder-val="{{false}}"><span style="font-size: 14px; font-weight: 500; color: #44403c">{{r.tag}}</span></sc-if></span><span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: #57534e">{{r.pen}}</span><span style="display: flex; justify-content: space-between; align-items: center"><sc-for list="{{r.days}}" as="d" hint-placeholder-count="14"><span style="display: flex; gap: 2px; align-items: center"><sc-for list="{{d.dots}}" as="m" hint-placeholder-count="2"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></sc-for></span></sc-for></span></div></sc-for>
         <div style="display: flex; align-items: center; gap: 6px; height: 50px; border-top: 1px solid #e7e5e4; font-size: 13px; color: #57534e">
           <span style="flex: 1">Page 1 of 3 · pens 5 to 7</span>
           <span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; color: #a8a29e">‹</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; background: #f5f5f4; color: #1c1917; font-weight: 600">1</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px;">2</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px;">3</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; color: #1c1917">›</span>
@@ -305,35 +270,20 @@
         </div>
       </section>
       <section style="margin-top: 24px; padding: 20px 24px 6px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
-        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">RX-25G014 · 28 pigs in Gestation 2: pens of one, group pens and a pen without IDs</div>
-        <div style="font-size: 13px; color: #57534e; margin-bottom: 12px">A pig alone in her pen is a plain row, her pen in its own column. A pen holding several of these pigs becomes a group. Pigs without an ID become one row for their pen.</div>
+        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">RX-25G014 · 28 pigs across 4 rooms in 2 sections</div>
+        <div style="font-size: 13px; color: #57534e; margin-bottom: 12px">One row per ID, never a pen group. The place says only as much as it must: the pen alone when the list sits in one room, room · pen when it spans rooms. Room names are unique on a farm, so a section is never named; pigs without an ID are one row for their pen.</div>
         <h3 style="margin: 0 0 12px; font-size: 17px; font-weight: 600">Pigs</h3>
-        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 90px 132px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e">
-          <span>Pig</span><span>Pen</span><span style="padding-left: 14px">Doses</span>
-        </div>
-        <sc-for list="{{stallLanes}}" as="g" hint-placeholder-count="2">
-          <div>
-            <sc-if value="{{g.hasHead}}" hint-placeholder-val="{{true}}"><div style="display: flex; align-items: center; height: 44px; border-top: {{g.top}}"><span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 10px; border-radius: 8px; background: #f5f5f4; font-size: 13px; font-weight: 600; color: #44403c"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M3 3h18v18H3zM3 12h18M12 3v18"></path></svg>{{g.lane}}<span style="font-weight: 500; color: #78716c">· {{g.n}}{{g.kind}}</span></span></div></sc-if>
-            <sc-for list="{{g.pigs}}" as="r" hint-placeholder-count="4">
-              <div style="display: grid; grid-template-columns: minmax(0, 1fr) 90px 132px; align-items: center; height: 44px; border-top: {{r.line}}">
-                <span><sc-if value="{{r.isId}}" hint-placeholder-val="{{true}}"><span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: #1c1917">{{r.tag}}</span></sc-if><sc-if value="{{r.isWords}}" hint-placeholder-val="{{false}}"><span style="font-size: 14px; font-weight: 500; color: #44403c">{{r.tag}}</span></sc-if></span>
-                <span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: #57534e">{{r.stall}}</span>
-                <span style="display: flex">
-                  <sc-for list="{{r.doses}}" as="m" hint-placeholder-count="3"><span style="width: 44px; display: flex; justify-content: center"><span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span></span></sc-for>
-                </span>
-              </div>
-            </sc-for>
-          </div>
-        </sc-for>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 170px 132px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e"><span>Pig</span><span>Room · Pen</span><span style="padding-left: 14px">Doses</span></div>
+        <sc-for list="{{hyRows}}" as="r" hint-placeholder-count="6"><div style="display: grid; grid-template-columns: minmax(0, 1fr) 170px 132px; align-items: center; height: 46px; border-top: {{r.line}}"><span><sc-if value="{{r.isId}}" hint-placeholder-val="{{true}}"><span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: #1c1917">{{r.tag}}</span></sc-if><sc-if value="{{r.isWords}}" hint-placeholder-val="{{false}}"><span style="font-size: 14px; font-weight: 500; color: #44403c">{{r.tag}}</span></sc-if></span><span style="font-size: 13px; color: #57534e; white-space: nowrap">{{r.room}} · <span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-weight: 500">{{r.pen}}</span></span><span style="display: flex"><sc-for list="{{r.doses}}" as="m" hint-placeholder-count="3"><span style="width: 44px; display: flex; justify-content: center"><span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span></span></sc-for></span></div></sc-for>
         <div style="display: flex; align-items: center; gap: 6px; height: 50px; border-top: 1px solid #e7e5e4; font-size: 13px; color: #57534e">
-          <span style="flex: 1">28 pigs in 7 pens · one page</span>
+          <span style="flex: 1">28 pigs in 4 rooms · one page</span>
         </div>
       </section>
     </div>
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2248,"height":2340}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2248,"height":2120}}'>
 class Component extends DCLogic {
   renderVals() {
     const C = { done: '#5fae6e', due: '#6f9fdc', skip: '#e8b33c', plan: '#dce0d4' };
@@ -473,7 +423,20 @@ class Component extends DCLogic {
       { hasHead: true, lane: 'Pen 22', kind: '', n: '2 sows', pigs: [hy('201240', '', ['done', 'due', 'plan']), hy('201241', '', ['done', 'due', 'plan'])] },
       { hasHead: true, lane: 'Pen 7', kind: ' · no IDs', n: '20 pigs', pigs: [{ tag: '20 pigs without an ID', isId: false, isWords: true, stall: '', doses: [ring([['done', 20]], 18, 3), ring([['done', 14], ['due', 6]], 18, 3), plannedRing(16, 1.75)] }] }
     ].map((g, i) => Object.assign(g, { top: i === 0 ? '0' : '1px solid #e7e5e4', pigs: g.pigs.map((r, j) => Object.assign(r, { line: j === 0 ? (g.hasHead ? '0' : '0') : '1px solid #f0efed' })) }));
-    return { rxTrack, tracks, oneDays, pens, longPens, fields, longDays, waterDays, twoHeads, twoMeds, twoPigs, twoRx, stallLanes };
+
+    const L = (i) => (i === 0 ? '0' : '1px solid #f0efed');
+    const rxRows = sowData.map((r, i) => ({ tag: r[0], pen: r[1], isId: true, isWords: false, line: L(i), doses: r[2].map((k, j) => dot(k, 16, r[0] === 'D41' && j === 0)) }));
+    const longRows = [];
+    [['5', ['341201', -1], ['341202', 9], ['341203', -1], ['341204', -1]], ['6', ['341221', -1], ['341222', -1], ['341223', 9], ['341224', 4]]].forEach((g) => g.slice(1).forEach((p) => longRows.push({ tag: p[0], pen: g[0], isId: true, isWords: false, days: strip(p[1]) })));
+    longRows.push({ tag: '20 pigs without an ID', pen: '7', isId: false, isWords: true, days: penStrip() });
+    longRows.forEach((r, i) => { r.line = L(i); });
+    const hyRows = [
+      ['201101', 'Gestation 1', 'A1', ['done', 'done', 'plan']], ['201102', 'Gestation 1', 'A2', ['done', 'due', 'plan']], ['201104', 'Gestation 1', 'A3', ['skip', 'due', 'plan']],
+      ['201215', 'Gestation 2', '14', ['done', 'done', 'plan']], ['201220', 'Gestation 2', '14', ['done', 'done', 'plan']],
+      ['207301', 'Sick room', '2', ['done', 'due', 'plan']]
+    ].map((r, i) => ({ tag: r[0], room: r[1], pen: r[2], isId: true, isWords: false, line: L(i), doses: r[3].map((k) => dot(k, 16)) }));
+    hyRows.push({ tag: '20 pigs without an ID', room: 'Nursery 2', pen: '7', isId: false, isWords: true, line: L(1), doses: [dot('done', 13), ring([['done', 14], ['due', 6]], 18, 3), plannedRing(16, 1.75)] });
+    return { rxTrack, tracks, oneDays, pens, longPens, fields, longDays, waterDays, twoHeads, twoMeds, twoPigs, twoRx, stallLanes, rxRows, longRows, hyRows };
   }
 }
 </script>
