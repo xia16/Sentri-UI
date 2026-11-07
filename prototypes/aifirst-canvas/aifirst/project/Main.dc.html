@@ -1300,7 +1300,7 @@ class Component extends DCLogic {
     this.onOpen = (e) => {
       const d = (e && e.detail) || {}, from = d.from || {};
       const bn = String(from.batch || '').replace('Batch ', '');
-      const map = { treat: ['treatment', 'proposal'], treatrun: ['treatment', 'running'], rxpage: ['treatment', 'running'], vaxpage: ['vax', ''], vax: ['vax', ''], sampling: ['sampling', 'list'], cull: ['offsite', 'cull'], move: ['transfers', 'move'], ship: ['transfers', 'move'], batch: ['batches', 'new'], feed: ['feed', 'change'],
+      const map = { treat: ['treatment', 'proposal'], treatrun: ['treatment', 'running'], rxpage: ['treatment', 'running'], vaxpage: ['vax', ''], samplingpage: ['sampling', 'list'], vax: ['vax', ''], sampling: ['sampling', 'list'], cull: ['offsite', 'cull'], move: ['transfers', 'move'], ship: ['transfers', 'move'], batch: ['batches', 'new'], feed: ['feed', 'change'],
         vaxplan: ['vax', ''], cullplan: ['batches', 'planned'], keepplan: ['batches', 'planned'], endbatch: ['batches', 'change'], report: [bn ? 'batch-' + bn : 'batches', bn ? '' : 'list'], decisions: ['decisions', 'list'] };
       const go = map[d.action];
       if (!go) return;
@@ -1309,7 +1309,7 @@ class Component extends DCLogic {
       const tabStart = Object.assign({}, s0.tabStart || {});
       if (go[1]) tabStart[go[0]] = go[1];
       const pigs = d.action === 'decisions' || d.action === 'report' || from.many ? [] : (d.pigs || []).map((p) => ({ code: p.code, room: p.room }));
-      this.setState({ tabs: tabs, active: go[0], tabStart: tabStart, plusOpen: false, fromFarm: d.action === 'report' || d.action === 'treatrun' || d.action === 'rxpage' || d.action === 'vaxpage' ? null : { tab: go[0], title: from.title || from.label || '', pigs: pigs } });
+      this.setState({ tabs: tabs, active: go[0], tabStart: tabStart, plusOpen: false, fromFarm: d.action === 'report' || d.action === 'treatrun' || d.action === 'rxpage' || d.action === 'vaxpage' || d.action === 'samplingpage' ? null : { tab: go[0], title: from.title || from.label || '', pigs: pigs } });
     };
     window.addEventListener('sentri:open', this.onOpen);
   }

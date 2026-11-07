@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Running treatment page, revamped</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1520px; height: 1420px; box-sizing: border-box; padding: 48px; background: #EEEFEB; font-family: Inter, system-ui, sans-serif; color: #1c1917; -webkit-font-smoothing: antialiased">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">Running treatment page, revamped</h1>
+  <p style="margin: 8px 0 0; max-width: 1100px; font-size: 14px; line-height: 21px; color: #57534e">The page the Farm view's "Open page" opens, brought in line with the treatment card: one number with its unit, the course on a week calendar (a ring per day across the sows, small circles where it's one pig), detail on hover instead of a legend, the mobile status colours, and the prescription as set fields. The sows list stays as the page's working list, its dose cells drawn with the same circles. Hover states are shown held.</p>
+
+  <div style="display: flex; gap: 48px; margin-top: 28px; align-items: flex-start">
+    <!-- the page, at the pane's 680 width, shown at full scroll length -->
+    <div>
+      <div style="font-size: 15px; font-weight: 600">The page (680 px pane, full length)</div>
+      <div style="font-size: 13px; color: #57534e; margin: 2px 0 12px">Thu's ring is hovered; D41's skipped dose is hovered.</div>
+      <div style="width: 680px; box-sizing: border-box; border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 1px #DADFD5, 0 12px 32px rgba(17,21,17,.10); background: #f5f5f4">
+        <div style="padding: 24px; display: flex; flex-direction: column; gap: 18px">
+          <header>
+            <div style="display: flex; align-items: center; gap: 12px">
+              <h2 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.7px">Treatment RX-25G009</h2>
+              <span style="padding: 3px 8px; border-radius: 8px; background: #c1ddfd; color: #1f4470; font-size: 12px; font-weight: 500">Running</span>
+              <span style="flex: 1"></span>
+              <span style="display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px #d6d3d1; background: #ffffff; font-size: 14px; font-weight: 500">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3ZM9 3v15M15 6v15"></path></svg>
+                Show in Farm view
+              </span>
+            </div>
+            <div style="margin-top: 6px; font-size: 13px; color: #57534e">4 sows · Batch 32 · Gestation 2</div>
+            <div style="display: flex; gap: 6px; margin-top: 10px">
+              <span style="padding: 3px 8px; border-radius: 8px; box-shadow: inset 0 0 0 1px #e7e5e4; background: #ffffff; font-size: 12px; font-weight: 500">Lameness</span>
+              <span style="padding: 3px 8px; border-radius: 8px; box-shadow: inset 0 0 0 1px #e7e5e4; background: #ffffff; font-size: 12px; font-weight: 500">Fever</span>
+            </div>
+          </header>
+
+          <!-- the course -->
+          <section style="position: relative; padding: 20px 24px 22px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+            <div style="display: flex; align-items: baseline; gap: 8px">
+              <span style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; line-height: 1">5</span>
+              <span style="font-size: 15px; color: #44403c">of 12 doses given</span>
+              <span style="flex: 1"></span>
+              <span style="font-size: 13px; color: #57534e">Thu 5 – Sat 7 Nov · every 24 h</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 64px repeat(7, minmax(0, 1fr)); align-items: center; row-gap: 10px; margin-top: 22px">
+              <span></span>
+              <sc-for list="{{week.heads}}" as="h" hint-placeholder-count="7">
+                <span style="text-align: center; font-size: 12px; font-weight: {{h.weight}}; color: {{h.ink}}">{{h.d}}</span>
+              </sc-for>
+              <span style="font-size: 12px; color: #57534e">2 Nov</span>
+              <sc-for list="{{week.days}}" as="c" hint-placeholder-count="7">
+                <span style="display: flex; justify-content: center; align-items: center; height: 40px">
+                  <sc-for list="{{c.marks}}" as="m" hint-placeholder-count="1">
+                    <span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span>
+                  </sc-for>
+                </span>
+              </sc-for>
+            </div>
+            <!-- held hover on Thu -->
+            <div style="position: absolute; left: 262px; top: 150px; padding: 10px 12px; border-radius: 12px; background: #ffffff; box-shadow: 0 6px 20px rgba(17,21,17,.16), 0 0 0 1px #ECEEE8; white-space: nowrap; z-index: 2">
+              <div style="font-size: 13px; font-weight: 600">Thu 5 Nov · Dose 1</div>
+              <div style="margin-top: 2px; font-size: 12.5px; color: #57534e">3 given · 1 skipped</div>
+            </div>
+          </section>
+
+          <!-- the sows: the page's working list -->
+          <section style="position: relative; padding: 20px 24px 8px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+            <h3 style="margin: 0 0 14px; font-size: 17px; font-weight: 600">Sows</h3>
+            <div style="display: flex; gap: 8px; margin-bottom: 8px">
+              <span style="flex: 1; display: flex; align-items: center; gap: 9px; height: 40px; padding: 0 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px #d6d3d1; font-size: 14px; color: #57534e">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round"><path d="m21 21-4.3-4.3M11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16"></path></svg>Find a sow
+              </span>
+              <span style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px #d6d3d1; font-size: 14px">Any dose status<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round"><path d="m6 9 6 6 6-6"></path></svg></span>
+              <span style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px #d6d3d1; font-size: 14px">All pens<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round"><path d="m6 9 6 6 6-6"></path></svg></span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.1fr 1fr 64px 64px 64px 72px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e">
+              <span>Sow</span><span>Pen</span><span style="text-align: center">Thu</span><span style="text-align: center">Fri</span><span style="text-align: center">Sat</span><span style="text-align: right">Given</span>
+            </div>
+            <sc-for list="{{sows}}" as="r" hint-placeholder-count="4">
+              <div style="display: grid; grid-template-columns: 1.1fr 1fr 64px 64px 64px 72px; align-items: center; height: 50px; border-bottom: {{r.line}}">
+                <span style="font-size: 14px; font-weight: 600">{{r.tag}}</span>
+                <span style="font-size: 14px">Pen {{r.pen}}</span>
+                <sc-for list="{{r.doses}}" as="m" hint-placeholder-count="3">
+                  <span style="display: flex; justify-content: center"><span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span></span>
+                </sc-for>
+                <span style="text-align: right; font-size: 14px; font-variant-numeric: tabular-nums">{{r.given}}</span>
+              </div>
+            </sc-for>
+            <!-- held hover on D41's Thu dose -->
+            <div style="position: absolute; left: 120px; top: 290px; padding: 10px 12px; border-radius: 12px; background: #ffffff; box-shadow: 0 6px 20px rgba(17,21,17,.16), 0 0 0 1px #ECEEE8; white-space: nowrap; z-index: 2">
+              <div style="font-size: 13px; font-weight: 600">Thu 5 Nov · Skipped</div>
+              <div style="margin-top: 2px; font-size: 12.5px; color: #57534e">08:52 · could not stand · Wang Fang</div>
+            </div>
+          </section>
+
+          <!-- the prescription as set fields -->
+          <section style="padding: 20px 24px 8px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+            <h3 style="margin: 0 0 6px; font-size: 17px; font-weight: 600">Prescription</h3>
+            <sc-for list="{{fields}}" as="f" hint-placeholder-count="6">
+              <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; padding: 12px 0; border-bottom: {{f.line}}">
+                <span style="font-size: 14px; color: #57534e">{{f.k}}</span>
+                <span>
+                  <span style="display: block; font-size: 14px; font-weight: 600">{{f.v}}</span>
+                  <sc-if value="{{f.hasSub}}" hint-placeholder-val="{{true}}"><span style="display: block; margin-top: 2px; font-size: 13px; color: #57534e">{{f.sub}}</span></sc-if>
+                </span>
+              </div>
+            </sc-for>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- longer courses read the same -->
+    <div style="width: 680px">
+      <div style="font-size: 15px; font-weight: 600">Longer courses read the same</div>
+      <div style="font-size: 13px; color: #57534e; margin: 2px 0 12px">A row per week. Twice a day = two marks per day: rings across the sows, small circles for one pig.</div>
+      <sc-for list="{{courses}}" as="co" hint-placeholder-count="2">
+        <section style="position: relative; margin-bottom: 24px; padding: 20px 24px 22px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+          <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">{{co.label}}</div>
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; line-height: 1">{{co.n}}</span>
+            <span style="font-size: 15px; color: #44403c">{{co.of}}</span>
+            <span style="flex: 1"></span>
+            <span style="font-size: 13px; color: #57534e">{{co.dates}}</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 64px repeat(7, minmax(0, 1fr)); align-items: center; row-gap: 6px; margin-top: 20px">
+            <span></span>
+            <sc-for list="{{co.heads}}" as="h" hint-placeholder-count="7">
+              <span style="text-align: center; font-size: 12px; font-weight: {{h.weight}}; color: {{h.ink}}">{{h.d}}</span>
+            </sc-for>
+            <sc-for list="{{co.weeks}}" as="w" hint-placeholder-count="3">
+              <span style="font-size: 12px; color: #57534e">{{w.label}}</span>
+              <sc-for list="{{w.days}}" as="c" hint-placeholder-count="7">
+                <span style="display: flex; justify-content: center; align-items: center; gap: 5px; height: 36px">
+                  <sc-for list="{{c.marks}}" as="m" hint-placeholder-count="2">
+                    <span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span>
+                  </sc-for>
+                </span>
+              </sc-for>
+            </sc-for>
+          </div>
+          <sc-if value="{{co.hasTip}}" hint-placeholder-val="{{false}}">
+            <div style="position: absolute; left: {{co.tipX}}; top: {{co.tipY}}; padding: 10px 12px; border-radius: 12px; background: #ffffff; box-shadow: 0 6px 20px rgba(17,21,17,.16), 0 0 0 1px #ECEEE8; white-space: nowrap; z-index: 2">
+              <div style="font-size: 13px; font-weight: 600">{{co.tipT}}</div>
+              <div style="margin-top: 2px; font-size: 12.5px; color: #57534e">{{co.tipS}}</div>
+            </div>
+          </sc-if>
+        </section>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1520,"height":1420}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const C = { done: '#5fae6e', due: '#6f9fdc', skip: '#e8b33c', plan: '#dce0d4' };
+    // a ring across the sows: segments by count, each a share of the circle
+    const ring = (parts, size, w, hover) => {
+      const total = parts.reduce((a, p) => a + p[1], 0);
+      let at = 0;
+      const stops = parts.map(([k, n]) => { const a = at, b = at + (n / total) * 360; at = b; return C[k] + ' ' + (a + 2) + 'deg ' + (b - 2) + 'deg, transparent ' + (b - 2) + 'deg ' + b + 'deg'; }).join(', ');
+      const wst = hover ? 'box-shadow: 0 0 0 2px #ffffff, 0 0 0 3.5px #1c1917' : '';
+      return { wst, st: 'width: ' + size + 'px; height: ' + size + 'px; background: conic-gradient(' + stops + '); -webkit-mask: radial-gradient(circle, transparent ' + (size / 2 - w) + 'px, #000 ' + (size / 2 - w + 0.5) + 'px); mask: radial-gradient(circle, transparent ' + (size / 2 - w) + 'px, #000 ' + (size / 2 - w + 0.5) + 'px)' };
+    };
+    const plannedRing = (size, w) => ({ wst: '', st: 'width: ' + size + 'px; height: ' + size + 'px; border: ' + w + 'px solid ' + C.plan });
+    const dot = (k, size, hover) => {
+      const wst = hover ? 'box-shadow: 0 0 0 2px #ffffff, 0 0 0 3.5px #1c1917' : '';
+      if (k === 'done' || k === 'skip') return { wst, st: 'width: ' + size + 'px; height: ' + size + 'px; background: ' + C[k] };
+      return { wst, st: 'width: ' + size + 'px; height: ' + size + 'px; border: 1.75px solid ' + C[k] };
+    };
+    const none = { wst: '', st: 'width: 4px; height: 4px; background: #dce0d4' };
+    const heads = (today) => ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => ({ d, weight: i === today ? 700 : 500, ink: i === today ? '#1c1917' : '#57534e' }));
+
+    // RX-25G009: Thu dose 1 (3 given, 1 skipped), Fri dose 2 (2 given, 2 due, today), Sat dose 3 (4 planned)
+    const week = { heads: heads(4), days: [[none], [none], [none], [ring([['done', 3], ['skip', 1]], 32, 5, true)], [ring([['done', 2], ['due', 2]], 32, 5)], [plannedRing(32, 4)], [none]].map((marks) => ({ marks })) };
+
+    const sowData = [['B15', '14', ['done', 'done', 'plan'], '2 of 3'], ['B20', '14', ['done', 'done', 'plan'], '2 of 3'], ['D40', '22', ['done', 'due', 'plan'], '1 of 3'], ['D41', '22', ['skip', 'due', 'plan'], '0 of 3']];
+    const sows = sowData.map((r, i) => ({ tag: r[0], pen: r[1], given: r[3], line: i === sowData.length - 1 ? '0' : '1px solid #f0efed', doses: r[2].map((k, j) => dot(k, 16, r[0] === 'D41' && j === 0)) }));
+
+    const fields = [
+      { k: 'Medicine', v: 'Amoxicillin 15% LA', sub: 'Injectable suspension · 100 mL bottle' },
+      { k: 'Dose and route', v: '15 mL a sow', sub: 'Intramuscular, neck' },
+      { k: 'Schedule', v: '3 doses, every 24 h', sub: 'Thu 5 – Sat 7 Nov' },
+      { k: 'Withdrawal', v: '14 days', sub: 'Ends Sat 21 Nov, if the last dose is Sat' },
+      { k: 'Prescribed by', v: 'Vet', sub: 'Wed 4 Nov 16:10 · issued by Li Wei Thu 5 Nov 08:30' },
+      { k: 'Note', v: 'Keep D40 and D41 on straw', sub: '' }
+    ].map((f, i, a) => Object.assign(f, { hasSub: !!f.sub, line: i === a.length - 1 ? '0' : '1px solid #f0efed' }));
+
+    // one sow, twice a day for 3 weeks: 19 of 42 given, Wed 11 Nov PM skipped (hovered), Thu AM due today
+    const one = [];
+    for (let w = 0; w < 3; w++) {
+      const days = [];
+      for (let d = 0; d < 7; d++) {
+        const idx = w * 7 + d, marks = [];
+        for (let h = 0; h < 2; h++) {
+          const slot = idx * 2 + h;
+          let k = slot < 18 ? 'done' : slot === 18 ? 'done' : slot === 19 ? 'skip' : slot === 20 ? 'due' : 'plan';
+          if (slot === 18) k = 'done';
+          marks.push(dot(k, 13, slot === 19));
+        }
+        days.push({ marks });
+      }
+      one.push({ label: ['2 Nov', '9 Nov', '16 Nov'][w], days });
+    }
+    // a batch of 40, twice a day for 2 weeks: rings per dose across the pigs
+    const grp = [];
+    for (let w = 0; w < 2; w++) {
+      const days = [];
+      for (let d = 0; d < 7; d++) {
+        const idx = w * 7 + d, marks = [];
+        for (let h = 0; h < 2; h++) {
+          const slot = idx * 2 + h;
+          if (slot < 15) marks.push(ring([['done', slot === 9 ? 37 : 40], ['skip', slot === 9 ? 3 : 0]].filter((p) => p[1]), 22, 4, slot === 9));
+          else if (slot === 15) marks.push(ring([['done', 24], ['due', 16]], 22, 4));
+          else marks.push(plannedRing(22, 3));
+        }
+        days.push({ marks });
+      }
+      grp.push({ label: ['2 Nov', '9 Nov'][w], days });
+    }
+    const courses = [
+      { label: 'One sow · twice a day for 3 weeks', n: '19', of: 'of 42 doses given', dates: '2 – 22 Nov · every 12 h', heads: heads(3), weeks: one, hasTip: true, tipX: '318px', tipY: '154px', tipT: 'Wed 11 Nov PM · Skipped', tipS: '20:10 · off feed, vet called · LW' },
+      { label: 'Batch 34 · 40 weaners · twice a day for 2 weeks', n: '621', of: 'of 1,120 doses given', dates: '2 – 15 Nov · every 12 h', heads: heads(0), weeks: grp, hasTip: true, tipX: '396px', tipY: '152px', tipT: 'Fri 6 Nov PM · Dose 10', tipS: '37 given · 3 skipped' }
+    ];
+    return { week, sows, fields, courses };
+  }
+}
+</script>
+</body>
+</html>

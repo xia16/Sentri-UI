@@ -9,7 +9,7 @@
 <x-dc>
 <helmet>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-<style>body{margin:0}a:hover{filter:brightness(.95)}</style>
+<style>body{margin:0}a:hover{filter:brightness(.95)}.hs-open:hover .hs-name{text-decoration:underline;text-underline-offset:3px}</style>
 </helmet>
 <!-- Approved sources: style-board/home-blind.html (#frame) and schedule-b.html (week). -->
 <sc-if value="{{isHome}}" hint-placeholder-val="{{true}}">
@@ -365,8 +365,8 @@
 <div style="height:40px;box-sizing:border-box;padding:6px 0 0 14px;display:flex;align-items:center;background:#fafaf9;border-bottom:1px solid #efeeec;font-size:12px;font-weight:600;color:#57534e">{{group.name}}</div>
 <sc-for list="{{group.rows}}" as="row" hint-placeholder-count="3">
 <div role="group" aria-label="{{row.name}}" onMouseEnter="{{row.preview}}" onMouseLeave="{{hidePreview}}" style="display:grid;grid-template-columns:140px repeat(7,minmax(0,1fr)) 6px;height:56px;box-sizing:border-box;border-bottom:1px solid #f1f0ee;background:{{row.bg}}">
-<div style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;padding:0 8px 0 14px;border-right:1px solid #efeeec;min-width:0">
-<span style="font-size:13px;font-weight:500;line-height:16px;white-space:nowrap">{{row.name}}</span>
+<div class="{{row.cls}}" role="{{row.role}}" title="{{row.openTitle}}" onClick="{{row.open}}" style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;padding:0 8px 0 14px;border-right:1px solid #efeeec;min-width:0;cursor:{{row.cursor}}">
+<span class="hs-name" style="font-size:13px;font-weight:500;line-height:16px;white-space:nowrap">{{row.name}}</span>
 <span tabIndex="0" onMouseEnter="{{row.showTag}}" onMouseLeave="{{hideTag}}" onFocus="{{row.showTag}}" onBlur="{{hideTag}}" aria-label="{{row.tagAria}}" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#44403c;background:#F1F3EE;border-radius:6px;padding:2px 7px;line-height:16px;font-variant-numeric:tabular-nums;cursor:default">
 <sc-if value="{{row.pig}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="13" r="7.5"></circle><path d="M6.5 8 5 3.5 9.5 6M17.5 8 19 3.5 14.5 6"></path><ellipse cx="12" cy="15.5" rx="3.2" ry="2.3"></ellipse><path d="M11 15.5h.01M13 15.5h.01"></path></svg></sc-if>
 <sc-if value="{{row.room}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M3 10.5 12 3l9 7.5V21H3V10.5Z M9 21v-6h6v6"></path></svg></sc-if>
@@ -745,6 +745,8 @@ class Component extends DCLogic {
           }};
         })};
         model.preview=name==='Amox treatment'?model.cells[3].preview:()=>{};
+        const pg={'Amox treatment':'treatrun','PRRS vaccine':'vaxpage','PRRS sampling':'samplingpage'}[name];
+        Object.assign(model,{cls:pg?'hs-open':'',role:pg?'button':'presentation',cursor:pg?'pointer':'default',openTitle:pg?'Open '+name:'',open:pg?()=>window.dispatchEvent(new CustomEvent('sentri:open',{detail:{action:pg}})):()=>{}});
         return model;
       })}))};
     });
