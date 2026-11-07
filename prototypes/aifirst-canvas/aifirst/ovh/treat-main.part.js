@@ -6,7 +6,7 @@
     return '<figure style="margin: 0; width: ' + W + 'px;"><div style="' + st({ position: 'relative', width: W + 'px', height: Hh + 'px', overflow: 'hidden', borderRadius: '16px', background: K.tint, boxShadow: '0 0 0 1px #D9DDD3, 0 10px 30px rgba(17,21,17,.10)', fontFamily: "'Geist', system-ui, sans-serif", color: K.ink, fontSize: '14px', lineHeight: '20px', fontVariantNumeric: 'tabular-nums' }) + '">' + img + f.html() + '</div><figcaption style="margin-top: 12px; font-size: 14px; line-height: 21px; color: #3B4540;"><b style="font-weight: 600; color: #111511;">' + n + '</b> · ' + esc(f.cap) + '</figcaption></figure>';
   };
   const rules = [
-    ['Words from the task', 'Treatment says Given, Due, Skipped. No generic labels (To do, Needs a look). Colours stay: green given, blue due, amber skipped.'],
+    ['Words from the task', 'Treatment says Given, Due, Skipped. No generic labels (To do, Needs a look). Colours follow the mobile convention: green done, blue today, amber skipped; tonal fills for shapes, marks for thin parts, ink for words.'],
     ['Hover: where she is now', 'Who; her state in this task with when; the recorded reason only if it explains the state. Nothing outside the task.'],
     ['Click: this task, for her', 'A track of the task\'s steps, then the log of what was recorded in this task, with who. No moves, no other tasks, no next task: those are on her profile, one button away.'],
     ['Group pens', 'The same view for the pen: a ring per round (given, skipped), a log that names tagged pigs and counts the rest.']
