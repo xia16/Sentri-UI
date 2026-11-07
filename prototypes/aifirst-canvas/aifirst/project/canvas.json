@@ -683,6 +683,14 @@
       "w": 4016,
       "h": 2392,
       "title": "Proposal · Farm view and Edit layout on one set of rules: the panel docks full height, the bar says where you are"
+    },
+    "FarmViewEdges.dc.html": {
+      "page": "home",
+      "x": 6720,
+      "y": 2552,
+      "w": 4016,
+      "h": 2371,
+      "title": "Proposal B · Card left, bar bottom, window right: the earlier layout kept and made strict, for the Farm view and Edit layout"
     }
   },
   "createdOnFiles": {
@@ -937,7 +945,8 @@
     "HomeBesideChat.dc.html",
     "HomeReport.dc.html",
     "EditLayoutRebuilt.dc.html",
-    "FarmViewDocked.dc.html"
+    "FarmViewDocked.dc.html",
+    "FarmViewEdges.dc.html"
   ],
   "pages": [
     {
