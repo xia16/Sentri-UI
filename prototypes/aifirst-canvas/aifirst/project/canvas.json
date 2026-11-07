@@ -379,43 +379,43 @@
     },
     "HomeBesideChat.dc.html": {
       "h": 3720,
-      "page": "home",
+      "page": "archive",
       "title": "Proposal · Home beside the chat: Inbox and Today lead, the widgets below; A quiet colour, B shadcn black and white",
       "w": 2052,
-      "x": 480,
-      "y": 3100
+      "x": 5100,
+      "y": 46200
     },
     "HomeCalmCards.dc.html": {
       "h": 1150,
-      "page": "home",
+      "page": "archive",
       "title": "Proposal · Home, calmer, with cards: the same calm, each thing its own white card",
       "w": 1078,
-      "x": 2212,
-      "y": 1140
+      "x": 1272,
+      "y": 46200
     },
     "HomeCalmer.dc.html": {
       "h": 1150,
-      "page": "home",
+      "page": "archive",
       "title": "Proposal · Home, calmer: as it is now, and quieter (tint, lists, no green band)",
       "w": 1072,
-      "x": 1060,
-      "y": 1140
+      "x": 0,
+      "y": 46200
     },
     "HomeDashboards.dc.html": {
       "h": 1668,
-      "page": "home",
+      "page": "archive",
       "title": "Proposal · Home dashboards as widgets: three modules, Production, Health, Finance",
       "w": 1072,
-      "x": 4528,
-      "y": 1140
+      "x": 3828,
+      "y": 46200
     },
     "HomeRouting.dc.html": {
       "h": 1150,
-      "page": "home",
+      "page": "archive",
       "title": "Proposal · Home as a routing page: entrances with one live figure, no details",
       "w": 1078,
-      "x": 3370,
-      "y": 1140
+      "x": 2550,
+      "y": 46200
     },
     "L3D_Site.dc.html": {
       "h": 900,
@@ -661,52 +661,60 @@
       "y": 0
     },
     "HomeReport.dc.html": {
-      "page": "home",
-      "x": 480,
-      "y": 6920,
+      "page": "archive",
+      "x": 7352,
+      "y": 46200,
       "w": 2052,
       "h": 2515,
       "title": "Proposal · Home with the daily report in place of the dashboards: C1 a busy morning, C2 a quiet one"
     },
     "EditLayoutRebuilt.dc.html": {
-      "page": "home",
-      "x": 480,
-      "y": 9800,
+      "page": "archive",
+      "x": 9604,
+      "y": 46200,
       "w": 2752,
       "h": 9878,
       "title": "Proposal · Edit layout rebuilt: one panel, pages, the map only for placing; Farm view Schedule scoped to where you are"
     },
     "FarmViewDocked.dc.html": {
-      "page": "home",
-      "x": 6720,
-      "y": 0,
+      "page": "archive",
+      "x": 12556,
+      "y": 46200,
       "w": 4016,
       "h": 2392,
       "title": "Proposal · Farm view and Edit layout on one set of rules: the panel docks full height, the bar says where you are"
     },
     "FarmViewEdges.dc.html": {
-      "page": "home",
-      "x": 6720,
-      "y": 2552,
+      "page": "archive",
+      "x": 16772,
+      "y": 46200,
       "w": 4016,
       "h": 2371,
       "title": "Proposal B · Card left, bar bottom, window right: the earlier layout kept and made strict, for the Farm view and Edit layout"
     },
     "FarmViewTop.dc.html": {
       "page": "home",
-      "x": 6720,
-      "y": 5083,
+      "x": 3706,
+      "y": 2300,
       "w": 4016,
       "h": 2447,
-      "title": "Proposal C · Everything at the top: the place by its kind and name, the actions, then one main pane for everything"
+      "title": "Built · Farm view and Edit layout on proposal C: one bar at the top, one pane under it"
     },
     "FarmViewLens.dc.html": {
-      "page": "home",
-      "x": 6720,
-      "y": -1390,
+      "page": "archive",
+      "x": 20988,
+      "y": 46200,
       "w": 4016,
       "h": 1230,
       "title": "Proposal · Pages in tabs, the Farm view for where, joined by a lens (task progress on the map, pig detail in the pane)"
+    },
+    "FarmViewTasks.dc.html": {
+      "page": "home",
+      "x": 480,
+      "y": 2300,
+      "w": 3026,
+      "h": 2304,
+      "title": "Proposal · A task on the Farm view: the pane names the task, the pens carry its state (one fill per pen)"
     }
   },
   "createdOnFiles": {
@@ -734,7 +742,8 @@
     "arch-blend",
     "arch-barn",
     "arch-actions",
-    "arch-other"
+    "arch-other",
+    "arch-homefv"
   ],
   "notes": {
     "arch-actions": {
@@ -878,6 +887,15 @@
       "w": 240,
       "x": 0,
       "y": -300
+    },
+    "arch-homefv": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "archive",
+      "text": "Home and Farm view explorations (6–7 Nov), superseded: Home is now the navigator panel; the Farm view is built on proposal C",
+      "w": 240,
+      "x": 0,
+      "y": 45900
     }
   },
   "order": [
@@ -964,7 +982,8 @@
     "FarmViewDocked.dc.html",
     "FarmViewEdges.dc.html",
     "FarmViewTop.dc.html",
-    "FarmViewLens.dc.html"
+    "FarmViewLens.dc.html",
+    "FarmViewTasks.dc.html"
   ],
   "pages": [
     {
