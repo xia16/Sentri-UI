@@ -13,13 +13,13 @@
 </helmet>
 <div style="width: 1520px; height: 1760px; box-sizing: border-box; padding: 48px; background: #EEEFEB; font-family: Inter, system-ui, sans-serif; color: #1c1917; -webkit-font-smoothing: antialiased">
   <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">Running treatment page, revamped</h1>
-  <p style="margin: 8px 0 0; max-width: 1100px; font-size: 14px; line-height: 21px; color: #57534e">The page the Farm view's "Open page" opens, brought in line with the treatment card: one number with its unit, the course on a week calendar (a ring per day across the sows, small circles where it's one pig), detail on hover instead of a legend, the mobile status colours, and the prescription as set fields. The Pigs list stays as the page's working list, grouped by pen, with only circles in it (small dots when there are many doses), and pages when it runs long. Hover states are shown held.</p>
+  <p style="margin: 8px 0 0; max-width: 1100px; font-size: 14px; line-height: 21px; color: #57534e">The page the Farm view's "Open page" opens, brought in line with the treatment card: one number with its unit, the course as a track of doses in order (a ring across the pigs while a dose is partial, a solid dot once every pig has it), the counts in words under each dose, the mobile status colours, and the prescription as set fields. The Pigs list stays as the page's working list, grouped by pen, with only circles in it (small dots when there are many doses), and pages when it runs long. Hover states are shown held.</p>
 
   <div style="display: flex; gap: 48px; margin-top: 28px; align-items: flex-start">
     <!-- the page, at the pane's 680 width, shown at full scroll length -->
     <div>
       <div style="font-size: 15px; font-weight: 600">The page (680 px pane, full length)</div>
-      <div style="font-size: 13px; color: #57534e; margin: 2px 0 12px">Thu's ring and D41's skipped dose are hovered.</div>
+      <div style="font-size: 13px; color: #57534e; margin: 2px 0 12px">D41's skipped dose is hovered.</div>
       <div style="width: 680px; box-sizing: border-box; border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 1px #DADFD5, 0 12px 32px rgba(17,21,17,.10); background: #f5f5f4">
         <div style="padding: 24px; display: flex; flex-direction: column; gap: 18px">
           <header>
@@ -47,24 +47,26 @@
               <span style="flex: 1"></span>
               <span style="font-size: 13px; color: #57534e">Thu 5 – Sat 7 Nov · every 24 h</span>
             </div>
-            <div style="display: grid; grid-template-columns: 64px repeat(7, minmax(0, 1fr)); align-items: center; row-gap: 10px; margin-top: 22px">
-              <span></span>
-              <sc-for list="{{week.heads}}" as="h" hint-placeholder-count="7">
-                <span style="text-align: center; font-size: 12px; font-weight: {{h.weight}}; color: {{h.ink}}">{{h.d}}</span>
+            <div style="display: flex; flex-wrap: wrap; align-items: flex-start; row-gap: 20px; margin-top: 20px">
+              <sc-for list="{{rxTrack}}" as="it" hint-placeholder-count="5">
+                <sc-if value="{{it.isDose}}" hint-placeholder-val="{{true}}">
+                  <div style="width: 112px; flex: none; display: flex; flex-direction: column; align-items: center; text-align: center">
+                    <span style="height: 22px; display: flex; align-items: center">
+                      <sc-if value="{{it.today}}" hint-placeholder-val="{{false}}"><span style="padding: 1px 7px; border-radius: 6px; background: #c1ddfd; color: #1f4470; font-size: 11.5px; font-weight: 600">Today</span></sc-if>
+                    </span>
+                    <span style="height: 40px; display: flex; align-items: center; justify-content: center"><span style="display: block; border-radius: 50%; {{it.mark.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{it.mark.st}}"></span></span></span>
+                    <span style="margin-top: 8px; font-size: 13px; font-weight: 600">{{it.title}}</span>
+                    <span style="font-size: 12.5px; color: #57534e">{{it.date}}</span>
+                    <span style="margin-top: 4px; font-size: 12.5px; color: #44403c">{{it.count}}</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{it.isGap}}" hint-placeholder-val="{{false}}">
+                  <div style="flex: 1 1 24px; min-width: 24px; display: flex; flex-direction: column; align-items: center; padding-top: 41px">
+                    <span style="display: block; width: 100%; height: 1.5px; background: #e7e5e4"></span>
+                    <span style="margin-top: 5px; font-size: 11.5px; color: #78716c; white-space: nowrap">{{it.label}}</span>
+                  </div>
+                </sc-if>
               </sc-for>
-              <span style="font-size: 12px; color: #57534e">2 Nov</span>
-              <sc-for list="{{week.days}}" as="c" hint-placeholder-count="7">
-                <span style="display: flex; justify-content: center; align-items: center; height: 40px">
-                  <sc-for list="{{c.marks}}" as="m" hint-placeholder-count="1">
-                    <span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span>
-                  </sc-for>
-                </span>
-              </sc-for>
-            </div>
-            <!-- held hover on Thu -->
-            <div style="position: absolute; left: 262px; top: 150px; padding: 10px 12px; border-radius: 12px; background: #ffffff; box-shadow: 0 6px 20px rgba(17,21,17,.16), 0 0 0 1px #ECEEE8; white-space: nowrap; z-index: 2">
-              <div style="font-size: 13px; font-weight: 600">Thu 5 Nov · Dose 1</div>
-              <div style="margin-top: 2px; font-size: 12.5px; color: #57534e">3 given · 1 skipped</div>
             </div>
           </section>
 
@@ -121,12 +123,12 @@
       </div>
     </div>
 
-    <!-- longer courses read the same -->
+    <!-- other courses on the same track -->
     <div style="width: 680px">
-      <div style="font-size: 15px; font-weight: 600">Longer and sparser courses read the same</div>
-      <div style="font-size: 13px; color: #57534e; margin: 2px 0 12px">A row per week, a mark only on dose days. Across several pigs a dose is a ring until every pig has it, then a solid dot. One pig: small circles.</div>
-      <sc-for list="{{courses}}" as="co" hint-placeholder-count="2">
-        <section style="position: relative; margin-bottom: 24px; padding: 20px 24px 22px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+      <div style="font-size: 15px; font-weight: 600">Other courses on the same track</div>
+      <div style="font-size: 13px; color: #57534e; margin: 2px 0 12px">Long gaps fold to a quiet line with the days between. Past ten doses the track turns compact: a day per column, detail on hover.</div>
+      <sc-for list="{{tracks}}" as="co" hint-placeholder-count="2">
+        <section style="margin-bottom: 24px; padding: 20px 24px 22px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
           <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">{{co.label}}</div>
           <div style="display: flex; align-items: baseline; gap: 8px">
             <span style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; line-height: 1">{{co.n}}</span>
@@ -134,30 +136,52 @@
             <span style="flex: 1"></span>
             <span style="font-size: 13px; color: #57534e">{{co.dates}}</span>
           </div>
-          <div style="display: grid; grid-template-columns: 64px repeat(7, minmax(0, 1fr)); align-items: center; row-gap: 6px; margin-top: 20px">
-            <span></span>
-            <sc-for list="{{co.heads}}" as="h" hint-placeholder-count="7">
-              <span style="text-align: center; font-size: 12px; font-weight: {{h.weight}}; color: {{h.ink}}">{{h.d}}</span>
-            </sc-for>
-            <sc-for list="{{co.weeks}}" as="w" hint-placeholder-count="3">
-              <span style="font-size: 12px; color: #57534e">{{w.label}}</span>
-              <sc-for list="{{w.days}}" as="c" hint-placeholder-count="7">
-                <span style="display: flex; justify-content: center; align-items: center; gap: 5px; height: 36px">
-                  <sc-for list="{{c.marks}}" as="m" hint-placeholder-count="2">
-                    <span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span>
-                  </sc-for>
-                </span>
+          <div style="display: flex; flex-wrap: wrap; align-items: flex-start; row-gap: 20px; margin-top: 20px">
+              <sc-for list="{{co.items}}" as="it" hint-placeholder-count="5">
+                <sc-if value="{{it.isDose}}" hint-placeholder-val="{{true}}">
+                  <div style="width: 112px; flex: none; display: flex; flex-direction: column; align-items: center; text-align: center">
+                    <span style="height: 22px; display: flex; align-items: center">
+                      <sc-if value="{{it.today}}" hint-placeholder-val="{{false}}"><span style="padding: 1px 7px; border-radius: 6px; background: #c1ddfd; color: #1f4470; font-size: 11.5px; font-weight: 600">Today</span></sc-if>
+                    </span>
+                    <span style="height: 40px; display: flex; align-items: center; justify-content: center"><span style="display: block; border-radius: 50%; {{it.mark.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{it.mark.st}}"></span></span></span>
+                    <span style="margin-top: 8px; font-size: 13px; font-weight: 600">{{it.title}}</span>
+                    <span style="font-size: 12.5px; color: #57534e">{{it.date}}</span>
+                    <span style="margin-top: 4px; font-size: 12.5px; color: #44403c">{{it.count}}</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{it.isGap}}" hint-placeholder-val="{{false}}">
+                  <div style="flex: 1 1 24px; min-width: 24px; display: flex; flex-direction: column; align-items: center; padding-top: 41px">
+                    <span style="display: block; width: 100%; height: 1.5px; background: #e7e5e4"></span>
+                    <span style="margin-top: 5px; font-size: 11.5px; color: #78716c; white-space: nowrap">{{it.label}}</span>
+                  </div>
+                </sc-if>
               </sc-for>
-            </sc-for>
-          </div>
-          <sc-if value="{{co.hasTip}}" hint-placeholder-val="{{false}}">
-            <div style="position: absolute; left: {{co.tipX}}; top: {{co.tipY}}; padding: 10px 12px; border-radius: 12px; background: #ffffff; box-shadow: 0 6px 20px rgba(17,21,17,.16), 0 0 0 1px #ECEEE8; white-space: nowrap; z-index: 2">
-              <div style="font-size: 13px; font-weight: 600">{{co.tipT}}</div>
-              <div style="margin-top: 2px; font-size: 12.5px; color: #57534e">{{co.tipS}}</div>
             </div>
-          </sc-if>
         </section>
       </sc-for>
+      <section style="position: relative; margin-bottom: 24px; padding: 20px 24px 22px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">One sow · twice a day for 3 weeks (compact)</div>
+        <div style="display: flex; align-items: baseline; gap: 8px">
+          <span style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; line-height: 1">19</span>
+          <span style="font-size: 15px; color: #44403c">of 42 doses given</span>
+          <span style="flex: 1"></span>
+          <span style="font-size: 13px; color: #57534e">2 – 22 Nov · every 12 h</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); row-gap: 14px; margin-top: 20px">
+              <sc-for list="{{oneDays}}" as="it" hint-placeholder-count="14">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 7px">
+                  <span style="font-size: 11.5px; font-weight: {{it.weight}}; color: {{it.ink}}">{{it.date}}</span>
+                  <span style="display: flex; gap: 3px; align-items: center; height: 22px">
+                    <sc-for list="{{it.marks}}" as="m" hint-placeholder-count="2"><span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span></sc-for>
+                  </span>
+                </div>
+              </sc-for>
+            </div>
+        <div style="position: absolute; left: 300px; top: 150px; padding: 10px 12px; border-radius: 12px; background: #ffffff; box-shadow: 0 6px 20px rgba(17,21,17,.16), 0 0 0 1px #ECEEE8; white-space: nowrap; z-index: 2">
+          <div style="font-size: 13px; font-weight: 600">Wed 11 Nov PM · Skipped</div>
+          <div style="margin-top: 2px; font-size: 12.5px; color: #57534e">20:10 · off feed, vet called · LW</div>
+        </div>
+      </section>
       <section style="padding: 20px 24px 6px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
         <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">Batch 34 · twice a day for 2 weeks: its Pigs list, page 1 (tagged pens, then a pen without IDs)</div>
         <h3 style="margin: 0 0 12px; font-size: 17px; font-weight: 600">Pigs</h3>
@@ -212,8 +236,14 @@ class Component extends DCLogic {
     const none = { wst: '', st: 'width: 4px; height: 4px; background: #dce0d4' };
     const heads = (today) => ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => ({ d, weight: i === today ? 700 : 500, ink: i === today ? '#1c1917' : '#57534e' }));
 
-    // RX-25G009: Thu dose 1 (3 given, 1 skipped), Fri dose 2 (2 given, 2 due, today), Sat dose 3 (4 planned)
-    const week = { heads: heads(4), days: [[none], [none], [none], [ring([['done', 3], ['skip', 1]], 32, 5, true)], [ring([['done', 2], ['due', 2]], 32, 5)], [plannedRing(32, 4)], [none]].map((marks) => ({ marks })) };
+    const D = (o) => Object.assign({ isDose: true, isGap: false, today: false, count: '' }, o);
+    const G = (label) => ({ isDose: false, isGap: true, label, mark: { wst: '', st: '' }, title: '', date: '', count: '', today: false });
+    // RX-25G009: three doses, a day apart (no gap words under a day)
+    const rxTrack = [
+      D({ mark: ring([['done', 3], ['skip', 1]], 36, 5), title: 'Dose 1', date: 'Thu 5 Nov', count: '3 given · 1 skipped' }), G(''),
+      D({ mark: ring([['done', 2], ['due', 2]], 36, 5), title: 'Dose 2', date: 'Fri 6 Nov', count: '2 given · 2 due', today: true }), G(''),
+      D({ mark: plannedRing(36, 4), title: 'Dose 3', date: 'Sat 7 Nov', count: '4 to give' })
+    ];
 
     const sowData = [['B15', '14', ['done', 'done', 'plan'], '2 of 3'], ['B20', '14', ['done', 'done', 'plan'], '2 of 3'], ['D40', '22', ['done', 'due', 'plan'], '1 of 3'], ['D41', '22', ['skip', 'due', 'plan'], '0 of 3']];
     const pigRow = (r) => ({ tag: r[0], doses: r[2].map((k, j) => dot(k, 16, r[0] === 'D41' && j === 0)) });
@@ -273,12 +303,26 @@ class Component extends DCLogic {
       { label: '2 Nov', days: [[ring([['done', 12]], 26, 4)], [none], [none], [none], [none], [ring([['done', 8], ['due', 4]], 26, 4)], [none]].map((marks) => ({ marks })) },
       { label: '9 Nov', days: [[none], [none], [none], [plannedRing(26, 3)], [none], [none], [none]].map((marks) => ({ marks })) }
     ];
-    const courses = [
-      { label: 'Batch 33 · 12 sows · one dose every 5 days', n: '20', of: 'of 36 doses given', dates: '2 – 12 Nov · every 5 days', heads: heads(5), weeks: sparse, hasTip: false, tipX: '0', tipY: '0', tipT: '', tipS: '' },
-      { label: 'One sow · twice a day for 3 weeks', n: '19', of: 'of 42 doses given', dates: '2 – 22 Nov · every 12 h', heads: heads(3), weeks: one, hasTip: true, tipX: '318px', tipY: '154px', tipT: 'Wed 11 Nov PM · Skipped', tipS: '20:10 · off feed, vet called · LW' },
-      { label: 'Batch 34 · 40 weaners · twice a day for 2 weeks', n: '621', of: 'of 1,120 doses given', dates: '2 – 15 Nov · every 12 h', heads: heads(0), weeks: grp, hasTip: true, tipX: '396px', tipY: '152px', tipT: 'Fri 6 Nov PM · Dose 10', tipS: '37 given · 3 skipped' }
+    const tracks = [
+      { label: 'Batch 33 · 12 sows · one dose every 5 days', n: '20', of: 'of 36 doses given', dates: '2 – 12 Nov · every 5 days', items: [
+        D({ mark: ring([['done', 12]], 36, 5), title: 'Dose 1', date: 'Mon 2 Nov', count: '12 given' }), G('5 days'),
+        D({ mark: ring([['done', 8], ['due', 4]], 36, 5), title: 'Dose 2', date: 'Sat 7 Nov', count: '8 given · 4 due', today: true }), G('5 days'),
+        D({ mark: plannedRing(36, 4), title: 'Dose 3', date: 'Thu 12 Nov', count: '12 to give' })
+      ] },
+      { label: 'Batch 35G · 24 gilts · once a week for 4 weeks', n: '44', of: 'of 96 doses given', dates: '2 – 23 Nov · every 7 days', items: [
+        D({ mark: ring([['done', 24]], 36, 5), title: 'Dose 1', date: 'Mon 2 Nov', count: '24 given' }), G('7 days'),
+        D({ mark: ring([['done', 20], ['due', 4]], 36, 5), title: 'Dose 2', date: 'Mon 9 Nov', count: '20 given · 4 due', today: true }), G('7 days'),
+        D({ mark: plannedRing(36, 4), title: 'Dose 3', date: 'Mon 16 Nov', count: '24 to give' }), G('7 days'),
+        D({ mark: plannedRing(36, 4), title: 'Dose 4', date: 'Mon 23 Nov', count: '24 to give' })
+      ] }
     ];
-    return { week, pens, longPens, fields, courses };
+    const oneDays = [];
+    for (let d = 0; d < 21; d++) {
+      const marks = [];
+      for (let h = 0; h < 2; h++) { const sl = d * 2 + h; const k = sl < 19 ? 'done' : sl === 19 ? 'skip' : sl === 20 ? 'due' : 'plan'; marks.push(dot(k, 12, sl === 19)); }
+      oneDays.push({ date: String(2 + d), weight: d === 10 ? 700 : 500, ink: d === 10 ? '#1c1917' : '#78716c', marks });
+    }
+    return { rxTrack, tracks, oneDays, pens, longPens, fields };
   }
 }
 </script>
