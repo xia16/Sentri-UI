@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>body{margin:0}</style>
 </helmet>
-<div style="width: 1520px; height: 1500px; box-sizing: border-box; padding: 48px; background: #EEEFEB; font-family: Inter, system-ui, sans-serif; color: #1c1917; -webkit-font-smoothing: antialiased">
+<div style="width: 1520px; height: 1760px; box-sizing: border-box; padding: 48px; background: #EEEFEB; font-family: Inter, system-ui, sans-serif; color: #1c1917; -webkit-font-smoothing: antialiased">
   <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">Running treatment page, revamped</h1>
   <p style="margin: 8px 0 0; max-width: 1100px; font-size: 14px; line-height: 21px; color: #57534e">The page the Farm view's "Open page" opens, brought in line with the treatment card: one number with its unit, the course on a week calendar (a ring per day across the sows, small circles where it's one pig), detail on hover instead of a legend, the mobile status colours, and the prescription as set fields. The Pigs list stays as the page's working list, grouped by pen, with only circles in it (small dots when there are many doses), and pages when it runs long. Hover states are shown held.</p>
 
@@ -80,7 +80,7 @@
             </div>
             <div style="display: grid; grid-template-columns: minmax(0, 1fr) 132px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e">
               <span>Pig</span>
-              <span style="display: flex"><span style="width: 44px; text-align: center">Thu</span><span style="width: 44px; text-align: center">Fri</span><span style="width: 44px; text-align: center">Sat</span></span>
+              <span style="padding-left: 14px">Doses</span>
             </div>
             <sc-for list="{{pens}}" as="g" hint-placeholder-count="2">
               <div>
@@ -123,8 +123,8 @@
 
     <!-- longer courses read the same -->
     <div style="width: 680px">
-      <div style="font-size: 15px; font-weight: 600">Longer courses read the same</div>
-      <div style="font-size: 13px; color: #57534e; margin: 2px 0 12px">A row per week. Twice a day = two marks per day: rings across the sows, small circles for one pig.</div>
+      <div style="font-size: 15px; font-weight: 600">Longer and sparser courses read the same</div>
+      <div style="font-size: 13px; color: #57534e; margin: 2px 0 12px">A row per week, a mark only on dose days. Across several pigs a dose is a ring until every pig has it, then a solid dot. One pig: small circles.</div>
       <sc-for list="{{courses}}" as="co" hint-placeholder-count="2">
         <section style="position: relative; margin-bottom: 24px; padding: 20px 24px 22px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
           <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">{{co.label}}</div>
@@ -159,20 +159,20 @@
         </section>
       </sc-for>
       <section style="padding: 20px 24px 6px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
-        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">Batch 34 · 40 weaners · twice a day for 2 weeks: its Pigs list</div>
+        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">Batch 34 · twice a day for 2 weeks: its Pigs list, page 1 (tagged pens, then a pen without IDs)</div>
         <h3 style="margin: 0 0 12px; font-size: 17px; font-weight: 600">Pigs</h3>
         <div style="display: grid; grid-template-columns: minmax(0, 1fr) 330px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e">
-          <span>Pig</span><span style="display: flex; justify-content: space-between"><span>Mon 2 Nov</span><span>Sun 15 Nov</span></span>
+          <span>Pig</span><span>Doses</span>
         </div>
         <sc-for list="{{longPens}}" as="g" hint-placeholder-count="2">
           <div>
             <div style="display: flex; align-items: flex-end; justify-content: space-between; height: 38px; padding-bottom: 7px; box-sizing: border-box; border-top: {{g.top}}; font-size: 13px; font-weight: 600"><span>{{g.pen}}</span><span style="font-weight: 500; color: #57534e">{{g.n}}</span></div>
             <sc-for list="{{g.pigs}}" as="r" hint-placeholder-count="4">
               <div style="display: grid; grid-template-columns: minmax(0, 1fr) 330px; align-items: center; height: 42px; border-top: 1px solid #f0efed">
-                <span style="font-size: 14px; font-weight: 600">{{r.tag}}</span>
-                <span style="display: flex; justify-content: space-between">
+                <span style="font-size: 14px; font-weight: {{r.weight}}; color: {{r.ink}}">{{r.tag}}</span>
+                <span style="display: flex; justify-content: space-between; align-items: center">
                   <sc-for list="{{r.days}}" as="d" hint-placeholder-count="14">
-                    <span style="display: flex; gap: 2px">
+                    <span style="display: flex; gap: 2px; align-items: center">
                       <sc-for list="{{d.dots}}" as="m" hint-placeholder-count="2"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></sc-for>
                     </span>
                   </sc-for>
@@ -182,20 +182,26 @@
           </div>
         </sc-for>
         <div style="display: flex; align-items: center; gap: 6px; height: 50px; border-top: 1px solid #e7e5e4; font-size: 13px; color: #57534e">
-          <span style="flex: 1">1–8 of 40 pigs</span>
-          <span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; color: #a8a29e">‹</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; background: #f5f5f4; color: #1c1917; font-weight: 600">1</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px;">2</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px;">3</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px;">4</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px;">5</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; color: #1c1917">›</span>
+          <span style="flex: 1">Page 1 of 3 · pens 5 to 7</span>
+          <span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; color: #a8a29e">‹</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; background: #f5f5f4; color: #1c1917; font-weight: 600">1</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px;">2</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px;">3</span><span style="width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; color: #1c1917">›</span>
         </div>
       </section>
     </div>
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1520,"height":1500}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1520,"height":1760}}'>
 class Component extends DCLogic {
   renderVals() {
     const C = { done: '#5fae6e', due: '#6f9fdc', skip: '#e8b33c', plan: '#dce0d4' };
-    // a ring across the sows: segments by count, each a share of the circle
+    const dot = (k, size, hover) => {
+      const wst = hover ? 'box-shadow: 0 0 0 2px #ffffff, 0 0 0 3.5px #1c1917' : '';
+      if (k === 'done' || k === 'skip') return { wst, st: 'width: ' + size + 'px; height: ' + size + 'px; background: ' + C[k] };
+      return { wst, st: 'width: ' + size + 'px; height: ' + size + 'px; border: 1.75px solid ' + C[k] };
+    };
+    // a ring across the pigs: segments by count, each a share of the circle; every pig given = a solid dot
     const ring = (parts, size, w, hover) => {
+      if (parts.length === 1 && parts[0][0] === 'done') return dot('done', Math.round(size * 0.72), hover);
       const total = parts.reduce((a, p) => a + p[1], 0);
       let at = 0;
       const stops = parts.map(([k, n]) => { const a = at, b = at + (n / total) * 360; at = b; return C[k] + ' ' + (a + 2) + 'deg ' + (b - 2) + 'deg, transparent ' + (b - 2) + 'deg ' + b + 'deg'; }).join(', ');
@@ -203,11 +209,6 @@ class Component extends DCLogic {
       return { wst, st: 'width: ' + size + 'px; height: ' + size + 'px; background: conic-gradient(' + stops + '); -webkit-mask: radial-gradient(circle, transparent ' + (size / 2 - w) + 'px, #000 ' + (size / 2 - w + 0.5) + 'px); mask: radial-gradient(circle, transparent ' + (size / 2 - w) + 'px, #000 ' + (size / 2 - w + 0.5) + 'px)' };
     };
     const plannedRing = (size, w) => ({ wst: '', st: 'width: ' + size + 'px; height: ' + size + 'px; border: ' + w + 'px solid ' + C.plan });
-    const dot = (k, size, hover) => {
-      const wst = hover ? 'box-shadow: 0 0 0 2px #ffffff, 0 0 0 3.5px #1c1917' : '';
-      if (k === 'done' || k === 'skip') return { wst, st: 'width: ' + size + 'px; height: ' + size + 'px; background: ' + C[k] };
-      return { wst, st: 'width: ' + size + 'px; height: ' + size + 'px; border: 1.75px solid ' + C[k] };
-    };
     const none = { wst: '', st: 'width: 4px; height: 4px; background: #dce0d4' };
     const heads = (today) => ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => ({ d, weight: i === today ? 700 : 500, ink: i === today ? '#1c1917' : '#57534e' }));
 
@@ -221,14 +222,17 @@ class Component extends DCLogic {
     const longPens = [
       { pen: 'Pen 5', pigs: [['341201', -1], ['341202', 9], ['341203', -1], ['341204', -1]] },
       { pen: 'Pen 6', pigs: [['341221', -1], ['341222', -1], ['341223', 9], ['341224', 4]] }
-    ].map((g, i) => ({ pen: g.pen, n: '20 pigs', top: i === 0 ? '0' : '1px solid #e7e5e4', pigs: g.pigs.map((p) => ({ tag: p[0], days: strip(p[1]) })) }));
+    ].map((g, i) => ({ pen: g.pen, n: '4 pigs', top: i === 0 ? '0' : '1px solid #e7e5e4', pigs: g.pigs.map((p) => ({ tag: p[0], weight: 600, ink: '#1c1917', days: strip(p[1]) })) }));
+    const mini = (parts) => { const total = parts.reduce((a, q) => a + q[1], 0); let at = 0; const stops = parts.map(([k, n]) => { const a = at, b = at + (n / total) * 360; at = b; return C[k] + ' ' + (a + 4) + 'deg ' + (b - 4) + 'deg, transparent ' + (b - 4) + 'deg ' + b + 'deg'; }).join(', '); return { st: 'width: 11px; height: 11px; background: conic-gradient(' + stops + '); -webkit-mask: radial-gradient(circle, transparent 2.6px, #000 3.1px); mask: radial-gradient(circle, transparent 2.6px, #000 3.1px)' }; };
+    const penStrip = () => { const days = []; for (let d = 0; d < 14; d++) { const dots = []; for (let h = 0; h < 2; h++) { const sl = d * 2 + h; dots.push(sl === 9 ? mini([['done', 17], ['skip', 3]]) : sl < 15 ? { st: 'width: 8px; height: 8px; background: ' + C.done } : sl === 15 ? mini([['done', 12], ['due', 8]]) : { st: 'width: 8px; height: 8px; border: 1.5px solid ' + C.plan }); } days.push({ dots }); } return days; };
+    longPens.push({ pen: 'Pen 7', n: '20 pigs · no ID', top: '1px solid #e7e5e4', pigs: [{ tag: '20 pigs without an ID', weight: 500, ink: '#44403c', days: penStrip() }] });
 
     const fields = [
       { k: 'Medicine', v: 'Amoxicillin 15% LA', sub: 'Injectable suspension · 100 mL bottle' },
       { k: 'Dose and route', v: '15 mL a sow', sub: 'Intramuscular, neck' },
       { k: 'Schedule', v: '3 doses, every 24 h', sub: 'Thu 5 – Sat 7 Nov' },
       { k: 'Withdrawal', v: '14 days', sub: 'Ends Sat 21 Nov, if the last dose is Sat' },
-      { k: 'Prescribed by', v: 'Vet', sub: 'Wed 4 Nov 16:10 · issued by Li Wei Thu 5 Nov 08:30' },
+      { k: 'Prescribed by', v: 'Dr. Chen', sub: 'Wed 4 Nov 16:10 · issued by Li Wei, Thu 5 Nov 08:30' },
       { k: 'Note', v: 'Keep D40 and D41 on straw', sub: '' }
     ].map((f, i, a) => Object.assign(f, { hasSub: !!f.sub, line: i === a.length - 1 ? '0' : '1px solid #f0efed' }));
 
@@ -264,7 +268,13 @@ class Component extends DCLogic {
       }
       grp.push({ label: ['2 Nov', '9 Nov'][w], days });
     }
+    // Batch 33 · 12 sows · one dose every 5 days: Mon 2 Nov all given (dot), Sat 7 Nov today 8 of 12, Thu 12 Nov planned
+    const sparse = [
+      { label: '2 Nov', days: [[ring([['done', 12]], 26, 4)], [none], [none], [none], [none], [ring([['done', 8], ['due', 4]], 26, 4)], [none]].map((marks) => ({ marks })) },
+      { label: '9 Nov', days: [[none], [none], [none], [plannedRing(26, 3)], [none], [none], [none]].map((marks) => ({ marks })) }
+    ];
     const courses = [
+      { label: 'Batch 33 · 12 sows · one dose every 5 days', n: '20', of: 'of 36 doses given', dates: '2 – 12 Nov · every 5 days', heads: heads(5), weeks: sparse, hasTip: false, tipX: '0', tipY: '0', tipT: '', tipS: '' },
       { label: 'One sow · twice a day for 3 weeks', n: '19', of: 'of 42 doses given', dates: '2 – 22 Nov · every 12 h', heads: heads(3), weeks: one, hasTip: true, tipX: '318px', tipY: '154px', tipT: 'Wed 11 Nov PM · Skipped', tipS: '20:10 · off feed, vet called · LW' },
       { label: 'Batch 34 · 40 weaners · twice a day for 2 weeks', n: '621', of: 'of 1,120 doses given', dates: '2 – 15 Nov · every 12 h', heads: heads(0), weeks: grp, hasTip: true, tipX: '396px', tipY: '152px', tipT: 'Fri 6 Nov PM · Dose 10', tipS: '37 given · 3 skipped' }
     ];
