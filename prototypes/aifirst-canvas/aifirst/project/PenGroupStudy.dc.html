@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Group pens in the Pigs list</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 2040px; height: 860px; box-sizing: border-box; padding: 48px; background: #EEEFEB; font-family: Inter, system-ui, sans-serif; color: #1c1917; -webkit-font-smoothing: antialiased">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">Group pens in the Pigs list: three ways</h1>
+  <p style="margin: 8px 0 0; max-width: 1200px; font-size: 14px; line-height: 21px; color: #57534e">The same 28 pigs. Pigs alone in their pen stay plain rows. The question is how a pen holding several pigs reads as a pen, not as another pig, while staying part of one list.</p>
+  <div style="display: flex; gap: 40px; margin-top: 28px; align-items: flex-start">
+    <sc-for list="{{variants}}" as="v" hint-placeholder-count="3">
+      <div style="width: 621px">
+        <div style="font-size: 15px; font-weight: 600">{{v.title}}</div>
+        <div style="font-size: 13px; line-height: 19px; color: #57534e; margin: 2px 0 12px; min-height: 38px">{{v.note}}</div>
+        <section style="padding: 16px 24px 8px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
+          <div style="display: grid; grid-template-columns: minmax(0, 1fr) 84px 132px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e">
+            <span>Pig</span><span>Pen</span><span style="padding-left: 14px">Doses</span>
+          </div>
+          <sc-for list="{{v.rows}}" as="r" hint-placeholder-count="8">
+            <div>
+              <!-- A: a tinted pen band -->
+              <sc-if value="{{r.isBand}}" hint-placeholder-val="{{false}}">
+                <div style="display: flex; align-items: center; gap: 8px; height: 34px; margin-top: 8px; padding: 0 10px; border-radius: 8px; background: #f5f5f4; font-size: 13px; font-weight: 600; color: #44403c">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M3 3h18v18H3zM3 12h18M12 3v18"></path></svg>
+                  <span style="flex: 1">{{r.pen}}</span>
+                  <span style="font-weight: 500; color: #57534e">{{r.count}}</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{r.isRow}}" hint-placeholder-val="{{true}}">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) 84px 132px; align-items: center; height: 48px; margin: {{r.margin}}; padding: {{r.pad}}; border-top: {{r.line}}; background: {{r.bg}}; border-radius: {{r.radius}}; box-shadow: {{r.edge}}">
+                  <span>
+                    <sc-if value="{{r.isId}}" hint-placeholder-val="{{true}}"><span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 15px; font-weight: 600; letter-spacing: -0.2px">{{r.tag}}</span></sc-if>
+                    <sc-if value="{{r.isWords}}" hint-placeholder-val="{{false}}"><span style="font-size: 14px; font-weight: 500; color: #44403c">{{r.tag}}</span></sc-if>
+                  </span>
+                  <span style="position: relative; height: 100%; display: flex; align-items: center">
+                    <span style="position: absolute; left: 0; top: {{r.brTop}}; bottom: {{r.brBottom}}; width: 2px; border-radius: 1px; background: {{r.brInk}}"></span>
+                    <span style="position: absolute; left: 0; top: calc(50% - 1px); width: {{r.tick}}; height: 2px; background: {{r.brInk}}"></span>
+                    <span style="padding-left: {{r.penPad}}; display: flex; flex-direction: column; line-height: 1.25">
+                      <span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; font-weight: {{r.penWeight}}; color: {{r.penInk}}">{{r.penText}}</span>
+                      <span style="font-size: 11.5px; color: #78716c">{{r.penSub}}</span>
+                    </span>
+                  </span>
+                  <span style="display: flex">
+                    <sc-for list="{{r.doses}}" as="m" hint-placeholder-count="3"><span style="width: 44px; display: flex; justify-content: center"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span></sc-for>
+                  </span>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+          <div style="display: flex; align-items: center; height: 44px; margin-top: 4px; border-top: 1px solid #e7e5e4; font-size: 13px; color: #57534e">28 pigs in 7 pens</div>
+        </section>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2040,"height":860}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const C = { done: '#5fae6e', due: '#6f9fdc', skip: '#e8b33c', plan: '#dce0d4' };
+    const dot = (k) => (k === 'done' || k === 'skip') ? { st: 'width: 16px; height: 16px; background: ' + C[k] } : { st: 'width: 16px; height: 16px; border: 1.75px solid ' + C[k] };
+    const ring = (parts, size, w) => { const total = parts.reduce((a, q) => a + q[1], 0); let at = 0; const stops = parts.map(([k, n]) => { const a = at, b = at + (n / total) * 360; at = b; return C[k] + ' ' + (a + 3) + 'deg ' + (b - 3) + 'deg, transparent ' + (b - 3) + 'deg ' + b + 'deg'; }).join(', '); return { st: 'width: ' + size + 'px; height: ' + size + 'px; background: conic-gradient(' + stops + '); -webkit-mask: radial-gradient(circle, transparent ' + (size / 2 - w) + 'px, #000 ' + (size / 2 - w + 0.5) + 'px); mask: radial-gradient(circle, transparent ' + (size / 2 - w) + 'px, #000 ' + (size / 2 - w + 0.5) + 'px)' }; };
+    const noIdDoses = [dot('done'), ring([['done', 14], ['due', 6]], 18, 3), dot('plan')];
+    // the data: three pens of one, two group pens, a pen without IDs
+    const data = [
+      { pen: 'A1', pigs: [['201101', ['done', 'done', 'plan']]] },
+      { pen: 'A2', pigs: [['201102', ['done', 'due', 'plan']]] },
+      { pen: 'A3', pigs: [['201104', ['skip', 'due', 'plan']]] },
+      { pen: '14', pigs: [['201215', ['done', 'done', 'plan']], ['201220', ['done', 'done', 'plan']]] },
+      { pen: '22', pigs: [['201240', ['done', 'due', 'plan']], ['201241', ['done', 'due', 'plan']]] },
+      { pen: '7', noId: 20 }
+    ];
+    const base = { isBand: false, isRow: true, isId: true, isWords: false, margin: '0', pad: '0', line: '1px solid #f0efed', bg: 'transparent', radius: '0', edge: 'none', brTop: '50%', brBottom: '50%', brInk: 'transparent', tick: '0', penPad: '0', penText: '', penSub: '', penWeight: 500, penInk: '#57534e', count: '', pen: '' };
+    const row = (o) => Object.assign({}, base, o);
+
+    // A: a tinted pen band above the pen's pigs, its pigs indented under it
+    const a = [];
+    data.forEach((g, gi) => {
+      if (g.noId) { a.push(row({ isBand: true, isRow: false, pen: 'Pen ' + g.pen, count: g.noId + ' pigs · no IDs' })); a.push(row({ isId: false, isWords: true, tag: g.noId + ' pigs without an ID', line: '0', pad: '0 0 0 20px', doses: noIdDoses })); return; }
+      if (g.pigs.length === 1) { a.push(row({ tag: g.pigs[0][0], penText: g.pen, doses: g.pigs[0][1].map(dot), line: gi === 0 ? '0' : '1px solid #f0efed' })); return; }
+      a.push(row({ isBand: true, isRow: false, pen: 'Pen ' + g.pen, count: g.pigs.length + ' sows' }));
+      g.pigs.forEach((p, i) => a.push(row({ tag: p[0], doses: p[1].map(dot), line: i === 0 ? '0' : '1px solid #f0efed', pad: '0 0 0 20px' })));
+    });
+
+    // B: the pen lives in the Pen column for everyone; a group pen names itself once and a bracket holds its pigs
+    const b = [];
+    data.forEach((g, gi) => {
+      const top = gi === 0 ? '0' : '1px solid #e7e5e4';
+      if (g.noId) { b.push(row({ isId: false, isWords: true, tag: g.noId + ' pigs without an ID', line: top, penText: g.pen, penWeight: 600, penInk: '#1c1917', penSub: 'no IDs', doses: noIdDoses })); return; }
+      if (g.pigs.length === 1) { b.push(row({ tag: g.pigs[0][0], penText: g.pen, doses: g.pigs[0][1].map(dot), line: gi === 0 ? '0' : '1px solid #f0efed' })); return; }
+      g.pigs.forEach((p, i) => {
+        const first = i === 0, last = i === g.pigs.length - 1;
+        b.push(row({ tag: p[0], doses: p[1].map(dot), line: first ? top : '0', brInk: '#a8a29e', brTop: first ? '50%' : '0', brBottom: last ? '50%' : '0', tick: '8px', penPad: '16px', penText: first ? g.pen : '', penWeight: 600, penInk: '#1c1917', penSub: first ? g.pigs.length + ' sows' : '' }));
+      });
+    });
+
+    // C: a group pen's pigs share one soft block; the pen is named once in the Pen column
+    const c = [];
+    data.forEach((g, gi) => {
+      if (g.noId) { c.push(row({ isId: false, isWords: true, tag: g.noId + ' pigs without an ID', line: '0', margin: '6px 0', pad: '0 12px', bg: '#f5f5f4', radius: '10px', penText: g.pen, penWeight: 600, penInk: '#1c1917', penSub: 'no IDs', doses: noIdDoses })); return; }
+      if (g.pigs.length === 1) { c.push(row({ tag: g.pigs[0][0], penText: g.pen, doses: g.pigs[0][1].map(dot), line: gi === 0 ? '0' : '1px solid #f0efed', pad: '0 12px' })); return; }
+      g.pigs.forEach((p, i) => {
+        const first = i === 0, last = i === g.pigs.length - 1;
+        c.push(row({ tag: p[0], doses: p[1].map(dot), line: first ? '0' : '1px solid #ebeae6', bg: '#f5f5f4', pad: '0 12px', margin: (first ? '6px' : '0') + ' 0 ' + (last ? '6px' : '0') + ' 0', radius: (first ? '10px 10px ' : '0 0 ') + (last ? '10px 10px' : '0 0'), penText: first ? g.pen : '', penWeight: 600, penInk: '#1c1917', penSub: first ? g.pigs.length + ' sows' : '' }));
+      });
+    });
+
+    return { variants: [
+      { title: 'A · A tinted pen band', note: 'The pen gets a soft grey band with the pen icon; its pigs indent under it. Clear, but the band is a second kind of row.', rows: a },
+      { title: 'B · The pen column brackets its pigs', note: 'No header row. Every pig names its pen in the same column; a group pen names itself once and a thin bracket holds its pigs.', rows: b },
+      { title: 'C · One soft block per pen', note: 'A group pen’s pigs share one light block, the pen named once in the Pen column. Pigs alone in their pen stay plain.', rows: c }
+    ] };
+  }
+}
+</script>
+</body>
+</html>
