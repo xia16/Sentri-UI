@@ -305,15 +305,15 @@
         </div>
       </section>
       <section style="margin-top: 24px; padding: 20px 24px 6px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
-        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">RX-25G014 · 28 pigs in Gestation 2: stalls, group pens and a pen without IDs</div>
-        <div style="font-size: 13px; color: #57534e; margin-bottom: 12px">Each group is the smallest place that holds more than one of these pigs: single stalls gather under their lane (the stall a quiet column), group pens under the pen, and pigs without an ID become one row for their pen.</div>
+        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">RX-25G014 · 28 pigs in Gestation 2: pens of one, group pens and a pen without IDs</div>
+        <div style="font-size: 13px; color: #57534e; margin-bottom: 12px">A pig alone in her pen is a plain row, her pen in its own column. A pen holding several of these pigs becomes a group. Pigs without an ID become one row for their pen.</div>
         <h3 style="margin: 0 0 12px; font-size: 17px; font-weight: 600">Pigs</h3>
         <div style="display: grid; grid-template-columns: minmax(0, 1fr) 90px 132px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e">
-          <span>Pig</span><span>Stall</span><span style="padding-left: 14px">Doses</span>
+          <span>Pig</span><span>Pen</span><span style="padding-left: 14px">Doses</span>
         </div>
         <sc-for list="{{stallLanes}}" as="g" hint-placeholder-count="2">
           <div>
-            <div style="display: flex; align-items: flex-end; justify-content: space-between; height: 38px; padding-bottom: 7px; box-sizing: border-box; border-top: {{g.top}}; font-size: 13px; font-weight: 600"><span>{{g.lane}}<span style="font-weight: 500; color: #a8a29e">{{g.kind}}</span></span><span style="font-weight: 500; color: #57534e">{{g.n}}</span></div>
+            <sc-if value="{{g.hasHead}}" hint-placeholder-val="{{true}}"><div style="display: flex; align-items: flex-end; justify-content: space-between; height: 38px; padding-bottom: 7px; box-sizing: border-box; border-top: {{g.top}}; font-size: 13px; font-weight: 600"><span>{{g.lane}}<span style="font-weight: 500; color: #a8a29e">{{g.kind}}</span></span><span style="font-weight: 500; color: #57534e">{{g.n}}</span></div></sc-if>
             <sc-for list="{{g.pigs}}" as="r" hint-placeholder-count="4">
               <div style="display: grid; grid-template-columns: minmax(0, 1fr) 90px 132px; align-items: center; height: 44px; border-top: 1px solid #f0efed">
                 <span><sc-if value="{{r.isId}}" hint-placeholder-val="{{true}}"><span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: #1c1917">{{r.tag}}</span></sc-if><sc-if value="{{r.isWords}}" hint-placeholder-val="{{false}}"><span style="font-size: 14px; font-weight: 500; color: #44403c">{{r.tag}}</span></sc-if></span>
@@ -326,7 +326,7 @@
           </div>
         </sc-for>
         <div style="display: flex; align-items: center; gap: 6px; height: 50px; border-top: 1px solid #e7e5e4; font-size: 13px; color: #57534e">
-          <span style="flex: 1">28 pigs · Lane A, pens 14, 22 and 7 · one page</span>
+          <span style="flex: 1">28 pigs in 7 pens · one page</span>
         </div>
       </section>
     </div>
@@ -468,10 +468,10 @@ class Component extends DCLogic {
     const IDF = "font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 15px; font-weight: 600; letter-spacing: -0.2px";
     const hy = (tag, place, ks) => ({ tag, isId: true, isWords: false, stall: place, doses: ks.map((k) => dot(k, 16)) });
     const stallLanes = [
-      { lane: 'Lane A', kind: ' · stalls', n: '4 sows', pigs: [hy('201101', 'A1', ['done', 'done', 'plan']), hy('201102', 'A2', ['done', 'due', 'plan']), hy('201103', 'A3', ['done', 'done', 'plan']), hy('201104', 'A4', ['skip', 'due', 'plan'])] },
-      { lane: 'Pen 14', kind: ' · group pen', n: '2 sows', pigs: [hy('201215', '', ['done', 'done', 'plan']), hy('201220', '', ['done', 'done', 'plan'])] },
-      { lane: 'Pen 22', kind: ' · group pen', n: '2 sows', pigs: [hy('201240', '', ['done', 'due', 'plan']), hy('201241', '', ['done', 'due', 'plan'])] },
-      { lane: 'Pen 7', kind: ' · no IDs', n: '20 pigs', pigs: [{ tag: '20 pigs without an ID', isId: false, isWords: true, stall: '', doses: [ring([['done', 20]], 18, 3), ring([['done', 14], ['due', 6]], 18, 3), plannedRing(16, 1.75)] }] }
+      { hasHead: false, lane: '', kind: '', n: '', pigs: [hy('201101', 'A1', ['done', 'done', 'plan']), hy('201102', 'A2', ['done', 'due', 'plan']), hy('201103', 'A3', ['done', 'done', 'plan']), hy('201104', 'A4', ['skip', 'due', 'plan'])] },
+      { hasHead: true, lane: 'Pen 14', kind: '', n: '2 sows', pigs: [hy('201215', '', ['done', 'done', 'plan']), hy('201220', '', ['done', 'done', 'plan'])] },
+      { hasHead: true, lane: 'Pen 22', kind: '', n: '2 sows', pigs: [hy('201240', '', ['done', 'due', 'plan']), hy('201241', '', ['done', 'due', 'plan'])] },
+      { hasHead: true, lane: 'Pen 7', kind: ' · no IDs', n: '20 pigs', pigs: [{ tag: '20 pigs without an ID', isId: false, isWords: true, stall: '', doses: [ring([['done', 20]], 18, 3), ring([['done', 14], ['due', 6]], 18, 3), plannedRing(16, 1.75)] }] }
     ].map((g, i) => Object.assign(g, { top: i === 0 ? '0' : '1px solid #e7e5e4' }));
     return { rxTrack, tracks, oneDays, pens, longPens, fields, longDays, waterDays, twoHeads, twoMeds, twoPigs, twoRx, stallLanes };
   }
