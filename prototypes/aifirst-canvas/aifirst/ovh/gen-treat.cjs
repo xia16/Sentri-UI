@@ -314,15 +314,15 @@ const pigGlyph = (x, y, ang, s, o) => { o = o || {}; const rx = 13 * s, ry = 7.5
   return '<g' + (o.hot ? ' filter="url(#pigsh)"' : '') + '><ellipse cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" rx="' + rx.toFixed(1) + '" ry="' + ry.toFixed(1) + '" transform="rotate(' + ang.toFixed(1) + ' ' + x.toFixed(1) + ' ' + y.toFixed(1) + ')" fill="' + (o.untagged ? '#EBC9BE' : '#E3A999') + '" stroke="' + (o.hot ? K.ink : '#C98F82') + '" stroke-width="' + (o.hot ? 2.2 : 0.8) + '"></ellipse><ellipse cx="' + hxp.toFixed(1) + '" cy="' + hyp.toFixed(1) + '" rx="' + (ry * 0.75).toFixed(1) + '" ry="' + (ry * 0.62).toFixed(1) + '" transform="rotate(' + ang.toFixed(1) + ' ' + hxp.toFixed(1) + ' ' + hyp.toFixed(1) + ')" fill="' + (o.untagged ? '#EBC9BE' : '#E3A999') + '" stroke="' + (o.hot ? K.ink : '#C98F82') + '" stroke-width="' + (o.hot ? 2.2 : 0.8) + '"></ellipse></g>'; };
 // sections: [state, label, pigs: tags or '' for untagged]; the pen is split along its length by count; each section a tinted floor, pigs in rows
 const penSections = (q, secs, o) => {
-  o = o || {}; const total = secs.reduce((a, s) => a + Math.max(s[2].length, 2), 0); let u0 = 0, svg = '', lab = '';
+  o = o || {}; const total = secs.reduce((a, s) => a + Math.max(s[2].length, 3), 0); let u0 = 0, svg = '', lab = '';
   const ang = Math.atan2(q[3][1] - q[0][1], q[3][0] - q[0][0]) * 180 / Math.PI;
   svg += '<polygon points="' + q.map((p) => p.join(',')).join(' ') + '" fill="#F5F3EC" stroke="' + K.ink + '" stroke-width="2"></polygon>';
   secs.forEach((sec) => {
-    const w = Math.max(sec[2].length, 2) / total, u1 = u0 + w, g = 0.012;
+    const w = Math.max(sec[2].length, 3) / total, u1 = u0 + w, g = 0.012;
     const poly = [bil(q, u0 + g, 0.03), bil(q, u1 - g, 0.03), bil(q, u1 - g, 0.97), bil(q, u0 + g, 0.97)];
     svg += '<polygon points="' + poly.map((p) => p.map((v) => v.toFixed(1)).join(',')).join(' ') + '" fill="' + SECF[sec[0]] + '" fill-opacity=".85"></polygon>';
     const n = sec[2].length, cols = Math.max(1, Math.round(Math.sqrt(n * w * 2.2))), rows = Math.ceil(n / cols);
-    const sc = Math.max(0.45, Math.min(1, (o.scale || 1) * Math.min(1, 3.2 / Math.max(rows, cols / 1.6))));
+    const sc = Math.max(0.45, Math.min(o.maxScale || 1, (o.scale || 1) * Math.min(1, 3.2 / Math.max(rows, cols / 1.6))));
     sec[2].forEach((tag, i) => {
       const c = i % cols, r = Math.floor(i / cols), at = bil(q, u0 + w * (c + 0.5) / cols, 0.1 + (r + 0.5) / rows * 0.8), hot = o.hot === tag && tag;
       svg += pigGlyph(at[0], at[1], ang, sc, { untagged: !tag, hot: hot });
@@ -343,6 +343,16 @@ const crowd = [['skip', 'Skipped 1', ['']], ['due', 'Due 6', ['310455', '', '', 
 frames.p1 = { bg: 'zb12', cap: 'Click a group pen: no pen card. The pane stays on the task; the camera flies in and the pigs line up in sections by state, Skipped, Due, Given, each on a tinted floor, all facing the same way. Tagged pigs carry their tag; untagged ones are drawn plainer and counted.', html: () => tabsStrip('Farm view').replace('Treatment RX-25G009', 'Treatment RX-25G011') + penBar('9', 'Pen B12') + penSections(QB12, B12secs) + grpPane() + vctl };
 frames.p2 = { bg: 'zb12', cap: 'Click a tagged pig: her treatment view, one segment per day; hover a day for what happened. Untagged pigs only say "Untagged · counted at the pen" on hover.', html: () => tabsStrip('Farm view').replace('Treatment RX-25G009', 'Treatment RX-25G011') + penBar('9', 'Pen B12') + penSections(QB12, B12secs, { hot: '310422' }) + vctl + p422() };
 frames.p3 = { bg: 'zb12', cap: 'A small pen holding 30: the figures shrink to fit the grid, down to a floor size; past that, Given folds to a few and "+5", because the pigs still to do matter most. Zoom out, click empty map or ‹ and the pigs go back to where they lie.', html: () => tabsStrip('Farm view').replace('Treatment RX-25G009', 'Treatment RX-25G011') + penBar('30', 'Pen B12') + penSections(QB12, crowd, { scale: 0.62 }) + grpPane() + vctl };
+// ===== v6: the task card follows the bar's place; a crowded pen zooms in to a readable size =====
+const scopeRow = (kind, name) => '<div style="display: flex; align-items: center; gap: 8px; margin: 0 2px 10px;"><span style="' + st({ display: 'inline-grid', placeItems: 'center', width: '22px', height: '22px', borderRadius: '6px', background: K.press }) + '">' + ic(kind === 'pen' ? PEN2 : 'M4 10 12 4l8 6v10H4V10Z', 13) + '</span>' + t('In ' + name, { fontSize: '13px', fontWeight: 600 }) + '</div>';
+const wholeRow = (s) => '<div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #FFFFFF; border: 1px solid ' + K.line + '; font-size: 13px;"><span style="color: ' + K.muted + ';">Whole task</span><span style="display: inline-flex; align-items: center; gap: 2px; font-weight: 600;">' + s + ic(I.chev, 14, 1.8, K.faint) + '</span></div>';
+const grpScoped = (name, parts, total, big, small) => paneSlim(thead({ title: 'Treatment RX-25G011', sub: 'Florfenicol · day 3 of 3 today' }), scopeRow('pen', name) + gauge(parts, total, big, small) + wholeRow('41 of 63 given') + '<div style="display: flex; gap: 8px; margin-top: 12px;">' + fbtn(ic(SC2.ext, 15) + '&nbsp; Open page') + '</div>');
+const QZ = [[404, 204], [620, 762], [232, 866], [70, 310]];
+const crowd2 = [['skip', 'Skipped 1', ['310460']], ['due', 'Due 6', ['310455', '', '', '', '', '']], ['done', 'Given 23', ['310441'].concat(Array(22).fill(''))]];
+const more = card({ left: '206px', bottom: '74px' }, '<span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; font-size: 12.5px; font-weight: 500;">' + ic(I.down, 14, 2) + 'Given 23 continues below</span>');
+
+frames.p1 = { bg: 'zb12', cap: 'Click a group pen: no pen card. The bar says Pen B12 and the task card counts this pen: 5 of 9 given, 2 due, 2 skipped. "Whole task" keeps the overall number one click away. The pigs line up in sections by state.', html: () => tabsStrip('Farm view').replace('Treatment RX-25G009', 'Treatment RX-25G011') + penBar('9', 'Pen B12') + penSections(QB12, B12secs) + grpScoped('Pen B12', [[DM, 'Given', 5], [PM, 'Due', 2], [LM, 'Skipped', 2]], 9, '5', 'of 9 given') + vctl };
+frames.p3 = { bg: 'zb12z', cap: 'A pen holding 30: the figures never go below a readable size; the camera zooms in instead. It opens on Skipped and Due, where the work is; Given runs past the edge and the map pans to it. Folding only happens at the camera\'s zoom limit.', html: () => tabsStrip('Farm view').replace('Treatment RX-25G009', 'Treatment RX-25G011') + penBar('30', 'Pen B12') + penSections(QZ, crowd2, { scale: 2.1, maxScale: 1.7 }) + grpScoped('Pen B12', [[DM, 'Given', 23], [PM, 'Due', 6], [LM, 'Skipped', 1]], 30, '23', 'of 30 given') + vctl + more };
 (async () => {
   const W = 950, Hh = 830, gap = 40, pad = 48;
   const frame = async (k, n) => {

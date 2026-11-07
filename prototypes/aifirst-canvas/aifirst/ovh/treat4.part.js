@@ -5,15 +5,15 @@ const pigGlyph = (x, y, ang, s, o) => { o = o || {}; const rx = 13 * s, ry = 7.5
   return '<g' + (o.hot ? ' filter="url(#pigsh)"' : '') + '><ellipse cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" rx="' + rx.toFixed(1) + '" ry="' + ry.toFixed(1) + '" transform="rotate(' + ang.toFixed(1) + ' ' + x.toFixed(1) + ' ' + y.toFixed(1) + ')" fill="' + (o.untagged ? '#EBC9BE' : '#E3A999') + '" stroke="' + (o.hot ? K.ink : '#C98F82') + '" stroke-width="' + (o.hot ? 2.2 : 0.8) + '"></ellipse><ellipse cx="' + hxp.toFixed(1) + '" cy="' + hyp.toFixed(1) + '" rx="' + (ry * 0.75).toFixed(1) + '" ry="' + (ry * 0.62).toFixed(1) + '" transform="rotate(' + ang.toFixed(1) + ' ' + hxp.toFixed(1) + ' ' + hyp.toFixed(1) + ')" fill="' + (o.untagged ? '#EBC9BE' : '#E3A999') + '" stroke="' + (o.hot ? K.ink : '#C98F82') + '" stroke-width="' + (o.hot ? 2.2 : 0.8) + '"></ellipse></g>'; };
 // sections: [state, label, pigs: tags or '' for untagged]; the pen is split along its length by count; each section a tinted floor, pigs in rows
 const penSections = (q, secs, o) => {
-  o = o || {}; const total = secs.reduce((a, s) => a + Math.max(s[2].length, 2), 0); let u0 = 0, svg = '', lab = '';
+  o = o || {}; const total = secs.reduce((a, s) => a + Math.max(s[2].length, 3), 0); let u0 = 0, svg = '', lab = '';
   const ang = Math.atan2(q[3][1] - q[0][1], q[3][0] - q[0][0]) * 180 / Math.PI;
   svg += '<polygon points="' + q.map((p) => p.join(',')).join(' ') + '" fill="#F5F3EC" stroke="' + K.ink + '" stroke-width="2"></polygon>';
   secs.forEach((sec) => {
-    const w = Math.max(sec[2].length, 2) / total, u1 = u0 + w, g = 0.012;
+    const w = Math.max(sec[2].length, 3) / total, u1 = u0 + w, g = 0.012;
     const poly = [bil(q, u0 + g, 0.03), bil(q, u1 - g, 0.03), bil(q, u1 - g, 0.97), bil(q, u0 + g, 0.97)];
     svg += '<polygon points="' + poly.map((p) => p.map((v) => v.toFixed(1)).join(',')).join(' ') + '" fill="' + SECF[sec[0]] + '" fill-opacity=".85"></polygon>';
     const n = sec[2].length, cols = Math.max(1, Math.round(Math.sqrt(n * w * 2.2))), rows = Math.ceil(n / cols);
-    const sc = Math.max(0.45, Math.min(1, (o.scale || 1) * Math.min(1, 3.2 / Math.max(rows, cols / 1.6))));
+    const sc = Math.max(0.45, Math.min(o.maxScale || 1, (o.scale || 1) * Math.min(1, 3.2 / Math.max(rows, cols / 1.6))));
     sec[2].forEach((tag, i) => {
       const c = i % cols, r = Math.floor(i / cols), at = bil(q, u0 + w * (c + 0.5) / cols, 0.1 + (r + 0.5) / rows * 0.8), hot = o.hot === tag && tag;
       svg += pigGlyph(at[0], at[1], ang, sc, { untagged: !tag, hot: hot });
