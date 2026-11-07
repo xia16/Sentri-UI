@@ -24,5 +24,9 @@ once("      if (this.IP && u.vm === 'view' && u.vf && !this.locationMatches((thi
 // hover
 once("    if (this.tipFor !== key && this.ovOn() && this.ovPenTip) { el.innerHTML = this.ovPenTip(hit); this.tipFor = key; }", "    const tkKey = key + '|' + (this.ovS().tk || '') + (this.ovS().tkOpen ? '1' : '0');\n    if (this.tipFor !== tkKey && this.tkTip) { const th = this.tkTip(hit); if (th) { el.innerHTML = th; this.tipFor = tkKey; } }\n    if (this.tipFor !== key && this.tipFor !== tkKey && this.ovOn() && this.ovPenTip) { el.innerHTML = this.ovPenTip(hit); this.tipFor = key; }");
 once("    if (this.tipFor !== key) {\n      const i = this.pigInfo(hit.rm, hit.pen)", "    if (this.tipFor !== key && this.tipFor !== tkKey) {\n      const i = this.pigInfo(hit.rm, hit.pen)");
+// pen tags: only the task's pens, coloured by status
+once("      L.want = want;\n", "      if (k === 'pen' && this.tkLabel) { const tw = this.tkLabel(L, roomView, u); if (tw != null) want = tw; }\n      L.want = want;\n");
+once("        if (L.kind === 'room') { const rr = this.roomById(L.roomId);", "        if (L.kind === 'pen' && this.tkTagStyle) this.tkTagStyle(L);\n        if (L.kind === 'room') { const rr = this.roomById(L.roomId);");
+once("    if (this.IP) { const pr = []; cands.filter", "    if (this.tkNudge) this.tkNudge(cands, rectOf);\n    if (this.IP) { const pr = []; cands.filter");
 fs.writeFileSync(F, s);
 console.log('patched', Math.round(s.length / 1024) + ' KB');

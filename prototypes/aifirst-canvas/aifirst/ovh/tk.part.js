@@ -21,23 +21,30 @@
   }
   tkTask() { const O = this.ovS(); return O.tk ? this.tkDefs()[O.tk] : null; }
   tkLive() { const O = this.ovS(); return !!(O.tk && O.tkOpen && this.ovOn && this.ovOn()); }
-  tkCol(rid, code) { if (!this.tkLive()) return undefined; const T = this.tkTask(), s = T.state(rid, code), C = this.tkC(); if (s) return C[s]; return T.rooms.indexOf(rid) >= 0 || rid === this.ui().roomId ? C.fade : undefined; }
+  tkCol(rid, code) { if (!this.tkLive()) return undefined; const T = this.tkTask(), s = T.state(rid, code), C = this.tkC(); if (s) return T.kind === 'rx' ? ({ done: C.dm, due: C.pm, skip: C.lm })[s] : C[s]; return T.rooms.indexOf(rid) >= 0 || rid === this.ui().roomId ? C.fade : undefined; }
   tkSave() { const O = this.ovS(); try { window.__sentriTasks = { tks: (O.tks || []).slice(), tk: O.tk || '', open: !!O.tkOpen }; } catch (e) { /* ignore */ } }
   tkRestore() { const W = window.__sentriTasks, O = this.ovS(); if (!W || !W.tks || !W.tks.length || (O.tks || []).length) return false; O.tks = W.tks.slice(); O.tk = W.tk; if (W.tk && W.open) this.tkActivate(W.tk); else { O.tkOpen = false; this.ovPaint(); } return true; }
   // a page or a chat card asks for a task: start 'task:<id>' (anything after @ is ignored) or the window event sentri:task {id}
   tkHook() { if (this.tkEvt) return; this.tkEvt = (e) => { const d = (e && e.detail) || {}; if (d.id && this.alive !== false) this.tkOpen(d.id); }; window.addEventListener('sentri:task', this.tkEvt); }
   tkUnhook() { if (this.tkEvt) window.removeEventListener('sentri:task', this.tkEvt); this.tkEvt = null; }
+  tkCodes(T) { return T && T.kind === 'rx' ? Object.keys(T.pig || {}) : []; }
+  tkFocus(codes) { const O = this.ovS(), T = this.tkTask(); O.focus = T && T.go.room && codes.length ? { roomId: T.go.room, codes: codes } : null; this.dirty = true; }
+  // pen tags while a single-pig task is live: only its pens, in the status fill with dark ink
+  tkLabel(L, roomView, u) { if (!this.tkLive() || L.kind !== 'pen' || !roomView || L.roomId !== u.roomId) return null; const T = this.tkTask(); if (T.kind !== 'rx' || T.rooms.indexOf(L.roomId) < 0) return null; return !!T.state(L.roomId, L.pen.code); }
+  tkTagStyle(L) { const T = this.tkLive() ? this.tkTask() : null, s = T && T.kind === 'rx' && L.pen ? T.state(L.roomId, L.pen.code) : '', k = s ? s + ':' + L.on : ''; if ((L.tkS || '') === k) return; L.tkS = k; if (!s) { L.el.style.cssText = this.labelCss(L.kind, L.on, L); L.el.style.display = ''; return; } const F = { done: ['#d5e8cc', '#1d4d2e', '#5fae6e'], due: ['#c1ddfd', '#1f4470', '#6f9fdc'], skip: ['#fede82', '#5c3f00', '#e8b33c'] }[s]; L.el.style.background = F[0]; L.el.style.color = F[1]; L.el.style.boxShadow = '0 0 0 1.5px ' + F[2] + ', 0 2px 6px rgba(17,21,17,.25)'; L.el.style.borderColor = 'transparent'; L.w = 0; }
+  // neighbouring task pens: a tag that would cover another is lifted above it, so every pen keeps its tag
+  tkNudge(cands, rectOf) { const u = this.ui(), ts = cands.filter((L) => L.vis && L.kind === 'pen' && this.tkLabel(L, u.view === 'room', u) === true).sort((x, y) => x.sx - y.sx), placed = []; ts.forEach((L) => { let r = rectOf(L), g = 0; while (g++ < 4 && placed.some((b) => r.l < b.r + 2 && r.r > b.l - 2 && r.t < b.b + 2 && r.b > b.t - 2)) { L.sy -= L.h + 4; r = rectOf(L); } placed.push(r); }); }
   tkTop() { return (this.ovS().tks || []).length ? 134 : 84; }
   tkOpen(id) { const O = this.ovS(), T = this.tkDefs()[id]; if (!T) return; O.tks = O.tks || []; if (O.tks.indexOf(id) < 0) O.tks.push(id); this.tkActivate(id); }
   // Open page: the console opens the task's own page in its tab
   tkPage() { const O = this.ovS(), T = this.tkTask(); if (!T) return; try { window.dispatchEvent(new CustomEvent('sentri:open', { detail: { action: T.kind === 'rx' ? 'rxpage' : 'vaxpage', id: O.tk, from: { title: T.title, many: true } } })); } catch (e) { /* ignore */ } }
   tkActivate(id) {
-    const O = this.ovS(), T = this.tkDefs()[id]; O.tk = id; O.tkOpen = true; O.tkPen = ''; O.panel = 'tk'; O.hist = []; this.setSel([]);
+    const O = this.ovS(), T = this.tkDefs()[id]; O.tk = id; O.tkOpen = true; O.tkPen = ''; O.panel = 'tk'; O.hist = []; this.setSel([]); O.focus = T.go.room && this.tkCodes(T).length ? { roomId: T.go.room, codes: this.tkCodes(T) } : null;
     if (T.go.room) { if (this.ui().roomId !== T.go.room || this.ui().view !== 'room') this.goRoom(T.go.room); }
     else { const s = this.M().sections.find((x) => /nurs/i.test(x.name)); if (s) this.goScope(s.zone || '', s.id, { ms: 650 }); }
     this.tkSave(); this.repaintBv(); this.ovPaint();
   }
-  tkCollapse() { const O = this.ovS(); O.tkOpen = false; O.tkPen = ''; if (['tk', 'tkpig'].indexOf(O.panel) >= 0) { O.panel = ''; O.hist = []; } this.setSel([]); this.tkSave(); this.repaintBv(); this.ovPaint(); }
+  tkCollapse() { const O = this.ovS(); O.tkOpen = false; O.tkPen = ''; O.focus = null; this.dirty = true; if (['tk', 'tkpig'].indexOf(O.panel) >= 0) { O.panel = ''; O.hist = []; } this.setSel([]); this.tkSave(); this.repaintBv(); this.ovPaint(); }
   tkClose(id) { const O = this.ovS(); O.tks = (O.tks || []).filter((x) => x !== id); if (O.tk === id) { O.tk = ''; this.tkCollapse(); } else { this.tkSave(); this.ovPaint(); } }
   tkStart() { const O = this.ovS(); O.tks = ['rx09', 'prrs']; this.tkActivate('rx09'); }
   // returns true when it handled the action
@@ -48,8 +55,8 @@
     if (k === 'tkc') { this.tkCollapse(); return true; }
     if (k === 'tkpage') { this.tkPage(); return true; }
     if (k === 'tkroom') { this.goRoom(v); return true; }
-    if (k === 'tkwhole') { O.tkPen = ''; this.setSel([]); O.panel = 'tk'; this.ovPaint(); return true; }
-    if (k === 'tkback') { O.panel = 'tk'; O.tkPig = null; this.setSel([]); this.ovPaint(); return true; }
+    if (k === 'tkwhole') { O.tkPen = ''; this.setSel([]); O.panel = 'tk'; this.tkFocus(this.tkCodes(this.tkTask())); this.ovPaint(); return true; }
+    if (k === 'tkback') { O.panel = 'tk'; O.tkPig = null; this.setSel([]); this.tkFocus(this.tkCodes(this.tkTask())); this.ovPaint(); return true; }
     if (k === 'tkprof') { this.ovPush(); O.pig = O.tkPig; O.panel = 'pig'; this.ovPaint(); return true; }
     if ((k === 'close' || k === 'back') && ['tk', 'tkpig'].indexOf(O.panel) >= 0 && !(k === 'back' && O.panel === 'tkpig')) { this.tkCollapse(); return true; }
     if (k === 'back' && O.panel === 'tkpig') { return this.tkAct('tkback'); }
@@ -62,7 +69,7 @@
     const T = this.tkTask(), code = ps[0], s = T.state(u.roomId, code); if (!s) return false;
     const cell = ((this.IP && this.IP.cell[u.roomId]) || {})[code] || {};
     if ((cell.n || 1) > 1 || T.kind === 'vax') { O.tkPen = code; O.panel = 'tk'; return true; }
-    O.tkPig = { roomId: u.roomId, code: code }; O.panel = 'tkpig'; return true;
+    O.tkPig = { roomId: u.roomId, code: code }; O.panel = 'tkpig'; this.tkFocus([code]); return true;
   }
   // ----- parts -----
   tkRing(r, hot) { const C = this.tkC(), L = 2 * Math.PI * 7, n = r[3], seg = (v, off, col) => v ? '<circle cx="10" cy="10" r="7" fill="none" stroke="' + col + '" stroke-width="4" stroke-dasharray="' + (L * v / n).toFixed(1) + ' ' + L.toFixed(1) + '" stroke-dashoffset="' + (-L * off / n).toFixed(1) + '" transform="rotate(-90 10 10)"></circle>' : ''; return '<svg viewBox="0 0 20 20" style="width: 20px; height: 20px; flex: none;"><circle cx="10" cy="10" r="7" fill="none" stroke="' + C.handle + '" stroke-width="4"></circle>' + seg(r[0], 0, C.dm) + seg(r[1], r[0], C.lm) + seg(r[2], r[0] + r[1], C.pm) + '</svg>'; }
