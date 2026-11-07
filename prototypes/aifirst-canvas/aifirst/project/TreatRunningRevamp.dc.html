@@ -269,11 +269,11 @@
             <span style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; line-height: 1">18</span>
             <span style="font-size: 15px; color: #44403c">of 48 doses given</span>
             <span style="flex: 1"></span>
-            <span style="font-size: 13px; color: #57534e">Thu 5 – Mon 9 Nov</span>
+            <span style="font-size: 13px; color: #57534e">Thu 30 Oct – Mon 3 Nov</span>
           </div>
         <div style="display: grid; grid-template-columns: 160px repeat(5, minmax(0, 1fr)); align-items: center; row-gap: 12px; margin-top: 20px">
           <span></span>
-          <sc-for list="{{twoHeads}}" as="h" hint-placeholder-count="5"><span style="text-align: center; font-size: 12px; font-weight: {{h.weight}}; color: {{h.ink}}">{{h.d}}</span></sc-for>
+          <sc-for list="{{twoHeads}}" as="h" hint-placeholder-count="5"><span style="display: flex; flex-direction: column; align-items: center; line-height: 1.3"><span style="height: 15px; font-size: 10.5px; font-weight: 600; color: #57534e">{{h.month}}</span><span style="font-size: 12px; font-weight: {{h.weight}}; color: {{h.ink}}">{{h.d}}</span></span></sc-for>
           <sc-for list="{{twoMeds}}" as="md" hint-placeholder-count="2">
             <span><span style="display: block; font-size: 14px; font-weight: 600">{{md.name}}</span><span style="display: block; font-size: 12.5px; color: #57534e">{{md.count}}</span></span>
             <sc-for list="{{md.days}}" as="it" hint-placeholder-count="5">
@@ -302,7 +302,7 @@
         <div style="margin-top: 4px; font-size: 13px; color: #57534e">6 pigs · showing the medicine due today</div>
 
         <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0efed">
-          <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 600">Prescription</span><span style="font-size: 13px; color: #57534e">Withdrawal ends <strong style="color: #1c1917; font-weight: 600">Mon 7 Dec</strong>, the later of the two</span></div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 600">Prescription</span><span style="font-size: 13px; color: #57534e">Withdrawal ends <strong style="color: #1c1917; font-weight: 600">Mon 1 Dec</strong>, the later of the two</span></div>
           <sc-for list="{{twoRx}}" as="f" hint-placeholder-count="2">
             <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; padding: 12px 0; border-bottom: {{f.line}}">
               <span style="font-size: 14px; font-weight: 600">{{f.k}}</span>
@@ -433,7 +433,7 @@ class Component extends DCLogic {
     const waterDays = [];
     ['30', '31', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].forEach((x, i) => waterDays.push({ month: i === 0 ? 'Oct' : i === 2 ? 'Nov' : '', date: x, weight: i === 8 ? 700 : 500, ink: i === 8 ? '#1c1917' : '#78716c', marks: [i < 8 ? dot('done', 16) : i === 8 ? ring([['done', 1], ['due', 1]], 20, 4) : plannedRing(18, 2.5)] }));
     // two medicines, shared dates Thu-Mon, today Fri
-    const twoHeads = ['Thu 5', 'Fri 6', 'Sat 7', 'Sun 8', 'Mon 9'].map((d, i) => ({ d, weight: i === 1 ? 700 : 500, ink: i === 1 ? '#1c1917' : '#57534e' }));
+    const twoHeads = [['Oct', 'Thu 30'], ['', 'Fri 31'], ['Nov', 'Sat 1'], ['', 'Sun 2'], ['', 'Mon 3']].map(([month, d], i) => ({ month, d, weight: i === 1 ? 700 : 500, ink: i === 1 ? '#1c1917' : '#57534e' }));
     const empty = { wst: '', st: 'width: 4px; height: 4px; background: #dce0d4' };
     const twoMeds = [
       { name: 'Amoxicillin', count: '10 of 18 · daily, 3 days', days: [[ring([['done', 6]], 30, 4)], [ring([['done', 4], ['due', 2]], 30, 4)], [plannedRing(30, 3)], [empty], [empty]].map((marks) => ({ marks })) },
