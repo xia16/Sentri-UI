@@ -54,7 +54,7 @@
     const note = (text, warn) => text ? '<div style="margin: 10px 4px 0; font-size: 13.5px; line-height: 20px; color: ' + (warn ? K.red : K.muted) + ';">' + esc(text) + '</div>' : '';
     const panel = (inner) => { const cut = (src, a, b) => { const i = src.indexOf(a), j = i < 0 ? -1 : src.indexOf(b, i); return i < 0 || j < 0 ? [null, src] : [[null, src.slice(i + a.length, j)], src.slice(0, i) + src.slice(j + b.length)]; };
       const c1 = cut(inner, '<!--H-->', '<!--/H-->'), c2 = cut(c1[1], '<!--F-->', '<!--/F-->'), hm = c1[0], fm = c2[0], body = c2[1]; return panelBox((hm ? hm[1] : '') + '<div data-zone="edbody" style="flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 0 16px ' + (fm ? 12 : 18) + 'px;">' + body + '</div>' + (fm ? fm[1] : '')); };
-    const narrow = (this.W || 950) < 760, place = narrow ? 'left: 16px; right: 16px; bottom: 84px; max-height: calc(50% - 60px);' : 'right: 16px; top: 16px; width: 380px; max-height: calc(100% - 104px);';
+    const narrow = (this.W || 950) < 760, place = narrow ? 'left: 12px; right: 12px; bottom: 12px; max-height: calc(55% - 20px);' : 'right: 12px; top: 84px; bottom: 12px; width: 380px;';
     const panelBox = (inner) => '<section data-zone="edcol" aria-label="Edit" style="position: absolute; ' + place + ' max-width: calc(100% - 32px); box-sizing: border-box; display: flex; flex-direction: column; border-radius: 22px; background: ' + K.tint + '; box-shadow: 0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12); overflow: hidden; pointer-events: auto; font-family: \'Geist\', system-ui, sans-serif; color: ' + K.ink + '; font-size: 14px; line-height: 20px; font-variant-numeric: tabular-nums;">' + inner + '</section>';
     const isRed = (s) => /#7A2C2C/i.test(s || '');
 
@@ -68,7 +68,7 @@
       else if (u.devT && u.devT.kind) { act = 'Cancel'; fn = () => this.put({ devT: null }); ico = (this.devPaths && this.devPaths()[u.devT.kind]) || ''; }
       else if (u.dp) { act = 'Done'; }
       else if (u.addDoor) { ico = ic.door || ''; }
-      const pill = '<div data-zone="edguide" role="status" style="position: absolute; ' + ((this.W || 950) < 760 ? 'left: 16px; right: 16px; top: 84px;' : 'right: 16px; top: 16px; width: 380px; max-width: calc(100% - 290px); min-width: 260px;') + ' box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 16px; border-radius: 18px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(17,21,17,.06), 0 12px 30px rgba(17,21,17,.16); pointer-events: auto; font-family: \'Geist\', system-ui, sans-serif; color: ' + K.ink + '; z-index: 6;">' +
+      const pill = '<div data-zone="edguide" role="status" style="position: absolute; left: 12px; right: 12px; top: 12px; min-height: 60px; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 10px; border-radius: 16px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(17,21,17,.06), 0 12px 30px rgba(17,21,17,.16); pointer-events: auto; font-family: \'Geist\', system-ui, sans-serif; color: ' + K.ink + '; z-index: 6;">' +
         (ico ? '<span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; border-radius: 10px; background: ' + K.ink + '; color: #FFFFFF;">' + sv(ico, 18) + '</span>' : '') +
         '<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; line-height: 20px; font-weight: 600;">' + esc(title) + '</span>' + (sub ? '<span style="font-size: 13px; line-height: 18px; color: ' + K.muted + ';">' + esc(sub) + '</span>' : '') + '</span>' +
         '<button type="button"' + A(fn) + ' style="flex: none; height: 40px; padding: 0 14px; border-radius: 10px; border: ' + (act === 'Done' ? '0' : '1px solid #D5DACF') + '; background: ' + (act === 'Done' ? K.ink : '#FFFFFF') + '; color: ' + (act === 'Done' ? '#FFFFFF' : K.ink) + '; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">' + esc(act) + '</button></div>';
@@ -155,7 +155,9 @@
       return panel(h);
     }
 
-    // ----- the place you are on, or the thing picked: what it is, what is inside, what you can do -----
+    // a place at rest opens no pane: the bar holds its actions and the map shows it
+    if (!this.edPicked(u)) return '';
+    // ----- the thing picked: what it is, what is inside, what you can do -----
     const closer = (P.cRuns || P.cHead || P.cNote) ? P.close : null;
     if (P.cNote && P.note) {
       const ix = P.note.indexOf(','), t1 = ix > 0 ? P.note.slice(0, ix) : P.note, t2 = ix > 0 ? P.note.slice(ix + 1).trim() : '';

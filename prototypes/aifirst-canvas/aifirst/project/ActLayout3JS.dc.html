@@ -5370,8 +5370,8 @@ class Component extends DCLogic {
     if (this.IP) { ins.l = 28; ins.t = Math.max(ins.t, 104); ins.r = prof ? pw : 28; }
     if (this.IP && u.view === 'room') ins.t = Math.max(ins.t, 128);
     if (this.ovEdOn && this.ovEdOn(u) && u.view === 'room' && this.edMapTask && this.edMapTask(u)) { ins.l = 20; ins.r = 20; ins.t = 96; ins.b = 80; return ins; }
-    if (this.ovEdOn && this.ovEdOn(u)) { /* ovEdIns */ ins.l = 28; ins.t = 88; const nw = (this.W || 950) < 760; ins.b = nw ? Math.round((this.H || 830) * 0.5) + 40 : 92; ins.r = nw ? 28 : 412; return ins; }
-    if (this.ovOn && this.ovOn(u)) { const O = this.ovS(); /* ovInsets */ ins.l = 28; ins.t = 84; ins.b = 92; ins.r = O.panel ? 412 + (O.her && O.panel === 'compare' ? 376 : 0) : 28; return ins; }
+    if (this.ovEdOn && this.ovEdOn(u)) { /* ovEdIns */ ins.l = 28; ins.t = 96; const nw = (this.W || 950) < 760, po = this.edPaneOpen && this.edPaneOpen(u); ins.b = nw && po ? Math.round((this.H || 830) * 0.55) + 20 : 84; ins.r = nw || !po ? 28 : 404; return ins; }
+    if (this.ovOn && this.ovOn(u)) { const O = this.ovS(); /* ovInsets */ ins.l = 28; ins.t = 96; ins.b = 84; ins.r = O.panel ? 404 + (O.her && O.panel === 'compare' ? 376 : 0) : 28; return ins; }
     if (this.IP && u.mode === 'saved' && u.vm === 'view') {
       const hasPen = !u.bv && (u.psel || []).length === 1;
       const rs = u.view === 'room' ? this.M().rooms.filter((r) => r.id === u.roomId) : u.secId ? this.roomsOf(u.secId) : u.zoneId ? this.M().rooms.filter((r) => this.zoneOfRoom(r) === u.zoneId) : this.M().rooms;
@@ -9001,7 +9001,7 @@ class Component extends DCLogic {
     if (ps !== this.ovPsel) { this.ovPsel = ps; if (this.ovPicked) this.ovPicked(u); }
     const panel = O.panel ? this.ovPanelHtml(O, u) : '';
     const H = OVH, K = H.K;
-    const html = this.ovLoc(u) +
+    const html = this.ovTopBar(u, O) +
       (panel ? '<section data-zone="panel" aria-label="Panel" style="' + H.st({ position: 'absolute', right: '16px', top: '72px', maxHeight: 'calc(100% - 164px)', width: '380px', boxSizing: 'border-box', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint, boxShadow: '0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12)', overflowY: 'auto', overflowX: 'hidden', scrollbarWidth: 'none', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums', color: K.ink, fontSize: '14px', lineHeight: '20px' }) + '">' + panel + '</section>' : '') +
       (this.ovSide ? this.ovSide(O, u) : '') +
       '<div data-zone="bar" role="toolbar" aria-label="Actions bar" style="' + H.st({ position: 'absolute', left: '16px', right: '16px', bottom: '16px', height: '60px', padding: '0 8px', boxSizing: 'border-box', borderRadius: '18px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 10px 26px rgba(17,21,17,.14)', display: 'flex', alignItems: 'center', gap: '6px', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif" }) + '">' + OVP.bar(Object.assign({}, O, { barCtl: O.picking && this.ovBarCtl ? this.ovBarCtl(O) : '', eqOk: u.view === 'room' })) + '</div>' +
@@ -9010,7 +9010,7 @@ class Component extends DCLogic {
     const pEl = this.ovBody.querySelector('[data-zone="panel"]'), keep = pEl ? pEl.scrollTop : 0, sc = {};
     this.ovBody.querySelectorAll('[data-scroll]').forEach((x) => { sc[x.getAttribute('data-scroll')] = x.scrollTop; });
     const samePanel = this.ovLastPanel === O.panel;
-    this.ovBody.innerHTML = html; this.ovLast = html; this.ovLastPanel = O.panel; { const pz = this.ovBody.querySelector('[data-zone="panel"]'), lz = this.ovBody.firstElementChild, R = this.ovBody.getBoundingClientRect(); if (pz && lz && lz !== pz) { const a = lz.getBoundingClientRect(), b = pz.getBoundingClientRect(); if (a.right + 12 > b.left) { const top = Math.round(a.bottom - R.top + 8); pz.style.top = top + 'px'; pz.style.maxHeight = 'calc(100% - ' + (top + 88) + 'px)'; } } }
+    this.ovBody.innerHTML = html; this.ovLast = html; this.ovLastPanel = O.panel; { const pz = this.ovBody.querySelector('[data-zone="panel"]'), lz = this.ovBody.firstElementChild, R = this.ovBody.getBoundingClientRect(); if (pz && lz && lz !== pz) { const a = lz.getBoundingClientRect(), b = pz.getBoundingClientRect(); if (false) { const top = Math.round(a.bottom - R.top + 8); pz.style.top = top + 'px'; pz.style.maxHeight = 'calc(100% - ' + (top + 88) + 'px)'; } } }
     const p2 = this.ovBody.querySelector('[data-zone="panel"]'); if (p2 && samePanel) p2.scrollTop = keep;
     this.ovBody.querySelectorAll('[data-scroll]').forEach((x) => { const id = x.getAttribute('data-scroll'); if (sc[id] != null && samePanel) x.scrollTop = sc[id]; else if (x.getAttribute('data-scroll-to')) x.scrollTop = +x.getAttribute('data-scroll-to'); });
   }
@@ -9323,7 +9323,7 @@ class Component extends DCLogic {
     const vl = '<i style="' + H.st({ width: '1px', height: '24px', background: K.line, margin: '0 6px', flexShrink: 0 }) + '"></i>';
     const head = '<span style="' + H.st({ display: 'inline-flex', flexDirection: 'column', padding: '0 12px 0 8px', minWidth: '104px' }) + '">' + (c ? H.t(c[0], { fontSize: '15px', fontWeight: 600 }) + H.sm(c[1]) : H.t('Pick pens', { color: K.muted }) + H.sm('nothing picked yet')) + '</span>';
     const mid = '<span style="' + H.st({ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: '2px', justifyContent: arrows ? 'space-between' : 'flex-start' }) + '">' + (arrows ? arw(H.I.back, 'actstep:-1') : '') + shown.map(tab).join('') + (arrows ? arw(H.I.chev, 'actstep:1') : '') + '</span>';
-    return this.ovCard({ left: '16px', right: '16px', bottom: '16px' }, head + vl + mid + vl + this.ovBtn(H.icon(H.I.x, 18) + 'Cancel', 'selcancel', false, { background: K.tint, fontWeight: 600, padding: '0 14px' }), { display: 'flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' });
+    return this.ovCard({ left: '12px', right: this.ovS().panel ? '404px' : '12px', bottom: '12px' }, head + vl + mid + vl + this.ovBtn(H.icon(H.I.x, 18) + 'Cancel', 'selcancel', false, { background: K.tint, fontWeight: 600, padding: '0 14px' }), { display: 'flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' });
   }
   ovAct3(k, v, h, at) {
     const O = this.ovS(), u = this.ui();
@@ -9406,7 +9406,7 @@ class Component extends DCLogic {
     if (!this.ovBody) return;
     const u = this.ui();
     if (!this.ovOn(u) && u.ready && !u.err && u.mode === 'intro') { const html = this.ovViewHtml(this.ovS(), u, true); if (html !== this.ovLast) { this.ovBody.innerHTML = html; this.ovLast = html; } return; }
-    if (!this.ovOn(u) && this.ovEdOn(u)) { const O = this.ovS(), H = OVH; if (!(u.tool === 'zone' || u.tool === 'sec' || u.tool === 'room' || (u.nn && u.nn.gat)) && this.ghostOn) this.hideGhost(); if (u.nn && u.nn.gat) this.syncGhost(); const mapTask = this.edMapTask(u); if (mapTask !== !!this.edRT) { this.edRT = mapTask; if (mapTask) { this.edPlanWas = !!u.plan; setTimeout(() => { if (!this.ui().plan) this.put({ plan: true }); this.reframe(550); }, 0); } else { const back = !!this.edPlanWas; setTimeout(() => { if (!!this.ui().plan !== back) this.put({ plan: back }); this.reframe(550); }, 0); } } if (!(u.tool === 'lane' || u.tool === 'row')) this.edHideGhost(); const placing = u.view === 'room' && (u.tool === 'lane' || u.tool === 'row' || u.addDoor || (u.devT && u.devT.kind)); if (this.labelsEl) this.labelsEl.classList.toggle('edplacing', !!placing); const html = (placing ? '<style>.edplacing, .edplacing * { pointer-events: none !important; }</style>' : '') + this.ovEdLoc(u) + this.ovViewHtml(O, u, true) + this.edHtml(u) + this.ovCard({ right: '16px', bottom: '16px' }, this.edUndoHtml() + (this.ovVals && this.ovVals.showMode === false ? '' : '<i style="width: 1px; height: 24px; background: #DFE4D8; margin: 0 6px 0 4px; flex: none;"></i>' + this.ovBtn(H.icon(H.I.check, 18) + H.esc((this.ovVals && this.ovVals.modeLabel) || 'Done'), 'vw:modeToggle', false, { background: H.K.ink, color: '#FFFFFF', fontWeight: 600, padding: '0 16px' })), { display: 'flex', alignItems: 'center', gap: '2px' }); this.edSwap(html); this.ovEdFit(); return; }
+    if (!this.ovOn(u) && this.ovEdOn(u)) { const O = this.ovS(), H = OVH; if (!(u.tool === 'zone' || u.tool === 'sec' || u.tool === 'room' || (u.nn && u.nn.gat)) && this.ghostOn) this.hideGhost(); if (u.nn && u.nn.gat) this.syncGhost(); const mapTask = this.edMapTask(u); if (mapTask !== !!this.edRT) { this.edRT = mapTask; if (mapTask) { this.edPlanWas = !!u.plan; setTimeout(() => { if (!this.ui().plan) this.put({ plan: true }); this.reframe(550); }, 0); } else { const back = !!this.edPlanWas; setTimeout(() => { if (!!this.ui().plan !== back) this.put({ plan: back }); this.reframe(550); }, 0); } } if (!(u.tool === 'lane' || u.tool === 'row')) this.edHideGhost(); const placing = u.view === 'room' && (u.tool === 'lane' || u.tool === 'row' || u.addDoor || (u.devT && u.devT.kind)); if (this.labelsEl) this.labelsEl.classList.toggle('edplacing', !!placing); const html = (placing ? '<style>.edplacing, .edplacing * { pointer-events: none !important; }</style>' : '') + (() => { const pane = this.edHtml(u); return this.edTopBar(u) + this.ovViewCtl(O, u, true) + pane; })(); this.edSwap(html); this.ovEdFit(); return; }
     if (!this.ovOn(u)) { if (this.ovLast !== '') { this.ovBody.innerHTML = ''; this.ovLast = ''; this.ovTipHide(); } return; }
     const O = this.ovS(), st0 = this.props.start || 'saved';
     if (this.ovStarted !== st0) { this.ovStarted = st0; this.ovStart(st0); }
@@ -9419,17 +9419,17 @@ class Component extends DCLogic {
     let panel = O.panel ? this.ovPanelHtml(O, u) : '';
     panel = panel.replace('display: flex; align-items: center; gap: 12px; min-height: 44px;', 'display: flex; align-items: center; gap: 12px; min-height: 44px; position: sticky; top: -16px; z-index: 3; background: ' + K.tint + '; margin: -16px -16px 0; padding: 16px 16px 10px;');
     const acting = O.selecting || (O.panel === 'pen' && (O.ticks || []).length > 0);
-    const bottom = O.picking ? this.ovCard({ left: '16px', right: '16px', bottom: '16px' }, this.ovBarCtl(O), { display: 'flex', alignItems: 'center', gap: '6px', height: '60px', padding: '0 8px', whiteSpace: 'nowrap' })
+    const bottom = O.picking ? this.ovCard({ left: '12px', right: O.panel ? '404px' : '12px', bottom: '12px' }, this.ovBarCtl(O), { display: 'flex', alignItems: 'center', gap: '6px', height: '60px', padding: '0 8px', whiteSpace: 'nowrap' })
       : acting ? this.ovActsHtml(O, u)
-      : this.ovViewHtml(O, u) + this.ovCard({ right: '16px', bottom: '16px' }, this.ovBtn(H.icon(H.I.select, 18) + 'Select', 'select', false, { fontWeight: 600, padding: '0 12px' }));
-    const html = this.ovLoc(u) +
-      (panel ? '<section data-zone="panel" aria-label="Panel" style="' + H.st({ position: 'absolute', right: '16px', top: '16px', maxHeight: 'calc(100% - 104px)', width: '380px', boxSizing: 'border-box', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint, boxShadow: '0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12)', overflowY: 'auto', overflowX: 'hidden', scrollbarWidth: 'none', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums', color: K.ink, fontSize: '14px', lineHeight: '20px' }) + '">' + panel + '</section>' : '') +
+      : this.ovViewCtl(O, u, false);
+    const html = this.ovTopBar(u, O) +
+      (panel ? '<section data-zone="panel" aria-label="Panel" style="' + H.st({ position: 'absolute', right: '12px', top: '84px', bottom: '12px', width: '380px', boxSizing: 'border-box', padding: '16px 16px 20px', borderRadius: '22px', background: K.tint, boxShadow: '0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12)', overflowY: 'auto', overflowX: 'hidden', scrollbarWidth: 'none', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums', color: K.ink, fontSize: '14px', lineHeight: '20px' }) + '">' + panel + '</section>' : '') +
       this.ovSide(O, u) + bottom + this.ovPopHtml(O, u) + (this.ovExtra ? this.ovExtra(O, u) : '');
     if (html === this.ovLast) return;
     const pEl = this.ovBody.querySelector('[data-zone="panel"]'), keep = pEl ? pEl.scrollTop : 0, sc = {};
     this.ovBody.querySelectorAll('[data-scroll]').forEach((x) => { sc[x.getAttribute('data-scroll')] = x.scrollTop; });
     const samePanel = this.ovLastPanel === O.panel;
-    this.ovBody.innerHTML = html; this.ovLast = html; this.ovLastPanel = O.panel; { const pz = this.ovBody.querySelector('[data-zone="panel"]'), lz = this.ovBody.firstElementChild, R = this.ovBody.getBoundingClientRect(); if (pz && lz && lz !== pz) { const a = lz.getBoundingClientRect(), b = pz.getBoundingClientRect(); if (a.right + 12 > b.left) { const top = Math.round(a.bottom - R.top + 8); pz.style.top = top + 'px'; pz.style.maxHeight = 'calc(100% - ' + (top + 88) + 'px)'; } } }
+    this.ovBody.innerHTML = html; this.ovLast = html; this.ovLastPanel = O.panel; { const pz = this.ovBody.querySelector('[data-zone="panel"]'), lz = this.ovBody.firstElementChild, R = this.ovBody.getBoundingClientRect(); if (pz && lz && lz !== pz) { const a = lz.getBoundingClientRect(), b = pz.getBoundingClientRect(); if (false) { const top = Math.round(a.bottom - R.top + 8); pz.style.top = top + 'px'; pz.style.maxHeight = 'calc(100% - ' + (top + 88) + 'px)'; } } }
     const p2 = this.ovBody.querySelector('[data-zone="panel"]'); if (p2 && samePanel) p2.scrollTop = keep;
     this.ovBody.querySelectorAll('[data-scroll]').forEach((x) => { const id = x.getAttribute('data-scroll'); if (sc[id] != null && samePanel) x.scrollTop = sc[id]; else if (x.getAttribute('data-scroll-to')) x.scrollTop = +x.getAttribute('data-scroll-to'); });
   }
@@ -9694,6 +9694,75 @@ class Component extends DCLogic {
     this.openEndRow();
     const a = this.ui().arT; if (a) this.put({ arT: Object.assign({}, a, { at: s.at || a.at, placed: true }) });
   }
+  // ===================== Proposal C, built: one bar across the top, one main pane under it, 3D/Plan and zoom at the bottom left =====================
+  ovKindPath(kind) { return ({ farm: 'M4 21V9m5 12V9m5 12V9m5 12V9M2 12h20M2 17h20', zone: 'M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20V6.5Zm6-2.5v13.5m6-11v13.5', section: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', sec: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', room: 'M4 10 12 4l8 6v10H4V10Z', pen: 'M5 5h14v14H5zM9.7 5v14M14.3 5v14' })[kind] || 'M4 10 12 4l8 6v10H4V10Z'; }
+  // the place: ‹ up, its kind as an icon, its name
+  ovWhere(P, o) {
+    const H = OVH, K = H.K; o = o || {};
+    const kind = P.cur && P.cur.kind === 'pen' ? 'pen' : (P.cur && P.cur.kind) || 'farm';
+    return (P.levels.length > 1 ? this.ovSq(H.I.back, 'up', 'Up one level') : '') + '<span title="' + H.esc(({ farm: 'Farm', zone: 'Zone', section: 'Section', sec: 'Section', room: 'Room', pen: 'Pen' })[kind] || '') + '" style="' + H.st({ display: 'inline-flex', alignItems: 'center', gap: '9px', height: '40px', padding: '0 10px 0 6px', whiteSpace: 'nowrap', flexShrink: 0 }) + '"><span style="' + H.st({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '9px', background: K.press, color: K.ink, flexShrink: 0 }) + '">' + H.icon(this.ovKindPath(kind), 17) + '</span>' + H.t(P.name, { fontSize: '17px', lineHeight: '22px', fontWeight: 600, letterSpacing: '-.01em' }) + (o.fault ? H.dot(K.red, 8) : '') + '</span>';
+  }
+  ovBarSep() { return '<i style="' + OVH.st({ width: '1px', height: '24px', background: OVH.K.line, margin: '0 6px', flexShrink: 0 }) + '"></i>'; }
+  ovTopCard(inner) { return this.ovCard({ left: '12px', right: '12px', top: '12px' }, inner, { display: 'flex', alignItems: 'center', gap: '2px', minHeight: '60px', padding: '0 8px', whiteSpace: 'nowrap' }); }
+  // the Farm view's bar: the place, what you can open, Select at the right end
+  ovTopBar(u, O) {
+    const H = OVH, K = H.K, P = this.ovPlace(u);
+    const kinds = P.pen ? this.ovPigs(P.r.id, P.pen) : this.ovPigsIn(P.rooms), fault = P.rooms.some((x) => this.ovFault(x.id, P.pen));
+    this.ovKinds = kinds;
+    const total = kinds.reduce((a, x) => a + x[0], 0), pnl = O.panel;
+    const isBatch = ['sched', 'rx', 'list', 'batch', 'task', 'dates', 'done', 'compare'].indexOf(pnl) >= 0, isPigs = ['pigs', 'pig', 'pigperf', 'piglog', 'pen'].indexOf(pnl) >= 0, dd = P.r ? this.ovDevDot(u) : '';
+    const nw = (this.W || 950) < 760, L = (x) => nw ? '' : x;
+    const tabs = this.ovBtn(H.icon(H.I.cal, 18) + L('Schedule'), 'sched', isBatch) +
+      (total && !P.pen ? this.ovBtn(H.icon(H.I.pig, 18) + L('Pigs') + '<span style="' + H.st({ color: isPigs ? K.ink : K.muted, fontWeight: 600 }) + '">' + total.toLocaleString('en-GB') + '</span>', 'pigspanel', isPigs) : '') +
+      (P.r ? this.ovBtn(H.icon(H.I.tool, 18) + L('Devices') + (dd ? H.dot(dd, 8) : ''), 'devices', pnl === 'devices') : '');
+    return this.ovTopCard(this.ovWhere(P, { fault: fault }) + this.ovBarSep() + tabs + '<span style="flex: 1;"></span>' + this.ovBtn(H.icon(H.I.select, 18) + L('Select'), 'select', !!O.selecting, { fontWeight: 600, padding: nw ? '0 10px' : '0 12px' }));
+  }
+  // bottom left: 3D or Plan, zoom, fit, and ··· for the rest of the view
+  ovViewCtl(O, u, ed) {
+    const H = OVH, K = H.K, open = O.pop === 'view';
+    const seg = '<span style="' + H.st({ display: 'inline-flex', gap: '2px', padding: '3px', borderRadius: '11px', background: K.press }) + '">' + [['3D', 'toAngle', !u.plan], ['Plan', 'toPlan', !!u.plan]].map((x) => '<button type="button"' + H.A('vw:' + x[1]) + ' style="' + H.st({ display: 'inline-flex', alignItems: 'center', height: '34px', padding: '0 12px', borderRadius: '8px', border: 0, background: x[2] ? '#FFFFFF' : 'transparent', boxShadow: x[2] ? '0 1px 2px rgba(17,21,17,.12)' : 'none', fontFamily: 'inherit', fontSize: '13.5px', fontWeight: x[2] ? 600 : 500, color: K.ink, cursor: 'pointer' }) + '">' + x[0] + '</button>').join('') + '</span>';
+    const sb = (d, a, lab) => '<button type="button"' + H.A(a) + ' aria-label="' + lab + '" title="' + lab + '" style="' + H.st({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '10px', border: 0, background: a === 'viewmenu' && open ? K.press : 'transparent', color: K.ink, cursor: 'pointer', padding: 0 }) + '">' + H.icon(d, 17) + '</button>';
+    const I = { rl: 'M4 12a8 8 0 1 0 2.4-5.7 M4 4v4.5h4.5', rr: 'M20 12a8 8 0 1 1-2.4-5.7 M20 4v4.5h-4.5', fit: 'M4 9V4h5 M20 9V4h-5 M4 15v5h5 M20 15v5h-5', moon: 'M20 13.5A8 8 0 1 1 10.5 4a6.5 6.5 0 0 0 9.5 9.5Z', edit: 'M4 20h4L19 9l-4-4L4 16v4Z M13.5 6.5l4 4', more: 'M5 12h.01M12 12h.01M19 12h.01' };
+    const ctl = this.ovCard({ left: '12px', bottom: '12px' }, seg + this.ovBarSep() + sb(H.I.minus, 'vw:zoomOut', 'Zoom out') + sb(H.I.plus, 'vw:zoomIn', 'Zoom in') + sb(I.fit, 'vw:fit', 'Fit to the screen') + sb(I.more, 'viewmenu', 'More view'), { display: 'flex', alignItems: 'center', gap: '2px', padding: '6px' });
+    if (!open) return ctl;
+    const row = (d, l, a) => '<button type="button"' + H.A(a) + ' style="' + H.st({ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', height: '42px', padding: '0 10px', borderRadius: '10px', border: 0, background: 'transparent', fontFamily: 'inherit', fontSize: '14px', color: K.ink, cursor: 'pointer', textAlign: 'left' }) + '">' + H.icon(d, 17) + l + '</button>';
+    return ctl + '<div data-pop="1" style="' + H.st({ position: 'absolute', left: '12px', bottom: '72px', width: '230px', padding: '6px', boxSizing: 'border-box', borderRadius: '14px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 14px 32px rgba(17,21,17,.16)', pointerEvents: 'auto', fontFamily: "'Geist', system-ui, sans-serif", zIndex: 7 }) + '">' +
+      row(I.rl, 'Turn left', 'vw:turnLeft') + row(I.rr, 'Turn right', 'vw:turnRight') + row(I.moon, 'Night', 'vw:toNight') + (ed ? '' : '<div style="' + H.st({ height: '1px', background: K.line, margin: '4px 6px' }) + '"></div>' + row(I.edit, 'Edit layout', 'vw:modeToggle')) + '</div>';
+  }
+  // Edit: something picked on the map (a lane, a pen, a door, a device, rooms) opens its page in the pane
+  edPicked(u) { return !!(u.sel || u.pen || (u.selKind === 'room' && (u.selIds || []).length)); }
+  edPaneOpen(u) { return !this.edMapTask(u) && (this.edPicked(u) || !!(u.nn || u.ed || u.cf || u.dupT || u.mvT || u.chT || u.ptList || u.ptForm || u.arT || u.dvE || (u.devT && !u.devT.kind) || u.vt)); }
+  // Edit's bar: the place, Add ▾ and the place's actions (the rest under More ▾), then undo · redo · Done
+  edTopBar(u) {
+    if (this.edMapTask(u)) return '';
+    const V = this.ovVals || {}, P = V.P || {}, H = OVH, K = H.K, PL = this.ovPlace(u), picked = this.edPicked(u);
+    this.edF = this.edF || {};
+    const A = (fn) => { const k = 'f' + (this.edN = (this.edN || 0) + 1); this.edF[k] = fn; return 'ed:' + k; };
+    const repaint = () => { this.ovLast = null; this.ovPaint(); };
+    const toggle = (m) => A(() => { this.edMenu = this.edMenu === m ? '' : m; repaint(); });
+    const run = (fn) => A(() => { this.edMenu = ''; if (fn) fn(); repaint(); });
+    if (!this.edMenuOff) { this.edMenuOff = (e) => { if (!this.edMenu) return; if (e.target && e.target.closest && e.target.closest('[data-edmenu]')) return; this.edMenu = ''; this.ovLast = null; this.ovPaint(); }; window.addEventListener('pointerdown', this.edMenuOff, true); }
+    const caret = H.icon('m6 9 6 6 6-6', 14, { color: K.muted });
+    const menu = (m, items) => this.edMenu !== m ? '' : '<div data-edmenu="1" style="' + H.st({ position: 'absolute', left: 0, top: '50px', minWidth: '270px', padding: '6px', boxSizing: 'border-box', borderRadius: '14px', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(17,21,17,.06), 0 14px 32px rgba(17,21,17,.16)', zIndex: 8, whiteSpace: 'normal' }) + '">' + items.map((x) => (x.sep ? '<div style="' + H.st({ height: '1px', background: K.line, margin: '4px 6px' }) + '"></div>' : '') + '<button type="button"' + H.A(run(x.fn)) + ' style="' + H.st({ width: '100%', display: 'flex', alignItems: 'flex-start', gap: '10px', padding: '9px 10px', borderRadius: '10px', border: 0, background: 'transparent', fontFamily: 'inherit', textAlign: 'left', color: x.red ? K.red : K.ink, cursor: 'pointer' }) + '"><span style="display: inline-flex; margin-top: 1px;">' + H.icon(x.ico || H.I.plus, 17) + '</span><span style="' + H.st({ display: 'flex', flexDirection: 'column', gap: '1px' }) + '">' + H.t(x.label, { fontSize: '14px', fontWeight: 500 }) + (x.hint ? H.t(x.hint, { fontSize: '12.5px', lineHeight: '17px', color: K.muted, whiteSpace: 'normal' }) : '') + '</span></button>').join('') + '</div>';
+    let mid = '';
+    if (!picked) {
+      if (P.hasAdd) {
+        if (P.addMenu) mid += '<span data-edmenu="1" style="position: relative; display: inline-flex;">' + this.ovBtn(H.icon(H.I.plus, 18) + 'Add' + caret, toggle('add'), this.edMenu === 'add') + menu('add', (P.addItems || []).map((a) => ({ label: a.label, hint: String(a.hint || '').replace(/\.?\s*Not ready yet\.?/, ''), ico: a.icon, fn: a.run }))) + '</span>';
+        else mid += this.ovBtn(H.icon(H.I.plus, 18) + H.esc(P.addLabel || 'Add'), run(P.addClick), false);
+      }
+      const acts = [], rest = [];
+      if (P.hasLead && P.lead) acts.push({ label: P.lead.label, ico: P.lead.icon, fn: P.lead.run });
+      (P.actions || []).forEach((a) => (a.danger ? rest : acts).push({ label: a.label, ico: a.icon, fn: a.run, red: a.danger }));
+      if (P.hasMore) (P.more || []).forEach((a) => rest.unshift({ label: a.label, ico: a.icon, fn: a.run, red: a.danger }));
+      const nw = (this.W || 950) < 760, shown = acts.slice(0, nw ? 0 : 3), over = acts.slice(nw ? 0 : 3);
+      mid += shown.map((a) => this.ovBtn(H.icon(a.ico || H.I.plus, 18) + H.esc(a.label), run(a.fn), false)).join('');
+      const moreItems = over.concat(P.hasEdit && P.edit ? [{ label: P.editTitle || 'Edit details', ico: 'M4 20h4L19 9l-4-4L4 16v4Z', fn: P.edit }] : []);
+      const dangers = rest.filter((x) => x.red), others = rest.filter((x) => !x.red), list = moreItems.concat(others).concat(dangers.map((d, i) => Object.assign({}, d, { sep: i === 0 && (moreItems.length + others.length) > 0 })));
+      if (list.length) mid += '<span data-edmenu="1" style="position: relative; display: inline-flex;">' + this.ovBtn(H.icon('M5 12h.01M12 12h.01M19 12h.01', 18) + 'More', toggle('more'), this.edMenu === 'more') + menu('more', list) + '</span>';
+    }
+    const done = (this.ovVals && this.ovVals.showMode === false) ? '' : this.ovBarSep() + this.ovBtn(H.icon(H.I.check, 18) + H.esc((this.ovVals && this.ovVals.modeLabel) || 'Done'), 'vw:modeToggle', false, { background: K.ink, color: '#FFFFFF', fontWeight: 600, padding: '0 16px' });
+    return this.ovTopCard(this.ovWhere(PL) + (mid ? this.ovBarSep() + mid : '') + '<span style="flex: 1;"></span>' + this.edUndoHtml() + done);
+  }
   edMapTask(u) { return !!(u.tool === 'room' || u.tool === 'zone' || u.tool === 'sec' || u.tool === 'lane' || u.tool === 'row' || u.addDoor || u.reshape || (u.devT && u.devT.kind) || u.dp); }
   edDevGroups() {
     return [
@@ -9747,7 +9816,7 @@ class Component extends DCLogic {
     const note = (text, warn) => text ? '<div style="margin: 10px 4px 0; font-size: 13.5px; line-height: 20px; color: ' + (warn ? K.red : K.muted) + ';">' + esc(text) + '</div>' : '';
     const panel = (inner) => { const cut = (src, a, b) => { const i = src.indexOf(a), j = i < 0 ? -1 : src.indexOf(b, i); return i < 0 || j < 0 ? [null, src] : [[null, src.slice(i + a.length, j)], src.slice(0, i) + src.slice(j + b.length)]; };
       const c1 = cut(inner, '<!--H-->', '<!--/H-->'), c2 = cut(c1[1], '<!--F-->', '<!--/F-->'), hm = c1[0], fm = c2[0], body = c2[1]; return panelBox((hm ? hm[1] : '') + '<div data-zone="edbody" style="flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; padding: 0 16px ' + (fm ? 12 : 18) + 'px;">' + body + '</div>' + (fm ? fm[1] : '')); };
-    const narrow = (this.W || 950) < 760, place = narrow ? 'left: 16px; right: 16px; bottom: 84px; max-height: calc(50% - 60px);' : 'right: 16px; top: 16px; width: 380px; max-height: calc(100% - 104px);';
+    const narrow = (this.W || 950) < 760, place = narrow ? 'left: 12px; right: 12px; bottom: 12px; max-height: calc(55% - 20px);' : 'right: 12px; top: 84px; bottom: 12px; width: 380px;';
     const panelBox = (inner) => '<section data-zone="edcol" aria-label="Edit" style="position: absolute; ' + place + ' max-width: calc(100% - 32px); box-sizing: border-box; display: flex; flex-direction: column; border-radius: 22px; background: ' + K.tint + '; box-shadow: 0 2px 6px rgba(17,21,17,.05), 0 16px 36px rgba(17,21,17,.12); overflow: hidden; pointer-events: auto; font-family: \'Geist\', system-ui, sans-serif; color: ' + K.ink + '; font-size: 14px; line-height: 20px; font-variant-numeric: tabular-nums;">' + inner + '</section>';
     const isRed = (s) => /#7A2C2C/i.test(s || '');
 
@@ -9761,7 +9830,7 @@ class Component extends DCLogic {
       else if (u.devT && u.devT.kind) { act = 'Cancel'; fn = () => this.put({ devT: null }); ico = (this.devPaths && this.devPaths()[u.devT.kind]) || ''; }
       else if (u.dp) { act = 'Done'; }
       else if (u.addDoor) { ico = ic.door || ''; }
-      const pill = '<div data-zone="edguide" role="status" style="position: absolute; ' + ((this.W || 950) < 760 ? 'left: 16px; right: 16px; top: 84px;' : 'right: 16px; top: 16px; width: 380px; max-width: calc(100% - 290px); min-width: 260px;') + ' box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 16px; border-radius: 18px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(17,21,17,.06), 0 12px 30px rgba(17,21,17,.16); pointer-events: auto; font-family: \'Geist\', system-ui, sans-serif; color: ' + K.ink + '; z-index: 6;">' +
+      const pill = '<div data-zone="edguide" role="status" style="position: absolute; left: 12px; right: 12px; top: 12px; min-height: 60px; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 10px; border-radius: 16px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(17,21,17,.06), 0 12px 30px rgba(17,21,17,.16); pointer-events: auto; font-family: \'Geist\', system-ui, sans-serif; color: ' + K.ink + '; z-index: 6;">' +
         (ico ? '<span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; border-radius: 10px; background: ' + K.ink + '; color: #FFFFFF;">' + sv(ico, 18) + '</span>' : '') +
         '<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px; line-height: 20px; font-weight: 600;">' + esc(title) + '</span>' + (sub ? '<span style="font-size: 13px; line-height: 18px; color: ' + K.muted + ';">' + esc(sub) + '</span>' : '') + '</span>' +
         '<button type="button"' + A(fn) + ' style="flex: none; height: 40px; padding: 0 14px; border-radius: 10px; border: ' + (act === 'Done' ? '0' : '1px solid #D5DACF') + '; background: ' + (act === 'Done' ? K.ink : '#FFFFFF') + '; color: ' + (act === 'Done' ? '#FFFFFF' : K.ink) + '; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">' + esc(act) + '</button></div>';
@@ -9848,7 +9917,9 @@ class Component extends DCLogic {
       return panel(h);
     }
 
-    // ----- the place you are on, or the thing picked: what it is, what is inside, what you can do -----
+    // a place at rest opens no pane: the bar holds its actions and the map shows it
+    if (!this.edPicked(u)) return '';
+    // ----- the thing picked: what it is, what is inside, what you can do -----
     const closer = (P.cRuns || P.cHead || P.cNote) ? P.close : null;
     if (P.cNote && P.note) {
       const ix = P.note.indexOf(','), t1 = ix > 0 ? P.note.slice(0, ix) : P.note, t2 = ix > 0 ? P.note.slice(ix + 1).trim() : '';
