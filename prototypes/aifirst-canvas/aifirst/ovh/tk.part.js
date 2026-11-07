@@ -22,16 +22,23 @@
   tkTask() { const O = this.ovS(); return O.tk ? this.tkDefs()[O.tk] : null; }
   tkLive() { const O = this.ovS(); return !!(O.tk && O.tkOpen && this.ovOn && this.ovOn()); }
   tkCol(rid, code) { if (!this.tkLive()) return undefined; const T = this.tkTask(), s = T.state(rid, code), C = this.tkC(); if (s) return C[s]; return T.rooms.indexOf(rid) >= 0 || rid === this.ui().roomId ? C.fade : undefined; }
+  tkSave() { const O = this.ovS(); try { window.__sentriTasks = { tks: (O.tks || []).slice(), tk: O.tk || '', open: !!O.tkOpen }; } catch (e) { /* ignore */ } }
+  tkRestore() { const W = window.__sentriTasks, O = this.ovS(); if (!W || !W.tks || !W.tks.length || (O.tks || []).length) return false; O.tks = W.tks.slice(); O.tk = W.tk; if (W.tk && W.open) this.tkActivate(W.tk); else { O.tkOpen = false; this.ovPaint(); } return true; }
+  // a page or a chat card asks for a task: start 'task:<id>' (anything after @ is ignored) or the window event sentri:task {id}
+  tkHook() { if (this.tkEvt) return; this.tkEvt = (e) => { const d = (e && e.detail) || {}; if (d.id && this.alive !== false) this.tkOpen(d.id); }; window.addEventListener('sentri:task', this.tkEvt); }
+  tkUnhook() { if (this.tkEvt) window.removeEventListener('sentri:task', this.tkEvt); this.tkEvt = null; }
   tkTop() { return (this.ovS().tks || []).length ? 134 : 84; }
   tkOpen(id) { const O = this.ovS(), T = this.tkDefs()[id]; if (!T) return; O.tks = O.tks || []; if (O.tks.indexOf(id) < 0) O.tks.push(id); this.tkActivate(id); }
+  // Open page: the console opens the task's own page in its tab
+  tkPage() { const O = this.ovS(), T = this.tkTask(); if (!T) return; try { window.dispatchEvent(new CustomEvent('sentri:open', { detail: { action: T.kind === 'rx' ? 'rxpage' : 'vaxpage', id: O.tk, from: { title: T.title, many: true } } })); } catch (e) { /* ignore */ } }
   tkActivate(id) {
     const O = this.ovS(), T = this.tkDefs()[id]; O.tk = id; O.tkOpen = true; O.tkPen = ''; O.panel = 'tk'; O.hist = []; this.setSel([]);
     if (T.go.room) { if (this.ui().roomId !== T.go.room || this.ui().view !== 'room') this.goRoom(T.go.room); }
     else { const s = this.M().sections.find((x) => /nurs/i.test(x.name)); if (s) this.goScope(s.zone || '', s.id, { ms: 650 }); }
-    this.repaintBv(); this.ovPaint();
+    this.tkSave(); this.repaintBv(); this.ovPaint();
   }
-  tkCollapse() { const O = this.ovS(); O.tkOpen = false; O.tkPen = ''; if (['tk', 'tkpig'].indexOf(O.panel) >= 0) { O.panel = ''; O.hist = []; } this.setSel([]); this.repaintBv(); this.ovPaint(); }
-  tkClose(id) { const O = this.ovS(); O.tks = (O.tks || []).filter((x) => x !== id); if (O.tk === id) { O.tk = ''; this.tkCollapse(); } else this.ovPaint(); }
+  tkCollapse() { const O = this.ovS(); O.tkOpen = false; O.tkPen = ''; if (['tk', 'tkpig'].indexOf(O.panel) >= 0) { O.panel = ''; O.hist = []; } this.setSel([]); this.tkSave(); this.repaintBv(); this.ovPaint(); }
+  tkClose(id) { const O = this.ovS(); O.tks = (O.tks || []).filter((x) => x !== id); if (O.tk === id) { O.tk = ''; this.tkCollapse(); } else { this.tkSave(); this.ovPaint(); } }
   tkStart() { const O = this.ovS(); O.tks = ['rx09', 'prrs']; this.tkActivate('rx09'); }
   // returns true when it handled the action
   tkAct(k, v) {
@@ -39,6 +46,7 @@
     if (k === 'tk') { if (O.tk === v && O.tkOpen) this.tkCollapse(); else this.tkActivate(v); return true; }
     if (k === 'tkx') { this.tkClose(v); return true; }
     if (k === 'tkc') { this.tkCollapse(); return true; }
+    if (k === 'tkpage') { this.tkPage(); return true; }
     if (k === 'tkroom') { this.goRoom(v); return true; }
     if (k === 'tkwhole') { O.tkPen = ''; this.setSel([]); O.panel = 'tk'; this.ovPaint(); return true; }
     if (k === 'tkback') { O.panel = 'tk'; O.tkPig = null; this.setSel([]); this.ovPaint(); return true; }
@@ -95,7 +103,7 @@
     const rooms = !O.tkPen && T.roomsLeft ? '<div style="margin: 16px 4px 8px; font-size: 13px; font-weight: 600; color: ' + K.muted + '; display: flex; justify-content: space-between;"><span>Rooms</span><span style="font-weight: 400;">pens left</span></div>' + this.tkBox(T.roomsLeft.map((r, i) => '<div' + H.A('tkroom:' + r[0]) + ' style="display: flex; align-items: center; gap: 8px; min-height: 42px; border-top: ' + (i ? '1px solid #EEF0EA' : '0') + '; cursor: pointer;"><span style="flex: 1; font-weight: 500;">' + r[1] + '</span><span style="color: ' + K.muted + '; font-size: 13px;">' + r[2] + '</span>' + H.icon(H.I.chev, 14, { color: K.faint }) + '</div>').join(''), '0 14px') : '';
     return this.tkHead(T) + (scope || chips) + this.tkBox(num + this.tkCal(T.week, days)) + whole + rooms +
       '<div style="margin: 16px 4px 8px; font-size: 13px; font-weight: 600; color: ' + K.muted + ';">' + (T.kind === 'vax' ? 'Plan' : 'Prescription') + '</div>' + facts +
-      '<div style="display: flex; margin-top: 12px;">' + H.wbtn('M14 4h6v6M20 4l-9 9M18 14v6H4V6h6', 'Open page', 'noop') + '</div>';
+      '<div style="display: flex; margin-top: 12px;">' + H.wbtn('M14 4h6v6M20 4l-9 9M18 14v6H4V6h6', 'Open page', 'tkpage') + '</div>';
   }
   tkPigHtml() {
     const H = OVH, K = H.K, O = this.ovS(), T = this.tkTask(), g = O.tkPig; if (!T || !g) return '';

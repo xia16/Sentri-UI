@@ -7,8 +7,9 @@ const all = (a, b) => { const n = s.split(a).length - 1; if (n < 1) { console.lo
 
 once('  ovKindPath(kind) {', fs.readFileSync(path.join(S, 'tk.part.js'), 'utf8') + '  ovKindPath(kind) {');
 // start state and an event any page or the chat can send
-once('"options":["pigsow",', '"options":["tasks","pigsow",');
-once("  ovStart(st) {\n", "  ovStart(st) {\n    if (st === 'tasks') { setTimeout(() => this.tkStart(), 300); return; }\n    if (!this.tkEvt) { this.tkEvt = (e) => { const d = (e && e.detail) || {}; if (d.id) this.tkOpen(d.id); }; window.addEventListener('sentri:task', this.tkEvt); }\n");
+once('"options":["pigsow",', '"options":["tasks","task:rx09","pigsow",');
+once("  ovStart(st) {\n", "  ovStart(st) {\n    this.tkHook();\n    if (st === 'tasks') { setTimeout(() => this.tkStart(), 300); return; }\n    { const m = /^task:([^@]+)/.exec(String(st || '')); if (m) { setTimeout(() => { this.tkRestore(); this.tkOpen(m[1]); }, 300); return; } }\n    if (!this.tkRestored) { this.tkRestored = true; setTimeout(() => this.tkRestore(), 320); }\n");
+once("  componentWillUnmount() {\n    this.alive = false;\n", "  componentWillUnmount() {\n    this.alive = false;\n    if (this.tkUnhook) this.tkUnhook();\n");
 // actions
 once("    if (k === 'ed') { const f = this.edF && this.edF[v]; if (f) f(); return; }\n", "    if (k === 'ed') { const f = this.edF && this.edF[v]; if (f) f(); return; }\n    if (this.tkAct && this.tkAct(k, v)) return;\n");
 // a pen picked while a task is open
