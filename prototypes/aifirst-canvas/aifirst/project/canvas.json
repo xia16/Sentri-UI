@@ -1,5 +1,4 @@
 {
-  "v": 3,
   "attachments": {},
   "boards": {
     "ActApply.dc.html": {
@@ -344,6 +343,30 @@
       "x": 3600,
       "y": 30189
     },
+    "EditLayoutRebuilt.dc.html": {
+      "h": 9878,
+      "page": "archive",
+      "title": "Proposal · Edit layout rebuilt: one panel, pages, the map only for placing; Farm view Schedule scoped to where you are",
+      "w": 2752,
+      "x": 9604,
+      "y": 46200
+    },
+    "FarmViewDocked.dc.html": {
+      "h": 2392,
+      "page": "archive",
+      "title": "Proposal · Farm view and Edit layout on one set of rules: the panel docks full height, the bar says where you are",
+      "w": 4016,
+      "x": 12556,
+      "y": 46200
+    },
+    "FarmViewEdges.dc.html": {
+      "h": 2371,
+      "page": "archive",
+      "title": "Proposal B · Card left, bar bottom, window right: the earlier layout kept and made strict, for the Farm view and Edit layout",
+      "w": 4016,
+      "x": 16772,
+      "y": 46200
+    },
     "FarmViewLayout.dc.html": {
       "h": 7260,
       "page": "archive",
@@ -352,6 +375,14 @@
       "x": 5360,
       "y": 30189
     },
+    "FarmViewLens.dc.html": {
+      "h": 1230,
+      "page": "archive",
+      "title": "Proposal · Pages in tabs, the Farm view for where, joined by a lens (task progress on the map, pig detail in the pane)",
+      "w": 4016,
+      "x": 20988,
+      "y": 46200
+    },
     "FarmViewShots.dc.html": {
       "h": 5658,
       "page": "archive",
@@ -359,6 +390,38 @@
       "w": 2080,
       "x": 8312,
       "y": 30189
+    },
+    "FarmViewTaskTabs.dc.html": {
+      "h": 2108,
+      "page": "treatment",
+      "title": "Proposal · Open tasks in the Farm view: chips under the bar, one active, collapse to step out, × to close",
+      "w": 3026,
+      "x": 480,
+      "y": 5200
+    },
+    "FarmViewTasks.dc.html": {
+      "h": 3278,
+      "page": "archive",
+      "title": "Superseded · A task on the Farm view (zoom into a pen, generic state words)",
+      "w": 3026,
+      "x": 25204,
+      "y": 46200
+    },
+    "FarmViewTop.dc.html": {
+      "h": 2447,
+      "page": "home",
+      "title": "Built · Farm view and Edit layout on proposal C: one bar at the top, one pane under it",
+      "w": 4016,
+      "x": 3706,
+      "y": 2300
+    },
+    "FarmViewTreatment.dc.html": {
+      "h": 3049,
+      "page": "treatment",
+      "title": "Proposal · Treatment on the Farm view: hover says where she is now; click shows this treatment for her (track and log)",
+      "w": 3026,
+      "x": 3706,
+      "y": 5200
     },
     "FlowActionOpened.dc.html": {
       "h": 900,
@@ -407,6 +470,14 @@
       "title": "Proposal · Home dashboards as widgets: three modules, Production, Health, Finance",
       "w": 1072,
       "x": 3828,
+      "y": 46200
+    },
+    "HomeReport.dc.html": {
+      "h": 2515,
+      "page": "archive",
+      "title": "Proposal · Home with the daily report in place of the dashboards: C1 a busy morning, C2 a quiet one",
+      "w": 2052,
+      "x": 7352,
       "y": 46200
     },
     "HomeRouting.dc.html": {
@@ -496,6 +567,15 @@
       "x": 0,
       "y": 16464
     },
+    "PenGroupStudy.dc.html": {
+      "h": 860,
+      "is_interactive": false,
+      "page": "treatment",
+      "title": "Study (superseded 8 Nov) · Group pens in the Pigs list: no pen grouping was chosen",
+      "w": 2040,
+      "x": 10728,
+      "y": 0
+    },
     "PigKit.dc.html": {
       "h": 900,
       "is_interactive": true,
@@ -504,6 +584,15 @@
       "w": 1360,
       "x": 14472,
       "y": 30189
+    },
+    "PigsListCases.dc.html": {
+      "h": 3955,
+      "is_interactive": false,
+      "page": "treatment",
+      "title": "Pigs list on a treatment: every case (37 cases; Codex attacked the first board, its 27 additions are marked)",
+      "w": 2208,
+      "x": 8320,
+      "y": 2500
     },
     "ProductMap.dc.html": {
       "h": 3140,
@@ -642,6 +731,15 @@
       "x": 2840,
       "y": 0
     },
+    "TreatRunningRevamp.dc.html": {
+      "h": 2340,
+      "is_interactive": false,
+      "page": "treatment",
+      "title": "Proposal · Running treatment page, revamped: the dose track, the Pigs list by pen, long courses, medicated water, two medicines",
+      "w": 2248,
+      "x": 8320,
+      "y": 0
+    },
     "Treatment.dc.html": {
       "h": 900,
       "is_interactive": true,
@@ -660,77 +758,13 @@
       "x": 480,
       "y": 0
     },
-    "HomeReport.dc.html": {
-      "page": "archive",
-      "x": 7352,
-      "y": 46200,
-      "w": 2052,
-      "h": 2515,
-      "title": "Proposal · Home with the daily report in place of the dashboards: C1 a busy morning, C2 a quiet one"
-    },
-    "EditLayoutRebuilt.dc.html": {
-      "page": "archive",
-      "x": 9604,
-      "y": 46200,
-      "w": 2752,
-      "h": 9878,
-      "title": "Proposal · Edit layout rebuilt: one panel, pages, the map only for placing; Farm view Schedule scoped to where you are"
-    },
-    "FarmViewDocked.dc.html": {
-      "page": "archive",
-      "x": 12556,
-      "y": 46200,
-      "w": 4016,
-      "h": 2392,
-      "title": "Proposal · Farm view and Edit layout on one set of rules: the panel docks full height, the bar says where you are"
-    },
-    "FarmViewEdges.dc.html": {
-      "page": "archive",
-      "x": 16772,
-      "y": 46200,
-      "w": 4016,
-      "h": 2371,
-      "title": "Proposal B · Card left, bar bottom, window right: the earlier layout kept and made strict, for the Farm view and Edit layout"
-    },
-    "FarmViewTop.dc.html": {
+    "FarmViewAudit.dc.html": {
+      "h": 5478,
       "page": "home",
-      "x": 3706,
-      "y": 2300,
-      "w": 4016,
-      "h": 2447,
-      "title": "Built · Farm view and Edit layout on proposal C: one bar at the top, one pane under it"
-    },
-    "FarmViewLens.dc.html": {
-      "page": "archive",
-      "x": 20988,
-      "y": 46200,
-      "w": 4016,
-      "h": 1230,
-      "title": "Proposal · Pages in tabs, the Farm view for where, joined by a lens (task progress on the map, pig detail in the pane)"
-    },
-    "FarmViewTasks.dc.html": {
-      "page": "archive",
-      "x": 25204,
-      "y": 46200,
-      "w": 3026,
-      "h": 3278,
-      "title": "Superseded · A task on the Farm view (zoom into a pen, generic state words)"
-    },
-    "FarmViewTreatment.dc.html": {
-      "page": "treatment",
-      "x": 3706,
-      "y": 5200,
-      "w": 3026,
-      "h": 3049,
-      "title": "Proposal · Treatment on the Farm view: hover says where she is now; click shows this treatment for her (track and log)"
-    },
-    "FarmViewTaskTabs.dc.html": {
-      "page": "treatment",
+      "title": "Farm view audit · before and after (mock-up, not live): seven fixes, two open questions",
+      "w": 2080,
       "x": 480,
-      "y": 5200,
-      "w": 3026,
-      "h": 2108,
-      "title": "Proposal · Open tasks in the Farm view: chips under the bar, one active, collapse to step out, × to close"
+      "y": 2300
     }
   },
   "createdOnFiles": {
@@ -807,6 +841,15 @@
       "w": 240,
       "x": 0,
       "y": 7457
+    },
+    "arch-homefv": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "archive",
+      "text": "Home and Farm view explorations (6–7 Nov), superseded: Home is now the navigator panel; the Farm view is built on proposal C",
+      "w": 240,
+      "x": 0,
+      "y": 45900
     },
     "arch-l3d": {
       "kind": "title1",
@@ -888,6 +931,15 @@
       "x": 0,
       "y": -300
     },
+    "treat-fv": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "treatment",
+      "text": "Treatment on the Farm view: open tasks as chips, the task on the map, her view, group pens",
+      "w": 240,
+      "x": 0,
+      "y": 4900
+    },
     "treat-plan": {
       "fill": "green",
       "page": "treatment",
@@ -904,24 +956,6 @@
       "w": 240,
       "x": 0,
       "y": -300
-    },
-    "arch-homefv": {
-      "kind": "title1",
-      "maxW": 8000,
-      "page": "archive",
-      "text": "Home and Farm view explorations (6–7 Nov), superseded: Home is now the navigator panel; the Farm view is built on proposal C",
-      "w": 240,
-      "x": 0,
-      "y": 45900
-    },
-    "treat-fv": {
-      "kind": "title1",
-      "maxW": 8000,
-      "page": "treatment",
-      "text": "Treatment on the Farm view: open tasks as chips, the task on the map, her view, group pens",
-      "w": 240,
-      "x": 0,
-      "y": 4900
     }
   },
   "order": [
@@ -1011,7 +1045,11 @@
     "FarmViewLens.dc.html",
     "FarmViewTasks.dc.html",
     "FarmViewTreatment.dc.html",
-    "FarmViewTaskTabs.dc.html"
+    "FarmViewTaskTabs.dc.html",
+    "TreatRunningRevamp.dc.html",
+    "PenGroupStudy.dc.html",
+    "PigsListCases.dc.html",
+    "FarmViewAudit.dc.html"
   ],
   "pages": [
     {
@@ -1027,5 +1065,6 @@
       "name": "Archive: earlier explorations"
     }
   ],
-  "title": "Sentri AI-first desktop"
+  "title": "Sentri AI-first desktop",
+  "v": 3
 }
