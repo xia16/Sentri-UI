@@ -461,7 +461,24 @@ Canvas: the Treatment page (top frame live; Farm view mock-ups beside it).
 
 ---
 
-## 10. Open (don't build these as final)
+## 10. Who can do what
+
+**Open (proposal, 8 Nov).** Roles and permissions are their own feature, designed apart from any one page; each Action page shows or hides its actions by these rules and says nothing else about them. First case: the running treatment's Actions menu.
+
+| Action | Vet | Manager | Worker | Agent |
+| --- | --- | --- | --- | --- |
+| Change a prescription, hold, resume, stop | Yes | No | No | Fills it in; the vet issues |
+| Add pigs to a course, take pigs off | Yes | No | No | Fills it in; the vet issues |
+| Close a course whose doses are all settled | Yes | Yes | No | No |
+| Correct a recorded dose (with a reason, audited) | Yes | No | No | No |
+| Record doses | Phone | Phone | Phone | No |
+| See the treatment page | Yes | Yes | Read-only | Yes |
+
+- A person who can't take an action doesn't see it: the page stays the same without the Actions menu.
+- Prescriptions belong to the human vet, so an agent never issues one.
+- Open: whether a farm can grant a manager hold or stop, and who may add pigs during an outbreak.
+
+## 11. Open (don't build these as final)
 
 - **Home's form.** Proposals on the canvas's Home page:
   - "Home, calmer" (lists);
