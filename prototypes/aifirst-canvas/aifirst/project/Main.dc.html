@@ -1107,6 +1107,7 @@ class Component extends DCLogic {
   }
 
   defaults(start) {
+    if (start && start.indexOf('farmtask:') === 0) { const d = this.defaults('brief'); return Object.assign(d, { tabs: ['home', 'layout'], active: 'layout', tabStart: Object.assign({}, d.tabStart, { layout: 'task:' + start.slice(9) }) }); }
     if (start && start.indexOf('treat') === 0 && start.indexOf(':') > 0) { const parts = start.split(':'); const d = this.defaults(parts[0]); return Object.assign(d, { tabStart: Object.assign({}, d.tabStart, { treatment: parts[1] }) }); }
     const base = { chatId: 'gm', tabs: ['home', 'layout'], active: 'home', tabStart: { layout: 'view' }, expanded: false, approved: false, cleared: false, vals: {}, edited: {}, draft: '', query: '', plusOpen: false, extra: {}, seen: {}, orderDrafted: false, askFirst: true };
     if (start === 'canvas') return Object.assign(base, { tabs: ['home', 'vax'], active: 'vax' });
