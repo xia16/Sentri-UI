@@ -1303,6 +1303,8 @@ class Component extends DCLogic {
       const bn = String(from.batch || '').replace('Batch ', '');
       const map = { treat: ['treatment', 'proposal'], treatrun: ['treatment', 'running'], rxpage: ['treatment', 'running'], vaxpage: ['vax', ''], samplingpage: ['sampling', 'list'], vax: ['vax', ''], sampling: ['sampling', 'list'], cull: ['offsite', 'cull'], move: ['transfers', 'move'], ship: ['transfers', 'move'], batch: ['batches', 'new'], feed: ['feed', 'change'],
         vaxplan: ['vax', ''], cullplan: ['batches', 'planned'], keepplan: ['batches', 'planned'], endbatch: ['batches', 'change'], report: [bn ? 'batch-' + bn : 'batches', bn ? '' : 'list'], decisions: ['decisions', 'list'] };
+      // a task's record opens in the Farm view (records live there), framed on its pens
+      if (d.action === 'farmtask' && d.id) { const s1 = Object.assign(this.defaults(this.props.start || 'brief'), this.state || {}), t1 = s1.tabs || ['home']; this.setState({ tabs: t1.indexOf('layout') >= 0 ? t1 : t1.concat(['layout']), active: 'layout', tabStart: Object.assign({}, s1.tabStart || {}, { layout: 'task:' + d.id + '@' + Date.now() }), plusOpen: false, fromFarm: null }); return; }
       const go = map[d.action];
       if (!go) return;
       const s0 = Object.assign(this.defaults(this.props.start || 'brief'), this.state || {}), tabs0 = s0.tabs || ['home'];

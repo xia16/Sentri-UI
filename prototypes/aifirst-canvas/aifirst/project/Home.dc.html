@@ -374,7 +374,7 @@
 </div>
 <sc-for list="{{row.cells}}" as="cell" hint-placeholder-count="7">
 <div style="padding:0 2px;display:flex;align-items:center;justify-content:center;border-left:1px solid #f1f0ee;min-width:0">
-<sc-if value="{{cell.visible}}" hint-placeholder-val="{{true}}"><button type="button" aria-label="{{cell.aria}}" onMouseEnter="{{cell.preview}}" onFocus="{{cell.preview}}" onBlur="{{hidePreview}}" onClick="{{cell.open}}" style="box-sizing:border-box;width:100%;min-width:0;height:30px;padding:0;border:{{cell.border}};border-radius:{{cell.radius}};background:{{cell.bg}};color:{{cell.ink}};box-shadow:{{cell.shadow}};font:600 12px Inter,sans-serif;font-variant-numeric:tabular-nums;cursor:pointer">{{cell.label}}</button></sc-if>
+<sc-if value="{{cell.visible}}" hint-placeholder-val="{{true}}"><button type="button" aria-label="{{cell.aria}}" onMouseEnter="{{cell.preview}}" onFocus="{{cell.preview}}" onBlur="{{hidePreview}}" onClick="{{cell.open}}" style="box-sizing:border-box;width:100%;min-width:0;height:30px;padding:0;border:{{cell.border}};border-radius:{{cell.radius}};background:{{cell.bg}};color:{{cell.ink}};box-shadow:{{cell.shadow}};font:600 12px Inter,sans-serif;font-variant-numeric:tabular-nums;cursor:{{cell.cur}}">{{cell.label}}</button></sc-if>
 </div>
 </sc-for>
 </div>
@@ -733,20 +733,19 @@ class Component extends DCLogic {
       const offset=s.weekOffset+wi,start=new Date(Date.UTC(2026,10,2+offset*7)),end=new Date(Date.UTC(2026,10,8+offset*7));
       const days=dayNames.map((name,i)=>{const date=new Date(+start+i*86400000),today=offset===0&&i===3,past=+date<Date.UTC(2026,10,5);return {name,date:date.getUTCDate(),today,bg:today?'#28734F':'transparent',ink:today?'#fff':past?'#a8a29e':'#1c1917'}});
       return {caption:'Mon '+start.getUTCDate()+' – Sun '+formatDate(end),number:45+offset,isCurrent:offset===0,days,groups:rows.map(g=>({name:g.name,rows:g.rows.map(r=>{
-        const name=r[0],hover=s.preview&&s.preview.row===name,tagAria=r[4]?(r[1]+(r[3]==='pig'?' pigs: ':' rooms: ')+r[4]):r[1];
+        const name=r[0],farm={'Amox treatment':'rx09','PRRS vaccine':'prrs'}[name],toFarm=()=>window.dispatchEvent(new CustomEvent('sentri:open',{detail:{action:'farmtask',id:farm}})),hover=s.preview&&s.preview.row===name,tagAria=r[4]?(r[1]+(r[3]==='pig'?' pigs: ':' rooms: ')+r[4]):r[1];
         const model={name,tag:r[1],pig:r[3]==='pig',room:r[3]==='room',tagAria,bg:hover?'#fafaf9':'transparent',showTag:e=>{if(!r[4])return;this.setState({tagTip:r[4],tagTop:Math.max(8,e.currentTarget.getBoundingClientRect().top-64)+'px',preview:null})},cells:dayNames.map((day,i)=>{
           const code=offset===0?r[2][i]:'',type=code[0],n=Number(code.replace(/[^0-9]/g,'')),visible=!!code&&code!=='n',on=c=>!!c&&c!=='n',prev=on(r[2][i-1]),next=on(r[2][i+1]),radius=(prev?'3px':'9px')+' '+(next||code.endsWith('>')?'3px':'9px')+' '+(next||code.endsWith('>')?'3px':'9px')+' '+(prev?'3px':'9px');
           const done=type==='d'||type==='w',today=['o','u','v'].includes(type),label=type==='u'?'–':type==='e'?'~'+n:String(n);
           const description=type==='w'?n+' of 8 done, past its plan':done?n+' done':today?type==='u'?'waiting':n+' today':type==='e'?'about '+n:n+' planned';
-          return {open:name==='Amox treatment'?()=>window.dispatchEvent(new CustomEvent('sentri:open',{detail:{action:'treatrun'}})):()=>{},visible,label,radius,bg:done?'#E3F0E8':today?'#EAF1FC':type==='e'?'transparent':'#F1F3EE',ink:type==='w'?'#B34B43':done?'#28734F':today?'#3972B7':type==='e'?'#657060':'#20291F',border:type==='e'?'1px dashed #9CA59D':'0',shadow:today?'inset 0 0 0 1.5px #3972B7':'none',aria:name+' · '+r[1]+' · '+day+' '+(i+2)+' Nov · '+description,preview:e=>{
+          return {open:farm?toFarm:()=>{},cur:farm?'pointer':'default',visible,label,radius,bg:done?'#E3F0E8':today?'#EAF1FC':type==='e'?'transparent':'#F1F3EE',ink:type==='w'?'#B34B43':done?'#28734F':today?'#3972B7':type==='e'?'#657060':'#20291F',border:type==='e'?'1px dashed #9CA59D':'0',shadow:today?'inset 0 0 0 1.5px #3972B7':'none',aria:name+' · '+r[1]+' · '+day+' '+(i+2)+' Nov · '+description,preview:e=>{
             if(name!=='Amox treatment'&&!(name==='Fostering checks'&&i===2)){hidePreview();return}
             const rect=e.currentTarget.getBoundingClientRect(),foster=name==='Fostering checks',total=foster?8:4,doneCount=done?n:0;
             this.setState({tagTip:'',preview:{row:name,title:foster?'Fostering checks · B32':'Treatment · Amox',meta:day+' '+(i+2)+' Nov · '+(foster?'Farrowing 2':'Gestation 2')+' · Li Wei',done:doneCount,pending:total-doneCount,progress:doneCount+' of '+total,note:foster?'2 not reported: A5, B10':'RX-25G009 · Running'},previewLeft:Math.min(175,Math.max(8,rect.left-16))+'px',previewTop:Math.min(700,rect.bottom+8)+'px'});
           }};
         })};
         model.preview=name==='Amox treatment'?model.cells[3].preview:()=>{};
-        const pg={'Amox treatment':'treatrun','PRRS vaccine':'vaxpage','PRRS sampling':'samplingpage'}[name];
-        Object.assign(model,{cls:pg?'hs-open':'',role:pg?'button':'presentation',cursor:pg?'pointer':'default',openTitle:pg?'Open '+name:'',open:pg?()=>window.dispatchEvent(new CustomEvent('sentri:open',{detail:{action:pg}})):()=>{}});
+        Object.assign(model,{cls:farm?'hs-open':'',role:farm?'button':'presentation',cursor:farm?'pointer':'default',openTitle:farm?'Show '+name+' in the Farm view':'',open:farm?toFarm:()=>{}});
         return model;
       })}))};
     });
