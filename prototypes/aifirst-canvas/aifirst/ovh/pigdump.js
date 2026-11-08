@@ -1,0 +1,5 @@
+(() => { const L = window.__l3, T = L.T, rm = L.rooms.find((r) => r.id === 'n1'), pen = rm.pens.find((p) => p.code === 'B7'); rm.g.updateMatrixWorld(true);
+  const inv = new T.Matrix4().copy(rm.g.matrixWorld).invert(), meshes = []; rm.pg.traverse((o) => { if (o.isInstancedMesh) meshes.push(o); });
+  const m = new T.Matrix4(), v = new T.Vector3(), q = new T.Quaternion(), s = new T.Vector3(), ent = [];
+  meshes.forEach((o, k) => { o.updateMatrixWorld(true); for (let i = 0; i < o.count; i++) { o.getMatrixAt(i, m); const w = m.clone().premultiply(o.matrixWorld); w.decompose(v, q, s); const lp = v.clone().applyMatrix4(inv); if (Math.abs(lp.x - pen.x) < pen.sx / 2 + 0.05 && Math.abs(lp.z - pen.z) < pen.sz / 2 + 0.05) { const e = new T.Euler().setFromQuaternion(q, 'YXZ'); ent.push([k, i, +lp.x.toFixed(2), +lp.y.toFixed(2), +lp.z.toFixed(2), +e.y.toFixed(2), +s.x.toFixed(2)]); } } });
+  return JSON.stringify({ pen: [pen.x, pen.z, pen.sx, pen.sz], meshes: meshes.map((o, k) => k + ':' + (o.name || '') + ':' + o.count + ':' + o.geometry.attributes.position.count + ':' + (o.parent === rm.pg ? 'pg' : 'sub')), ent: ent }); })()

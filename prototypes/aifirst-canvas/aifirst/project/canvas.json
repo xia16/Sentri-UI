@@ -767,9 +767,9 @@
       "y": 2300
     },
     "FarmViewGroupPigs.dc.html": {
-      "h": 1732,
+      "h": 1786,
       "page": "home",
-      "title": "Group pens: click each pig, each pig its own status (mock-up)",
+      "title": "Group pens: the pigs line up by status, click each one, no-ID pigs in their own row (mock-up)",
       "w": 2080,
       "x": 3706,
       "y": 5000
