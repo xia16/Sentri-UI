@@ -47,5 +47,7 @@ once("    if (this.tipFor !== key && this.tipFor !== tkKey && this.ovOn() && thi
 once("    if (this.tipFor !== key && this.tipFor !== tkKey) {\n      const i = this.pigInfo(hit.rm, hit.pen)", "    if (!gph && this.tipFor !== key && this.tipFor !== tkKey) {\n      const i = this.pigInfo(hit.rm, hit.pen)");
 once("  tipHide() { if (this.tipEl) this.tipEl.style.display = 'none'; this.tipFor = ''; }", "  tipHide() { if (this.tipEl) this.tipEl.style.display = 'none'; this.tipFor = ''; if (this.gpHov) this.gpHov(null); }");
 once("    const hc = this.hoverPen && this.hoverPen.roomId === rm.id ? this.hoverPen.code : (u.lh || ''), sel = u.psel || [];", "    let hc = this.hoverPen && this.hoverPen.roomId === rm.id ? this.hoverPen.code : (u.lh || ''), sel = u.psel || [];\n    if (this.gpIs && this.gpIs(rm.id, hc)) hc = '';");
+// a group pen's hover is about its pigs, not a sow's cycle
+once("    const P = this.ovPigData(hit.rm.id, code), cell = ((this.IP && this.IP.cell[hit.rm.id]) || {})[code] || {}, group = (cell.n || 1) > 1;\n", "    const P = this.ovPigData(hit.rm.id, code), cell = ((this.IP && this.IP.cell[hit.rm.id]) || {})[code] || {}, group = (cell.n || 1) > 1;\n    if (group && O.panel !== 'compare' && this.gpGroupCell && this.gpGroupCell(hit.rm.id, code)) return this.gpPenTip(hit.rm.id, code, cell);\n");
 fs.writeFileSync(F, s);
 console.log('patched', Math.round(s.length / 1024) + ' KB');

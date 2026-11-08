@@ -9172,6 +9172,7 @@ class Component extends DCLogic {
     let i = {}; try { i = this.pigInfo(hit.rm, hit.pen); } catch (e) { i = {}; }
     if (i.empty) return '<div style="' + H.st({ fontSize: '13px', fontWeight: 600 }) + '">' + H.esc(code) + '</div><div style="' + H.st({ fontSize: '12px', color: K.muted }) + '">Empty</div>';
     const P = this.ovPigData(hit.rm.id, code), cell = ((this.IP && this.IP.cell[hit.rm.id]) || {})[code] || {}, group = (cell.n || 1) > 1;
+    if (group && O.panel !== 'compare' && this.gpGroupCell && this.gpGroupCell(hit.rm.id, code)) return this.gpPenTip(hit.rm.id, code, cell);
     const headH = '<div style="' + H.st({ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '14px' }) + '">' + H.t(code + (group ? '' : ' · ' + P.tag), { fontSize: '13px', fontWeight: 600 }) + H.t(group ? cell.n + ' ' + (cell.kind || 'pigs') : 'Sow · P' + P.parity, { fontSize: '12px', color: K.muted }) + '</div>';
     if (O.panel === 'compare') { const mine = 10 + (this.hs(hit.rm.id + code) % 6); return headH + H.tip('', [[K.green, 'Her litter', String(mine), true], ['', 'Batch average', '12.9', false, 'tick']], 'Click for her card').replace(/^<div[^>]*><\/div>/, ''); }
     const line = (l, r) => '<div style="' + H.st({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', minHeight: '30px', borderTop: '1px solid ' + K.line, marginTop: '6px', paddingTop: '6px' }) + '">' + H.t(l, { fontSize: '13px' }) + r + '</div>';
@@ -10037,6 +10038,13 @@ class Component extends DCLogic {
     const tasks = (p.st === 'urgent' ? task('Treatment RX-25G011', 'Dose 2 of 3 · today', chip('Due', '#c1ddfd', '#1f4470')) : '') + task(gilt ? 'Heat check' : 'PRRS vaccine', gilt ? 'With the pen · daily' : 'With the pen · Fri', chip('Planned', '#F1F2EE', K.ink), p.st === 'urgent');
     return head + this.tkBox('<div style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Its tasks</div>' + tasks) + '<div style="height: 12px;"></div>' +
       this.tkBox(this.gpFacts([['Batch', D.batch || '–'], ['Age', gilt ? '7 months' : '38 days'], ['Weight', gilt ? '131 kg' : (p.st ? '10.4 kg' : '11.6 kg')], ['Sex', 'Gilt']]));
+  }
+  // hover on a group pen, open or not: the pen and its count, then one line on how its pigs are
+  gpPenTip(rid, code, cell) {
+    const K = OVH.K, ppl = this.gpPeople(rid, code), need = ppl.filter((p) => p.r <= 1).length, urgent = ppl.some((p) => p.r === 0), w = cell.kind === 'gilts' ? 'gilts' : cell.kind === 'weaners' ? 'weaners' : 'pigs';
+    const dot = need ? '<span style="display:inline-block; width:8px; height:8px; border-radius:99px; background:' + (urgent ? '#B3261E' : '#e8b33c') + '; margin-right:6px;"></span>' : '';
+    return '<div style="display:flex; align-items:baseline; justify-content:space-between; gap:14px;"><span style="font-size:13px; font-weight:600; font-family:\'Geist Mono\', ui-monospace, monospace;">' + OVH.esc(code) + '</span><span style="font-size:12px; color:' + K.muted + ';">' + ppl.length + ' ' + w + '</span></div>' +
+      '<div style="display:flex; align-items:center; font-size:13px; font-weight:' + (need ? 600 : 500) + '; margin-top:2px;">' + dot + (need ? need + ' need' + (need === 1 ? 's' : '') + ' a look' : 'All fine') + '</div>';
   }
   ovKindPath(kind) { return ({ farm: 'M4 21V9m5 12V9m5 12V9m5 12V9M2 12h20M2 17h20', zone: 'M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20V6.5Zm6-2.5v13.5m6-11v13.5', section: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', sec: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', room: 'M4 10 12 4l8 6v10H4V10Z', pen: 'M5 5h14v14H5zM9.7 5v14M14.3 5v14' })[kind] || 'M4 10 12 4l8 6v10H4V10Z'; }
   // the place: ‹ up, its kind as an icon, its name

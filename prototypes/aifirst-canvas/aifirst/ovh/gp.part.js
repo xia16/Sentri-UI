@@ -158,3 +158,10 @@
     return head + this.tkBox('<div style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Its tasks</div>' + tasks) + '<div style="height: 12px;"></div>' +
       this.tkBox(this.gpFacts([['Batch', D.batch || '–'], ['Age', gilt ? '7 months' : '38 days'], ['Weight', gilt ? '131 kg' : (p.st ? '10.4 kg' : '11.6 kg')], ['Sex', 'Gilt']]));
   }
+  // hover on a group pen, open or not: the pen and its count, then one line on how its pigs are
+  gpPenTip(rid, code, cell) {
+    const K = OVH.K, ppl = this.gpPeople(rid, code), need = ppl.filter((p) => p.r <= 1).length, urgent = ppl.some((p) => p.r === 0), w = cell.kind === 'gilts' ? 'gilts' : cell.kind === 'weaners' ? 'weaners' : 'pigs';
+    const dot = need ? '<span style="display:inline-block; width:8px; height:8px; border-radius:99px; background:' + (urgent ? '#B3261E' : '#e8b33c') + '; margin-right:6px;"></span>' : '';
+    return '<div style="display:flex; align-items:baseline; justify-content:space-between; gap:14px;"><span style="font-size:13px; font-weight:600; font-family:\'Geist Mono\', ui-monospace, monospace;">' + OVH.esc(code) + '</span><span style="font-size:12px; color:' + K.muted + ';">' + ppl.length + ' ' + w + '</span></div>' +
+      '<div style="display:flex; align-items:center; font-size:13px; font-weight:' + (need ? 600 : 500) + '; margin-top:2px;">' + dot + (need ? need + ' need' + (need === 1 ? 's' : '') + ' a look' : 'All fine') + '</div>';
+  }
