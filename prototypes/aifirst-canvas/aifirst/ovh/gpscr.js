@@ -1,0 +1,2 @@
+(() => { const L = window.__l3, g = L.ovS().gp; if (!g) return 'no gp ' + L.ovS().panel; const rm = L.rooms.find((r) => r.id === g.roomId), T = L.T, cv = L.renderer.domElement, r = cv.getBoundingClientRect(), v = new T.Vector3();
+  return JSON.stringify({ panel: L.ovS().panel, n: g.pigs.length, pts: g.pigs.map((q) => { v.set(q.x, q.y + 0.15, q.z).applyMatrix4(rm.g.matrixWorld).project(L.camera); return [q.p.id || 'noid', q.p.st, Math.round(r.left + (v.x + 1) / 2 * r.width), Math.round(r.top + (1 - v.y) / 2 * r.height)]; }) }); })()
