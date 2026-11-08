@@ -765,6 +765,14 @@
       "w": 2080,
       "x": 480,
       "y": 2300
+    },
+    "FarmViewGroupPigs.dc.html": {
+      "h": 1732,
+      "page": "home",
+      "title": "Group pens: click each pig, each pig its own status (mock-up)",
+      "w": 2080,
+      "x": 3706,
+      "y": 5000
     }
   },
   "createdOnFiles": {
@@ -1049,7 +1057,8 @@
     "TreatRunningRevamp.dc.html",
     "PenGroupStudy.dc.html",
     "PigsListCases.dc.html",
-    "FarmViewAudit.dc.html"
+    "FarmViewAudit.dc.html",
+    "FarmViewGroupPigs.dc.html"
   ],
   "pages": [
     {
