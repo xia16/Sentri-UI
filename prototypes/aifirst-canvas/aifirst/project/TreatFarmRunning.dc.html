@@ -85,7 +85,7 @@
     <div style="margin: 0 12px; padding: 12px 16px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2; font-size: 13px; line-height: 20px">
       <div style="font-weight: 600">Amoxicillin 15% LA</div>
       <div style="color: #3B4540">Intramuscular · 15 mL a sow · 3 doses, 24 h apart</div>
-      <div style="color: #5D665F">Withdrawal 14 days · Keep D40 and D41 on straw</div>
+      <div style="color: #5D665F">Withdrawal 14 days · Keep the sows in D40 and D41 on straw</div>
     </div>
 
     <div style="display: flex; gap: 8px; padding: 14px 12px 0">
@@ -143,7 +143,7 @@ class Component extends DCLogic {
       due: { label: 'due today', skip: false, text: '', size: '14px', bg: 'transparent', ink: '#3972B7', ring: 'inset 0 0 0 1.5px #3972B7' },
       later: { label: 'waiting', skip: false, text: '', size: '14px', bg: 'transparent', ink: '#5D665F', ring: 'inset 0 0 0 1.5px #C9CEC4' }
     })[k];
-    const sows = [['B15', ['done', 'done', 'later'], ''], ['B20', ['done', 'done', 'later'], ''], ['D40', ['done', 'due', 'later'], ''], ['D41', ['skipped', 'due', 'later'], 'Dose 1 skipped: could not stand']];
+    const sows = [['206950', ['done', 'done', 'later'], ''], ['202507', ['done', 'done', 'later'], ''], ['206461', ['done', 'due', 'later'], ''], ['209172', ['skipped', 'due', 'later'], 'Dose 1 skipped: could not stand']];
     return {
       crates: [
         Object.assign({ x: '200px', y: '400px', label: 'B15 ✓' }, done),
@@ -154,7 +154,7 @@ class Component extends DCLogic {
       sows: sows.map((r, i) => ({ tag: r[0], marks: r[1].map(mark), hasNote: !!r[2], note: r[2], line: i === sows.length - 1 ? '0' : '1px solid #EEF0EA' })),
       chat: [
         { time: '08:41', text: 'I filled in the treatment page: Amoxicillin 15% LA, 15 mL into the neck muscle, 3 doses a day apart. Check it and issue it.', hasDivider: false, divider: '' },
-        { time: '16:20', text: 'Dose 2 is half done: D40 and D41 are still waiting. D41 was skipped on dose 1, she could not stand.', hasDivider: true, divider: 'Fri 6 Nov' }
+        { time: '16:20', text: 'Dose 2 is half done: 206461 and 209172 are still waiting. 209172 was skipped on dose 1, she could not stand.', hasDivider: true, divider: 'Fri 6 Nov' }
       ]
     };
   }

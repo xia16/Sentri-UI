@@ -19,7 +19,7 @@
     <!-- the page, at the pane's 680 width, shown at full scroll length -->
     <div>
       <div style="font-size: 15px; font-weight: 600">The page (680 px pane, full length)</div>
-      <div style="font-size: 13px; color: #57534e; margin: 2px 0 12px">D41's skipped dose is hovered.</div>
+      <div style="font-size: 13px; color: #57534e; margin: 2px 0 12px">209172's skipped dose is hovered.</div>
       <div style="width: 680px; box-sizing: border-box; border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 1px #DADFD5, 0 12px 32px rgba(17,21,17,.10); background: #f5f5f4">
         <div style="padding: 24px; display: flex; flex-direction: column; gap: 18px">
           <header>
@@ -81,7 +81,7 @@
             </div>
             <div style="display: grid; grid-template-columns: minmax(0, 1fr) 90px 132px; align-items: center; height: 34px; border-bottom: 1px solid #e7e5e4; font-size: 12px; font-weight: 500; color: #57534e"><span>Pig</span><span>Pen</span><span style="padding-left: 14px">Doses</span></div>
             <div style="display: flex; align-items: center; height: 44px"><span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 10px; border-radius: 8px; background: #f5f5f4; font-size: 13px; font-weight: 600; color: #44403c"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"></path></svg>Gestation 2<span style="font-weight: 500; color: #78716c">· 4 pigs</span></span></div><sc-for list="{{rxRows}}" as="r" hint-placeholder-count="6"><div style="display: grid; grid-template-columns: minmax(0, 1fr) 90px 132px; align-items: center; height: 46px; border-top: {{r.line}}"><span><sc-if value="{{r.isId}}" hint-placeholder-val="{{true}}"><span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: #1c1917">{{r.tag}}</span></sc-if><sc-if value="{{r.isWords}}" hint-placeholder-val="{{false}}"><span style="font-size: 14px; font-weight: 500; color: #44403c">{{r.tag}}</span></sc-if></span><span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: #57534e">{{r.pen}}</span><span style="display: flex"><sc-for list="{{r.doses}}" as="m" hint-placeholder-count="3"><span style="width: 44px; display: flex; justify-content: center"><span style="display: block; border-radius: 50%; {{m.wst}}"><span style="display: block; box-sizing: border-box; border-radius: 50%; {{m.st}}"></span></span></span></sc-for></span></div></sc-for>
-            <div style="display: flex; align-items: center; height: 46px; border-top: 1px solid #e7e5e4; font-size: 13px; color: #57534e">4 pigs in 2 pens</div>
+            <div style="height: 8px; border-top: 1px solid #e7e5e4"></div>
             <div style="position: absolute; left: 240px; top: 329px; padding: 10px 12px; border-radius: 12px; background: #ffffff; box-shadow: 0 6px 20px rgba(17,21,17,.16), 0 0 0 1px #ECEEE8; white-space: nowrap; z-index: 2">
               <div style="font-size: 13px; font-weight: 600">Thu 5 Nov · Skipped</div>
               <div style="margin-top: 2px; font-size: 12.5px; color: #57534e">08:52 · could not stand · Wang Fang</div>
@@ -270,7 +270,7 @@
         </div>
       </section>
       <section style="margin-top: 24px; padding: 20px 24px 6px; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 3px #1c19170f, 0 1px 2px #1c19170a">
-        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">RX-25G014 · 28 pigs across 4 rooms in 2 sections</div>
+        <div style="font-size: 13px; font-weight: 600; color: #57534e; margin-bottom: 10px">RX-25G014 · 26 pigs across 4 rooms in 2 sections</div>
         <div style="font-size: 13px; color: #57534e; margin-bottom: 12px">The room is always a short tag above its pigs, the pen a column under it. When the pigs span rooms, there is one tag per room and the place filter turns from All pens to All rooms; a section is never named, since room names are unique on a farm.</div>
         <h3 style="margin: 0 0 12px; font-size: 17px; font-weight: 600">Pigs</h3>
         <div style="display: flex; gap: 8px; margin-bottom: 8px"><span style="flex: 1; display: flex; align-items: center; gap: 9px; height: 40px; padding: 0 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px #d6d3d1; font-size: 14px; color: #57534e">Find a pig</span><span style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px #d6d3d1; font-size: 14px">Any dose status<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round"><path d="m6 9 6 6 6-6"></path></svg></span><span style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px #d6d3d1; font-size: 14px">All rooms<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #57534e; stroke-width: 1.75; stroke-linecap: round"><path d="m6 9 6 6 6-6"></path></svg></span></div>
@@ -282,7 +282,7 @@
           </div>
         </sc-for>
         <div style="display: flex; align-items: center; gap: 6px; height: 50px; border-top: 1px solid #e7e5e4; font-size: 13px; color: #57534e">
-          <span style="flex: 1">28 pigs in 4 rooms · one page</span>
+          <span style="flex: 1">26 pigs in 4 rooms · one page</span>
         </div>
       </section>
     </div>
@@ -320,8 +320,8 @@ class Component extends DCLogic {
       D({ mark: plannedRing(36, 4), title: 'Dose 3', date: 'Sat 7 Nov', count: '4 to give' })
     ];
 
-    const sowData = [['B15', '14', ['done', 'done', 'plan'], '2 of 3'], ['B20', '14', ['done', 'done', 'plan'], '2 of 3'], ['D40', '22', ['done', 'due', 'plan'], '1 of 3'], ['D41', '22', ['skip', 'due', 'plan'], '0 of 3']];
-    const pigRow = (r, i) => ({ tag: r[0], line: i === 0 ? '0' : '1px solid #f0efed', doses: r[2].map((k, j) => dot(k, 16, r[0] === 'D41' && j === 0)) });
+    const sowData = [['206950', 'B15', ['done', 'done', 'plan'], '2 of 3'], ['202507', 'B20', ['done', 'done', 'plan'], '2 of 3'], ['206461', 'D40', ['done', 'due', 'plan'], '1 of 3'], ['209172', 'D41', ['skip', 'due', 'plan'], '0 of 3']];
+    const pigRow = (r, i) => ({ tag: r[0], line: i === 0 ? '0' : '1px solid #f0efed', doses: r[2].map((k, j) => dot(k, 16, r[0] === '209172' && j === 0)) });
     const pens = [{ pen: 'Pen 14', pigs: sowData.filter((r) => r[1] === '14').map(pigRow) }, { pen: 'Pen 22', pigs: sowData.filter((r) => r[1] === '22').map(pigRow) }].map((g, i) => Object.assign(g, { n: g.pigs.length + ' pigs', top: i === 0 ? '0' : '1px solid #e7e5e4' }));
     const strip = (skipAt) => { const days = []; for (let d = 0; d < 14; d++) { const dots = []; for (let h = 0; h < 2; h++) { const sl = d * 2 + h; const k = sl === skipAt ? 'skip' : sl < 15 ? 'done' : sl === 15 ? 'due' : 'plan'; dots.push(k === 'done' || k === 'skip' ? { st: 'width: 8px; height: 8px; background: ' + C[k] } : { st: 'width: 8px; height: 8px; border: 1.5px solid ' + C[k] }); } days.push({ dots }); } return days; };
     const longPens = [
@@ -338,7 +338,7 @@ class Component extends DCLogic {
       { k: 'Schedule', v: '3 doses, every 24 h', sub: 'Thu 5 – Sat 7 Nov' },
       { k: 'Withdrawal', v: '14 days', sub: 'Ends Sat 21 Nov, if the last dose is Sat' },
       { k: 'Prescribed by', v: 'Dr. Chen', sub: 'Wed 4 Nov 16:10 · issued by Li Wei, Thu 5 Nov 08:30' },
-      { k: 'Note', v: 'Keep D40 and D41 on straw', sub: '' }
+      { k: 'Note', v: 'Keep the sows in D40 and D41 on straw', sub: '' }
     ].map((f, i, a) => Object.assign(f, { hasSub: !!f.sub, line: i === a.length - 1 ? '0' : '1px solid #f0efed' }));
 
     // one sow, twice a day for 3 weeks: 19 of 42 given, Wed 11 Nov PM skipped (hovered), Thu AM due today
@@ -415,7 +415,7 @@ class Component extends DCLogic {
       { name: 'Amoxicillin', count: '10 of 18 · daily, 3 days', days: [[ring([['done', 6]], 30, 4)], [ring([['done', 4], ['due', 2]], 30, 4)], [plannedRing(30, 3)], [empty], [empty]].map((marks) => ({ marks })) },
       { name: 'Meloxicam', count: '8 of 30 · daily, 5 days', days: [[ring([['done', 6]], 30, 4)], [ring([['done', 2], ['due', 4]], 30, 4)], [plannedRing(30, 3)], [plannedRing(30, 3)], [plannedRing(30, 3)]].map((marks) => ({ marks })) }
     ];
-    const twoPigs = [['C03', ['done', 'done', 'plan']], ['C04', ['done', 'due', 'plan']], ['C09', ['done', 'done', 'plan']]].map((r, i) => ({ tag: r[0], line: i === 0 ? '1px solid #e7e5e4' : '1px solid #f0efed', doses: r[1].map((k) => dot(k, 16)) }));
+    const twoPigs = [['205557', ['done', 'done', 'plan']], ['208268', ['done', 'due', 'plan']], ['203825', ['done', 'done', 'plan']]].map((r, i) => ({ tag: r[0], line: i === 0 ? '1px solid #e7e5e4' : '1px solid #f0efed', doses: r[1].map((k) => dot(k, 16)) }));
     const twoRx = [
       { k: 'Amoxicillin 15% LA', v: '15 mL a sow · intramuscular, neck', sub: '3 doses, every 24 h · withdrawal 14 days' },
       { k: 'Meloxicam 2%', v: '2 mL a sow · intramuscular', sub: '5 doses, every 24 h · withdrawal 28 days' }
@@ -431,17 +431,17 @@ class Component extends DCLogic {
     ].map((g, i) => Object.assign(g, { top: i === 0 ? '0' : '1px solid #e7e5e4', pigs: g.pigs.map((r, j) => Object.assign(r, { line: j === 0 ? (g.hasHead ? '0' : '0') : '1px solid #f0efed' })) }));
 
     const L = (i) => (i === 0 ? '0' : '1px solid #f0efed');
-    const rxRows = sowData.map((r, i) => ({ tag: r[0], pen: r[1], isId: true, isWords: false, line: L(i), doses: r[2].map((k, j) => dot(k, 16, r[0] === 'D41' && j === 0)) }));
+    const rxRows = sowData.map((r, i) => ({ tag: r[0], pen: r[1], isId: true, isWords: false, line: L(i), doses: r[2].map((k, j) => dot(k, 16, r[0] === '209172' && j === 0)) }));
     const longRows = [];
     [['5', ['341201', -1], ['341202', 9], ['341203', -1], ['341204', -1]], ['6', ['341221', -1], ['341222', -1], ['341223', 9], ['341224', 4]]].forEach((g) => g.slice(1).forEach((p) => longRows.push({ tag: p[0], pen: g[0], isId: true, isWords: false, days: strip(p[1]) })));
     longRows.push({ tag: '20 pigs without an ID', pen: '7', isId: false, isWords: true, days: penStrip() });
     longRows.forEach((r, i) => { r.line = L(i); });
     const hyRows = [
-      ['201101', 'Gestation 1', 'A1', ['done', 'done', 'plan']], ['201102', 'Gestation 1', 'A2', ['done', 'due', 'plan']], ['201104', 'Gestation 1', 'A3', ['skip', 'due', 'plan']],
-      ['201215', 'Gestation 2', '14', ['done', 'done', 'plan']], ['201220', 'Gestation 2', '14', ['done', 'done', 'plan']],
-      ['207301', 'Sick room', '2', ['done', 'due', 'plan']]
+      ['203711', 'Gestation 1', 'A1', ['done', 'done', 'plan']], ['206422', 'Gestation 1', 'A2', ['done', 'due', 'plan']], ['209133', 'Gestation 1', 'A3', ['skip', 'due', 'plan']],
+      ['206950', 'Gestation 2', 'B15', ['done', 'done', 'plan']], ['202507', 'Gestation 2', 'B20', ['done', 'done', 'plan']],
+      ['202997', 'Sick room', 'B1', ['done', 'due', 'plan']]
     ].map((r, i) => ({ tag: r[0], room: r[1], pen: r[2], isId: true, isWords: false, line: L(i), doses: r[3].map((k) => dot(k, 16)) }));
-    hyRows.push({ tag: '20 pigs without an ID', room: 'Nursery 2', pen: '7', isId: false, isWords: true, line: L(1), doses: [dot('done', 13), ring([['done', 14], ['due', 6]], 18, 3), plannedRing(16, 1.75)] });
+    hyRows.push({ tag: '20 pigs without an ID', room: 'Nursery 2', pen: 'A7', isId: false, isWords: true, line: L(1), doses: [dot('done', 13), ring([['done', 14], ['due', 6]], 18, 3), plannedRing(16, 1.75)] });
 
     const roomGroups = [];
     hyRows.forEach((r) => { let g = roomGroups.find((x) => x.room === r.room); if (!g) { g = { room: r.room, rows: [] }; roomGroups.push(g); } g.rows.push(r); });

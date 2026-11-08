@@ -43,8 +43,8 @@
       </span>
     </div>
     <div role="table" aria-label="Pigs with a fever this week, by room" style="flex: 1; min-height: 0; overflow-y: auto; margin: 0 12px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2; scrollbar-width: thin; scrollbar-color: #D5DAD0 transparent">
-      <div role="row" style="position: sticky; top: 0; z-index: 1; display: grid; grid-template-columns: 80px minmax(0, 1fr) 48px; align-items: center; height: 38px; padding: 0 16px; background: #FFFFFF; border-bottom: 1px solid #E6E9E2; font-size: 12px; font-weight: 500; color: #5D665F">
-        <span role="columnheader">Pig</span><span role="columnheader">Finding</span><span role="columnheader" aria-sort="descending" style="text-align: right">°C</span>
+      <div role="row" style="position: sticky; top: 0; z-index: 1; display: grid; grid-template-columns: 78px 50px minmax(0, 1fr) 48px; align-items: center; height: 38px; padding: 0 16px; background: #FFFFFF; border-bottom: 1px solid #E6E9E2; font-size: 12px; font-weight: 500; color: #5D665F">
+        <span role="columnheader">Pig</span><span role="columnheader">Pen</span><span role="columnheader">Finding</span><span role="columnheader" aria-sort="descending" style="text-align: right">°C</span>
       </div>
       <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
         <div role="rowgroup">
@@ -52,8 +52,8 @@
             <span role="rowheader">{{g.room}}</span><span style="font-weight: 500; color: #5D665F">{{g.n}}</span>
           </div>
           <sc-for list="{{g.pigs}}" as="p" hint-placeholder-count="2">
-            <div role="row" style="display: grid; grid-template-columns: 80px minmax(0, 1fr) 48px; align-items: center; height: 50px; margin: 0 16px; border-top: 1px solid #EEF0EA">
-              <span role="cell" style="font-size: 14px; font-weight: 600">{{p.tag}}</span>
+            <div role="row" style="display: grid; grid-template-columns: 78px 50px minmax(0, 1fr) 48px; align-items: center; height: 50px; margin: 0 16px; border-top: 1px solid #EEF0EA">
+              <span role="cell" style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 14px; font-weight: 600; letter-spacing: -0.2px">{{p.tag}}</span><span role="cell" style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: #5D665F">{{p.pen}}</span>
               <span role="cell" style="font-size: 13.5px; color: #5D665F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px">{{p.finding}}</span>
               <span role="cell" style="text-align: right; font-size: 14px; font-variant-numeric: tabular-nums; color: #B91C1C">{{p.temp}}</span>
             </div>
@@ -78,7 +78,7 @@
       <span style="width: 26px; height: 26px; flex: none; display: grid; place-items: center; border-radius: 7px; background: #DDF1EF; color: #1F6F68; font-size: 9.5px; font-weight: 600">VT</span>
       <div style="min-width: 0">
         <div style="font-size: 13px"><strong style="font-weight: 600">Vet</strong><span style="margin-left: 8px; font-size: 11.5px; color: #5D665F">09:02</span></div>
-        <div style="margin-top: 4px">Nine, in four rooms. I've lit them on the farm and listed them by room, hottest first. D40 and D41 are already on Amoxicillin (RX-25G009). The two in the sick room are new since yesterday.</div>
+        <div style="margin-top: 4px">Nine, in four rooms. I've lit them on the farm and listed them by room, hottest first. 206461 and 209172 are already on Amoxicillin (RX-25G009). The two in the sick room are new since yesterday.</div>
       </div>
     </div>
   </div>
@@ -88,19 +88,19 @@
 class Component extends DCLogic {
   renderVals() {
     const groups = [
-      { room: 'Sick room', pigs: [['S3', 'Off feed', '40.1'], ['S5', 'Coughing', '39.7']] },
-      { room: 'Gestation 1', pigs: [['D40', 'Lame', '39.8'], ['D41', 'Lame, off feed', '39.8'], ['B20', 'Lame, hind legs', '39.6'], ['C12', 'Stiff gait', '39.4']] },
-      { room: 'Gestation 2', pigs: [['207118', 'Pen 14 · lame', '39.5'], ['207342', 'Pen 22 · coughing', '39.3']] },
-      { room: 'Farrowing 1', pigs: [['F1-08', 'Off feed after farrowing', '39.4']] }
+      { room: 'Sick room', pigs: [['209285', 'A1', 'Off feed', '40.1'], ['202997', 'B1', 'Coughing', '39.7']] },
+      { room: 'Gestation 2', pigs: [['206461', 'D40', 'Lame', '39.8'], ['209172', 'D41', 'Lame, off feed', '39.8'], ['202507', 'B20', 'Lame, hind legs', '39.6'], ['202959', 'C12', 'Stiff gait', '39.4']] },
+      { room: 'Gestation 1', pigs: [['203523', 'B14', 'Lame', '39.5'], ['207778', 'C22', 'Coughing', '39.3']] },
+      { room: 'Farrowing Room 2', pigs: [['204518', 'A3', 'Off feed after farrowing', '39.4']] }
     ];
     return {
       rooms: [
-        { x: '150px', y: '300px', n: '4', name: 'Gestation 1' },
-        { x: '269px', y: '337px', n: '2', name: 'Gestation 2' },
+        { x: '150px', y: '300px', n: '2', name: 'Gestation 1' },
+        { x: '269px', y: '337px', n: '4', name: 'Gestation 2' },
         { x: '322px', y: '403px', n: '2', name: 'Sick room' },
-        { x: '462px', y: '357px', n: '1', name: 'Farrowing 1' }
+        { x: '462px', y: '357px', n: '1', name: 'Farrowing Room 2' }
       ],
-      groups: groups.map((g, gi) => ({ room: g.room, top: gi === 0 ? '0' : '1px solid #E6E9E2', n: g.pigs.length + (g.pigs.length === 1 ? ' pig' : ' pigs'), pigs: g.pigs.map((p) => ({ tag: p[0], finding: p[1], temp: p[2] })) }))
+      groups: groups.map((g, gi) => ({ room: g.room, top: gi === 0 ? '0' : '1px solid #E6E9E2', n: g.pigs.length + (g.pigs.length === 1 ? ' pig' : ' pigs'), pigs: g.pigs.map((p) => ({ tag: p[0], pen: p[1], finding: p[2], temp: p[3] })) }))
     };
   }
 }

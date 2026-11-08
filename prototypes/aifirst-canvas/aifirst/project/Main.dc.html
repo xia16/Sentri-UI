@@ -1125,7 +1125,7 @@ class Component extends DCLogic {
     if (start === 'treatment') return Object.assign(base, { chatId: 'vet', seen: { vet: true }, tabs: ['home', 'layout', 'treatment'], active: 'treatment', tabStart: { layout: 'view', treatment: 'pick' } });
     if (start === 'treat') return Object.assign(base, { chatId: 'vet', seen: { vet: true }, tabs: ['home', 'treatment'], active: 'treatment', tabStart: { treatment: 'proposal' }, extra: { vet: [
       { k: 'user', text: "Treat the four lame sows I picked" },
-      { k: 'agent', who: 'vet', time: '08:41', text: "B15, B20, D40 and D41 are lame on the hind legs; D40 and D41 were 39.8 °C this morning. I filled in the treatment page: Amoxicillin 15% LA, 15 mL into the neck muscle, 3 doses a day apart. Check it and issue it.", card: { iconKey: 'clipboard', title: "New treatment · 4 sows", sub: "Amoxicillin 15% LA · 3 doses", tab: 'treatment', start: 'proposal', wide: false } }
+      { k: 'agent', who: 'vet', time: '08:41', text: "The sows in B15, B20, D40 and D41 are lame on the hind legs; 206461 and 209172 were 39.8 °C this morning. I filled in the treatment page: Amoxicillin 15% LA, 15 mL into the neck muscle, 3 doses a day apart. Check it and issue it.", card: { iconKey: 'clipboard', title: "New treatment · 4 sows", sub: "Amoxicillin 15% LA · 3 doses", tab: 'treatment', start: 'proposal', wide: false } }
     ] } });
     if (start === 'meds') return Object.assign(base, { chatId: 'vet', seen: { vet: true }, tabs: ['home', 'medicines'], active: 'medicines', tabStart: { medicines: 'list' }, extra: { vet: [
       { k: 'user', text: "What are we low on?" },
@@ -1502,11 +1502,11 @@ class Component extends DCLogic {
           ]
         },
         {
-          k: 'agent', who: 'vet', time: '07:45', text: "Dose 2 of RX-25G009 is due today for B15, B20, D40 and D41. D41 was skipped on dose 1; she could not stand.",
+          k: 'agent', who: 'vet', time: '07:45', text: "Dose 2 of RX-25G009 is due today for the four sows in B15, B20, D40 and D41. 209172 in D41 was skipped on dose 1; she could not stand.",
           card: Object.assign({ icon: I.clipboard, title: 'Treatment RX-25G009', sub: 'Running · dose 2 of 3', subInk: T.aiInk, open: () => openTab('layout', 'task:rx09@' + Date.now()) }, aiCard)
         },
         {
-          k: 'agent', who: 'vet', time: '08:41', text: "Six sows in Gestation 2 have new lameness findings since Monday. B15, B20, D40 and D41 are worst; D40 and D41 were 39.8 °C this morning. I filled in a treatment for those four: Amoxicillin 15% LA, 15 mL into the neck muscle, 3 doses a day apart. Check it and issue it.",
+          k: 'agent', who: 'vet', time: '08:41', text: "Six sows in Gestation 2 have new lameness findings since Monday. The sows in B15, B20, D40 and D41 are worst; 206461 and 209172 were 39.8 °C this morning. I filled in a treatment for those four: Amoxicillin 15% LA, 15 mL into the neck muscle, 3 doses a day apart. Check it and issue it.",
           card: Object.assign({ icon: I.clipboard, title: 'New treatment · 4 sows', sub: 'Filled in by Vet · not issued yet', subInk: T.aiInk, open: () => { set({ fromFarm: null }); openTab('treatment', 'proposal'); } }, aiCard)
         },
         { k: 'log', working: true, text: 'Working now · Batch 32 losses, Rooms 2 and 3' }
@@ -1820,7 +1820,7 @@ class Component extends DCLogic {
       closePlus: () => set({ plusOpen: false }),
       goHome: () => set({ active: 'home', plusOpen: false }),
       hasFromFarm: !!(s.fromFarm && s.active === s.fromFarm.tab && s.active !== 'treatment'),
-      treatPigs: s.fromFarm && s.fromFarm.tab === 'treatment' ? s.fromFarm.pigs.map((p) => p.code) : null,
+      treatPigs: s.fromFarm && s.fromFarm.tab === 'treatment' ? s.fromFarm.pigs.map((p) => (p.room || 'g2') + ':' + p.code) : null,
       treatH: 900 - 2 * (parseInt(T.gap, 10) || 0) - 52 - 2,
       treatAsk: (text) => { set({ chatId: 'vet', expanded: false, chatHidden: false, plusOpen: false, draft: text || '', seen: Object.assign({}, s.seen, { vet: true }) }); setTimeout(() => { const el = document.getElementById('composer'); if (el) el.focus(); }, 80); },
       treatFarm: (id) => (id ? openTab('layout', 'task:' + id + '@' + Date.now()) : set({ active: 'layout', expanded: false })),
