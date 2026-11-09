@@ -2,6 +2,15 @@
 
 Written 9 Nov 2026 for a new session. The phone work moves out of the AI-first canvas session (Work schedule and Users boards). That session keeps the console side: the Work schedule tab, its job details, Users, Roles and Time away.
 
+## Rulings since the handover (9 Nov, rounds 3–7 on the phone canvas)
+
+- The agent's look is **B**, a light violet used only for the agent (round 3).
+- The agent says only what the screens and fixed rules can't catch. Nothing about late tasks or due dates; when there's nothing, nothing shows (rounds 4, 6).
+- **Feeding is not a task** (nothing to record) and is **off My day** (rounds 5, 7).
+- My day has **no prescribed order**; work is batched (round 6).
+- **My day is grouped by room:** section headings, one card per room, the tasks done there as rows; the agent's violet band at a room's foot only when needed, opening that room's report (round 7, decided).
+- Still open: a farm walking direction for the list order; whether heat check, breeding and inspection are one pass on the owner's farms; the agent's name on the phone; whether the morning brief buzzes.
+
 ## Where things are
 
 > **Moved 9 Nov (later):** the phone boards now live on their own canvas, "Sentri phone: My day and the agent", https://claude.ai/artifact/UNXAnopBzeWSC5jTNFTm28 (StopsHeadsUp at the top with round 3 above round 2, MyDayPhone below). Their sources are in `prototypes/aifirst-canvas/phone/project/`; generators stay in `aifirst/ovh/` (`gen-stops-r3.cjs` for round 3) and now write into that folder. The console canvas keeps only a note pointing there. The positions below describe the old canvas.
