@@ -794,3 +794,7 @@
 .inspection-phone .sheet-body > .review-list + .st-heading.st-heading { margin-top: var(--space-section); }
 /* Find a pig: the design system's Lookup find page (components/Lookup) fills the phone over the walk, as a page does. */
 .inspection-phone>.st-find{position:absolute;inset:0;z-index:5}
+
+/* Move (2026-11-09): the pages' stack and the one stepper whose heading the page draws itself (Without ID, with its "of 14"). */
+.inspection-phone .move-stack{display:flex;flex-direction:column;gap:var(--space-16)}
+.inspection-phone .move-stepper .st-stepper-copy{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}

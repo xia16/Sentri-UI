@@ -1362,12 +1362,14 @@
     const lo=Math.min(...s),r=Math.max(...s)/lo,p=r>PEN_CAP?Math.log(PEN_CAP)/Math.log(r):1;
     return v=>v>0?Math.round(PEN_TILE*Math.pow(v/lo,p)):PEN_TILE;
   }
-  function penMap({lanes=['A','B','C','D'],depth=6,rows=[],apart=[],aSide='left',entranceAt='middle',backDoor=null,pens={},current='',action='pen',key='pen-map',entrance='Entrance',labels={},peek=null,className=''}={}){
+  function penMap({lanes=['A','B','C','D'],depth=6,rows=[],apart=[],aSide='left',entranceAt='middle',backDoor=null,pens={},current='',selected='',disabled={},action='pen',key='pen-map',entrance='Entrance',labels={},peek=null,className=''}={}){
     const L=penLabels(labels);
     if(typeof peek==='function')penPeeks.set(key,peek);else penPeeks.delete(key);
     const level=c=>PEN_LEVELS.includes(pens[c])?pens[c]:'empty';
-    const tile=(c,at='')=>{const l=level(c),off=l==='empty'||l==='hidden';
-      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${at}${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc(L.pen(c)+', '+L[l])}">${esc(c)}</button>`;};
+    /* disabled:{ C1:'the pigs are here' }: a pen the worker cannot choose (Move: where the pigs are now). It takes the empty tile's
+       muted face, is a real disabled button and says why in its accessible name. selected: the one chosen pen, a 2px ink ring. */
+    const tile=(c,at='')=>{const why=Object.prototype.hasOwnProperty.call(disabled,c)?String(disabled[c]||''):null,l=why!==null?'empty':level(c),off=l==='empty'||l==='hidden',sel=!off&&selected===c,word=why!==null?why:L[l];
+      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${at}${why!==null?' data-disabled=""':''}${sel?' data-selected="" aria-pressed="true"':''}${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc(L.pen(c)+(word?', '+word:''))}">${esc(c)}</button>`;};
     const band=(cls,text,at,extra='')=>`<div class="${cls}"${at==='left'||at==='right'?` data-at="${at}"`:''}${extra}>${sGlyph('arrow-down')}<span>${esc(text)}</span></div>`;
     const letterOf=i=>String.fromCharCode(65+i),runsOf=l=>typeof l==='string'?[]:l.runs||[];
     const sizeOf=penSizes([...lanes.flatMap(l=>runsOf(l).map(r=>r.size)),...rows.flatMap(w=>(w.runs||[]).map(r=>r.size))]);

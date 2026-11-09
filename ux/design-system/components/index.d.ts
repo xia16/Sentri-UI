@@ -828,6 +828,10 @@ export interface PenMapProps {
   pens?: Record<string, PenLevel>;
   /** The pen the map opens centred on. */
   current?: string;
+  /** The one chosen pen (Move): drawn with a 2px ink ring, aria-pressed. */
+  selected?: string;
+  /** Pens that cannot be chosen, with the reason in the accessible name (`{ C1: 'the pigs are here' }`): a real disabled tile in the empty face. */
+  disabled?: Record<string, string>;
   /** The data-action of every tile that can be opened; its data-value is the pen code. */
   action?: string;
   /** Names this map for the peek registry; give each map on a page its own. */

@@ -1223,6 +1223,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-pen-tile[data-level=live]{border-color:transparent;background:var(--progress-fill);color:var(--progress-fill-ink)}
 .st-pen-tile:is([data-level=empty],[data-level=hidden]){border-color:transparent;background:var(--well);color:var(--muted);font-weight:var(--type-weight-medium)}
 .st-pen-tile[data-level=plain]:is(:active,[data-preview~=pressed]){background:var(--st-press)}
+.st-pen-tile[data-selected]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}   /* the chosen pen (Move): a 2px ink ring on paper, no fill (SURFACES.md: a pen cell) */
 .st-pen-tile:is([data-level=act],[data-level=live]):is(:active,[data-preview~=pressed]){filter:brightness(.94)}
 .st-pen-peek{position:absolute;left:0;right:0;bottom:0;z-index:5;padding:0 var(--space-card-x) var(--space-4);border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--st-panel-bg);color:var(--ink);pointer-events:none}
 .st-pen-peek[data-at=top]{top:0;bottom:auto}
@@ -1710,20 +1711,20 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 /* Foster piglets · With ID (owner, 2026-11-02): a label as Without ID's (its ticked count at the end), the search or scan bar, then one
    box of tick rows that scrolls past three whole rows (a fade says there are more), so the count and Send stay on screen. No card inside the box. Foster off is a
    page (the tint), so the box is white (Surfaces rule 1). */
-.farrowing-phone .foster-ids{display:flex;flex-direction:column;gap:var(--space-8)}
-.farrowing-phone .foster-ids-head{display:flex;align-items:baseline;justify-content:space-between;margin:0;font:500 var(--type-entry-label-size)/1.5 var(--font-sans);color:var(--ink)}
-.farrowing-phone .foster-ids-count{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
-.farrowing-phone .foster-ids .st-choice-search{margin:0}
-.farrowing-phone .foster-id-box{border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--paper);overflow:clip}
-.farrowing-phone .foster-id-scroll{max-height:calc(3 * var(--row-min) + 2 * var(--border-width));overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;scroll-snap-type:y mandatory}
-.farrowing-phone .foster-id-scroll>.st-row{scroll-snap-align:start}   /* a whole row at the top of the box, never a half one */
+:is(.farrowing-phone,.inspection-phone) .foster-ids{display:flex;flex-direction:column;gap:var(--space-8)}
+:is(.farrowing-phone,.inspection-phone) .foster-ids-head{display:flex;align-items:baseline;justify-content:space-between;margin:0;font:500 var(--type-entry-label-size)/1.5 var(--font-sans);color:var(--ink)}
+:is(.farrowing-phone,.inspection-phone) .foster-ids-count{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
+:is(.farrowing-phone,.inspection-phone) .foster-ids .st-choice-search{margin:0}
+:is(.farrowing-phone,.inspection-phone) .foster-id-box{border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--paper);overflow:clip}
+:is(.farrowing-phone,.inspection-phone) .foster-id-scroll{max-height:calc(3 * var(--row-min) + 2 * var(--border-width));overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;scroll-snap-type:y mandatory}
+:is(.farrowing-phone,.inspection-phone) .foster-id-scroll>.st-row{scroll-snap-align:start}   /* a whole row at the top of the box, never a half one */
 /* Three whole rows show; while more sit below, the bottom edge fades (owner, 2026-11-03: a cut row read as a spacing bug). */
-.farrowing-phone .foster-id-scroll[data-more]{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - var(--space-28)),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - var(--space-28)),transparent)}
-.farrowing-phone .foster-id-scroll::-webkit-scrollbar{display:none}
-.farrowing-phone .foster-id-scroll>.st-row+.st-row{border-top:var(--border-width) solid var(--line)}
-.farrowing-phone .foster-id-none{margin:0;padding:var(--space-16)}
+:is(.farrowing-phone,.inspection-phone) .foster-id-scroll[data-more]{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - var(--space-28)),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - var(--space-28)),transparent)}
+:is(.farrowing-phone,.inspection-phone) .foster-id-scroll::-webkit-scrollbar{display:none}
+:is(.farrowing-phone,.inspection-phone) .foster-id-scroll>.st-row+.st-row{border-top:var(--border-width) solid var(--line)}
+:is(.farrowing-phone,.inspection-phone) .foster-id-none{margin:0;padding:var(--space-16)}
 /* Foster piglets: Send or Receive heads the page, over the search bar. */
-.farrowing-phone .foster-pick .foster-direction{padding:0 var(--space-gutter) var(--space-12)}
+:is(.farrowing-phone,.inspection-phone) .foster-pick .foster-direction{padding:0 var(--space-gutter) var(--space-12)}
 /* Allocate piglets (owner, 2026-11-02): a menu drawer, the question and its three choices, then what has been sent so far; the same
    list heads Foster piglets when it is opened from Allocate. */
 .farrowing-phone .allocate-sent{margin-top:var(--space-18)}

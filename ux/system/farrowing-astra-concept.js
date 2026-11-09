@@ -548,7 +548,7 @@ function scanSetup(c,preset=''){
    list. Scan turns the list itself to scanning: each read ticks her and marks her row; a pig from another unit is not added. Then the verb's
    own form (Inspection's), filled once and saved for every pig chosen. Death is not here: it can't be undone, so it stays one pig at a time.
    Copy (owner): the sheet is plain "Actions", its line "Pigs in Unit 7"; not "For several sows", "Many pigs at once" or "bulk". */
-const batchVerbs=[['health','condition','Condition','Disease or symptom'],['treatment','treat','Treat','Record treatment'],['triage','care','Care','Care instructions'],['note','note','Note','Add a note'],['body','measure','Measure','Measurements & condition'],['feed','feed','Feed','Adjust feed'],['transfer','transfer','Transfer','Transfer']];
+const batchVerbs=[['health','condition','Condition','Disease or symptom'],['treatment','treat','Treat','Record treatment'],['triage','care','Care','Care instructions'],['note','note','Note','Add a note'],['body','measure','Measure','Measurements & condition'],['feed','feed','Feed','Adjust feed'],['transfer','transfer','Move','Move these sows to another pen']];
 const batchScans=['000431','004305','000434','000512','000392','000999','000622','004811','000437'];   // what "Simulate scan" reads while choosing: 000434 is in Unit 3, 000512 died, 000622 was sold, 000437 farrows in Unit 6
 /* A read that can't join this list adds nothing (owner reviews, 2026-10-22), but it is not lost: it goes into the list itself, at the top,
    where the eye is after a read, with no tick box, each row a door to her record. Why, in the order that matters: no pig has this tag (a
@@ -1075,7 +1075,7 @@ function sowActionCatalogue(s){return [
  {id:'not-in-pig',title:'Mark not in pig',group:'production',scope:'farrowing',sub:'Record the outcome and return to rebreed watch',icon:'pregnancy',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':''},
  {id:'move-batch',title:'Move to another farrowing batch',group:'production',scope:'other',sub:'Keep the sow in the production plan',icon:'batch',reason:'No destination farrowing batches are connected in this preview.'},
  {id:'marker',title:s.markers.length?'Edit note':'Add note',content:s.markers.length>0,group:'routine',sub:s.markers[0]?.text||'Leave a note or describe a visible marker',icon:'note',reason:s.ended?'This sow has died.':''},
- {id:'transfer',title:'Transfer sow',group:'routine',sub:'Move this sow to another unit or pen',icon:'transfer',reason:s.ended?'This sow has died.':''}
+ {id:'transfer',title:'Move this sow to another pen',group:'routine',sub:'To another pen or room',icon:'transfer',reason:s.ended?'This sow has died.':''}
 ];}
 // Scan's Actions: the embedded actions page opens for the first ticked sow, and the row the worker chose is opened in it.
 const deepSelectors={transfer:'[data-action="sow-host-action"][data-value="transfer"]',marker:'[data-action="sow-host-action"][data-value="marker"]',health:'[data-action="health"]',treatment:'[data-action="treatment"]'};

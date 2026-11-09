@@ -40,8 +40,11 @@ test('Record health is a full page like Record treatment (owner, 2026-10-17)', (
 test('treatment and transfer use full pages with completion controls', () => {
   const c = context('pig'); c.selected.add(c.pigId); model.openBulkAction(c, 'treatment');
   checkPage(model.overlay(c)); assert.match(model.overlay(c), /data-action="bulk-save"/);
-  c.view = 'sow-transfer'; c.transferDraft = {}; checkPage(model.overlay(c));
-  assert.match(model.overlay(c), /data-action="save-transfer"/);
+  // Move (2026-11-09): the sow's move is the destination step, a page with its commit; its footer repeats Back beside the commit, as Farrowing's Send piglets does
+  c.view = 'sow-transfer'; model.moveOpenSow(c);
+  const html = model.overlay(c);
+  assert.match(html, /data-presentation="page"/); assert.match(html, /data-st-context="page"/);
+  assert.match(html, /data-action="move-save"/); assert.match(html, /data-ds="PenMap"/);
 });
 test('medicine picker preserves the treatment page and entered dose behind it', () => {
   const c = context('pig'); c.selected.add(c.pigId); model.openBulkAction(c, 'treatment');
@@ -139,7 +142,7 @@ test('the verb words come from the strings registry, and Transfer is not the reg
   const c=context('actions');c.selected.add(c.pigId);
   c.hostActions=farrowing.sowActionCatalogue(farrowing.seed('count'));
   const labels=[...model.overlay(c).matchAll(/<span class="st-row-tile-label">([^<]+)<\/span>/g)].map(m=>m[1]);
-  assert.ok(labels.includes('Transfer'));assert.ok(!labels.includes('Move'));
+  assert.ok(labels.includes('Move'));assert.ok(!labels.includes('Transfer'));   // Move is the ad hoc verb; Transfer is the planned task (owner, 2026-11-09)
   const registry=require('../laws/strings.json').strings;
   for(const label of labels)assert.ok(Object.entries(registry).some(([id,s])=>id.startsWith('actions.tile.')&&s.en===label&&s.zh),label);
 });
@@ -306,7 +309,7 @@ test('the pen page leads with its verbs, then what needs someone, then how the p
   const html=model.overlay(c);
   const grid=html.match(/<div class="st-panel st-row-grid[^"]*"[^>]*aria-label="Pen actions"[^>]*>([\s\S]*?)<\/div><\/section>/);
   assert.ok(grid,'pen verbs as a tile grid');
-  assert.deepEqual([...grid[1].matchAll(/data-action="([^"]+)"/g)].map(m=>m[1]),['pen-note','feed','pen-observe','new-fault','tick-pen']);
+  assert.deepEqual([...grid[1].matchAll(/data-action="([^"]+)"/g)].map(m=>m[1]),['pen-note','feed','pen-observe','new-fault','pen-move','tick-pen']);
   const order=['Pen actions','Needs attention','>Now<','Pen log'].map(k=>html.indexOf(k));
   assert.ok(order.every((x,i)=>x>0&&(i===0||x>order[i-1])),'verbs, needs attention, now, log: '+order);
   assert.match(html,/data-action="fault-record" data-value="C1\|f1"/);
@@ -320,4 +323,37 @@ test('Tick all returns to the walk with the pen\'s shown pigs ticked', () => {
   model.tickPen(c,'C1');
   assert.equal(c.view,'list');
   assert.deepEqual([...c.selected].sort(),pe.pigs.map(p=>p.id).sort());
+});
+
+/* Move (owner, 2026-11-09): an ad hoc move of pigs; Transfer is a planned task and is not designed. */
+test('Move: a pen of one tagged pig skips Which pigs; a group pen asks which, and how many without ID', () => {
+  const one = context('pen-detail'); one.penId = 'C2'; one.pens.find(p => p.id === 'C2').pigs.length = 1;
+  model.moveOpenPen(one, 'C2'); assert.equal(one.view, 'move-to');
+  const many = context('pen-detail'); model.moveOpenPen(many, 'D4'); assert.equal(many.view, 'move-pigs');
+  const html = model.overlay(many);
+  assert.match(html, /With ID/); assert.match(html, /Without ID/); assert.match(html, /of 14/); assert.match(html, /data-ds="Stepper" data-variant="well"/);
+  assert.match(html, /disabled|aria-disabled="true"[^>]*>[\s\S]*Choose pen|Choose pen/);
+});
+test('Move: the commit takes the pigs out of their pen, into the destination, and logs both pens', () => {
+  const c = context('pen-detail'); model.moveOpenPen(c, 'D4');
+  c.mv.sel = { ids: ['000801'], noTags: { D4: 5 } }; c.mv.to = 'C4'; c.view = 'move-to';
+  assert.match(model.overlay(c), /Move 6 pigs/); assert.match(model.overlay(c), /the pigs are here/);
+  assert.ok(model.moveCommit(c));
+  const d4 = c.pens.find(p => p.id === 'D4'), c4 = c.pens.find(p => p.id === 'C4');
+  assert.equal(d4.pigs.length, 1); assert.equal(d4.untagged.count, 9);
+  assert.equal(c4.pigs.length, 1); assert.equal(c4.untagged.count, 5);
+  assert.equal(c.view, 'pen-detail'); assert.equal(c.toast, 'Moved 6 pigs to C4');
+  assert.ok(c.events.some(e => /^Moved out · 6 pigs to C4/.test(e.title) && e.penSubjects.some(p => p.id === 'D4')));
+  assert.ok(c.events.some(e => /^Moved in · 6 pigs from D4/.test(e.title) && e.penSubjects.some(p => p.id === 'C4')));
+});
+test('Move: one pig from Actions names the pig, and lands back where she started', () => {
+  const c = context('actions'); c.selected.add('000267'); model.moveOpenSelection(c);
+  c.mv.to = 'C4'; assert.match(model.overlay(c), /Move 000267/);
+  assert.ok(model.moveCommit(c)); assert.equal(c.view, 'list'); assert.equal(c.toast, 'Moved 000267 to C4');
+  assert.equal(c.selected.size, 0);
+});
+test('Move: the pen page and every Actions menu offer Move, never Transfer', () => {
+  const pen = model.overlay(context('pen-detail')); assert.match(pen, /data-action="pen-move"/); assert.doesNotMatch(pen, />Transfer</);
+  const c = context('actions'); c.selected.add(c.pigId);
+  assert.match(model.overlay(c), /data-action="transfer"/); assert.doesNotMatch(model.overlay(c), />Transfer</);
 });
