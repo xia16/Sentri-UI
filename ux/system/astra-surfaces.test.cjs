@@ -357,3 +357,9 @@ test('Move: the pen page and every Actions menu offer Move, never Transfer', () 
   const c = context('actions'); c.selected.add(c.pigId);
   assert.match(model.overlay(c), /data-action="transfer"/); assert.doesNotMatch(model.overlay(c), />Transfer</);
 });
+test('Move: Choose room lists the pigs\' own section first, their room first in it', () => {
+  const c = context('pen-detail'); model.moveOpenPen(c, 'D4'); c.view = 'move-rooms';
+  const html = model.overlay(c), at = (k) => html.indexOf(k);
+  assert.ok(at('>Gestation<') > 0 && at('>Gestation<') < at('>Nursery<') && at('>Nursery<') < at('>Hospital<'), 'own section first');
+  assert.ok(at('This room') < at('Unit 6'), 'own room first in its section');
+});

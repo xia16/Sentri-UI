@@ -621,7 +621,9 @@ function moveRoomCount(r){let n=0;for(const l of r.lanes)for(let k=1;k<=r.depth;
 function moveRoomLine(c,r){const n=moveRoomCount(r)+(moveRoomCount(r)===1?' pen':' pens');return moveHome(c,r)?'This room · '+n:n;}
 /* The To pen room row: its section and whether it is the pigs' own room; a room named like its section (Hospital) says its pens instead. */
 function moveRoomWhere(c,r){const t=[r.section&&r.section!==r.name?r.section:'',moveHome(c,r)?'this room':''].filter(Boolean).join(' · ');return t?t[0].toUpperCase()+t.slice(1):moveRoomCount(r)+' pens';}
-function moveRoomGroups(c){const out=[];for(const r of moveRooms(c)){const k=r.section||'';let g=out.find(x=>x.section===k);if(!g)out.push(g={section:k,rooms:[]});g.rooms.push(r);}return out;}
+/* The room list (owner, 2026-11-09): the section the pigs' room is in always comes first, and that room first in it; the other
+   sections follow in farm order. */
+function moveRoomGroups(c){const out=[];for(const r of moveRooms(c)){const k=r.section||'';let g=out.find(x=>x.section===k);if(!g)out.push(g={section:k,rooms:[]});g.rooms.push(r);}for(const g of out)g.rooms.sort((x,y)=>moveHome(c,y)-moveHome(c,x));return out.sort((x,y)=>y.rooms.some(r=>moveHome(c,r))-x.rooms.some(r=>moveHome(c,r)));}
 function moveRoomsPage(c){
  const m=c.mv,row=r=>SentriUI.row({variant:'navigation',icon:icon('grid'),title:r.name,description:moveRoomLine(c,r),action:'move-room',value:r.id,attrs:r.id===m.room?{'aria-current':'true'}:{}}),card=rs=>'<div class="st-panel st-row-group st-action-list">'+rs.map(row).join('')+'</div>';
  const groups=moveRoomGroups(c),body=groups.length===1&&!groups[0].section?card(groups[0].rooms):'<div>'+groups.map(g=>'<section class="detail-section" aria-label="'+esc(g.section)+'">'+stHeading({title:g.section,kind:'section',level:4})+card(g.rooms)+'</section>').join('')+'</div>';
