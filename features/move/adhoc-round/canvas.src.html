@@ -1,0 +1,133 @@
+<title>Move pigs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: a review sheet. Each flow is a strip of phones in the order the worker sees them; renamed screens are before/after pairs. */
+:root {
+  --bg: #f3f4ef;
+  --paper: #ffffff;
+  --ink: #1e2420;
+  --ink-2: #5b635d;
+  --line: #dde1d8;
+  --tag-before: #8a8f88;
+  --tag-after: #2f6b3f;
+  --font-body: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #161a17; --paper: #1f2420; --ink: #e8ece6; --ink-2: #a3aba4; --line: #323a33; --tag-before: #9aa09a; --tag-after: #7fc58f; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #161a17; --paper: #1f2420; --ink: #e8ece6; --ink-2: #a3aba4; --line: #323a33; --tag-before: #9aa09a; --tag-after: #7fc58f; color-scheme: dark; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font-body); }
+.page { max-width: 1180px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 40px; }
+header { display: grid; gap: 8px; max-width: 70ch; }
+h1 { font-size: 28px; line-height: 1.2; margin: 0; text-wrap: balance; }
+h2 { font-size: 19px; margin: 0; text-wrap: balance; }
+p { margin: 0; color: var(--ink-2); }
+.meta { font: 12px/1.4 var(--font-mono); color: var(--ink-2); letter-spacing: .02em; }
+section { display: grid; gap: 16px; }
+.lead { max-width: 70ch; display: grid; gap: 6px; }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.card h3 { margin: 0; font-size: 15px; }
+.strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(220px, 260px); gap: 14px; overflow-x: auto; padding-bottom: 6px; }
+.shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+figure { margin: 0; display: grid; gap: 6px; align-content: start; justify-items: center; min-width: 0; }
+figure img { width: 100%; max-width: 300px; height: auto; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); }
+figcaption { font: 600 11px/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--tag-after); text-align: center; }
+.before figcaption { color: var(--tag-before); }
+.step { font: 600 11px/1 var(--font-mono); color: var(--ink-2); }
+ul.calls { display: grid; gap: 8px; padding-left: 18px; margin: 0; color: var(--ink-2); max-width: 74ch; }
+ul.calls strong { color: var(--ink); }
+@media (max-width: 520px) { .shots { gap: 8px; } }
+</style>
+
+<div class="page">
+  <header>
+    <span class="meta">Move · canvas · 2026-11-09 · branch move/adhoc-move</span>
+    <h1>Move: pick the pigs, pick the pen</h1>
+    <p>Your rule: <strong>Move</strong> is the ad hoc move a worker does on the spot. <strong>Transfer</strong> is a planned task and stays out of this round. Open a pig and tap Move, then pick the pen. Open a pen and tap Move, then say which pigs go. Pigs with an ID are ticked; pigs without an ID are counted. Then pick the pen. Every screen below is from the real prototype at 390 wide.</p>
+  </header>
+
+  <section>
+    <div class="lead">
+      <h2>1 · A pen with pigs without ID (D4: 2 tagged, 14 without)</h2>
+      <p>The pen page gets a Move tile. Which pigs uses the same parts as Farrowing's Send piglets: tick the tagged ones (search or scan), count the rest. Choose pen opens the room's pen map, with the pigs' own pen greyed.</p>
+    </div>
+    <div class="card"><div class="strip">
+      <figure><img src="after/pen-D4.png" alt="Pen D4 page with a Move tile"><figcaption>Pen page · Move</figcaption></figure>
+      <figure><img src="after/step1-D4.png" alt="Move pigs: 000801 ticked, 5 without ID"><figcaption>Which pigs</figcaption></figure>
+      <figure><img src="after/step2-D4.png" alt="To pen for the 6 pigs from D4"><figcaption>To pen</figcaption></figure>
+    </div></div>
+  </section>
+
+  <section>
+    <div class="lead">
+      <h2>2 · A pen of tagged pigs (C1), to this room or another</h2>
+      <p>Tap a pen and the button says where: Move to C4. The room row at the top switches to another room (Hospital here). You land back on the pen page: its count drops, both pens' logs get a line, and a toast confirms.</p>
+    </div>
+    <div class="card"><div class="strip">
+      <figure><img src="after/pen-C1.png" alt="Pen C1 page"><figcaption>Pen page</figcaption></figure>
+      <figure><img src="after/step1-C1.png" alt="Move pigs for C1, two ticked"><figcaption>Which pigs</figcaption></figure>
+      <figure><img src="after/step2-empty.png" alt="To pen, nothing picked"><figcaption>To pen</figcaption></figure>
+      <figure><img src="after/step2-picked.png" alt="To pen with C4 picked"><figcaption>C4 picked</figcaption></figure>
+      <figure><img src="after/rooms.png" alt="Choose room: Unit 7, Unit 6, Hospital"><figcaption>Another room</figcaption></figure>
+      <figure><img src="after/step2-hospital.png" alt="Hospital map, H2 picked"><figcaption>Hospital · H2</figcaption></figure>
+      <figure><img src="after/after-pen.png" alt="Pen C1 after the move, toast Moved 2 pigs to C4"><figcaption>Back on the pen</figcaption></figure>
+      <figure><img src="after/after-pen-log.png" alt="Pen log with the move line"><figcaption>Pen log</figcaption></figure>
+    </div></div>
+  </section>
+
+  <section>
+    <div class="lead">
+      <h2>3 · One pig, or pigs already ticked</h2>
+      <p>A single pig's Actions → Move goes straight to the pen map: there is nothing to choose. Pigs ticked on the walk (the without-ID row with its count too) also skip Which pigs, because the ticks already say which.</p>
+    </div>
+    <div class="card"><div class="strip">
+      <figure><img src="after/pig-actions.png" alt="A pig's Actions with the Move tile"><figcaption>Pig · Actions</figcaption></figure>
+      <figure><img src="after/pig-step2.png" alt="Move 000267, to pen"><figcaption>To pen</figcaption></figure>
+      <figure><img src="after/ticked-actions.png" alt="Ticked pigs' Actions with Move"><figcaption>Ticked · Actions</figcaption></figure>
+      <figure><img src="after/ticked-step2.png" alt="Move 15 pigs from 2 pens"><figcaption>15 pigs · 2 pens</figcaption></figure>
+    </div></div>
+  </section>
+
+  <section>
+    <div class="lead">
+      <h2>4 · What it replaces</h2>
+      <p>The Actions tile said Transfer and only gave a "not designed yet" toast. Farrowing's sow move was two dropdowns. Both now open the same To pen step.</p>
+    </div>
+    <div class="card"><h3>A pig's Actions: Transfer → Move</h3><div class="shots">
+      <figure class="before"><img src="before/pig-actions.png" alt="Before: Transfer tile"><figcaption>Before</figcaption></figure>
+      <figure><img src="after/pig-actions.png" alt="After: Move tile"><figcaption>After</figcaption></figure>
+    </div></div>
+    <div class="card"><h3>Tapping it: a toast → the pen map</h3><div class="shots">
+      <figure class="before"><img src="before/transfer-toast.png" alt="Before: Transfer is not designed yet toast"><figcaption>Before</figcaption></figure>
+      <figure><img src="after/pig-step2.png" alt="After: To pen"><figcaption>After</figcaption></figure>
+    </div></div>
+    <div class="card"><h3>Pen page: a Move tile (six tiles, three and three)</h3><div class="shots">
+      <figure class="before"><img src="before/pen-C1.png" alt="Before: pen page with five tiles"><figcaption>Before</figcaption></figure>
+      <figure><img src="after/pen-C1.png" alt="After: pen page with Move"><figcaption>After</figcaption></figure>
+    </div></div>
+    <div class="card"><h3>Farrowing · a sow: Transfer sow dropdowns → the same To pen</h3><div class="shots">
+      <figure class="before"><img src="before/farrowing-transfer-sow.png" alt="Before: Transfer sow, unit and pen dropdowns"><figcaption>Before</figcaption></figure>
+      <figure><img src="after/farrowing-sow-move-picked.png" alt="After: Move 000418, B4 picked"><figcaption>After</figcaption></figure>
+    </div></div>
+  </section>
+
+  <section>
+    <div class="lead"><h2>Why it looks like this</h2></div>
+    <ul class="calls">
+      <li><strong>House patterns, not new parts.</strong> Which pigs is Farrowing's Send piglets: same ticks, same search and scan, same counter. The pen picker is the Pen map the worker already uses to walk the room. The map gained two states: a picked pen (ink ring) and a greyed one (where the pigs already are).</li>
+      <li><strong>One question per screen.</strong> Which pigs asks only that; To pen shows only the room and its pens. A pen's colour statuses are left off the map, because they don't help choose where pigs go.</li>
+      <li><strong>The button says what will happen:</strong> Choose a pen (off) → Move to C4.</li>
+      <li><strong>No second confirm.</strong> The footer button is the confirmation; the toast, the new counts and both pens' logs are the receipt.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="lead"><h2>Not in this round</h2></div>
+    <ul class="calls">
+      <li>Farrowing's piglet Foster and Move-to-pen, and Piglet processing's move: once you agree, they can open this same flow.</li>
+      <li>Transfer, the planned task.</li>
+      <li>The Move feature's spec and atlas entries still say "Transfer". They get rewritten when you agree.</li>
+    </ul>
+  </section>
+</div>
