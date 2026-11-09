@@ -1313,7 +1313,9 @@ function actionCatalogue(c){
 }
 function sowTaskCard(c){if(picked(c).length!==1||c.selectedPens.size)return '';const tasks=currentTasksForPig(c,picked(c)[0]);if(!tasks.length)return '';const heading=stHeading({title:'Current tasks',meta:String(tasks.length),kind:'section',level:4});return `<section class="sow-task-section" aria-label="Linked tasks">${heading}<div class="sow-task-rail" aria-label="Current tasks">${tasks.map(t=>button(t.action||'sow-current-task',`<span class="sow-task-card-main"><strong>${esc(t.title)}</strong>${icon('chevron')}</span><span class="sow-task-card-meta"><span class="sow-task-status">${esc(t.status)}</span><span class="sow-task-type" data-type="${esc((t.type||'General').toLowerCase())}">${esc(t.type||'General')}</span></span>`,'sow-task-card',t.value||t.id)).join('')}</div></section>`;}
 
-function actionRows(items){return items.map(x=>action(x.a,x.k,x.title,x.reason||x.sub,x.value,!!x.reason)).join('');}
+/* A greyed row keeps its own description: the reason is in its accessible name only, as on a greyed tile (owner, 2026-11-06: "just
+   grey"; six rows each saying "This sow has died." is the same fact six times). */
+function actionRows(items){return items.map(x=>action(x.a,x.k,x.title,x.sub,x.value,!!x.reason,x.reason)).join('');}
 function productionActionGroups(c,items){
  const farrowingIds=new Set(['miscarriage','edit']),processingIds=new Set(['piglets','death','countReconcile','foster']);
  const taskScope=x=>['farrowing','piglet-processing','pregnancy-check','gestation','breeding','lactation','growth','other'].includes(x.section)?x.section:farrowingIds.has(x.value)?'farrowing':processingIds.has(x.value)?'piglet-processing':'other';
@@ -2053,7 +2055,7 @@ function pigWhat(p){const type=animalType(p);return type!=='Sow'?type:(p.stage==
 function pigFacts(c,p){if(c.hostNote){const where=[c.unitLabel,penOf(c,p.id).id].filter(Boolean).join(' · ');return {text:[{text:c.hostNote},...(where?[{sep:true},{text:where}]:[])]};}return {text:[{text:pigUnit(c,p.id)+' · '+penOf(c,p.id).id},...(pigWhat(p)?[{sep:true},{text:pigWhat(p)}]:[])]};}
 function pigRoute(c,p){return {chip:{id:p.id,action:'pig',value:p.id,label:'Open pig '+p.id},facts:[penOf(c,p.id).id]};}
 function scope(c){const ids=c.form.subjects||[...c.selected],pens=[...new Set(ids.map(id=>penOf(c,id)?.id))];return `${countLabel(ids.length)} · ${pens.join(' / ')}`;}
-function action(a,k,title,sub,v='',disabled=false){return stRow({action:a,title,description:sub,icon:icon(k),value:v,disabled,className:'action-item',attrs:entryFor(a)?{'data-entry':entryFor(a)}:{}});}
+function action(a,k,title,sub,v='',disabled=false,reason=''){return stRow({action:a,title,description:sub,icon:icon(k),value:v,disabled,className:'action-item',attrs:{...(entryFor(a)?{'data-entry':entryFor(a)}:{}),...(disabled&&reason?{'aria-label':`${title}, not available: ${String(reason).replace(/\.$/,'')}`}:{})}});}
 function textField(label,key,value='',placeholder=''){return SentriUI.field({label:label||'Note',variant:'textarea',control:`<textarea data-field="${key}" placeholder="${placeholder}">${esc(value)}</textarea>`});}
 
 function choices(items,current,key,group){return SentriUI.choiceRadios({label:'Reason',key,action:'form-choice',selected:current||'',options:items.map(([value,label,meta])=>({value,label,meta}))});}
