@@ -899,14 +899,6 @@
    "x": 480,
    "y": -1480
   },
-  "MyDayPhone.dc.html": {
-   "h": 1262,
-   "page": "workday",
-   "title": "Phone: My day as a quest line from the agent; agent in the dock middle; scan floating (mock-up on live main screens)",
-   "w": 3008,
-   "x": 480,
-   "y": -2900
-  },
   "HomeFeatureList.dc.html": {
    "x": 480,
    "y": 5300,
@@ -923,14 +915,6 @@
    "page": "home",
    "is_interactive": true,
    "title": "Home D (9 Nov): A's layout, list cards, Decide carousel, dashboard widgets, Production / Health / Farm toggle (mock-up, plays)"
-  },
-  "StopsHeadsUp.dc.html": {
-   "h": 6043,
-   "page": "workday",
-   "title": "Phone round 3 (9 Nov): the agent's own look (toast A/B/C), notes about the whole room or task, and where they live in the task (spots 6-8); round 2 below for reference (mock-up, live main screens)",
-   "w": 3008,
-   "x": 480,
-   "y": -9119
   },
   "HomeFeatureListF.dc.html": {
    "x": 4000,
@@ -986,7 +970,7 @@
   "work-plan",
   "users-title",
   "users-plan",
-  "phone-r3"
+  "phone-moved"
  ],
  "notes": {
   "arch-actions": {
@@ -1218,13 +1202,13 @@
    "maxW": 1640,
    "page": "home"
   },
-  "phone-r3": {
+  "phone-moved": {
    "fill": "green",
    "page": "workday",
    "w": 420,
    "x": 0,
-   "y": -9119,
-   "text": "Phone round 3, for you to pick (9 Nov):\n- The agent's look for its toast: A ink, B its own light violet (my pick), C deep violet. Violet would be one new token, used only for the agent.\n- The note format: room and task lines run full width with no badge, then pen lines with their badge (frames 4, 5).\n- Where the notes live in the task: 6 a row under the summary (my pick), 7 a section in the list, 8 a labelled chip in the header.\nStill open from round 1:\n1. The agent's name on the phone: General Manager or Assistant? (I'd say General Manager everywhere, always with the sparkle.)\n2. Should a recorded task tick itself in My day? (I'd say no: My day is the plan.)\n3. Does the morning brief buzz the phone? (I'd say once, at the start of the shift.)"
+   "y": -2900,
+   "text": "The phone boards (My day, the day as stops, the agent's toast and notes inside tasks; rounds 1 to 3) moved to their own canvas on 9 Nov: https://claude.ai/artifact/UNXAnopBzeWSC5jTNFTm28"
   }
  },
  "order": [
@@ -1334,10 +1318,8 @@
   "RolesScreens.dc.html",
   "TimeAway.dc.html",
   "WorkScheduleOrder.dc.html",
-  "MyDayPhone.dc.html",
   "HomeFeatureList.dc.html",
   "HomeFeatureListD.dc.html",
-  "StopsHeadsUp.dc.html",
   "HomeFeatureListF.dc.html",
   "HomeDecideOptions.dc.html"
  ],

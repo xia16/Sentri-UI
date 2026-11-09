@@ -4,6 +4,8 @@ Written 9 Nov 2026 for a new session. The phone work moves out of the AI-first c
 
 ## Where things are
 
+> **Moved 9 Nov (later):** the phone boards now live on their own canvas, "Sentri phone: My day and the agent", https://claude.ai/artifact/UNXAnopBzeWSC5jTNFTm28 (StopsHeadsUp at the top with round 3 above round 2, MyDayPhone below). Their sources are in `prototypes/aifirst-canvas/phone/project/`; generators stay in `aifirst/ovh/` (`gen-stops-r3.cjs` for round 3) and now write into that folder. The console canvas keeps only a note pointing there. The positions below describe the old canvas.
+
 - **Canvas:** https://claude.ai/code/artifact/15394c53-c767-4178-a99f-287167e3eb10 (the "Sentri AI-first console" Design artifact). Page **Work schedule** (id `workday`).
 - **Phone boards on that page:**
   - `StopsHeadsUp.dc.html` (top of the page, y −6440). Round 2, the current one. Frames:

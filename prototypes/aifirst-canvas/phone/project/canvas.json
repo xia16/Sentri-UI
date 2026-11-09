@@ -1,0 +1,53 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-09T09:10:14.472Z"
+ },
+ "title": "Sentri phone: My day and the agent",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "StopsHeadsUp.dc.html": {
+   "h": 6043,
+   "title": "Phone round 3 (9 Nov): the agent's own look (toast A/B/C), notes about the whole room or task, and where they live in the task (spots 6-8); round 2 below for reference (mock-up, live main screens)",
+   "w": 3008,
+   "x": 0,
+   "y": 0
+  },
+  "MyDayPhone.dc.html": {
+   "h": 1262,
+   "title": "Phone: My day as a quest line from the agent; agent in the dock middle; scan floating (mock-up on live main screens)",
+   "w": 3008,
+   "x": 0,
+   "y": 6163
+  }
+ },
+ "order": [
+  "MyDayPhone.dc.html",
+  "StopsHeadsUp.dc.html"
+ ],
+ "notes": {
+  "phone-title": {
+   "kind": "title1",
+   "x": 0,
+   "y": -300,
+   "maxW": 3008,
+   "text": "Phone: My day, the agent in the dock, and the agent's notes inside tasks"
+  },
+  "phone-r3": {
+   "fill": "green",
+   "w": 420,
+   "x": -500,
+   "y": 0,
+   "text": "Phone round 3, for you to pick (9 Nov):\n- The agent's look for its toast: A ink, B its own light violet (my pick), C deep violet. Violet would be one new token, used only for the agent.\n- The note format: room and task lines run full width with no badge, then pen lines with their badge (frames 4, 5).\n- Where the notes live in the task: 6 a row under the summary (my pick), 7 a section in the list, 8 a labelled chip in the header.\nStill open from round 1:\n1. The agent's name on the phone: General Manager or Assistant? (I'd say General Manager everywhere, always with the sparkle.)\n2. Should a recorded task tick itself in My day? (I'd say no: My day is the plan.)\n3. Does the morning brief buzz the phone? (I'd say once, at the start of the shift.)"
+  }
+ },
+ "noteOrder": [
+  "phone-title",
+  "phone-r3"
+ ],
+ "designSystems": []
+}
