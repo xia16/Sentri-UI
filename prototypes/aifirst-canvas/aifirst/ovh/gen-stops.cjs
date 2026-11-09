@@ -130,3 +130,79 @@ const html = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\
   '<div style="flex: 1; display: flex; flex-direction: column; gap: 20px; padding-top: 168px;">' + headsCard + '</div></div></div>\n</x-dc>\n<script type="text/x-dc" data-dc-script data-props=\'{"$preview":{"width":3008,"height":2300}}\'>\nclass Component extends DCLogic {\n  renderVals() { return {}; }\n}\n</script>\n</body>\n</html>\n';
 fs.writeFileSync(path.join(S, 'pub/project/StopsHeadsUp.dc.html'), html);
 console.log('ok', Math.round(html.length / 1024) + ' KB');
+// ===== round 2: rounds and coming back; a rich morning brief; the heads-up as a notification, not a forced pop-up =====
+const MONO = "ui-monospace, 'SF Mono', Menlo, monospace";
+// B · an interrupted day: a task, a feeding round across five rooms, then back to the task
+const routeLine = (rooms) => '<div style="display: flex; gap: 6px; overflow: hidden; padding: 2px 0 12px 56px; white-space: nowrap; -webkit-mask-image: linear-gradient(90deg, #000 78%, transparent); mask-image: linear-gradient(90deg, #000 78%, transparent);">' + rooms.map((r, i) => '<span style="flex: none; display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 9px 0 4px; border-radius: 8px; background: ' + PH.soft + '; font-size: 13px; font-weight: 600;"><b style="width: 20px; height: 20px; border-radius: 6px; background: #fff; display: grid; place-items: center; font-size: 11px;">' + (i + 1) + '</b>' + r + '</span>').join('') + '</div>';
+const STOPS_B = [
+  { place: 'Farrowing 3', at: '06:00', rows: [['birth', 'Farrowing']] },
+  { place: 'Feeding round', sub: '5 rooms, in walking order', at: '07:00', rows: [['feed', 'Feeding']], route: ['Farrowing 1', 'Farrowing 2', 'Farrowing 3', 'Farrowing 4', 'Nursery 1'] },
+  { place: 'Back to Farrowing 3', time: '~2 h', rows: [['birth', 'Farrowing, carry on']] },
+  { place: 'Farrowing 2', at: '15:00', rows: [['dose', 'Pen-strep, evening']] }
+];
+const stopBlockB = (s, n, last) => '<div style="display: flex; align-items: stretch; gap: 10px;">' +
+  '<div style="width: 30px; flex: none; display: flex; flex-direction: column; align-items: center;"><span style="width: 30px; height: 30px; border-radius: 99px; display: grid; place-items: center; font-size: 14px; font-weight: 700; margin-top: 2px; ' + (n === 1 ? 'background: ' + PH.green + '; color: #fff; box-shadow: 0 0 0 5px #dcebdd;' : 'background: #fff; box-shadow: inset 0 0 0 2px #a3aa9f;') + '">' + n + '</span>' + (last ? '' : '<span style="flex: 1; width: 2px; background: #cdd5c3; margin-top: 4px;"></span>') + '</div>' +
+  '<div style="flex: 1; min-width: 0; margin-bottom: 14px;"><div style="display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 2px 6px;"><span style="flex: 1; min-width: 0;"><span style="display: block; font-size: 18px; font-weight: 700;">' + s.place + '</span>' + (s.sub ? '<span style="display: block; font-size: 13px; color: ' + PH.muted + '; margin-top: 1px;">' + s.sub + '</span>' : '') + '</span>' + (s.at ? clockChip(s.at) : '<span style="font-size: 14px; color: ' + PH.muted + ';">' + s.time + '</span>') + '</div>' +
+  '<div style="background: #fff; border: 1px solid ' + PH.line + '; border-radius: 16px; overflow: hidden;">' + s.rows.map((r, i) => taskRow(r, i === 0)).join('') + (s.route ? routeLine(s.route) : '') + '</div></div></div>';
+const mydayB = mydayHead.replace(/about 5&frac12; h &middot; .*?from the General Manager/, '4 stops &middot; about 6 h') + '<div style="padding: 14px 18px 0 14px;">' + STOPS_B.map((s, i) => stopBlockB(s, i + 1, i === STOPS_B.length - 1)).join('') + '</div>';
+
+// the morning brief: written by the agent as a formatted page, not a chat line
+const pen = (t) => '<span style="display: inline-flex; align-items: center; height: 22px; padding: 0 6px; border-radius: 6px; background: ' + PH.soft + '; font: 700 12.5px ' + MONO + '; vertical-align: 1px;">' + t + '</span>';
+const pig = (t) => '<b style="font: 700 14.5px ' + MONO + ';">' + t + '</b>';
+const node = (ic, t, on) => '<div style="display: flex; flex-direction: column; align-items: center; gap: 5px; width: 54px;"><span style="width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; ' + (on ? 'background: ' + PH.green + '; color: #fff;' : 'background: #fff; color: ' + PH.ink + '; box-shadow: inset 0 0 0 1px ' + PH.line + ';') + '">' + svg(IC[ic], 20, 1.8) + '</span><span style="font-size: 12px; font-weight: 700; color: ' + (on ? PH.green : PH.muted) + ';">' + t + '</span></div>';
+const dash = '<span style="flex: 1; height: 2px; margin-top: 19px; background: repeating-linear-gradient(90deg, #b9c2ae 0 4px, transparent 4px 8px);"></span>';
+const brief = '<div style="margin: 12px 14px 0; border-radius: 20px; overflow: hidden; background: #fff; border: 1px solid ' + PH.line + ';">' +
+  '<div style="padding: 16px 16px 14px; background: linear-gradient(180deg, #eef3e6, #fff);"><div style="font-size: 12px; font-weight: 700; letter-spacing: .06em; color: ' + PH.muted + ';">THURSDAY 5 NOV</div><div style="font-size: 22px; font-weight: 800; letter-spacing: -.02em; margin-top: 4px;">Four stops, about 6 hours</div>' +
+  '<div style="display: flex; align-items: flex-start; margin-top: 14px;">' + node('birth', '06:00', true) + dash + node('feed', '07:00') + dash + node('birth', '~2 h') + dash + node('dose', '15:00') + '</div></div>' +
+  '<div style="padding: 4px 16px 6px;"><div style="font-size: 13px; font-weight: 700; color: ' + PH.muted + '; margin: 8px 0 6px;">Start with</div><div style="font-size: 16px; line-height: 23px;"><b>Farrowing 3.</b> B33 is farrowing; three sows are close. At 07:00 leave them for the feeding round, then come back.</div>' +
+  '<div style="font-size: 13px; font-weight: 700; color: ' + PH.muted + '; margin: 14px 0 6px;">Worth knowing</div>' +
+  '<div style="font-size: 15px; line-height: 23px; padding-left: 12px; border-left: 3px solid #c8d8b8;">' + pig('000392') + ' in ' + pen('B2') + ' is due tomorrow and off her feed since last night.</div>' +
+  '<div style="font-size: 15px; line-height: 23px; padding-left: 12px; border-left: 3px solid #c8d8b8; margin-top: 10px;">In Farrowing 2, the litter in ' + pen('B3') + ' gets Pen-strep at 15:00.</div></div>' +
+  '<div style="margin: 14px 16px 16px; height: 50px; border-radius: 14px; border: 1px solid #b6c0ad; display: grid; place-items: center; font-size: 15px; font-weight: 700;">Open My day</div></div>';
+const morningRich = agentHead + '<div style="display: flex; align-items: center; gap: 8px; margin: 14px 18px 0; font-size: 13px; color: ' + PH.muted + ';"><b style="color: ' + PH.ink + '; font-weight: 700;">General Manager</b>&middot; 05:30</div>' + brief + composer + dock('agent');
+
+// the heads-up: slides in like a notification above the task's footer; the page stays usable
+const toast = '<div style="position: absolute; left: 12px; right: 12px; top: 650px; z-index: 3; background: #fff; border-radius: 18px; box-shadow: 0 12px 30px rgba(32,41,31,.22), 0 0 0 1px ' + PH.line + '; display: flex; align-items: center; gap: 12px; padding: 12px 4px 12px 12px;">' + tile(36, true) +
+  '<div style="flex: 1; min-width: 0;"><div style="font-size: 15px; font-weight: 700;">2 things in Farrowing 3</div><div style="font-size: 13.5px; color: ' + PH.muted + '; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">000392 in B2 is due tomorrow and off her feed&hellip;</div></div>' +
+  '<span style="width: 44px; height: 44px; display: grid; place-items: center; color: ' + PH.muted + ';">' + svg(IC.x, 20, 2.2) + '</span></div>';
+const farrowToast = farrowBase + headBtn(326, true) + toast;
+// opened by tapping it: the same note, formatted, closable
+const item = (penT, pigT, text) => '<div style="display: flex; gap: 12px; padding: 14px 0; border-top: 1px solid #e8eddf;"><div style="flex: none; width: 48px;">' + pen(penT) + '</div><div style="flex: 1; font-size: 15.5px; line-height: 23px;">' + (pigT ? pig(pigT) + ' ' : '') + text + '</div></div>';
+const readSheetOf = (kicker, title, items) => '<div style="position: absolute; inset: 0; background: rgba(20,24,19,.32);"></div><div style="position: absolute; left: 0; right: 0; bottom: 0; padding-bottom: 34px; background: #fff; border-radius: 24px 24px 0 0;">' +
+  '<div style="width: 40px; height: 4px; border-radius: 2px; background: #c7cebe; margin: 10px auto 0;"></div>' +
+  '<div style="display: flex; align-items: flex-start; gap: 10px; padding: 12px 8px 4px 18px;">' + tile(32, true) + '<div style="flex: 1;"><div style="font-size: 12px; font-weight: 700; letter-spacing: .06em; color: ' + PH.muted + ';">' + kicker + '</div><div style="font-size: 20px; font-weight: 800; letter-spacing: -.01em; margin-top: 3px;">' + title + '</div></div><span style="width: 44px; height: 44px; display: grid; place-items: center;">' + svg(IC.x, 22, 2.2, PH.ink) + '</span></div>' +
+  '<div style="padding: 6px 18px 0;">' + items +
+  '<div style="font-size: 13px; color: ' + PH.muted + '; padding-top: 12px; border-top: 1px solid #e8eddf;">General Manager &middot; 05:30 &middot; reopen any time from ' + '<span style="display: inline-flex; vertical-align: -3px;">' + svg(IC.spark, 15, 1.8) + '</span> in the header</div></div></div>';
+const farrowRead = farrowBase + headBtn(326, false) + readSheetOf('FARROWING 3 &middot; TODAY', 'Two sows to watch', item('B2', '000392', 'is due tomorrow and has been off her feed since last night. <b>Look at her first.</b>') + item('B1', '000418', 'lost 5 yesterday. Check the heat lamp is on before you count again.'));
+const walkRead = walkBase + headBtn(274, false) + readSheetOf('GESTATION 2 &middot; WHILE YOU WALK', 'Body condition on four sows', item('C1', null, '<b>Score</b> ' + pig('000267') + ' and ' + pig('000281') + '. It&rsquo;s the usual record on each pig.') + item('C2', null, '<b>Score</b> ' + pig('000306') + ' and ' + pig('000312') + '. ' + pig('000306') + ' had a fever yesterday: take her temperature again.'));
+
+const consoleFrag2 = fs.readFileSync(path.join(S, 'stops-console.frag.html'), 'utf8');
+const pf2 = (title, cap, ph) => '<figure style="margin: 0; width: 414px; flex: none;"><figcaption style="font-size: 17px; font-weight: 600; margin-bottom: 6px;">' + title + '</figcaption><div style="font-size: 14.5px; line-height: 22px; color: #3B4540; margin-bottom: 14px; min-height: 132px;">' + cap + '</div>' + phone(ph) + '</figure>';
+const rc = (t, items) => '<div style="background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px #E6E9E2; padding: 22px 26px 12px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">' + t + '</div><ul style="margin: 0; padding-left: 20px; font-size: 14.5px; line-height: 22px; color: #3B4540;">' + items.map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ul></div>';
+const rule2 = rc('The rule, round 2: a card is a stop, one trip', [
+  '<b>A place:</b> several tasks in one room or block. <b>A round:</b> one task across several rooms (feeding, a walk); its rooms sit on one scrolling line inside, in walking order.',
+  '<b>Coming back is its own card,</b> named &ldquo;Back to Farrowing 3&rdquo;, so an interrupted task reads as leave, round, return; never five room cards.',
+  'A new card only for a new trip: another place, a round, or a return later. Tasks in the same trip are rows; &ldquo;as you go&rdquo; work is a sentence.',
+  'The console Work schedule follows: a round is one card with its first room and how many more (&ldquo;Feeding &middot; Farrowing 1 +4&rdquo;).']);
+const heads2 = rc('The heads-up, round 2: a notification, never forced', [
+  'Opening a task with something to say slides a small card in above the footer: what it&rsquo;s about and the first line. The page stays usable; nothing is dimmed or blocked.',
+  'Tap it to read the whole note; &#10005; to put it away. Either way the agent&rsquo;s mark in the header keeps it, with a dot until it&rsquo;s been read.',
+  'The agent writes it formatted: a title, one item per pen with the pig named, the one thing to do in bold. Same for the morning brief: a laid-out page, not a chat line.',
+  'Still short by rule: only what changes what you do today in this task.']);
+const html2 = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Stops and heads-up</title>\n<script src="./support.js"></script>\n</head>\n<body>\n<x-dc>\n<helmet>\n<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Inter:wght@400..700&family=Plus+Jakarta+Sans:wght@400..800&display=swap" rel="stylesheet">\n<style>body{margin:0}</style>\n</helmet>\n' +
+  '<div style="width: 3008px; padding: 44px 48px 60px; box-sizing: border-box; background: #F3F4F1; font-family: Geist, system-ui, sans-serif; color: #111511; -webkit-font-smoothing: antialiased;">' +
+  '<h1 style="margin: 0; font-size: 30px; line-height: 38px; font-weight: 600; letter-spacing: -.025em;">The day as trips, a rich morning brief, and the heads-up as a notification (mock-up, round 2)</h1><p style="margin: 8px 0 34px; font-size: 16px; line-height: 24px; color: #5D665F; max-width: 2300px;">Round 2 after your notes: an interrupted day (a task, a feeding round across five rooms, then back) must read cleanly; the agent writes formatted pages, not chat lines; and its note in a task arrives like a notification you can open or close. Built on the live phone screens from main.</p>' +
+  '<div style="display: flex; gap: 36px; align-items: flex-start;">' +
+  pf2('1 · A simple day', 'Places with tasks in order, as before.', mydayStops) +
+  pf2('2 · An interrupted day', 'Farrowing 3 from 06:00, the feeding round at 07:00 across five rooms (one card, rooms on one line), then Back to Farrowing 3. Three trips, not seven cards.', mydayB) +
+  pf2('3 · The morning brief, written by the agent', 'A laid-out page in the chat: the day in one line, the trips as a route with times, where to start and why, and what&rsquo;s worth knowing, with pens and pigs set apart.', morningRich) +
+  '<div style="flex: 1; display: flex; flex-direction: column; gap: 20px; padding-top: 168px;">' + rule2 + '</div></div>' +
+  '<div style="height: 56px;"></div><div style="display: flex; gap: 36px; align-items: flex-start;">' +
+  pf2('4 · Opening a task: a notification, not a pop-up', 'The note slides in above the footer. The list stays in view and works; &#10005; puts it away, tapping opens it.', farrowToast) +
+  pf2('5 · Opened: the note, formatted', 'One item per pen, the pig named, the thing to do in bold. Close it and carry on; the header button keeps it.', farrowRead) +
+  pf2('6 · A walk: the same, while you walk', 'Zhao Min&rsquo;s walk in Gestation 2, opened from its notification: what to measure and who to check, named in sentences.', walkRead) +
+  '<div style="flex: 1; display: flex; flex-direction: column; gap: 20px; padding-top: 168px;">' + heads2 + '</div></div>' +
+  '<div style="height: 56px;"></div><figure style="margin: 0;"><figcaption style="font-size: 17px; font-weight: 600; margin-bottom: 6px;">7 · Console: the Work schedule as trips (round 1, still holds for places)</figcaption><div style="font-size: 14.5px; line-height: 22px; color: #3B4540; margin-bottom: 14px;">A card per trip. Wang Fang and Zhao Min stay in one block all day, so one card each; Ma Lin goes back to Gestation for the 13:30 feed, so two.</div>' + consoleFrag2 + '</figure>' +
+  '</div>\n</x-dc>\n<script type="text/x-dc" data-dc-script data-props=\'{"$preview":{"width":3008,"height":3400}}\'>\nclass Component extends DCLogic {\n  renderVals() { return {}; }\n}\n</script>\n</body>\n</html>\n';
+fs.writeFileSync(path.join(S, 'pub/project/StopsHeadsUp.dc.html'), html2);
+console.log('round 2 ok', Math.round(html2.length / 1024) + ' KB');
