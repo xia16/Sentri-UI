@@ -1,0 +1,105 @@
+<title>Greyed Actions and Record dead</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: a review sheet. Each changed screen is one row: before and after phones side by side, a one-line caption above. */
+:root {
+  --bg: #f3f4ef;
+  --paper: #ffffff;
+  --ink: #1e2420;
+  --ink-2: #5b635d;
+  --line: #dde1d8;
+  --tag-before: #8a8f88;
+  --tag-after: #2f6b3f;
+  --font-body: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #161a17; --paper: #1f2420; --ink: #e8ece6; --ink-2: #a3aba4; --line: #323a33; --tag-before: #9aa09a; --tag-after: #7fc58f; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #161a17; --paper: #1f2420; --ink: #e8ece6; --ink-2: #a3aba4; --line: #323a33; --tag-before: #9aa09a; --tag-after: #7fc58f; color-scheme: dark; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font-body); }
+.page { max-width: 1040px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 40px; }
+header { display: grid; gap: 8px; max-width: 68ch; }
+h1 { font-size: 28px; line-height: 1.2; margin: 0; text-wrap: balance; }
+h2 { font-size: 19px; margin: 0; text-wrap: balance; }
+p { margin: 0; color: var(--ink-2); }
+.meta { font: 12px/1.4 var(--font-mono); color: var(--ink-2); letter-spacing: .02em; }
+section { display: grid; gap: 20px; }
+.lead { max-width: 68ch; display: grid; gap: 6px; }
+.pair { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; }
+.pair h3 { margin: 0; font-size: 15px; }
+.pair .why { font-size: 14px; }
+.shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+figure { margin: 0; display: grid; gap: 6px; justify-items: center; min-width: 0; }
+figure img { width: 100%; max-width: 330px; height: auto; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); }
+figcaption { font: 600 11px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }
+.before figcaption { color: var(--tag-before); }
+.after figcaption { color: var(--tag-after); }
+.calls { display: grid; gap: 8px; padding-left: 18px; margin: 0; color: var(--ink-2); max-width: 72ch; }
+@media (max-width: 520px) { .shots { gap: 8px; } }
+</style>
+
+<div class="page">
+  <header>
+    <span class="meta">Farrowing · canvas · 2026-11-09 · branch design/grey-actions-record-dead</span>
+    <h1>Greyed Actions and Record dead on a white card</h1>
+    <p>Your two notes: a dead sow's actions should simply be grey, not hidden behind "Unavailable actions", and Record dead should not be rows loose on the grey. Every screen that changed is below, before and after, at 390 wide.</p>
+  </header>
+
+  <section>
+    <div class="lead">
+      <h2>1 · Actions stay in place, greyed when they don't apply</h2>
+      <p>The Actions sheet is shared, so this applies to every pig and every reason. A greyed action keeps its place and its own description; the reason is read out by the screen reader only. The "Unavailable actions" link and its page are gone.</p>
+    </div>
+    <div class="pair"><h3>A sow that died</h3><p class="why">Was one Note tile and "Unavailable actions (2)". Now the whole grid, greyed except Note, and her Production rows greyed.</p>
+      <div class="shots"><figure class="before"><img src="farrowing-dead-sow-actions-before.png" alt="Before: a dead sow's Actions with one Note tile and an Unavailable actions link"><figcaption>Before</figcaption></figure><figure class="after"><img src="farrowing-dead-sow-actions-after.png" alt="After: every action tile shown, all but Note greyed"><figcaption>After</figcaption></figure></div></div>
+    <div class="pair"><h3>A live sow</h3><p class="why">Resolve and Care (no open condition) and Feed (no feeding plan) were missing. Now they sit in their places, greyed.</p>
+      <div class="shots"><figure class="before"><img src="farrowing-live-sow-actions-before.png" alt="Before: live sow Actions"><figcaption>Before</figcaption></figure><figure class="after"><img src="farrowing-live-sow-actions-after.png" alt="After: live sow Actions with greyed tiles"><figcaption>After</figcaption></figure></div></div>
+    <div class="pair"><h3>Pig record · Actions</h3><p class="why">Resolve greyed in place (no open condition).</p>
+      <div class="shots"><figure class="before"><img src="pig-profile-actions-before.png" alt="Before: pig record Actions"><figcaption>Before</figcaption></figure><figure class="after"><img src="pig-profile-actions-after.png" alt="After: pig record Actions with Resolve greyed"><figcaption>After</figcaption></figure></div></div>
+    <div class="pair"><h3>The old "Unavailable actions" page</h3><p class="why">The page is gone; this screen now shows the same pig's Actions with Resolve and Care greyed.</p>
+      <div class="shots"><figure class="before"><img src="pig-profile-unavailable-actions-before.png" alt="Before: the Unavailable actions page"><figcaption>Before</figcaption></figure><figure class="after"><img src="pig-profile-unavailable-actions-after.png" alt="After: Actions with greyed tiles"><figcaption>After</figcaption></figure></div></div>
+    <div class="pair"><h3>Inspection · Actions for two pigs</h3><p class="why">Nothing is unavailable here, so the content is unchanged.</p>
+      <div class="shots"><figure class="before"><img src="inspection-actions-before.png" alt="Before: Inspection Actions"><figcaption>Before</figcaption></figure><figure class="after"><img src="inspection-actions-after.png" alt="After: Inspection Actions"><figcaption>After</figcaption></figure></div></div>
+  </section>
+
+  <section>
+    <div class="lead">
+      <h2>2 · Record dead and Report death on a white card</h2>
+      <p>Your surfaces rule from 3 November: every drawer is the grey with white cards, nothing loose on the grey. The steppers are now one white card.</p>
+    </div>
+    <div class="pair"><h3>Record dead · finished litter</h3>
+      <div class="shots"><figure class="before"><img src="farrowing-record-dead-locked-before.png" alt="Before: steppers loose on the grey"><figcaption>Before</figcaption></figure><figure class="after"><img src="farrowing-record-dead-locked-after.png" alt="After: steppers in one white card"><figcaption>After</figcaption></figure></div></div>
+    <div class="pair"><h3>Record dead · a sow that died</h3><p class="why">Same card. Clear no longer shows when there is nothing to clear.</p>
+      <div class="shots"><figure class="before"><img src="farrowing-record-dead-sow-died-before.png" alt="Before"><figcaption>Before</figcaption></figure><figure class="after"><img src="farrowing-record-dead-sow-died-after.png" alt="After"><figcaption>After</figcaption></figure></div></div>
+    <div class="pair"><h3>Record dead · The sow</h3>
+      <div class="shots"><figure class="before"><img src="farrowing-record-dead-the-sow-before.png" alt="Before"><figcaption>Before</figcaption></figure><figure class="after"><img src="farrowing-record-dead-the-sow-after.png" alt="After"><figcaption>After</figcaption></figure></div></div>
+    <div class="pair"><h3>Report death · during counting</h3>
+      <div class="shots"><figure class="before"><img src="farrowing-death-before.png" alt="Before"><figcaption>Before</figcaption></figure><figure class="after"><img src="farrowing-death-after.png" alt="After"><figcaption>After</figcaption></figure></div></div>
+    <div class="pair"><h3>Report death · The sow</h3>
+      <div class="shots"><figure class="before"><img src="farrowing-death-the-sow-before.png" alt="Before"><figcaption>Before</figcaption></figure><figure class="after"><img src="farrowing-death-the-sow-after.png" alt="After"><figcaption>After</figcaption></figure></div></div>
+  </section>
+
+  <section>
+    <div class="lead">
+      <h2>3 · Other Farrowing drawers with the same problem</h2>
+      <p>The 3 November sweep skipped Farrowing, so three more drawers had counter boxes grey on grey. They now use white cards.</p>
+    </div>
+    <div class="pair"><h3>Foster piglets · Send</h3>
+      <div class="shots"><figure class="before"><img src="farrowing-foster-send-before.png" alt="Before"><figcaption>Before</figcaption></figure><figure class="after"><img src="farrowing-foster-send-after.png" alt="After"><figcaption>After</figcaption></figure></div></div>
+    <div class="pair"><h3>Correct piglet count</h3>
+      <div class="shots"><figure class="before"><img src="farrowing-reconcile-before.png" alt="Before"><figcaption>Before</figcaption></figure><figure class="after"><img src="farrowing-reconcile-after.png" alt="After"><figcaption>After</figcaption></figure></div></div>
+    <div class="pair"><h3>Record piglet deaths</h3>
+      <div class="shots"><figure class="before"><img src="farrowing-piglet-death-before.png" alt="Before"><figcaption>Before</figcaption></figure><figure class="after"><img src="farrowing-piglet-death-after.png" alt="After"><figcaption>After</figcaption></figure></div></div>
+  </section>
+
+  <section>
+    <div class="lead"><h2>Calls I made</h2></div>
+    <ul class="calls">
+      <li>A dead sow's Production actions now show greyed. Before, they were hidden. Nothing that was unavailable became available.</li>
+      <li>A greyed row keeps its normal description. Showing the reason instead put "This sow has died." on six rows in a row.</li>
+      <li>With several pigs selected and none with a condition, Edit conditions now shows greyed instead of being absent.</li>
+      <li>Piglet processing's pages were left alone, since that feature isn't designed yet.</li>
+    </ul>
+  </section>
+</div>
