@@ -52,6 +52,7 @@ Reviewed on the Claude Design canvas ([canvas.md](canvas.md)). Ruled and redrawn
 - The recount draws an empty pen as a pen you can tap, never disabled. (P28)
 - **The balance sheet opens whenever a tagged pig was found or missed**, not only when the total changed: a swap (000512 found, 000803 not found) reads Counted 59 · +1 · −1 · On record 59 ([11s](mock/mock-11s-swap.png)). No sheet only when the total matches and no tagged pig moved. (P10)
 - **An uncounted pen takes the difference.** Untagged pigs shift between pens of a unit, so a gain or loss in a counted pen is settled against the unit's uncounted pens first (D4 counts 18 against 16, D5 goes from 38 to 36; the footer says *D5 not counted · 36 if you finish*, [10](mock/mock-10-unit-recount.png)); only what they cannot cover is found or lost. Counting every pen gives the exact answer. (P26)
+- **A count starts blank** (owner, 2026-11-09): nothing is ticked from the record, so a pig nobody saw cannot pass on the record's word. The empty list says *Scan every tagged pig* and how many the record expects (*3 on record in D4*), never which ones; once scanning starts, the pigs still missing are named ([3e](mock/mock-3e-count-blank.png)). Receiving starts blank the same way.
 - **Pigs to move carries no header card** (owner, 2026-11-05: too much text): the tiles say what moves, the subtitle where to (*To Units 9 and 10*).
 
 ## 1. The old system, and what is complex about it

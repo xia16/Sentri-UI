@@ -123,20 +123,23 @@ const TICK = {
   B: '.st-choice-trail input[type="checkbox"]{accent-color:#276640!important}.inspect-pig.selected,.roster-pig.selected{background:var(--paper,#fff)!important}',
   C: '.st-choice-trail input[type="checkbox"]{accent-color:#276640!important}.inspect-pig.selected,.roster-pig.selected{background:#eaf2e5!important}',
 };
-for (const [name, fewer, tick] of [['mock-3-count-pen.png', true, 'B'], ['mock-3b-count-pen-match.png', false, 'B'], ['mock-3v-tick-a-now.png', true, 'A'], ['mock-3v-tick-b-green-box.png', true, 'B'], ['mock-3v-tick-c-green-wash.png', true, 'C']]) {
+// 3e. A count starts blank (owner, 2026-11-09): nothing ticked, so a pig nobody saw can't slip through on the record's word. The empty
+//     list says what to do and how many tagged pigs the record expects, never which ones (naming them invites ticking from the list).
+for (const [name, fewer, tick] of [['mock-3e-count-blank.png', 'blank', 'B'], ['mock-3-count-pen.png', true, 'B'], ['mock-3b-count-pen-match.png', false, 'B'], ['mock-3v-tick-a-now.png', true, 'A'], ['mock-3v-tick-b-green-box.png', true, 'B'], ['mock-3v-tick-c-green-wash.png', true, 'C']]) {
   if (!want(name.slice(5, 7))) continue;
   const p = await open(INSPECT, 'inspection.walk');
   await prep(p);
   await p.evaluate(({ fewer }) => {
     const { U, ic, page, footer, primary } = window.M;
     const all = 16;
-    const added = fewer
+    const blank = fewer === 'blank';
+    const added = blank ? [] : fewer
       ? [['000801', 'Grower · 63d'], ['000802', 'Grower · 63d'], ['000512', 'Grower · 63d', 'In Unit 9 · C3'], ['000733', 'Grower · 61d', 'In Unit 6 · D2'], ['000915', 'Grower · 63d', 'In D5', true]]
       : [['000801', 'Grower · 63d'], ['000802', 'Grower · 63d'], ['000803', 'Grower · 63d']];
-    const notAdded = fewer ? ['000803'] : [];
+    const notAdded = fewer && !blank ? ['000803'] : [];
     // Every pig added is a ticked row; untick one read by mistake (a pig in the next pen through the bars) and it leaves the count.
     const kept = added.filter((a) => !a[3]);
-    const tagged = kept.length, untagged = all - tagged, expected = 16 + (fewer ? 2 : 0), diff = all - expected;
+    const tagged = kept.length, untagged = all - tagged, expected = 16 + (fewer && !blank ? 2 : 0), diff = all - expected;
     // A pig the record places in another pen carries one quiet amber chip on the right (owner, 2026-11-03), where the row's state goes.
     const chip = (text) => '<span class="st-animal-tags m-chip">' + U.status({ variant: 'chip', kind: 'late', icon: '', text }) + '</span>';
     const row = ([id, ctx, away, off]) => {
@@ -145,21 +148,22 @@ for (const [name, fewer, tick] of [['mock-3-count-pen.png', true, 'B'], ['mock-3
     };
     const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'How many pigs are in D4?', value: all, min: kept.length, max: 80, action: 'x', reserveHint: false }) + '</section>';
     const search = U.choiceSearch({ label: 'Search ear tag', placeholder: 'Ear tag', value: '', clear: { action: 'x' }, scan: { action: 'x', label: 'Scan ear tags' } });
-    const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Which tagged pigs are here?', meta: kept.length + ' found', icon: ic('tag'), kind: 'section', level: 3 })
+    const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Which tagged pigs are here?', meta: blank ? '' : kept.length + ' found', icon: ic('tag'), kind: 'section', level: 3 })
       + '<div class="m-inline-bar">' + search + '</div>'
-      + U.rowGroup(added.map(row).join(''))
+      + (blank ? '<div class="m-blank">' + U.choiceEmpty('3 on record in D4', { title: 'Scan every tagged pig' }) + '</div>' : U.rowGroup(added.map(row).join('')))
       + (notAdded.length ? '<p class="m-hint">Recorded here, not scanned yet: <b>' + notAdded.join(', ') + '</b></p>' : '')
-      + (fewer ? '<p class="m-hint">000802 added twice · counted once.</p>' : '') + '</section>';
+      + (fewer && !blank ? '<p class="m-hint">000802 added twice · counted once.</p>' : '') + '</section>';
     const line = (title, description, figure, strong) => U.row({ title, description, trailing: figure, className: strong ? 'm-total' : '' });
     const evidence = U.heading({ title: 'Since the last count', icon: ic('record'), kind: 'section', level: 3 })
       + U.rowGroup(line('Counted', 'Oct 28 · 08:10 · G.H', '20')
         + line('Moved to D6', 'Oct 30 · 14:20 · M.L', '−3')
         + line('Died', 'Yesterday · 07:05 · G.H', '−1')
         + line('Should be here now', '3 with ear tags · 13 without', '16', true), { className: 'm-evidence' });
-    const left = '<div class="m-left"><strong>' + untagged + ' without ear tags</strong><small>' + (notAdded.length ? notAdded.join(', ') + ' not found' : 'Matches the record') + '</small></div>';
+    const left = '<div class="m-left"><strong>' + untagged + ' without ear tags</strong><small>' + (blank ? 'None scanned yet' : notAdded.length ? notAdded.join(', ') + ' not found' : 'Matches the record') + '</small></div>';
     page('Count D4', 'Recount · Unit 7', count + tags + `<section class="feature-section">${evidence}</section>`, footer(left, primary('Done')));
   }, { fewer });
   if (TICK[tick]) await p.addStyleTag({ content: TICK[tick] });
+  await p.addStyleTag({ content: '.m-blank{background:var(--paper,#fff);border:1px solid var(--line,#dfe3da);border-radius:16px;padding:24px 16px}' });
   await shoot(p, name);
 }
 
