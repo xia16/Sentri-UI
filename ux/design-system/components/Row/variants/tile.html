@@ -8,6 +8,8 @@
 <div data-state="More opened · eleven verbs (4 + 4 + 3)" id="tile-state-7"></div>
 <div data-state="Chinese" id="tile-state-6"></div>
 <div data-state="Three verbs (one row)" id="tile-state-8"></div>
+<div data-state="Greyed in place · a sow that died" id="tile-state-10"></div>
+<div data-state="Greyed in place · Death stays last" id="tile-state-11"></div>
 <script>
 // Each state renders in its own iframe in the atlas: draw only the states present.
 const UI = window.SentriUI, I = function (k) { return SentriIcons.icon(k); };
@@ -37,6 +39,9 @@ var RENDER = {
   "tile-state-4": () => UI.rowGrid(pick(['death', 'condition', 'treat', 'note', 'move']), { more: more, label: 'Everyday actions' }),
   "tile-state-5": () => UI.rowGrid(pick(['condition', 'treat', 'edit', 'resolve', 'care', 'note', 'move', 'measure', 'feed', 'weigh', 'temp', 'death']), { more: more, label: 'Everyday actions' }),
   "tile-state-7": () => UI.rowGrid(pick(['condition', 'treat', 'edit', 'resolve', 'care', 'note', 'move', 'measure', 'feed', 'weigh', 'death']), { more: more, expanded: true, label: 'Everyday actions' }),
+  /* Greyed in place (owner, 2026-11-06): every verb keeps its slot in a live pig's order; the ones that do not apply are disabled, with the reason in the accessible name only. */
+  "tile-state-10": () => UI.rowGrid(pick(['condition', 'treat', 'resolve', 'care', 'note', 'move', 'measure', 'feed']).map((function (keys, reason) { return function (t) { return keys.indexOf(t.action) < 0 ? Object.assign(t, { disabled: true, reason: reason }) : t; }; })(['note'], 'This sow has died.')), { label: 'Everyday actions' }),
+  "tile-state-11": () => UI.rowGrid(pick(['death', 'condition', 'treat', 'resolve', 'care', 'note']).map((function (keys, reason) { return function (t) { return keys.indexOf(t.action) < 0 ? Object.assign(t, { disabled: true, reason: reason }) : t; }; })(['health', 'treatment', 'resolve', 'triage', 'note'], 'Sow death is already recorded.')), { label: 'Everyday actions' }),
   "tile-state-6": () => UI.rowGrid([
     { label: '疾病', title: '疾病或症状', icon: I('condition'), action: 'health' },
     { label: '治疗', title: '记录治疗', icon: I('treat'), action: 'treatment' },

@@ -10,14 +10,14 @@ A worker on the walk or in a task who reaches a single pig; the same sheet opens
 
 ## Anchor
 
-No anchor. The record is the same for a pig at any stage; what changes is which blocks and which actions apply. Screens are grouped as The record, Read more, Actions - Production, Actions - General and Actions - Unavailable.
+No anchor. The record is the same for a pig at any stage; what changes is which blocks and which actions apply. Screens are grouped as The record, Read more, Actions - Production, Actions - General and Actions - Greyed in place.
 
 ## Rules
 
 - Human-entered records lead; derived plans and stable facts sit in reading sections.
 - The blocks follow the animal type (Sow cycle, Gilt breeding, Boar breeding, Piglet growth, Growth).
 - An empty production-average section is absent; facts missing from the registry show a dash.
-- The Actions sheet has three groups, Production, Health and General. Production is for one pig only and holds only the rows that fit her stage and tasks; blocked rows are listed with the reason in "Unavailable actions".
+- The Actions sheet has three groups, Production, Health and General. Production is for one pig only and holds only the rows that fit her stage and tasks; an action she can't take stays in its place, greyed (a tile, or a Production row with its reason as line 2; owner, 2026-11-06), and there is no Unavailable actions page.
 - Farrowing opens the shared health and measurement flows rather than copying them; it adds its own Production rows when embedded (piglet processing, piglet deaths, count reconciliation, fostering, litter edit, remove from batch, not in pig, transfer).
 - Not in pig, abortion and batch removal take a sow out of her batch and return her to rebreed watch; saved records are kept.
 - Weight, temperature and backfat take one value per pig.
@@ -25,7 +25,7 @@ No anchor. The record is the same for a pig at any stage; what changes is which 
 
 ## Scope
 
-In: the record (full, partial, empty, with tasks), Production stats and a batch record, Origin, the pig Log, the Actions sheet for one pig, the task outcome form, abortion, batch membership, the measurement menu and forms, body condition, notes and the unavailable list.
+In: the record (full, partial, empty, with tasks), Production stats and a batch record, Origin, the pig Log, the Actions sheet for one pig, the task outcome form, abortion, batch membership, the measurement menu and forms, body condition, notes and the greyed-in-place states.
 
 Entry points: Inspection (a pig row, search or scan), Tasks (a sow in the Farrowing room list), Pigs (the pig list; that feature is a placeholder written elsewhere, so this entry has no source screen yet).
 

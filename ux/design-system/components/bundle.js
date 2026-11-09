@@ -159,17 +159,21 @@
   /* Row tile (owner, 2026-10-19): one action as an icon well over one word, for the grid of everyday verbs in More actions.
      The word is the short verb ("Treat"); the accessible name always contains that word (label in name: voice control says what it sees):
      it is the full action name when that holds the word as a whole word ("Add a note"), else the word, then the full name ("Condition, Disease or symptom", "Treat, Record treatment"). tone 'danger' is
-     the one irreversible verb (Death): red ink on its well and word, nothing louder. */
-  function rowTile({label,title='',icon='',action='',value='',tone='',attrs={},className=''}={}){
+     the one irreversible verb (Death): red ink on its well and word, nothing louder.
+     disabled (owner, 2026-11-06: "the actions should just be grey"): a verb this pig can't take stays in its place, greyed. A real
+     disabled button (no tap, no press), the well flat and dashed, the glyph and word muted; danger loses its red but keeps its last
+     place. No reason on screen: `reason` joins the accessible name ("Treat, Record treatment, not available: the sow died"). */
+  function rowTile({label,title='',icon='',action='',value='',tone='',attrs={},className='',disabled=false,reason=''}={}){
     const word=new RegExp('(^|[^\\p{L}\\p{N}])'+String(label).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'($|[^\\p{L}\\p{N}])','iu');
     const holds=/\p{Script=Han}/u.test(String(label))?String(title).includes(String(label)):word.test(String(title)); // Chinese has no spaces: containment is the word test
-    const danger=tone==='danger',name=title&&!holds?label+', '+title:(title||label);
-    return `<button type="button" class="st-row-tile${danger?' is-danger':''}${className?' '+esc(className):''}" data-ds="Row" data-variant="tile" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(name)}"${safeAttr(attrs)}><span class="st-row-tile-icon" aria-hidden="true">${icon}</span><span class="st-row-tile-label">${esc(label)}</span></button>`;
+    const danger=tone==='danger',base=title&&!holds?label+', '+title:(title||label);
+    const why=String(reason||'').trim().replace(/\.$/,''),name=disabled?base+', not available'+(why?': '+why.charAt(0).toLowerCase()+why.slice(1):''):base;
+    return `<button type="button" class="st-row-tile${danger?' is-danger':''}${className?' '+esc(className):''}" data-ds="Row" data-variant="tile" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(name)}"${disabled?' disabled aria-disabled="true"':''}${safeAttr(attrs)}><span class="st-row-tile-icon" aria-hidden="true">${icon}</span><span class="st-row-tile-label">${esc(label)}</span></button>`;
   }
   /* The tile grid: one panel. One to five tiles sit in one row (owner, 2026-10-20: two rows only from six); six to ten take two rows,
      split as evenly as possible (6 = 3+3, 7 = 4+3, 8 = 4+4, 9 = 5+4, 10 = 5+5), at most five across. Danger tiles never fold and are always the last tile. Over ten,
      nine show and `more` (a tile that opens the rest in place) sits just before the danger tiles; `expanded` shows them all in
-     even rows of at most five (11 = 4+4+3). */
+     even rows of at most five (11 = 4+4+3). A disabled tile counts like any other: it holds its place, so the grid keeps one shape. */
   function rowGrid(tiles=[],{more=null,expanded=false,label='',className=''}={}){
     const calm=tiles.filter(t=>t.tone!=='danger'),danger=tiles.filter(t=>t.tone==='danger'),ordered=[...calm,...danger];
     const folded=ordered.length>10&&!expanded&&!!more,shown=folded?[...calm.slice(0,Math.max(0,9-danger.length)),...danger]:ordered,slots=shown.length+(folded?1:0);

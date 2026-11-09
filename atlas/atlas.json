@@ -7544,7 +7544,7 @@
               "shows": "Closes Move to another farrowing batch"
              }
             ],
-            "logic": "Closed rows are not listed in the working list; they sit behind one \"Unavailable actions (n)\" link with the reason beside each. Farrowing's own rows hand back to the room (the host) to open their screens; Health and the rest run inside the embedded Inspection sheet.",
+            "logic": "Greyed in place (owner, 2026-11-06: \"when a sow died, the actions should just be grey\"): every action keeps its place in a live pig's order; one that does not apply is a disabled tile (its reason in the accessible name only, no reason line) or, in Production, a disabled row with the reason as line 2. No \"Unavailable actions\" link or page. Farrowing's own rows hand back to the room (the host) to open their screens; Health and the rest run inside the embedded Inspection sheet.",
             "source": "farrowing-astra-concept.js sowActionCatalogue(); ASTRA-SOW-ACTIONS-MOBBIN.md"
            }
           ],
@@ -16897,12 +16897,12 @@
              {
               "state": "Resolve conditions · Care instructions",
               "when": "A selected pig has a condition",
-              "shows": "Shown; otherwise unavailable (\"No open conditions to resolve.\" / \"Record a health finding first.\")"
+              "shows": "Live; otherwise greyed in place (\"No open conditions to resolve.\" / \"Record a health finding first.\")"
              },
              {
               "state": "Adjust feed",
               "when": "At least one pig can be fed (not ad-lib, not dead, has a plan)",
-              "shows": "Shown; otherwise unavailable with the reason"
+              "shows": "Live; otherwise greyed in place with the reason"
              },
              {
               "state": "Add a note",
@@ -16917,15 +16917,15 @@
              {
               "state": "Adjust feed unavailable",
               "when": "No selected pig can be fed",
-              "shows": "Reason is that of the first selected pig only (Pig has died / Ad-lib feeding has no fixed daily allowance / No feeding plan recorded)"
+              "shows": "Feed greyed in place; its accessible name carries the first selected pig's reason (This pig has died / Ad-lib feeding has no fixed daily allowance / No feeding plan recorded)"
              },
              {
-              "state": "Health group empty",
+              "state": "Health greyed",
               "when": "No selected pig is alive",
-              "shows": "Group and its rows are absent"
+              "shows": "Every health tile greyed in its place"
              }
             ],
-            "logic": "Rows that do not apply move to \"Unavailable actions (N)\" with the reason. Dead sows get only a note.",
+            "logic": "Greyed in place (owner, 2026-11-06: \"when a sow died, the actions should just be grey\"): every action keeps its place in a live pig's order; one that does not apply is a disabled tile (its reason in the accessible name only, no reason line) or, in Production, a disabled row with the reason as line 2. No \"Unavailable actions\" link or page. A dead sow keeps the whole set greyed; only Add a note is live.",
             "source": "ASTRA-BULK-ACTIONS",
             "at": "Edit conditions"
            },
@@ -16948,8 +16948,7 @@
            "Actions (raw)",
            "Disease or symptom (raw)",
            "Record treatment (raw)",
-           "Adjust feed (raw)",
-           "Unavailable actions (raw)"
+           "Adjust feed (raw)"
           ],
           "issues": [
            "Health and General groups sit in one long scroll with tabs at the foot; two small groups do not need tabs.",
@@ -18638,7 +18637,7 @@
          ]
         ],
         [
-         "Actions · Unavailable",
+         "Actions · Greyed in place",
          [
           "pig-profile.unavailable-actions"
          ]
@@ -18762,7 +18761,7 @@
         [
          "pig-profile.actions",
          "pig-profile.unavailable-actions",
-         "tap Unavailable actions"
+         "a pig with something she cannot take: the same sheet, greyed in place"
         ],
         [
          "pig-profile.actions",
@@ -19381,7 +19380,7 @@
              {
               "state": "No condition",
               "when": "None",
-              "shows": "Resolve and Care listed as unavailable with the reason"
+              "shows": "Resolve and Care greyed in place"
              }
             ],
             "logic": "Edit conditions is bulk only. Farrowing opens these shared flows rather than duplicating them.",
@@ -19390,32 +19389,32 @@
            {
             "name": "General group",
             "shows": "Add a note · Measurements & condition · Adjust feed",
-            "logic": "Adjust feed is unavailable with the reason for ad-lib, dead or no-plan pigs. When Farrowing's Add marker row exists, this sheet hides its own Add a note.",
+            "logic": "Adjust feed is greyed in place for ad-lib, dead or no-plan pigs. When Farrowing's Add marker row exists, this sheet hides its own Add a note.",
             "at": "Add a note",
             "states": [
              {
               "state": "Adjust feed unavailable",
               "when": "Dead sow, ad-lib pen, or no feeding plan",
-              "shows": "Listed under Unavailable actions with the reason; a single ad-lib pig also gets \"Body condition adjustment · Ad-lib pigs do not have an individual ration.\""
+              "shows": "Feed greyed in place; a single ad-lib pig's Measurements keeps Record body condition greyed (\"Ad-lib pigs do not have an individual ration.\")"
              }
             ]
            },
            {
             "name": "Dead sow",
-            "shows": "Everything unavailable except Add a note",
+            "shows": "Everything greyed in place except Add a note",
             "states": [
              {
               "state": "Dead sow",
               "when": "Stage \"Sow died\"",
-              "shows": "Production and Health empty; only a note"
+              "shows": "Every action greyed in its place; only Add a note is live"
              }
             ]
            },
            {
-            "name": "Unavailable actions (N)",
-            "shows": "Link at the end",
-            "rule": "A blocked row is listed with its reason, never dropped silently. N = count of blocked rows; footer tabs jump between groups and follow the scroll.",
-            "at": "Unavailable actions"
+            "name": "Greyed in place",
+            "shows": "A verb she cannot take keeps its tile or row, greyed",
+            "rule": "Greyed in place (owner, 2026-11-06: \"when a sow died, the actions should just be grey\"): every action keeps its place in a live pig's order; one that does not apply is a disabled tile (its reason in the accessible name only, no reason line) or, in Production, a disabled row with the reason as line 2. No \"Unavailable actions\" link or page.",
+            "at": "Resolve"
            }
           ],
           "controls": [],
@@ -19423,8 +19422,7 @@
            "Actions (raw)",
            "Production (raw)",
            "Health (raw)",
-           "General (raw)",
-           "Unavailable actions (raw)"
+           "General (raw)"
           ],
           "issues": [
            "The cluster heading repeats the row title (\"Pregnancy check\" over \"Pregnancy check\").",
@@ -19775,66 +19773,61 @@
         },
         {
          "id": "pig-profile.unavailable-actions",
-         "name": "Unavailable actions",
-         "zh": "不可用操作",
+         "name": "Actions · greyed in place",
+         "zh": "操作 · 不可用置灰",
          "status": "in-design",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "walk",
          "steps": [
           "[data-pig-select=\"000254\"]",
-          "[data-action=\"actions\"]",
-          "[data-action=\"unavailable-actions\"]"
+          "[data-action=\"actions\"]"
          ],
          "figma": "",
          "notes": {
-          "purpose": "Show every blocked action with its reason.",
+          "purpose": "Show a pig's Actions with what she cannot take greyed in place (000254 has no open condition).",
           "elements": [
            {
-            "name": "Blocked rows",
-            "shows": "Resolve conditions · No open conditions to resolve.",
+            "name": "Greyed tiles and rows",
+            "shows": "Resolve and Care greyed in their places in the grid; the rest live",
             "states": [
              {
               "state": "No open conditions",
               "when": "No condition on pig",
-              "shows": "\"No open conditions to resolve.\""
+              "shows": "Resolve greyed; accessible name \"…, not available: no open conditions to resolve\""
              },
              {
               "state": "No finding yet",
               "when": "Care instructions without one",
-              "shows": "\"Record a health finding first.\""
+              "shows": "Care greyed (\"Record a health finding first\")"
              },
              {
               "state": "Dead",
               "when": "Pig has died",
-              "shows": "\"Pig has died\""
+              "shows": "Every tile greyed but Note; Production rows greyed with \"This sow has died.\""
              },
              {
               "state": "Ad-lib",
               "when": "Ad-lib pen",
-              "shows": "\"Ad-lib feeding has no fixed daily allowance\" / \"Ad-lib pigs do not have an individual ration.\""
+              "shows": "Feed greyed; Measurements keeps Record body condition greyed (\"Ad-lib pigs do not have an individual ration.\")"
              },
              {
               "state": "No plan",
               "when": "No feeding plan",
-              "shows": "\"No feeding plan recorded\""
+              "shows": "Feed greyed (\"No feeding plan recorded\")"
              },
              {
               "state": "No batches",
               "when": "None exist",
-              "shows": "\"No production batches are available.\""
+              "shows": "Batch membership row greyed, line 2 \"No production batches are available.\""
              }
             ],
-            "logic": "Grouped Production, Health, General; every row disabled with the reason as sub-line. A blocked action is listed with its reason, never dropped silently.",
-            "at": "No open conditions to resolve."
+            "logic": "Greyed in place (owner, 2026-11-06: \"when a sow died, the actions should just be grey\"): every action keeps its place in a live pig's order; one that does not apply is a disabled tile (its reason in the accessible name only, no reason line) or, in Production, a disabled row with the reason as line 2. No \"Unavailable actions\" link or page.",
+            "at": "Resolve"
            }
           ],
           "controls": [],
-          "copy": [
-           "Unavailable actions (raw)"
-          ],
-          "issues": [
-           "The list sits one tap behind Actions and usually holds one or two rows; the reason could sit on the disabled row itself."
-          ]
+          "copy": [],
+          "issues": []
          }
         },
         {
@@ -19862,7 +19855,7 @@
          ]
         }
        ],
-       "prd": "# Pig profile 猪只详情\n\n## Problem\n\nWhen a worker taps a pig they need, in this order: what needs attention, what to do next, who she is, how she is fed, where to read more, and the actions they can take. The old Figma draws pig detail twice: inside Inspection and in the pig list (猪只列表) file. The built version (inside the Inspection prototype) is one sheet with six blocks and many repeated facts.\n\n## Who\n\nA worker on the walk or in a task who reaches a single pig; the same sheet opens inside Farrowing's sow drawer. A supervisor reading history uses Production stats, Origin and Log.\n\n## Anchor\n\nNo anchor. The record is the same for a pig at any stage; what changes is which blocks and which actions apply. Screens are grouped as The record, Read more, Actions - Production, Actions - General and Actions - Unavailable.\n\n## Rules\n\n- Human-entered records lead; derived plans and stable facts sit in reading sections.\n- The blocks follow the animal type (Sow cycle, Gilt breeding, Boar breeding, Piglet growth, Growth).\n- An empty production-average section is absent; facts missing from the registry show a dash.\n- The Actions sheet has three groups, Production, Health and General. Production is for one pig only and holds only the rows that fit her stage and tasks; blocked rows are listed with the reason in \"Unavailable actions\".\n- Farrowing opens the shared health and measurement flows rather than copying them; it adds its own Production rows when embedded (piglet processing, piglet deaths, count reconciliation, fostering, litter edit, remove from batch, not in pig, transfer).\n- Not in pig, abortion and batch removal take a sow out of her batch and return her to rebreed watch; saved records are kept.\n- Weight, temperature and backfat take one value per pig.\n- A dead sow offers a note only.\n\n## Scope\n\nIn: the record (full, partial, empty, with tasks), Production stats and a batch record, Origin, the pig Log, the Actions sheet for one pig, the task outcome form, abortion, batch membership, the measurement menu and forms, body condition, notes and the unavailable list.\n\nEntry points: Inspection (a pig row, search or scan), Tasks (a sow in the Farrowing room list), Pigs (the pig list; that feature is a placeholder written elsewhere, so this entry has no source screen yet).\n\nOut: health forms and findings (health-record), feed editing and the pig's feed plan (feed-plan), the unit walk (inspection). Transfer sow, Mark not in pig and Remove from batch render only inside Farrowing's drawer. Mark not in pig is shown as a screen, opened through Farrowing's sow sheet. Remove from batch has a built page but no control opens it (Batch membership's Remove option replaced it); it is not shown.\n\n## Decisions\n\n- One Actions sheet for one pig or twenty; the Production group appears only for one.\n- Tasks are shown as cards on the record and as rows in Actions; Farrowing and Piglet processing open the Farrowing task.\n- Body condition is recorded from Measurements & condition and creates a health finding with Monitor care.\n\nOpen (recorded on the screens as issues):\n\n- Next task and Batch are repeated in the task card, the grid and the type block; stage and days appear in the header, the grid and the type block.\n- Age is in days for a sow.\n- Saving a reading or a note returns to the walk list, not to the pig record; the task, abortion and batch forms return to the record.\n- The pig's lifetime figures (litters, born total, rates) are in the data but not shown.\n- Mark-not-in-pig, remove-from-batch and transfer cannot be reviewed outside Farrowing.\n",
+       "prd": "# Pig profile 猪只详情\n\n## Problem\n\nWhen a worker taps a pig they need, in this order: what needs attention, what to do next, who she is, how she is fed, where to read more, and the actions they can take. The old Figma draws pig detail twice: inside Inspection and in the pig list (猪只列表) file. The built version (inside the Inspection prototype) is one sheet with six blocks and many repeated facts.\n\n## Who\n\nA worker on the walk or in a task who reaches a single pig; the same sheet opens inside Farrowing's sow drawer. A supervisor reading history uses Production stats, Origin and Log.\n\n## Anchor\n\nNo anchor. The record is the same for a pig at any stage; what changes is which blocks and which actions apply. Screens are grouped as The record, Read more, Actions - Production, Actions - General and Actions - Greyed in place.\n\n## Rules\n\n- Human-entered records lead; derived plans and stable facts sit in reading sections.\n- The blocks follow the animal type (Sow cycle, Gilt breeding, Boar breeding, Piglet growth, Growth).\n- An empty production-average section is absent; facts missing from the registry show a dash.\n- The Actions sheet has three groups, Production, Health and General. Production is for one pig only and holds only the rows that fit her stage and tasks; an action she can't take stays in its place, greyed (a tile, or a Production row with its reason as line 2; owner, 2026-11-06), and there is no Unavailable actions page.\n- Farrowing opens the shared health and measurement flows rather than copying them; it adds its own Production rows when embedded (piglet processing, piglet deaths, count reconciliation, fostering, litter edit, remove from batch, not in pig, transfer).\n- Not in pig, abortion and batch removal take a sow out of her batch and return her to rebreed watch; saved records are kept.\n- Weight, temperature and backfat take one value per pig.\n- A dead sow offers a note only.\n\n## Scope\n\nIn: the record (full, partial, empty, with tasks), Production stats and a batch record, Origin, the pig Log, the Actions sheet for one pig, the task outcome form, abortion, batch membership, the measurement menu and forms, body condition, notes and the greyed-in-place states.\n\nEntry points: Inspection (a pig row, search or scan), Tasks (a sow in the Farrowing room list), Pigs (the pig list; that feature is a placeholder written elsewhere, so this entry has no source screen yet).\n\nOut: health forms and findings (health-record), feed editing and the pig's feed plan (feed-plan), the unit walk (inspection). Transfer sow, Mark not in pig and Remove from batch render only inside Farrowing's drawer. Mark not in pig is shown as a screen, opened through Farrowing's sow sheet. Remove from batch has a built page but no control opens it (Batch membership's Remove option replaced it); it is not shown.\n\n## Decisions\n\n- One Actions sheet for one pig or twenty; the Production group appears only for one.\n- Tasks are shown as cards on the record and as rows in Actions; Farrowing and Piglet processing open the Farrowing task.\n- Body condition is recorded from Measurements & condition and creates a health finding with Monitor care.\n\nOpen (recorded on the screens as issues):\n\n- Next task and Batch are repeated in the task card, the grid and the type block; stage and days appear in the header, the grid and the type block.\n- Age is in days for a sow.\n- Saving a reading or a note returns to the walk list, not to the pig record; the task, abortion and batch forms return to the record.\n- The pig's lifetime figures (litters, born total, rates) are in the data but not shown.\n- Mark-not-in-pig, remove-from-batch and transfer cannot be reviewed outside Farrowing.\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,
@@ -19979,12 +19972,12 @@
              {
               "state": "Resolve conditions · Care instructions",
               "when": "A selected pig has a condition",
-              "shows": "Shown; otherwise unavailable (\"No open conditions to resolve.\" / \"Record a health finding first.\")"
+              "shows": "Live; otherwise greyed in place (\"No open conditions to resolve.\" / \"Record a health finding first.\")"
              },
              {
               "state": "Adjust feed",
               "when": "At least one pig can be fed (not ad-lib, not dead, has a plan)",
-              "shows": "Shown; otherwise unavailable with the reason"
+              "shows": "Live; otherwise greyed in place with the reason"
              },
              {
               "state": "Add a note",
@@ -19999,15 +19992,15 @@
              {
               "state": "Adjust feed unavailable",
               "when": "No selected pig can be fed",
-              "shows": "Reason is that of the first selected pig only (Pig has died / Ad-lib feeding has no fixed daily allowance / No feeding plan recorded)"
+              "shows": "Feed greyed in place; its accessible name carries the first selected pig's reason (This pig has died / Ad-lib feeding has no fixed daily allowance / No feeding plan recorded)"
              },
              {
-              "state": "Health group empty",
+              "state": "Health greyed",
               "when": "No selected pig is alive",
-              "shows": "Group and its rows are absent"
+              "shows": "Every health tile greyed in its place"
              }
             ],
-            "logic": "Rows that do not apply move to \"Unavailable actions (N)\" with the reason. Dead sows get only a note.",
+            "logic": "Greyed in place (owner, 2026-11-06: \"when a sow died, the actions should just be grey\"): every action keeps its place in a live pig's order; one that does not apply is a disabled tile (its reason in the accessible name only, no reason line) or, in Production, a disabled row with the reason as line 2. No \"Unavailable actions\" link or page. A dead sow keeps the whole set greyed; only Add a note is live.",
             "source": "ASTRA-BULK-ACTIONS",
             "at": "Edit conditions"
            },
@@ -20030,8 +20023,7 @@
            "Actions (raw)",
            "Disease or symptom (raw)",
            "Record treatment (raw)",
-           "Adjust feed (raw)",
-           "Unavailable actions (raw)"
+           "Adjust feed (raw)"
           ],
           "issues": [
            "Health and General groups sit in one long scroll with tabs at the foot; two small groups do not need tabs.",

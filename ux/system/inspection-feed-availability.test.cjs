@@ -11,8 +11,8 @@ test('a sow opened from farrowing without a feeding plan cannot save a zero-resu
   const context = model.sowDetailContext({ id: '000406', pen: 'B3', unit: 'Unit 7', stage: 'Lactating', parity: 4 });
   context.selected.add('000406');
   const catalogue = model.actionCatalogue(context);
-  assert.equal(catalogue.groups.flatMap(group => group.items).some(item => item.a === 'feed-edit-selected'), false);
-  assert.match(catalogue.unavailable.find(item => item.title === 'Adjust feed').reason, /No feeding plan/);
+  // Greyed in place (owner, 2026-11-06): Adjust feed keeps its place with the reason, and draws disabled.
+  assert.match(catalogue.groups.flatMap(group => group.items).find(item => item.a === 'feed-edit-selected').reason, /No feeding plan/);
   model.openFeedEditor(context, 'pigs', ['000406']);
   model.updateFeedInput(context, 'percent', 30);
   assert.equal(model.feedEditorValid(context), false);

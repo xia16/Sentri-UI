@@ -651,7 +651,7 @@ export interface SentriUI {
   facts(items: Fact[], options?: { columns?: 1 | 2 | 3; className?: string; variant?: 'record' | 'figures'; panel?: boolean }): string;
   row(props: RowProps): string;
   /** One action as an icon well over one word (More actions' everyday verbs). The accessible name is the word, then `title` (the full action name) when it does not already hold the word. */
-  rowTile(props: { label: string; title?: string; icon?: string; action?: string; value?: string; tone?: 'danger' | ''; attrs?: Record<string, string>; className?: string }): string;
+  rowTile(props: { label: string; title?: string; icon?: string; action?: string; value?: string; tone?: 'danger' | ''; attrs?: Record<string, string>; className?: string; /** greyed in place: a real disabled button, no press (owner, 2026-11-06) */ disabled?: boolean; /** why, read in the accessible name only */ reason?: string }): string;
   /** Tiles in one panel: always two rows split evenly, at most five across, danger last; over ten, nine plus `more`. */
   rowGrid(tiles: Array<{ label: string; title?: string; icon?: string; action?: string; value?: string; tone?: 'danger' | ''; attrs?: Record<string, string> }>, options?: { more?: { action: string; value?: string; label?: string; title?: string } | null; expanded?: boolean; label?: string; className?: string }): string;
   rowGroup(content: string, options?: { title?: string; level?: number; className?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
