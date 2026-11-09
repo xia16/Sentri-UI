@@ -141,7 +141,7 @@ const pageA = wsPage(ws1);
     'Moving a job is still drag or ask, now along one line; Sentri warns as before (clean to dirty, a dose that would miss its time).',
     'C stays an option for a manager&rsquo;s &ldquo;who&rsquo;s overloaded&rdquo; look, but the bar on the right already answers that.'].map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ul></div>';
   fs.writeFileSync(path.join(S, 'pub/project/WorkScheduleOrder.dc.html'), doc('Work schedule order', 3008, 1263,
-    '<h1 style="margin: 0; font-size: 30px; line-height: 38px; font-weight: 600; letter-spacing: -.025em;">Work schedule: morning and afternoon, or one order with rough times?</h1><p style="margin: 8px 0 34px; font-size: 16px; line-height: 24px; color: #5D665F;">The same day (Thu 5 Nov, same people, same jobs) three ways.</p>' +
+    '<h1 style="margin: 0; font-size: 30px; line-height: 38px; font-weight: 600; letter-spacing: -.025em;">Work schedule: morning and afternoon, or one order with rough times? B chosen (9 Nov)</h1><p style="margin: 8px 0 34px; font-size: 16px; line-height: 24px; color: #5D665F;">The same day (Thu 5 Nov, same people, same jobs) three ways.</p>' +
     '<div style="display: flex; gap: 31px; align-items: flex-start;">' + A1 + B1 + C1 + '</div>' + note));
   console.log('ok');
 })();
