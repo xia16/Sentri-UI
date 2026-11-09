@@ -16,7 +16,7 @@ const P = [
   { ini: 'LW', bg: '#FDE7C2', fg: '#6B4300', name: 'Li Wei', role: 'Farrowing manager', load: [7.7, 8],
     am: [['d', 'Walk-through', 'Farrowing 1–4'], ['n', 'Fostering checks', '8 litters · Farrowing 2'], ['x', 'A5 and B10', 'From Wed · Farrowing 2', 'late']], pm: [['x', 'Ready for farrowing', 'B33 · Farrowing 1']] },
   { ini: 'LY', bg: '#E4ECF7', fg: '#2B4A73', name: 'Liu Yang', role: 'Farrowing technician', load: [7.2, 8],
-    am: [['d', 'Feeding', 'Farrowing 1 and 2'], ['n', 'Piglet processing', 'B32 · 34 piglets']], pm: [['x', 'Second feed', 'Farrowing 1 and 2'], ['x', 'Get ready to wash', 'Farrowing 3']] },
+    am: [['d', 'Feeding', 'Farrowing 1 and 2'], ['n', 'Piglet processing', 'B32 · Farrowing 2']], pm: [['x', 'Second feed', 'Farrowing 1 and 2'], ['x', 'Get ready to wash', 'Farrowing 3']] },
   { ini: 'SQ', bg: '#EDE7F6', fg: '#4B3577', name: 'Sun Qing', role: 'Farrowing technician', load: [5.5, 8],
     am: [['d', 'Feeding', 'Farrowing 3 and 4'], ['d', 'Pen-strep, morning', '6 piglets · Farrowing 2']], pm: [['x', 'Second feed', 'Farrowing 3 and 4'], ['x', 'Pen-strep, evening', '6 piglets · Farrowing 2']] },
   { ini: 'WF', bg: '#E2F0DA', fg: '#203D2B', name: 'Wang Fang', role: 'Nursery manager', load: [6.5, 8],
@@ -71,7 +71,7 @@ const pRow = (n, t, s, o) => { o = o || {}; return '<div style="' + st({ display
   '<span style="width: 44px; height: 44px; display: grid; place-items: center;">' + GRIP(o.lift ? PH.ink : '#a3aa9f') + '</span></div>'; };
 const pCard = (h) => '<div style="margin: 0 16px 12px; background: #fff; border: 1px solid ' + PH.line + '; border-radius: 16px; overflow: visible;">' + h + '</div>';
 const lab = (t) => '<div style="padding: 10px 22px 8px; font-size: 13px; font-weight: 600; color: ' + PH.muted + ';">' + t + '</div>';
-const nowCard = pCard('<div style="padding: 16px;"><div style="font-size: 13px; font-weight: 600; color: ' + PH.prog + ';">Now</div><div style="font-size: 19px; font-weight: 700; margin-top: 4px;">Piglet processing</div><div style="font-size: 14px; color: ' + PH.muted + '; margin-top: 3px;">B32 · 34 piglets · Farrowing 2</div>' +
+const nowCard = pCard('<div style="padding: 16px;"><div style="font-size: 13px; font-weight: 600; color: ' + PH.prog + ';">Now</div><div style="font-size: 19px; font-weight: 700; margin-top: 4px;">Piglet processing</div><div style="font-size: 14px; color: ' + PH.muted + '; margin-top: 3px;">B32 · Farrowing 2</div>' +
   '<div style="height: 56px; margin-top: 16px; border-radius: 14px; background: ' + PH.green + '; color: #fff; font-size: 16px; font-weight: 600; display: grid; place-items: center;">Open</div></div>');
 const doneRow = pCard('<div style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px;">' + CHECK(PH.doneM, 18) + '<span style="flex: 1; font-size: 15px; color: ' + PH.muted + ';">1 done · Feeding, Farrowing 1 and 2</span></div>');
 const f3 = phone(pHead + doneRow + nowCard + lab('Afternoon') + pCard(pRow(2, 'Second feed', 'Farrowing 1 and 2', { first: true }) + pRow(3, 'Get ready to wash', 'Farrowing 3')) +
