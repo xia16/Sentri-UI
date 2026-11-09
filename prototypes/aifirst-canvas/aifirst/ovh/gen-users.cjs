@@ -10,7 +10,7 @@ const pill = (t, bg, ink) => '<span style="display: inline-flex; align-items: ce
 const yes = (t) => '<span style="color: ' + C.ink + ';">' + t + '</span>', no = (t) => '<span style="color: #9aa19b;">' + (t || 'No') + '</span>';
 
 // 1 · who's who
-const kinds = card('Who&rsquo;s who', 'Five kinds of people and one kind of agent. The kind sets the starting access profile and the seat; nothing else.', table('210px 230px 1fr 1fr 1fr', ['Kind', 'Uses', 'Seat (prices are placeholders)', 'Added by', 'Example'], [
+const kinds = card('Who&rsquo;s who', 'Five kinds of people and one kind of agent. Each kind is a base role: it sets the starting access and the seat; nothing else.', table('210px 230px 1fr 1fr 1fr', ['Kind', 'Uses', 'Seat (prices are placeholders)', 'Added by', 'Example'], [
   ['Owner (admin)', 'Console and phone', 'In the platform fee', 'Creates the farm at sign-up; can make a manager an admin too', 'Adam'],
   ['Manager', 'Console and phone', 'Console seat, a small monthly fee', 'An admin', 'Li Wei, Zhao Min, Wang Fang'],
   ['Worker', 'Phone', 'Billed by active day (a day they record anything)', 'An admin, or the manager of their team', 'Liu Yang, Sun Qing, Ma Lin, Gao Feng'],
@@ -58,7 +58,7 @@ const rules = '<ul style="margin: 16px 0 0; padding-left: 20px; font-size: 14.5p
   '<b style="color: ' + C.ink + ';">Anything a profile doesn&rsquo;t list is Never.</b> Parts keep their kind: an initial on a log line is still &ldquo;who did what&rdquo;.',
   '<b style="color: ' + C.ink + ';">A total over fewer than three people isn&rsquo;t shown;</b> it would point at one person.',
   '<b style="color: ' + C.ink + ';">Where is applied by the system,</b> before any page or agent sees the data. Nobody, person or agent, filters for permission.',
-  '<b style="color: ' + C.ink + ';">Exceptions</b> are written under the preset on the person&rsquo;s profile, e.g. &ldquo;Li Wei can also stop a treatment&rdquo;. If a farm needs many, the preset is wrong, not the person.'
+  '<b style="color: ' + C.ink + ';">No one-off exceptions.</b> To give one person something different, make a farm role from a base (e.g. Farrowing lead: Manager, no prices, can stop a treatment). A role can have one person.'
 ].map((x) => '<li style="margin-bottom: 4px;">' + x + '</li>').join('') + '</ul>';
 // the agent explains a gap and answers the rest
 const gmMark = '<span style="width: 22px; height: 22px; flex: none; border-radius: 6px; background: #15241a; color: #c8f26b; font: 700 9px Geist; display: grid; place-items: center;">GM</span>';
@@ -70,10 +70,10 @@ const chatEx = '<div style="border-radius: 14px; background: #F6F7F3; padding: 1
 const agentSide = '<div>' + sub3('The agents answer inside the asker&rsquo;s profile') +
   '<div style="font-size: 14.5px; line-height: 22px; color: ' + C.body + '; margin-bottom: 14px;">The same profile is written into the agent&rsquo;s instructions as &ldquo;What this person may see&rdquo;, so it can explain a gap. It never decides access itself: the system only hands it what the profile allows. When a question needs more, it says what it can&rsquo;t show and why, answers the rest, and offers to ask an admin.</div>' + chatEx +
   sub3('How a profile is checked') +
-  '<div style="font-size: 14.5px; line-height: 22px; color: ' + C.body + ';">Each preset gets a set of questions with what the answer must and must not contain, including questions it is allowed to answer, so refusing too much fails as well as showing too much. A preset changes only when its questions pass.</div>' +
+  '<div style="font-size: 14.5px; line-height: 22px; color: ' + C.body + ';">Later. The questions that check a role depend on how Sentri&rsquo;s data is marked by kind, which isn&rsquo;t done yet.</div>' +
   sub3('What the person sees') +
   '<div style="font-size: 14.5px; line-height: 22px; color: ' + C.body + ';">On the phone&rsquo;s &ldquo;What I can access&rdquo;, the same profile in sentences: &ldquo;Farrowing 3 and 4. Pigs, treatments and your own day. Your own work and hours. Your team&rsquo;s phone numbers. No prices or costs.&rdquo; Pages hide what someone can&rsquo;t see or do; they never show a lock.</div></div>';
-const access = card('Access profiles: where, what they may see, what they may do', 'Each kind starts from one preset. A profile has three parts: the rooms it covers (applied by the system), a level for each kind of data, and the actions it allows. Only an admin changes a profile; a manager can give up to Worker inside their team.',
+const access = card('Roles: where, what they may see, what they may do', 'Sentri keeps a base role per kind; a farm can make its own roles from a base with a few changes (screens on the Roles board). A role has three parts: the rooms it covers (applied by the system), a level for each kind of data, and the actions it allows. Only an admin makes or changes a role; a manager can give Worker or Temp inside their team.',
   '<div style="display: grid; grid-template-columns: 1.75fr 1fr; gap: 48px; align-items: start;"><div>' + where + '<div style="height: 18px;"></div>' + see + '<div style="height: 18px;"></div>' + doo + rules + '</div>' + agentSide + '</div>', { n: '3', span: '1 / -1' });
 
 // 4 · who fills what
@@ -83,7 +83,8 @@ const fills = card('Who fills in what', 'The admin sets what the farm decides (a
   ['Rooms they work in', 'Adding person suggests, the person confirms', 'Sentri suggests from records; a manager can correct'],
   ['Jobs they can do', 'The person, on first sign-in', 'Same; the Work schedule plans only with these'],
   ['Usual hours', 'The farm&rsquo;s working week by default', 'The person or a manager changes theirs'],
-  ['What they decide', 'Who decides (the sentences), by an admin', 'Shown on their profile, never stored there']
+  ['What they decide', 'Who decides (the sentences), by an admin', 'Shown on their profile, never stored there'],
+  ['Days away', 'The person, on the phone; or a manager', 'Back by itself on the date']
 ]), { n: '4' });
 
 // 5 · seats and the bill
@@ -103,7 +104,7 @@ const agents = card('Agents: only an admin hires them', 'Everyone sees the team 
 // 7 · lifecycle
 const st8 = (t, s, bg, ink) => '<div style="flex: 1; min-width: 0;"><div>' + pill(t, bg, ink) + '</div><div style="font-size: 13.5px; line-height: 20px; color: ' + C.body + '; margin-top: 8px;">' + s + '</div></div>';
 const life = card('A person&rsquo;s states', 'What People shows, and what each state does to the seat.', '<div style="display: flex; gap: 14px; align-items: flex-start;">' + [
-  st8('Invited', 'Link sent, 7 days. Resend or cancel. No seat.', '#F1F1EE', C.ink), st8('Active', 'Signed in. Seat running. Planned by the Work schedule.', C.greenW, C.green), st8('Temp, ends Fri 20 Nov', 'Stops by itself on the date; extend in one tap.', C.blueW, C.blue),
+  st8('Invited', 'Link sent, 7 days. Resend or cancel. No seat.', '#F1F1EE', C.ink), st8('Active', 'Signed in. Seat running. Planned by the Work schedule.', C.greenW, C.green), st8('Away, back Mon 9 Nov', 'Set on the phone or by a manager. Not planned; jobs and decisions go to others. Back by itself.', '#EEF0F6', '#3E4A6B'), st8('Temp, ends Fri 20 Nov', 'Stops by itself on the date; extend in one tap.', C.blueW, C.blue),
   st8('Left the farm', 'Seat stops; record stays; can come back.', '#F1F1EE', C.muted), st8('Ended', 'No longer staff; history stays.', '#F1F1EE', C.muted), st8('Deleted', 'Only for someone added by mistake; past records keep the name.', '#FBECEA', '#B34B43')].join('<div style="flex: none; padding-top: 2px; color: #9aa19b;">&rarr;</div>') + '</div>', { n: '7' });
 
 // 8 · open
@@ -112,12 +113,12 @@ const open = card('Yours to decide', null, '<ol style="margin: 0; padding-left: 
   'Can a manager add workers and temps to their team without an admin? My call: yes; it shows on the bill and on People.',
   'An active day: any record, or just signing in? My call: any record.',
   'Where the agents live in the console: a section on People next to the people, or under Farm settings? My call: People, so the team is one list.',
-  'Can a person change their own rooms and jobs after set-up? My call: yes, and a manager sees the change; access stays the admin&rsquo;s.', 'Access enforced by the system from the pilot, or only told to the agents at first (as in the role-profile prototype)? My call: enforced from the pilot; people&rsquo;s work and hours are the first thing a worker would test.'].map((x) => '<li style="margin-bottom: 6px;">' + x + '</li>').join('') + '</ol><div style="margin-top: 10px; font-size: 14px; color: ' + C.muted + ';">Next, once these are settled: the screens. People (list with seats), Add a person, the two phone set-up screens, an access profile, Hire an agent, Billing.</div>', { n: '8', span: '1 / -1' });
+  'Can a person change their own rooms and jobs after set-up? My call: yes, and a manager sees the change; access stays the admin&rsquo;s.', 'Access enforced by the system from the pilot, or only told to the agents at first (as in the role-profile prototype)? My call: enforced from the pilot; people&rsquo;s work and hours are the first thing a worker would test.', 'Days away: just shown, or approved by a manager? My call: just shown. Sentri isn&rsquo;t a leave system, and the manager sees it at once.'].map((x) => '<li style="margin-bottom: 6px;">' + x + '</li>').join('') + '</ol><div style="margin-top: 10px; font-size: 14px; color: ' + C.muted + ';">Screens so far, below: Roles, and Time away. Next, once these are settled: People with seats, Add a person, the phone set-up, Hire an agent, Billing.</div>', { n: '8', span: '1 / -1' });
 
 const html = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Users</title>\n<script src="./support.js"></script>\n</head>\n<body>\n<x-dc>\n<helmet>\n<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&display=swap" rel="stylesheet">\n<style>body{margin:0}</style>\n</helmet>\n' +
   '<div style="width: 3008px; padding: 44px 48px 60px; box-sizing: border-box; background: ' + C.page + '; font-family: Geist, system-ui, sans-serif; color: ' + C.ink + '; -webkit-font-smoothing: antialiased;">' +
   '<h1 style="margin: 0; font-size: 30px; line-height: 38px; font-weight: 600; letter-spacing: -.025em;">Users: adding people and agents, their access and their seats (product design, before screens)</h1>' +
   '<p style="margin: 8px 0 32px; font-size: 16px; line-height: 24px; color: ' + C.muted + '; max-width: 2200px;">An admin adds a person with a name, a kind and rooms; the person fills in what they do on their phone. The kind sets the access profile and the seat. Only an admin hires agents and sets their budgets. Prices follow the business model and are placeholders until the April 2027 pilot.</p>' +
-  '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px;">' + kinds + fills + journey + access + agents + seats + life + open + '</div></div>\n</x-dc>\n<script type="text/x-dc" data-dc-script data-props=\'{"$preview":{"width":3008,"height":3288}}\'>\nclass Component extends DCLogic {\n  renderVals() { return {}; }\n}\n</script>\n</body>\n</html>\n';
+  '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px;">' + kinds + fills + journey + access + agents + seats + life + open + '</div></div>\n</x-dc>\n<script type="text/x-dc" data-dc-script data-props=\'{"$preview":{"width":3008,"height":3318}}\'>\nclass Component extends DCLogic {\n  renderVals() { return {}; }\n}\n</script>\n</body>\n</html>\n';
 fs.writeFileSync(path.join(S, 'pub/project/UsersDesign.dc.html'), html);
 console.log('board', Math.round(html.length / 1024) + ' KB');
