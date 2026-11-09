@@ -613,16 +613,20 @@ function movePigsPage(c){
  const body='<div class="move-stack">'+(list.length?moveIdList(c,m,list):'')+without+'</div>';
  return sheet(c,'Move pigs','',body,footer(SentriUI.backButton({action:'move-back'}),button('move-choose','Choose pen','button primary','',!(m.draftIds.length+m.count))),'',moveLine(pe.id,unitName(c)));
 }
-/* Step 2 · To pen: the room (a row that opens the list of rooms), then that room's map. */
+/* Step 2 · To pen: the room (a row that opens the list of rooms), then that room's map. A room row says what it holds, not "Room" again
+   on every line: the pigs' own room first ("This room · 24 pens"), the others by their pen count. */
+const moveHome=(c,r)=>r.name===unitName(c);
+function moveRoomCount(r){let n=0;for(const l of r.lanes)for(let k=1;k<=r.depth;k++)if(!r.valid||r.valid.has(l+k))n++;return n;}
+function moveRoomLine(c,r){const n=moveRoomCount(r)+(moveRoomCount(r)===1?' pen':' pens');return moveHome(c,r)?'This room · '+n:n;}
 function moveRoomsPage(c){
- const m=c.mv,rows=moveRooms(c).map(r=>SentriUI.row({variant:'navigation',icon:icon('grid'),title:r.name,description:'Room',action:'move-room',value:r.id,attrs:r.id===m.room?{'aria-current':'true'}:{}})).join('');
+ const m=c.mv,rows=moveRooms(c).map(r=>SentriUI.row({variant:'navigation',icon:icon('grid'),title:r.name,description:moveRoomLine(c,r),action:'move-room',value:r.id,attrs:r.id===m.room?{'aria-current':'true'}:{}})).join('');
  return sheet(c,'Choose room','','<div class="st-panel st-row-group st-action-list">'+rows+'</div>',footer(SentriUI.backButton({action:'move-back'}),''),'',moveFrom(c,m));
 }
 function moveToPage(c){
  const m=c.mv,sel=m.sel,n=moveCount(sel),rooms=moveRooms(c),room=rooms.find(r=>r.id===m.room)||rooms[0],pens={},disabled={};
  for(const l of room.lanes)for(let k=1;k<=room.depth;k++){const code=l+k;if(room.valid&&!room.valid.has(code))disabled[code]='no pen';else pens[code]='plain';}
  moveSources(c,m).filter(s=>s.unit===room.name).forEach(s=>{disabled[s.pen]='the pigs are here';delete pens[s.pen];});
- const roomCard='<div class="st-panel st-row-group st-action-list">'+SentriUI.row({variant:'navigation',icon:icon('grid'),title:room.name,description:'Room',action:'move-rooms'})+'</div>';
+ const roomCard='<div class="st-panel st-row-group st-action-list">'+SentriUI.row({variant:'navigation',icon:icon('grid'),title:room.name,description:moveHome(c,room)?'This room':'Another room',action:'move-rooms'})+'</div>';
  const map=SentriUI.penMap({lanes:room.lanes,depth:room.depth,pens,disabled,selected:m.to,action:'move-pen',key:'move-pens-'+moveCardIndex(c),labels:{pen:code=>code,plain:''}});
  const title=n===1&&sel.ids.length===1?'Move '+sel.ids[0]:'Move '+movePigsWord(n);
  return sheet(c,title,'','<div class="move-stack">'+roomCard+map+'</div>',footer(SentriUI.backButton({action:'move-back'}),button('move-save',m.to?'Move to '+m.to:'Choose a pen','button primary','',!m.to)),'',moveFrom(c,m));
