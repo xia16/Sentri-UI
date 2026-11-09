@@ -76,7 +76,7 @@ const visiblePigs=(c,pe)=>pe.pigs.filter(p=>c.reviewOnly?c.selected.has(p.id):ma
 const logTypes=['Production','Health','Movement','Feed','Measurements','Notes','Equipment'];
 function eventCategory(e){
  if(logTypes.includes(e.category))return e.category;
- const types={Production:['Service recorded','Pregnancy check','Farrowing recorded','Weaning recorded'],Health:['Health recorded','Body condition recorded','Treatment recorded','Triage updated','Recovered','Record corrected','Finding edited','Finding entered in error','Thin','Fever','Poor appetite','Coughing','Diarrhoea'],Movement:['3 pigs transferred in','1 pig transferred out','Transferred in','Transferred out'],Feed:['Feed adjustment cleared','Condition support plan','Standard feed plan','Individual adjustment active','Individual adjustment changed','Individual adjustment cleared','Manual feeding instruction','Feeding exception'],Measurements:['Weight recorded','Temperature','Backfat'],Equipment:['Fault reported','Fault resolved','Equipment fault reported','Pen issue']};
+ const types={Production:['Service recorded','Pregnancy check','Farrowing recorded','Weaning recorded'],Health:['Health recorded','Body condition recorded','Treatment recorded','Triage updated','Recovered','Record corrected','Finding edited','Finding entered in error','Thin','Fever','Poor appetite','Coughing','Diarrhoea'],Movement:['3 pigs moved in','1 pig moved out','Moved in','Moved out'],Feed:['Feed adjustment cleared','Condition support plan','Standard feed plan','Individual adjustment active','Individual adjustment changed','Individual adjustment cleared','Manual feeding instruction','Feeding exception'],Measurements:['Weight recorded','Temperature','Backfat'],Equipment:['Fault reported','Fault resolved','Equipment fault reported','Pen issue']};
  return Object.keys(types).find(k=>types[k].includes(e.title))||'Notes';
 }
 function addEvent(c,title,subjects,note='',category){
@@ -166,12 +166,12 @@ function seed(){const c=baseSeed();c.medFarm=medicineFarmSeed();c.selectedPens=n
   if(p.adjustmentActive){p.ends='when recovered';p.feedChanges.push({title:'Individual adjustment active',note:'Thin · mild · +10% · until resolved',time:'Before this walk',who:''});}
 
   }));
- c.penHistory={C1:[{category:'Notes',title:'Pen note added',note:a.note,time:'Today · 06:40',who:'G. Hansen'},{category:'Movement',title:'3 pigs transferred in',note:'Unit 6 · B2 → Unit 7 · C1 · 000254, 000267, 000281',time:'10 Sep · 14:20',who:'M. Larsen'}],C2:[{category:'Equipment',title:'Equipment fault reported',note:'Drinking station · Drinker valve leaking on the east side.',time:'Today · 06:40',who:'G. Hansen'},{category:'Movement',title:'1 pig transferred out',note:'Unit 7 · C2 → Hospital · H1 · 000299',time:'Yesterday · 15:10',who:'M. Larsen'}]};
+ c.penHistory={C1:[{category:'Notes',title:'Pen note added',note:a.note,time:'Today · 06:40',who:'G. Hansen'},{category:'Movement',title:'3 pigs moved in',note:'Unit 6 · B2 → Unit 7 · C1 · 000254, 000267, 000281',time:'10 Sep · 14:20',who:'M. Larsen'}],C2:[{category:'Equipment',title:'Equipment fault reported',note:'Drinking station · Drinker valve leaking on the east side.',time:'Today · 06:40',who:'G. Hansen'},{category:'Movement',title:'1 pig moved out',note:'Unit 7 · C2 → Hospital · H1 · 000299',time:'Yesterday · 15:10',who:'M. Larsen'}]};
  seedProfileExamples(c);
  // Sample stage-entry records; duration never falls back to lifetime age.
  for(const [id,date] of Object.entries({"000254":"2026-08-03","000281":"2026-07-28","000312":"2026-08-08","000801":"2026-08-15","000802":"2026-08-15"}))pig(c,id).stageStartedAt=date;
  c.pens.forEach(pe=>pe.pigs.forEach(p=>{p.initialRecords.push(...p.feedChanges.map(e=>({...e,category:'Feed'})));}));
- pig(c,'000267').initialRecords.push({category:'Movement',title:'Transferred in',note:'Unit 6 · B2 → Unit 7 · C1',time:'10 Sep · 14:20',who:'M. Larsen'});
+ pig(c,'000267').initialRecords.push({category:'Movement',title:'Moved in',note:'Unit 6 · B2 → Unit 7 · C1',time:'10 Sep · 14:20',who:'M. Larsen'});
  return c;}
 const cases=p=>p.cases||[];
 const openFaults=pe=>pe.faults.filter(f=>f.open);
@@ -553,8 +553,9 @@ function penOverview(c){
    From a pen page the worker says which pigs (step 1, only when the pen holds more than one pig or pigs without ID: a pen of one tagged
    pig skips it); from a pig's or ticked pigs' Actions the ticks already say which. Step 2 is the destination: the room, then its
    PenMap with every pen neutral (no status colour means anything here) and the pen the pigs are in greyed. One commit names the pen. */
-const moveRoomsHome=c=>({id:'home',name:unitName(c),lanes:PEN_LANES,depth:PEN_DEPTH});
-const MOVE_ROOMS_OTHER=[{id:'6',name:'Unit 6',lanes:['A','B','C','D'],depth:4},{id:'H',name:'Hospital',lanes:['H'],depth:4}];
+/* Rooms sit in sections, as on the farm (owner, 2026-11-09: "default that room"; another room, even in another section, if she wants). */
+const moveRoomsHome=c=>({id:'home',name:unitName(c),section:'Gestation',lanes:PEN_LANES,depth:PEN_DEPTH});
+const MOVE_ROOMS_OTHER=[{id:'6',name:'Unit 6',section:'Gestation',lanes:['A','B','C','D'],depth:4},{id:'N2',name:'Nursery 2',section:'Nursery',lanes:['A','B','C'],depth:5},{id:'H',name:'Hospital',section:'Hospital',lanes:['H'],depth:4}];
 /* A host's rooms (Farrowing's sow move) come as { id, name, pens }: the pen codes are grouped by letter into lanes, the deepest lane sets
    the depth, and a code the room does not have stays a greyed tile. */
 function moveLayout(u){
@@ -618,15 +619,19 @@ function movePigsPage(c){
 const moveHome=(c,r)=>r.name===unitName(c);
 function moveRoomCount(r){let n=0;for(const l of r.lanes)for(let k=1;k<=r.depth;k++)if(!r.valid||r.valid.has(l+k))n++;return n;}
 function moveRoomLine(c,r){const n=moveRoomCount(r)+(moveRoomCount(r)===1?' pen':' pens');return moveHome(c,r)?'This room · '+n:n;}
+/* The To pen room row: its section and whether it is the pigs' own room; a room named like its section (Hospital) says its pens instead. */
+function moveRoomWhere(c,r){const t=[r.section&&r.section!==r.name?r.section:'',moveHome(c,r)?'this room':''].filter(Boolean).join(' · ');return t?t[0].toUpperCase()+t.slice(1):moveRoomCount(r)+' pens';}
+function moveRoomGroups(c){const out=[];for(const r of moveRooms(c)){const k=r.section||'';let g=out.find(x=>x.section===k);if(!g)out.push(g={section:k,rooms:[]});g.rooms.push(r);}return out;}
 function moveRoomsPage(c){
- const m=c.mv,rows=moveRooms(c).map(r=>SentriUI.row({variant:'navigation',icon:icon('grid'),title:r.name,description:moveRoomLine(c,r),action:'move-room',value:r.id,attrs:r.id===m.room?{'aria-current':'true'}:{}})).join('');
- return sheet(c,'Choose room','','<div class="st-panel st-row-group st-action-list">'+rows+'</div>',footer(SentriUI.backButton({action:'move-back'}),''),'',moveFrom(c,m));
+ const m=c.mv,row=r=>SentriUI.row({variant:'navigation',icon:icon('grid'),title:r.name,description:moveRoomLine(c,r),action:'move-room',value:r.id,attrs:r.id===m.room?{'aria-current':'true'}:{}}),card=rs=>'<div class="st-panel st-row-group st-action-list">'+rs.map(row).join('')+'</div>';
+ const groups=moveRoomGroups(c),body=groups.length===1&&!groups[0].section?card(groups[0].rooms):'<div>'+groups.map(g=>'<section class="detail-section" aria-label="'+esc(g.section)+'">'+stHeading({title:g.section,kind:'section',level:4})+card(g.rooms)+'</section>').join('')+'</div>';
+ return sheet(c,'Choose room','',body,footer(SentriUI.backButton({action:'move-back'}),''),'',moveFrom(c,m));
 }
 function moveToPage(c){
  const m=c.mv,sel=m.sel,n=moveCount(sel),rooms=moveRooms(c),room=rooms.find(r=>r.id===m.room)||rooms[0],pens={},disabled={};
  for(const l of room.lanes)for(let k=1;k<=room.depth;k++){const code=l+k;if(room.valid&&!room.valid.has(code))disabled[code]='no pen';else pens[code]='plain';}
  moveSources(c,m).filter(s=>s.unit===room.name).forEach(s=>{disabled[s.pen]='the pigs are here';delete pens[s.pen];});
- const roomCard='<div class="st-panel st-row-group st-action-list">'+SentriUI.row({variant:'navigation',icon:icon('grid'),title:room.name,description:moveHome(c,room)?'This room':'Another room',action:'move-rooms'})+'</div>';
+ const roomCard='<div class="st-panel st-row-group st-action-list">'+SentriUI.row({variant:'navigation',icon:icon('grid'),title:room.name,description:moveRoomWhere(c,room),action:'move-rooms'})+'</div>';
  const map=SentriUI.penMap({lanes:room.lanes,depth:room.depth,pens,disabled,selected:m.to,action:'move-pen',key:'move-pens-'+moveCardIndex(c),labels:{pen:code=>code,plain:''}});
  const title=n===1&&sel.ids.length===1?'Move '+sel.ids[0]:'Move '+movePigsWord(n);
  return sheet(c,title,'','<div class="move-stack">'+roomCard+map+'</div>',footer(SentriUI.backButton({action:'move-back'}),button('move-save',m.to?'Move to '+m.to:'Choose a pen','button primary','',!m.to)),'',moveFrom(c,m));

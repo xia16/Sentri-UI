@@ -44,7 +44,7 @@ ul.calls strong { color: var(--ink); }
   <header>
     <span class="meta">Move · canvas · 2026-11-09 · branch move/adhoc-move</span>
     <h1>Move: pick the pigs, pick the pen</h1>
-    <p>Your rule: <strong>Move</strong> is the ad hoc move a worker does on the spot. <strong>Transfer</strong> is a planned task and stays out of this round. Open a pig and tap Move, then pick the pen. Open a pen and tap Move, then say which pigs go. Pigs with an ID are ticked; pigs without an ID are counted. Then pick the pen. Every screen below is from the real prototype at 390 wide.</p>
+    <p>Your rule: <strong>Move</strong> is the ad hoc move a worker does on the spot. <strong>Transfer</strong> is a planned task sent only from the console, so it never appears in the phone's Actions. Open a pig and tap Move, then pick the pen. Open a pen and tap Move, then say which pigs go. Pigs with an ID are ticked; pigs without an ID are counted. Then pick the pen. Every screen below is from the real prototype at 390 wide.</p>
   </header>
 
   <section>
@@ -62,7 +62,7 @@ ul.calls strong { color: var(--ink); }
   <section>
     <div class="lead">
       <h2>2 · A pen of tagged pigs (C1), to this room or another</h2>
-      <p>Tap a pen and the button says where: Move to C4. The room row at the top switches to another room (Hospital here). You land back on the pen page: its count drops, both pens' logs get a line, and a toast confirms.</p>
+      <p>Tap a pen and the button says where: Move to C4. The map opens on the pigs' own room. The room row above it says which room and section it is ("Gestation · this room"). Tapping it lists every room grouped by section, so another room, in this section or another, is one tap away (Hospital here). You land back on the pen page: its count drops, both pens' logs get a line, and a toast confirms.</p>
     </div>
     <div class="card"><div class="strip">
       <figure><img src="after/pen-C1.png" alt="Pen C1 page"><figcaption>Pen page</figcaption></figure>
@@ -118,6 +118,7 @@ ul.calls strong { color: var(--ink); }
       <li><strong>House patterns, not new parts.</strong> Which pigs is Farrowing's Send piglets: same ticks, same search and scan, same counter. The pen picker is the Pen map the worker already uses to walk the room. The map gained two states: a picked pen (ink ring) and a greyed one (where the pigs already are).</li>
       <li><strong>One question per screen.</strong> Which pigs asks only that; To pen shows only the room and its pens. A pen's colour statuses are left off the map, because they don't help choose where pigs go.</li>
       <li><strong>The button says what will happen:</strong> Choose a pen (off) → Move to C4.</li>
+      <li><strong>Move everywhere on the phone.</strong> The Actions tile, the pen page, Farrowing's sow and room tiles, and the log lines ("Moved out · 2 pigs to C4", "3 pigs moved in") all say Move. Transfer is left for the console.</li>
       <li><strong>No second confirm.</strong> The footer button is the confirmation; the toast, the new counts and both pens' logs are the receipt.</li>
     </ul>
   </section>
@@ -126,7 +127,7 @@ ul.calls strong { color: var(--ink); }
     <div class="lead"><h2>Not in this round</h2></div>
     <ul class="calls">
       <li>Farrowing's piglet Foster and Move-to-pen, and Piglet processing's move: once you agree, they can open this same flow.</li>
-      <li>Transfer, the planned task.</li>
+      <li>Transfer, the planned task: it is sent from the console only.</li>
       <li>The Move feature's spec and atlas entries still say "Transfer". They get rewritten when you agree.</li>
     </ul>
   </section>
