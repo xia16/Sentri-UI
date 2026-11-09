@@ -29,7 +29,7 @@
   {
     "id": "tile",
     "name": "Tile",
-    "use": "Use for the everyday verbs of More actions: one action as an icon well over one word, in one row up to five, two rows split evenly from six, a third only once More is opened (SentriUI.rowGrid). Owner, 2026-10-19 and 2026-10-20.",
+    "use": "Use for the everyday verbs of More actions: one action as an icon well over one word, in one row up to five, two rows split evenly from six, a third only once More is opened (SentriUI.rowGrid). A verb the pig can't take stays in its place, greyed (disabled). Owner, 2026-10-19, 2026-10-20 and 2026-11-06.",
     "notUse": "Not for verbs that need a line to explain them (Production) — use navigation; not for places or animals.",
     "states": [
       "Default · eight verbs (4 + 4)",
@@ -41,7 +41,9 @@
       "Over ten · More",
       "More opened · eleven verbs (4 + 4 + 3)",
       "Chinese",
-      "Three verbs (one row)"
+      "Three verbs (one row)",
+      "Greyed in place · a sow that died",
+      "Greyed in place · Death stays last"
     ],
     "usedBy": [
       "inspection.actions",

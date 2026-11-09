@@ -16,7 +16,7 @@ Label; optional description; decrease key; spinbutton value; increase key; persi
 ## Variants
 - **Row** (`row`): use for inline animal counts in death, condition and adjustment records. not for the primary screen count — use count.
 - **Count** (`count`): use for the primary count in Farrowing and Set count. not for repeated record rows — use row.
-- **Well** (`well`): use for foster, move and reconcile counts. not for a measured value — use Measure.
+- **Well** (`well`): use for foster, move and reconcile counts. not for a measured value — use Measure. On the tint (every page and drawer, [SURFACES.md](../../SURFACES.md)) its keys sit in a white card with its label above on the tint, never a well on the tint (owner, 2026-11-06); the skeleton context keeps the well.
 
 ## States
 | State | Behaviour |

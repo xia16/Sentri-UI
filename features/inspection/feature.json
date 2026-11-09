@@ -1340,12 +1340,12 @@
               {
                 "state": "Resolve conditions · Care instructions",
                 "when": "A selected pig has a condition",
-                "shows": "Shown; otherwise unavailable (\"No open conditions to resolve.\" / \"Record a health finding first.\")"
+                "shows": "Live; otherwise greyed in place (\"No open conditions to resolve.\" / \"Record a health finding first.\")"
               },
               {
                 "state": "Adjust feed",
                 "when": "At least one pig can be fed (not ad-lib, not dead, has a plan)",
-                "shows": "Shown; otherwise unavailable with the reason"
+                "shows": "Live; otherwise greyed in place with the reason"
               },
               {
                 "state": "Add a note",
@@ -1360,15 +1360,15 @@
               {
                 "state": "Adjust feed unavailable",
                 "when": "No selected pig can be fed",
-                "shows": "Reason is that of the first selected pig only (Pig has died / Ad-lib feeding has no fixed daily allowance / No feeding plan recorded)"
+                "shows": "Feed greyed in place; its accessible name carries the first selected pig's reason (This pig has died / Ad-lib feeding has no fixed daily allowance / No feeding plan recorded)"
               },
               {
-                "state": "Health group empty",
+                "state": "Health greyed",
                 "when": "No selected pig is alive",
-                "shows": "Group and its rows are absent"
+                "shows": "Every health tile greyed in its place"
               }
             ],
-            "logic": "Rows that do not apply move to \"Unavailable actions (N)\" with the reason. Dead sows get only a note.",
+            "logic": "Greyed in place (owner, 2026-11-06: \"when a sow died, the actions should just be grey\"): every action keeps its place in a live pig's order; one that does not apply is a disabled tile (its reason in the accessible name only, no reason line) or, in Production, a disabled row with the reason as line 2. No \"Unavailable actions\" link or page. A dead sow keeps the whole set greyed; only Add a note is live.",
             "source": "ASTRA-BULK-ACTIONS",
             "at": "Edit conditions"
           },
@@ -1391,8 +1391,7 @@
           "Actions (raw)",
           "Disease or symptom (raw)",
           "Record treatment (raw)",
-          "Adjust feed (raw)",
-          "Unavailable actions (raw)"
+          "Adjust feed (raw)"
         ],
         "issues": [
           "Health and General groups sit in one long scroll with tabs at the foot; two small groups do not need tabs.",

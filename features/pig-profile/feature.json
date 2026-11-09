@@ -45,7 +45,7 @@
       ]
     ],
     [
-      "Actions · Unavailable",
+      "Actions · Greyed in place",
       [
         "pig-profile.unavailable-actions"
       ]
@@ -169,7 +169,7 @@
     [
       "pig-profile.actions",
       "pig-profile.unavailable-actions",
-      "tap Unavailable actions"
+      "a pig with something she cannot take: the same sheet, greyed in place"
     ],
     [
       "pig-profile.actions",
@@ -788,7 +788,7 @@
               {
                 "state": "No condition",
                 "when": "None",
-                "shows": "Resolve and Care listed as unavailable with the reason"
+                "shows": "Resolve and Care greyed in place"
               }
             ],
             "logic": "Edit conditions is bulk only. Farrowing opens these shared flows rather than duplicating them.",
@@ -797,32 +797,32 @@
           {
             "name": "General group",
             "shows": "Add a note · Measurements & condition · Adjust feed",
-            "logic": "Adjust feed is unavailable with the reason for ad-lib, dead or no-plan pigs. When Farrowing's Add marker row exists, this sheet hides its own Add a note.",
+            "logic": "Adjust feed is greyed in place for ad-lib, dead or no-plan pigs. When Farrowing's Add marker row exists, this sheet hides its own Add a note.",
             "at": "Add a note",
             "states": [
               {
                 "state": "Adjust feed unavailable",
                 "when": "Dead sow, ad-lib pen, or no feeding plan",
-                "shows": "Listed under Unavailable actions with the reason; a single ad-lib pig also gets \"Body condition adjustment · Ad-lib pigs do not have an individual ration.\""
+                "shows": "Feed greyed in place; a single ad-lib pig's Measurements keeps Record body condition greyed (\"Ad-lib pigs do not have an individual ration.\")"
               }
             ]
           },
           {
             "name": "Dead sow",
-            "shows": "Everything unavailable except Add a note",
+            "shows": "Everything greyed in place except Add a note",
             "states": [
               {
                 "state": "Dead sow",
                 "when": "Stage \"Sow died\"",
-                "shows": "Production and Health empty; only a note"
+                "shows": "Every action greyed in its place; only Add a note is live"
               }
             ]
           },
           {
-            "name": "Unavailable actions (N)",
-            "shows": "Link at the end",
-            "rule": "A blocked row is listed with its reason, never dropped silently. N = count of blocked rows; footer tabs jump between groups and follow the scroll.",
-            "at": "Unavailable actions"
+            "name": "Greyed in place",
+            "shows": "A verb she cannot take keeps its tile or row, greyed",
+            "rule": "Greyed in place (owner, 2026-11-06: \"when a sow died, the actions should just be grey\"): every action keeps its place in a live pig's order; one that does not apply is a disabled tile (its reason in the accessible name only, no reason line) or, in Production, a disabled row with the reason as line 2. No \"Unavailable actions\" link or page.",
+            "at": "Resolve"
           }
         ],
         "controls": [],
@@ -830,8 +830,7 @@
           "Actions (raw)",
           "Production (raw)",
           "Health (raw)",
-          "General (raw)",
-          "Unavailable actions (raw)"
+          "General (raw)"
         ],
         "issues": [
           "The cluster heading repeats the row title (\"Pregnancy check\" over \"Pregnancy check\").",
@@ -1182,66 +1181,61 @@
     },
     {
       "id": "pig-profile.unavailable-actions",
-      "name": "Unavailable actions",
-      "zh": "不可用操作",
+      "name": "Actions · greyed in place",
+      "zh": "操作 · 不可用置灰",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "walk",
       "steps": [
         "[data-pig-select=\"000254\"]",
-        "[data-action=\"actions\"]",
-        "[data-action=\"unavailable-actions\"]"
+        "[data-action=\"actions\"]"
       ],
       "figma": "",
       "notes": {
-        "purpose": "Show every blocked action with its reason.",
+        "purpose": "Show a pig's Actions with what she cannot take greyed in place (000254 has no open condition).",
         "elements": [
           {
-            "name": "Blocked rows",
-            "shows": "Resolve conditions · No open conditions to resolve.",
+            "name": "Greyed tiles and rows",
+            "shows": "Resolve and Care greyed in their places in the grid; the rest live",
             "states": [
               {
                 "state": "No open conditions",
                 "when": "No condition on pig",
-                "shows": "\"No open conditions to resolve.\""
+                "shows": "Resolve greyed; accessible name \"…, not available: no open conditions to resolve\""
               },
               {
                 "state": "No finding yet",
                 "when": "Care instructions without one",
-                "shows": "\"Record a health finding first.\""
+                "shows": "Care greyed (\"Record a health finding first\")"
               },
               {
                 "state": "Dead",
                 "when": "Pig has died",
-                "shows": "\"Pig has died\""
+                "shows": "Every tile greyed but Note; Production rows greyed with \"This sow has died.\""
               },
               {
                 "state": "Ad-lib",
                 "when": "Ad-lib pen",
-                "shows": "\"Ad-lib feeding has no fixed daily allowance\" / \"Ad-lib pigs do not have an individual ration.\""
+                "shows": "Feed greyed; Measurements keeps Record body condition greyed (\"Ad-lib pigs do not have an individual ration.\")"
               },
               {
                 "state": "No plan",
                 "when": "No feeding plan",
-                "shows": "\"No feeding plan recorded\""
+                "shows": "Feed greyed (\"No feeding plan recorded\")"
               },
               {
                 "state": "No batches",
                 "when": "None exist",
-                "shows": "\"No production batches are available.\""
+                "shows": "Batch membership row greyed, line 2 \"No production batches are available.\""
               }
             ],
-            "logic": "Grouped Production, Health, General; every row disabled with the reason as sub-line. A blocked action is listed with its reason, never dropped silently.",
-            "at": "No open conditions to resolve."
+            "logic": "Greyed in place (owner, 2026-11-06: \"when a sow died, the actions should just be grey\"): every action keeps its place in a live pig's order; one that does not apply is a disabled tile (its reason in the accessible name only, no reason line) or, in Production, a disabled row with the reason as line 2. No \"Unavailable actions\" link or page.",
+            "at": "Resolve"
           }
         ],
         "controls": [],
-        "copy": [
-          "Unavailable actions (raw)"
-        ],
-        "issues": [
-          "The list sits one tap behind Actions and usually holds one or two rows; the reason could sit on the disabled row itself."
-        ]
+        "copy": [],
+        "issues": []
       }
     },
     {
