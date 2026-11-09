@@ -15,19 +15,27 @@
    "title": "Phone round 3 (9 Nov): the agent's own look (toast A/B/C), notes about the whole room or task, and where they live in the task (spots 6-8); round 2 below for reference (mock-up, live main screens)",
    "w": 3008,
    "x": 0,
-   "y": 0
+   "y": 2630
   },
   "MyDayPhone.dc.html": {
    "h": 1262,
    "title": "Phone: My day as a quest line from the agent; agent in the dock middle; scan floating (mock-up on live main screens)",
    "w": 3008,
    "x": 0,
-   "y": 6163
+   "y": 8793
+  },
+  "AgentNotesR4.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 3008,
+   "h": 2510,
+   "title": "Phone round 4 (9 Nov): B scoped to this room and this task, a generic daily toast; My day with whole jobs only (mock-up, live main screens)"
   }
  },
  "order": [
   "MyDayPhone.dc.html",
-  "StopsHeadsUp.dc.html"
+  "StopsHeadsUp.dc.html",
+  "AgentNotesR4.dc.html"
  ],
  "notes": {
   "phone-title": {
@@ -41,13 +49,21 @@
    "fill": "green",
    "w": 420,
    "x": -500,
-   "y": 0,
+   "y": 2630,
    "text": "Phone round 3, for you to pick (9 Nov):\n- The agent's look for its toast: A ink, B its own light violet (my pick), C deep violet. Violet would be one new token, used only for the agent.\n- The note format: room and task lines run full width with no badge, then pen lines with their badge (frames 4, 5).\n- Where the notes live in the task: 6 a row under the summary (my pick), 7 a section in the list, 8 a labelled chip in the header.\nStill open from round 1:\n1. The agent's name on the phone: General Manager or Assistant? (I'd say General Manager everywhere, always with the sparkle.)\n2. Should a recorded task tick itself in My day? (I'd say no: My day is the plan.)\n3. Does the morning brief buzz the phone? (I'd say once, at the start of the shift.)"
+  },
+  "phone-r4": {
+   "fill": "green",
+   "w": 420,
+   "x": -500,
+   "y": 0,
+   "text": "Phone round 4, for you to rule (9 Nov):\n- B is in. The toast reads \"Today's notes\"; the drawer splits This room (for anyone in Farrowing 3) from This task (its pigs, by pen). Only what the screens and fixed rules can't catch; no late-task lines.\n- My day: the agent orders the jobs you already have and never splits or creates one. A job's size follows the farm's setup (one crank feeds all 10 rooms = one row). A shared job is one job on both phones.\nTo rule: 1. Agent never splits or creates a job? 2. Routine jobs like feeding stay in My day as one row? (I'd keep them.) 3. Notes spot: 6 the row (my pick), 7 or 8?\nStill open: the agent's name, auto-tick, morning buzz."
   }
  },
  "noteOrder": [
   "phone-title",
-  "phone-r3"
+  "phone-r3",
+  "phone-r4"
  ],
  "designSystems": []
 }
