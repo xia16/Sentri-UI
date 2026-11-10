@@ -335,7 +335,7 @@
   <div style="height: 52px; flex-shrink: 0; box-sizing: border-box; display: flex; align-items: center; gap: 8px; padding: 0 10px; border-bottom: 1px solid {{t.lineSoft}}">
     <div style="display: flex; align-items: center; gap: 2px; flex: 1; min-width: 0; overflow: hidden">
       <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="2">
-        <div style="display: flex; align-items: center; height: 34px; border-radius: {{t.r10}}; background: {{tb.bg}}; min-width: 0; max-width: 240px; padding-right: {{tb.padR}}; flex-shrink: {{tb.shrink}}">
+        <div style="display: flex; align-items: center; height: 34px; border-radius: {{t.r10}}; background: {{tb.bg}}; min-width: {{tb.minW}}; max-width: 220px; padding-right: {{tb.padR}}; flex-shrink: {{tb.shrink}}">
           <button type="button" onClick="{{tb.go}}" style="display: flex; align-items: center; gap: 7px; height: 34px; border: 0; background: transparent; padding: 0 10px; font: inherit; font-size: 13px; font-weight: {{tb.weight}}; color: {{tb.ink}}; cursor: pointer; min-width: 0">
             <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0"><path d="{{tb.icon}}"></path></svg>
             <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{tb.title}}</span>
@@ -351,6 +351,25 @@
         </div>
       </sc-for>
     </div>
+    <sc-if value="{{hasMore}}" hint-placeholder-val="{{false}}">
+    <span style="position: relative; display: flex; flex-shrink: 0">
+      <button type="button" aria-haspopup="menu" aria-expanded="{{moreOpen}}" aria-label="{{moreLabel}}" onClick="{{toggleMore}}" style="display: flex; align-items: center; gap: 4px; height: 34px; padding: 0 9px; border: 0; border-radius: 10px; background: {{moreBg}}; font: inherit; font-size: 13px; font-weight: 600; color: #3B4540; cursor: pointer">+{{moreN}}<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m6 9 6 6 6-6"></path></svg></button>
+      <sc-if value="{{moreOpen}}" hint-placeholder-val="{{false}}">
+        <div role="menu" aria-label="More open pages" style="position: absolute; right: 0; top: 40px; z-index: 40; width: 260px; padding: 6px; box-sizing: border-box; border-radius: 12px; background: #FFFFFF; border: 1px solid #E6E9E2; box-shadow: 0 20px 25px -5px rgba(17,21,17,.10), 0 8px 10px -6px rgba(17,21,17,.10)">
+          <div style="padding: 6px 10px 4px; font-size: 12px; font-weight: 600; color: #5D665F">Open pages</div>
+          <sc-for list="{{moreTabs}}" as="m" hint-placeholder-count="2">
+            <div style="display: flex; align-items: center; border-radius: 8px">
+              <button type="button" role="menuitem" onClick="{{m.go}}" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 9px; height: 40px; padding: 0 10px; border: 0; background: transparent; font: inherit; font-size: 13.5px; font-weight: 500; color: #1B211C; text-align: left; cursor: pointer">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{m.icon}}"></path></svg>
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{m.title}}</span>
+              </button>
+              <button type="button" aria-label="Close {{m.title}}" onClick="{{m.close}}" style="width: 32px; height: 32px; flex: none; border: 0; border-radius: 8px; background: transparent; color: #8A938C; display: grid; place-items: center; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="{{m.xIcon}}"></path></svg></button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </span>
+    </sc-if>
     <span style="position: relative; display: flex">
     <sc-if value="{{artOpen}}" hint-placeholder-val="{{false}}">
       <div role="menu" aria-label="Artifacts" style="position: absolute; right: 0; top: 40px; z-index: 40; width: 320px; padding: 6px; box-sizing: border-box; border-radius: 12px; background: #FFFFFF; border: 1px solid #E6E9E2; box-shadow: 0 20px 25px -5px rgba(17,21,17,.10), 0 8px 10px -6px rgba(17,21,17,.10)">
@@ -1387,7 +1406,7 @@ class Component extends DCLogic {
   openTabX(id, start, wide) {
     const s = this.st(); const tabs = s.tabs.indexOf(id) >= 0 ? s.tabs : s.tabs.concat([id]);
     const tabStart = Object.assign({}, s.tabStart || {}); if (start) tabStart[id] = start;
-    this.setState(Object.assign({ tabs, active: id, tabStart, plusOpen: false, fromFarm: null }, wide ? { expanded: true } : {}));
+    this.setState({ tabs, active: id, tabStart, plusOpen: false, fromFarm: null, moreOpen: false });
   }
   addMsgs(chat, msgs) { const s = this.st(); const extra = Object.assign({}, s.extra); extra[chat] = (extra[chat] || []).concat(msgs); this.setState({ extra }); }
   patchMsg(pid, fields) {
@@ -1477,7 +1496,7 @@ class Component extends DCLogic {
         medicines: { title: "Medicines", icon: I.pill, kind: 'act', act: 'ActMedicines' },
         barns: { title: "Rooms and pens", icon: I.map, kind: 'act', act: 'ActBarns' },
         cameras: { title: "Cameras", icon: I.video, kind: 'act', act: 'ActCameras' },
-        schedule: { title: "Task schedule", icon: I.calendar, kind: 'act', act: 'ActSchedule' },
+        schedule: { title: 'Day plan', icon: I.users, kind: 'act', act: 'ActSchedule' },
         transfers: { title: "Transfers", icon: I.arrows, kind: 'act', act: 'ActTransfers' },
         disinfect: { title: "Disinfection", icon: I.shield, kind: 'act', act: 'ActDisinfection' },
         feed: { title: "Feed plans", icon: I.bowl, kind: 'act', act: 'ActFeed' },
@@ -1501,7 +1520,7 @@ class Component extends DCLogic {
       const draft = s.draft && s.draft.charAt(0) === '/' ? '' : s.draft;
       const tabStart = Object.assign({}, s.tabStart || {});
       if (start) tabStart[id] = start;
-      set(Object.assign({ tabs, active: id, plusOpen: false, draft, tabStart }, wide ? { expanded: true } : {}));
+      set({ tabs, active: id, plusOpen: false, draft, tabStart, moreOpen: false });
     };
     const closeTab = (id) => {
       const tabs = s.tabs.filter((t) => t !== id);
@@ -1797,14 +1816,21 @@ class Component extends DCLogic {
     });
     const forYouCount = forYouOpen.filter((x) => !(x.kind === 'todo' && doneTodos[x.id])).length;
 
-    const tabs = s.tabs.map((id) => {
+    const fixedTabs = s.tabs.filter((id) => id === 'home' || id === 'layout');
+    const pageTabs = s.tabs.filter((id) => id !== 'home' && id !== 'layout');
+    const room = 1;
+    let shown = pageTabs.slice(-room);
+    if (pageTabs.indexOf(s.active) >= 0 && shown.indexOf(s.active) < 0) shown = shown.slice(1).concat([s.active]);
+    const hidden = pageTabs.filter((id) => shown.indexOf(id) < 0);
+    const moreTabs = hidden.map((id) => { const p = pageInfo(id); return { title: p.title, icon: p.icon, xIcon: I.x, go: () => set({ active: id, moreOpen: false }), close: () => { closeTab(id); } }; });
+    const tabs = fixedTabs.concat(pageTabs.filter((id) => shown.indexOf(id) >= 0)).map((id) => {
       const p = pageInfo(id);
       const on = s.active === id;
       const closable = id !== 'home' && id !== 'layout';
       return {
         title: p.title, icon: p.icon, xIcon: I.x,
         bg: on ? T.fill2 : 'transparent', weight: on ? 600 : 500, ink: on ? ink : T.muted,
-        padR: closable ? '5px' : '0px', shrink: closable ? 1 : 0,
+        padR: closable ? '5px' : '0px', shrink: closable ? 1 : 0, minW: closable ? '112px' : '0px',
         hasCount: forYouCount > 0 && (id === 'decisions' || (id === 'home' && s.tabs.indexOf('decisions') < 0)), count: id === 'home' ? 17 : forYouCount,
         closable,
         go: () => set({ active: id }),
@@ -1948,7 +1974,7 @@ class Component extends DCLogic {
       expandIcon: workPage ? I.message : expanded ? I.collapse : I.expand,
       toggleExpand: () => workPage ? set({ chatHidden: false }) : set({ expanded: !expanded }),
       tabs,
-      isActProdSetup: page.kind === 'act' && page.act === 'ProdSetup', isActVaxProgramme: page.kind === 'act' && page.act === 'VaxProgramme', isActScheduleDemo: page.kind === 'act' && page.act === 'ScheduleDemo', arts: this.artList(openTab), artOpen: !!s.artOpen, toggleArts: () => set({ artOpen: !s.artOpen }), isActLateBatch: page.kind === 'act' && page.act === 'LateBatch', isActConnections: page.kind === 'act' && page.act === 'Connections', isActDecisions: page.kind === 'act' && page.act === 'ActDecisions', isActVaccination: page.kind === 'act' && page.act === 'ActVaccination', isActPigs: page.kind === 'act' && page.act === 'ActPigs', isActBatches: page.kind === 'act' && page.act === 'ActBatches', isActPeople: page.kind === 'act' && page.act === 'ActPeople', isActSampling: page.kind === 'act' && page.act === 'ActSampling', isActApply: page.kind === 'act' && page.act === 'ActApply', isActSetup: page.kind === 'act' && page.act === 'ActSetup', isActLayout: page.kind === 'act' && page.act === 'ActLayout', isActLine: page.kind === 'act' && page.act === 'ActLine', isActImport: page.kind === 'act' && page.act === 'ActImport', isActSettings: page.kind === 'act' && page.act === 'ActSettings', isActTreatment: page.kind === 'act' && page.act === 'ActTreatment', isActMedicines: page.kind === 'act' && page.act === 'ActMedicines', isActBarns: page.kind === 'act' && page.act === 'ActBarns', isActCameras: page.kind === 'act' && page.act === 'ActCameras', isActSchedule: page.kind === 'act' && page.act === 'ActSchedule', isActTransfers: page.kind === 'act' && page.act === 'ActTransfers', isActDisinfection: page.kind === 'act' && page.act === 'ActDisinfection', isActFeed: page.kind === 'act' && page.act === 'ActFeed', isActAutomations: page.kind === 'act' && page.act === 'ActAutomations', isActOffsite: page.kind === 'act' && page.act === 'ActOffsite',
+      isActProdSetup: page.kind === 'act' && page.act === 'ProdSetup', isActVaxProgramme: page.kind === 'act' && page.act === 'VaxProgramme', isActScheduleDemo: page.kind === 'act' && page.act === 'ScheduleDemo', arts: this.artList(openTab), artOpen: !!s.artOpen, toggleArts: () => set({ artOpen: !s.artOpen, moreOpen: false }), moreTabs, hasMore: moreTabs.length > 0, moreN: moreTabs.length, moreOpen: !!s.moreOpen && moreTabs.length > 0, moreBg: s.moreOpen ? '#EEF0EA' : 'transparent', moreLabel: moreTabs.length + ' more open pages', toggleMore: () => set({ moreOpen: !s.moreOpen, artOpen: false }), isActLateBatch: page.kind === 'act' && page.act === 'LateBatch', isActConnections: page.kind === 'act' && page.act === 'Connections', isActDecisions: page.kind === 'act' && page.act === 'ActDecisions', isActVaccination: page.kind === 'act' && page.act === 'ActVaccination', isActPigs: page.kind === 'act' && page.act === 'ActPigs', isActBatches: page.kind === 'act' && page.act === 'ActBatches', isActPeople: page.kind === 'act' && page.act === 'ActPeople', isActSampling: page.kind === 'act' && page.act === 'ActSampling', isActApply: page.kind === 'act' && page.act === 'ActApply', isActSetup: page.kind === 'act' && page.act === 'ActSetup', isActLayout: page.kind === 'act' && page.act === 'ActLayout', isActLine: page.kind === 'act' && page.act === 'ActLine', isActImport: page.kind === 'act' && page.act === 'ActImport', isActSettings: page.kind === 'act' && page.act === 'ActSettings', isActTreatment: page.kind === 'act' && page.act === 'ActTreatment', isActMedicines: page.kind === 'act' && page.act === 'ActMedicines', isActBarns: page.kind === 'act' && page.act === 'ActBarns', isActCameras: page.kind === 'act' && page.act === 'ActCameras', isActSchedule: page.kind === 'act' && page.act === 'ActSchedule', isActTransfers: page.kind === 'act' && page.act === 'ActTransfers', isActDisinfection: page.kind === 'act' && page.act === 'ActDisinfection', isActFeed: page.kind === 'act' && page.act === 'ActFeed', isActAutomations: page.kind === 'act' && page.act === 'ActAutomations', isActOffsite: page.kind === 'act' && page.act === 'ActOffsite',
       actStart: (s.tabStart || {})[s.active] || ({ b32: 'record', vax: s.approved ? 'receipt' : 'proposal', round31: 'round', decisions: 'list', pigs: 'list', batches: 'list', people: 'list', sampling: 'list', programme: 'draft', apply: 'review', setup: 'progress', layout: 'record', line: 'plan', import: 'check', settings: 'record', treatment: 'list', medicines: 'list', barns: 'rooms', cameras: 'list', schedule: 'today', transfers: 'list', disinfect: 'list', feed: 'programme', autos: 'list', offsite: 'list' })[s.active] || 'list',
       isHome: s.active === 'home', isVax: page.kind === 'vax', isDash: page.kind === 'dash', isKb: page.kind === 'kb', isConnect: page.kind === 'connect', isNewGroup: page.kind === 'newgroup', isGeneric: page.kind === 'generic',
       page,

@@ -12,7 +12,12 @@ The phrases below are rehearsed. They answer instantly and open the right page. 
 
 ## 1 · Home (30 s)
 - The console beside the chat. Decide rotates every 10 s.
-- Click the Decide card to open the item it shows.
+- **Decide:**
+  - **Decide 17** (left) opens For you, the full list.
+  - The item on the right opens that item.
+  - The bar underneath jumps to an item.
+- **Day plan** opens the people plan (each team and its jobs). **Task schedule** opens the task grid.
+- Pages open beside the chat. Use expand (top right) when you want a page full width. Older pages collect under **+N** in the tab bar.
 - Production / Health / Farm show at a glance; hover any number.
 
 ## 2 · Farm setup (2 min, no AI)
@@ -29,7 +34,7 @@ The phrases below are rehearsed. They answer instantly and open the right page. 
 - **Your team's three weeks**, then **Set up Line 1**.
 
 ## 4 · Tasks in the Farm view (2 min)
-- Home → **Task schedule** (or **Day plan**) opens the Schedule.
+- Home → **Task schedule** opens the Schedule.
 - Click a task name, for example **Breeding**, **Farrowing** or **Treatment RX-25G009**. Or click a day, then **Open in Farm view**. The Farm view opens on that room with the task's panel open.
 
 ## 5 · A batch running late (2 min)

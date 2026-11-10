@@ -378,6 +378,8 @@ class Component extends DCLogic {
   items() {
     const vac = 'vaccination plans go to Dr. Chen and Adam';
     return [
+      { id: 'late', kind: 'decide', by: 'PR', area: 'Production', title: 'Batch 31 is 4 days behind: wean Batch 32 on Mon 30 Nov?', to: 'To you', due: 'Today', why: 'room plans go to Adam', told: 'Wang Fang and Li Na are told', hot: true, tone: 'amber', crumb: 'For you · Production', ext: ['late', 'proposal'] },
+      { id: 'treat', kind: 'decide', by: 'VT', area: 'Health', title: 'Treat 4 lame sows in Gestation 2', to: 'To you and Dr. Chen', due: 'Today', why: vac, told: 'Dr. Chen is told', hot: true, tone: 'amber', crumb: 'For you · Treatment', ext: ['treatment', 'proposal'] },
       { id: 'booster', kind: 'decide', by: 'VT', area: 'Health', title: 'Approve the PRRS booster plan for Batch 34', to: 'To you and Dr. Chen', due: 'Today 10:00', why: vac, told: 'Dr. Chen is told', hot: true, tone: 'amber', crumb: 'For you · Vaccination' },
       { id: 'missed', kind: 'decide', by: 'VT', area: 'Health', title: "3 pigs were missed in Batch 31's PRRS round", to: 'To you · cc Zhao Min', due: 'Today', why: vac, told: 'Zhao Min is told', tone: 'neutral', crumb: 'For you · Vaccination' },
       { id: 'revax', kind: 'decide', by: 'VT', area: 'Health', title: 'Revaccinate Batch 29?', to: 'To you and Dr. Chen', due: 'Wed 4 Nov', why: vac, told: 'Dr. Chen is told', tone: 'neutral', crumb: 'For you · Vaccination' },
@@ -591,7 +593,7 @@ class Component extends DCLogic {
     const lineOf = (n) => (n === 0 || youAll[n].hot || youAll[n - 1].hot ? NONE : HAIR);
     const mark = (i) => ({ initials: i.by, markBg: M[i.by].bg, markInk: M[i.by].ink });
     const dueTxt = (i) => (i.due ? ' · due ' + i.due : '');
-    const openRec = (id) => () => set({ view: 'rec', openId: id, rejecting: false, reason: '', asked: false, opened: false });
+    const openRec = (id) => () => { const it = this.items().find((x) => x.id === id); if (it && it.ext) { try { window.dispatchEvent(new CustomEvent('sentri:tab', { detail: { id: it.ext[0], start: it.ext[1] } })); } catch (e) {} return; } set({ view: 'rec', openId: id, rejecting: false, reason: '', asked: false, opened: false }); };
     const decideRows = decideVis.map((i, n) => Object.assign({
       id: i.id, title: i.title, meta: i.to + dueTxt(i), whyLabel: 'Why you:', why: i.why,
       line: lineOf(n), bg: i.hot ? '#F5FAF2' : 'transparent', edge: i.hot ? '#D5E7CF' : 'transparent',

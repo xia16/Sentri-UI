@@ -9,25 +9,25 @@
 <x-dc>
 <helmet>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;display=swap" rel="stylesheet">
-<style>body{margin:0}.hf-btn{border:0;margin:0;font:inherit;color:inherit;text-align:left;cursor:pointer;background:none;padding:0}.hf-card:hover{box-shadow:0 0 0 1px #D5DAD0,0 2px 8px rgba(17,21,17,.07)}.hf-row:hover{background:#F6F7F3}.hf-nav:hover{background:#EEF0EA}.hf-num{font-variant-numeric:tabular-nums}@keyframes hfSlide{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}@keyframes hfTimer{from{width:0}to{width:100%}}@keyframes upA{from{transform:translateY(100%)}to{transform:none}}@keyframes upB{from{transform:translateY(100%)}to{transform:none}}.hf-ct{opacity:0}.hf-col:hover .hf-ct{opacity:1}.hf-tip{opacity:0;pointer-events:none;transition:opacity .12s}.hf-stop:hover .hf-tip{opacity:1}@keyframes hfIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+<style>body{margin:0}.hf-btn{border:0;margin:0;font:inherit;color:inherit;text-align:left;cursor:pointer;background:none;padding:0}.hf-card:hover{box-shadow:0 0 0 1px #D5DAD0,0 2px 8px rgba(17,21,17,.07)}.hf-row:hover{background:#F6F7F3}.hf-nav:hover{background:#EEF0EA}.hf-dk:hover{background:rgba(255,255,255,.07)}.hf-num{font-variant-numeric:tabular-nums}@keyframes hfSlide{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}@keyframes hfTimer{from{width:0}to{width:100%}}@keyframes upA{from{transform:translateY(100%)}to{transform:none}}@keyframes upB{from{transform:translateY(100%)}to{transform:none}}.hf-ct{opacity:0}.hf-col:hover .hf-ct{opacity:1}.hf-tip{opacity:0;pointer-events:none;transition:opacity .12s}.hf-stop:hover .hf-tip{opacity:1}@keyframes hfIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
 </helmet>
 <div style="width: 100%; height: 100%; box-sizing: border-box; overflow-y: auto; scrollbar-width: none; background: #F6F7F1; font-family: 'Geist', system-ui, sans-serif; color: #1B211C; -webkit-font-smoothing: antialiased">
   <sc-for list="{{panes}}" as="pn" hint-placeholder-count="1">
             <div style="padding: 12px 16px 12px">
 
               <!-- Decide: ticker band, title inside -->
-              <a href="#" onClick="{{decideGo}}" style="display: flex; flex-direction: column; box-sizing: border-box; height: 76px; padding: 10px 14px 9px; border-radius: 14px; background: #1E2A22; color: #FFFFFF; text-decoration: none">
-                <span style="display: flex; align-items: center; gap: 12px; flex: 1">
-                  <span style="display: flex; flex-direction: column; align-items: flex-start; flex: none; padding-right: 14px; border-right: 1px solid rgba(255,255,255,.14)"><span style="font-size: 12.5px; font-weight: 600; line-height: 16px; color: #DCE6DE">Decide</span><span style="display: flex; align-items: baseline; gap: 5px"><span class="hf-num" style="font-size: 24px; font-weight: 600; line-height: 28px">17</span><span style="font-size: 11.5px; color: #F2C77F; font-weight: 600">6 today</span></span></span>
-                  <span style="position: relative; flex: 1; min-width: 0; height: 40px; overflow: hidden">
+              <div style="display: flex; flex-direction: column; box-sizing: border-box; height: 80px; padding: 8px 10px 0; border-radius: 14px; background: #1E2A22; color: #FFFFFF">
+                <span style="display: flex; align-items: stretch; gap: 8px; flex: 1">
+                  <button type="button" class="hf-btn hf-dk" onClick="{{listGo}}" aria-label="Open For you: 17 decisions, 6 today" style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; flex: none; padding: 0 12px 0 4px; border-radius: 9px; color: #FFFFFF; border-right: 1px solid rgba(255,255,255,.14); border-top-right-radius: 0; border-bottom-right-radius: 0"><span style="font-size: 12.5px; font-weight: 600; line-height: 16px; color: #DCE6DE">Decide</span><span style="display: flex; align-items: baseline; gap: 5px"><span class="hf-num" style="font-size: 24px; font-weight: 600; line-height: 28px">17</span><span style="font-size: 11.5px; color: #F2C77F; font-weight: 600">6 today</span></span></button>
+                  <button type="button" class="hf-btn hf-dk" onClick="{{decideGo}}" aria-label="Open {{tk.title}}" style="position: relative; flex: 1; min-width: 0; height: 44px; align-self: center; overflow: hidden; border-radius: 9px; color: #FFFFFF; padding: 0 6px">
                     <span style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; animation: {{tkAnim}} .45s cubic-bezier(.2,.8,.2,1)">
                       <span style="display: flex; align-items: center; gap: 7px; font-size: 12px; color: #AFC2B5"><span style="width: 8px; height: 8px; border-radius: 50%; background: {{tk.dot}}"></span>{{tk.agent}}<span style="margin-left: auto; font-weight: 600; color: {{tk.dueDark}}">{{tk.when}}</span></span>
                       <span style="font-size: 14.5px; font-weight: 600; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{tk.title}}</span>
                     </span>
-                  </span>
+                  </button>
                 </span>
-                <span style="display: flex; gap: 2px; height: 3px; margin-top: 5px"><sc-for list="{{tsegs}}" as="s" hint-placeholder-count="17"><span style="flex: 1; border-radius: 2px; background: {{s.c}}"></span></sc-for></span>
-              </a>
+                <span role="tablist" aria-label="Decisions" style="display: flex; gap: 3px; height: 16px"><sc-for list="{{tsegs}}" as="s" hint-placeholder-count="7"><button type="button" role="tab" aria-selected="{{s.on}}" aria-label="{{s.label}}" onClick="{{s.pick}}" class="hf-btn" style="flex: 1; height: 16px; display: flex; align-items: center; padding: 0"><span style="display: block; width: 100%; height: {{s.h}}; border-radius: 2px; background: {{s.c}}"></span></button></sc-for></span>
+              </div>
               <!-- doors: Day plan leads -->
               <div style="display: grid; grid-template-columns: 1.35fr 1fr; gap: 8px; margin-top: 12px">
                 <button type="button" class="hf-btn hf-card" onClick="{{dayGo}}" style="display: flex; flex-direction: column; padding: 12px 14px 13px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2, 0 1px 2px rgba(17,21,17,.04)">
@@ -382,10 +382,10 @@ class Component extends DCLogic {
       'Treatment': ['treatment', 'list'], 'Vaccination': ['vax', 'proposal'], 'Sampling': ['sampling', 'list'], 'Biosecurity': ['disinfect', 'list'],
       'Feed': ['feed', 'programme'], 'People': ['people', 'list'], 'AI team': ['autos', 'list'], 'Farm layout': ['layout', 'view'], 'Farm settings': ['settings', 'record'],
       'Knowledge': ['kb'], 'Connections': ['systems', 'list', true], 'Automations': ['autos', 'list'] };
-    const goTile = (name) => { const t = tileTo[name]; return t ? openTab(t[0], t[1], t[2]) : () => {}; };
+    const goTile = (name) => { const t = tileTo[name]; return t ? openTab(t[0], t[1]) : () => {}; };
     const withGo = (gs) => (gs || []).map((g) => Object.assign({}, g, { items: (g.items || []).map((x) => Object.assign({}, x, { go: goTile(x.name) })) }));
     const dashTo = { production: ['batches', 'list'], health: ['treatment', 'list'], farm: ['feed', 'programme'] };
-    const n = 17, i = k % all.length, cur = all[i], decideGo = openTab(cur[6][0], cur[6][1], cur[6][2]);
+    const n = 17, i = k % all.length, cur = all[i], decideGo = openTab(cur[6][0], cur[6][1]);
     const slide = Object.assign({ who: cur[0], title: cur[1], why: cur[2], when: cur[3], ago: cur[5], dueBg: cur[4] ? '#FBE9D2' : '#EEF0EA', dueInk: cur[4] ? '#8A5A12' : '#3B4540' }, agent[cur[0]]);
     const go = (d) => () => { this.start(); this.setState({ k: Math.max(0, k + d) }); };
     const setTab = (pi, id) => () => { const t = tabs.slice(); t[pi] = id; this.setState({ tabs: t }); };
@@ -409,10 +409,11 @@ class Component extends DCLogic {
       prev: go(-1), next: go(1),
       tk: Object.assign({}, slide, { dot: { VT: '#5CC2B7', PR: '#E7B65C', BS: '#A99BEA', EQ: '#E9877B', GM: '#C9CEC6' }[slide.who], dueDark: slide.dueBg === '#FBE9D2' ? '#F2C77F' : '#AFC2B5' }),
       tkAnim: k % 2 ? 'upB' : 'upA',
-      tsegs: Array.from({ length: n }, (_, j) => ({ c: j < i ? 'rgba(255,255,255,.75)' : (j === i ? '#F2C77F' : 'rgba(255,255,255,.18)') })),
+      tsegs: all.map((x, j) => ({ c: j === i ? '#F2C77F' : 'rgba(255,255,255,.28)', h: j === i ? '4px' : '3px', on: j === i ? 'true' : 'false', label: x[1], pick: () => { this.start(); this.setState({ k: j }); } })),
+      listGo: openTab('decisions', 'list'),
       faces: team,
-      doorsSmall: [{ name: 'Task schedule', icon: P.cal, n: '41', go: openTab('sched', '', true) }, { name: 'Initiatives', icon: P.flag, n: '3', go: openTab('decisions', 'list') }],
-      decideGo, dayGo: openTab('sched', '', true),
+      doorsSmall: [{ name: 'Task schedule', icon: P.cal, n: '41', go: openTab('sched', '') }, { name: 'Initiatives', icon: P.flag, n: '3', go: openTab('decisions', 'list') }],
+      decideGo, dayGo: openTab('schedule', 'today'),
       doors: [{ name: 'Day plan', icon: P.day, n: '23', word: 'jobs' }, { name: 'Task schedule', icon: P.cal, n: '41', word: 'tasks' }, { name: 'Initiatives', icon: P.flag, n: '3', word: 'running' }],
       artifacts: [
         art('PR', 'Sows to cull, ranked by output', 'List', '7 Nov'), art('GM', 'Feed cost by house, October', 'Chart', '5 Nov'),
