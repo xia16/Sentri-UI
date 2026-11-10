@@ -7,49 +7,56 @@
       "title": "Phone round 4 (9 Nov): B scoped to this room and this task, a generic daily toast; My day with whole jobs only (mock-up,",
       "w": 3008,
       "x": -184,
-      "y": 6000
+      "y": 7520
     },
     "AgentNotesR5.dc.html": {
       "h": 1300,
       "title": "Phone round 5 (9 Nov): the agent's notes live in My day (a report before the task); feeding a plain line; walks as round",
       "w": 3008,
       "x": 0,
-      "y": 4460
+      "y": 5980
     },
     "MyDayPhone.dc.html": {
       "h": 1262,
       "title": "Phone: My day as a quest line from the agent; agent in the dock middle; scan floating (mock-up on live main screens)",
       "w": 3008,
       "x": 0,
-      "y": 14673
+      "y": 16193
     },
     "StopsHeadsUp.dc.html": {
       "h": 6043,
       "title": "Phone round 3 (9 Nov): the agent's own look (toast A/B/C), notes about the whole room or task, and where they live in th",
       "w": 3008,
       "x": 0,
-      "y": 8510
+      "y": 10030
     },
     "MyDayR6.dc.html": {
       "x": 0,
-      "y": 3040,
+      "y": 4560,
       "w": 3008,
       "h": 1300,
       "title": "Phone round 6 (9 Nov): My day in Home's look; A by main task or B by place, batched, no order; the agent only when there's something (mock-up)"
     },
     "MyDayR7.dc.html": {
       "x": 0,
-      "y": 1520,
+      "y": 3040,
       "w": 3008,
       "h": 1400,
       "title": "Phone round 7 (9 Nov): My day by room, sections as headings, no feeding; one pass per room; a room report (mock-up)"
     },
     "WhoWhereR8.dc.html": {
       "x": 0,
-      "y": 0,
+      "y": 1520,
       "w": 3008,
       "h": 1400,
       "title": "Phone round 8 (9 Nov): no My day page; Home shows who works where (A chooser, B whole-farm tiles, C your units as tabs); the agent band on the unit page (mock-up)"
+    },
+    "WorthKnowingR9.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 3008,
+      "h": 1400,
+      "title": "Phone round 9 (10 Nov): Worth knowing as the unit's summary: reminders, across your tasks, the room, from the manager (mock-up)"
     }
   },
   "createdOnFiles": {
@@ -67,7 +74,8 @@
     "phone-r5",
     "phone-r6",
     "phone-r7",
-    "phone-r8"
+    "phone-r8",
+    "phone-r9"
   ],
   "notes": {
     "phone-r3": {
@@ -75,21 +83,21 @@
       "text": "Phone round 3, for you to pick (9 Nov):\n- The agent's look for its toast: A ink, B its own light violet (my pick), C deep violet. Violet would be one new token, used only for the agent.\n- The note format: room and task lines run full width with no badge, then pen lines with their badge (frames 4, 5).\n- Where the notes live in the task: 6 a row under the summary (my pick), 7 a section in the list, 8 a labelled chip in the header.\nStill open from round 1:\n1. The agent's name on the phone: General Manager or Assistant? (I'd say General Manager everywhere, always with the sparkle.)\n2. Should a recorded task tick itself in My day? (I'd say no: My day is the plan.)\n3. Does the morning brief buzz the phone? (I'd say once, at the start of the shift.)",
       "w": 420,
       "x": -500,
-      "y": 8510
+      "y": 10030
     },
     "phone-r4": {
       "fill": "green",
       "text": "Phone round 4, for you to rule (9 Nov):\n- B is in. The toast reads \"Today's notes\"; the drawer splits This room (for anyone in Farrowing 3) from This task (its pigs, by pen). Only what the screens and fixed rules can't catch; no late-task lines.\n- My day: the agent orders the jobs you already have and never splits or creates one. A job's size follows the farm's setup (one crank feeds all 10 rooms = one row). A shared job is one job on both phones.\nTo rule: 1. Agent never splits or creates a job? 2. Routine jobs like feeding stay in My day as one row? (I'd keep them.) 3. Notes spot: 6 the row (my pick), 7 or 8?\nStill open: the agent's name, auto-tick, morning buzz.",
       "w": 420,
       "x": -500,
-      "y": 5880
+      "y": 7400
     },
     "phone-r5": {
       "fill": "green",
       "text": "Phone round 5, for you to rule (9 Nov):\n- The agent's notes live only in My day. A row with notes shows its first line in violet; tap it for the report (this room, then this task), then Open Farrowing. Task pages stay exactly as built: no toast, no row.\n- Feeding is a plain line with its time: no card, nothing to open.\n- Walks (pen walks, inspections) are a round: one card, a row per room in walking order, each opening that room's walk.\nTo rule: 1. A task opened from Home's list shows no notes: OK? (I'd accept.) 2. Walks as rounds with a row per room? 3. The agent orders and never splits or creates a job?\nStill open: the agent's name, auto-tick, morning buzz.",
       "w": 420,
       "x": -500,
-      "y": 4460
+      "y": 5980
     },
     "phone-title": {
       "kind": "title1",
@@ -103,22 +111,29 @@
       "fill": "green",
       "w": 420,
       "x": -500,
-      "y": 3040,
+      "y": 4560,
       "text": "Phone round 6, for you to rule (9 Nov):\n- Restyled in Home's own look: no rail, numbers or clock chips.\n- No order; work is batched. A: one card per main task with its subtasks under it (I'd pick A). B: one card per place with its tasks as rows.\n- The agent speaks only when there's something: a violet band at the foot of a card, which opens the report. A quiet day has none.\n- Feeding: one quiet line with its times.\nTo rule: 1. A or B? 2. Subtasks come from the task itself, never written by the agent? (I'd say yes.)\nStill open: the agent's name, the morning buzz."
     },
     "phone-r7": {
       "fill": "green",
       "w": 420,
       "x": -500,
-      "y": 1520,
+      "y": 3040,
       "text": "DECIDED 9 Nov, then superseded by round 8 (no My day page): My day is grouped by room. Section headings (Breeding, Gestation, Farrowing), one card per room, the tasks done there as rows; no feeding, no order numbers. The agent's violet band at a room's foot only when it has something; it opens the room's report.\nStill to rule: 1. A farm walking direction (clean to dirty) for the list order? 2. Do your farms do heat check, breeding and inspection in one pass? 3. The agent's name on the phone. 4. Does the morning brief buzz?"
     },
     "phone-r8": {
       "fill": "green",
       "w": 420,
       "x": -500,
+      "y": 1520,
+      "text": "DECIDED 10 Nov: A. Who works where shows in the Choose a unit sheet (the section switcher is on top): each unit with today's people as initials at the right, You dark, No one quiet grey. No My day page.\nStill open: everyone sees everyone's units? Walking direction, agent name, morning buzz."
+    },
+    "phone-r9": {
+      "fill": "green",
+      "w": 420,
+      "x": -500,
       "y": 0,
-      "text": "Phone round 8, for you to rule (9 Nov):\n- No My day page: work is given out by unit and each unit's page already shows everything to do there.\n- Who works where, three ways: A in the Choose a unit sheet (initials at the right, You dark); B the whole farm as tiles per section from the section name (my pick); C your units as tabs in Home's header.\n- The agent's violet band sits on the unit page only when it has something.\n- \"No one\" is quiet grey: not every unit is visited daily.\nTo rule: 1. A, B or C (or B+C)? 2. Everyone sees everyone's units? 3. Walking direction, agent name, morning buzz."
+      "text": "Phone round 9, for you to rule (10 Nov):\n- Worth knowing becomes the unit's summary: the violet band on the unit page (first item as its line) opens a page with up to four kinds, in this order: Reminders (vet at 10:00, a withdrawal ending, a booster due), Across your tasks (one sow in two tasks), The room (ran hot, ate less), From the manager (a console note, with name).\n- Not in it: task counts, late tasks, pen notes; they're said where they live.\n- Empty kinds have no heading; nothing at all means no band.\nTo rule: 1. These four kinds, this order? 2. Managers leave unit notes from the console? 3. Agent name (a real manager's notes here argue for Assistant), walking direction, morning buzz."
     }
   },
   "order": [
@@ -128,7 +143,8 @@
     "AgentNotesR5.dc.html",
     "MyDayR6.dc.html",
     "MyDayR7.dc.html",
-    "WhoWhereR8.dc.html"
+    "WhoWhereR8.dc.html",
+    "WorthKnowingR9.dc.html"
   ],
   "pages": [],
   "title": "Sentri phone: My day and the agent"

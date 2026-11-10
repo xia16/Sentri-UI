@@ -9,6 +9,7 @@ Written 9 Nov 2026 for a new session. The phone work moves out of the AI-first c
 - **Feeding is not a task** (nothing to record) and is **off My day** (rounds 5, 7).
 - My day has **no prescribed order**; work is batched (round 6).
 - **My day is grouped by room:** section headings, one card per room, the tasks done there as rows; the agent's violet band at a room's foot only when needed, opening that room's report (round 7, decided), then **superseded: no My day page** (round 8). Work is given out by unit and each unit's Home page already lists it; round 8 shows who works where (A chooser, B whole-farm tiles, C your units as tabs) and puts the agent's band on the unit page.
+- **Who works where: A** (10 Nov): today's people as initials in the Choose a unit sheet (the section switcher is on top). Round 9 proposes Worth knowing as the unit's summary: Reminders, Across your tasks, The room, From the manager. The console session was told the Work schedule should assign people to units, not tasks.
 - Still open: a farm walking direction for the list order; whether heat check, breeding and inspection are one pass on the owner's farms; the agent's name on the phone; whether the morning brief buzzes.
 
 ## Where things are

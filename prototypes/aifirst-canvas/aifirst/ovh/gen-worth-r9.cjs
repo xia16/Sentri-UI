@@ -1,0 +1,638 @@
+// Round 9 (10 Nov): Worth knowing as the unit summary (band on the unit page, full and light day). Helpers from rounds 3-8; writes pub/project/WorthKnowingR9.dc.html.
+// Phone: My day as a quest line from the agent; agent in the dock's middle; scan floats (hides while scrolling). Built on live main screens.
+const fs = require('fs'), path = require('path');
+const S = __dirname;
+const b64 = (f) => 'data:image/png;base64,' + fs.readFileSync(path.join(S, f)).toString('base64');
+const HOME = b64('home/workbench.today/en-390.png'), TREAT = b64('home/treat.record/en-390.png');
+const PH = { bg: '#f6f7f1', line: '#dfe4d8', ink: '#20291f', muted: '#657060', green: '#276640', soft: '#eef1e7', dark: '#20291f' };
+const JK = "'Plus Jakarta Sans', Arial, sans-serif";
+const svg = (d, w, sw, c) => '<svg viewBox="0 0 24 24" style="width: ' + w + 'px; height: ' + w + 'px; flex: none; fill: none; stroke: ' + (c || 'currentColor') + '; stroke-width: ' + sw + '; stroke-linecap: round; stroke-linejoin: round;"><path d="' + d + '"/></svg>';
+const IC = { spark: 'M12 3c.6 4.4 2.6 6.4 7 7-4.4.6-6.4 2.6-7 7-.6-4.4-2.6-6.4-7-7 4.4-.6 6.4-2.6 7-7Z', scan: 'M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16', chev: 'm9 6 6 6-6 6', back: 'm15 6-6 6 6 6', clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 7v5l3 2', send: 'M12 19V5M6 11l6-6 6 6', home: 'M3 10.5 12 3l9 7.5V21H3V10.5Z', tool: 'M4 8h16v11H4zM9 8V5h6v3M4 13h16', flag: 'M5 21V4M5 4h11l-2 4 2 4H5' };
+const slice = (src, y0, y1, dy) => '<div style="position: absolute; left: 0; top: ' + (y0 + dy) + 'px; width: 390px; height: ' + (y1 - y0) + 'px; background: url(' + src + ') 0 ' + (-y0) + 'px / 390px 844px no-repeat;"></div>';
+const phone = (inner) => '<div style="width: 414px; height: 868px; border-radius: 62px; background: #111; padding: 12px; box-sizing: border-box; box-shadow: 0 20px 50px rgba(17,21,17,.25); flex: none;"><div style="position: relative; width: 390px; height: 844px; border-radius: 50px; overflow: hidden; background: ' + PH.bg + '; font-family: ' + JK + '; color: ' + PH.ink + ';">' + inner + '</div></div>';
+const status = '<div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px 0 24px; font-size: 13px; font-weight: 700;"><span>9:41</span><span style="font-size: 11px;">&#9679;&#9679;&#9679; &#9646;</span></div>';
+const card = (h, m) => '<div style="margin: ' + (m || '0 18px 12px') + '; background: #fff; border: 1px solid ' + PH.line + '; border-radius: 16px; overflow: hidden;">' + h + '</div>';
+const tile = (w, dark) => '<span style="width: ' + w + 'px; height: ' + w + 'px; flex: none; border-radius: ' + Math.round(w * 0.3) + 'px; background: ' + (dark ? PH.dark : PH.soft) + '; color: ' + (dark ? '#fff' : PH.ink) + '; display: grid; place-items: center;">' + svg(IC.spark, Math.round(w * 0.5), 1.7) + '</span>';
+const clockChip = (t) => '<span style="display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 7px; border-radius: 7px; background: ' + PH.soft + '; font-size: 13px; font-weight: 700;">' + svg(IC.clock, 13, 2.2) + t + '</span>';
+
+// the day (Sun Qing, Thu 5 Nov), the same jobs as the console's Work schedule
+const DAY = [['Feeding', 'Farrowing 3 and 4', '~1½ h'], ['Pen-strep, morning', 'Farrowing 2', null, '07:00'], ['Second feed', 'Farrowing 3 and 4', null, '13:30'], ['Pen-strep, evening', 'Farrowing 2', null, '15:00']];
+
+// dock: Home · agent (middle) · Toolbox, drawn over the live dock
+const dock = (on) => '<div style="position: absolute; left: 0; right: 0; top: 760px; bottom: 0; background: #fff; border-top: 1px solid ' + PH.line + ';">' +
+  '<div style="position: absolute; left: 52px; top: 16px; width: 60px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: ' + (on === 'home' ? PH.ink : PH.muted) + ';">' + svg(IC.home, 20, 1.8) + 'Home</div>' +
+  '<div style="position: absolute; left: 278px; top: 16px; width: 60px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13px; font-weight: 500; color: ' + PH.muted + ';">' + svg(IC.tool, 20, 1.8) + 'Toolbox</div>' +
+  '<div style="position: absolute; left: 143px; bottom: 7px; width: 104px; height: 4px; border-radius: 2px; background: #c7cebe;"></div></div>' +
+  '<div style="position: absolute; left: 161px; top: 746px; width: 68px; height: 68px; border-radius: 22px; background: ' + PH.bg + ';"></div>' +
+  '<div style="position: absolute; left: 166px; top: 751px; width: 58px; height: 58px; border-radius: 18px; background: ' + PH.dark + '; color: #fff; display: grid; place-items: center;' + (on === 'agent' ? ' box-shadow: 0 0 0 3px #c8f26b;' : '') + '">' + svg(IC.spark, 26, 1.7) + '</div>';
+const scanFab = (o) => { o = o || {}; return '<div style="position: absolute; left: ' + (316 + (o.dx || 0)) + 'px; top: 688px; width: 56px; height: 56px; border-radius: 99px; background: #fff; border: 1px solid ' + PH.line + '; box-shadow: 0 8px 20px rgba(32,41,31,.18); display: grid; place-items: center; color: ' + PH.ink + '; opacity: ' + (o.op === undefined ? 1 : o.op) + ';">' + svg(IC.scan, 24, 2) + '</div>'; };
+
+// A · Home, still: Your day on top, agent in the dock, scan floating
+const yourDay = '<div style="position: absolute; left: 0; right: 0; top: 168px;">' + card('<div style="display: flex; align-items: center; gap: 12px; padding: 14px 8px 12px 14px;">' + tile(36) +
+  '<div style="flex: 1; min-width: 0;"><div style="display: flex; align-items: baseline; gap: 8px;"><span style="font-size: 17px; font-weight: 700;">Your day</span><span style="font-size: 13px; color: ' + PH.muted + ';">4 jobs &middot; about 5&frac12; h</span></div>' +
+  '<div style="font-size: 14px; margin-top: 3px;"><span style="color: ' + PH.muted + ';">First:</span> <b style="font-weight: 600;">Feeding</b> <span style="color: ' + PH.muted + ';">&middot; Farrowing 3 and 4</span></div></div>' +
+  '<span style="width: 44px; height: 44px; display: grid; place-items: center; color: ' + PH.muted + ';">' + svg(IC.chev, 20, 2) + '</span></div>', '0 18px') + '</div>';
+const homeA = '<div style="position: absolute; left: 0; top: 0; width: 390px; height: 760px; overflow: hidden;">' + slice(HOME, 0, 158, 0) +
+  '<div style="position: absolute; left: 202px; top: 36px; width: 120px; height: 56px; background: ' + PH.bg + ';"></div>' + yourDay + slice(HOME, 158, 760, 84) + '</div>' + dock('home') + scanFab();
+
+// C · the agent, from the dock's middle: the morning message carries the day
+const step = (n, t, p, dur, at, o) => { o = o || {}; return '<div style="display: flex; align-items: stretch; gap: 12px; min-height: 58px;">' +
+  '<div style="width: 26px; flex: none; display: flex; flex-direction: column; align-items: center;"><span style="width: 26px; height: 26px; border-radius: 99px; display: grid; place-items: center; font-size: 13px; font-weight: 700; margin-top: 6px; ' + (n === 1 ? 'background: ' + PH.green + '; color: #fff;' : 'background: #fff; box-shadow: inset 0 0 0 1.5px #a3aa9f; color: ' + PH.ink + ';') + '">' + n + '</span>' + (o.last ? '' : '<span style="flex: 1; width: 2px; background: #d5dccb; margin: 3px 0 -3px;"></span>') + '</div>' +
+  '<div style="flex: 1; min-width: 0; padding: 6px 0 10px;"><div style="font-size: 15px; font-weight: 700;">' + t + '</div><div style="display: flex; align-items: center; gap: 8px; margin-top: 3px; font-size: 13px; color: ' + PH.muted + ';">' + (at ? clockChip(at) : '<span>' + dur + '</span><span>&middot;</span>') + '<span>' + p + '</span></div></div>' +
+  '<span style="width: 36px; display: grid; place-items: center; color: #a3aa9f;">' + svg(IC.chev, 18, 2) + '</span></div>'; };
+const agentHead = status + '<div style="display: flex; align-items: center; gap: 12px; padding: 8px 18px 14px;">' + tile(44, true) + '<div style="flex: 1;"><div style="font-size: 22px; font-weight: 700; letter-spacing: -.01em;">General Manager</div><div style="font-size: 14px; color: ' + PH.muted + '; margin-top: 2px;">Farrowing</div></div></div><div style="height: 1px; background: ' + PH.line + ';"></div>';
+const msg = (time, t) => '<div style="display: flex; align-items: center; gap: 8px; margin: 16px 18px 8px; font-size: 13px; color: ' + PH.muted + ';"><b style="color: ' + PH.ink + '; font-weight: 700;">General Manager</b>&middot; ' + time + '</div><div style="margin: 0 18px; font-size: 16px; line-height: 23px;">' + t + '</div>';
+const questCompact = card('<div style="padding: 8px 4px 2px 14px;">' + DAY.map((d, i) => step(i + 1, d[0], d[1], d[2], d[3], { last: i === DAY.length - 1 })).join('') + '</div>' +
+  '<div style="border-top: 1px solid ' + PH.line + '; height: 52px; display: grid; place-items: center; font-size: 15px; font-weight: 700; color: ' + PH.green + ';">Open My day</div>', '12px 18px 0');
+const finding = '<div style="margin: 14px 18px 0; display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; background: #fff; border: 1px solid ' + PH.line + ';"><div style="flex: 1;"><div style="font-size: 13px; color: ' + PH.muted + ';">From last night</div><div style="font-size: 15px; font-weight: 700; margin-top: 2px;">Where did the 4 pigs from Unit 7 go?</div></div><span style="height: 44px; display: grid; place-items: center; color: ' + PH.muted + ';">' + svg(IC.chev, 18, 2) + '</span></div>';
+const composer = '<div style="position: absolute; left: 0; right: 0; top: 684px; height: 76px; display: flex; align-items: center; gap: 10px; padding: 0 18px; background: ' + PH.bg + ';"><div style="flex: 1; height: 52px; border-radius: 14px; background: #fff; border: 1px solid #b6c0ad; display: flex; align-items: center; padding: 0 14px; font-size: 15px; color: ' + PH.muted + ';">Ask about your work</div><span style="width: 52px; height: 52px; border-radius: 14px; background: ' + PH.dark + '; color: #fff; display: grid; place-items: center;">' + svg(IC.send, 20, 2.2) + '</span></div>';
+const agentC = agentHead + msg('05:30', 'Morning, Sun Qing. Your day, in the order I&rsquo;d go:') + questCompact + finding + composer + dock('agent');
+
+// D · My day: the quest line, each step opens its task
+const bigStep = (n, t, p, dur, at, o) => { o = o || {}; const first = n === 1;
+  return '<div style="display: flex; align-items: stretch; gap: 12px;">' +
+    '<div style="width: 34px; flex: none; display: flex; flex-direction: column; align-items: center;"><span style="width: 34px; height: 34px; border-radius: 99px; display: grid; place-items: center; font-size: 15px; font-weight: 700; margin-top: 18px; ' + (first ? 'background: ' + PH.green + '; color: #fff; box-shadow: 0 0 0 5px #dcebdd;' : 'background: #fff; box-shadow: inset 0 0 0 2px #a3aa9f;') + '">' + n + '</span><span style="flex: 1; width: 2px; background: #cdd5c3; margin-top: 4px;"></span></div>' +
+    '<div style="flex: 1; min-width: 0; margin-bottom: 12px; background: #fff; border: 1px solid ' + (o.pressed ? PH.ink : PH.line) + '; border-radius: 16px; padding: 14px 6px 14px 16px; display: flex; align-items: center; gap: 6px;' + (o.pressed ? ' background: #f1f3ec; box-shadow: 0 0 0 1px ' + PH.ink + ';' : '') + '">' +
+    '<div style="flex: 1; min-width: 0;">' + (first ? '<div style="font-size: 13px; font-weight: 700; color: ' + PH.green + '; margin-bottom: 3px;">Start here</div>' : '') + '<div style="font-size: 17px; font-weight: 700;">' + t + '</div><div style="font-size: 14px; color: ' + PH.muted + '; margin-top: 3px;">' + p + '</div>' +
+    '<div style="margin-top: 8px;">' + (at ? clockChip(at) : '<span style="font-size: 13px; color: ' + PH.muted + ';">' + dur + '</span>') + '</div></div>' +
+    '<span style="width: 44px; height: 44px; display: grid; place-items: center; color: ' + PH.muted + ';">' + svg(IC.chev, 20, 2) + '</span></div></div>'; };
+const mydayHead = status + '<div style="padding: 4px 18px 6px;"><div style="display: inline-flex; align-items: center; gap: 2px; height: 44px; padding: 0 14px 0 8px; border-radius: 12px; border: 1px solid #b6c0ad; background: #fff; font-size: 15px; font-weight: 600;">' + svg(IC.back, 18, 2) + 'Home</div>' +
+  '<h1 style="margin: 14px 0 0; font-size: 26px; font-weight: 700; letter-spacing: -.02em;">My day</h1><div style="display: flex; align-items: center; gap: 6px; font-size: 14px; color: ' + PH.muted + '; margin-top: 4px;">Thu 5 Nov &middot; about 5&frac12; h &middot; ' + svg(IC.spark, 14, 1.8) + 'from the General Manager</div></div>';
+const endFlag = '<div style="display: flex; align-items: center; gap: 12px; margin-top: -6px;"><div style="width: 34px; display: grid; place-items: center; color: #a3aa9f;">' + svg(IC.flag, 20, 2) + '</div><span style="font-size: 14px; color: ' + PH.muted + ';">That&rsquo;s your day. Hold a step to change the order.</span></div>';
+const myday = (pressed) => mydayHead + '<div style="padding: 14px 18px 0 14px;">' + DAY.map((d, i) => bigStep(i + 1, d[0], d[1], d[2], d[3], { pressed: pressed === i })).join('') + endFlag + '</div>';
+
+// ===== phone: My day as stops; the agent's heads-up as prose on entering a task =====
+const FARROW = b64('home/farrowing.room/en-390.png'), WALK = b64('home/inspection.walk/en-390.png');
+Object.assign(IC, { feed: 'M5 9h14l-1.5 10h-11L5 9ZM8.5 9V7a3.5 3.5 0 0 1 7 0v2', walk: 'M6 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm12-12a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM8 18h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7', dose: 'm18 3 3 3M16.5 4.5l3 3M15 6l3 3-8.5 8.5-3-3L15 6ZM6.5 14.5l3 3M7 17l-4 4M10 9.5l1.5 1.5M12.5 7l1.5 1.5',
+  foster: 'M7 7h11l-3-3M17 17H6l3 3', birth: 'M4 16a8 8 0 0 1 16 0M12 4v3M5.5 7.5l2 2M18.5 7.5l-2 2M3 20h18', x: 'M7 7l10 10M17 7 7 17' });
+const STOPS_P = [
+  { place: 'Farrowing 3 and 4', time: '~2½ h', rows: [['feed', 'Feeding'], ['birth', 'Farrowing']] },
+  { place: 'Farrowing 2', at: '09:00', rows: [['foster', 'Fostering checks'], ['walk', 'Walk-through', 'Give the morning Pen-strep to the litter in B3 as you go.']] },
+  { place: 'Farrowing 3 and 4', at: '13:30', rows: [['feed', 'Second feed']] },
+  { place: 'Farrowing 2', at: '15:00', rows: [['dose', 'Pen-strep, evening']] }
+];
+const taskRow = (r, first) => '<div style="border-top: ' + (first ? '0' : '1px solid #e8eddf') + ';"><div style="display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 6px 0 14px;"><span style="width: 30px; height: 30px; flex: none; border-radius: 9px; background: ' + PH.soft + '; display: grid; place-items: center; color: ' + PH.ink + ';">' + svg(IC[r[0]], 17, 1.8) + '</span><span style="flex: 1; font-size: 16px; font-weight: 600;">' + r[1] + '</span><span style="width: 44px; height: 44px; display: grid; place-items: center; color: ' + PH.muted + ';">' + svg(IC.chev, 18, 2) + '</span></div>' +
+  (r[2] ? '<div style="margin: -6px 14px 12px 56px; font-size: 14px; line-height: 20px; color: ' + PH.muted + ';">' + r[2] + '</div>' : '') + '</div>';
+const stopBlock = (s, n, last) => '<div style="display: flex; align-items: stretch; gap: 10px;">' +
+  '<div style="width: 30px; flex: none; display: flex; flex-direction: column; align-items: center;"><span style="width: 30px; height: 30px; border-radius: 99px; display: grid; place-items: center; font-size: 14px; font-weight: 700; margin-top: 2px; ' + (n === 1 ? 'background: ' + PH.green + '; color: #fff; box-shadow: 0 0 0 5px #dcebdd;' : 'background: #fff; box-shadow: inset 0 0 0 2px #a3aa9f;') + '">' + n + '</span>' + (last ? '' : '<span style="flex: 1; width: 2px; background: #cdd5c3; margin-top: 4px;"></span>') + '</div>' +
+  '<div style="flex: 1; min-width: 0; margin-bottom: 14px;"><div style="display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 2px 6px;"><span style="flex: 1; font-size: 18px; font-weight: 700;">' + s.place + '</span>' + (s.at ? clockChip(s.at) : '<span style="font-size: 14px; color: ' + PH.muted + ';">' + s.time + '</span>') + '</div>' +
+  '<div style="background: #fff; border: 1px solid ' + PH.line + '; border-radius: 16px; overflow: hidden;">' + s.rows.map((r, i) => taskRow(r, i === 0)).join('') + '</div></div></div>';
+const mydayStops = mydayHead.replace(/about 5&frac12; h &middot; .*?from the General Manager/, '4 stops &middot; about 5&frac12; h') + '<div style="padding: 14px 18px 0 14px;">' + STOPS_P.map((s, i) => stopBlock(s, i + 1, i === STOPS_P.length - 1)).join('') + '</div>';
+
+// agent's morning message, as stops
+const stopLine = (s, n, last) => '<div style="display: flex; align-items: stretch; gap: 12px; min-height: 56px;"><div style="width: 26px; flex: none; display: flex; flex-direction: column; align-items: center;"><span style="width: 26px; height: 26px; border-radius: 99px; display: grid; place-items: center; font-size: 13px; font-weight: 700; margin-top: 6px; ' + (n === 1 ? 'background: ' + PH.green + '; color: #fff;' : 'background: #fff; box-shadow: inset 0 0 0 1.5px #a3aa9f;') + '">' + n + '</span>' + (last ? '' : '<span style="flex: 1; width: 2px; background: #d5dccb; margin: 3px 0 -3px;"></span>') + '</div>' +
+  '<div style="flex: 1; min-width: 0; padding: 6px 0 10px;"><div style="display: flex; align-items: center; gap: 8px;"><span style="flex: 1; font-size: 15px; font-weight: 700;">' + s.place + '</span>' + (s.at ? clockChip(s.at) : '<span style="font-size: 13px; color: ' + PH.muted + ';">' + s.time + '</span>') + '</div><div style="font-size: 14px; color: ' + PH.muted + '; margin-top: 3px;">' + s.rows.map((r, i) => i && !/^Pen/.test(r[1]) ? r[1][0].toLowerCase() + r[1].slice(1) : r[1]).join(', then ') + '</div></div></div>';
+const morning = agentHead + msg('05:30', 'Morning, Sun Qing. Four stops today:') + card('<div style="padding: 8px 14px 2px;">' + STOPS_P.map((s, i) => stopLine(s, i + 1, i === STOPS_P.length - 1)).join('') + '</div><div style="border-top: 1px solid ' + PH.line + '; height: 52px; display: grid; place-items: center; font-size: 15px; font-weight: 700; color: ' + PH.green + ';">Open My day</div>', '12px 18px 0') + composer + dock('agent');
+
+// heads-up: prose sheet on entering a task; afterwards a sparkle button in the header reopens it
+const fixLabel = (src, x, y, w, h, html, bg) => '<div style="position: absolute; left: ' + x + 'px; top: ' + y + 'px; width: ' + w + 'px; height: ' + h + 'px; background: ' + (bg || '#fff') + '; display: flex; align-items: center; font-family: ' + JK + ';">' + html + '</div>';
+const farrowBase = slice(FARROW, 0, 844, 0) + fixLabel(FARROW, 52, 132, 110, 20, '<span style="font-size: 13px; color: ' + PH.muted + ';">Farrowing 3</span>');
+const walkBase = slice(WALK, 0, 844, 0) + fixLabel(WALK, 76, 76, 196, 20, '<span style="font-size: 13px; color: ' + PH.muted + ';">Gestation 2 &middot; <b style="color: ' + PH.ink + '; font-weight: 600;">06:40</b> &middot; G.H</span>', PH.bg);
+const headBtn = (x, dot) => '<div style="position: absolute; left: ' + x + 'px; top: 47px; width: 46px; height: 46px; border-radius: 13px; background: #fff; border: 1px solid ' + PH.line + '; display: grid; place-items: center; color: ' + PH.ink + ';">' + svg(IC.spark, 20, 1.8) + (dot ? '<span style="position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; border-radius: 99px; background: ' + PH.green + ';"></span>' : '') + '</div>';
+const para = (t) => '<p style="margin: 0 0 14px; font-size: 16px; line-height: 24px;">' + t + '</p>';
+const sheet = (top, title, paras) => '<div style="position: absolute; inset: 0; background: rgba(20,24,19,.40);"></div><div style="position: absolute; left: 0; right: 0; top: ' + top + 'px; bottom: 0; background: ' + PH.bg + '; border-radius: 24px 24px 0 0;">' +
+  '<div style="width: 40px; height: 4px; border-radius: 2px; background: #c7cebe; margin: 10px auto 0;"></div>' +
+  '<div style="display: flex; align-items: center; gap: 10px; padding: 12px 10px 12px 18px;">' + tile(32, true) + '<div style="flex: 1;"><div style="font-size: 17px; font-weight: 700;">' + title + '</div><div style="font-size: 13px; color: ' + PH.muted + '; margin-top: 1px;">General Manager &middot; 05:30</div></div><span style="width: 44px; height: 44px; display: grid; place-items: center;">' + svg(IC.x, 22, 2.2, PH.ink) + '</span></div>' +
+  card('<div style="padding: 16px 16px 4px;">' + paras.map(para).join('') + '</div>', '0 16px') +
+  '<div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 30px; background: #fff; border-top: 1px solid ' + PH.line + ';">' + '<div style="height: 56px; border-radius: 14px; background: ' + PH.green + '; color: #fff; display: grid; place-items: center; font-size: 16px; font-weight: 700;">Got it</div></div></div>';
+const farrowSheet = farrowBase + headBtn(326, true) + sheet(330, 'Before you start', [
+  '000392 in B2 is due tomorrow and has been off her feed since last night. Look at her first.',
+  '000418 in B1 lost 5 yesterday. Check the heat lamp in B1 is on before you count again.']);
+const farrowAfter = farrowBase + headBtn(326, false);
+// the walk header already has History at the right; the agent's button sits left of it
+const walkSheetFull = walkBase + headBtn(274, true) + sheet(330, 'While you walk', [
+  'Score body condition on 000267 and 000281 in C1, and on 000306 and 000312 in C2. It&rsquo;s the usual record on each pig, about 3 minutes.',
+  '000306 had a fever yesterday. Take her temperature again when you&rsquo;re at C2.']);
+
+const consoleFrag = fs.readFileSync(path.join(S, 'stops-console.frag.html'), 'utf8');
+const pf = (title, cap, ph) => '<figure style="margin: 0; width: 414px; flex: none;"><figcaption style="font-size: 17px; font-weight: 600; margin-bottom: 6px;">' + title + '</figcaption><div style="font-size: 14.5px; line-height: 22px; color: #3B4540; margin-bottom: 14px; min-height: 132px;">' + cap + '</div>' + phone(ph) + '</figure>';
+const ruleCard = '<div style="background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px #E6E9E2; padding: 22px 26px 12px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">The rule: a card is a stop</div><ul style="margin: 0; padding-left: 20px; font-size: 14.5px; line-height: 22px; color: #3B4540;">' + [
+  '<b>A stop is a place:</b> a room or rooms walked together. A new stop only when you move somewhere else, or come back later (a dose at 15:00).',
+  '<b>Inside a stop, its tasks in order,</b> one row each with a plain icon. A row opens that task&rsquo;s own page; nothing of the task is redrawn here.',
+  '<b>&ldquo;As you go&rdquo; is a sentence,</b> not a row: work done inside another task&rsquo;s page (the Pen-strep during the walk).',
+  '<b>Everything else is prose inside the task:</b> what to watch, what to measure, what to do while there. No new controls in the task pages.'].map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ul></div>';
+const headsCard = '<div style="background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px #E6E9E2; padding: 22px 26px 12px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">The heads-up: prose, out of the way</div><ul style="margin: 0; padding-left: 20px; font-size: 14.5px; line-height: 22px; color: #3B4540;">' + [
+  'Opening a task with something to say shows it once as a sheet: a few sentences, then Got it. Nothing on the page itself moves or changes.',
+  'After that, one button in the header (the agent&rsquo;s mark) reopens it; a dot until it&rsquo;s been read. A task with nothing to say has no button.',
+  'Pigs and pens are named in the sentences; no tags in the list. This replaces the earlier comment card and &ldquo;Body condition&rdquo; tags in the walk.',
+  'Short by rule: at most three sentences, only what changes what you do today.'].map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ul></div>';
+const html = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Stops and heads-up</title>\n<script src="./support.js"></script>\n</head>\n<body>\n<x-dc>\n<helmet>\n<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Inter:wght@400..700&family=Plus+Jakarta+Sans:wght@400..800&display=swap" rel="stylesheet">\n<style>body{margin:0}</style>\n</helmet>\n' +
+  '<div style="width: 3008px; padding: 44px 48px 60px; box-sizing: border-box; background: #F3F4F1; font-family: Geist, system-ui, sans-serif; color: #111511; -webkit-font-smoothing: antialiased;">' +
+  '<h1 style="margin: 0; font-size: 30px; line-height: 38px; font-weight: 600; letter-spacing: -.025em;">The day as stops, and the agent&rsquo;s heads-up as prose inside each task (mock-up)</h1><p style="margin: 8px 0 34px; font-size: 16px; line-height: 24px; color: #5D665F; max-width: 2300px;">The plan points you to where to work and in what order; each task page stays as it is and carries what the agent has to say as a few sentences. Built on the live phone screens from main.</p>' +
+  '<div style="display: flex; gap: 36px; align-items: flex-start;">' +
+  pf('1 · My day: stops', 'Four stops, each a place with its time. Inside, the tasks in order, each with a plain icon; a row opens that task. The Pen-strep rides in the walk as one sentence.', mydayStops) +
+  pf('2 · The morning message', 'The agent sends the same stops: place, time, and the tasks as words. Open My day for the rows.', morning) +
+  '<figure style="margin: 0; width: 950px; flex: none;"><figcaption style="font-size: 17px; font-weight: 600; margin-bottom: 6px;">3 · Console: the Work schedule as stops</figcaption><div style="font-size: 14.5px; line-height: 22px; color: #3B4540; margin-bottom: 14px; min-height: 132px;">Same rule for every row: a card per place. Wang Fang and Zhao Min work in one building all day, so one card each; Ma Lin goes back to Gestation for the 13:30 feed, so two.</div>' + consoleFrag + '</figure>' +
+  '<div style="flex: 1; display: flex; flex-direction: column; gap: 20px; padding-top: 168px;">' + ruleCard + '</div></div>' +
+  '<div style="height: 56px;"></div><div style="display: flex; gap: 36px; align-items: flex-start;">' +
+  pf('4 · Opening a task: the heads-up', 'Sun Qing opens Farrowing 3. The agent&rsquo;s note shows once, in plain sentences, over the page; Got it and the list is untouched.', farrowSheet) +
+  pf('5 · After: one button, nothing else', 'The page is exactly the live page, plus the agent&rsquo;s mark in the header to read the note again.', farrowAfter) +
+  pf('6 · A walk: what to do while there', 'Zhao Min&rsquo;s walk in Gestation 2. The data ask and the temperature are sentences naming the pigs; the list has no tags. Recording is the usual record on each pig.', walkSheetFull) +
+  '<div style="flex: 1; display: flex; flex-direction: column; gap: 20px; padding-top: 168px;">' + headsCard + '</div></div></div>\n</x-dc>\n<script type="text/x-dc" data-dc-script data-props=\'{"$preview":{"width":3008,"height":2300}}\'>\nclass Component extends DCLogic {\n  renderVals() { return {}; }\n}\n</script>\n</body>\n</html>\n';
+// ===== round 2: rounds and coming back; a rich morning brief; the heads-up as a notification, not a forced pop-up =====
+const MONO = "ui-monospace, 'SF Mono', Menlo, monospace";
+// B · an interrupted day: a task, a feeding round across five rooms, then back to the task
+const routeLine = (rooms) => '<div style="display: flex; gap: 6px; overflow: hidden; padding: 2px 0 12px 56px; white-space: nowrap; -webkit-mask-image: linear-gradient(90deg, #000 78%, transparent); mask-image: linear-gradient(90deg, #000 78%, transparent);">' + rooms.map((r, i) => '<span style="flex: none; display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 9px 0 4px; border-radius: 8px; background: ' + PH.soft + '; font-size: 13px; font-weight: 600;"><b style="width: 20px; height: 20px; border-radius: 6px; background: #fff; display: grid; place-items: center; font-size: 11px;">' + (i + 1) + '</b>' + r + '</span>').join('') + '</div>';
+const STOPS_B = [
+  { place: 'Farrowing 3', at: '06:00', rows: [['birth', 'Farrowing']] },
+  { place: 'Feeding round', sub: '5 rooms, in walking order', at: '07:00', rows: [['feed', 'Feeding']], route: ['Farrowing 1', 'Farrowing 2', 'Farrowing 3', 'Farrowing 4', 'Nursery 1'] },
+  { place: 'Back to Farrowing 3', time: '~2 h', rows: [['birth', 'Farrowing, carry on']] },
+  { place: 'Farrowing 2', at: '15:00', rows: [['dose', 'Pen-strep, evening']] }
+];
+const stopBlockB = (s, n, last) => '<div style="display: flex; align-items: stretch; gap: 10px;">' +
+  '<div style="width: 30px; flex: none; display: flex; flex-direction: column; align-items: center;"><span style="width: 30px; height: 30px; border-radius: 99px; display: grid; place-items: center; font-size: 14px; font-weight: 700; margin-top: 2px; ' + (n === 1 ? 'background: ' + PH.green + '; color: #fff; box-shadow: 0 0 0 5px #dcebdd;' : 'background: #fff; box-shadow: inset 0 0 0 2px #a3aa9f;') + '">' + n + '</span>' + (last ? '' : '<span style="flex: 1; width: 2px; background: #cdd5c3; margin-top: 4px;"></span>') + '</div>' +
+  '<div style="flex: 1; min-width: 0; margin-bottom: 14px;"><div style="display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 2px 6px;"><span style="flex: 1; min-width: 0;"><span style="display: block; font-size: 18px; font-weight: 700;">' + s.place + '</span>' + (s.sub ? '<span style="display: block; font-size: 13px; color: ' + PH.muted + '; margin-top: 1px;">' + s.sub + '</span>' : '') + '</span>' + (s.at ? clockChip(s.at) : '<span style="font-size: 14px; color: ' + PH.muted + ';">' + s.time + '</span>') + '</div>' +
+  '<div style="background: #fff; border: 1px solid ' + PH.line + '; border-radius: 16px; overflow: hidden;">' + s.rows.map((r, i) => taskRow(r, i === 0)).join('') + (s.route ? routeLine(s.route) : '') + '</div></div></div>';
+const mydayB = mydayHead.replace(/about 5&frac12; h &middot; .*?from the General Manager/, '4 stops &middot; about 6 h') + '<div style="padding: 14px 18px 0 14px;">' + STOPS_B.map((s, i) => stopBlockB(s, i + 1, i === STOPS_B.length - 1)).join('') + '</div>';
+
+// the morning brief: written by the agent as a formatted page, not a chat line
+const pen = (t) => '<span style="display: inline-flex; align-items: center; height: 22px; padding: 0 6px; border-radius: 6px; background: ' + PH.soft + '; font: 700 12.5px ' + MONO + '; vertical-align: 1px;">' + t + '</span>';
+const pig = (t) => '<b style="font: 700 14.5px ' + MONO + ';">' + t + '</b>';
+const node = (ic, t, on) => '<div style="display: flex; flex-direction: column; align-items: center; gap: 5px; width: 54px;"><span style="width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; ' + (on ? 'background: ' + PH.green + '; color: #fff;' : 'background: #fff; color: ' + PH.ink + '; box-shadow: inset 0 0 0 1px ' + PH.line + ';') + '">' + svg(IC[ic], 20, 1.8) + '</span><span style="font-size: 12px; font-weight: 700; color: ' + (on ? PH.green : PH.muted) + ';">' + t + '</span></div>';
+const dash = '<span style="flex: 1; height: 2px; margin-top: 19px; background: repeating-linear-gradient(90deg, #b9c2ae 0 4px, transparent 4px 8px);"></span>';
+const brief = '<div style="margin: 12px 14px 0; border-radius: 20px; overflow: hidden; background: #fff; border: 1px solid ' + PH.line + ';">' +
+  '<div style="padding: 16px 16px 14px; background: linear-gradient(180deg, #eef3e6, #fff);"><div style="font-size: 12px; font-weight: 700; letter-spacing: .06em; color: ' + PH.muted + ';">THURSDAY 5 NOV</div><div style="font-size: 22px; font-weight: 800; letter-spacing: -.02em; margin-top: 4px;">Four stops, about 6 hours</div>' +
+  '<div style="display: flex; align-items: flex-start; margin-top: 14px;">' + node('birth', '06:00', true) + dash + node('feed', '07:00') + dash + node('birth', '~2 h') + dash + node('dose', '15:00') + '</div></div>' +
+  '<div style="padding: 4px 16px 6px;"><div style="font-size: 13px; font-weight: 700; color: ' + PH.muted + '; margin: 8px 0 6px;">Start with</div><div style="font-size: 16px; line-height: 23px;"><b>Farrowing 3.</b> B33 is farrowing; three sows are close. At 07:00 leave them for the feeding round, then come back.</div>' +
+  '<div style="font-size: 13px; font-weight: 700; color: ' + PH.muted + '; margin: 14px 0 6px;">Worth knowing</div>' +
+  '<div style="font-size: 15px; line-height: 23px; padding-left: 12px; border-left: 3px solid #c8d8b8;">' + pig('000392') + ' in ' + pen('B2') + ' is due tomorrow and off her feed since last night.</div>' +
+  '<div style="font-size: 15px; line-height: 23px; padding-left: 12px; border-left: 3px solid #c8d8b8; margin-top: 10px;">In Farrowing 2, the litter in ' + pen('B3') + ' gets Pen-strep at 15:00.</div></div>' +
+  '<div style="margin: 14px 16px 16px; height: 50px; border-radius: 14px; border: 1px solid #b6c0ad; display: grid; place-items: center; font-size: 15px; font-weight: 700;">Open My day</div></div>';
+const morningRich = agentHead + '<div style="display: flex; align-items: center; gap: 8px; margin: 14px 18px 0; font-size: 13px; color: ' + PH.muted + ';"><b style="color: ' + PH.ink + '; font-weight: 700;">General Manager</b>&middot; 05:30</div>' + brief + composer + dock('agent');
+
+// the heads-up: slides in like a notification above the task's footer; the page stays usable
+const toast = '<div style="position: absolute; left: 12px; right: 12px; top: 650px; z-index: 3; background: #fff; border-radius: 18px; box-shadow: 0 12px 30px rgba(32,41,31,.22), 0 0 0 1px ' + PH.line + '; display: flex; align-items: center; gap: 12px; padding: 12px 4px 12px 12px;">' + tile(36, true) +
+  '<div style="flex: 1; min-width: 0;"><div style="font-size: 15px; font-weight: 700;">2 things in Farrowing 3</div><div style="font-size: 13.5px; color: ' + PH.muted + '; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">000392 in B2 is due tomorrow and off her feed&hellip;</div></div>' +
+  '<span style="width: 44px; height: 44px; display: grid; place-items: center; color: ' + PH.muted + ';">' + svg(IC.x, 20, 2.2) + '</span></div>';
+const farrowToast = farrowBase + headBtn(326, true) + toast;
+// opened by tapping it: the same note, formatted, closable
+const item = (penT, pigT, text) => '<div style="display: flex; gap: 12px; padding: 14px 0; border-top: 1px solid #e8eddf;"><div style="flex: none; width: 48px;">' + pen(penT) + '</div><div style="flex: 1; font-size: 15.5px; line-height: 23px;">' + (pigT ? pig(pigT) + ' ' : '') + text + '</div></div>';
+const readSheetOf = (kicker, title, items) => '<div style="position: absolute; inset: 0; background: rgba(20,24,19,.32);"></div><div style="position: absolute; left: 0; right: 0; bottom: 0; padding-bottom: 34px; background: #fff; border-radius: 24px 24px 0 0;">' +
+  '<div style="width: 40px; height: 4px; border-radius: 2px; background: #c7cebe; margin: 10px auto 0;"></div>' +
+  '<div style="display: flex; align-items: flex-start; gap: 10px; padding: 12px 8px 4px 18px;">' + tile(32, true) + '<div style="flex: 1;"><div style="font-size: 12px; font-weight: 700; letter-spacing: .06em; color: ' + PH.muted + ';">' + kicker + '</div><div style="font-size: 20px; font-weight: 800; letter-spacing: -.01em; margin-top: 3px;">' + title + '</div></div><span style="width: 44px; height: 44px; display: grid; place-items: center;">' + svg(IC.x, 22, 2.2, PH.ink) + '</span></div>' +
+  '<div style="padding: 6px 18px 0;">' + items +
+  '<div style="font-size: 13px; color: ' + PH.muted + '; padding-top: 12px; border-top: 1px solid #e8eddf;">General Manager &middot; 05:30 &middot; reopen any time from ' + '<span style="display: inline-flex; vertical-align: -3px;">' + svg(IC.spark, 15, 1.8) + '</span> in the header</div></div></div>';
+const farrowRead = farrowBase + headBtn(326, false) + readSheetOf('FARROWING 3 &middot; TODAY', 'Two sows to watch', item('B2', '000392', 'is due tomorrow and has been off her feed since last night. <b>Look at her first.</b>') + item('B1', '000418', 'lost 5 yesterday. Check the heat lamp is on before you count again.'));
+const walkRead = walkBase + headBtn(274, false) + readSheetOf('GESTATION 2 &middot; WHILE YOU WALK', 'Body condition on four sows', item('C1', null, '<b>Score</b> ' + pig('000267') + ' and ' + pig('000281') + '. It&rsquo;s the usual record on each pig.') + item('C2', null, '<b>Score</b> ' + pig('000306') + ' and ' + pig('000312') + '. ' + pig('000306') + ' had a fever yesterday: take her temperature again.'));
+
+const consoleFrag2 = fs.readFileSync(path.join(S, 'stops-console.frag.html'), 'utf8');
+const pf2 = (title, cap, ph) => '<figure style="margin: 0; width: 414px; flex: none;"><figcaption style="font-size: 17px; font-weight: 600; margin-bottom: 6px;">' + title + '</figcaption><div style="font-size: 14.5px; line-height: 22px; color: #3B4540; margin-bottom: 14px; min-height: 132px;">' + cap + '</div>' + phone(ph) + '</figure>';
+const rc = (t, items) => '<div style="background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px #E6E9E2; padding: 22px 26px 12px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">' + t + '</div><ul style="margin: 0; padding-left: 20px; font-size: 14.5px; line-height: 22px; color: #3B4540;">' + items.map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ul></div>';
+const rule2 = rc('The rule, round 2: a card is a stop, one trip', [
+  '<b>A place:</b> several tasks in one room or block. <b>A round:</b> one task across several rooms (feeding, a walk); its rooms sit on one scrolling line inside, in walking order.',
+  '<b>Coming back is its own card,</b> named &ldquo;Back to Farrowing 3&rdquo;, so an interrupted task reads as leave, round, return; never five room cards.',
+  'A new card only for a new trip: another place, a round, or a return later. Tasks in the same trip are rows; &ldquo;as you go&rdquo; work is a sentence.',
+  'The console Work schedule follows: a round is one card with its first room and how many more (&ldquo;Feeding &middot; Farrowing 1 +4&rdquo;).']);
+const heads2 = rc('The heads-up, round 2: a notification, never forced', [
+  'Opening a task with something to say slides a small card in above the footer: what it&rsquo;s about and the first line. The page stays usable; nothing is dimmed or blocked.',
+  'Tap it to read the whole note; &#10005; to put it away. Either way the agent&rsquo;s mark in the header keeps it, with a dot until it&rsquo;s been read.',
+  'The agent writes it formatted: a title, one item per pen with the pig named, the one thing to do in bold. Same for the morning brief: a laid-out page, not a chat line.',
+  'Still short by rule: only what changes what you do today in this task.']);
+
+// ===== round 3 (9 Nov): the agent's own look; notes about the whole task or room; a place in the task where the notes live =====
+const FOOT = 750; // top of the live task footer
+// three looks for the agent; all keep the Toast's door-and-dismiss anatomy (✕ at the left, the rest one door with a chevron)
+const LOOK = {
+  A: { box: PH.ink, line: 'none', title: '#fff', sub: 'rgba(255,255,255,.78)', icon: 'rgba(255,255,255,.8)', disc: '#6f62c4', discInk: '#fff', name: 'Ink, with the agent&rsquo;s mark' },
+  B: { box: '#eeebfa', line: '#d3cdef', title: '#2b2459', sub: '#4f4880', icon: '#4f4880', disc: '#5b4fb0', discInk: '#fff', name: 'The agent&rsquo;s own tint' },
+  C: { box: '#3b3473', line: 'none', title: '#fff', sub: '#d9d5f2', icon: '#d9d5f2', disc: 'rgba(255,255,255,.16)', discInk: '#fff', name: 'The agent&rsquo;s own deep colour' }
+};
+const disc = (L, w) => '<span style="width: ' + w + 'px; height: ' + w + 'px; flex: none; border-radius: 99px; background: ' + L.disc + '; color: ' + L.discInk + '; display: grid; place-items: center;">' + svg(IC.spark, Math.round(w * 0.6), 1.9) + '</span>';
+const agentToast = (L, title, line) => '<div style="position: absolute; left: 18px; right: 18px; top: ' + (FOOT - 10 - 60) + 'px; height: 60px; z-index: 3; box-sizing: border-box; background: ' + L.box + '; border-radius: 14px; ' + (L.line === 'none' ? '' : 'box-shadow: 0 0 0 1px ' + L.line + ', 0 10px 24px rgba(43,36,89,.16); ') + (L.line === 'none' ? 'box-shadow: 0 10px 24px rgba(20,24,19,.24); ' : '') + 'display: flex; align-items: center; padding: 0 2px 0 0;">' +
+  '<span style="width: 44px; height: 44px; flex: none; display: grid; place-items: center; color: ' + L.icon + ';">' + svg(IC.x, 18, 2.2) + '</span>' + disc(L, 30) +
+  '<div style="flex: 1; min-width: 0; margin-left: 10px;"><div style="font-size: 15px; font-weight: 700; color: ' + L.title + '; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + title + '</div><div style="font-size: 13px; color: ' + L.sub + '; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + line + '</div></div>' +
+  '<span style="width: 40px; height: 44px; flex: none; display: grid; place-items: center; color: ' + L.icon + ';">' + svg(IC.chev, 18, 2.2) + '</span></div>';
+const toastTitle = 'The room ran hot overnight', toastLine = 'and 3 more notes for Farrowing 3';
+const farrowToast3 = (k) => farrowBase + agentToast(LOOK[k], toastTitle, toastLine);
+
+// the note format: whole-room and whole-task lines run full width with no badge; pen lines keep the pen badge
+const wide = (text, first) => '<div style="padding: 13px 0; border-top: ' + (first ? '0' : '1px solid #e8eddf') + '; font-size: 16px; line-height: 23px;">' + text + '</div>';
+const penLine = (penT, text) => '<div style="display: flex; gap: 12px; padding: 13px 0; border-top: 1px solid #e8eddf;"><div style="flex: none; width: 32px; padding-top: 1px;">' + pen(penT) + '</div><div style="flex: 1; font-size: 16px; line-height: 23px;">' + text + '</div></div>';
+const L3 = LOOK.B;
+// a drawer in the house pattern of the pen note (tint sheet, centred title, white card, Back footer); the card's byline carries the agent
+const notesSheet = (title, sub, byline, items, top) => '<div style="position: absolute; inset: 0; background: rgba(20,24,19,.32);"></div><div style="position: absolute; left: 0; right: 0; top: ' + top + 'px; bottom: 0; background: ' + PH.bg + '; border-radius: 24px 24px 0 0; overflow: hidden;">' +
+  '<div style="width: 40px; height: 4px; border-radius: 2px; background: #c7cebe; margin: 10px auto 0;"></div>' +
+  '<div style="text-align: center; padding: 12px 18px 12px; border-bottom: 1px solid ' + PH.line + ';"><div style="font-size: 20px; font-weight: 600;">' + title + '</div><div style="font-size: 13px; color: ' + PH.muted + '; margin-top: 3px;">' + sub + '</div></div>' +
+  '<div style="margin: 16px 18px 0; background: #fff; border: 1px solid ' + PH.line + '; border-radius: 16px; padding: 14px 16px 2px;">' +
+  '<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: ' + PH.muted + '; padding-bottom: 4px;">' + disc(L3, 24) + '<b style="color: ' + PH.ink + '; font-weight: 700;">General Manager</b>&middot; ' + byline + '</div>' + items + '</div>' +
+  '<div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 18px 26px; background: #fff; border-top: 1px solid ' + PH.line + ';"><div style="height: 56px; border-radius: 14px; border: 1px solid #b6c0ad; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 16px; font-weight: 600;">' + svg(IC.back, 16, 2.2) + 'Back</div></div></div>';
+const farrowNotes = farrowBase + notesSheet('Notes for this task', 'Farrowing 3', 'today 05:30',
+  wide('The room ran hot overnight, 29&nbsp;&deg;C at 03:00. <b>Check every sow is drinking.</b>', true) +
+  wide('You&rsquo;re 2 days late on fostering checks here. <b>Do them after this count.</b>') +
+  penLine('B1', pig('000418') + ' lost 5 yesterday. <b>Check the heat lamp before you count again.</b>') +
+  penLine('B2', pig('000392') + ' is due tomorrow and off her feed since last night. <b>Look at her first.</b>'), 268);
+const walkNotes = walkBase + notesSheet('Notes for this task', 'Gestation 2 &middot; walk-through', 'today 05:30',
+  wide('Gestation 2 ran hot overnight. <b>Check the drinkers in every pen as you go.</b>', true) +
+  penLine('C1', '<b>Score</b> ' + pig('000267') + ' and ' + pig('000281') + '. It&rsquo;s the usual record on each pig.') +
+  penLine('C2', pig('000306') + ' had a fever yesterday: <b>take her temperature again.</b> <b>Score</b> her and ' + pig('000312') + '.'), 330);
+
+// where the notes live: three spots in the Farrowing task page, all in the agent's tint
+const chev = (c) => '<span style="width: 40px; height: 44px; flex: none; display: grid; place-items: center; color: ' + c + ';">' + svg(IC.chev, 18, 2.2) + '</span>';
+const withInsert = (src, at, dy, ins, extra) => '<div style="position: absolute; left: 0; top: 0; width: 390px; height: ' + FOOT + 'px; overflow: hidden;">' + slice(src, 0, at, 0) + (extra || '') + slice(src, at, FOOT, dy) + ins + '</div>' + slice(src, FOOT, 844, 0);
+const unitFix = fixLabel(FARROW, 52, 132, 110, 20, '<span style="font-size: 13px; color: ' + PH.muted + ';">Farrowing 3</span>');
+// V1 · a row under the summary card
+const spotRow = '<div style="position: absolute; left: 18px; right: 18px; top: 264px; height: 60px; box-sizing: border-box; background: ' + L3.box + '; border-radius: 16px; box-shadow: inset 0 0 0 1px ' + L3.line + '; display: flex; align-items: center; gap: 12px; padding-left: 14px;">' + disc(L3, 30) +
+  '<div style="flex: 1; min-width: 0;"><div style="font-size: 15px; font-weight: 700; color: ' + L3.title + ';">4 notes for this task</div><div style="font-size: 13px; color: ' + L3.sub + '; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">The room ran hot overnight</div></div>' + chev(L3.icon) + '</div>';
+const spotV1 = withInsert(FARROW, 258, 72, spotRow, unitFix);
+// V2 · a section in the list, above the first pen, in the pen sections' own shape (header line, then a row)
+const spotSection = '<div style="position: absolute; left: 18px; right: 18px; top: 336px; box-sizing: border-box; background: #fff; border-radius: 16px; box-shadow: inset 0 0 0 1px ' + PH.line + '; overflow: hidden;">' +
+  '<div style="height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: ' + L3.box + '; border-bottom: 1px solid ' + L3.line + ';">' + svg(IC.spark, 16, 1.9, L3.disc) + '<span style="font-size: 14px; font-weight: 700; color: ' + L3.title + ';">For this task</span></div>' +
+  '<div style="display: flex; align-items: center; padding: 10px 0 10px 14px;"><div style="flex: 1; font-size: 15px; line-height: 22px;">The room ran hot overnight, 29&nbsp;&deg;C at 03:00. <b>Check every sow is drinking.</b></div>' + chev(PH.muted) + '</div></div>';
+const spotV2 = withInsert(FARROW, 330, 132, spotSection, unitFix);
+// V3 · the header button as a labelled chip (the page is untouched)
+const spotChip = '<div style="position: absolute; left: 262px; top: 47px; width: 110px; height: 46px; box-sizing: border-box; border-radius: 14px; background: ' + L3.box + '; box-shadow: inset 0 0 0 1px ' + L3.line + '; display: flex; align-items: center; justify-content: center; gap: 7px; color: ' + L3.title + '; font-size: 15px; font-weight: 700;">' + svg(IC.spark, 18, 1.9, L3.disc) + 'Notes<span style="position: absolute; top: 7px; right: 8px; width: 8px; height: 8px; border-radius: 99px; background: ' + L3.disc + ';"></span></div>';
+const spotV3 = farrowBase + spotChip;
+
+// side cards: the two checks per row, the rules, the questions
+const checks = (house, budget) => rc('The two checks', ['<b>House pattern:</b> ' + house, '<b>Attention budget:</b> ' + budget]);
+const swatch = (k) => { const L = LOOK[k]; return '<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;"><span style="width: 120px; height: 34px; border-radius: 10px; background: ' + L.box + '; box-shadow: ' + (L.line === 'none' ? 'none' : 'inset 0 0 0 1px ' + L.line) + '; display: flex; align-items: center; gap: 8px; padding-left: 8px; box-sizing: border-box; color: ' + L.title + '; font-size: 13px; font-weight: 700;">' + disc(L, 22) + k + '</span><span style="font-size: 14.5px; color: #3B4540;">' + L.name + '</span></div>'; };
+const looksCard = '<div style="background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px #E6E9E2; padding: 22px 26px 12px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">The agent&rsquo;s look: pick one</div>' + swatch('A') + swatch('B') + swatch('C') +
+  '<ul style="margin: 8px 0 0; padding-left: 20px; font-size: 14.5px; line-height: 22px; color: #3B4540;">' + [
+    '<b>I&rsquo;d pick B.</b> A sits on the same ink as the save toast and the Scan button right below it, so it still reads as the app talking. B and C read as someone else.',
+    'Violet is free: not a status (green done, blue today, amber late, red act now) and not an action. It would be one new token, <code>agent</code>, used only for the agent: the toast, its spot in the task, the byline disc, and the dock&rsquo;s middle button.',
+    'The shape is the Toast you already ruled for Scan (22 Oct): &#10005; at the left, the rest one door with a chevron, 18&nbsp;px from the edges, above the footer. It stays until closed; it never stacks.'].map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ul></div>';
+const formatCard = rc('The note format: three kinds of line', [
+  '<b>The room</b> (&ldquo;The room ran hot overnight&rdquo;) and <b>the task</b> (&ldquo;You&rsquo;re 2 days late on fostering checks here&rdquo;) run full width, no badge. They come first.',
+  '<b>A pen</b> keeps its badge in the left column; the pig is named in the sentence. Pens follow in walking order.',
+  'One line, one thing to do, in bold. Only what changes what you do today in this task; the room is already in the title, so a line never repeats it.',
+  'The card&rsquo;s byline says who wrote it once; the lines don&rsquo;t.']);
+const spotCard = '<div style="background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px #E6E9E2; padding: 22px 26px 12px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Where the notes live: pick one</div><ul style="margin: 0; padding-left: 20px; font-size: 14.5px; line-height: 22px; color: #3B4540;">' + [
+  '<b>I&rsquo;d pick 6, the row.</b> It&rsquo;s always in view, says what the notes are about in one line, and stays out of the pen list. Closing the toast drops it into this row, so you see where it went.',
+  '<b>7, the section</b> reads like the pens, but it scrolls away with the list and looks like one more pen.',
+  '<b>7</b> has one door (the whole card), so its header carries no chevron and no count.', '<b>8, the chip</b> changes nothing on the page, but &ldquo;Notes&rdquo; is small and next to pen notes it&rsquo;s easy to confuse. The walk&rsquo;s header has no room for it beside History.',
+  'All three open the same drawer (4). A task with nothing to say shows no spot. Pen and pig notes stay where they are, on the pen.'].map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ul></div>';
+const qCard = '<div style="background: #fffbea; border-radius: 16px; box-shadow: 0 0 0 1px #efe3b0; padding: 22px 26px 12px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Three questions still open from round 1</div><ol style="margin: 0; padding-left: 20px; font-size: 14.5px; line-height: 22px; color: #3B4540;">' + [
+  '<b>The agent&rsquo;s name on the phone:</b> &ldquo;General Manager&rdquo; (as on the console) or &ldquo;Assistant&rdquo; (today&rsquo;s phone word)? <i>I&rsquo;d use one name everywhere, General Manager, always with the sparkle so it isn&rsquo;t read as a person.</i>',
+  '<b>Should a recorded task quietly tick itself in My day?</b> <i>I&rsquo;d say no: My day is the plan, not a tracker (your ruling); done shows on the console&rsquo;s week Schedule.</i>',
+  '<b>Does the morning brief buzz the phone?</b> <i>I&rsquo;d buzz once, at the start of the person&rsquo;s shift, not at 05:30; notes inside tasks never buzz, they show when you open the task.</i>'].map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ol></div>';
+const side = (...cards) => '<div style="flex: 1; max-width: 960px; display: flex; flex-direction: column; gap: 20px; padding-top: 168px;">' + cards.join('') + '</div>';
+const row = (...items) => '<div style="display: flex; gap: 36px; align-items: flex-start;">' + items.join('') + '</div>';
+const sectionHead = (t, p) => '<h2 style="margin: 0 0 6px; font-size: 22px; line-height: 30px; font-weight: 600; letter-spacing: -.015em;">' + t + '</h2><p style="margin: 0 0 22px; font-size: 15px; line-height: 23px; color: #5D665F; max-width: 2300px;">' + p + '</p>';
+
+const r3 = '<h1 style="margin: 0; font-size: 30px; line-height: 38px; font-weight: 600; letter-spacing: -.025em;">Round 3: the agent&rsquo;s own look, notes about the whole room or task, and a place in the task where its notes live (mock-up)</h1><p style="margin: 8px 0 34px; font-size: 16px; line-height: 24px; color: #5D665F; max-width: 2300px;">After your three notes on round 2. The toast is how the agent&rsquo;s notes arrive; the spot in the task is where they live; the drawer is how they read. Built on the live phone screens from main (9 Nov, df82ba5d). Pick a look (1&ndash;3) and a spot (6&ndash;8).</p>' +
+  sectionHead('The toast in the agent&rsquo;s own look', 'Same toast, same words, three looks. The first line is a whole-room note, so the format change shows here too.') +
+  row(pf2('1 · A: ink, with the agent&rsquo;s mark', 'The system toast&rsquo;s ink with a violet disc. Closest to what&rsquo;s built; the only new colour is the disc.', farrowToast3('A')),
+    pf2('2 · B: the agent&rsquo;s own tint (recommended)', 'A light violet box. It is not white like the cards and not ink like the Scan button under it, so it reads as the agent, not the page or an action.', farrowToast3('B')),
+    pf2('3 · C: the agent&rsquo;s own deep colour', 'A deep violet box: the loudest of the three. Strong in sunlight, but a second dark block right above Scan.', farrowToast3('C')),
+    side(looksCard, checks('the Toast&rsquo;s door-and-dismiss form you ruled on 22 Oct (Scan, &ldquo;No pig with this tag&rdquo;): &#10005; left, door right, above the footer.', 'first, that it&rsquo;s the agent (the look and the disc), then what it&rsquo;s about (the first note as the title). Cut: the agent&rsquo;s name and time (the drawer has them), the count as a title (&ldquo;4 things in&hellip;&rdquo; became the first note itself).'))) +
+  '<div style="height: 56px;"></div>' + sectionHead('The note format: the room, the task, then pens', 'Opened from the toast or the spot. A drawer in the pen note&rsquo;s pattern: one white card, the agent&rsquo;s byline once, then the lines.') +
+  row(pf2('4 · Farrowing 3: room, task and pen lines', 'A room line and a task line run full width with no badge; the two pen lines keep B1 and B2. Back closes it; nothing to confirm.', farrowNotes),
+    pf2('5 · A walk: a room line and pen lines', 'Zhao Min&rsquo;s walk in Gestation 2. The heat is about every pen, so it&rsquo;s one line for the room, not a line per pen.', walkNotes),
+    side(formatCard, checks('the pen note drawer (PR 314): tint sheet, centred title, one white card with the byline, Back in the footer. Round 2&rsquo;s white sheet with a big title is gone.', 'first, what to do (bold), then where (badge or the room) and which pig. Cut: a time per line, the agent&rsquo;s name per line, &ldquo;Got it&rdquo; (Back is enough), the room name inside the lines.'))) +
+  '<div style="height: 56px;"></div>' + sectionHead('Where the notes live in the task: three spots', 'The task page as built, plus one spot marked as the agent&rsquo;s, in look B. Tapping it opens 4. Pen and pig notes stay on their pens; this is only the agent&rsquo;s notes for this task.') +
+  row(pf2('6 · A row under the summary (recommended)', 'One row between the summary and the lens bar: how many notes and the first line. The list moves down by one row.', spotV1),
+    pf2('7 · A section in the list', 'Above the first pen, in the pens&rsquo; own shape: a header line, then the first note. It scrolls with the list.', spotV2),
+    pf2('8 · A labelled chip in the header', 'The page is untouched; the header gets one chip with a dot until the notes are read.', spotV3),
+    side(spotCard, checks('the pen&rsquo;s &ldquo;Needs attention&rdquo; note row (PR 314) for the row; the pen sections for the section; Inspection&rsquo;s History button for the chip.', 'first, that the agent has something for this task; second, what about. Cut: the pen badges and the other lines (they&rsquo;re in the drawer), the header sparkle button from round 2 (the spot replaces it; say it once).'), qCard));
+
+// ===== round 4 (9 Nov): B chosen. A generic daily toast; notes split by scope (the room / this task); only what the screens can't show. My day: whole jobs only. =====
+Object.assign(IC, { unit: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', task: 'M7 3h8l4 4v14H7zM15 3v4h4M10 12h6M10 16h6', line: 'M3 12h18M6 8v8M12 8v8M18 8v8' });
+const LB = LOOK.B;
+// 1 · the toast: a generic daily title; the second line names the two scopes
+const toast4 = farrowBase + agentToast(LB, 'Today&rsquo;s notes', 'Farrowing 3 &middot; this room and this task');
+// 2 · the drawer: one card per scope, each under its own heading on the tint; the agent named once in the sheet's subtitle
+const scopeHead = (ic, t, sub) => '<div style="display: flex; align-items: center; gap: 8px; margin: 18px 22px 8px; font-size: 14px; font-weight: 600;">' + svg(IC[ic], 16, 1.8, PH.muted) + '<span>' + t + '</span><span style="font-weight: 400; color: ' + PH.muted + ';">&middot; ' + sub + '</span></div>';
+const scopeCard = (items) => '<div style="margin: 0 18px; background: #fff; border: 1px solid ' + PH.line + '; border-radius: 16px; padding: 0 16px;">' + items + '</div>';
+const scopedSheet = (top, place, room, task) => '<div style="position: absolute; inset: 0; background: rgba(20,24,19,.32);"></div><div style="position: absolute; left: 0; right: 0; top: ' + top + 'px; bottom: 0; background: ' + PH.bg + '; border-radius: 24px 24px 0 0; overflow: hidden;">' +
+  '<div style="width: 40px; height: 4px; border-radius: 2px; background: #c7cebe; margin: 10px auto 0;"></div>' +
+  '<div style="text-align: center; padding: 12px 18px 12px; border-bottom: 1px solid ' + PH.line + ';"><div style="font-size: 20px; font-weight: 600;">Today&rsquo;s notes</div><div style="display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; color: ' + PH.muted + '; margin-top: 4px;">' + disc(LB, 18) + 'General Manager &middot; 05:30</div></div>' +
+  scopeHead('unit', place, 'for anyone in this room') + scopeCard(room) +
+  scopeHead('task', 'Farrowing', 'this task') + scopeCard(task) +
+  '<div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 18px 26px; background: #fff; border-top: 1px solid ' + PH.line + ';"><div style="height: 56px; border-radius: 14px; border: 1px solid #b6c0ad; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 16px; font-weight: 600;">' + svg(IC.back, 16, 2.2) + 'Back</div></div></div>';
+const roomLines = wide('Ran hot overnight, 29&nbsp;&deg;C at 03:00, and the sows in B1 to B4 ate less. <b>Check every sow is drinking.</b>', true);
+const taskLines = penLine('B1', pig('000418') + ' lost 5 yesterday, all in the first hour. <b>Check the heat lamp before you count again.</b>').replace('border-top: 1px solid #e8eddf;', 'border-top: 0;') +
+  penLine('B2', pig('000392') + ' is due tomorrow and off her feed since last night. <b>Look at her first.</b>');
+const scoped4 = farrowBase + scopedSheet(252, 'Farrowing 3', roomLines, taskLines);
+// 3 · where they live: the row under the summary, with the same generic name
+const row4 = '<div style="position: absolute; left: 18px; right: 18px; top: 264px; height: 60px; box-sizing: border-box; background: ' + LB.box + '; border-radius: 16px; box-shadow: inset 0 0 0 1px ' + LB.line + '; display: flex; align-items: center; gap: 12px; padding-left: 14px;">' + disc(LB, 30) +
+  '<div style="flex: 1; min-width: 0;"><div style="font-size: 15px; font-weight: 700; color: ' + LB.title + ';">Today&rsquo;s notes</div><div style="font-size: 13px; color: ' + LB.sub + '; margin-top: 2px;">This room and this task</div></div>' + chev(LB.icon) + '</div>';
+const spot4 = withInsert(FARROW, 258, 72, row4, unitFix);
+
+// 4 · My day with whole jobs: feeding is one job as the farm's feed line runs it, never split between people
+const STOPS_W = [
+  { place: 'Feed line 1', sub: 'All 10 rooms, one crank', at: '06:00', rows: [['feed', 'Feeding', 'Check last night&rsquo;s intake and set the rations in the feed page before you crank.']] },
+  { place: 'Farrowing 3', time: '~2&frac12; h', rows: [['birth', 'Farrowing'], ['foster', 'Fostering checks']] },
+  { place: 'Farrowing 2', at: '15:00', rows: [['dose', 'Pen-strep, evening']] }
+];
+const mydayW = mydayHead.replace(/about 5&frac12; h &middot; .*?from the General Manager/, '3 stops &middot; about 5 h') + '<div style="padding: 14px 18px 0 14px;">' + STOPS_W.map((s, i) => stopBlockB(s, i + 1, i === STOPS_W.length - 1)).join('') + '</div>';
+// 5 · the same job when two people share it: one job on both phones, never two halves
+const STOPS_S = [
+  { place: 'Feed line 1', sub: 'All 10 rooms, with Wang Fang', at: '06:00', rows: [['feed', 'Feeding', 'One job for both of you. A room shows as fed on both phones as soon as either of you records it.']] },
+  { place: 'Farrowing 3', time: '~2&frac12; h', rows: [['birth', 'Farrowing'], ['foster', 'Fostering checks']] },
+  { place: 'Farrowing 2', at: '15:00', rows: [['dose', 'Pen-strep, evening']] }
+];
+const mydayS = mydayHead.replace(/about 5&frac12; h &middot; .*?from the General Manager/, '3 stops &middot; about 5 h') + '<div style="padding: 14px 18px 0 14px;">' + STOPS_S.map((s, i) => stopBlockB(s, i + 1, i === STOPS_S.length - 1)).join('') + '</div>';
+
+const scopeRule = rc('B, scoped: what the agent says, and where', [
+  '<b>The toast is generic and daily:</b> &ldquo;Today&rsquo;s notes&rdquo;, then the place and the two scopes. It no longer leads with one note.',
+  '<b>Two scopes, two cards.</b> <b>This room</b> is for anyone working in Farrowing 3 today, whatever their task (heat, water, a fan); it shows in every task opened there and counts as read once read. <b>This task</b> is about the task&rsquo;s own pigs, by pen. An empty scope is absent.',
+  '<b>Only what the screens and fixed rules can&rsquo;t catch.</b> No late tasks, due dates or counts: Home and the task page already show them. The agent adds the pattern behind them (ate less after a hot night; all 5 lost in the first hour).',
+  'The row under the summary takes the same name, &ldquo;Today&rsquo;s notes&rdquo;, and opens the same drawer.']);
+const jobsRule = rc('The middle ground for My day: the agent orders, it never allocates', [
+  '<b>My day shows only jobs already yours,</b> each one whole. The agent puts them in order and adds notes; it never invents a job and never splits one into rooms per person. So no room can fall between two people.',
+  '<b>A job&rsquo;s size comes from how the farm is set up, not from the agent.</b> If one crank on Line 1 feeds all 10 rooms, Feeding is one row. If the farm feeds by hand, room by room, it&rsquo;s a round with its rooms.',
+  '<b>A job&rsquo;s own preparation stays in its page:</b> checking intake and setting rations come before the crank in the feed page, not as stops of their own. My day says it in one sentence at most.',
+  '<b>Shared job:</b> both people see the same one job, and a room ticks for both as soon as either records it (task pages already work this way).',
+  '<b>Who does what stays with the manager</b> on the console&rsquo;s Work schedule. The agent may suggest; a job with no one on it shows there, not on a phone.']);
+const q4 = '<div style="background: #fffbea; border-radius: 16px; box-shadow: 0 0 0 1px #efe3b0; padding: 22px 26px 12px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">For you to rule</div><ol style="margin: 0; padding-left: 20px; font-size: 14.5px; line-height: 22px; color: #3B4540;">' + [
+  '<b>The agent never splits or creates a job; it only orders yours.</b> Agree? <i>This is the rule that stops &ldquo;3 rooms for you, 2 for her, 5 for nobody&rdquo;.</i>',
+  '<b>Do routine jobs like feeding stay in My day?</b> <i>I&rsquo;d keep them, as one whole row: they&rsquo;re usually the first trip of the day and set the order of the rest. The alternative is My day with only non-routine work.</i>',
+  '<b>Where the notes live in the task:</b> 6 the row (drawn here), 7 a section in the list, or 8 a chip in the header? <i>I&rsquo;d keep the row.</i>',
+  'Still open from round 1: the agent&rsquo;s name on the phone, auto-tick on record, and whether the morning brief buzzes.'].map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ol></div>';
+
+const r4 = '<h1 style="margin: 0; font-size: 30px; line-height: 38px; font-weight: 600; letter-spacing: -.025em;">Round 4: B, scoped to this room and this task; and My day with whole jobs only (mock-up)</h1><p style="margin: 8px 0 34px; font-size: 16px; line-height: 24px; color: #5D665F; max-width: 2300px;">After your notes on round 3: B it is. The toast is a generic daily one; the notes split clearly into the room and the task, and say only what the screens and rules can&rsquo;t. Then the middle ground you asked for on My day, so the plan can never leave rooms unfed. Built on the live phone screens from main (df82ba5d).</p>' +
+  sectionHead('B, scoped', 'The same task opened three ways: the toast arriving, the drawer opened, and the row that keeps it.') +
+  row(pf2('1 · The toast: generic, daily', '&ldquo;Today&rsquo;s notes&rdquo;, then where and for what. Tap to open; &#10005; puts it in the row (3).', toast4),
+    pf2('2 · Opened: the room, then the task', 'Two cards under their own headings. The room&rsquo;s note is for anyone in Farrowing 3 today; the task&rsquo;s notes are about its sows, by pen. No late-task line: Home shows that.', scoped4),
+    pf2('3 · Where it stays: the row', 'The same name in the row under the summary. Pen and pig notes stay on their pens.', spot4),
+    side(scopeRule, checks('the pen page&rsquo;s sections (an icon heading on the tint, a white card under it) for the two scopes; the task summary&rsquo;s own icons for room (grid) and task (page).', 'first, which scope a note is for; then what to do (bold). Cut: the late-task line (Home has it), the first note as the toast title, the agent&rsquo;s name on each card (once, in the subtitle).'))) +
+  '<div style="height: 56px;"></div>' + sectionHead('My day: the middle ground', 'Detailed enough to set the order of the day, never so detailed that it divides a job. The agent orders the jobs you already have; it doesn&rsquo;t hand out rooms.') +
+  row(pf2('4 · Feeding as one job', 'Sun Qing feeds the whole site: Line 1, one crank, all 10 rooms, one row. Checking intake and setting rations happen in the feed page first; the plan says so in one sentence.', mydayW),
+    pf2('5 · A job shared by two', 'If Wang Fang feeds with her, both phones show the same one job, never 5 rooms each. A room shows as fed on both as soon as either records it.', mydayS),
+    side(jobsRule, checks('round 2&rsquo;s stops (a place, a round, a return); the to-do list on Home for which jobs are yours; the console Work schedule for who does what.', 'first, the order of whole jobs and their times. Cut: rooms split per person, feeding prep as separate stops, the round&rsquo;s room chips when one line feeds them all.'), q4));
+const html4 = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Agent notes, round 4</title>\n<script src="./support.js"></script>\n</head>\n<body>\n<x-dc>\n<helmet>\n<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Inter:wght@400..700&family=Plus+Jakarta+Sans:wght@400..800&display=swap" rel="stylesheet">\n<style>body{margin:0}</style>\n</helmet>\n' +
+  '<div style="width: 3008px; padding: 44px 48px 60px; box-sizing: border-box; background: #F3F4F1; font-family: Geist, system-ui, sans-serif; color: #111511; -webkit-font-smoothing: antialiased;">' + r4 +
+  '</div>\n</x-dc>\n<script type="text/x-dc" data-dc-script data-props=\'{"$preview":{"width":3008,"height":2400}}\'>\nclass Component extends DCLogic {\n  renderVals() { return {}; }\n}\n</script>\n</body>\n</html>\n';
+fs.writeFileSync(path.join(S, 'pub/project/AgentNotesR4.dc.html'), html4);
+console.log('round 4 ok', Math.round(html4.length / 1024) + ' KB');
+
+// ===== round 5 (9 Nov): notes live in My day only (task pages untouched); feeding is a plain line (nothing to record); walks are rounds with a row per room =====
+// a row in a stop: opens its report when the agent has something to say, else the task itself; the note's first line sits under the name in the agent's hue
+const noteLine = (t) => '<div style="display: flex; gap: 6px; align-items: flex-start; margin: -8px 14px 12px 56px; font-size: 13.5px; line-height: 19px; color: ' + LB.sub + ';"><span style="padding-top: 2px;">' + svg(IC.spark, 13, 1.9, LB.disc) + '</span><span>' + t + '</span></div>';
+const row5 = (ic, name, o) => { o = o || {}; return '<div style="border-top: ' + (o.first ? '0' : '1px solid #e8eddf') + ';"><div style="display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 6px 0 14px;"><span style="width: 30px; height: 30px; flex: none; border-radius: 9px; background: ' + PH.soft + '; display: grid; place-items: center; color: ' + PH.ink + ';">' + svg(IC[ic], 17, 1.8) + '</span>' +
+  '<span style="flex: 1; min-width: 0;"><span style="display: block; font-size: 16px; font-weight: 600;">' + name + '</span>' + (o.sub ? '<span style="display: block; font-size: 13px; color: ' + PH.muted + '; margin-top: 1px;">' + o.sub + '</span>' : '') + '</span>' +
+  (o.plain ? '<span style="width: 14px;"></span>' : '<span style="width: 44px; height: 44px; display: grid; place-items: center; color: ' + PH.muted + ';">' + svg(IC.chev, 18, 2) + '</span>') + '</div>' + (o.note ? noteLine(o.note) : '') + (o.plain ? '<div style="height: 8px;"></div>' : '') + '</div>'; };
+const stop5 = (s, n, last) => '<div style="display: flex; align-items: stretch; gap: 10px;">' +
+  '<div style="width: 30px; flex: none; display: flex; flex-direction: column; align-items: center;"><span style="width: 30px; height: 30px; border-radius: 99px; display: grid; place-items: center; font-size: 14px; font-weight: 700; margin-top: 2px; ' + (n === 1 ? 'background: ' + PH.green + '; color: #fff; box-shadow: 0 0 0 5px #dcebdd;' : 'background: #fff; box-shadow: inset 0 0 0 2px #a3aa9f;') + '">' + n + '</span>' + (last ? '' : '<span style="flex: 1; width: 2px; background: #cdd5c3; margin-top: 4px;"></span>') + '</div>' +
+  '<div style="flex: 1; min-width: 0; margin-bottom: 14px;"><div style="display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 2px 6px;"><span style="flex: 1; min-width: 0;"><span style="display: block; font-size: 18px; font-weight: 700;">' + s.place + '</span>' + (s.sub ? '<span style="display: block; font-size: 13px; color: ' + PH.muted + '; margin-top: 1px;">' + s.sub + '</span>' : '') + '</span>' + (s.at ? clockChip(s.at) : '<span style="font-size: 14px; color: ' + PH.muted + ';">' + s.time + '</span>') + '</div>' +
+  (s.body ? '<div style="background: #fff; border: 1px solid ' + PH.line + '; border-radius: 16px; overflow: hidden;">' + s.body + '</div>' : '') + '</div></div>';
+const STOPS5 = [
+  { place: 'Feeding', sub: 'Feed line 1 &middot; all 10 rooms', at: '06:00' },
+  { place: 'Inspection walk', sub: '2 rooms, in walking order', at: '06:30', body: row5('walk', 'Gestation 1', { first: true }) + row5('walk', 'Gestation 2', { note: '000306 had a fever yesterday; the room ran hot' }) },
+  { place: 'Farrowing 3', time: '~2&frac12; h', body: row5('birth', 'Farrowing', { first: true, note: 'Ran hot overnight; look at 000392 in B2 first' }) + row5('foster', 'Fostering checks') }
+];
+const myday5 = mydayHead.replace(/about 5&frac12; h &middot; .*?from the General Manager/, '3 stops &middot; about 5 h') + '<div style="padding: 14px 18px 0 14px;">' + STOPS5.map((s, i) => stop5(s, i + 1, i === STOPS5.length - 1)).join('') + '</div>';
+// the report: a page between My day and the task; the agent's notes for that room and task, then the way into the task
+const report = (title, sub, open, room, task, taskLabel) => status +
+  '<div style="display: flex; align-items: center; gap: 12px; padding: 3px 18px 0;"><span style="width: 48px; height: 48px; flex: none; border-radius: 14px; background: #fff; border: 1px solid ' + PH.line + '; display: grid; place-items: center;">' + svg(IC.back, 20, 2) + '</span><div><div style="font-size: 22px; font-weight: 600; letter-spacing: -.02em;">' + title + '</div><div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: ' + PH.muted + '; margin-top: 2px;">' + disc(LB, 16) + 'General Manager &middot; 05:30</div></div></div>' +
+  '<div style="height: 6px;"></div>' + scopeHead('unit', title, 'this room') + scopeCard(room) + scopeHead('task', taskLabel, 'this task') + scopeCard(task) +
+  '<div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 18px 26px; background: #fff; border-top: 1px solid ' + PH.line + ';"><div style="height: 56px; border-radius: 14px; background: ' + PH.ink + '; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600;">' + open + '</div></div>';
+const firstLine = (s) => s.replace('border-top: 1px solid #e8eddf;', 'border-top: 0;');
+const reportFarrow = report('Farrowing 3', 'Farrowing', 'Open Farrowing', roomLines, taskLines, 'Farrowing');
+const reportWalk = report('Gestation 2', 'Inspection', 'Open the walk',
+  wide('Ran hot overnight. <b>Check the drinkers in every pen as you go.</b>', true),
+  firstLine(penLine('C1', '<b>Score</b> ' + pig('000267') + ' and ' + pig('000281') + '. It&rsquo;s the usual record on each pig.')) +
+  penLine('C2', pig('000306') + ' had a fever yesterday: <b>take her temperature again.</b>'), 'Inspection');
+
+const rule5 = rc('Round 5: the notes live in My day; the task pages stay as built', [
+  '<b>One way in for the agent&rsquo;s notes:</b> My day. A row with something to say shows its first line under the task name, in the agent&rsquo;s violet; tapping it opens the report, then <b>Open Farrowing</b> takes you into the task. A row with nothing to say opens the task straight away.',
+  '<b>The report keeps round 4&rsquo;s scopes:</b> this room (for anyone in it today), then this task (its pigs, by pen). Only what the screens and rules can&rsquo;t show.',
+  '<b>Nothing in the task pages:</b> no toast, no row, no header button. They stay exactly as built.',
+  '<b>Feeding is a plain line,</b> not a task: it has no record, so it has no card and opens nothing. It keeps its time so the day reads in order.']);
+const walk5 = rc('Walks: a round with a row per room', [
+  'Pen walks, inspections and walk-throughs are one kind of stop: <b>a round</b>. One card, named after the task (&ldquo;Inspection walk&rdquo;), with its rooms as rows in walking order.',
+  'Each room row opens that room&rsquo;s walk (Inspection&rsquo;s page per unit, as built), so the rooms are rows, not round 2&rsquo;s small chips: each one is a door and needs the full 44&nbsp;pt.',
+  'The agent&rsquo;s notes sit on the room they&rsquo;re about; its report for a room is the same page as for any task (frame 3).']);
+const q5 = '<div style="background: #fffbea; border-radius: 16px; box-shadow: 0 0 0 1px #efe3b0; padding: 22px 26px 12px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">For you to rule</div><ol style="margin: 0; padding-left: 20px; font-size: 14.5px; line-height: 22px; color: #3B4540;">' + [
+  '<b>A task opened from Home&rsquo;s to-do list shows no notes,</b> since they live only in My day. OK? <i>I&rsquo;d accept it: the morning brief and the Your day card on top of Home are the way in each morning, and the task pages stay clean.</i>',
+  '<b>A walk is a round with a row per room</b> (frame 1, stop 2). Agree?',
+  '<b>The agent orders and never splits or creates a job</b> (round 4). Agree?',
+  'Still open from round 1: the agent&rsquo;s name on the phone, auto-tick on record, and whether the morning brief buzzes.'].map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ol></div>';
+
+const r5 = '<h1 style="margin: 0; font-size: 30px; line-height: 38px; font-weight: 600; letter-spacing: -.025em;">Round 5: the agent&rsquo;s notes live in My day; feeding is a plain line; walks are rounds (mock-up)</h1><p style="margin: 8px 0 34px; font-size: 16px; line-height: 24px; color: #5D665F; max-width: 2300px;">After your notes on round 4: feeding has nothing to record, so it isn&rsquo;t a task; walks need a shape; and the notes come out of the task pages. You tap Farrowing in My day, read the report, then open the task. The task pages are the live ones from main (df82ba5d), untouched.</p>' +
+  row(pf2('1 · My day', 'Feeding is a line of text with its time: no card, nothing to open. The Inspection walk is one card with a row per room. Rows with notes show the first line in violet.', myday5),
+    pf2('2 · Tap Farrowing: the report', 'This room, then this task, as in round 4. <b>Open Farrowing</b> goes into the task page; the header&rsquo;s back returns to My day.', reportFarrow),
+    pf2('3 · Tap Gestation 2: the walk&rsquo;s report', 'The same page for a walk: the room&rsquo;s note, then the pigs to score and check, by pen. <b>Open the walk</b> goes into Inspection.', reportWalk),
+    side(rule5, walk5, checks('My day&rsquo;s stops (rounds 2 and 4) for the rows; round 4&rsquo;s scoped drawer for the report, now a page with the live header (square back, title, one dark button in the footer).', 'first, the order of the day; second, which rows have something to read (the violet line). Cut: the toast, the row and the header button inside task pages; feeding&rsquo;s card and task page; the task name repeated in the report&rsquo;s header; round 2&rsquo;s room chips.'), q5));
+const html5 = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Agent notes, round 5</title>\n<script src="./support.js"></script>\n</head>\n<body>\n<x-dc>\n<helmet>\n<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Inter:wght@400..700&family=Plus+Jakarta+Sans:wght@400..800&display=swap" rel="stylesheet">\n<style>body{margin:0}</style>\n</helmet>\n' +
+  '<div style="width: 3008px; padding: 44px 48px 60px; box-sizing: border-box; background: #F3F4F1; font-family: Geist, system-ui, sans-serif; color: #111511; -webkit-font-smoothing: antialiased;">' + r5 +
+  '</div>\n</x-dc>\n<script type="text/x-dc" data-dc-script data-props=\'{"$preview":{"width":3008,"height":1300}}\'>\nclass Component extends DCLogic {\n  renderVals() { return {}; }\n}\n</script>\n</body>\n</html>\n';
+fs.writeFileSync(path.join(S, 'pub/project/AgentNotesR5.dc.html'), html5);
+console.log('round 5 ok', Math.round(html5.length / 1024) + ' KB');
+
+// ===== round 6 (9 Nov): restyled in Home's own look; no order, work batched; the agent only speaks when there's something =====
+if (!IC.pig) IC.pig = 'M5 12a7 5 0 0 0 14 0 7 5 0 0 0-14 0ZM8 17v3M16 17v3M19 11l2-1M9 10h.01';
+Object.assign(IC, { eye: 'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z', heart: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z' });
+const H6 = (kicker, title) => status + '<div style="display: flex; align-items: center; gap: 14px; padding: 4px 18px 0;"><span style="width: 48px; height: 48px; flex: none; border-radius: 14px; background: #fff; border: 1px solid ' + PH.line + '; display: grid; place-items: center;">' + svg(IC.back, 20, 2) + '</span>' +
+  '<div><div style="font-size: 12px; letter-spacing: .06em; color: ' + PH.muted + ';">' + kicker + '</div><div style="font-size: 25px; font-weight: 500; letter-spacing: -.02em; margin-top: 1px;">' + title + '</div></div></div>';
+const tile6 = (ic) => '<span style="width: 40px; height: 40px; flex: none; border-radius: 12px; background: ' + PH.soft + '; display: grid; place-items: center; color: ' + PH.ink + ';">' + svg(IC[ic], 20, 1.7) + '</span>';
+const chev6 = (c) => '<span style="width: 40px; height: 44px; flex: none; display: grid; place-items: center; color: ' + (c || '#8d968a') + ';">' + svg(IC.chev, 18, 2) + '</span>';
+const card6 = (inner, m) => '<div style="margin: ' + (m || '0 18px 14px') + '; background: #fff; border: 1px solid ' + PH.line + '; border-radius: 18px; overflow: hidden;">' + inner + '</div>';
+// a card's head: the main task (or place), a door when it opens a task
+const head6 = (ic, title, sub, door) => '<div style="display: flex; align-items: center; gap: 12px; padding: 14px ' + (door ? '4px' : '16px') + ' 12px 16px;">' + tile6(ic) + '<div style="flex: 1; min-width: 0;"><div style="font-size: 17px; font-weight: 500;">' + title + '</div><div style="font-size: 13px; color: ' + PH.muted + '; margin-top: 2px;">' + sub + '</div></div>' + (door ? chev6() : '') + '</div>';
+// subtasks: a batch of plain lines under the head (what to do in there; no order, no ticks)
+const lines6 = (items) => '<div style="padding: 0 16px 12px 68px; margin-top: -2px;">' + items.map((t) => '<div style="display: flex; align-items: center; gap: 10px; min-height: 30px; font-size: 15px;"><span style="width: 5px; height: 5px; border-radius: 9px; background: #a3aa9f; flex: none;"></span><span style="flex: 1;">' + t[0] + '</span>' + (t[1] ? '<span style="font: 600 13px ' + MONO + '; color: ' + PH.muted + ';">' + t[1] + '</span>' : '') + '</div>').join('') + '</div>';
+// a task row inside a place card (version B): a door to the task
+const row6 = (ic, title, sub, at) => '<div style="display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 0 4px 0 16px; border-top: 1px solid #edf0e8;">' + tile6(ic) + '<div style="flex: 1; min-width: 0;"><div style="font-size: 16px; font-weight: 500;">' + title + '</div>' + (sub ? '<div style="font-size: 13px; color: ' + PH.muted + '; margin-top: 2px;">' + sub + '</div>' : '') + '</div>' + (at ? '<span style="font: 600 13px ' + MONO + '; color: ' + PH.muted + ';">' + at + '</span>' : '') + chev6() + '</div>';
+// the agent's band: the card's foot, only when it has something; opens the report
+const agent6 = (t) => '<div style="display: flex; align-items: center; gap: 12px; padding: 12px 4px 12px 16px; background: ' + LB.box + '; border-top: 1px solid ' + LB.line + ';">' + disc(LB, 28) + '<div style="flex: 1; min-width: 0; font-size: 14px; line-height: 20px; color: ' + LB.title + ';">' + t + '</div>' + chev6(LB.icon) + '</div>';
+// feeding: routine, nothing to record: one quiet line, no card, no door
+const routine6 = '<div style="display: flex; align-items: center; gap: 10px; margin: 18px 22px 14px; font-size: 14px; color: ' + PH.muted + ';">' + svg(IC.feed, 18, 1.7, PH.muted) + '<span style="flex: 1;">Feeding, Feed line 1</span><span style="font: 600 13px ' + MONO + ';">06:00 &middot; 13:30</span></div>';
+const kick = 'THURSDAY 5 NOVEMBER';
+// A · by main task: one card per task, its subtasks batched under it
+const byTask = (notes) => H6(kick, 'My day') + routine6 +
+  card6(head6('birth', 'Farrowing', 'Farrowing 3 and 4', true) + lines6([['Births in progress in B1 and B3'], ['Fostering checks'], ['Count yesterday&rsquo;s litters']]) + (notes ? agent6('Farrowing 3 ran hot overnight, and 000392 is off her feed') : '')) +
+  card6(head6('walk', 'Inspection', 'Gestation 1 and 2', true) + lines6([['Health checks'], ['Set feed in 3 pens']]) + (notes ? agent6('Score body condition on four sows in C1 and C2') : '')) +
+  card6(head6('dose', 'To treat', 'Farrowing 2', true) + lines6([['Pen-strep, litter in B3', '15:00']]));
+const taskA = byTask(true), quietA = byTask(false);
+// B · by place: one card per room or block, its tasks as rows; the room's note at its foot
+const byPlace = H6(kick, 'My day') + routine6 +
+  card6(head6('unit', 'Farrowing 3', 'and Farrowing 4', false) + row6('birth', 'Farrowing', 'Births, counts') + row6('foster', 'Fostering checks') + agent6('Ran hot overnight, and 000392 is off her feed')) +
+  card6(head6('unit', 'Gestation 1 and 2', 'Walk them together', false) + row6('walk', 'Inspection', 'Health checks, feed in 3 pens') + agent6('Score body condition on four sows')) +
+  card6(head6('unit', 'Farrowing 2', 'Back in the afternoon', false) + row6('dose', 'Pen-strep', 'Litter in B3', '15:00'));
+// the report: opened from an agent band; this task's rooms, then its pigs; then the way into the task
+const secHead6 = (ic, t) => '<div style="display: flex; align-items: center; gap: 8px; margin: 22px 22px 10px; font-size: 17px; font-weight: 500;">' + svg(IC[ic], 18, 1.7, PH.ink) + t + '</div>';
+const rline = (text, first) => '<div style="padding: 14px 0; border-top: ' + (first ? '0' : '1px solid #edf0e8') + '; font-size: 16px; line-height: 24px;">' + text + '</div>';
+const rpen = (p, text, first) => '<div style="display: flex; gap: 12px; padding: 14px 0; border-top: ' + (first ? '0' : '1px solid #edf0e8') + ';"><span style="flex: none; padding-top: 1px;">' + pen(p) + '</span><div style="flex: 1; font-size: 16px; line-height: 24px;">' + text + '</div></div>';
+const report6 = H6('FARROWING &middot; TODAY', 'Worth knowing') +
+  '<div style="display: flex; align-items: center; gap: 8px; margin: 14px 22px 0; font-size: 13px; color: ' + PH.muted + ';">' + disc(LB, 20) + 'From the General Manager, 05:30</div>' +
+  secHead6('unit', 'Farrowing 3') + card6('<div style="padding: 0 16px;">' + rline('Ran hot overnight, 29&nbsp;&deg;C at 03:00, and the sows in B1 to B4 ate less. <b>Check every sow is drinking.</b>', true) + '</div>', '0 18px') +
+  secHead6('task', 'This task, by pen') + card6('<div style="padding: 0 16px;">' + rpen('B1', pig('000418') + ' lost 5 yesterday, all in the first hour. <b>Check the heat lamp.</b>', true) + rpen('B2', pig('000392') + ' is due tomorrow and off her feed since last night.') + '</div>', '0 18px') +
+  '<div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 18px 26px; background: #fff; border-top: 1px solid ' + PH.line + ';"><div style="height: 56px; border-radius: 14px; background: ' + PH.ink + '; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600;">Open Farrowing</div></div>';
+
+const rule6 = rc('Round 6: Home&rsquo;s look, work batched, no order', [
+  '<b>It looks like Home now:</b> the same header, white cards with an icon tile, a 17&nbsp;px title over a quiet line. No timeline rail, no numbered circles, no clock chips.',
+  '<b>No order.</b> Nothing says &ldquo;first&rdquo; or &ldquo;then&rdquo;. Work is batched: in A under its main task, in B under its place. A fixed time shows only where the work has one (Pen-strep 15:00).',
+  '<b>The agent speaks only when there&rsquo;s something</b> the screens and rules can&rsquo;t show: a violet band at the foot of that card. No band, nothing to know (frame 4). The report opens from the band.',
+  '<b>Feeding</b> is one quiet line with its times. No card, nothing to open.']);
+const ab6 = rc('A or B?', [
+  '<b>A, by main task (your idea; I&rsquo;d pick it).</b> The card is the task you open; under it, the batch of things to do inside it. It matches how the app is built (one Farrowing task holds births, fostering and counts) and Home&rsquo;s groups.',
+  '<b>B, by place.</b> The card is where you&rsquo;ll be; the tasks there are rows. It suits the room notes best, but a task that spans rooms shows up twice, and a walk splits.',
+  'Either way, a subtask line in A is not a door: tapping the card&rsquo;s head opens the task, where the work is.']);
+const q6 = '<div style="background: #fffbea; border-radius: 16px; box-shadow: 0 0 0 1px #efe3b0; padding: 22px 26px 12px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">For you to rule</div><ol style="margin: 0; padding-left: 20px; font-size: 14.5px; line-height: 22px; color: #3B4540;">' + [
+  '<b>A (by main task) or B (by place)?</b> <i>I&rsquo;d pick A.</i>',
+  '<b>Where do the subtasks come from?</b> <i>I&rsquo;d take them from the task itself (what&rsquo;s open in it today: births, fostering, counts, pens with feed to set), never written by the agent, so they can&rsquo;t disagree with the task page.</i>',
+  'Still open: the agent&rsquo;s name on the phone, and whether the morning brief buzzes. (Auto-tick is moot: My day has no ticks.)'].map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ol></div>';
+const r6 = '<h1 style="margin: 0; font-size: 30px; line-height: 38px; font-weight: 600; letter-spacing: -.025em;">Round 6: My day in Home&rsquo;s look, work batched with no order, the agent only when there&rsquo;s something (mock-up)</h1><p style="margin: 8px 0 34px; font-size: 16px; line-height: 24px; color: #5D665F; max-width: 2300px;">After your notes on round 5: it was ugly; nothing should show when there&rsquo;s nothing to know; and the day could be your main tasks with their subtasks batched, not a numbered order. Two ways to batch, in the same look as Home on main (df82ba5d).</p>' +
+  row(pf2('1 · A: by main task', 'One card per task you open. Under it, what to do in there, as a batch. The violet band is the agent, only where it has something.', taskA),
+    pf2('2 · B: by place', 'One card per room or block; the tasks there are rows. The room&rsquo;s note at its foot.', byPlace),
+    pf2('3 · The band opens the report', 'For Farrowing: the room&rsquo;s note, then the sows, by pen. <b>Open Farrowing</b> goes into the task.', report6),
+    pf2('4 · A quiet day', 'Same day with nothing the screens can&rsquo;t already show: no bands at all.', quietA),
+    side(rule6, ab6, checks('Home on main: its header (kicker over a 25&nbsp;px title), its cards (icon tile, title, quiet line, chevron) and its groups. The report uses Home&rsquo;s section headings.', 'first, the tasks of the day as cards; second, what to do in each; third, the violet band where there&rsquo;s something to know. Cut: the order, numbers, rail, clock chips, &ldquo;first&rdquo;, the feeding card, any agent line when there&rsquo;s nothing.'), q6));
+const html6 = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>My day, round 6</title>\n<script src="./support.js"></script>\n</head>\n<body>\n<x-dc>\n<helmet>\n<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Inter:wght@400..700&family=Plus+Jakarta+Sans:wght@400..800&display=swap" rel="stylesheet">\n<style>body{margin:0}</style>\n</helmet>\n' +
+  '<div style="width: 3008px; padding: 44px 48px 60px; box-sizing: border-box; background: #F3F4F1; font-family: Geist, system-ui, sans-serif; color: #111511; -webkit-font-smoothing: antialiased;">' + r6 +
+  '</div>\n</x-dc>\n<script type="text/x-dc" data-dc-script data-props=\'{"$preview":{"width":3008,"height":1300}}\'>\nclass Component extends DCLogic {\n  renderVals() { return {}; }\n}\n</script>\n</body>\n</html>\n';
+fs.writeFileSync(path.join(S, 'pub/project/MyDayR6.dc.html'), html6);
+console.log('round 6 ok', Math.round(html6.length / 1024) + ' KB');
+
+// ===== round 7 (9 Nov): My day by room, sections as headings; no feeding; one pass per room; glyphs from the app's registry =====
+Object.assign(IC, {
+  g_grid: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
+  g_heat: 'M12 3c1 5-4 5-4 9 0 2 2 3 3 3-1-3 3-4 3-7 4 4 6 7 4 10-2 4-9 4-12 0-3-5 3-10 6-15z',
+  g_service: 'M13 9.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0M8.5 14v7M6 18.5h5M19.5 10.5a4.5 4.5 0 1 1-9 0M15 6a4.5 4.5 0 0 1 4.5 4.5M17.5 3H21v3.5M21 3l-3.3 3.3',
+  g_preg: 'M3 15h4l3-8 4 12 3-7h4M3 4h18',
+  g_farrow: 'M7.5 5H14.5A4.5 4.5 0 0 1 14.5 14H7.5A4.5 4.5 0 0 1 7.5 5zM19 7.88h1.48a.5.5 0 0 1 .5.5v2.24a.5.5 0 0 1-.5.5H19M11.13 5.1L13.11 2.3L15.27 5.25M3.15 8.42c-1.2-.3-1.4-1.6-.3-2M15.63 8.42h.01M9.25 16.5H12.75A2.25 2.25 0 0 1 12.75 21H9.25A2.25 2.25 0 0 1 9.25 16.5zM15 17.94h0.8a.5.5 0 0 1 .5.5v0.62a.5.5 0 0 1-.5.5H15M13.31 18.21h.01',
+  g_health: 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8M8 12h8M12 8v8',
+  g_treat: 'M15 3l6 6M16 4l-4 4M20 8l-4 4M10 6l8 8M11 7l-7 7v6h6l7-7M4 20l-2 2M8 12l3 3M11 9l3 3',
+  g_transfer: 'M7 7h11l-3-3M17 17H6l3 3'
+});
+const sect7 = (t) => '<div style="margin: 20px 22px 10px; font-size: 17px; font-weight: 500;">' + t + '</div>';
+const roomHead7 = (name, sub) => '<div style="display: flex; align-items: baseline; gap: 8px; padding: 14px 16px 10px;"><span style="align-self: center; display: flex; color: ' + PH.muted + ';">' + svg(IC.g_grid, 16, 1.7) + '</span><span style="font-size: 18px; font-weight: 600; letter-spacing: -.01em;">' + name + '</span>' + (sub ? '<span style="font-size: 13px; color: ' + PH.muted + ';">&middot; ' + sub + '</span>' : '') + '</div>';
+const room7 = (name, sub, rows, note) => card6(roomHead7(name, sub) + rows.map((r) => row6(r[0], r[1], r[2], r[3])).join('') + (note ? agent6(note) : ''));
+const breedDay = H6(kick, 'My day') +
+  sect7('Breeding') + room7('Breeding 1', 'One pass with the boar', [['g_heat', 'Heat check', null, '07:30'], ['g_service', 'Breeding', 'Sows found in heat'], ['g_health', 'Inspection', 'Every sow as you pass']], '000521 has come back on heat twice; ask the vet before you breed her again') +
+  sect7('Gestation') + room7('Gestation 2', null, [['g_health', 'Inspection', 'Health checks, feed in 3 pens'], ['g_preg', 'Pregnancy check', 'Sows bred 28 days ago']], 'Ran hot overnight; check the drinkers in every pen');
+const farrowDay = H6(kick, 'My day') +
+  sect7('Farrowing') + room7('Farrowing 3', null, [['g_farrow', 'Farrowing', 'Births, counts'], ['g_transfer', 'Fostering checks']], 'Ran hot overnight, and 000392 is off her feed') +
+  room7('Farrowing 2', null, [['g_treat', 'Pen-strep', 'Litter in B3', '15:00']]);
+// head6 prints the sub line even when empty: drop it
+const fixEmpty = (h) => h.replace(/<div style="font-size: 13px; color: #657060; margin-top: 2px;">null<\/div>/g, '');
+const report7 = H6('BREEDING 1 &middot; TODAY', 'Worth knowing') +
+  '<div style="display: flex; align-items: center; gap: 8px; margin: 14px 22px 0; font-size: 13px; color: ' + PH.muted + ';">' + disc(LB, 20) + 'From the General Manager, 05:30</div>' +
+  sect7('This room') + card6('<div style="padding: 0 16px;">' + rline('Four sows bred on Monday showed signs again this morning. <b>Watch rows 3 and 4 closely with the boar.</b>', true) + '</div>', '0 18px') +
+  sect7('Sows') + card6('<div style="padding: 0 16px;">' + rpen('A3', pig('000521') + ' has come back on heat twice since September. <b>Ask the vet before you breed her again.</b>', true) + rpen('A7', pig('000534') + ' was lame yesterday. <b>Watch how she gets up.</b>') + '</div>', '0 18px');
+
+const rule7 = rc('How farms work it, as far as I know (to confirm with you)', [
+  '<b>Room by room, yes.</b> The animals of one stage share a room, and the work is done there in one visit. Most farms also keep a direction for hygiene: young and healthy before old and sick (farrowing and nursery before finishing, sick pens last), with a boot change between sections. That direction is a farm rule, not the agent&rsquo;s.',
+  '<b>Heat check, breeding and inspection go together.</b> The boar is walked along the stalls (usually twice a day); sows standing in heat are bred right there, and each sow is looked over on the same pass. So they&rsquo;re one room card, three rows.',
+  '<b>Gestation:</b> the daily look-over is the walk; the pregnancy check is done in the same room visit when sows are due for it.',
+  '<i>Sourced: the heat check PRD (a twice-a-day sweep, pen by pen). The rest is general farm practice, not yet checked with your farms.</i>']);
+const shape7 = rc('Round 7: My day by room', [
+  '<b>Section, then room.</b> The section (Breeding, Gestation, Farrowing) is a heading; each room is one card, its name as the card&rsquo;s title; the tasks done in it are rows, each opening its task. No numbers, no &ldquo;first&rdquo;.',
+  '<b>Rooms are listed in the farm&rsquo;s walking direction,</b> set once for the farm (clean to dirty), not by the agent.',
+  '<b>Feeding is gone.</b> A time shows only where the work has one (heat check 07:30, Pen-strep 15:00).',
+  '<b>The violet band</b> at the foot of a room is the agent, only when it has something; it opens that room&rsquo;s report (frame 3).']);
+const q7 = '<div style="background: #fffbea; border-radius: 16px; box-shadow: 0 0 0 1px #efe3b0; padding: 22px 26px 12px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">For you to rule</div><ol style="margin: 0; padding-left: 20px; font-size: 14.5px; line-height: 22px; color: #3B4540;">' + [
+  '<b>My day by room, sections as headings?</b>',
+  '<b>Does the farm set a walking direction between sections</b> (clean to dirty), so rooms list in that order? <i>I&rsquo;d make it one farm setting, shown only as the list&rsquo;s order.</i>',
+  '<b>Is that how your farms do heat check, breeding and inspection: one pass?</b> If inspection is a separate walk later, it becomes its own room card in the afternoon.',
+  'Still open: the agent&rsquo;s name on the phone, and whether the morning brief buzzes.'].map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ol></div>';
+const r7 = '<h1 style="margin: 0; font-size: 30px; line-height: 38px; font-weight: 600; letter-spacing: -.025em;">Round 7: My day by room, sections as headings, no feeding (mock-up)</h1><p style="margin: 8px 0 34px; font-size: 16px; line-height: 24px; color: #5D665F; max-width: 2300px;">After your notes on round 6: feeding is off; the day is grouped by the rooms you work in, under their sections, with what you do there as rows. Two people&rsquo;s days, and a room&rsquo;s report. Same look as Home on main (df82ba5d); icons from the app&rsquo;s registry.</p>' +
+  row(pf2('1 · Zhao Min: breeding and gestation', 'Breeding 1 is one pass with the boar: heat check, breeding and the look-over. Gestation 2 has the walk and the pregnancy check.', fixEmpty(breedDay)),
+    pf2('2 · Sun Qing: farrowing', 'Two rooms in one section. Farrowing 2 has a time because the dose has one.', fixEmpty(farrowDay)),
+    pf2('3 · A room&rsquo;s report', 'From Breeding 1&rsquo;s violet band: the room, then the sows by pen. Only what the task pages and rules can&rsquo;t show.', fixEmpty(report7)),
+    side(rule7, shape7, checks('Home on main (header, white cards, icon tiles, section headings without icons); round 6&rsquo;s B; the app&rsquo;s icon registry for every glyph (heat, service, pregnancy, farrow, health, treat, transfer, grid for a room).', 'first, which rooms today; second, what to do in each; third, the violet band where there&rsquo;s something to know. Cut: feeding, order numbers, subtasks written as lines, the room&rsquo;s sub-line where it says nothing.'), q7));
+const html7 = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>My day, round 7</title>\n<script src="./support.js"></script>\n</head>\n<body>\n<x-dc>\n<helmet>\n<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Inter:wght@400..700&family=Plus+Jakarta+Sans:wght@400..800&display=swap" rel="stylesheet">\n<style>body{margin:0}</style>\n</helmet>\n' +
+  '<div style="width: 3008px; padding: 44px 48px 60px; box-sizing: border-box; background: #F3F4F1; font-family: Geist, system-ui, sans-serif; color: #111511; -webkit-font-smoothing: antialiased;">' + r7 +
+  '</div>\n</x-dc>\n<script type="text/x-dc" data-dc-script data-props=\'{"$preview":{"width":3008,"height":1400}}\'>\nclass Component extends DCLogic {\n  renderVals() { return {}; }\n}\n</script>\n</body>\n</html>\n';
+fs.writeFileSync(path.join(S, 'pub/project/MyDayR7.dc.html'), html7);
+console.log('round 7 ok', Math.round(html7.length / 1024) + ' KB');
+
+// ===== round 8 (9 Nov): no My day page. Home's unit choice shows who works where (you and the others); the agent's band on the unit page =====
+const CHOOSE = b64('home/workbench.choose-unit/en-390.png'), UNIT = b64('home/workbench.unit-busy/en-390.png');
+// people: initials on a disc; you are the one ink disc
+const av = (t, you, s) => { s = s || 26; return '<span style="width: ' + (you ? 'auto' : s + 'px') + '; min-width: ' + s + 'px; height: ' + s + 'px; padding: ' + (you ? '0 8px' : '0') + '; box-sizing: border-box; border-radius: 99px; display: inline-grid; place-items: center; font-size: ' + (s > 24 ? 11.5 : 10.5) + 'px; font-weight: 700; letter-spacing: .02em; box-shadow: 0 0 0 2px #fff; ' + (you ? 'background: ' + PH.ink + '; color: #fff;' : 'background: #e4e9dc; color: ' + PH.ink + ';') + '">' + t + '</span>'; };
+const avs = (list, s) => '<span style="display: inline-flex; align-items: center; gap: 4px;">' + list.map((p) => av(p === 'You' ? 'You' : p, p === 'You', s)).join('') + '</span>';
+const nobody = '<span style="font-size: 13px; color: #8d968a;">No one</span>';
+// the people working each unit today (Zhao Min is "You")
+const SECTIONS = [
+  { name: 'Gestation', units: [['Unit 6', '8 pigs &middot; 4 pens &middot; 2 tasks', ['ML']], ['Unit 7', '7 pigs &middot; 4 pens &middot; 2 tasks', ['You']], ['Unit 8', '4 pigs &middot; 2 pens &middot; 1 task', ['You', 'WF']], ['Unit 9', '6 pigs &middot; 3 pens &middot; no tasks', []]] },
+  { name: 'Farrowing', units: [['Unit 1', '', ['SQ']], ['Unit 2', '', ['SQ']], ['Unit 3', '', ['LN']], ['Unit 4', '', []]] },
+  { name: 'Breeding', units: [['Unit 10', '', ['You']], ['Unit 11', '', ['ML']]] },
+  { name: 'Nursery', units: [['Unit 12', '', ['ML']], ['Unit 13', '', []]] }
+];
+const blurTop = (src, h) => '<div style="position: absolute; left: 0; top: 0; width: 390px; height: ' + h + 'px; overflow: hidden;"><div style="position: absolute; inset: 0; filter: blur(3px);">' + slice(src, 0, h, 0) + '</div><div style="position: absolute; inset: 0; background: rgba(20,24,19,.32);"></div></div>';
+const sheetShell = (top, title, sub, body) => blurTop(UNIT, top + 30) + '<div style="position: absolute; left: 0; right: 0; top: ' + top + 'px; bottom: 0; background: ' + PH.bg + '; border-radius: 24px 24px 0 0; overflow: hidden;">' +
+  '<div style="width: 40px; height: 4px; border-radius: 2px; background: #c7cebe; margin: 10px auto 0;"></div>' +
+  '<div style="text-align: center; padding: 12px 18px 12px; border-bottom: 1px solid ' + PH.line + ';"><div style="font-size: 20px; font-weight: 500;">' + title + '</div>' + (sub ? '<div style="font-size: 13px; color: ' + PH.muted + '; margin-top: 3px;">' + sub + '</div>' : '') + '</div>' + body +
+  '<div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 18px 26px; background: #fff; border-top: 1px solid ' + PH.line + ';"><div style="height: 56px; border-radius: 14px; border: 1px solid #b6c0ad; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 16px; font-weight: 500;">' + svg(IC.back, 16, 2.2) + 'Back</div></div></div>';
+// A · the chooser as built, each unit with who's on it today at the right
+const unitRow = (u, first) => '<div style="display: flex; align-items: center; gap: 12px; min-height: 68px; padding: 0 14px; border-top: ' + (first ? '0' : '1px solid #edf0e8') + ';">' + tile6('g_grid') + '<div style="flex: 1; min-width: 0;"><div style="font-size: 15px; font-weight: 500;">' + u[0] + '</div><div style="font-size: 13px; color: ' + PH.muted + '; margin-top: 3px;">' + u[1] + '</div></div>' + (u[2].length ? avs(u[2]) : nobody) + '</div>';
+const chooseA = sheetShell(300, 'Choose a unit', 'Gestation &middot; who&rsquo;s on each today', '<div style="margin: 16px 18px 0; background: #fff; border: 1px solid ' + PH.line + '; border-radius: 18px; overflow: hidden;">' + SECTIONS[0].units.map((u, i) => unitRow(u, i === 0)).join('') + '</div>');
+// B · the whole farm at a glance: sections, a tile per unit, your tiles in ink; opened from the section name in Home's header
+const utile = (u) => { const you = u[2].includes('You'); return '<div style="height: 84px; border-radius: 14px; box-sizing: border-box; padding: 9px 9px 8px; display: flex; flex-direction: column; justify-content: space-between; ' + (you ? 'background: ' + PH.ink + '; color: #fff;' : 'background: #fff; box-shadow: inset 0 0 0 1px ' + PH.line + ';') + '">' +
+  '<div style="font-size: 15px; font-weight: 600;">' + u[0].replace('Unit ', 'Unit&nbsp;') + '</div><div style="display: flex; gap: 3px; flex-wrap: wrap;">' + (u[2].length ? u[2].map((p) => '<span style="height: 20px; padding: 0 6px; border-radius: 99px; display: inline-grid; place-items: center; font-size: 10.5px; font-weight: 700; ' + (you ? (p === 'You' ? 'background: #fff; color: ' + PH.ink + ';' : 'background: rgba(255,255,255,.18); color: #fff;') : 'background: #e4e9dc; color: ' + PH.ink + ';') + '">' + p + '</span>').join('') : '<span style="font-size: 11.5px; color: #8d968a;">No one</span>') + '</div></div>'; };
+const mapB = sheetShell(118, 'Who&rsquo;s where today', 'Green Valley Farm', '<div style="padding: 4px 18px 0;">' + SECTIONS.map((s) => '<div style="font-size: 15px; font-weight: 500; margin: 14px 2px 8px;">' + s.name + '</div><div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px;">' + s.units.map(utile).join('') + '</div>').join('') + '</div>');
+// C · Home's header: the units you're on become one-tap tabs beside Overview; the rest stay in the chooser
+const segC = '<div style="position: absolute; left: 18px; right: 18px; top: 100px; height: 58px; box-sizing: border-box; border-radius: 16px; background: #e4e9dc; padding: 4px; display: flex; gap: 4px;">' +
+  ['Overview', 'Unit 7', 'Unit 8', 'Unit 10'].map((t, i) => '<span style="flex: ' + (i ? '1' : '1.25') + '; border-radius: 12px; display: grid; place-items: center; font-size: 14.5px; ' + (t === 'Unit 7' ? 'background: #fff; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.06);' : 'color: ' + PH.ink + ';') + '">' + t + '</span>').join('') +
+  '<span style="width: 44px; flex: none; display: grid; place-items: center; color: ' + PH.ink + ';">' + svg('m6 9 6 6 6-6', 18, 2) + '</span></div>';
+const withC = slice(UNIT, 0, 844, 0) + '<div style="position: absolute; left: 0; right: 0; top: 96px; height: 66px; background: ' + PH.bg + ';"></div>' + segC +
+  // the people line under the header: who else is in this unit
+  '';
+// D · the unit page with the agent's band (only when it has something), between Inspect unit and Today's work
+const bandD = '<div style="position: absolute; left: 18px; right: 18px; top: 424px; height: 64px; box-sizing: border-box; border-radius: 16px; background: ' + LB.box + '; box-shadow: inset 0 0 0 1px ' + LB.line + '; display: flex; align-items: center; gap: 12px; padding-left: 14px;">' + disc(LB, 30) +
+  '<div style="flex: 1; min-width: 0;"><div style="font-size: 15px; font-weight: 600; color: ' + LB.title + ';">Worth knowing</div><div style="font-size: 13px; color: ' + LB.sub + '; margin-top: 2px;">Ran hot overnight; recheck 000306</div></div>' + chev6(LB.icon) + '</div>';
+const withD = '<div style="position: absolute; left: 0; top: 0; width: 390px; height: 760px; overflow: hidden;">' + slice(UNIT, 0, 418, 0) + slice(UNIT, 418, 760, 78) + bandD + '</div>' + slice(UNIT, 760, 844, 0);
+
+const ruleA = rc('Three ways to show who works where', [
+  '<b>A, in the chooser as built.</b> Each unit keeps its row; who&rsquo;s on it today sits at the right as initials. You are the one dark disc, &ldquo;You&rdquo;. A unit no one is on says so. Smallest change.',
+  '<b>B, the whole farm at a glance (I&rsquo;d pick it).</b> Tapping the section name in Home&rsquo;s header (it already opens the sections) shows every section with a tile per unit. Your units are the dark tiles; everyone else&rsquo;s initials are on theirs. One look answers &ldquo;where am I, where is everyone, what has no one&rdquo;.',
+  '<b>C, your units as tabs.</b> Home&rsquo;s Overview | Choose unit becomes Overview and your units, one tap each. Fastest for you, but it shows no one else, so it pairs with A or B.']);
+const ruleD = rc('No My day page', [
+  'A unit&rsquo;s page already lists everything to do there, plans split by room included, so a separate day page only repeated it. It goes, and so does the Your day card.',
+  'The agent&rsquo;s note for a unit is a violet band on that unit&rsquo;s page (frame 4), only when it has something. Task pages stay as built.',
+  'The morning message in the agent&rsquo;s thread names your units and links to them; nothing else to keep in step.']);
+const q8 = '<div style="background: #fffbea; border-radius: 16px; box-shadow: 0 0 0 1px #efe3b0; padding: 22px 26px 12px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">For you to rule</div><ol style="margin: 0; padding-left: 20px; font-size: 14.5px; line-height: 22px; color: #3B4540;">' + [
+  '<b>A, B or C</b> (or B with C)? <i>I&rsquo;d pick B, and add C if switching between your own units is frequent.</i>',
+  '<b>Who sees who:</b> everyone sees everyone&rsquo;s units by initials? <i>I&rsquo;d say yes, names on tap; it&rsquo;s the farm&rsquo;s own team.</i>',
+  '<b>&ldquo;No one&rdquo; is quiet grey, never a warning.</b> Not every unit is visited every day (finishers, contract barns), so an empty unit is normal; only the task pages say when something is late.', 'Still open: a walking direction for the order of units, the agent&rsquo;s name, and whether the morning message buzzes.'].map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ol></div>';
+const r8 = '<h1 style="margin: 0; font-size: 30px; line-height: 38px; font-weight: 600; letter-spacing: -.025em;">Round 8: no My day page; Home shows who works where (mock-up)</h1><p style="margin: 8px 0 34px; font-size: 16px; line-height: 24px; color: #5D665F; max-width: 2300px;">After your note: work is given out by room, and each unit&rsquo;s page already shows everything to do there, so there&rsquo;s no day page. What&rsquo;s left is a clear view of where you are and where everyone else is. Three ways, on Home&rsquo;s real chooser and unit page from main (df82ba5d). Zhao Min is &ldquo;You&rdquo;.</p>' +
+  row(pf2('1 · A: who&rsquo;s on each unit, in the chooser', 'The Choose a unit sheet as built; each unit&rsquo;s people at the right. You are the dark &ldquo;You&rdquo;.', chooseA),
+    pf2('2 · B: who&rsquo;s where, the whole farm (recommended)', 'From the section name in Home&rsquo;s header: every section, a tile per unit. Yours are dark; others carry their initials; empty ones say No one.', mapB),
+    pf2('3 · C: your units as tabs', 'Home&rsquo;s header: Overview, then the units you&rsquo;re on today, one tap each. Others through the arrow.', withC),
+    pf2('4 · A unit&rsquo;s page, with the agent', 'Unit 7 as built, plus the violet band only when the agent has something; it opens the unit&rsquo;s report.', withD),
+    side(ruleA, ruleD, checks('Home on main: the Choose a unit sheet (A), the section switcher in the header (B), the Overview | unit segment (C), the unit page (D); PenMap&rsquo;s tiles for B&rsquo;s grid, four across.', 'first, where you are today (the dark tiles or &ldquo;You&rdquo;); second, who&rsquo;s where else; third, units no one is on. Cut: the My day page, the Your day card, tasks repeated outside their unit, names spelled out (initials; the name on tap).'), q8));
+const html8 = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Who works where, round 8</title>\n<script src="./support.js"></script>\n</head>\n<body>\n<x-dc>\n<helmet>\n<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Inter:wght@400..700&family=Plus+Jakarta+Sans:wght@400..800&display=swap" rel="stylesheet">\n<style>body{margin:0}</style>\n</helmet>\n' +
+  '<div style="width: 3008px; padding: 44px 48px 60px; box-sizing: border-box; background: #F3F4F1; font-family: Geist, system-ui, sans-serif; color: #111511; -webkit-font-smoothing: antialiased;">' + r8 +
+  '</div>\n</x-dc>\n<script type="text/x-dc" data-dc-script data-props=\'{"$preview":{"width":3008,"height":1400}}\'>\nclass Component extends DCLogic {\n  renderVals() { return {}; }\n}\n</script>\n</body>\n</html>\n';
+fs.writeFileSync(path.join(S, 'pub/project/WhoWhereR8.dc.html'), html8);
+console.log('round 8 ok', Math.round(html8.length / 1024) + ' KB');
+
+// ===== round 9 (10 Nov): A chosen. "Worth knowing" as the unit's summary: what goes in it =====
+const rtime = (text, at, first) => '<div style="display: flex; gap: 12px; align-items: baseline; padding: 14px 0; border-top: ' + (first ? '0' : '1px solid #edf0e8') + ';"><div style="flex: 1; font-size: 16px; line-height: 24px;">' + text + '</div>' + (at ? '<span style="flex: none; font: 600 13px ' + MONO + '; color: ' + PH.muted + ';">' + at + '</span>' : '') + '</div>';
+const box9 = (items) => card6('<div style="padding: 0 16px;">' + items + '</div>', '0 18px');
+const by9 = (t) => '<div style="display: flex; align-items: center; gap: 8px; margin: 14px 22px 0; font-size: 13px; color: ' + PH.muted + ';">' + disc(LB, 20) + t + '</div>';
+const head9 = (t) => '<div style="margin: 22px 22px 10px; font-size: 17px; font-weight: 500;">' + t + '</div>';
+// 1 · the unit page as built, with the band: the first thing worth knowing as its line
+const band9 = (line) => '<div style="position: absolute; left: 18px; right: 18px; top: 424px; height: 64px; box-sizing: border-box; border-radius: 16px; background: ' + LB.box + '; box-shadow: inset 0 0 0 1px ' + LB.line + '; display: flex; align-items: center; gap: 12px; padding-left: 14px;">' + disc(LB, 30) +
+  '<div style="flex: 1; min-width: 0;"><div style="font-size: 15px; font-weight: 600; color: ' + LB.title + ';">Worth knowing</div><div style="font-size: 13px; color: ' + LB.sub + '; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + line + '</div></div>' + chev6(LB.icon) + '</div>';
+const unit9 = (line) => '<div style="position: absolute; left: 0; top: 0; width: 390px; height: 760px; overflow: hidden;">' + slice(UNIT, 0, 418, 0) + slice(UNIT, 418, 760, 78) + band9(line) + '</div>' + slice(UNIT, 760, 844, 0);
+// 2 · the full summary: reminders, across your tasks, the room, from the manager
+const full9 = H6('UNIT 7 &middot; TODAY', 'Worth knowing') + by9('General Manager &middot; 05:30') +
+  head9('Reminders') + box9(rtime('Vet visit for the sows in C2.', '10:00', true) + rtime('Withdrawal ends tomorrow for ' + pig('000306') + '; she can move from Thursday.') + rtime('Batch 31&rsquo;s booster is due Friday. <b>Check there are 40 doses in the fridge.</b>')) +
+  head9('Across your tasks') + box9(rpen('C2', pig('000306') + ' is on To treat and in today&rsquo;s pregnancy check. <b>Treat her first, scan her after.</b>', true)) +
+  head9('The room') + box9(rline('3&nbsp;&deg;C over target from 01:00 to 05:00, and the sows in C1 to C4 ate less. <b>Check the drinkers.</b>', true)) +
+  head9('From the manager') + box9(rtime('Keep everyone in C2 until the vet has been. <span style="color: ' + PH.muted + ';">Li Wei, yesterday</span>', null, true));
+// 3 · a light day: only what there is; empty headings are absent
+const light9 = H6('UNIT 7 &middot; TODAY', 'Worth knowing') + by9('General Manager &middot; 05:30') +
+  head9('Reminders') + box9(rtime('Vet visit for the sows in C2.', '10:00', true));
+
+const kinds9 = '<div style="background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px #E6E9E2; padding: 22px 26px 14px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">What a unit&rsquo;s &ldquo;Worth knowing&rdquo; could hold (my proposal)</div>' +
+  '<table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 20px; color: #3B4540;"><tr style="text-align: left; color: #5D665F;"><th style="padding: 6px 10px 6px 0; font-weight: 600;">Kind</th><th style="padding: 6px 10px; font-weight: 600;">Example</th><th style="padding: 6px 10px; font-weight: 600;">Where it comes from</th><th style="padding: 6px 0 6px 10px; font-weight: 600;">In?</th></tr>' +
+  [['<b>Reminders</b>', 'Vet at 10:00; a withdrawal ending; a booster due Friday, check doses', 'Dates already in the system (plans, treatments, the console calendar), gathered for this unit', 'Yes, first'],
+   ['<b>Across your tasks</b>', 'One sow in two of today&rsquo;s tasks: treat first, scan after', 'The tasks, read together; each task alone can&rsquo;t see it', 'Yes'],
+   ['<b>The room</b>', 'Ran hot overnight and they ate less; ammonia up three days', 'Sensors and feed records, against the unit&rsquo;s normal', 'Yes'],
+   ['<b>From the manager</b>', '&ldquo;Keep everyone in C2 until the vet has been&rdquo;', 'A note the manager leaves on the unit from the console', 'Yes, with name'],
+   ['Patterns the agent sees', 'More return heats than usual in Batch 30', 'The agent, across records', 'Only when it changes today&rsquo;s work'],
+   ['Task counts and progress', '2 sows ready to check; 2/6 recorded', 'Each task card, right below', 'No: said there'],
+   ['Late tasks', 'Fostering checks 2 days late', 'Home and the task pages', 'No: said there'],
+   ['Pen notes', 'Close the aisle gate (G. Hansen)', 'The pen, where they&rsquo;re read', 'No: they stay on the pen']].map((r) => '<tr style="border-top: 1px solid #edf0e8;">' + r.map((c, i) => '<td style="padding: 8px ' + (i === 3 ? '0' : '10px') + ' 8px ' + (i ? '10px' : '0') + '; vertical-align: top;">' + c + '</td>').join('') + '</tr>').join('') + '</table></div>';
+const rule9 = rc('How it shows', [
+  '<b>The band</b> sits on the unit page between Inspect unit and Today&rsquo;s work, with the first thing worth knowing as its line. No band when there&rsquo;s nothing.',
+  '<b>The page</b> keeps the kinds in a fixed order: Reminders, Across your tasks, The room, From the manager. An empty kind has no heading (frame 3).',
+  '<b>Short by rule:</b> a line each, the thing to do in bold, a time at the right where there is one. Nothing a task card or a pen already says.']);
+const q9 = '<div style="background: #fffbea; border-radius: 16px; box-shadow: 0 0 0 1px #efe3b0; padding: 22px 26px 12px;"><div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">For you to rule</div><ol style="margin: 0; padding-left: 20px; font-size: 14.5px; line-height: 22px; color: #3B4540;">' + [
+  '<b>These four kinds, in this order?</b> Anything to add or cut?',
+  '<b>From the manager:</b> may a manager leave a note on a unit from the console? <i>It&rsquo;s a console feature; I&rsquo;d say yes, shown here with their name.</i>',
+  'Still open: the agent&rsquo;s name (General Manager would clash with a real manager&rsquo;s notes here, which argues for Assistant), a walking direction for the units, and whether the morning message buzzes.'].map((x) => '<li style="margin-bottom: 8px;">' + x + '</li>').join('') + '</ol></div>';
+const r9 = '<h1 style="margin: 0; font-size: 30px; line-height: 38px; font-weight: 600; letter-spacing: -.025em;">Round 9: &ldquo;Worth knowing&rdquo; as the unit&rsquo;s summary: what goes in it (mock-up)</h1><p style="margin: 8px 0 34px; font-size: 16px; line-height: 24px; color: #5D665F; max-width: 2300px;">After round 8: A it is (who&rsquo;s on each unit, in the Choose a unit sheet). The violet band on the unit page becomes the unit&rsquo;s summary: reminders and the general things no single task shows. On Home&rsquo;s real unit page from main (df82ba5d).</p>' +
+  row(pf2('1 · The unit page, with its band', 'Unit 7 as built. The band&rsquo;s line is the first thing worth knowing; tapping it opens 2.', unit9('Vet visit for the sows in C2 at 10:00')),
+    pf2('2 · A full day', 'Four kinds, each only when it has something: reminders first, then what crosses your tasks, the room, and the manager&rsquo;s note.', full9),
+    pf2('3 · A light day', 'Only a reminder, so only that heading. A day with nothing has no band at all.', light9),
+    '<div style="flex: 1; max-width: 1300px; display: flex; flex-direction: column; gap: 20px; padding-top: 168px;">' + kinds9 + '<div style="display: flex; gap: 20px; align-items: flex-start;"><div style="flex: 1;">' + rule9 + '</div><div style="flex: 1;">' + checks('the unit page on main (the band in its card gap); the pen note drawer and Home&rsquo;s section headings for the page; the report pages of rounds 6 and 7.', 'first, reminders with times; then what no task shows alone; then the room; then a person&rsquo;s note. Cut: counts and progress (the task cards), late tasks (Home), pen notes (the pen), anything the agent can&rsquo;t tie to today.') + '</div></div>' + q9 + '</div>');
+const html9 = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Worth knowing, round 9</title>\n<script src="./support.js"></script>\n</head>\n<body>\n<x-dc>\n<helmet>\n<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Inter:wght@400..700&family=Plus+Jakarta+Sans:wght@400..800&display=swap" rel="stylesheet">\n<style>body{margin:0}</style>\n</helmet>\n' +
+  '<div style="width: 3008px; padding: 44px 48px 60px; box-sizing: border-box; background: #F3F4F1; font-family: Geist, system-ui, sans-serif; color: #111511; -webkit-font-smoothing: antialiased;">' + r9 +
+  '</div>\n</x-dc>\n<script type="text/x-dc" data-dc-script data-props=\'{"$preview":{"width":3008,"height":1400}}\'>\nclass Component extends DCLogic {\n  renderVals() { return {}; }\n}\n</script>\n</body>\n</html>\n';
+fs.writeFileSync(path.join(S, 'pub/project/WorthKnowingR9.dc.html'), html9);
+console.log('round 9 ok', Math.round(html9.length / 1024) + ' KB');
