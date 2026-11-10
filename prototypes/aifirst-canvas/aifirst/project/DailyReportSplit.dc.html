@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home and the daily report</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}.dr-num{font-variant-numeric:tabular-nums}</style>
+</helmet>
+<div style="width: 1400px; height: 1420px; box-sizing: border-box; padding: 48px; background: #F3F4F1; font-family: 'Geist', system-ui, sans-serif; color: #1B211C; -webkit-font-smoothing: antialiased">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">Home shows state, the daily report explains change</h1>
+  <p style="margin: 8px 0 0; font-size: 14px; line-height: 21px; color: #5D665F; max-width: 1180px">The same Monday morning, both ways. Home holds what is true every day, against plan. The report, written by the agents at 06:00 and linked in the farm's group chat, holds only what happened, why, and what is coming. A Home figure only shows up in the report when it moved, and then with the reason: Home says 12 short, the report says why.</p>
+
+  <div style="display: flex; gap: 56px; margin-top: 30px; align-items: flex-start">
+    <div style="width: 467px; flex: none">
+      <div style="font-size: 17px; font-weight: 600">Home · state</div>
+      <div style="font-size: 13px; line-height: 20px; color: #5D665F; margin: 2px 0 14px; min-height: 40px">Same figures in the same places every day. Health tab shown; the toggle works.</div>
+      <div style="width: 467px; height: 848px; border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 1px #DADFD5, 0 12px 32px rgba(17,21,17,.10)">
+        <dc-import name="HomeGPane" tab="health" hint-size="467px,848px"></dc-import>
+      </div>
+    </div>
+
+    <div style="width: 780px; flex: none">
+      <div style="font-size: 17px; font-weight: 600">Daily report · change</div>
+      <div style="font-size: 13px; line-height: 20px; color: #5D665F; margin: 2px 0 14px; min-height: 40px">One page for everyone: your part on top, then the farm's. Each line is signed by the agent who wrote it, with what it rests on.</div>
+      <div style="border-radius: 16px; background: #FFFFFF; box-shadow: 0 0 0 1px #DADFD5, 0 12px 32px rgba(17,21,17,.10); padding: 28px 32px 30px">
+        <div style="display: flex; align-items: baseline; gap: 10px">
+          <h2 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em">Daily report · Mon 9 Nov</h2>
+          <span style="margin-left: auto; font-size: 12.5px; color: #8A938C">covers Sun 8 Nov</span>
+        </div>
+        <div style="margin-top: 4px; font-size: 13px; color: #5D665F">Hillside Sow Farm · written by the General Manager at 06:00 with Production, Vet and Equipment</div>
+
+        <!-- for you -->
+        <div style="margin-top: 22px; padding: 14px 16px; border-radius: 14px; background: #F6F7F1">
+          <div style="display: flex; align-items: center; gap: 8px"><span style="width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; background: #1B211C; color: #FFFFFF; font-size: 11px; font-weight: 600">A</span><span style="font-size: 15px; font-weight: 600">For you, Adam</span><a href="#" style="margin-left: auto; font-size: 13px; font-weight: 500; color: #3B4540; text-decoration: none">6 decisions due today in your Inbox ›</a></div>
+          <sc-for list="{{mine}}" as="r" hint-placeholder-count="3">
+            <div style="display: grid; grid-template-columns: 26px 1fr; gap: 10px; margin-top: 12px">
+              <span style="width: 26px; height: 26px; display: grid; place-items: center; border-radius: 8px; background: {{r.bg}}; color: {{r.ink}}; font-size: 10px; font-weight: 600">{{r.who}}</span>
+              <div><div style="font-size: 14px; font-weight: 600; line-height: 20px">{{r.title}}</div><div style="font-size: 13.5px; line-height: 20px; color: #3B4540">{{r.body}}</div></div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- what happened -->
+        <div style="margin-top: 24px; font-size: 13px; font-weight: 600; color: #5D665F">What happened</div>
+        <sc-for list="{{happened}}" as="r" hint-placeholder-count="5">
+          <div style="display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 13px 0; border-bottom: 1px solid #F0F1EC">
+            <span style="width: 26px; height: 26px; display: grid; place-items: center; border-radius: 8px; background: {{r.bg}}; color: {{r.ink}}; font-size: 10px; font-weight: 600">{{r.who}}</span>
+            <div>
+              <div style="display: flex; align-items: baseline; gap: 8px"><span style="font-size: 12px; font-weight: 600; color: #5D665F">{{r.area}}</span><span style="font-size: 14.5px; font-weight: 600">{{r.title}}</span></div>
+              <div style="margin-top: 2px; font-size: 13.5px; line-height: 20px; color: #3B4540">{{r.body}}</div>
+              <div style="display: flex; gap: 6px; margin-top: 7px"><sc-for list="{{r.tags}}" as="t" hint-placeholder-count="2"><span style="font-size: 11.5px; line-height: 20px; padding: 0 7px; border-radius: 6px; background: #F3F4F1; color: #5D665F">{{t}}</span></sc-for></div>
+            </div>
+          </div>
+        </sc-for>
+
+        <!-- coming up -->
+        <div style="margin-top: 22px; font-size: 13px; font-weight: 600; color: #5D665F">Coming up</div>
+        <sc-for list="{{coming}}" as="c" hint-placeholder-count="3">
+          <div style="display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid #F0F1EC; font-size: 13.5px; line-height: 20px"><span style="width: 34px; flex: none; font-weight: 600">{{c.day}}</span><span style="color: #3B4540">{{c.text}}</span></div>
+        </sc-for>
+
+        <div style="margin-top: 18px; padding: 10px 12px; border-radius: 10px; border: 1px dashed #DADFD5; font-size: 12.5px; line-height: 18px; color: #5D665F">Not repeated here, because Home always shows them: the whole line and the batches moving this week, feed used, deaths this week, the health tags pigs carry, pigs on treatment and in withdrawal, spend.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1400,"height":1420}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const A = { VT: { bg: '#DDF1EF', ink: '#1F6F68' }, PR: { bg: '#FCEFD6', ink: '#8A5A12' }, BS: { bg: '#ECE8FB', ink: '#5B4AB3' }, EQ: { bg: '#FBE4E1', ink: '#A33A2E' }, GM: { bg: '#E7E9E4', ink: '#1B211C' } };
+    const r = (who, o) => Object.assign({ who }, A[who], o);
+    return {
+      mine: [
+        r('PR', { title: 'Initiative: wean at 26 days, Batch 32 · day 12 of 42', body: 'Weaning weights 0.3 kg above Batch 30 so far. Done as planned: 2 of 3 weighings on time.' }),
+        r('VT', { title: 'Initiative: contain PRRS in Nursery 2 · day 5', body: 'No new cases since Fri. Tuesday’s sampling decides whether the extra daily checks stop.' }),
+        r('EQ', { title: 'Follow-up: the fan repair you approved on Sat', body: 'Booked for 10:00 today in Nursery 3.' })
+      ],
+      happened: [
+        r('VT', { area: 'Health', title: 'Fever cluster in Gestation 2', body: '4 sows since Fri (B14, B15, D40, D41), all in lane B. Likely PRRS re-exposure; samples taken Sun. These are the 4 fever tags on Home.', tags: ['4 temperature records', 'confidence: medium'] }),
+        r('PR', { area: 'Production', title: 'Batch 32 weaned 12 short of plan', body: '9 of the losses were in Farrowing 2 on days 1–3, all in the 4 crates nearest the door, where the heat lamps failed on 21 Oct.', tags: ['weaning counts', 'death records'] }),
+        r('GM', { area: 'Feed', title: 'Count closed 2 % over plan', body: '868 t used against 851 t planned since 1 Oct. The gap is in Finisher 2, where the feeder line leaked until 3 Nov.', tags: ['count 31 Oct', 'deliveries'] }),
+        r('EQ', { area: 'Equipment', title: 'Nursery 3 ran warm from 05:10', body: 'A fan stopped; the room reached 2.4 °C over set point. No losses so far. Repair at 10:00.', tags: ['room sensor', 'fan status'] }),
+        r('GM', { area: 'Missed', title: '2 of 8 fostering checks not done', body: 'Farrowing 1 on Sun. Moved to 08:00 today on Sun Qing’s day plan.', tags: ['tasks'] })
+      ],
+      coming: [
+        { day: 'Tue', text: 'PRRS sampling in Nursery 2 (30 pigs).' },
+        { day: 'Thu', text: 'Last 2 loads of Batch 9 to Fuxing; the 18 in withdrawal stay behind. Feed delivery, 30 t.' },
+        { day: 'Mon', text: 'Batch 37 starts farrowing in Farrowing 1, about 10 sows a day.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

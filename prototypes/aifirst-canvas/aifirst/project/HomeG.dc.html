@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home F: a real carousel, one dashboard card</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}.hf-btn{border:0;margin:0;font:inherit;color:inherit;text-align:left;cursor:pointer;background:none;padding:0}.hf-card:hover{box-shadow:0 0 0 1px #D5DAD0,0 2px 8px rgba(17,21,17,.07)}.hf-row:hover{background:#F6F7F3}.hf-nav:hover{background:#EEF0EA}.hf-num{font-variant-numeric:tabular-nums}@keyframes hfSlide{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}@keyframes hfTimer{from{width:0}to{width:100%}}@keyframes upA{from{transform:translateY(100%)}to{transform:none}}@keyframes upB{from{transform:translateY(100%)}to{transform:none}}.hf-ct{opacity:0}.hf-col:hover .hf-ct{opacity:1}.hf-tip{opacity:0;pointer-events:none;transition:opacity .12s}.hf-stop:hover .hf-tip{opacity:1}@keyframes hfIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 1640px; height: 1150px; box-sizing: border-box; padding: 48px; background: #F3F4F1; font-family: 'Geist', system-ui, sans-serif; color: #1B211C; -webkit-font-smoothing: antialiased">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">Home G: your picks together (ticker B, doors D, icon tabs C, dashboard A refined, list A)</h1>
+  <p style="margin: 8px 0 0; font-size: 14px; line-height: 21px; color: #5D665F; max-width: 1180px">Decide is the ticker band. Day plan leads the doors with who is on today. The area switch is three icon tabs. The dashboard card keeps A's facts with clearer layout: the period on the header, the comparison chip beside the figure's name, values before labels. The dashboard shows standing state only. Production is the farm's own line, drawn like a flight card (pigs at each stage, hover a stop) with the batches moving this week under it; Health is deaths, the health tags pigs carry now, treatment and withdrawal; Farm is spend, cost per kg, equipment and feed. What happened and why goes in the daily report. Faces show the person's photo when they have uploaded one, initials when not. Press Play: the band turns, the tabs and the Artifacts menu work.</p>
+
+  <div style="display: flex; gap: 56px; margin-top: 30px">
+    <sc-for list="{{panes}}" as="pn" hint-placeholder-count="3">
+      <div style="width: 467px">
+        <div style="font-size: 17px; font-weight: 600">{{pn.label}}</div>
+        <div style="font-size: 13px; line-height: 20px; color: #5D665F; margin: 2px 0 14px; min-height: 40px">{{pn.note}}</div>
+        <div style="position: relative; width: 467px; height: 860px; border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 1px #DADFD5, 0 12px 32px rgba(17,21,17,.10); background: #F6F7F1; display: flex; flex-direction: column">
+
+          <div style="height: 52px; flex: none; box-sizing: border-box; display: flex; align-items: center; gap: 2px; padding: 0 10px; background: #FFFFFF; border-bottom: 1px solid #ECEEE8">
+            <span style="display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 10px; border-radius: 10px; background: #EEF0EA; font-size: 13px; font-weight: 600">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"></path></svg>
+              Home
+              <span style="font-size: 11px; font-weight: 500; background: #1B211C; color: #FFFFFF; border-radius: 999px; padding: 0 7px; line-height: 18px">17</span>
+            </span>
+            <span style="display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 10px; font-size: 13px; color: #3B4540">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3ZM9 3v15M15 6v15"></path></svg>
+              Farm view
+            </span>
+            <span style="flex: 1"></span>
+            <button type="button" class="hf-btn" onClick="{{pn.toggleMenu}}" aria-expanded="{{pn.menuOpen}}" style="display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 10px; border-radius: 10px; background: {{pn.menuBg}}; font-size: 13px; font-weight: 500; color: #3B4540">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.doc}}"></path></svg>
+              Artifacts
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m6 9 6 6 6-6"></path></svg>
+            </button>
+          </div>
+          <sc-for list="{{pn.menu}}" as="m" hint-placeholder-count="0">
+            <div style="position: absolute; top: 50px; right: 10px; z-index: 5; width: 300px; padding: 6px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E1E4DD, 0 16px 40px rgba(17,21,17,.16); animation: hfIn .18s ease-out">
+              <div style="padding: 8px 10px 6px; font-size: 12px; color: #5D665F">Pages you asked an agent to keep</div>
+              <sc-for list="{{artifacts}}" as="a" hint-placeholder-count="5">
+                <button type="button" class="hf-btn hf-row" style="display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box; min-height: 48px; padding: 6px 10px; border-radius: 9px">
+                  <span style="width: 26px; height: 26px; flex: none; display: grid; place-items: center; border-radius: 8px; background: {{a.bg}}; color: {{a.ink}}; font-size: 10px; font-weight: 600">{{a.who}}</span>
+                  <span style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+                    <span style="font-size: 13.5px; font-weight: 500; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{a.name}}</span>
+                    <span style="font-size: 12px; color: #5D665F">{{a.kind}} · {{a.date}}</span>
+                  </span>
+                </button>
+              </sc-for>
+              <div style="margin-top: 4px; padding: 10px 10px 6px; border-top: 1px solid #F0F1EC; font-size: 13px; font-weight: 500; color: #3B4540">All 9 artifacts</div>
+            </div>
+          </sc-for>
+
+          <div style="flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none">
+            <div style="padding: 12px 16px 12px">
+
+              <!-- Decide: ticker band, title inside -->
+              <a href="#" style="display: flex; flex-direction: column; box-sizing: border-box; height: 76px; padding: 10px 14px 9px; border-radius: 14px; background: #1E2A22; color: #FFFFFF; text-decoration: none">
+                <span style="display: flex; align-items: center; gap: 12px; flex: 1">
+                  <span style="display: flex; flex-direction: column; align-items: flex-start; flex: none; padding-right: 14px; border-right: 1px solid rgba(255,255,255,.14)"><span style="font-size: 12.5px; font-weight: 600; line-height: 16px; color: #DCE6DE">Decide</span><span style="display: flex; align-items: baseline; gap: 5px"><span class="hf-num" style="font-size: 24px; font-weight: 600; line-height: 28px">17</span><span style="font-size: 11.5px; color: #F2C77F; font-weight: 600">6 today</span></span></span>
+                  <span style="position: relative; flex: 1; min-width: 0; height: 40px; overflow: hidden">
+                    <span style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; animation: {{tkAnim}} .45s cubic-bezier(.2,.8,.2,1)">
+                      <span style="display: flex; align-items: center; gap: 7px; font-size: 12px; color: #AFC2B5"><span style="width: 8px; height: 8px; border-radius: 50%; background: {{tk.dot}}"></span>{{tk.agent}}<span style="margin-left: auto; font-weight: 600; color: {{tk.dueDark}}">{{tk.when}}</span></span>
+                      <span style="font-size: 14.5px; font-weight: 600; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{tk.title}}</span>
+                    </span>
+                  </span>
+                </span>
+                <span style="display: flex; gap: 2px; height: 3px; margin-top: 5px"><sc-for list="{{tsegs}}" as="s" hint-placeholder-count="17"><span style="flex: 1; border-radius: 2px; background: {{s.c}}"></span></sc-for></span>
+              </a>
+              <!-- doors: Day plan leads -->
+              <div style="display: grid; grid-template-columns: 1.35fr 1fr; gap: 8px; margin-top: 12px">
+                <button type="button" class="hf-btn hf-card" style="display: flex; flex-direction: column; padding: 12px 14px 13px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2, 0 1px 2px rgba(17,21,17,.04)">
+                  <span style="display: flex; align-items: center; gap: 6px; width: 100%; font-size: 13.5px; font-weight: 600"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #28734F; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.day}}"></path></svg>Day plan<span style="margin-left: auto; font-weight: 400; font-size: 12px; color: #8A938C">Mon 9 Nov</span></span>
+                  <span style="display: flex; align-items: baseline; gap: 5px; margin-top: 8px"><span class="hf-num" style="font-size: 26px; font-weight: 600; letter-spacing: -0.02em; line-height: 28px">23</span><span style="font-size: 12.5px; color: #5D665F">jobs · 7 people</span></span>
+                  <span style="display: flex; margin-top: 9px"><sc-for list="{{faces}}" as="x" hint-placeholder-count="7"><span style="width: 26px; height: 26px; margin-right: -4px; flex: none; position: relative; display: grid; place-items: center; border-radius: 50%; overflow: hidden; background: {{x.bg}}; color: #1B211C; font-size: 11px; font-weight: 600; box-shadow: 0 0 0 2px #FFFFFF"><sc-for list="{{x.photo}}" as="ph" hint-placeholder-count="0"><svg viewBox="0 0 32 32" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%"><rect width="32" height="32" style="fill: {{ph.bg}}"></rect><path d="M4 34c1-7 6-10 12-10s11 3 12 10Z" style="fill: {{ph.shirt}}"></path><ellipse cx="16" cy="14.5" rx="6" ry="7" style="fill: {{ph.skin}}"></ellipse><path d="{{ph.hair}}" style="fill: {{ph.hairCol}}"></path></svg></sc-for><sc-for list="{{x.init}}" as="t" hint-placeholder-count="1">{{t}}</sc-for></span></sc-for></span>
+                </button>
+                <span style="display: flex; flex-direction: column; gap: 8px">
+                  <sc-for list="{{doorsSmall}}" as="t" hint-placeholder-count="2">
+                    <button type="button" class="hf-btn hf-card" style="flex: 1; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 12px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2, 0 1px 2px rgba(17,21,17,.04)">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex: none; fill: none; stroke: #28734F; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="{{t.icon}}"></path></svg>
+                      <span style="flex: 1; font-size: 13.5px; font-weight: 600; white-space: nowrap">{{t.name}}</span>
+                      <span class="hf-num" style="font-size: 16px; font-weight: 600">{{t.n}}</span>
+                    </button>
+                  </sc-for>
+                </span>
+              </div>
+
+              <!-- the area switch: icon tabs -->
+              <div role="tablist" aria-label="Areas" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px">
+                <sc-for list="{{pn.segs}}" as="g" hint-placeholder-count="3">
+                  <button type="button" role="tab" aria-selected="{{g.on}}" class="hf-btn" onClick="{{g.pick}}" style="height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 12px; background: {{g.bg}}; box-shadow: {{g.sh}}; color: {{g.ink}}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="{{g.icon}}"></path></svg>
+                    <span style="font-size: 13px; font-weight: {{g.w}}">{{g.label}}</span>
+                  </button>
+                </sc-for>
+              </div>
+
+              <!-- one dashboard card for the area: quiet; labels, goals and weeks live in hover -->
+              <sc-for list="{{pn.dash}}" as="db" hint-placeholder-count="1">
+                <div class="hf-card" style="display: flex; flex-direction: column; width: 100%; box-sizing: border-box; margin-top: 8px; border-radius: 16px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2, 0 1px 2px rgba(17,21,17,.04); animation: hfIn .25s ease-out">
+                  <span style="display: flex; align-items: center; gap: 8px; min-height: 30px; padding: 10px 10px 0 14px">
+                    <sc-for list="{{db.lineBox}}" as="lbx" hint-placeholder-count="0"><span style="position: relative">
+                      <button type="button" class="hf-btn hf-nav" aria-haspopup="menu" aria-expanded="{{lbx.open}}" onClick="{{lbx.toggle}}" style="display: flex; align-items: center; gap: 5px; height: 30px; margin-left: -8px; padding: 0 8px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #1B211C">{{lbx.label}}<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #5D665F; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m6 9 6 6 6-6"></path></svg></button>
+                      <sc-for list="{{lbx.menu}}" as="mn" hint-placeholder-count="0"><span role="menu" aria-label="Production lines" style="position: absolute; top: calc(100% + 4px); left: -8px; z-index: 8; width: 230px; display: flex; flex-direction: column; padding: 4px; box-sizing: border-box; border-radius: 10px; border: 1px solid #E6E9E2; background: #FFFFFF; box-shadow: 0 20px 25px -5px rgba(17,21,17,.10), 0 8px 10px -6px rgba(17,21,17,.10)">
+                        <sc-for list="{{db.lines}}" as="ln" hint-placeholder-count="4"><button type="button" role="menuitemradio" aria-checked="{{ln.on}}" class="hf-btn hf-nav" onClick="{{ln.pick}}" style="display: grid; grid-template-columns: 16px minmax(0, 1fr); align-items: center; gap: 8px; padding: 6px 8px; border-radius: 7px; margin-bottom: {{ln.gap}}; box-shadow: {{ln.sep}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; visibility: {{ln.vis}}; fill: none; stroke: #1B211C; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="M20 6 9 17l-5-5"></path></svg><span style="display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 500; line-height: 18px">{{ln.label}}</span><span style="font-size: 12px; line-height: 16px; color: #5D665F">{{ln.type}}</span></span></button></sc-for>
+                      </span></sc-for>
+                    </span></sc-for>
+                    <sc-for list="{{db.period}}" as="pd" hint-placeholder-count="0"><span style="font-size: 12.5px; color: #5D665F">{{pd}}</span></sc-for>
+                    <button type="button" class="hf-btn hf-nav" aria-label="Open {{db.name}}" style="margin-left: auto; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #3B4540; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 18 6-6-6-6"></path></svg></button>
+                  </span>
+                  <span style="display: flex; flex-direction: column; width: 100%; box-sizing: border-box; padding: 8px 14px 14px">
+                    <sc-for list="{{db.big}}" as="bg" hint-placeholder-count="1">
+                      <span class="hf-stop" data-big="1" style="position: relative; align-self: flex-start; display: flex; align-items: baseline; gap: 6px; cursor: default"><span class="hf-num" style="font-size: 30px; font-weight: 600; letter-spacing: -0.03em; line-height: 34px; color: {{bg.ink}}">{{bg.v}}</span><span style="font-size: 13px; color: #5D665F">{{bg.unit}}</span><span class="hf-tip" style="position: absolute; top: calc(100% + 4px); left: 0; z-index: 6; white-space: nowrap; display: flex; flex-direction: column; gap: 6px; min-width: 128px; box-sizing: border-box; padding: 7px 10px 8px; border-radius: 8px; border: 1px solid #E6E9E2; background: #FFFFFF; color: #1B211C; box-shadow: 0 20px 25px -5px rgba(17,21,17,.10), 0 8px 10px -6px rgba(17,21,17,.10); text-align: left; font-weight: 400"><span style="font-size: 12px; font-weight: 500; line-height: 16px; color: #1B211C">{{bg.title}}</span><sc-for list="{{bg.rows}}" as="tr" hint-placeholder-count="2"><span style="display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 16px"><sc-for list="{{tr.dot}}" as="dc" hint-placeholder-count="0"><span style="width: 10px; height: 10px; flex: none; border-radius: 2px; background: {{dc}}"></span></sc-for><span style="color: #5D665F">{{tr.a}}</span><span style="margin-left: auto; padding-left: 16px; font-variant-numeric: tabular-nums; font-weight: 500; color: #1B211C">{{tr.b}}</span></span></sc-for><sc-for list="{{bg.warn}}" as="tw" hint-placeholder-count="0"><span style="padding-top: 6px; border-top: 1px solid #F0F1EC; font-size: 12px; font-weight: 500; line-height: 16px; color: #8A5A12">{{tw}}</span></sc-for></span></span>
+                    </sc-for>
+                    <sc-for list="{{db.hero}}" as="hc" hint-placeholder-count="0">
+                      <span style="position: relative; display: block; width: 100%; box-sizing: border-box; padding-right: 30px; margin-top: 10px">
+                        <svg viewBox="0 0 400 84" aria-hidden="true" style="display: block; width: 100%; height: auto; overflow: visible">
+                          <defs><linearGradient id="hfArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3E8A63" stop-opacity=".2"></stop><stop offset="1" stop-color="#3E8A63" stop-opacity="0"></stop></linearGradient></defs>
+                          <line x1="0" x2="400" y1="{{hc.tY}}" y2="{{hc.tY}}" style="stroke: #9AA39C; stroke-width: 1.2; stroke-dasharray: 4 4"></line>
+                          <polygon points="{{hc.area}}" style="fill: url(#hfArea)"></polygon>
+                          <polyline points="{{hc.pts}}" style="fill: none; stroke: #1F5C3F; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></polyline>
+                          <circle cx="{{hc.lastX}}" cy="{{hc.lastY}}" r="4.5" style="fill: #1F5C3F; stroke: #FFFFFF; stroke-width: 2"></circle>
+                        </svg>
+                        <span class="hf-num" style="position: absolute; right: 0; top: {{hc.tLabTop}}; width: 26px; font-size: 11px; color: #8A938C; text-align: right">{{hc.tLab}}</span>
+                        <span style="position: absolute; top: 0; bottom: 0; left: 0; right: 30px; display: flex">
+                          <sc-for list="{{hc.cols}}" as="cl" hint-placeholder-count="26">
+                            <span class="hf-col" style="position: relative; flex: 1; cursor: default">
+                              <span class="hf-ct" style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: #C9CFC5"></span>
+                              <span class="hf-ct hf-num" style="position: absolute; left: 50%; bottom: calc(100% + 4px); transform: translateX({{cl.tx}}); white-space: nowrap; font-size: 11.5px; font-weight: 600; line-height: 20px; padding: 0 7px; border-radius: 6px; background: #1E2A22; color: #FFFFFF">{{cl.t}}</span>
+                            </span>
+                          </sc-for>
+                        </span>
+                      </span>
+                    </sc-for>
+                    <sc-for list="{{db.budget}}" as="bu" hint-placeholder-count="0">
+                      <span class="hf-stop" data-budget="1" style="position: relative; display: flex; flex-direction: column; margin-top: 14px; cursor: default">
+                        <span style="position: relative; display: flex; gap: 2px; height: 12px; border-radius: 4px; background: #EEF0EA">
+                          <sc-for list="{{bu.parts}}" as="bp" hint-placeholder-count="4"><span style="width: {{bp.w}}; border-radius: 3px; background: {{bp.col}}"></span></sc-for>
+                          <span style="position: absolute; left: {{bu.pace}}; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; border-radius: 1px; background: #1B211C"></span>
+                        </span>
+                        <span style="display: flex; gap: 12px; margin-top: 8px; font-size: 11.5px; color: #5D665F"><sc-for list="{{bu.parts}}" as="bp" hint-placeholder-count="4"><span style="display: flex; align-items: center; gap: 5px"><span style="width: 7px; height: 7px; border-radius: 2px; background: {{bp.col}}"></span>{{bp.name}}</span></sc-for><span style="margin-left: auto; display: flex; align-items: center; gap: 5px"><span style="width: 2px; height: 10px; border-radius: 1px; background: #1B211C"></span>pace</span></span>
+                        <span class="hf-tip" style="position: absolute; top: calc(100% + 6px); left: 0; z-index: 6; white-space: nowrap; display: flex; flex-direction: column; gap: 6px; min-width: 128px; box-sizing: border-box; padding: 7px 10px 8px; border-radius: 8px; border: 1px solid #E6E9E2; background: #FFFFFF; color: #1B211C; box-shadow: 0 20px 25px -5px rgba(17,21,17,.10), 0 8px 10px -6px rgba(17,21,17,.10); text-align: left; font-weight: 400"><span style="font-size: 12px; font-weight: 500; line-height: 16px; color: #1B211C">{{bu.title}}</span><sc-for list="{{bu.rows}}" as="tr" hint-placeholder-count="2"><span style="display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 16px"><sc-for list="{{tr.dot}}" as="dc" hint-placeholder-count="0"><span style="width: 10px; height: 10px; flex: none; border-radius: 2px; background: {{dc}}"></span></sc-for><span style="color: #5D665F">{{tr.a}}</span><span style="margin-left: auto; padding-left: 16px; font-variant-numeric: tabular-nums; font-weight: 500; color: #1B211C">{{tr.b}}</span></span></sc-for><sc-for list="{{bu.warn}}" as="tw" hint-placeholder-count="0"><span style="padding-top: 6px; border-top: 1px solid #F0F1EC; font-size: 12px; font-weight: 500; line-height: 16px; color: #8A5A12">{{tw}}</span></sc-for></span>
+                      </span>
+                    </sc-for>
+                    <sc-for list="{{db.figs}}" as="fg" hint-placeholder-count="0">
+                      <span style="display: grid; grid-template-columns: repeat({{fg.n}}, minmax(0, 1fr)); gap: 16px; width: 100%; margin-top: 16px; padding-top: 14px; border-top: 1px solid #F0F1EC">
+                        <sc-for list="{{fg.list}}" as="k" hint-placeholder-count="4">
+                          <span class="hf-stop" data-fig="{{k.label}}" style="position: relative; display: flex; flex-direction: column; min-width: 0; cursor: default">
+                            <span style="font-size: 11.5px; color: #5D665F; white-space: nowrap">{{k.label}}</span>
+                            <span style="display: flex; align-items: baseline; gap: 3px; margin-top: 1px"><span class="hf-num" style="font-size: 17px; font-weight: 600; line-height: 21px; color: {{k.ink}}">{{k.v}}</span><span style="font-size: 11px; color: #8A938C">{{k.unit}}</span></span>
+                            <span style="position: relative; display: flex; align-items: flex-end; gap: 3px; height: 30px; margin-top: 7px">
+                              <sc-for list="{{k.bars}}" as="br" hint-placeholder-count="6"><span style="flex: 1; height: {{br.h}}; border-radius: 2px 2px 1px 1px; background: {{br.c}}"></span></sc-for>
+                              <sc-for list="{{k.goal}}" as="gl" hint-placeholder-count="0"><span style="position: absolute; left: 0; right: 0; bottom: {{gl}}; border-top: 1px dashed #1B211C"></span></sc-for>
+                            </span>
+                            <span class="hf-tip" style="position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX({{k.tx}}); z-index: 6; white-space: nowrap; display: flex; flex-direction: column; gap: 6px; min-width: 128px; box-sizing: border-box; padding: 7px 10px 8px; border-radius: 8px; border: 1px solid #E6E9E2; background: #FFFFFF; color: #1B211C; box-shadow: 0 20px 25px -5px rgba(17,21,17,.10), 0 8px 10px -6px rgba(17,21,17,.10); text-align: left; font-weight: 400"><span style="font-size: 12px; font-weight: 500; line-height: 16px; color: #1B211C">{{k.title}}</span><sc-for list="{{k.rows}}" as="tr" hint-placeholder-count="2"><span style="display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 16px"><sc-for list="{{tr.dot}}" as="dc" hint-placeholder-count="0"><span style="width: 10px; height: 10px; flex: none; border-radius: 2px; background: {{dc}}"></span></sc-for><span style="color: #5D665F">{{tr.a}}</span><span style="margin-left: auto; padding-left: 16px; font-variant-numeric: tabular-nums; font-weight: 500; color: #1B211C">{{tr.b}}</span></span></sc-for><sc-for list="{{k.warn}}" as="tw" hint-placeholder-count="0"><span style="padding-top: 6px; border-top: 1px solid #F0F1EC; font-size: 12px; font-weight: 500; line-height: 16px; color: #8A5A12">{{tw}}</span></sc-for></span>
+                          </span>
+                        </sc-for>
+                      </span>
+                    </sc-for>
+                  </span>
+                  <sc-for list="{{db.list}}" as="ls" hint-placeholder-count="0">
+                    <span style="display: flex; flex-direction: column; width: 100%; box-sizing: border-box; padding: 11px 14px 6px; border-top: 1px solid #F0F1EC">
+                      <span style="font-size: 12.5px; font-weight: 600; color: #3B4540">{{ls.title}}</span>
+                      <sc-for list="{{ls.rows}}" as="r" hint-placeholder-count="5">
+                        <span class="hf-stop" data-row="{{r.chip}}" style="position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr) 76px 42px; align-items: center; gap: 10px; height: 36px; border-top: 1px solid {{r.line}}; cursor: default">
+                          <span class="hf-num" style="justify-self: start; font-size: 11.5px; font-weight: 600; line-height: 20px; padding: 0 6px; border-radius: 6px; background: #F1F3EE; color: #3B4540">{{r.chip}}</span>
+                          <span style="position: relative; height: 11px">
+                            <span style="position: absolute; left: 0; right: 0; top: 3px; height: 5px; border-radius: 3px; background: #EEF0EA"></span>
+                            <span style="position: absolute; left: 0; width: {{r.pct}}; top: 3px; height: 5px; border-radius: 3px; background: {{r.col}}"></span>
+                            <span style="position: absolute; left: 0; top: 0; width: 11px; height: 11px; border-radius: 50%; background: {{r.dot}}"></span>
+                            <span style="position: absolute; right: -5px; top: 0; width: 11px; height: 11px; box-sizing: border-box; border-radius: 50%; border: 2px solid #CDD3C9; background: #FFFFFF"></span>
+                            <sc-for list="{{r.via}}" as="v" hint-placeholder-count="0"><span style="position: absolute; left: {{v.x}}; top: 0; width: 11px; height: 11px; margin-left: -5.5px; box-sizing: border-box; border-radius: 50%; border: 2px solid {{v.ring}}; background: #FFFFFF"></span></sc-for>
+                          </span>
+                          <span style="font-size: 12.5px; color: #5D665F; text-align: right; white-space: nowrap">{{r.end}}</span>
+                          <span class="hf-num" style="font-size: 13.5px; font-weight: 600; text-align: right; color: {{r.ink}}">{{r.value}}</span>
+                          <span class="hf-tip" style="position: absolute; top: calc(100% - 2px); left: 50px;  z-index: 6; white-space: nowrap; display: flex; flex-direction: column; gap: 6px; min-width: 128px; box-sizing: border-box; padding: 7px 10px 8px; border-radius: 8px; border: 1px solid #E6E9E2; background: #FFFFFF; color: #1B211C; box-shadow: 0 20px 25px -5px rgba(17,21,17,.10), 0 8px 10px -6px rgba(17,21,17,.10); text-align: left; font-weight: 400"><span style="font-size: 12px; font-weight: 500; line-height: 16px; color: #1B211C">{{r.title}}</span><sc-for list="{{r.rows}}" as="tr" hint-placeholder-count="2"><span style="display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 16px"><sc-for list="{{tr.dot}}" as="dc" hint-placeholder-count="0"><span style="width: 10px; height: 10px; flex: none; border-radius: 2px; background: {{dc}}"></span></sc-for><span style="color: #5D665F">{{tr.a}}</span><span style="margin-left: auto; padding-left: 16px; font-variant-numeric: tabular-nums; font-weight: 500; color: #1B211C">{{tr.b}}</span></span></sc-for><sc-for list="{{r.warn}}" as="tw" hint-placeholder-count="0"><span style="padding-top: 6px; border-top: 1px solid #F0F1EC; font-size: 12px; font-weight: 500; line-height: 16px; color: #8A5A12">{{tw}}</span></sc-for></span>
+                        </span>
+                      </sc-for>
+                    </span>
+                  </sc-for>
+                </div>
+              </sc-for>
+
+              <!-- features for this area -->
+              <sc-for list="{{pn.groups}}" as="gr" hint-placeholder-count="1">
+              <sc-for list="{{gr.title}}" as="gt" hint-placeholder-count="0"><div style="margin: 16px 4px 0; font-size: 12.5px; font-weight: 600; color: #5D665F">{{gt}}</div></sc-for>
+              <div style="margin-top: 8px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 44px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2, 0 1px 2px rgba(17,21,17,.04); overflow: hidden">
+                <sc-for list="{{gr.items}}" as="i" hint-placeholder-count="6">
+                  <button type="button" class="hf-btn hf-row" style="display: flex; align-items: center; gap: 10px; padding: 0 13px; border-top: 1px solid {{i.line}}; border-right: 1px solid {{i.right}}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex: none; fill: none; stroke: #3B4540; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{i.icon}}"></path></svg>
+                    <span style="flex: 1; font-size: 14px">{{i.name}}</span>
+                  </button>
+                </sc-for>
+              </div>
+              </sc-for>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1640,"height":1150}}'>
+class Component extends DCLogic {
+  componentDidMount() { this.start(); }
+  componentWillUnmount() { clearInterval(this.timer); }
+  start() {
+    clearInterval(this.timer);
+    this.timer = setInterval(() => this.setState({ k: ((this.state && this.state.k) || 0) + 1 }), 10000);
+  }
+  renderVals() {
+    const st = this.state || {};
+    const k = st.k || 0;
+    const tabs = st.tabs || ['production', 'health', 'farm'];
+    const menus = st.menus || [false, false, true];
+    const P = {
+      day: 'M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4M8 12a4 4 0 1 0 8 0 4 4 0 1 0-8 0',
+      cal: 'M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2ZM3 10h18M8 2v4M16 2v4',
+      flag: 'M4 22V4M4 4h13l-2.5 4L17 12H4',
+      doc: 'M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8ZM14 3v5h5M9 13h6M9 17h4',
+      tag: 'M12 2H2v10l9.3 9.3a1 1 0 0 0 1.4 0l8.6-8.6a1 1 0 0 0 0-1.4ZM7 7h.01',
+      layers: 'M12 2 2 7l10 5 10-5ZM2 17l10 5 10-5M2 12l10 5 10-5',
+      swap: 'M17 3l4 4-4 4M21 7H3M7 21l-4-4 4-4M3 17h18',
+      truck: 'M2 6h12v10H2ZM14 10h4l3 3v3h-7M4 18a2 2 0 1 0 4 0 2 2 0 1 0-4 0M15 18a2 2 0 1 0 4 0 2 2 0 1 0-4 0',
+      wheat: 'M12 22V9M12 9c-2.8 0-4.5-1.7-4.5-4.5C10.3 4.5 12 6.2 12 9Zm0 0c2.8 0 4.5-1.7 4.5-4.5C13.7 4.5 12 6.2 12 9ZM12 15c-2.8 0-4.5-1.7-4.5-4.5 2.8 0 4.5 1.7 4.5 4.5Zm0 0c2.8 0 4.5-1.7 4.5-4.5-2.8 0-4.5 1.7-4.5 4.5Z',
+      pill: 'M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7ZM7 10l7 7',
+      syringe: 'M18 2l4 4M17 7l3-3M19 9 8.7 19.3a1 1 0 0 1-1.4 0l-2.6-2.6a1 1 0 0 1 0-1.4L15 5M9 11l4 4M5 19l-3 3',
+      tube: 'M9 2h6M10 2v15a2 2 0 0 0 4 0V2M10 10h4',
+      shield: 'M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6Z',
+      grid: 'M4 4h16v16H4ZM4 10h16M10 10v10',
+      users: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M5 7a4 4 0 1 0 8 0 4 4 0 1 0-8 0M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8',
+      spark: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8ZM19 15l.7 1.8 1.8.7-1.8.7L19 20l-.7-1.8-1.8-.7 1.8-.7Z',
+      line: 'M6 3v12M15 6a3 3 0 1 0 6 0 3 3 0 1 0-6 0M3 18a3 3 0 1 0 6 0 3 3 0 1 0-6 0M18 9a9 9 0 0 1-9 9',
+      sliders: 'M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6',
+      book: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5ZM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5',
+      link: 'M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7',
+      zap: 'M13 2 3 14h9l-1 8 10-12h-9Z',
+      coin: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18M9 8l3 4 3-4M12 12v5M9 13h6'
+    };
+    const HAIR = { short: 'M9.5 13c0-5 3-7.5 6.5-7.5s6.5 2.5 6.5 7.5c-1.2-2.6-3.6-3.6-6.5-3.6S10.7 10.4 9.5 13Z', long: 'M9 20c-.6-6 .4-14.5 7-14.5S23.6 14 23 20c-1-3-1.4-8.6-7-8.6S10 17 9 20Z', bun: 'M10 12.5c0-4.2 2.7-6.6 6-6.6s6 2.4 6 6.6c-1.4-2.3-3.5-3.2-6-3.2s-4.6.9-6 3.2ZM14 3.6a2.4 2.4 0 1 0 4.8 0 2.4 2.4 0 1 0-4.8 0' };
+    const person = (i, ph) => ph ? { i, bg: '#DDE3D8', init: [], photo: [{ bg: ph[0], skin: ph[1], hair: HAIR[ph[2]], hairCol: ph[3], shirt: ph[4] }] } : { i, bg: '#E7E9E4', init: [i], photo: [] };
+    const team = [
+      person('SQ', ['#CFE0D6', '#E9C4A6', 'long', '#2B211C', '#3E6B55']), person('GH', ['#E4D9C8', '#D8A887', 'short', '#3A2A20', '#5A6B7A']),
+      person('AM'), person('ZM', ['#D6DCE6', '#F0CDB0', 'bun', '#1F1A17', '#8A5A3C']),
+      person('JW', ['#E8DCCF', '#C99375', 'short', '#1E1814', '#2F4A3B']), person('TL'), person('HY')
+    ];
+    const it = (name, icon) => ({ name, icon: P[icon] });
+    const cells = (list) => list.map((x, i) => Object.assign({}, x, { line: i < 2 ? 'transparent' : '#F0F1EC', right: i % 2 === 0 ? '#F0F1EC' : 'transparent' }));
+    const groups = {
+      production: [{ title: [], items: cells([it('Pigs', 'tag'), it('Batches', 'layers'), it('Transfers', 'swap'), it('Ship out', 'truck'), it('Production lines', 'line')]) }],
+      health: [{ title: [], items: cells([it('Treatment', 'pill'), it('Vaccination', 'syringe'), it('Sampling', 'tube'), it('Biosecurity', 'shield')]) }],
+      farm: [{ title: ['Running the farm'], items: cells([it('Feed', 'wheat'), it('Finance', 'coin'), it('People', 'users'), it('AI team', 'spark')]) },
+             { title: ['Setup'], items: cells([it('Farm layout', 'grid'), it('Farm settings', 'sliders'), it('Knowledge', 'book'), it('Connections', 'link'), it('Automations', 'zap')]) }]
+    };
+    const path = (vals, w, h, lo, hi) => { const span = (hi - lo) || 1; return vals.map((v, j) => [Math.round(j * (w / (vals.length - 1))), Math.round((h - 2) - ((v - lo) / span) * (h - 6))]); };
+    const trend = (vals, lo, hi, bandLo, bandHi, from, to, band) => {
+      const p = path(vals, 400, 50, lo, hi); const y = (v) => Math.round(48 - ((v - lo) / (hi - lo)) * 44);
+      return [{ pts: p.map((q) => q.join(',')).join(' '), lastX: p[p.length - 1][0], lastY: p[p.length - 1][1], bandY: y(bandHi), bandH: y(bandLo) - y(bandHi), from, to, band }];
+    };
+    const mini = (vals, lo, hi, target, note) => {
+      const p = path(vals, 160, 36, lo, hi); const tY = Math.round(34 - ((target - lo) / (hi - lo)) * 30);
+      return [{ pts: p.map((q) => q.join(',')).join(' '), area: p.map((q) => q.join(',')).join(' ') + ' 160,36 0,36', lastX: p[p.length - 1][0], lastY: p[p.length - 1][1], tY, note }];
+    };
+    const G = ['#1F5C3F', '#3E8A63', '#86BB9C', '#C9E2D2'];
+    const none = { stack: [], trend: [], line: [], bins: [], reasons: [], faces: [], status: [], tag: [], pairs: [], flow: [], foot: [], route: [], tiles: [], hero: [], sparks: [], gbars: [], sub: [] };
+    const tag = (text, bg, ink) => [{ text, bg, ink }];
+    const wk = (vals, max) => vals.map((v, j) => ({ name: 'W' + (41 + j), h: Math.round(v / max * 100) + '%', col: j === vals.length - 1 ? '#1F5C3F' : '#B9D6C4', lab: j === vals.length - 1 ? '#1B211C' : '#8A938C', lw: j === vals.length - 1 ? 600 : 400 }));
+    const bin = (name, h, low) => ({ name, h, col: low ? '#E0A23B' : '#86BB9C', lab: low ? '#8A5A12' : '#8A938C', lw: low ? 600 : 400 });
+    const W = (o) => Object.assign({}, none, { bigs: (o.flow || o.route) ? [] : [{}], heads: o.name ? [{}] : [] }, o);
+    const R = (rows) => rows.map(([a, b, c]) => ({ a, b, dot: c ? [c] : [] }));
+    const stop = (name, count, x, rows, warn) => ({ name, x: x + '%', lab: x === 0 || x === 100 ? [] : [count], top: x === 0 || x === 100 ? '30px' : '50px',
+      off: x === 0 ? '0px' : (x === 100 ? '-17px' : '-8.5px'), tx: x === 0 ? 'translateX(-18px)' : (x === 100 ? 'translateX(calc(-100% + 18px))' : 'translateX(-50%)'), rows: R(rows), warn: warn ? [warn] : [] });
+    const mv = (b, a, to, done, plan, pct, short, title, rows, warn, via) => ({ b, a, to, done, plan, pct: pct + '%', title, rows: R(rows), warn: warn ? [warn] : [],
+      via: (via || []).map(([name, x]) => ({ x: x + '%', ring: x <= pct ? '#3E8A63' : '#CDD3C9' })), vianame: (via || []).map(([name]) => name),
+      col: short ? 'linear-gradient(90deg, #C98A1F, #F0C273)' : 'linear-gradient(90deg, #3E8A63, #86D3A6)', dot: short ? '#E0A23B' : '#3E8A63', ink: short ? '#8A5A12' : '#1B211C' });
+    const amber = { chipBg: '#FBE9D2', chipInk: '#8A5A12' };
+    const kpi = (label, v, unit, target, off, series, lo, hi, rows) => ({ label, v, unit, target, rows: R(rows),
+      ink: off ? '#8A5A12' : '#1B211C', tInk: off ? '#8A5A12' : '#8A938C', tW: off ? 600 : 400,
+      bars: series.map((x, j) => ({ h: Math.max(8, Math.round((x - lo) / (hi - lo) * 100)) + '%', c: j === series.length - 1 ? (off ? '#E0A23B' : '#3E8A63') : 'rgba(255,255,255,.28)' })) });
+    const grid4 = (list) => [{ list: list.map((k, j) => Object.assign(k, { pl: j % 2 ? '14px' : '0px', right: j % 2 ? 'transparent' : '#F0F1EC' })) }];
+    const line = this.props.line || 'sow';
+    const heroC = (vals, lo, hi, target, tLab, fmt, from, to) => {
+      const y = (v) => Math.round((80 - (v - lo) / (hi - lo) * 72) * 10) / 10;
+      const xs = vals.map((v, j) => Math.round(j * 400 / (vals.length - 1) * 10) / 10);
+      const pts = vals.map((v, j) => xs[j] + ',' + y(v)).join(' ');
+      const tY = y(target);
+      return [{ pts, area: pts + ' 400,84 0,84', tY, tLab, tLabTop: Math.max(0, Math.round((tY / 84) * 100) - 8) + '%', lastX: xs[xs.length - 1], lastY: y(vals[vals.length - 1]), from, to,
+        cols: vals.map((v, j) => ({ t: 'W' + (46 - vals.length + 1 + j) + ' · ' + fmt(v), tx: j < 3 ? '-12%' : (j > vals.length - 4 ? '-88%' : '-50%') })) }];
+    };
+    const spark = (label, full, v, unit, target, off, vals, lo, hi, tv, j) => {
+      const y = (x) => Math.round((24 - (x - lo) / (hi - lo) * 22) * 10) / 10;
+      return { label, full, v, unit, target, ink: off ? '#8A5A12' : '#1B211C', col: off ? '#C98A1F' : '#1F5C3F', tipInk: off ? '#F2C77F' : '#AFC2B5',
+        pts: vals.map((x, i) => Math.round(i * 90 / (vals.length - 1) * 10) / 10 + ',' + y(x)).join(' '), tY: y(tv), tx: j === 0 ? '-20%' : (j === 3 ? '-80%' : '-50%') };
+    };
+    const lined = (rows) => rows.map((r, j) => Object.assign(r, { line: j ? '#F0F1EC' : 'transparent' }));
+    const stage = (name, v, plan, pct, col, note, noteInk, noteW) => ({ name, v, plan, pct, col, note, noteInk: noteInk || '#5D665F', noteW: noteW || 400 });
+    const stl = (note, ink, w) => [{ note, ink: ink || '#3B4540', w: w || 400 }];
+    const good = { chipBg: '#E3F1E8', chipInk: '#1F6B45' };
+    const plain = { chipBg: '#EEF0EA', chipInk: '#3B4540' };
+    const two = (a, b) => [Object.assign({}, a, { right: '#F0F1EC' }), Object.assign({}, b, { right: 'transparent' })];
+
+    const WK = ['W41', 'W42', 'W43', 'W44', 'W45', 'W46'];
+    const D = (o) => Object.assign({ name: '', lines: [], lineBox: [], period: [], big: [], hero: [], budget: [], figs: [], list: [] }, o);
+    const big = (v, unit, off, title, rows, warn) => [{ v, unit, ink: off ? '#8A5A12' : '#1B211C', title, rows: R(rows), warn: warn ? [warn] : [] }];
+    const chart = (vals, lo, hi, target, tLab, fmt) => {
+      const y = (v) => Math.round((80 - (v - lo) / (hi - lo) * 72) * 10) / 10;
+      const xs = vals.map((v, j) => Math.round(j * 400 / (vals.length - 1) * 10) / 10);
+      const pts = vals.map((v, j) => xs[j] + ',' + y(v)).join(' ');
+      const tY = y(target);
+      return [{ pts, area: pts + ' 400,84 0,84', tY, tLab, tLabTop: Math.max(0, Math.round((tY / 84) * 100) - 8) + '%', lastX: xs[xs.length - 1], lastY: y(vals[vals.length - 1]),
+        cols: vals.map((v, j) => ({ t: (j === vals.length - 1 ? 'This week' : 'W' + (46 - vals.length + 1 + j)) + ' · ' + fmt(v), tx: j < 3 ? '-12%' : (j > vals.length - 4 ? '-88%' : '-50%') })) }];
+    };
+    // one figure: label, value, six bars; the goal, every week and any note only in hover
+    const gb = (label, full, unit, vals, goal, low, lo, hi, glab, dec, note, o) => {
+      o = o || {};
+      const has = goal !== null, labs = o.labs || WK;
+      const okf = (v) => !has || (low ? v <= goal : v >= goal);
+      const f = o.fmt || ((v) => v.toFixed(dec));
+      const last = vals[vals.length - 1], ok = okf(last);
+      const bars = vals.map((v, i) => { const g = okf(v), L = i === vals.length - 1; return { h: Math.max(10, Math.round((v - lo) / (hi - lo) * 100)) + '%', c: !has ? (L ? '#5D665F' : '#D5DAD3') : (L ? (g ? '#1F5C3F' : '#C98A1F') : (g ? '#9CCBB0' : '#F0C273')) }; });
+      return { label, unit, v: f(last), ink: ok ? '#1B211C' : '#8A5A12',
+        goal: has ? [Math.round((goal - lo) / (hi - lo) * 100) + '%'] : [], bars,
+        title: has ? full + ' · ' + glab : full, rows: R(o.rows || vals.map((v, i) => [labs[i], f(v) + (unit ? ' ' + unit : ''), bars[i].c])), warn: note ? [note] : [] };
+    };
+    const figs = (list) => [{ n: list.length, list: list.map((k, j) => Object.assign(k, { tx: j === 0 ? '-14%' : (j === list.length - 1 ? '-86%' : '-50%') })) }];
+    // one row of a list: id, how far along, where it goes, how many; the rest in hover
+    const row = (chip, pct, end, value, short, title, rows, warn, via) => ({ chip, pct: pct + '%', end, value, title, rows: R(rows), warn: warn ? [warn] : [],
+      via: (via || []).map((x) => ({ x: x + '%', ring: x <= pct ? '#3E8A63' : '#CDD3C9' })),
+      col: short ? 'linear-gradient(90deg, #C98A1F, #F0C273)' : 'linear-gradient(90deg, #3E8A63, #86D3A6)', dot: short ? '#E0A23B' : '#3E8A63', ink: short ? '#8A5A12' : '#1B211C' });
+    const LINES = [['all', 'All lines', 'Farrow to finish · 3 lines'], ['s1', 'Sow line 1', 'Farrow to wean'], ['s2', 'Sow line 2', 'Farrow to wean'], ['fin', 'Finishing', 'Wean to finish']];
+    const lineSel = st.lineSel || ({ sow: 's1', finishing: 'fin', wean: 's2' }[this.props.line] || 'all');
+    const lineMenu = !!st.lineMenu;
+    const lineTabs = LINES.map(([id, label, type], j) => { const on = id === lineSel; return { label, type, on: on ? 'true' : 'false', vis: on ? 'visible' : 'hidden',
+      gap: j === 0 ? '4px' : '0px', sep: j === 0 ? '0 1px 0 0 #F0F1EC' : 'none', pick: () => this.setState({ lineSel: id, lineMenu: false }) }; });
+    const lineBox = [{ label: LINES.find((l) => l[0] === lineSel)[1], open: lineMenu ? 'true' : 'false', menu: lineMenu ? [{}] : [], toggle: () => this.setState({ lineMenu: !lineMenu }) }];
+    const sowFigs = (fr, ba, sb, pw) => figs([
+      gb('Farrowing rate', 'Farrowing rate', '%', fr, 85, false, 78, 92, 'goal 85 %', 0, 'Farrowed ÷ sows served 16 weeks before'),
+      gb('Born alive', 'Born alive a litter', '', ba, 13.5, false, 12.2, 14.2, 'goal 13.5', 1, null),
+      gb('Stillborn', 'Stillborn a litter', '', sb, 1.0, true, 0.4, 1.5, 'goal 1.0 or less', 1, null),
+      gb('Pre-wean deaths', 'Deaths before weaning', '%', pw, 12, true, 8, 15, 'goal 12 % or less', 1, pw[3] > 13 ? 'W44 was Batch 32 (heat lamps)' : null)]);
+    // the two sow lines blended by size (line 1 has twice the sows)
+    const mix = (a, b, d) => a.map((x, i) => Math.round(((2 * x + b[i]) / 3) * Math.pow(10, d)) / Math.pow(10, d));
+    const S1 = { psy: [29.4, 29.6, 29.5, 29.8, 29.9, 29.7, 29.6, 29.8, 29.5, 29.4, 29.5, 29.3, 29.4, 29.2, 29.0, 29.1, 28.9, 29.0, 28.8, 28.9, 28.7, 28.8, 28.6, 28.7, 28.5, 28.6],
+      fr: [86, 88, 85, 87, 84, 87], ba: [13.4, 13.2, 12.9, 13.1, 13.0, 13.1], sb: [1.1, 1.0, 1.2, 0.9, 1.3, 1.1], pw: [11.2, 11.6, 11.4, 13.7, 11.0, 11.4] };
+    const S2 = { psy: [29.1, 29.3, 29.2, 29.5, 29.4, 29.6, 29.8, 29.7, 29.9, 30.0, 29.8, 30.1, 30.0, 30.2, 30.1, 30.3, 30.2, 30.4, 30.3, 30.2, 30.4, 30.5, 30.3, 30.4, 30.5, 30.4],
+      fr: [89, 87, 90, 88, 91, 89], ba: [13.8, 13.6, 13.9, 13.7, 13.6, 13.8], sb: [0.9, 0.8, 1.0, 0.9, 0.8, 0.9], pw: [10.4, 10.9, 10.2, 10.8, 10.5, 10.6] };
+    const ALL = { psy: mix(S1.psy, S2.psy, 1), fr: mix(S1.fr, S2.fr, 0), ba: mix(S1.ba, S2.ba, 1), sb: mix(S1.sb, S2.sb, 1), pw: mix(S1.pw, S2.pw, 1) };
+    const L1 = ['Line', 'Sow line 1'], L2 = ['Line', 'Sow line 2'], LF = ['Line', 'Finishing'];
+    const M = {
+      b53: row('B53', 62, 'Gestation', '31', false, 'Batch 53 · Heat check → Breeding → Gestation', [L1, ['In heat', '54'], ['Served', '31 of 50'], ['Into gestation', '28'], ['Day', '2 of 5, on pace']], null, [50]),
+      b18: row('B18', 96, 'Gestation', '24', false, 'Batch 18 · Heat check → Breeding → Gestation', [L2, ['In heat', '26'], ['Served', '24 of 25']], null, [50]),
+      b37: row('B37', 100, 'Farrowing', '48', false, 'Batch 37 · Gestation → Farrowing', [L1, ['Sows moved', '48 of 48'], ['Due to farrow', 'from Mon 16']]),
+      b12: row('B12', 100, 'Farrowing', '25', false, 'Batch 12 · Gestation → Farrowing', [L2, ['Sows moved', '25 of 25']]),
+      b36: row('B36', 96, 'Born', '46', false, 'Batch 36 · farrowing', [L1, ['Litters', '46 of 48'], ['Born alive', '603'], ['Still to farrow', '2 sows']]),
+      b32: row('B32', 98, 'Nursery', '548', true, 'Batch 32 · weaned to the finishing line', [L1, ['Piglets weaned', '548 of 560'], ['Age', '26 days']], '12 short: lost in the first 3 days'),
+      b08: row('B08', 100, 'Nursery', '312', false, 'Batch 8 · weaned to the finishing line', [L2, ['Weaners', '312 of 300']]),
+      b25: row('B25', 98, 'Finishing', '530', false, 'Batch 25 · Nursery → Finishing', [LF, ['Pigs', '530 of 540'], ['Room', 'Finisher 2']]),
+      b09: row('B09', 96, 'Ship out', '212', false, 'Batch 9 · Finishing → Ship out', [LF, ['Sold this week', '212 of 220'], ['Last load', 'Thu']]) };
+    const prod = (o) => D(Object.assign({ name: 'Production', lines: lineTabs, lineBox }, o));
+    const prodLines = {
+      all: prod({
+        big: big('29.2', 'PSY', true, 'Pigs weaned per sow a year · both sow lines', [['Sow line 1', '28.6'], ['Sow line 2', '30.4'], ['Goal', '30.0']], '0.8 under goal'),
+        hero: chart(ALL.psy, 27.5, 30.6, 30, '30', (v) => v.toFixed(1)),
+        figs: sowFigs(ALL.fr, ALL.ba, ALL.sb, ALL.pw),
+        list: [{ title: 'Moving this week', rows: lined([M.b53, M.b18, M.b37, M.b36, M.b32, M.b25, M.b09]) }] }),
+      s1: prod({
+        big: big('28.6', 'PSY', true, 'Pigs weaned per sow a year', [['Goal', '30.0'], ['26 weeks ago', '29.4']], '1.4 under goal'),
+        hero: chart(S1.psy, 27.5, 30.6, 30, '30', (v) => v.toFixed(1)),
+        figs: sowFigs(S1.fr, S1.ba, S1.sb, S1.pw),
+        list: [{ title: 'Moving this week', rows: lined([M.b53, M.b37, M.b36, M.b32]) }] }),
+      s2: prod({
+        big: big('30.4', 'PSY', false, 'Pigs weaned per sow a year', [['Goal', '30.0'], ['26 weeks ago', '29.1']], null),
+        hero: chart(S2.psy, 28.5, 31, 30, '30', (v) => v.toFixed(1)),
+        figs: sowFigs(S2.fr, S2.ba, S2.sb, S2.pw),
+        list: [{ title: 'Moving this week', rows: lined([M.b18, M.b12, M.b08]) }] }),
+      fin: prod({
+        big: big('212', 'sold this week', true, 'Pigs sold a week', [['Plan', '220'], ['26 weeks ago', '224']], '8 under plan'),
+        hero: chart([224, 218, 226, 221, 219, 222, 228, 220, 215, 223, 219, 221, 216, 224, 218, 214, 221, 217, 213, 219, 215, 211, 216, 214, 210, 212], 200, 232, 220, '220', (v) => String(v)),
+        figs: figs([
+          gb('Nursery deaths', 'Nursery deaths', '%', [2.1, 2.0, 1.8, 2.0, 1.7, 1.9], 2.0, true, 1.0, 2.6, 'goal 2.0 % or less', 1, null),
+          gb('Finish deaths', 'Finishing deaths', '%', [2.5, 2.7, 2.6, 2.8, 2.9, 2.8], 2.5, true, 1.6, 3.2, 'goal 2.5 % or less', 1, null),
+          gb('Days on site', 'Weaner in to sale', 'd', [166, 165, 167, 168, 169, 168], 165, true, 158, 172, 'goal 165 or fewer', 0, null),
+          gb('Sale weight', 'Sale weight', 'kg', [117, 118, 119, 118, 117, 118], 115, false, 108, 122, 'goal 115–120 kg', 0, 'From abattoir slips')]),
+        list: [{ title: 'Open batches', rows: lined([
+          row('B32', 1, 'Nursery 1', '548', false, 'Batch 32 · Nursery 1', [['Day', '1 of about 165'], ['On hand', '548'], ['From', 'Sow line 1']]),
+          row('B29', 13, 'Nursery 2', '862', false, 'Batch 29 · Nursery 2', [['Day', '22'], ['On hand', '862'], ['Dead so far', '1.6 %']]),
+          row('B25', 32, 'Finisher 2', '530', false, 'Batch 25 · Finisher 2', [['Day', '52'], ['On hand', '530'], ['Dead so far', '2.1 %']]),
+          row('B20', 63, 'Finisher 3', '846', true, 'Batch 20 · Finisher 3', [['Day', '104'], ['On hand', '846'], ['Dead so far', '2.6 %']], 'Deaths over the 2.5 % goal'),
+          row('B14', 85, 'Finisher 1', '851', false, 'Batch 14 · Finisher 1', [['Day', '141'], ['On hand', '851'], ['Dead so far', '2.4 %']]),
+          row('B09', 100, 'Finisher 4', '104', true, 'Batch 9 · Finisher 4 · shipping', [['Day', '168'], ['Left to ship', '104, Thu'], ['Dead so far', '3.4 %']], 'Deaths over goal; 3 days past target')]) }] })
+    };
+    const dashboards = {
+      production: prodLines[lineSel],
+      health: D({ name: 'Health', period: ['This week'],
+        big: big('0.9', '% died', false, 'Deaths this week', [['Pigs', '41'], ['Goal', '1.0 % or less']], null),
+        hero: chart([1.3, 1.2, 1.4, 1.1, 1.2, 1.3, 1.0, 1.1, 1.2, 1.4, 1.2, 1.1, 1.0, 1.3, 1.1, 1.2, 1.0, 1.1, 0.9, 1.0, 0.8, 1.0, 0.9, 1.0, 0.9, 0.9], 0.5, 1.6, 1.0, '1.0', (v) => v.toFixed(1) + ' %'),
+        figs: figs([
+          gb('Tagged', 'Pigs with a health tag', '', [18, 20, 17, 21, 19, 22], null, false, 0, 24, '', 0, null, { rows: [['Cough', '9'], ['Lame', '6'], ['Fever', '4'], ['Off feed', '3']] }),
+          gb('On treatment', 'On treatment', '', [9, 11, 10, 14, 13, 12], null, false, 0, 16, '', 0, null, { rows: [['Courses running', '3'], ['First ends', 'Thu 12 Nov']] }),
+          gb('In withdrawal', 'In withdrawal', '', [12, 15, 14, 16, 20, 18], null, false, 0, 22, '', 0, 'Can’t ship yet · first clear Sat 21 Nov', { rows: [['Pigs', '18'], ['Batches', 'B25, B28']] })]) }),
+      farm: D({ name: 'Farm', period: ['November'],
+        big: big('¥1.21M', 'of ¥3.90M', false, 'Spent this month', [['Day', '10 of 30'], ['On pace would be', '¥1.30M']], null),
+        budget: [{ pace: '33.3%', parts: [{ name: 'Feed', w: '21%', col: G[0] }, { name: 'Labour', w: '4.6%', col: G[1] }, { name: 'Vet', w: '2.8%', col: G[2] }, { name: 'Energy', w: '2.6%', col: G[3] }],
+          title: 'Spent ¥1.21M · ¥90k under pace', rows: R([['Feed', '¥820k', G[0]], ['Labour', '¥180k', G[1]], ['Vet', '¥110k', G[2]], ['Energy', '¥100k', G[3]]]), warn: [] }],
+        figs: figs([
+          gb('Cost per kg', 'Cost per kg sold', '', [14.3, 14.1, 14.0, 13.9, 14.1, 13.8], 14.0, true, 13.2, 14.6, 'budget ¥14.0', 1, null, { labs: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'], fmt: (v) => '¥' + v.toFixed(1) }),
+          gb('Feed a day', 'Feed used a day', 't', [27.1, 27.6, 27.9, 28.0, 28.3, 28.6], null, false, 20, 30, '', 1, 'Rising with the batches, as planned'),
+          gb('Feed vs plan', 'Feed used against plan, at each count', '%', [0.4, -0.6, 1.1, 0.8, 1.6, 2.0], 1.5, true, -1.5, 2.5, 'goal within 1.5 %', 1, '31 Oct: 868 t used, 851 t planned · next count Sat',
+            { labs: ['22 Aug', '5 Sep', '19 Sep', '3 Oct', '17 Oct', '31 Oct'], fmt: (v) => (v > 0 ? '+' : '') + v.toFixed(1) })]) })
+    };
+    const agent = { VT: { bg: '#DDF1EF', ink: '#1F6F68', agent: 'Vet' }, BS: { bg: '#ECE8FB', ink: '#5B4AB3', agent: 'Biosecurity' }, PR: { bg: '#FCEFD6', ink: '#8A5A12', agent: 'Production' }, GM: { bg: '#E7E9E4', ink: '#1B211C', agent: 'General Manager' }, EQ: { bg: '#FBE4E1', ink: '#A33A2E', agent: 'Equipment' } };
+    const all = [
+      ['VT', 'Revaccinate Batch 29 against PRRS', 'Antibodies low in 14 of 30 samples; booster drafted for Mon', 'Due 10:00', 1, '3h ago'],
+      ['BS', '12 visitor requests for next week', 'Two come straight from another pig farm', 'Tue', 0, '2h ago'],
+      ['PR', 'Keep Farrowing 1 for Batch 33?', 'Batch 32 weans late; the rooms overlap by two days', 'Wed', 0, '2h ago'],
+      ['EQ', 'Replace the fan in Nursery 3', 'Room is 2.4 °C over set point since 05:10', 'Today', 1, '1h ago'],
+      ['GM', 'Approve next week’s feed order', '38 t across four diets, ¥121,600', 'Today', 1, '40m ago'],
+      ['PR', 'Cull 4 sows at weaning, Batch 32', 'Three litters under 9 weaned in a row', 'Thu', 0, '5h ago']
+    ];
+    const n = 17, i = k % all.length, cur = all[i];
+    const slide = Object.assign({ who: cur[0], title: cur[1], why: cur[2], when: cur[3], ago: cur[5], dueBg: cur[4] ? '#FBE9D2' : '#EEF0EA', dueInk: cur[4] ? '#8A5A12' : '#3B4540' }, agent[cur[0]]);
+    const go = (d) => () => { this.start(); this.setState({ k: Math.max(0, k + d) }); };
+    const setTab = (pi, id) => () => { const t = tabs.slice(); t[pi] = id; this.setState({ tabs: t }); };
+    const flipMenu = (pi) => () => { const m = menus.slice(); m[pi] = !m[pi]; this.setState({ menus: m }); };
+    const segs = (pi) => [['production', 'Production'], ['health', 'Health'], ['farm', 'Farm']].map(([id, label]) => {
+      const on = tabs[pi] === id;
+      return { label, icon: { production: P.layers, health: P.pill, farm: P.grid }[id], on: on ? 'true' : 'false', pick: setTab(pi, id), w: on ? 600 : 500, ink: on ? '#1B211C' : '#5D665F', bg: on ? '#FFFFFF' : '#EAECE6', sh: on ? '0 0 0 1.5px #1B211C, 0 2px 6px rgba(17,21,17,.08)' : 'none' };
+    });
+    const pane = (pi, label, note) => ({
+      label, note, segs: segs(pi),
+      dash: [dashboards[tabs[pi]]],
+      groups: groups[tabs[pi]],
+      menu: menus[pi] ? [{}] : [], menuOpen: menus[pi] ? 'true' : 'false', menuBg: menus[pi] ? '#EEF0EA' : 'transparent', toggleMenu: flipMenu(pi)
+    });
+    const art = (who, name, kind, date) => Object.assign({ who, name, kind, date }, agent[who]);
+    return {
+      ic: P,
+      slideA: k % 2 === 0 ? [slide] : [],
+      slideB: k % 2 === 1 ? [slide] : [],
+      pos: (i + 1) + ' of ' + n,
+      prev: go(-1), next: go(1),
+      tk: Object.assign({}, slide, { dot: { VT: '#5CC2B7', PR: '#E7B65C', BS: '#A99BEA', EQ: '#E9877B', GM: '#C9CEC6' }[slide.who], dueDark: slide.dueBg === '#FBE9D2' ? '#F2C77F' : '#AFC2B5' }),
+      tkAnim: k % 2 ? 'upB' : 'upA',
+      tsegs: Array.from({ length: n }, (_, j) => ({ c: j < i ? 'rgba(255,255,255,.75)' : (j === i ? '#F2C77F' : 'rgba(255,255,255,.18)') })),
+      faces: team,
+      doorsSmall: [{ name: 'Task schedule', icon: P.cal, n: '41' }, { name: 'Initiatives', icon: P.flag, n: '3' }],
+      doors: [{ name: 'Day plan', icon: P.day, n: '23', word: 'jobs' }, { name: 'Task schedule', icon: P.cal, n: '41', word: 'tasks' }, { name: 'Initiatives', icon: P.flag, n: '3', word: 'running' }],
+      artifacts: [
+        art('PR', 'Sows to cull, ranked by output', 'List', '7 Nov'), art('GM', 'Feed cost by house, October', 'Chart', '5 Nov'),
+        art('VT', 'Batch 29 antibody results', 'Report', '4 Nov'), art('PR', 'Pre-wean loss by sow parity', 'Chart', '2 Nov'),
+        art('BS', 'Visitor log, October', 'List', '1 Nov')
+      ],
+      panes: [
+        pane(0, 'Production', 'One switch per production line. Each line shows what its set-up decides: the headline trend, four figures against goal, then its batches or open groups.'),
+        pane(1, 'Health', 'Deaths against target, the health tags pigs carry now, treatment and withdrawal.'),
+        pane(2, 'Farm, with Artifacts open', 'Spend, cost per kg and equipment, then feed used by plan and at the last count. Features in two groups.')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
