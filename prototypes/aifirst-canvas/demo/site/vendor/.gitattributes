@@ -1,0 +1,2 @@
+# Bundled libraries are checked against integrity hashes: never convert their line endings.
+*.js -text
