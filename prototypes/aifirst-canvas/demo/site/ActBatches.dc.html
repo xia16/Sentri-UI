@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Batches and schedule</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+
+<!-- LIST -->
+<sc-if value="{{isList}}" hint-placeholder-val="{{true}}">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+  <sc-if value="{{showReceipt}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 10px; background: #F6F7F4; border: 1px solid #E8EBE5; color: #3B4540; border-radius: 12px; padding: 8px 8px 8px 14px; margin-bottom: 20px; font-size: 13.5px; font-weight: 500; line-height: 1.45; animation: sentriRise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both">
+      <span style="width: 20px; height: 20px; border-radius: 50%; background: #2D7A4B; flex-shrink: 0; display: flex; align-items: center; justify-content: center">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      </span>
+      <span style="flex: 1; min-width: 0">{{rcpLead}} <span style="display: {{rcpTimeShow}}; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">{{rcpTime}}</span>{{rcpTail}}</span>
+      <button type="button" onClick="{{undoReceipt}}" style="height: 32px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer; flex-shrink: 0">Undo</button>
+    </div>
+  </sc-if>
+
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Batches</h1>
+    <button type="button" onClick="{{goNew}}" style="display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px 0 11px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer; white-space: nowrap; flex-shrink: 0">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.plus}}"></path></svg>
+      New batch
+    </button>
+  </div>
+  <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 2px 12px; margin-top: 4px; font-size: 14px; color: #626C66">
+    <span>Line 1 · a batch every 3 weeks · 50 sows</span>
+    <button type="button" onClick="{{goCalendar}}" style="display: inline-flex; align-items: center; gap: 2px; height: 28px; margin-left: -2px; padding: 0 4px 0 6px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+      Calendar
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg>
+    </button>
+  </div>
+
+  <h2 style="margin: 24px 0 0; font-size: 15px; font-weight: 600">Running · 6</h2>
+  <div style="margin-top: 8px; border-top: 1px solid #E8EBE5">
+    <sc-for list="{{batches}}" as="b" hint-placeholder-count="6">
+      <div style="border-bottom: 1px solid #EFF1EC">
+        <button type="button" onClick="{{b.open}}" aria-label="{{b.aria}}" style="display: {{b.btnShow}}; width: 100%; box-sizing: border-box; align-items: center; gap: 14px; padding: 14px 4px; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+          <span style="flex: 1; min-width: 0; display: block">
+            <span style="display: flex; align-items: baseline; gap: 10px">
+              <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em">{{b.name}}</span>
+              <span style="font-size: 14px; color: #3B4540">{{b.stage}}</span>
+            </span>
+            <span style="display: block; margin-top: 2px; font-size: 12.5px; color: #626C66">{{b.meta}}</span>
+          </span>
+          <span style="display: {{b.chipShow}}; align-items: center; gap: 7px; flex-shrink: 0; padding: 3px 11px 3px 9px; border-radius: 999px; background: {{b.chipBg}}; color: {{b.chipInk}}; font-size: 12.5px; font-weight: 500; white-space: nowrap">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: {{b.chipDot}}"></span>{{b.chip}}
+          </span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="display: {{b.chevShow}}; width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg>
+        </button>
+        <div style="display: {{b.staticShow}}; align-items: center; gap: 14px; padding: 14px 4px">
+          <span style="flex: 1; min-width: 0; display: block">
+            <span style="display: flex; align-items: baseline; gap: 10px">
+              <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em">{{b.name}}</span>
+              <span style="font-size: 14px; color: #3B4540">{{b.stage}}</span>
+            </span>
+            <span style="display: block; margin-top: 2px; font-size: 12.5px; color: #626C66">{{b.meta}}</span>
+          </span>
+          <span style="display: {{b.chipShow}}; align-items: center; gap: 7px; flex-shrink: 0; padding: 3px 11px 3px 9px; border-radius: 999px; background: {{b.chipBg}}; color: {{b.chipInk}}; font-size: 12.5px; font-weight: 500; white-space: nowrap">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: {{b.chipDot}}"></span>{{b.chip}}
+          </span>
+          <span style="width: 16px; flex-shrink: 0"></span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <h2 style="margin: 30px 0 0; font-size: 15px; font-weight: 600">{{plannedHead}}</h2>
+  <div style="margin-top: 8px; border-top: 1px solid #E8EBE5">
+    <sc-for list="{{plannedRows}}" as="b" hint-placeholder-count="3">
+      <div style="border-bottom: 1px solid #EFF1EC">
+        <button type="button" onClick="{{b.open}}" aria-label="{{b.aria}}" style="display: {{b.btnShow}}; width: 100%; box-sizing: border-box; align-items: center; gap: 14px; padding: 14px 4px; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+          <span style="flex: 1; min-width: 0; display: block">
+            <span style="display: flex; align-items: baseline; gap: 10px">
+              <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em">{{b.name}}</span>
+              <span style="font-size: 14px; color: #3B4540">{{b.stage}}</span>
+            </span>
+            <span style="display: block; margin-top: 2px; font-size: 12.5px; color: #626C66">{{b.meta}}</span>
+          </span>
+          <span style="display: {{b.chipShow}}; align-items: center; gap: 7px; flex-shrink: 0; padding: 3px 11px 3px 9px; border-radius: 999px; background: {{b.chipBg}}; color: {{b.chipInk}}; font-size: 12.5px; font-weight: 500; white-space: nowrap">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: {{b.chipDot}}"></span>{{b.chip}}
+          </span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="display: {{b.chevShow}}; width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg>
+        </button>
+        <div style="display: {{b.staticShow}}; align-items: center; gap: 14px; padding: 14px 4px">
+          <span style="flex: 1; min-width: 0; display: block">
+            <span style="display: flex; align-items: baseline; gap: 10px">
+              <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em">{{b.name}}</span>
+              <span style="font-size: 14px; color: #3B4540">{{b.stage}}</span>
+            </span>
+            <span style="display: block; margin-top: 2px; font-size: 12.5px; color: #626C66">{{b.meta}}</span>
+          </span>
+          <span style="display: {{b.chipShow}}; align-items: center; gap: 7px; flex-shrink: 0; padding: 3px 11px 3px 9px; border-radius: 999px; background: {{b.chipBg}}; color: {{b.chipInk}}; font-size: 12.5px; font-weight: 500; white-space: nowrap">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: {{b.chipDot}}"></span>{{b.chip}}
+          </span>
+          <span style="width: 16px; flex-shrink: 0"></span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <p style="margin: 14px 0 0 4px; font-size: 12.5px; color: #626C66">29 batches ended · Batch 29 last, on Fri 16 Oct</p>
+
+  <button type="button" onClick="{{goWeek}}" style="margin-top: 14px; display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px 0 8px; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.calendar}}"></path></svg>
+    Show this week's schedule
+  </button>
+</div>
+</sc-if>
+
+<!-- RECORD (Batch 32) -->
+<sc-if value="{{isRecord}}" hint-placeholder-val="{{false}}">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+  <button type="button" onClick="{{goList}}" style="display: inline-flex; align-items: center; gap: 2px; margin: 0 0 14px -4px; padding: 2px 6px 2px 2px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevL}}"></path></svg>
+    Batches
+  </button>
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Batch 32</h1>
+  <p style="margin: 6px 0 0; font-size: 14px; color: #626C66">Farrowing · day 9 of 28 · Farrowing Room 2</p>
+
+  <div style="margin-top: 18px; padding: 12px 14px; border-radius: 12px; background: #FCE7E2; color: #9A2C17; font-size: 13.5px; line-height: 1.5">
+    <span style="font-weight: 600">Piglet losses 9.8% against 8%.</span>
+  </div>
+
+  <!-- stage path -->
+  <div style="margin-top: 28px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr))">
+    <sc-for list="{{stages}}" as="st" hint-placeholder-count="4">
+      <div>
+        <div style="display: flex; align-items: center; height: 18px">
+          <span style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: {{st.dotBg}}; border: 1.5px solid {{st.dotLine}}">
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="display: {{st.checkShow}}; width: 11px; height: 11px; fill: none; stroke: #FFFFFF; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+            <span style="display: {{st.nowShow}}; width: 6px; height: 6px; border-radius: 50%; background: #C5F06A"></span>
+          </span>
+          <span style="display: {{st.lineShow}}; flex: 1; height: 2px; margin: 0 8px; border-radius: 2px; background: {{st.lineBg}}"></span>
+        </div>
+        <div style="margin-top: 8px; font-size: 14px; font-weight: {{st.weight}}; color: {{st.ink}}">{{st.label}}</div>
+        <div style="font-size: 12.5px; color: #626C66">{{st.sub}}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- tasks -->
+  <h2 style="margin: 32px 0 0; font-size: 15px; font-weight: 600">Tasks</h2>
+  <div style="margin-top: 8px; border-top: 1px solid #E8EBE5">
+    <sc-for list="{{tasks}}" as="t" hint-placeholder-count="3">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 2px; border-bottom: 1px solid #EFF1EC">
+        <span style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: {{t.dotBg}}; border: 1.5px solid {{t.dotLine}}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="display: {{t.checkShow}}; width: 11px; height: 11px; fill: none; stroke: #FFFFFF; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+        </span>
+        <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">{{t.label}}</span>
+        <span style="font-size: 13px; color: #626C66; white-space: nowrap">{{t.meta}}</span>
+        <span style="display: {{t.chipShow}}; padding: 2px 10px; border-radius: 999px; background: #F0F2EE; color: #3B4540; font-size: 12.5px; font-weight: 500; white-space: nowrap">{{t.chip}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- coming up -->
+  <h2 style="margin: 28px 0 0; font-size: 15px; font-weight: 600">Coming up</h2>
+  <div style="margin-top: 8px; border-top: 1px solid #E8EBE5">
+    <sc-for list="{{coming}}" as="c" hint-placeholder-count="2">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 2px; border-bottom: 1px solid #EFF1EC">
+        <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">{{c.label}}</span>
+        <span style="font-size: 13px; color: #626C66; white-space: nowrap">{{c.meta}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+</div>
+</sc-if>
+
+<!-- WEEK -->
+<sc-if value="{{isWeek}}" hint-placeholder-val="{{false}}">
+<div style="max-width: 1040px; margin: 0 auto; padding: 24px 20px 32px; box-sizing: border-box">
+  <button type="button" onClick="{{goList}}" style="display: inline-flex; align-items: center; gap: 2px; margin: 0 0 14px -4px; padding: 2px 6px 2px 2px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevL}}"></path></svg>
+    Batches
+  </button>
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Schedule</h1>
+  <p style="margin: 6px 0 0; font-size: 14px; color: #626C66">Mon 2 – Sun 8 Nov</p>
+
+  <div style="margin-top: 18px; padding: 12px 14px; border-radius: 12px; background: #FFF0D1; color: #7A4A00; font-size: 13.5px; line-height: 1.5">
+    <span style="font-weight: 600">Thu 5 Nov:</span> revaccination of Batch 29 (52 sows) and weaning check of Batch 32 (50 sows) fall on the same team.
+  </div>
+
+  <div style="margin-top: 22px">
+    <div style="display: grid; grid-template-columns: 36px repeat(7, minmax(0, 1fr)); border-bottom: 1px solid #E8EBE5">
+      <span></span>
+      <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+        <div style="padding: 0 2px 8px; text-align: center; background: {{d.fill}}">
+          <div style="font-size: 12px; font-weight: 500; color: #626C66">{{d.dow}}</div>
+          <div style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em">{{d.n}}</div>
+        </div>
+      </sc-for>
+    </div>
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+      <div style="display: grid; grid-template-columns: 36px repeat(7, minmax(0, 1fr)); border-bottom: 1px solid #EFF1EC">
+        <span style="padding-top: 14px; font-size: 13px; font-weight: 600">{{r.label}}</span>
+        <sc-for list="{{r.cells}}" as="c" hint-placeholder-count="7">
+          <div style="padding: 6px 2px; background: {{c.fill}}; min-height: 56px; box-sizing: border-box">
+            <div style="display: {{c.show}}; box-sizing: border-box; width: 100%; padding: 5px 4px 6px 6px; border-radius: 8px; background: {{c.bg}}; border: 1px {{c.bstyle}} {{c.line}}; line-height: 1.25">
+              <div style="font-size: 12px; font-weight: 500; color: {{c.ink}}">{{c.name}}</div>
+              <div style="margin-top: 1px; font-size: 11.5px; color: {{c.sub}}">{{c.count}}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+  <p style="margin: 14px 0 0; font-size: 12.5px; color: #626C66">Nothing scheduled this week: B34 (booster plan waiting) and B35.</p>
+</div>
+</sc-if>
+
+<!-- CALENDAR -->
+<sc-if value="{{isCalendar}}" hint-placeholder-val="{{false}}">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+  <button type="button" onClick="{{goList}}" style="display: inline-flex; align-items: center; gap: 2px; margin: 0 0 14px -4px; padding: 2px 6px 2px 2px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevL}}"></path></svg>
+    Batches
+  </button>
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Batch calendar</h1>
+  <p style="margin: 6px 0 0; font-size: 14px; color: #626C66">{{calLead}}</p>
+
+  <div style="margin-top: 26px">
+    <div style="display: grid; grid-template-columns: 40px minmax(0, 1fr)">
+      <div>
+        <div style="height: 31px"></div>
+        <sc-for list="{{calRows}}" as="r" hint-placeholder-count="12">
+          <div style="height: 28px; box-sizing: border-box; display: flex; align-items: center; font-size: 12.5px; font-weight: 600; color: #121815">{{r.name}}</div>
+        </sc-for>
+      </div>
+      <div style="position: relative; min-width: 0">
+        <div style="position: relative; height: 30px">
+          <sc-for list="{{monthLabels}}" as="m" hint-placeholder-count="6">
+            <span style="position: absolute; top: 0; left: {{m.left}}; padding-left: 4px; font-size: 11px; font-weight: 500; line-height: 16px; color: #626C66; white-space: nowrap">{{m.text}}</span>
+          </sc-for>
+          <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 5px; display: flex">
+            <sc-for list="{{weekTicks}}" as="w" hint-placeholder-count="25">
+              <span style="flex: 1; min-width: 0; border-left: 1px solid #DADED6"></span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="position: relative; border-top: 1px solid #E8EBE5">
+          <sc-for list="{{monthLines}}" as="m" hint-placeholder-count="6">
+            <span aria-hidden="true" style="position: absolute; top: 0; bottom: 0; left: {{m.left}}; width: 1px; background: #EFF1EC"></span>
+          </sc-for>
+          <sc-for list="{{calRows}}" as="r" hint-placeholder-count="12">
+            <div style="position: relative; height: 28px; box-sizing: border-box; border-bottom: 1px solid #F3F5F1">
+              <sc-for list="{{r.bars}}" as="b" hint-placeholder-count="3">
+                <div title="{{b.title}}" style="position: absolute; top: 7px; height: 14px; box-sizing: border-box; left: {{b.left}}; width: {{b.width}}; background: {{b.bg}}; border-right: 1px solid #FFFFFF; border-radius: 4px"></div>
+              </sc-for>
+            </div>
+          </sc-for>
+          <span aria-hidden="true" style="position: absolute; top: 0; bottom: 0; left: {{todayLeft}}; width: 2px; margin-left: -1px; background: #121815; z-index: 2"></span>
+        </div>
+        <div style="position: relative; height: 22px">
+          <span style="position: absolute; top: 5px; left: {{todayLeft}}; transform: translateX(-50%); font-size: 11px; font-weight: 600; line-height: 16px; color: #121815; white-space: nowrap">Today</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 20px; margin-top: 8px; padding-left: 40px; font-size: 12.5px; color: #626C66">
+      <sc-for list="{{legend}}" as="l" hint-placeholder-count="3">
+        <span style="display: inline-flex; align-items: center; gap: 7px">
+          <span aria-hidden="true" style="width: 12px; height: 8px; border-radius: 3px; background: {{l.solid}}; flex-shrink: 0"></span>{{l.text}}
+        </span>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- PLANNED BATCH RECORD (planned, changed) -->
+<sc-if value="{{isPlanned}}" hint-placeholder-val="{{false}}">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+  <sc-if value="{{showReceipt}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 10px; background: #F6F7F4; border: 1px solid #E8EBE5; color: #3B4540; border-radius: 12px; padding: 8px 8px 8px 14px; margin-bottom: 20px; font-size: 13.5px; font-weight: 500; line-height: 1.45; animation: sentriRise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both">
+      <span style="width: 20px; height: 20px; border-radius: 50%; background: #2D7A4B; flex-shrink: 0; display: flex; align-items: center; justify-content: center">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      </span>
+      <span style="flex: 1; min-width: 0">{{rcpLead}} <span style="display: {{rcpTimeShow}}; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">{{rcpTime}}</span>{{rcpTail}}</span>
+      <button type="button" onClick="{{undoReceipt}}" style="height: 32px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer; flex-shrink: 0">Undo</button>
+    </div>
+  </sc-if>
+
+  <button type="button" onClick="{{goList}}" style="display: inline-flex; align-items: center; gap: 2px; margin: 0 0 14px -4px; padding: 2px 6px 2px 2px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevL}}"></path></svg>
+    Batches
+  </button>
+  <div style="display: flex; align-items: center; gap: 12px">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Batch 37</h1>
+    <span style="padding: 3px 11px; border-radius: 999px; background: #F0F2EE; color: #3B4540; font-size: 12.5px; font-weight: 500; white-space: nowrap">Planned</span>
+  </div>
+  <p style="margin: 6px 0 0; font-size: 14px; color: #626C66">Line 1 · breeds <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px">Mon 7 Dec</span></p>
+
+  <!-- facts -->
+  <div style="margin-top: 24px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 16px">
+    <sc-for list="{{facts}}" as="f" hint-placeholder-count="4">
+      <div style="min-width: 0">
+        <div style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</div>
+        <div style="margin-top: 2px; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap"><span aria-hidden="true" style="display: {{f.dotShow}}; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: #D99A1E; vertical-align: 2px"></span>{{f.value}}<span style="display: {{f.dotShow}}; margin-left: 8px; font-size: 13px; font-weight: 400; color: #626C66; text-decoration: line-through">{{f.old}}</span></div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- plan -->
+  <h2 style="margin: 32px 0 0; font-size: 15px; font-weight: 600">Plan</h2>
+  <div style="margin-top: 8px; border-top: 1px solid #E8EBE5">
+    <sc-for list="{{planRows}}" as="p" hint-placeholder-count="6">
+      <div style="display: flex; align-items: baseline; gap: 14px; padding: 12px 2px; border-bottom: 1px solid #EFF1EC">
+        <span style="width: 88px; flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #121815; white-space: nowrap">{{p.date}}</span>
+        <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">{{p.event}}<span style="display: {{p.placeShow}}; margin-left: 10px; font-size: 13px; color: #626C66">{{p.place}}</span></span>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- who's in it -->
+  <h2 style="margin: 30px 0 0; font-size: 15px; font-weight: 600">Who's in it</h2>
+  <p style="margin: 10px 0 0; font-size: 14px; color: #1E2622">Expected: 38 sows weaned from Batch 33 on Fri 4 Dec, and 12 gilts from Quarantine 1. Sows join when they're bred; anyone who returns to heat moves to Batch 38.</p>
+
+  <!-- targets -->
+  <h2 style="margin: 30px 0 0; font-size: 15px; font-weight: 600">Targets</h2>
+  <div style="margin-top: 8px; border-top: 1px solid #E8EBE5; border-bottom: 1px solid #EFF1EC; display: flex; align-items: center; gap: 12px; padding: 6px 2px 6px 2px; min-height: 44px">
+    <span style="flex: 1; min-width: 0; font-size: 14px; color: #121815">14 targets from Line 1 <span style="color: #626C66">· pregnancy ≥ 92%, live born ≥ 12</span></span>
+    <button type="button" title="Changes the line's targets" style="height: 32px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">Change</button>
+  </div>
+
+  <!-- changes -->
+  <sc-if value="{{showChanges}}" hint-placeholder-val="{{false}}">
+    <h2 style="margin: 30px 0 0; font-size: 15px; font-weight: 600">Changes</h2>
+    <div style="margin-top: 8px; border-top: 1px solid #E8EBE5; border-bottom: 1px solid #EFF1EC; padding: 12px 2px">
+      <div style="font-size: 14px; color: #121815">Farrows in Room 4, not Room 2</div>
+      <div style="margin-top: 2px; font-size: 12.5px; color: #626C66">Room 2 floor work · Adam, Fri 30 Oct</div>
+    </div>
+  </sc-if>
+
+  <p style="margin: 24px 0 0; font-size: 12.5px; color: #626C66">Planned: change anything. Once breeding starts, changes move future tasks only.</p>
+</div>
+</sc-if>
+
+<!-- PROPOSAL VIEWS (change, new, newdraft) -->
+<sc-if value="{{isProposal}}" hint-placeholder-val="{{false}}">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <span style="display: flex; align-items: center; gap: 6px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">
+      <sc-for list="{{crumbs}}" as="c" hint-placeholder-count="2">
+        <span style="display: inline-flex; align-items: center; gap: 6px">
+          <span aria-hidden="true" style="display: {{c.sepShow}}">›</span>
+          <button type="button" onClick="{{c.go}}" style="margin: 0; padding: 0; border: 0; background: transparent; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer">{{c.text}}</button>
+        </span>
+      </sc-for>
+    </span>
+    <h1 style="margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -0.025em; color: #121815">{{title}}</h1>
+    <div style="font-size: 14px; color: #3B4540; line-height: 1.5">{{lead}}</div>
+  </div>
+
+  <!-- filled-in rows -->
+  <sc-if value="{{showFields}}" hint-placeholder-val="{{true}}">
+    <div style="display: grid; grid-template-columns: {{fieldCols}}; gap: 18px 16px; margin-top: 24px">
+      <sc-for list="{{fields}}" as="f" hint-placeholder-count="3">
+        <div style="grid-column: {{f.span}}; display: flex; flex-direction: column; gap: 6px; min-width: 0">
+          <div style="display: flex; align-items: center; gap: 8px; min-height: 20px">
+            <span style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</span>
+            <span aria-hidden="true" style="display: {{f.chipShow}}; width: 7px; height: 7px; border-radius: 50%; background: #D99A1E"></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; height: 42px; box-sizing: border-box; width: 100%; border: 1px solid {{f.border}}; background: {{f.bg}}; border-radius: 11px; padding: 0 6px 0 13px; font-size: 14px; color: {{f.ink}}">
+            <span style="display: {{f.oldShow}}; color: #626C66; white-space: nowrap">{{f.old}}</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="display: {{f.oldShow}}; width: 13px; height: 13px; flex-shrink: 0; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.arrowRight}}"></path></svg>
+            <span style="flex: 1; min-width: 0; font-weight: {{f.weight}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{f.value}}</span>
+            <button type="button" title="Renames this batch" style="display: {{f.actShow}}; height: 30px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">Rename</button>
+          </div>
+          <div style="display: {{f.hintShow}}; align-items: flex-start; gap: 7px; font-size: 12.5px; line-height: 1.45; color: #3B4540">
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; margin-top: 3px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+            <span>{{f.hint}}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- check -->
+  <sc-if value="{{showCheck}}" hint-placeholder-val="{{true}}">
+    <div style="margin-top: 34px; padding-top: 24px; border-top: 1px solid #EFF1EC">
+      <h2 style="margin: 0 0 6px; font-size: 15px; line-height: 1.4; font-weight: 600">Nursery</h2>
+      <div style="display: flex; flex-direction: column">
+        <sc-for list="{{checks}}" as="c" hint-placeholder-count="3">
+          <div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid {{c.line}}">
+            <span style="width: 20px; height: 20px; border-radius: 50%; background: {{c.bg}}; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: {{c.stroke}}; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{c.icon}}"></path></svg>
+            </span>
+            <span style="flex: 1; min-width: 0; font-size: 14px; color: {{c.ink}}"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">{{c.sr}}</span>{{c.text}}</span>
+          </div>
+        </sc-for>
+        <sc-if value="{{showChoice}}" hint-placeholder-val="{{true}}">
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 4px 0 0 32px">
+            <sc-for list="{{choices}}" as="o" hint-placeholder-count="2">
+              <button type="button" onClick="{{o.pick}}" aria-pressed="{{o.on}}" style="display: flex; align-items: center; gap: 10px; min-height: 48px; box-sizing: border-box; width: 100%; padding: 8px 14px 8px 12px; border: 1px solid {{o.border}}; border-radius: 12px; background: {{o.bg}}; font: inherit; text-align: left; cursor: pointer">
+                <span aria-hidden="true" style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid {{o.ring}}; flex-shrink: 0; display: flex; align-items: center; justify-content: center">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background: {{o.dot}}"></span>
+                </span>
+                <span style="flex: 1; min-width: 0">
+                  <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{o.label}}</span>
+                </span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- what moves / what this creates -->
+  <sc-if value="{{showEffect}}" hint-placeholder-val="{{true}}">
+    <div style="margin-top: 26px">
+      <button type="button" onClick="{{toggleFx}}" aria-expanded="{{fxExpanded}}" style="display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 13.5px; font-weight: 500; color: #3B4540; cursor: pointer">
+        {{effectHead}}
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{fxRot}}"><path d="{{ic.chevR}}"></path></svg>
+      </button>
+      <sc-if value="{{fxOpen}}" hint-placeholder-val="{{false}}">
+        <p style="margin: 8px 0 0; font-size: 14px; color: #1E2622">{{effectText}}</p>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- new batch -->
+  <sc-if value="{{isNew}}" hint-placeholder-val="{{false}}">
+    <h2 style="margin: 26px 0 0; font-size: 15px; font-weight: 600">Start from</h2>
+    <div style="margin-top: 8px; border-top: 1px solid #E8EBE5">
+      <sc-for list="{{suggestions}}" as="s" hint-placeholder-count="3">
+        <div style="border-bottom: 1px solid #EFF1EC">
+          <button type="button" onClick="{{s.pick}}" style="display: {{s.btnShow}}; width: 100%; box-sizing: border-box; align-items: center; gap: 14px; padding: 15px 4px; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+            <span style="flex: 1; min-width: 0; font-size: 14.5px; font-weight: 500; color: #121815">{{s.label}}</span>
+            <span style="font-size: 13px; color: #626C66; text-align: right">{{s.reason}}</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg>
+          </button>
+          <div title="{{s.hint}}" style="display: {{s.staticShow}}; align-items: center; gap: 14px; padding: 15px 4px">
+            <span style="flex: 1; min-width: 0; font-size: 14.5px; font-weight: 500; color: #626C66">{{s.label}}</span>
+            <span style="font-size: 13px; color: #626C66; text-align: right">{{s.reason}}</span>
+            <span style="width: 16px; flex-shrink: 0"></span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<!-- sticky footer -->
+<sc-if value="{{footerShow}}" hint-placeholder-val="{{true}}">
+  <div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #EFF1EC; padding: 12px 0">
+    <div style="max-width: 760px; margin: 0 auto; padding: 0 32px; box-sizing: border-box; display: flex; align-items: center; gap: 10px">
+      <span style="display: {{barShow}}; flex: 1; min-width: 0; font-size: 13.5px; color: #3B4540">{{barText}}</span>
+      <button type="button" onClick="{{second}}" style="display: {{secondShow}}; align-items: center; height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer; white-space: nowrap">{{secondLabel}}</button>
+      <button type="button" onClick="{{primary}}" style="display: {{primaryShow}}; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 {{primaryPad}}; border: 0; border-radius: 10px; background: #121815; font: inherit; font-size: 14px; font-weight: 500; color: #FFFFFF; cursor: pointer; white-space: nowrap">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="display: {{primaryIconShow}}; width: 16px; height: 16px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+        {{primaryLabel}}
+      </button>
+    </div>
+  </div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["list","record","week","calendar","planned","change","changed","new","newdraft","created"],"default":"list"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  defaults(start) {
+    const base = { view: start, asked: false, startSeen: start, extra: false, moved: false, nurs: 'sell', fx: false };
+    if (start === 'created') base.extra = true;
+    if (start === 'changed') base.moved = true;
+    return base;
+  }
+
+  icons() {
+    return {
+      chevR: 'M9 6l6 6-6 6',
+      chevL: 'M15 6l-6 6 6 6',
+      check: 'M5 12l5 5L20 7',
+      calendar: 'M8 2v4 M16 2v4 M3 10h18 M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
+      plus: 'M12 5v14 M5 12h14',
+      arrowUp: 'M12 19V5 M5 12l7-7 7 7',
+      arrowRight: 'M5 12h14 M13 6l6 6-6 6',
+      bang: 'M12 6v7 M12 18h.01'
+    };
+  }
+
+  renderVals() {
+    const start = this.props.start || 'list';
+    const cur = this.state || {};
+    const s = cur.startSeen !== start ? this.defaults(start) : Object.assign(this.defaults(start), cur);
+    const set = (p) => this.setState(Object.assign({ startSeen: start }, p));
+    const go = (v, extra) => () => set(Object.assign({ view: v, asked: false }, extra || {}));
+    const ic = this.icons();
+    const view = s.view;
+
+    const NEUTRAL = { bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90' };
+    const WRONG = { bg: '#FCE7E2', ink: '#9A2C17', dot: '#D9583B' };
+    const DUE = { bg: '#FFF0D1', ink: '#7A4A00', dot: '#D99A1E' };
+
+    // ---------- list ----------
+    const batchData = [
+      { name: 'Batch 32', stage: 'Farrowing · day 9', meta: '493 piglets · Weaning Thu 26 Nov', chip: 'Losses 9.8% vs 8%', tone: WRONG, openable: true },
+      { name: 'Batch 33', stage: 'Gestation · day 107', meta: '48 sows · Farrowing from Fri 6 Nov', chip: 'Decision open: move date', tone: DUE },
+      { name: 'Batch 34', stage: 'Gestation · day 86', meta: '48 sows · Farrowing from Fri 27 Nov', chip: 'Booster plan waiting', tone: NEUTRAL },
+      { name: 'Batch 30', stage: 'Nursery · day 27', meta: '470 pigs · Out of Nursery 1 Wed 11 Nov', chip: '' },
+      { name: 'Batch 31', stage: 'Nursery · day 6', meta: '488 pigs · Out of Nursery 2 Sat 5 Dec', chip: '' },
+      { name: 'Batch 35', stage: 'Gestation · day 65', meta: '52 sows · Farrowing from Fri 18 Dec', chip: '' }
+    ];
+    const rowOf = (b, onOpen) => {
+      const t = b.tone || NEUTRAL;
+      return {
+        name: b.name, stage: b.stage, meta: b.meta, chip: b.chip,
+        chipShow: b.chip ? 'inline-flex' : 'none',
+        chipBg: t.bg, chipInk: t.ink, chipDot: t.dot,
+        btnShow: b.openable ? 'flex' : 'none',
+        staticShow: b.openable ? 'none' : 'flex',
+        chevShow: b.openable ? 'block' : 'none',
+        aria: 'Open ' + b.name,
+        open: onOpen
+      };
+    };
+    const batches = batchData.map((b) => rowOf(b, go('record')));
+
+    const plannedData = [
+      { name: 'Batch 36', stage: 'Breeds Mon 16 Nov', meta: '50 sows · Farrowing Room 1', chip: '' },
+      { name: 'Batch 37', stage: 'Breeds Mon 7 Dec', meta: '50 sows · Farrowing ' + (s.moved ? 'Room 4' : 'Room 2'), chip: '', openable: true },
+      { name: 'Batch 38', stage: 'Breeds Mon 28 Dec', meta: '50 sows · Farrowing Room 3', chip: '' }
+    ];
+    if (s.extra) plannedData.unshift({ name: 'Batch 35G · gilts', stage: 'Breeds Mon 9 Nov', meta: '24 gilts · Farrowing Room 3', chip: 'Extra', tone: NEUTRAL });
+    const plannedRows = plannedData.map((b) => rowOf(b, go('planned')));
+    const plannedHead = s.extra ? 'Planned · 4' : 'Planned · next 3';
+
+    // ---------- Batch 32 record ----------
+    const GREEN = '#2D7A4B';
+    const stageData = [
+      { label: 'Gestation', sub: 'Done · 3 Jul–14 Oct', st: 'done' },
+      { label: 'Farrowing', sub: 'Now · day 9', st: 'now' },
+      { label: 'Weaning', sub: 'Thu 26 Nov', st: 'next' },
+      { label: 'Nursery', sub: 'Nursery 1', st: 'next' }
+    ];
+    const stages = stageData.map((x, i) => ({
+      label: x.label, sub: x.sub,
+      dotBg: x.st === 'done' ? GREEN : x.st === 'now' ? '#121815' : '#FFFFFF',
+      dotLine: x.st === 'done' ? GREEN : x.st === 'now' ? '#121815' : '#DADED6',
+      checkShow: x.st === 'done' ? 'block' : 'none',
+      nowShow: x.st === 'now' ? 'block' : 'none',
+      lineShow: i < 3 ? 'block' : 'none',
+      lineBg: x.st === 'done' ? GREEN : '#E8EBE5',
+      weight: x.st === 'now' ? 600 : 500,
+      ink: x.st === 'next' ? '#3B4540' : '#121815'
+    }));
+
+    const tasks = [
+      { label: 'Piglet processing', meta: '493 of 493 · done Tue 27 Oct', st: 'done' },
+      { label: 'Fostering checks', meta: '6 of 8 reported', chip: '2 not reported yet', st: 'part' },
+      { label: 'Weaning check', meta: 'Tue 24 Nov · 50 sows', st: 'next' }
+    ].map((t) => ({
+      label: t.label, meta: t.meta, chip: t.chip || '',
+      chipShow: t.chip ? 'inline-block' : 'none',
+      dotBg: t.st === 'done' ? GREEN : '#FFFFFF',
+      dotLine: t.st === 'done' ? GREEN : t.st === 'part' ? '#8E9C90' : '#DADED6',
+      checkShow: t.st === 'done' ? 'block' : 'none'
+    }));
+
+    const coming = [
+      { label: 'Weaning', meta: 'Thu 26 Nov · 50 sows · Nursery 1' },
+      { label: 'Move to nursery', meta: 'Same day' }
+    ];
+
+    // ---------- week view ----------
+    const WEEKEND = '#F6F7F4';
+    const dow = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const days = dow.map((d, i) => ({ dow: d, n: 2 + i, fill: i > 4 ? WEEKEND : 'transparent' }));
+    const N = { bg: '#F0F2EE', line: '#F0F2EE', bstyle: 'solid', ink: '#121815', sub: '#626C66' };
+    const C = { bg: '#FFF0D1', line: '#D99A1E', bstyle: 'solid', ink: '#7A4A00', sub: '#7A4A00' };
+    const P = { bg: '#FFFFFF', line: '#C9CEC5', bstyle: 'dashed', ink: '#3B4540', sub: '#626C66' };
+    const weekRows = [
+      { label: 'B29', chips: { 3: Object.assign({ name: 'Revaccinate', count: '52 sows' }, C) } },
+      { label: 'B30', chips: { 1: Object.assign({ name: 'Weigh', count: '20 pigs' }, N) } },
+      { label: 'B31', chips: { 4: Object.assign({ name: '2nd shot', count: '488 pigs' }, N) } },
+      { label: 'B32', chips: { 0: Object.assign({ name: 'Fostering', count: '8 checks' }, N), 3: Object.assign({ name: 'Wean check', count: '50 sows' }, C) } },
+      { label: 'B33', chips: { 2: Object.assign({ name: 'Move date', count: 'open' }, P) } }
+    ];
+    const rows = weekRows.map((r) => ({
+      label: r.label,
+      cells: dow.map((d, i) => {
+        const ch = r.chips[i];
+        const base = { fill: i > 4 ? WEEKEND : 'transparent' };
+        if (!ch) return Object.assign(base, { show: 'none', name: '', count: '', bg: 'transparent', line: 'transparent', bstyle: 'solid', ink: '#121815', sub: '#626C66' });
+        return Object.assign(base, { show: 'block', name: ch.name, count: ch.count, bg: ch.bg, line: ch.line, bstyle: ch.bstyle, ink: ch.ink, sub: ch.sub });
+      })
+    }));
+
+    // ---------- batch calendar ----------
+    const DAY = 86400000;
+    const U = (y, m, d) => Date.UTC(y, m, d);
+    const add = (t, n) => t + n * DAY;
+    const DOWS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const MONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const fmt = (t) => { const d = new Date(t); return DOWS[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MONS[d.getUTCMonth()]; };
+    const mk = (n, breed, nurseryDays) => {
+      const moveIn = add(breed, 108);
+      const wean = add(breed, 140);
+      return { n, breed, moveIn, wean, out: add(wean, nurseryDays) };
+    };
+    const imported = [
+      mk('30', U(2026, 4, 13), 42), mk('31', U(2026, 5, 6), 42), mk('32', U(2026, 5, 26), 42),
+      mk('33', U(2026, 6, 15), 42), mk('34', U(2026, 7, 5), 42), mk('35', U(2026, 7, 26), 42)
+    ];
+    const plannedCal = [];
+    for (let i = 0; i < 6; i++) plannedCal.push(mk(String(36 + i), add(U(2026, 10, 16), i * 21), 42));
+    const extraCal = mk('35G', U(2026, 10, 9), 28);
+    const all = imported.concat(s.extra ? [extraCal] : [], plannedCal);
+
+    const SC = { gest: '#9DBF8C', farrow: '#E9B44C', nurs: '#7DB8D8' };
+    const WIN_START = U(2026, 9, 26);
+    const WEEKS = 25;
+    const WIN_END = add(WIN_START, WEEKS * 7);
+    const span = WIN_END - WIN_START;
+    const pct = (t) => ((t - WIN_START) / span) * 100;
+    const pc = (v) => (Math.round(v * 1000) / 1000) + '%';
+    const bar = (a, b, bg, title) => {
+      const l = Math.max(0, pct(a));
+      const r = Math.min(100, pct(b));
+      if (r <= l) return null;
+      return { left: pc(l), width: pc(r - l), bg, title };
+    };
+    const calRows = all.map((b) => ({
+      name: b.n.indexOf('G') > -1 ? b.n : b.n,
+      bars: [
+        bar(b.breed, b.moveIn, SC.gest, 'B' + b.n + ' gestation · ' + fmt(b.breed) + ' to ' + fmt(add(b.moveIn, -1))),
+        bar(b.moveIn, b.wean, SC.farrow, 'B' + b.n + ' farrowing · ' + fmt(b.moveIn) + ' to ' + fmt(add(b.wean, -1))),
+        bar(b.wean, b.out, SC.nurs, 'B' + b.n + ' nursery · ' + fmt(b.wean) + ' to ' + fmt(add(b.out, -1)))
+      ].filter(Boolean)
+    })).map((r) => ({ name: 'B' + r.name, bars: r.bars }));
+    const monthStarts = [U(2026, 10, 1), U(2026, 11, 1), U(2027, 0, 1), U(2027, 1, 1), U(2027, 2, 1), U(2027, 3, 1)];
+    const monthLabels = monthStarts.map((t) => {
+      const d = new Date(t);
+      const m = d.getUTCMonth();
+      const yr = m === 10 || m === 0 ? ' ' + d.getUTCFullYear() : '';
+      return { left: pc(pct(t)), text: MONS[m] + yr };
+    });
+    const monthLines = monthStarts.map((t) => ({ left: pc(pct(t)) }));
+    const weekTicks = [];
+    for (let i = 0; i < WEEKS; i++) weekTicks.push({ i });
+    const todayLeft = pc(pct(U(2026, 9, 30) + DAY / 2));
+    const legend = [
+      { text: 'Gestation', solid: SC.gest },
+      { text: 'Farrowing', solid: SC.farrow },
+      { text: 'Nursery', solid: SC.nurs }
+    ];
+
+    // ---------- planned record: Batch 37 ----------
+    const room = s.moved ? 'Room 4' : 'Room 2';
+    const facts = [
+      { label: 'Sows', value: '50' },
+      { label: 'Breeding', value: '7–11 Dec' },
+      { label: 'Farrowing', value: room },
+      { label: 'Nursery', value: 'Nursery 2' }
+    ].map((f) => Object.assign({ dotShow: 'none', old: '' }, f, f.label === 'Farrowing' && s.moved ? { dotShow: 'inline-block', old: 'Room 2' } : {}));
+    const planRows = [
+      { date: 'Mon 7 Dec', event: 'Breeding starts', place: 'Gestation 1' },
+      { date: 'Mon 4 Jan', event: 'Pregnancy check', place: '' },
+      { date: 'Thu 25 Mar', event: 'Into farrowing', place: room },
+      { date: 'Mon 29 Mar', event: 'Farrowing', place: '' },
+      { date: 'Mon 26 Apr', event: 'Weaning', place: 'into Nursery 2' },
+      { date: 'Mon 7 Jun', event: 'Out of nursery', place: '' }
+    ].map((p) => Object.assign({}, p, { placeShow: p.place ? 'inline' : 'none' }));
+
+    // ---------- proposals ----------
+    const OK = { icon: ic.check, bg: '#E7F4EA', stroke: '#2D7A4B', ink: '#1E2622', sr: 'OK: ' };
+    const WARN = { icon: ic.bang, bg: '#FFF0D1', stroke: '#7A4A00', ink: '#121815', sr: 'Check needed: ' };
+    const mkChecks = (arr) => arr.map((c, i) => Object.assign({}, c.warn ? WARN : OK, { text: c.text, line: i === arr.length - 1 ? 'transparent' : '#EFF1EC' }));
+    const optStyle = (on) => ({
+      bg: on ? "#F6F7F4" : "#FFFFFF", border: on ? "#C9CEC5" : "#E2E5DF",
+      ring: on ? '#121815' : '#C9CEC5', dot: on ? '#121815' : 'transparent'
+    });
+    const AIF = { chipShow: 'none', bg: '#FFFFFF', border: '#E2E5DF', ink: '#121815' };
+    const PLAINF = { chipShow: 'none', bg: '#FFFFFF', border: '#E2E5DF', ink: '#3B4540' };
+    const fld = (label, value, style, o) => Object.assign({ label, value, old: '', oldShow: 'none', span: 'auto', actShow: 'none', weight: 400, hint: '', hintShow: 'none' }, style, o || {});
+
+    let crumbs = [];
+    let title = '', lead = '', fields = [], barText = '', fieldCols = 'repeat(2, minmax(0, 1fr))';
+    let checks = [], choices = [], showChoice = false, effectHead = '', effectText = '';
+    let primaryLabel = '', primary = () => {}, secondLabel = 'Back', second = () => {};
+    const crumb = (text, g, i) => ({ text, go: g, sepShow: i ? 'inline' : 'none' });
+
+    if (view === 'change') {
+      crumbs = [crumb('Batches', go('list'), 0), crumb('Batch 37', go('planned'), 1)];
+      title = 'Change Batch 37';
+      lead = 'Room 2 has floor work 20 Mar–30 Apr.';
+      fieldCols = 'repeat(3, minmax(0, 1fr))';
+      fields = [
+        fld('Farrowing room', 'Room 4', AIF, { old: 'Room 2', oldShow: 'inline', weight: 500, chipShow: 'inline-flex', hint: 'Room 4 is free 25 Mar–26 Apr, then a week to wash before Batch 39.', hintShow: 'flex', span: '1 / -1' }),
+        fld('Dates', 'No change', PLAINF),
+        fld('Sows', '50, no change', PLAINF)
+      ];
+      effectHead = 'See what moves';
+      barText = '1 change · 9 tasks change room, no dates move';
+      effectText = "9 tasks for Batch 37 change room. No dates move. Li Wei's farrowing team sees it on their phones from Thu 25 Mar.";
+      primaryLabel = 'Move to Room 4';
+      primary = go('changed', { moved: true });
+      second = go('planned');
+    } else if (view === 'new') {
+      crumbs = [crumb('Batches', go('list'), 0)];
+      title = 'New batch';
+      lead = 'For an extra batch outside the 3-week rhythm. Your planned batches come from Line 1 by themselves.';
+    } else if (view === 'newdraft') {
+      crumbs = [crumb('Batches', go('list'), 0), crumb('New batch', go('new'), 1)];
+      title = 'Batch 35G · 24 gilts';
+      lead = 'An extra batch for the gilts in Quarantine 1. Batch 36 is full at 50 of 52 crates.';
+      fields = [
+        fld('Gilts', '24 · Quarantine 1', AIF, { hint: 'Room for 24 more in Gestation 2.', hintShow: 'flex' }),
+        fld('Breeding', 'Mon 9 – Fri 13 Nov', AIF),
+        fld('Farrowing', 'Room 3 · Thu 25 Feb – Mon 29 Mar', AIF, { hint: 'Room 3 is empty from Fri 4 Dec to Thu 15 Apr, then Batch 38 moves in.', hintShow: 'flex' }),
+        fld('Stages', 'Same as Line 1', AIF),
+        fld('Name', 'Batch 35G', AIF, { span: '1 / -1', actShow: 'inline-block' })
+      ];
+      checks = mkChecks([
+        { warn: true, text: 'Nursery 2 is free until Batch 37 weans on Mon 26 Apr. These pigs would get 28 days there, not 42.' }
+      ]);
+      showChoice = true;
+      choices = [
+        Object.assign({ label: 'Sell or move them on Mon 26 Apr', on: s.nurs === 'sell', tagShow: 'block', pick: () => set({ nurs: 'sell' }) }, optStyle(s.nurs === 'sell')),
+        Object.assign({ label: "Keep 42 days: I'll find nursery space", on: s.nurs === 'keep', tagShow: 'none', pick: () => set({ nurs: 'keep' }) }, optStyle(s.nurs === 'keep'))
+      ];
+      effectHead = 'See the 38 tasks';
+      barText = '1 new batch · 38 tasks';
+      effectText = "Batch 35G and its 38 tasks: breeding, pregnancy check, farrowing, piglet processing, weaning. Tasks reach Zhao Min's team from Fri 6 Nov.";
+      primaryLabel = 'Create Batch 35G';
+      primary = go('created', { extra: true });
+      second = go('new');
+    }
+    if (view === 'change') second = go('planned');
+
+    // new batch: ask + suggestions
+    const suggestions = [
+      { label: '24 gilts in Quarantine 1', reason: 'ready to breed from Mon 9 Nov', link: true, hint: '', pick: go('newdraft') },
+      { label: '6 sows that returned to heat', reason: "they'd join Batch 36 instead", link: false, hint: 'They join Batch 36', pick: () => {} },
+      { label: "Sows you're buying in", reason: 'once they arrive', link: false, hint: '', pick: () => {} }
+    ].map((x) => ({
+      label: x.label, reason: x.reason, hint: x.hint, pick: x.pick,
+      btnShow: x.link ? 'flex' : 'none', staticShow: x.link ? 'none' : 'flex'
+    }));
+
+    // ---------- receipts ----------
+    let rcpLead = '', rcpTime = '', rcpTimeShow = 'none', rcpTail = '';
+    if (view === 'created') { rcpLead = 'Saved'; rcpTime = '10:32'; rcpTimeShow = 'inline'; rcpTail = ' · Batch 35G created, 38 tasks planned.'; }
+    if (view === 'changed') { rcpLead = 'Saved'; rcpTime = '10:32'; rcpTimeShow = 'inline'; rcpTail = ' · 9 tasks now say Room 4.'; }
+
+    // ---------- footer ----------
+    const isPlanned = view === 'planned' || view === 'changed';
+    const isProposal = view === 'change' || view === 'new' || view === 'newdraft';
+    let footerShow = false, primaryShow = 'inline-flex', primaryIconShow = 'block', primaryPad = '14px';
+    if (isPlanned) {
+      footerShow = true;
+      primaryLabel = 'Change this batch';
+      primary = go('change');
+      primaryIconShow = 'none';
+      primaryPad = '16px';
+      primaryShow = s.moved ? 'none' : 'inline-flex';
+      footerShow = !s.moved;
+    }
+    if (view === 'change' || view === 'newdraft') footerShow = true;
+    secondLabel = 'Discard';
+
+    return {
+      ic,
+      isList: view === 'list' || view === 'created',
+      isRecord: view === 'record',
+      isWeek: view === 'week',
+      isCalendar: view === 'calendar',
+      isPlanned, isProposal,
+      isNew: view === 'new',
+      showReceipt: view === 'created' || view === 'changed',
+      rcpLead, rcpTime, rcpTimeShow, rcpTail,
+      undoReceipt: () => (view === 'created' ? set({ view: 'list', extra: false, asked: false }) : set({ view: 'planned', moved: false, asked: false })),
+      goList: go('list'),
+      goWeek: go('week'),
+      goNew: go('new'),
+      goCalendar: go('calendar'),
+      batches, plannedRows, plannedHead,
+      stages, tasks, coming, days, rows,
+      calRows, monthLabels, monthLines, weekTicks, todayLeft, legend,
+      calLead: 'Line 1 · every 3 weeks · 12 batches running or planned',
+      facts, planRows,
+      showChanges: s.moved,
+      // proposals
+      crumbs, title, lead,
+      showFields: view !== 'new',
+      showCheck: view === 'newdraft',
+      showEffect: view !== 'new',
+      fields, fieldCols, checks, choices, showChoice, effectHead, effectText,
+      fxOpen: s.fx, fxExpanded: s.fx ? 'true' : 'false', fxRot: s.fx ? 'rotate(90deg)' : 'none', toggleFx: () => set({ fx: !s.fx }),
+      barText, barShow: barText ? 'block' : 'none', secondShow: isPlanned ? 'none' : 'inline-flex',
+      // new
+      suggestions,
+      // footer
+      footerShow, primaryShow, primaryIconShow, primaryPad, primaryLabel, primary, secondLabel, second
+    };
+  }
+}
+</script>
+</body>
+</html>

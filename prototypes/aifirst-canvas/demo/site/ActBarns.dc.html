@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rooms and pens</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 900px">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 40px; box-sizing: border-box">
+
+<!-- ============ ROOMS LIST ============ -->
+<sc-if value="{{v.rooms}}" hint-placeholder-val="{{true}}">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Rooms</h1>
+  <div style="margin-top: 6px; font-size: 14px; color: #3B4540">{{listLead}}</div>
+
+  <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+    <div style="display: flex; align-items: baseline; gap: 10px; margin: {{g.mt}}px 0 8px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">{{g.name}}</h2>
+      <span style="font-size: 12.5px; color: #626C66">{{g.zone}}</span>
+    </div>
+    <div style="border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{g.rooms}}" as="r" hint-placeholder-count="2">
+        <button type="button" onClick="{{r.open}}" style="display: grid; grid-template-columns: minmax(0, 1fr) auto 16px; align-items: center; gap: 14px; width: 100%; box-sizing: border-box; padding: 13px 16px 13px 18px; border: 0; border-top: {{r.top}}; background: transparent; text-align: left; font: inherit; color: inherit; cursor: pointer">
+          <span style="display: flex; flex-direction: column; gap: 1px; min-width: 0">
+            <span style="font-size: 14.5px; font-weight: 500">{{r.name}}</span>
+            <span style="font-size: 12.5px; color: #626C66">{{r.occ}}</span>
+          </span>
+          <span style="display: inline-flex; align-items: center; justify-content: flex-end">
+            <sc-if value="{{r.hasChip}}" hint-placeholder-val="{{true}}">
+              <span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 500; white-space: nowrap; background: {{r.chipBg}}; color: {{r.chipInk}}">
+                <span style="width: 6px; height: 6px; border-radius: 999px; background: {{r.chipDot}}"></span>
+                {{r.chip}}
+              </span>
+            </sc-if>
+          </span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+        </button>
+      </sc-for>
+    </div>
+  </sc-for>
+
+</sc-if>
+
+<!-- ============ ONE ROOM ============ -->
+<sc-if value="{{v.room}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToRooms}}" style="display: inline-flex; align-items: center; gap: 3px; margin: 0 0 14px -4px; padding: 2px 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevLeft}}"></path></svg>
+    Rooms
+  </button>
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">{{rm.crumb}}</span>
+    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{rm.name}}</h1>
+    <div style="font-size: 14px; color: #3B4540">{{rm.lead}}</div>
+  </div>
+
+  <sc-if value="{{rm.hasFacts}}" hint-placeholder-val="{{true}}">
+    <div style="display: flex; flex-wrap: wrap; gap: 14px 48px; margin-top: 22px">
+      <sc-for list="{{rm.facts}}" as="f" hint-placeholder-count="1">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</span>
+          <span style="font-size: 15px; font-weight: 500; color: #121815">{{f.value}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 28px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">Pens</h2>
+    <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap">
+      <sc-for list="{{rm.legend}}" as="l" hint-placeholder-count="3">
+        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #626C66">
+          <span style="width: 10px; height: 10px; border-radius: 3px; box-sizing: border-box; background: {{l.bg}}; border: 1px solid {{l.bd}}"></span>
+          {{l.label}}
+        </span>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="margin-top: 12px">
+    <div style="position: relative; height: 16px; margin-left: 38px">
+      <sc-for list="{{rm.ticks}}" as="t" hint-placeholder-count="6">
+        <span style="position: absolute; top: 0; left: {{t.left}}px; width: 28px; text-align: center; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; line-height: 16px; color: #626C66">{{t.n}}</span>
+      </sc-for>
+    </div>
+    <sc-for list="{{rm.rows}}" as="mr" hint-placeholder-count="4">
+      <div style="display: flex; align-items: center; margin-top: 7px">
+        <span style="width: 38px; flex-shrink: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #626C66">{{mr.label}}</span>
+        <div style="display: flex; gap: 2px">
+          <sc-for list="{{mr.cells}}" as="c" hint-placeholder-count="26">
+            <sc-if value="{{c.isBtn}}" hint-placeholder-val="{{false}}">
+              <button type="button" aria-label="{{c.aria}}" title="{{c.tip}}" onClick="{{c.open}}" style="width: {{c.w}}px; height: {{c.h}}px; flex-shrink: 0; box-sizing: border-box; padding: 0; border: 0; border-radius: 3px; background: {{c.bg}}; cursor: pointer"></button>
+            </sc-if>
+            <sc-if value="{{c.isPlain}}" hint-placeholder-val="{{true}}">
+              <span title="{{c.tip}}" style="width: {{c.w}}px; height: {{c.h}}px; flex-shrink: 0; box-sizing: border-box; border-radius: 3px; background: {{c.bg}}; border: 1px solid {{c.bd}}"></span>
+            </sc-if>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{rm.hasLook}}" hint-placeholder-val="{{true}}">
+    <div style="display: flex; align-items: center; gap: 8px; margin: 30px 0 10px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Need a look</h2>
+      <span style="min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; background: #121815; color: #C5F06A; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">{{rm.lookCount}}</span>
+    </div>
+    <div style="border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{rm.look}}" as="p" hint-placeholder-count="5">
+        <button type="button" onClick="{{p.open}}" style="display: grid; grid-template-columns: 96px minmax(0, 1fr) auto 16px; align-items: center; gap: 14px; width: 100%; box-sizing: border-box; padding: 12px 16px 12px 18px; border: 0; border-top: {{p.top}}; background: transparent; text-align: left; font: inherit; color: inherit; cursor: pointer">
+          <span style="display: flex; flex-direction: column; gap: 1px">
+            <span style="font-size: 14px; font-weight: 500">{{p.pen}}</span>
+            <span style="font-size: 12.5px; color: #626C66">{{p.row}}</span>
+          </span>
+          <span style="display: flex; flex-direction: column; gap: 1px; min-width: 0">
+            <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; letter-spacing: 0.01em">{{p.tag}}</span>
+            <span style="font-size: 12.5px; color: #626C66">{{p.reason}}</span>
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 500; white-space: nowrap; background: {{p.chipBg}}; color: {{p.chipInk}}">
+            <span style="width: 6px; height: 6px; border-radius: 999px; background: {{p.chipDot}}"></span>
+            {{p.chip}}
+          </span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; margin-top: 22px">
+    <button type="button" onClick="{{watchRoom}}" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 4px; border: 0; background: transparent; font: inherit; font-size: 13.5px; font-weight: 500; color: #3B4540; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.video}}"></path></svg>
+      {{watchLabel}}
+    </button>
+  </div>
+</sc-if>
+
+<!-- ============ ONE PEN ============ -->
+<sc-if value="{{v.pen}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToRoom}}" style="display: inline-flex; align-items: center; gap: 3px; margin: 0 0 14px -4px; padding: 2px 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevLeft}}"></path></svg>
+    {{pn.backLabel}}
+  </button>
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">{{pn.crumb}}</span>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+      <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{pn.title}}</h1>
+      <span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: {{pn.chipBg}}; color: {{pn.chipInk}}">
+        <span style="width: 6px; height: 6px; border-radius: 999px; background: {{pn.chipDot}}"></span>
+        {{pn.chip}}
+      </span>
+    </div>
+    <div style="font-size: 14px; color: #3B4540">{{pn.lead}}</div>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 14px 48px; margin-top: 24px">
+    <sc-for list="{{pn.facts}}" as="f" hint-placeholder-count="3">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</span>
+        <span style="font-family: {{f.font}}; font-size: 15px; font-weight: 500; color: #121815">{{f.value}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <h2 style="margin: 28px 0 10px; font-size: 15px; font-weight: 600">Camera</h2>
+  <div style="position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #1B221E">
+    <svg viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%">
+      <rect x="0" y="0" width="640" height="360" fill="#1B221E"></rect>
+      <rect x="0" y="262" width="640" height="98" fill="#171D1A"></rect>
+      <path d="M0 96H640 M0 176H640" stroke="#2A332E" stroke-width="4" fill="none"></path>
+      <path d="M96 40V262 M224 40V262 M352 40V262 M480 40V262 M608 40V262" stroke="#2A332E" stroke-width="4" fill="none"></path>
+      <rect x="116" y="196" width="96" height="52" rx="24" fill="#29332D"></rect>
+      <rect x="244" y="200" width="96" height="48" rx="22" fill="#29332D"></rect>
+      <rect x="372" y="194" width="98" height="54" rx="24" fill="#29332D"></rect>
+      <rect x="500" y="200" width="92" height="48" rx="22" fill="#29332D"></rect>
+    </svg>
+    <span style="position: absolute; left: 14px; top: 14px; display: inline-flex; align-items: center; gap: 8px; height: 26px; padding: 0 11px 0 10px; border-radius: 999px; background: rgba(18, 24, 21, 0.78); color: #FFFFFF; font-size: 12.5px; font-weight: 500">
+      <span style="width: 8px; height: 8px; border-radius: 999px; background: #2FA36B; animation: sentriPulseG 1.8s ease-out infinite"></span>
+      Live
+    </span>
+    <span aria-hidden="true" style="position: absolute; left: 34%; top: 26%; width: 21%; height: 56%; box-sizing: border-box; border: 2px solid #C5F06A; border-radius: 8px"></span>
+    <span style="position: absolute; left: 34%; top: 26%; margin: -26px 0 0 0; height: 24px; padding: 0 9px; display: inline-flex; align-items: center; border-radius: 8px; background: #C5F06A; color: #121815; font-size: 12px; font-weight: 600">{{pn.title}}</span>
+    <span style="position: absolute; left: 14px; bottom: 12px; font-size: 13px; font-weight: 500; color: #FFFFFF">{{pn.camera}}</span>
+    <span style="position: absolute; right: 14px; bottom: 12px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: rgba(255, 255, 255, 0.85)">Fri 30 Oct &#183; 08:41</span>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px">
+    <button type="button" onClick="{{openRec}}" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; color: #121815; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.video}}"></path></svg>
+      {{recLabel}}
+    </button>
+    <button type="button" onClick="{{openSow}}" style="height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; color: #121815; cursor: pointer">{{sowLabel}}</button>
+  </div>
+
+  <h2 style="margin: 28px 0 4px; font-size: 15px; font-weight: 600">Last events</h2>
+  <div>
+    <sc-for list="{{pn.events}}" as="e" hint-placeholder-count="4">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 10px 0; border-top: 1px solid #EFF1EC">
+        <span style="font-size: 14px; color: #1E2622">{{e.text}}</span>
+        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66; white-space: nowrap">{{e.date}}</span>
+      </div>
+    </sc-for>
+  </div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["rooms","room","pen"],"default":"rooms"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      chev: 'M9 18l6-6-6-6',
+      chevLeft: 'M15 18l-6-6 6-6',
+      chat: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+      video: 'M15 10l6-4v12l-6-4 M3 6h12v12H3z'
+    };
+  }
+
+  range(a, b) {
+    const out = [];
+    for (let i = a; i <= b; i++) out.push(i);
+    return out;
+  }
+
+  rooms() {
+    const R = (a, b) => this.range(a, b);
+    return [
+      { id: 'g2', bld: 'Gestation barn', zone: 'Breeding zone', name: 'Gestation 2', occ: '186 of 200 stalls', chip: '5 pens to look at', kind: 'amber',
+        lead: '186 of 200 stalls in use. 5 pens need a look.',
+        facts: [{ label: 'Feed intake', value: '−6% since Tue' }],
+        rows: [{ l: 'A', n: 50, kind: 'stall', empty: R(48, 50) }, { l: 'B', n: 50, kind: 'stall', empty: R(49, 50) }, { l: 'C', n: 50, kind: 'stall', empty: R(47, 50) }, { l: 'D', n: 50, kind: 'stall', empty: R(46, 50) }] },
+      { id: 'g1', bld: 'Gestation barn', zone: 'Breeding zone', name: 'Gestation 1', occ: '196 of 200 stalls · 6 boars', chip: '', kind: '',
+        lead: '196 of 200 stalls in use, plus 6 boars.',
+        rows: [{ l: 'A', n: 50, kind: 'stall', empty: [] }, { l: 'B', n: 50, kind: 'stall', empty: [] }, { l: 'C', n: 50, kind: 'stall', empty: [] }, { l: 'D', n: 50, kind: 'stall', empty: R(47, 50) }, { l: 'Boar', n: 6, kind: 'boar', empty: [] }] },
+      { id: 'fr2', bld: 'Farrowing barn', zone: 'Breeding zone', name: 'Farrowing Room 2', occ: '50 sows · 493 piglets', chip: 'Losses 9.8% vs 8%', kind: 'amber',
+        lead: '50 of 52 crates in use, with 493 piglets (Batch 32, day 9).',
+        facts: [{ label: 'Piglet losses', value: '9.8% (target 8%)' }],
+        rows: [{ l: 'A', n: 26, kind: 'crate', empty: [] }, { l: 'B', n: 26, kind: 'crate', empty: R(25, 26) }] },
+      { id: 'fr1', bld: 'Farrowing barn', zone: 'Breeding zone', name: 'Farrowing Room 1', occ: 'Empty · ready', chip: 'B35 arrives Mon 14 Dec', kind: 'neutral',
+        lead: 'Empty. Clean and ready since Tue 27 Oct.',
+        rows: [{ l: 'A', n: 26, kind: 'crate', empty: R(1, 26) }, { l: 'B', n: 26, kind: 'crate', empty: R(1, 26) }] },
+      { id: 'fr3', bld: 'Farrowing barn', zone: 'Breeding zone', name: 'Farrowing Room 3', occ: 'Empty · drying', chip: 'B33 arrives Wed 4 Nov', kind: 'neutral',
+        lead: 'Empty. Drying, ready Sat 31 Oct 08:40.',
+        facts: [{ label: 'Batch 33', value: '48 sows in Wed 4 Nov' }],
+        rows: [{ l: 'A', n: 26, kind: 'crate', empty: R(1, 26) }, { l: 'B', n: 26, kind: 'crate', empty: R(1, 26) }] },
+      { id: 'fr4', bld: 'Farrowing barn', zone: 'Breeding zone', name: 'Farrowing Room 4', occ: 'Empty · ready', chip: '', kind: '',
+        lead: 'Empty and ready.',
+        rows: [{ l: 'A', n: 26, kind: 'crate', empty: R(1, 26) }, { l: 'B', n: 26, kind: 'crate', empty: R(1, 26) }] },
+      { id: 'n1', bld: 'Nursery barn', zone: 'Nursery zone', name: 'Nursery 1', occ: '470 pigs · 40 pens', chip: 'B30 leaves Wed 11 Nov', kind: 'neutral',
+        lead: '470 pigs in 40 group pens, about 12 a pen (Batch 30, day 27).',
+        facts: [{ label: 'Batch 30', value: '470 pigs out Wed 11 Nov' }],
+        rows: [{ l: 'A', n: 20, kind: 'pen', empty: [] }, { l: 'B', n: 20, kind: 'pen', empty: [] }] },
+      { id: 'n2', bld: 'Nursery barn', zone: 'Nursery zone', name: 'Nursery 2', occ: '488 pigs · 40 pens', chip: '', kind: '',
+        lead: '488 pigs in 40 group pens, about 12 a pen (Batch 31, day 6).',
+        rows: [{ l: 'A', n: 20, kind: 'pen', empty: [] }, { l: 'B', n: 20, kind: 'pen', empty: [] }] },
+      { id: 'q1', bld: 'Gilt isolation', zone: 'Isolation zone', name: 'Quarantine 1', occ: '24 gilts · 3 of 10 pens', chip: '', kind: '',
+        lead: '24 gilts in 3 of 10 group pens, ready to breed.',
+        rows: [{ l: 'A', n: 10, kind: 'pen', empty: R(4, 10) }] }
+    ];
+  }
+
+  // pens in Gestation 2 that need a look: rows A (numbers are within the row)
+  pens() {
+    const recheck = { date: 'Thu 29 Oct 09:15', text: 'Re-check by Zhao Min: still lame, eating well' };
+    const vac = { date: '13 Oct', text: 'Vaccinated PRRS' };
+    const moved = { date: '12 Oct', text: 'Moved in' };
+    return {
+      14: { tag: '204518', parity: 4, due: 'Fri 27 Nov', sev: 'urgent', reason: 'Lame, left hind', chip: 'Urgent · lame',
+        events: [recheck, { date: 'Wed 28 Oct 16:40', text: 'Lame, left hind, found by Zhao Min' }, vac, moved] },
+      17: { tag: '205102', parity: 6, due: 'Fri 20 Nov', sev: 'urgent', reason: 'Lame, right front', chip: 'Urgent · lame',
+        events: [{ date: 'Thu 29 Oct 07:40', text: 'Lame, right front, found by Zhao Min' }, vac, moved, { date: 'Mon 6 Apr', text: 'Lame, right front. Recovered after 6 days' }] },
+      9: { tag: '203377', parity: 2, due: 'Wed 9 Dec', sev: 'watch', reason: 'Lame, left front', chip: 'Watch · lame',
+        events: [recheck, { date: 'Tue 27 Oct 11:20', text: 'Lame, left front, found by Zhao Min' }, vac, moved] },
+      11: { tag: '205240', parity: 3, due: 'Wed 16 Dec', sev: 'watch', reason: 'Lame, right hind', chip: 'Watch · lame',
+        events: [recheck, { date: 'Wed 28 Oct 08:05', text: 'Lame, right hind, found by Zhao Min' }, vac, moved] },
+      3: { tag: '204093', parity: 3, due: 'Mon 9 Nov', sev: 'watch', reason: 'Off feed', chip: 'Watch · off feed',
+        events: [{ date: 'Thu 29 Oct 17:30', text: 'Left half of the ration, noted by Zhao Min' }, vac, moved] }
+    };
+  }
+
+  defaults(start) {
+    const base = { startSeen: start, view: 'rooms', room: 'g2', pen: 14, opened: {}, asked: {} };
+    if (start === 'room') return Object.assign(base, { view: 'room' });
+    if (start === 'pen') return Object.assign(base, { view: 'pen' });
+    return base;
+  }
+
+  chipStyle(kind) {
+    if (kind === 'amber') return { bg: '#FFF0D1', ink: '#7A4A00', dot: '#D99A1E', vis: 'visible' };
+    if (kind === 'red') return { bg: '#FCE7E2', ink: '#9A2C17', dot: '#D9583B', vis: 'visible' };
+    if (kind === 'neutral') return { bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90', vis: 'visible' };
+    return { bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90', vis: 'hidden' };
+  }
+
+  renderVals() {
+    const start = this.props.start || 'rooms';
+    const fresh = !this.state || this.state.startSeen !== start;
+    const s = fresh ? this.defaults(start) : Object.assign(this.defaults(start), this.state);
+    const set = (p) => this.setState(Object.assign({ startSeen: start }, s, p));
+    const ic = this.icons();
+    const all = this.rooms();
+    const pensData = this.pens();
+    
+    // ---------- rooms list ----------
+    const flaggedN = all.filter((r) => r.kind === 'amber').length;
+    const blds = [];
+    all.forEach((r) => { if (blds.indexOf(r.bld) < 0) blds.push(r.bld); });
+    const groups = blds.map((b, bi) => {
+      const rs = all.filter((r) => r.bld === b);
+      const ordered = rs.filter((r) => r.kind === 'amber').concat(rs.filter((r) => r.kind !== 'amber'));
+      return {
+        name: b, zone: rs[0].zone, mt: bi === 0 ? 24 : 26,
+        rooms: ordered.map((r, i) => {
+          const cs = this.chipStyle(r.kind);
+          return {
+            name: r.name, occ: r.occ, chip: r.chip, hasChip: !!r.chip, chipBg: cs.bg, chipInk: cs.ink, chipDot: cs.dot,
+            top: i === 0 ? '0' : '1px solid #EFF1EC',
+            open: () => set({ view: 'room', room: r.id })
+          };
+        })
+      };
+    });
+
+    // ---------- one room ----------
+    const room = all.filter((r) => r.id === s.room)[0] || all[0];
+    const isG2 = room.id === 'g2';
+    const gap = 2;
+    const maxN = room.rows.reduce((a, x) => Math.max(a, x.n), 0);
+    const avail = 566;
+    const cw = Math.max(7, Math.min(26, Math.floor(((avail - (maxN - 1) * gap) / maxN) * 10) / 10));
+    const hOf = (kind) => (kind === 'stall' ? 18 : kind === 'crate' ? 20 : kind === 'boar' ? 22 : 24);
+    let anyIn = false, anyEmpty = false, anyWatch = false, anyUrgent = false;
+    const rows = room.rows.map((x) => {
+      const cells = [];
+      for (let i = 1; i <= x.n; i++) {
+        const empty = x.empty.indexOf(i) >= 0;
+        const flagged = isG2 && x.l === 'A' ? pensData[i] : null;
+        let bg = '#DADED6', bd = '#DADED6', tip = x.l + i;
+        if (empty) { bg = '#FFFFFF'; bd = '#E2E5DF'; anyEmpty = true; } else { anyIn = true; }
+        if (flagged) {
+          const urgent = flagged.sev === 'urgent';
+          if (urgent) anyUrgent = true; else anyWatch = true;
+          cells.push({
+            isBtn: true, isPlain: false, w: cw, h: hOf(x.kind), bg: urgent ? '#D9583B' : '#D99A1E', bd: bd,
+            tip: 'Pen ' + i + ' · ' + flagged.reason, aria: 'Pen ' + i + ', ' + flagged.reason + ', ' + (urgent ? 'urgent' : 'watch'),
+            open: () => set({ view: 'pen', pen: i })
+          });
+        } else {
+          cells.push({ isBtn: false, isPlain: true, w: cw, h: hOf(x.kind), bg: bg, bd: bd, tip: 'Pen ' + tip, aria: '', open: () => {} });
+        }
+      }
+      return { label: x.l, cells };
+    });
+    const step = maxN > 30 ? 10 : maxN > 12 ? 5 : 5;
+    const ticks = [{ n: 1, left: cw / 2 - 14 }];
+    for (let n = step; n <= maxN; n += step) ticks.push({ n: n, left: (n - 1) * (cw + gap) + cw / 2 - 14 });
+    const legend = [];
+    if (anyIn) legend.push({ label: 'In use', bg: '#DADED6', bd: '#DADED6' });
+    if (anyEmpty) legend.push({ label: 'Empty', bg: '#FFFFFF', bd: '#E2E5DF' });
+    if (anyWatch) legend.push({ label: 'Watch', bg: '#D99A1E', bd: '#D99A1E' });
+    if (anyUrgent) legend.push({ label: 'Urgent', bg: '#D9583B', bd: '#D9583B' });
+
+    const lookKeys = isG2 ? [14, 17, 9, 11, 3] : [];
+    const look = lookKeys.map((k, i) => {
+      const p = pensData[k];
+      const cs = this.chipStyle(p.sev === 'urgent' ? 'red' : 'amber');
+      return {
+        pen: 'Pen ' + k, row: 'Row A', tag: p.tag, reason: p.reason, chip: p.chip.split(' · ')[0], chipBg: cs.bg, chipInk: cs.ink, chipDot: cs.dot,
+        top: i === 0 ? '0' : '1px solid #EFF1EC',
+        open: () => set({ view: 'pen', pen: k })
+      };
+    });
+    const rm = {
+      crumb: room.zone + ' › ' + room.bld,
+      name: room.name,
+      lead: room.lead,
+      hasFacts: !!room.facts, facts: room.facts || [],
+      rows, ticks, legend,
+      hasLook: look.length > 0, lookCount: look.length, look
+    };
+
+    // ---------- one pen ----------
+    const pd = pensData[s.pen] || pensData[14];
+    const pcs = this.chipStyle(pd.sev === 'urgent' ? 'red' : 'amber');
+    const pn = {
+      backLabel: 'Gestation 2',
+      crumb: 'Gestation 2 › Row A',
+      title: 'Pen ' + s.pen,
+      chip: pd.chip, chipBg: pcs.bg, chipInk: pcs.ink, chipDot: pcs.dot,
+      lead: pd.reason + '. One sow in a stall.',
+      camera: 'Gestation 2 · Rows A–B',
+      facts: [
+        { label: 'Sow', value: pd.tag, font: "'Geist Mono', ui-monospace, monospace" },
+        { label: 'Parity', value: String(pd.parity), font: "'Geist', 'Inter', system-ui, sans-serif" },
+        { label: 'Due to farrow', value: pd.due, font: "'Geist', 'Inter', system-ui, sans-serif" }
+      ],
+      events: pd.events
+    };
+
+    return {
+      ic,
+      v: { rooms: s.view === 'rooms', room: s.view === 'room', pen: s.view === 'pen' },
+
+      listLead: all.length + ' rooms. ' + flaggedN + ' need a look.',
+      groups,
+
+      rm,
+      backToRooms: () => set({ view: 'rooms' }),
+      watchLabel: s.opened.cam ? 'Opened in Cameras' : 'Watch this room',
+      watchRoom: () => set({ opened: Object.assign({}, s.opened, { cam: true }) }),
+
+      pn,
+      backToRoom: () => set({ view: 'room', room: 'g2', opened: {}, asked: {} }),
+      recLabel: s.opened.rec ? 'Opened in Cameras' : 'Recordings',
+      openRec: () => set({ opened: Object.assign({}, s.opened, { rec: true }) }),
+      sowLabel: s.opened.sow ? 'Opened in Pigs' : 'Open sow ' + pd.tag,
+      openSow: () => set({ opened: Object.assign({}, s.opened, { sow: true }) }),
+    };
+  }
+}
+</script>
+</body>
+</html>

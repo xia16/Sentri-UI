@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Disinfection</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+<!-- ============ LIST ============ -->
+<sc-if value="{{isList}}" hint-placeholder-val="{{true}}">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px">
+    <div>
+      <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Disinfection</h1>
+      <p style="margin: 6px 0 0; font-size: 14px; color: #626C66">{{summary}}</p>
+    </div>
+    <button type="button" onClick="{{openRoutine}}" style="height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer; white-space: nowrap">Routine</button>
+  </div>
+
+  <!-- Needs you -->
+  <sc-if value="{{hasNeeds}}" hint-placeholder-val="{{true}}">
+    <div style="margin-top: 28px; display: flex; align-items: center; gap: 8px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Needs you</h2>
+      <span style="min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; background: #121815; color: #C5F06A; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">{{needsCount}}</span>
+    </div>
+    <div style="margin-top: 10px; border: 1px solid #D5E7CF; border-radius: 14px; background: #F5FAF2; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{needs}}" as="r" hint-placeholder-count="3">
+        <button type="button" onClick="{{r.open}}" style="width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 0; border-top: {{r.top}}; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+          <span style="flex: 1; min-width: 0">
+            <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{r.what}}</span>
+            <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.why}}</span>
+          </span>
+          <span style="display: {{r.chipDisplay}}; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; background: {{r.chipBg}}; color: {{r.chipInk}}; font-size: 12.5px; font-weight: 500; white-space: nowrap"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{r.chipDot}}"></span>{{r.chip}}</span>
+          <span style="min-width: 44px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #3B4540; white-space: nowrap">{{r.when}}</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- Being cleaned -->
+  <div style="margin-top: 28px; display: flex; align-items: baseline; gap: 8px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">Being cleaned</h2>
+    <span style="font-size: 13px; color: #626C66">{{cleaningCount}}</span>
+  </div>
+  <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <sc-for list="{{cleaning}}" as="r" hint-placeholder-count="3">
+      <button type="button" onClick="{{r.open}}" style="width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 0; border-top: {{r.top}}; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+        <span style="flex: 1; min-width: 0">
+          <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{r.what}}</span>
+          <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.why}}</span>
+        </span>
+        <span style="display: {{r.chipDisplay}}; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; background: {{r.chipBg}}; color: {{r.chipInk}}; font-size: 12.5px; font-weight: 500; white-space: nowrap"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{r.chipDot}}; animation: {{r.chipAnim}}"></span>{{r.chip}}</span>
+        <span style="min-width: 44px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #3B4540; white-space: nowrap">{{r.when}}</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+      </button>
+    </sc-for>
+  </div>
+
+  <!-- Rooms -->
+  <div style="margin-top: 28px; display: flex; align-items: baseline; gap: 8px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">Rooms</h2>
+    <span style="font-size: 13px; color: #626C66">{{roomsCount}}</span>
+  </div>
+  <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <sc-for list="{{rooms}}" as="r" hint-placeholder-count="3">
+      <button type="button" onClick="{{r.open}}" style="width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 0; border-top: {{r.top}}; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+        <span style="flex: 1; min-width: 0">
+          <span style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px">
+            <span style="font-size: 14px; font-weight: 500; color: #121815">{{r.what}}</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; box-sizing: border-box; border: 1px solid {{r.chipBorder}}; border-radius: 999px; background: {{r.chipBg}}; color: {{r.chipInk}}; font-size: 12.5px; font-weight: 500; white-space: nowrap">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{r.chipIcon}}"></path></svg>{{r.chip}}
+            </span>
+          </span>
+          <span style="display: block; margin-top: 2px; font-size: 12.5px; color: #626C66">{{r.meta}}</span>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+      </button>
+    </sc-for>
+  </div>
+  <p style="margin: 10px 0 0; font-size: 13px; color: #626C66">{{nurseryLine}}</p>
+
+  <!-- Released and ready (collapsed) -->
+  <button type="button" onClick="{{toggleReleased}}" aria-expanded="{{releasedExpanded}}" style="margin-top: 28px; display: flex; align-items: baseline; gap: 8px; padding: 0; border: 0; background: transparent; font: inherit; color: inherit; cursor: pointer; text-align: left">
+    <span style="font-size: 15px; font-weight: 600">Released and ready</span>
+    <span style="font-size: 13px; color: #626C66">{{releasedCount}}</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="align-self: center; width: 15px; height: 15px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{releasedRot}}"><path d="{{ic.chev}}"></path></svg>
+  </button>
+  <sc-if value="{{releasedOpen}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+      <sc-for list="{{released}}" as="r" hint-placeholder-count="4">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-top: {{r.top}}">
+          <span style="flex: 1; min-width: 0">
+            <span style="display: block; font-size: 14px; font-weight: 500; color: #121815; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.what}}</span>
+            <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.why}}</span>
+          </span>
+          <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66; white-space: nowrap">{{r.date}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+</sc-if>
+
+<!-- ============ ITEM (record or proposal) ============ -->
+<sc-if value="{{isItem}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToList}}" style="display: inline-flex; align-items: center; gap: 2px; margin: 0 0 14px -4px; padding: 2px 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: rotate(180deg)"><path d="{{ic.chev}}"></path></svg>
+    Disinfection
+  </button>
+
+  <!-- saved strip (system voice) -->
+  <sc-if value="{{isDone}}" hint-placeholder-val="{{false}}">
+    <div style="margin: 0 0 20px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid #E8EBE5; border-radius: 14px; background: #F6F7F4; animation: sentriRise 0.4s ease-out">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      <span style="flex: 1; min-width: 0; font-size: 13.5px; color: #3B4540">{{receipt}}</span>
+      <button type="button" onClick="{{undoDone}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Biosecurity &middot; Disinfection</div>
+  <div style="margin-top: 6px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{it.title}}</h1>
+    <span style="display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; box-sizing: border-box; border: 1px solid {{it.chipBorder}}; border-radius: 999px; background: {{it.chipBg}}; color: {{it.chipInk}}; font-size: 12.5px; font-weight: 500"><span style="display: {{it.dotDisplay}}; width: 6px; height: 6px; border-radius: 50%; background: {{it.chipDot}}; animation: {{it.chipAnim}}"></span><svg viewBox="0 0 24 24" aria-hidden="true" style="display: {{it.iconDisplay}}; width: 13px; height: 13px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{it.chipIcon}}"></path></svg>{{it.chip}}</span>
+  </div>
+
+  <!-- facts -->
+  <div style="margin-top: 18px; display: flex; gap: 40px; flex-wrap: wrap">
+    <sc-for list="{{it.facts}}" as="f" hint-placeholder-count="3">
+      <div>
+        <div style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</div>
+        <div style="margin-top: 1px; font-size: 14px; color: #121815">{{f.value}}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- steps -->
+  <h2 style="margin: 28px 0 0; font-size: 15px; font-weight: 600">{{it.stepsTitle}}</h2>
+  <div style="margin-top: 12px">
+    <sc-for list="{{steps}}" as="st" hint-placeholder-count="4">
+      <div style="display: flex; align-items: stretch; gap: 14px">
+        <div style="width: 10px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center">
+          <span style="width: 10px; height: 10px; box-sizing: border-box; margin-top: 5px; flex-shrink: 0; border-radius: 50%; background: {{st.dot}}; border: {{st.ring}}; animation: {{st.anim}}"></span>
+          <span style="flex: 1; width: 1px; margin-top: 4px; background: {{st.line}}"></span>
+        </div>
+        <div style="flex: 1; min-width: 0; display: flex; align-items: flex-start; gap: 12px; padding-bottom: 16px">
+          <div style="flex: 1; min-width: 0">
+            <div style="display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap">
+              <span style="font-size: 14px; font-weight: 500; color: {{st.ink}}">{{st.label}}</span>
+              <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: {{st.whenInk}}">{{st.when}}</span>
+            </div>
+            <div style="margin-top: 1px; font-size: 12.5px; color: #626C66">{{st.who}}</div>
+            <div style="display: {{st.warnDisplay}}; margin-top: 6px; align-items: center; gap: 8px; flex-wrap: wrap">
+              <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: {{st.warnInk}}">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: {{st.warnIcon}}; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.warn}}"></path></svg>
+                {{st.warn}}
+              </span>
+              <button type="button" onClick="{{st.fix}}" style="display: {{st.fixDisplay}}; height: 28px; padding: 0 10px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap">{{st.fixLabel}}</button>
+            </div>
+          </div>
+          <span style="display: {{st.photoDisplay}}; align-items: center; gap: 6px; height: 28px; padding: 0 10px; box-sizing: border-box; border: 1px solid #DADED6; border-radius: 999px; background: #FFFFFF; color: #3B4540; font-size: 12.5px; font-weight: 500; white-space: nowrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.camera}}"></path></svg>
+            {{st.photoText}}
+          </span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- kits: what to do -->
+  <sc-if value="{{isKits}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">What to do</h2>
+      <span style="display: {{kitsDirty}}; align-items: center; gap: 6px; font-size: 12.5px; color: #626C66"><span style="width: 6px; height: 6px; border-radius: 50%; background: #2FA36B"></span><span style="text-decoration: line-through">{{kitsOld}}</span></span>
+    </div>
+    <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap">
+      <sc-for list="{{kitsOpts}}" as="o" hint-placeholder-count="2">
+        <button type="button" onClick="{{o.pick}}" aria-pressed="{{o.pressed}}" style="height: 40px; padding: 0 16px; box-sizing: border-box; border: 1px solid {{o.line}}; border-radius: 11px; background: {{o.bg}}; color: #121815; font: inherit; font-size: 14px; font-weight: {{o.weight}}; cursor: pointer">{{o.label}}</button>
+      </sc-for>
+    </div>
+    <sc-if value="{{kitsShort}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 12px; display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; color: #7A4A00">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; margin-top: 4px; fill: none; stroke: #D99A1E; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.warn}}"></path></svg>
+        <span>45 min short of the 2 h routine. The short run stays in the record.</span>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- gloves: release -->
+  <sc-if value="{{isGloves}}" hint-placeholder-val="{{false}}">
+    <h2 style="margin: 12px 0 0; font-size: 15px; font-weight: 600">Release</h2>
+    <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px">
+      <span style="font-size: 12px; font-weight: 500; color: #626C66">Cases to release</span>
+      <span style="display: {{countDirty}}; align-items: center; gap: 6px; font-size: 12.5px; color: #626C66"><span style="width: 6px; height: 6px; border-radius: 50%; background: #2FA36B"></span><span style="text-decoration: line-through">3</span></span>
+    </div>
+    <div style="margin-top: 8px; display: flex; align-items: center; gap: 14px">
+      <button type="button" onClick="{{lessCount}}" aria-label="One case less" style="width: 40px; height: 40px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: {{lessCountOpacity}}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round"><path d="{{ic.minus}}"></path></svg>
+      </button>
+      <span style="min-width: 80px; text-align: center; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 20px; font-weight: 500; color: #121815">{{countText}}</span>
+      <button type="button" onClick="{{moreCount}}" aria-label="One case more" style="width: 40px; height: 40px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: {{moreCountOpacity}}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg>
+      </button>
+    </div>
+    <sc-if value="{{wetWarn}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13.5px; color: #7A4A00">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: #D99A1E; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.warn}}"></path></svg>
+        <span>1 case arrived wet (delivery note).</span>
+        <button type="button" onClick="{{holdWet}}" style="height: 28px; padding: 0 10px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap">Hold 1 case</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{wetHeld}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 12px; font-size: 13.5px; color: #626C66">1 case stays in the supply room until it is dry.</div>
+    </sc-if>
+
+    <div style="margin-top: 20px; display: flex; align-items: center; gap: 8px">
+      <span style="font-size: 12px; font-weight: 500; color: #626C66">Goes to</span>
+      <span style="display: {{storeDirty}}; align-items: center; gap: 6px; font-size: 12.5px; color: #626C66"><span style="width: 6px; height: 6px; border-radius: 50%; background: #2FA36B"></span><span style="text-decoration: line-through">Gestation store</span></span>
+    </div>
+    <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap">
+      <sc-for list="{{stores}}" as="o" hint-placeholder-count="3">
+        <button type="button" onClick="{{o.pick}}" aria-pressed="{{o.pressed}}" style="height: 40px; padding: 0 16px; box-sizing: border-box; border: 1px solid {{o.line}}; border-radius: 11px; background: {{o.bg}}; color: #121815; font: inherit; font-size: 14px; font-weight: {{o.weight}}; cursor: pointer">{{o.label}}</button>
+      </sc-for>
+    </div>
+  </sc-if>
+</sc-if>
+
+<!-- ============ ROUTINE ============ -->
+<sc-if value="{{isRoutine}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToList}}" style="display: inline-flex; align-items: center; gap: 2px; margin: 0 0 14px -4px; padding: 2px 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: rotate(180deg)"><path d="{{ic.chev}}"></path></svg>
+    Disinfection
+  </button>
+
+  <sc-if value="{{hasRcpt}}" hint-placeholder-val="{{false}}">
+    <div style="margin: 0 0 20px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid #E8EBE5; border-radius: 14px; background: #F6F7F4; animation: sentriRise 0.4s ease-out">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #2D7A4B; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      <span style="flex: 1; min-width: 0; font-size: 13.5px; color: #3B4540">{{rcptText}}</span>
+      <button type="button" onClick="{{undoRoutine}}" style="height: 28px; padding: 0 8px; border: 0; background: transparent; color: #121815; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button>
+    </div>
+  </sc-if>
+
+  <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Biosecurity &middot; Disinfection</div>
+  <h1 style="margin: 6px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Routine</h1>
+  <p style="margin: 8px 0 0; font-size: 14px; color: #626C66">Supplies are checked against this when they come out. Rooms are cleaned by whoever ticks the to-do in the app.</p>
+
+  <h2 style="margin: 28px 0 0; font-size: 15px; font-weight: 600">Supplies stay in for at least</h2>
+  <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <sc-for list="{{routineSupplies}}" as="r" hint-placeholder-count="3">
+      <button type="button" onClick="{{r.open}}" style="width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 0; border-top: {{r.top}}; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+        <span style="flex: 1; min-width: 0">
+          <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{r.what}}</span>
+          <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66">{{r.how}}</span>
+        </span>
+        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13.5px; color: #121815; white-space: nowrap">{{r.value}}</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+      </button>
+    </sc-for>
+  </div>
+
+  <h2 style="margin: 28px 0 0; font-size: 15px; font-weight: 600">Rooms</h2>
+  <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <button type="button" onClick="{{openRoomsSetting}}" style="width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+      <span style="flex: 1; min-width: 0">
+        <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">Rooms dry 24 h</span>
+        <span style="display: block; margin-top: 1px; font-size: 12.5px; color: #626C66">Set in Production line &rsaquo; Rooms and moves</span>
+      </span>
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+    </button>
+  </div>
+</sc-if>
+
+<!-- ============ ROUTINE CHANGE ============ -->
+<sc-if value="{{isChange}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToRoutine}}" style="display: inline-flex; align-items: center; gap: 2px; margin: 0 0 14px -4px; padding: 2px 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: rotate(180deg)"><path d="{{ic.chev}}"></path></svg>
+    Routine
+  </button>
+  <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Disinfection &middot; Routine</div>
+  <h1 style="margin: 6px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{ch.title}}</h1>
+  <p style="margin: 8px 0 0; font-size: 14px; color: #626C66">{{ch.lede}}</p>
+
+  <div style="margin-top: 24px; display: flex; align-items: center; gap: 16px">
+    <button type="button" onClick="{{lessN}}" aria-label="One less" style="width: 40px; height: 40px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: {{lessOpacity}}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round"><path d="{{ic.minus}}"></path></svg>
+    </button>
+    <div style="min-width: 110px; text-align: center">
+      <div style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 26px; font-weight: 500; letter-spacing: -0.02em; color: #121815">{{nText}}</div>
+      <div style="display: {{nDirty}}; align-items: center; justify-content: center; gap: 6px; font-size: 12.5px; color: #626C66"><span style="width: 6px; height: 6px; border-radius: 50%; background: #2FA36B"></span><span style="text-decoration: line-through">{{nOld}}</span></div>
+    </div>
+    <button type="button" onClick="{{moreN}}" aria-label="One more" style="width: 40px; height: 40px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: {{moreOpacity}}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round"><path d="{{ic.plus}}"></path></svg>
+    </button>
+  </div>
+
+  <sc-if value="{{hasMoves}}" hint-placeholder-val="{{true}}">
+    <p style="margin: 16px 0 0; display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; color: #3B4540">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; margin-top: 4px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.clock}}"></path></svg>
+      <span>{{runsFact}}</span>
+    </p>
+  </sc-if>
+  <sc-if value="{{noMoves}}" hint-placeholder-val="{{false}}">
+    <p style="margin: 16px 0 0; font-size: 13.5px; color: #626C66">{{noMovesText}}</p>
+  </sc-if>
+
+  <sc-if value="{{hasMoves}}" hint-placeholder-val="{{true}}">
+    <button type="button" onClick="{{toggleMoves}}" aria-expanded="{{movesExpanded}}" style="margin-top: 20px; display: flex; align-items: center; gap: 6px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 13.5px; font-weight: 500; color: #3B4540; cursor: pointer; text-align: left">
+      {{movesLabel}}
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: #626C66; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{movesRot}}"><path d="{{ic.chev}}"></path></svg>
+    </button>
+    <sc-if value="{{movesOpen}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 10px; border: 1px solid #E8EBE5; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+        <sc-for list="{{moves}}" as="m" hint-placeholder-count="2">
+          <div style="padding: 12px 16px; border-top: {{m.top}}">
+            <div style="font-size: 14px; font-weight: 500; color: {{m.ink}}">{{m.what}}</div>
+            <div style="margin-top: 1px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #3B4540">{{m.change}}</div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </sc-if>
+</sc-if>
+
+</div>
+
+<!-- sticky save bar (solid white) -->
+<sc-if value="{{showFooter}}" hint-placeholder-val="{{false}}">
+  <div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+    <div style="max-width: 760px; margin: 0 auto; padding: 14px 32px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; flex-wrap: wrap">
+      <span style="display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 13.5px; color: #3B4540"><span style="display: {{barDot}}; width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: #2FA36B"></span>{{barText}}</span>
+      <span style="display: flex; align-items: center; gap: 10px; margin-left: auto">
+        <button type="button" onClick="{{discard}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer">Discard</button>
+        <button type="button" onClick="{{commit}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; border: 0; border-radius: 10px; background: #121815; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+          {{primaryLabel}}
+        </button>
+      </span>
+    </div>
+  </div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["list","running","room3","supply","supplyDone","early","earlyDone","room","roomDone","routine","routineChange","routineDone"],"default":"list"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      chev: 'M9 18l6-6-6-6',
+      check: 'M20 6 9 17l-5-5',
+      camera: 'M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+      warn: 'M12 9v4 M12 17h.01 M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z',
+      clock: 'M12 7v5l3 2 M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z',
+      plus: 'M12 5v14 M5 12h14',
+      minus: 'M5 12h14'
+    };
+  }
+
+  defaults(start) {
+    const base = {
+      startSeen: start, view: 'list', item: null, done: {}, kitsChoice: 0, count: 3, goesTo: 'Gestation store',
+      releasedOpen: false, movesOpen: false,
+      vals: { boxes: 2, clothing: 2, tools: 4 }, key: null, n: null, rcpt: null
+    };
+    const item = (id, extra) => Object.assign(base, { view: 'item', item: id }, extra || {});
+    if (start === 'running') return item('supplies');
+    if (start === 'room3') return item('room3');
+    if (start === 'supply') return item('gloves');
+    if (start === 'supplyDone') return item('gloves', { done: { gloves: true } });
+    if (start === 'early') return item('kits');
+    if (start === 'earlyDone') return item('kits', { done: { kits: true } });
+    if (start === 'room' || start === 'roomDone') return item('room1');
+    if (start === 'routine') return Object.assign(base, { view: 'routine' });
+    if (start === 'routineChange') return Object.assign(base, { view: 'change', key: 'tools', n: 3 });
+    if (start === 'routineDone') return Object.assign(base, { view: 'routine', vals: { boxes: 2, clothing: 2, tools: 3 }, rcpt: { key: 'tools', from: 4, count: 2 } });
+    return base;
+  }
+
+  hm(mins) {
+    const h = Math.floor(mins / 60), m = mins % 60;
+    return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+
+  routineDefs() {
+    return {
+      boxes: { what: 'Boxes and packaging', how: 'Spray, then rest', unit: 'h', min: 1, max: 12 },
+      clothing: { what: 'Clothing and boots', how: 'Spray, then rest', unit: 'h', min: 1, max: 12 },
+      tools: { what: 'Tools and equipment', how: 'Soak', unit: 'h', min: 1, max: 12 }
+    };
+  }
+
+  renderVals() {
+    const start = this.props.start || 'list';
+    const fresh = !this.state || this.state.startSeen !== start;
+    const s = fresh ? this.defaults(start) : Object.assign(this.defaults(start), this.state);
+    const set = (p) => this.setState(Object.assign({ startSeen: start }, s, p));
+    const ic = this.icons();
+    const defs = this.routineDefs();
+
+    const chipTone = {
+      red: { bg: '#FCE7E2', ink: '#9A2C17', dot: '#D9583B', border: 'transparent' },
+      amber: { bg: '#FFF0D1', ink: '#7A4A00', dot: '#D99A1E', border: 'transparent' },
+      green: { bg: '#E7F4EA', ink: '#1F5534', dot: '#2D7A4B', border: 'transparent' },
+      run: { bg: '#E7F4EA', ink: '#1F5534', dot: '#2FA36B', border: 'transparent' },
+      neutral: { bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90', border: 'transparent' },
+      ready: { bg: '#FFFFFF', ink: '#1F5534', dot: '#2D7A4B', border: '#2D7A4B', icon: ic.check },
+      drying: { bg: '#F0F2EE', ink: '#3B4540', dot: '#8E9C90', border: 'transparent', icon: ic.clock },
+      needsClean: { bg: '#FFFFFF', ink: '#7A4A00', dot: '#D99A1E', border: '#D99A1E', icon: ic.warn }
+    };
+    const chipOf = (tone, label) => {
+      const t = chipTone[tone];
+      return {
+        chip: label, chipBg: t.bg, chipInk: t.ink, chipDot: t.dot, chipBorder: t.border,
+        chipAnim: tone === 'run' ? 'sentriPulseG 1.8s ease-out infinite' : 'none',
+        chipIcon: t.icon || '', iconDisplay: t.icon ? 'inline-block' : 'none', dotDisplay: t.icon ? 'none' : 'inline-block'
+      };
+    };
+
+    const store = s.goesTo;
+    const kitsHold = s.kitsChoice === 0;
+    const heldWet = s.count < 3;
+    const id = s.item;
+    const done = !!s.done[id];
+
+    // ---- items ----
+    const roomSteps = (o) => [
+      { label: 'Emptied', when: o.emptied, who: o.emptiedWho, st: 'done', photos: 0 },
+      { label: 'Cleaning to-do in the app', when: o.todo, who: o.todoWho, st: 'done', photos: 0 },
+      { label: 'Washed and disinfected', when: o.washed, who: 'Ticked in the app', st: 'done', photos: 3 },
+      { label: 'Ready', when: o.ready, who: '24 h drying', st: o.readyDone ? 'done' : 'next', photos: 0 }
+    ];
+    const items = {
+      kits: {
+        title: 'Sampling kits · 4 boxes', kind: 'proposal', stepsTitle: 'What happened',
+        facts: [{ label: 'From', value: 'Hartland Vet Group' }, { label: 'Kind', value: 'Boxes and packaging' }, { label: 'Minimum', value: '2 h' }],
+        steps: [
+          { label: 'Put in', when: 'Fri 30 Oct 05:50', who: 'Gao Feng, from the delivery', st: 'done', photos: 1 },
+          { label: 'Taken out', when: '07:05', who: 'Zhao Min', st: 'warn', photos: 0, warn: 'Out 45 min early (1 h 15 min of 2 h)' }
+        ],
+        chipNow: chipOf('red', 'Out early'),
+        chipDone: kitsHold ? chipOf('neutral', 'Going back in') : chipOf('green', 'Released'),
+        after: kitsHold ? { label: 'Back in for 2 h', when: '09:41', who: 'Task sent to Zhao Min', st: 'next', photos: 0 } : { label: 'Released', when: '09:41', who: 'You · short run kept in the record', st: 'done', photos: 0 },
+        receipt: kitsHold ? 'Saved 09:41 · 4 boxes go back in for 2 h. Task sent to Zhao Min.' : 'Saved 09:41 · 4 boxes released as they are.',
+        primary: kitsHold ? 'Send 4 boxes back for 2 h' : 'Release 4 boxes as they are',
+        bar: kitsHold ? 'Task to Zhao Min’s phone' : '4 boxes to Released'
+      },
+      gloves: {
+        title: 'Gloves and coveralls · 3 cases', kind: 'proposal', stepsTitle: 'What happened',
+        facts: [{ label: 'From', value: 'Supplier delivery' }, { label: 'Kind', value: 'Clothing and boots' }, { label: 'Minimum', value: '2 h' }],
+        steps: [
+          { label: 'Put in', when: 'Fri 30 Oct 06:45', who: 'Wang Fang, from the delivery', st: 'done', photos: 3 },
+          { label: 'Disinfected', when: '06:45 – 08:55', who: '2 h 10 min of 2 h', st: 'done', photos: 0 }
+        ],
+        chipNow: chipOf('amber', 'Run finished'),
+        chipDone: heldWet ? chipOf('green', 'Released ' + s.count + ' of 3') : chipOf('green', 'Released'),
+        after: { label: heldWet ? 'Released ' + s.count + ' of 3' : 'Released', when: '09:34', who: 'You · to ' + store + (heldWet ? ' · 1 case held' : ''), st: 'done', photos: 0 },
+        receipt: 'Saved 09:34 · ' + s.count + (s.count === 1 ? ' case' : ' cases') + ' released to ' + store + (heldWet ? '. 1 case held.' : '.'),
+        primary: 'Release ' + s.count + (s.count === 1 ? ' case' : ' cases') + ' to ' + store,
+        bar: s.count + (s.count === 1 ? ' case moves' : ' cases move') + ' to Released' + (heldWet ? ' · ' + (3 - s.count) + ' held' : '')
+      },
+      room1: {
+        title: 'Farrowing Room 1', kind: 'record', stepsTitle: 'Steps',
+        facts: [{ label: 'Last batch', value: 'Batch 31' }, { label: 'Next batch', value: 'Batch 35, Mon 14 Dec' }, { label: 'Ready since', value: 'Tue 27 Oct 14:00' }],
+        steps: roomSteps({ emptied: 'Fri 23 Oct', emptiedWho: 'Batch 31 weaned', todo: 'Fri 23 Oct', todoWho: 'Made when the room emptied', washed: 'Mon 26 Oct 14:00', ready: 'Tue 27 Oct 14:00', readyDone: true }),
+        chipNow: chipOf('ready', 'Ready')
+      },
+      room4: {
+        title: 'Farrowing Room 4', kind: 'record', stepsTitle: 'Steps',
+        facts: [{ label: 'Last batch', value: 'Batch 30' }, { label: 'Next batch', value: 'Batch 34, Wed 25 Nov' }, { label: 'Ready since', value: 'Sat 3 Oct 14:00' }],
+        steps: roomSteps({ emptied: 'Wed 30 Sep', emptiedWho: 'Batch 30 weaned', todo: 'Wed 30 Sep', todoWho: 'Made when the room emptied', washed: 'Fri 2 Oct 14:00', ready: 'Sat 3 Oct 14:00', readyDone: true }),
+        chipNow: chipOf('ready', 'Ready')
+      },
+      supplies: {
+        title: 'Farrowing supplies · 14 boxes', kind: 'record', stepsTitle: 'Steps',
+        facts: [{ label: 'Put in', value: '07:15 by Li Wei' }, { label: 'Kind', value: 'Tools and equipment' }, { label: 'Ready', value: '11:15 (4 h)' }],
+        steps: [
+          { label: 'Put in', when: 'Fri 30 Oct 07:15', who: 'Li Wei · bulbs, gloves, ear tags', st: 'done', photos: 1 },
+          { label: 'Disinfecting', when: 'ready 11:15', who: 'Soak, 4 h', st: 'run', photos: 0 },
+          { label: 'Release', when: '', who: 'When the run is finished', st: 'next', photos: 0 }
+        ],
+        chipNow: chipOf('run', 'Disinfecting')
+      },
+      fittings: {
+        title: 'Water line B fittings · 6 boxes', kind: 'record', stepsTitle: 'Steps',
+        facts: [{ label: 'Put in', value: '08:05 by Gao Feng' }, { label: 'Kind', value: 'Tools and equipment' }, { label: 'Ready', value: '12:05 (4 h)' }],
+        steps: [
+          { label: 'Put in', when: 'Fri 30 Oct 08:05', who: 'Gao Feng · for the water line B repair', st: 'done', photos: 1 },
+          { label: 'Disinfecting', when: 'ready 12:05', who: 'Soak, 4 h', st: 'run', photos: 0 },
+          { label: 'Release', when: '', who: 'When the run is finished', st: 'next', photos: 0 }
+        ],
+        chipNow: chipOf('run', 'Disinfecting')
+      },
+      room3: {
+        title: 'Farrowing Room 3', kind: 'record', stepsTitle: 'Steps',
+        facts: [{ label: 'Last batch', value: 'Batch 29' }, { label: 'Next batch', value: 'Batch 33, Wed 4 Nov' }, { label: 'Ready at', value: 'Sat 31 Oct 08:40' }],
+        steps: roomSteps({ emptied: 'Wed 9 Sep', emptiedWho: 'Batch 29 weaned', todo: 'Wed 9 Sep', todoWho: 'Waited for the crate repair', washed: 'Fri 30 Oct 08:40', ready: 'Sat 31 Oct 08:40', readyDone: false }),
+        chipNow: chipOf('drying', 'Drying · ready Sat 31 Oct 08:40')
+      }
+    };
+
+    const stepStyle = (st) => {
+      if (st.st === 'done') return { dot: '#3B4540', ring: '1px solid #3B4540', line: '#DADED6', ink: '#121815', whenInk: '#3B4540', anim: 'none' };
+      if (st.st === 'run') return { dot: '#2FA36B', ring: '1px solid #2FA36B', line: '#DADED6', ink: '#121815', whenInk: '#1F5534', anim: 'sentriPulseG 1.8s ease-out infinite' };
+      if (st.st === 'warn') return { dot: '#D99A1E', ring: '1px solid #D99A1E', line: '#DADED6', ink: '#121815', whenInk: '#7A4A00', anim: 'none' };
+      return { dot: '#FFFFFF', ring: '1px solid #C3C9C0', line: '#EFF1EC', ink: '#626C66', whenInk: '#626C66', anim: 'none' };
+    };
+
+    // ---- list ----
+    const kitsDone = !!s.done.kits, glovesDone = !!s.done.gloves;
+    const goItem = (iid) => () => set({ view: 'item', item: iid });
+    const noChip = Object.assign(chipOf('neutral', ''), { chipDisplay: 'none' });
+    const needsRaw = [];
+    if (!kitsDone) needsRaw.push(Object.assign({ what: 'Sampling kits · 4 boxes', why: 'Hartland Vet Group · out 45 min early', when: '07:05', open: goItem('kits') }, chipOf('red', 'Out early'), { chipDisplay: 'inline-flex' }));
+    if (!glovesDone) needsRaw.push(Object.assign({ what: 'Gloves and coveralls · 3 cases', why: 'Supplier delivery · run finished, 2 h 10 min', when: '08:55', open: goItem('gloves') }, noChip));
+    const needs = needsRaw.map((r, i) => Object.assign({}, r, { top: i === 0 ? '0' : '1px solid #E0EBD9' }));
+
+    const cleaningRaw = [];
+    if (kitsDone && kitsHold) cleaningRaw.push(Object.assign({ what: 'Sampling kits · 4 boxes', why: 'Back in for 2 h · task sent to Zhao Min', when: 'Ready', open: goItem('kits'), chipAnim: 'none' }, chipOf('neutral', 'Going back in'), { chipDisplay: 'inline-flex' }));
+    cleaningRaw.push(
+      Object.assign({ what: 'Farrowing supplies · 14 boxes', why: 'Put in 07:15 by Li Wei', when: 'Ready 11:15', open: goItem('supplies') }, chipOf('run', 'Disinfecting'), { chipDisplay: 'inline-flex' }),
+      Object.assign({ what: 'Water line B fittings · 6 boxes', why: 'Put in 08:05 by Gao Feng', when: 'Ready 12:05', open: goItem('fittings') }, chipOf('run', 'Disinfecting'), { chipDisplay: 'inline-flex' })
+    );
+    const cleaning = cleaningRaw.map((r, i) => Object.assign({}, r, { top: i === 0 ? '0' : '1px solid #EFF1EC' }));
+
+    const roomsRaw = [
+      Object.assign({ what: 'Farrowing Room 3', meta: 'Washed and disinfected 08:40, ticked in the app · Batch 33 moves in Wed 4 Nov', open: goItem('room3') }, chipOf('drying', 'Drying · ready Sat 31 Oct 08:40')),
+      Object.assign({ what: 'Farrowing Room 1', meta: 'Ready since Tue 27 Oct 14:00 · next Batch 35, Mon 14 Dec', open: goItem('room1') }, chipOf('ready', 'Ready')),
+      Object.assign({ what: 'Farrowing Room 4', meta: 'Ready since Sat 3 Oct 14:00 · next Batch 34, Wed 25 Nov', open: goItem('room4') }, chipOf('ready', 'Ready'))
+    ];
+    const rooms = roomsRaw.map((r, i) => Object.assign({}, r, { top: i === 0 ? '0' : '1px solid #EFF1EC' }));
+
+    const releasedBase = [];
+    if (glovesDone) releasedBase.push({ what: 'Gloves and coveralls · ' + s.count + (s.count === 1 ? ' case' : ' cases'), why: 'Released to ' + store + (heldWet ? ' · ' + (3 - s.count) + ' held' : ''), date: 'Fri 30 Oct' });
+    if (kitsDone && !kitsHold) releasedBase.push({ what: 'Sampling kits · 4 boxes', why: 'Released as they are · short run in the record', date: 'Fri 30 Oct' });
+    const releasedAll = releasedBase.concat([
+      { what: 'Heat-lamp bulbs · 20', why: 'For Farrowing Room 2', date: 'Wed 28 Oct' },
+      { what: 'Ear tags · 600', why: 'Supplier delivery', date: 'Tue 27 Oct' },
+      { what: 'PRRS booster vaccine · outer boxes', why: 'Hartland Vet Group', date: 'Mon 26 Oct' }
+    ]);
+    const released = releasedAll.map((r, i) => Object.assign({}, r, { top: i === 0 ? '0' : '1px solid #EFF1EC' }));
+    const needsCount = needs.length;
+    const summary = (needsCount ? needsCount + ' need' + (needsCount === 1 ? 's' : '') + ' you. ' : 'Nothing needs you. ') + cleaning.length + ' being cleaned. 1 room drying.';
+
+    // ---- item view ----
+    const it = items[id] || items.kits;
+    const isProposal = it.kind === 'proposal';
+    const inItem = s.view === 'item';
+
+    let chipSrc = it.chipNow;
+    if (isProposal && done) chipSrc = it.chipDone;
+    let stepList = it.steps.slice();
+    if (isProposal && done) stepList = stepList.concat([it.after]);
+    const steps = stepList.map((st) => {
+      const ss = stepStyle(st);
+      const hasWarn = !!st.warn;
+      return Object.assign({}, st, ss, {
+        photoDisplay: !st.photos ? 'none' : 'inline-flex',
+        photoText: st.photos === 1 ? '1 photo' : st.photos + ' photos',
+        warn: st.warn || '', warnDisplay: hasWarn ? 'flex' : 'none',
+        warnInk: '#7A4A00', warnIcon: '#D99A1E',
+        fixLabel: '', fixDisplay: 'none', fix: () => {}
+      });
+    });
+    steps.forEach((st, i) => { if (i === steps.length - 1) st.line = 'transparent'; });
+    const dirtyDot = (b) => (b ? 'inline-flex' : 'none');
+
+    const kitsOpts = ['Disinfect again for 2 h', 'Release as they are'].map((label, i) => ({
+      label, pressed: s.kitsChoice === i ? 'true' : 'false',
+      line: s.kitsChoice === i ? '#121815' : '#E2E5DF', bg: s.kitsChoice === i ? '#F6F7F4' : '#FFFFFF', weight: s.kitsChoice === i ? 500 : 400,
+      pick: () => set({ kitsChoice: i })
+    }));
+    const stores = ['Farrowing store', 'Gestation store', 'Nursery store'].map((n) => ({
+      label: n, pressed: store === n ? 'true' : 'false',
+      line: store === n ? '#121815' : '#E2E5DF', bg: store === n ? '#F6F7F4' : '#FFFFFF', weight: store === n ? 500 : 400,
+      pick: () => set({ goesTo: n })
+    }));
+
+    const showItemBar = inItem && isProposal && !done;
+    const resetItem = { kitsChoice: 0, count: 3, goesTo: 'Gestation store' };
+    const commitItem = () => set({ done: Object.assign({}, s.done, { [id]: true }) });
+
+    // ---- change view (supplies only) ----
+    const key = s.key || 'tools';
+    const def = defs[key];
+    const cur = s.vals[key];
+    const n = s.n != null ? s.n : cur;
+    const delta = n - cur;
+    const runs = key === 'tools' ? [
+      { what: 'Farrowing supplies · 14 boxes', base: 11 * 60 + 15 },
+      { what: 'Water line B fittings · 6 boxes', base: 12 * 60 + 5 }
+    ] : [];
+    const moveList = delta !== 0 ? runs : [];
+    const moves = moveList.map((m, i) => ({
+      what: m.what, change: 'Ready ' + this.hm(m.base) + ' → ' + this.hm(m.base + delta * 60),
+      top: i === 0 ? '0' : '1px solid #EFF1EC', ink: '#121815'
+    }));
+    const movedCount = moveList.length;
+    const changed = delta !== 0;
+    const hourText = Math.abs(delta) === 1 ? 'an hour' : Math.abs(delta) + ' hours';
+    const dirText = delta < 0 ? 'earlier' : 'later';
+    const nText = n + ' h';
+    const oldText = cur + ' h';
+    const ch = {
+      title: def.what + ': stay in for',
+      lede: 'Applies to runs in progress and to new ones. Each run is checked against it when it comes out.'
+    };
+    const commitChange = () => {
+      if (!changed) return;
+      set({ view: 'routine', vals: Object.assign({}, s.vals, { [key]: n }), rcpt: { key, from: cur, count: movedCount }, key: null, n: null });
+    };
+
+    // ---- routine view ----
+    const valText = (k) => s.vals[k] + ' h';
+    const rowOf = (k, i) => ({
+      what: defs[k].what, how: defs[k].how, value: valText(k), top: i === 0 ? '0' : '1px solid #EFF1EC',
+      open: () => set({ view: 'change', key: k, n: s.vals[k], rcpt: null, movesOpen: false })
+    });
+    const routineSupplies = ['boxes', 'clothing', 'tools'].map(rowOf);
+    const rc = s.rcpt;
+    const rcptText = rc ? 'Saved 09:52 · ' + defs[rc.key].what + ' stay in for ' + valText(rc.key) + '. ' + (rc.count === 0 ? 'No runs changed.' : (rc.count === 1 ? '1 run updated.' : rc.count + ' runs updated.')) : '';
+
+    // ---- bar ----
+    const view = s.view;
+    const showFooter = showItemBar || (view === 'change' && changed);
+    const barText = view === 'change'
+      ? '1 change · ' + (movedCount === 0 ? 'no runs in progress change' : movedCount + ' runs today finish ' + hourText + ' ' + dirText)
+      : it.bar;
+    const primaryChange = 'Keep ' + ({ boxes: 'boxes', clothing: 'clothing', tools: 'tools' })[key] + ' in for ' + nText;
+
+    return {
+      ic,
+      isList: view === 'list', isItem: inItem, isRoutine: view === 'routine', isChange: view === 'change',
+      summary, hasNeeds: needs.length > 0, needsCount, needs, cleaning, cleaningCount: cleaning.length,
+      rooms, roomsCount: '1 drying · 2 ready',
+      nurseryLine: 'Nursery 1 needs cleaning after Batch 30 leaves Wed 11 Nov.',
+      released, releasedCount: released.length, releasedOpen: s.releasedOpen,
+      releasedExpanded: s.releasedOpen ? 'true' : 'false', releasedRot: s.releasedOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+      toggleReleased: () => set({ releasedOpen: !s.releasedOpen }),
+      openRoutine: () => set({ view: 'routine', rcpt: null }),
+      openRoomsSetting: () => {},
+      backToList: () => set({ view: 'list' }),
+      backToRoutine: () => set({ view: 'routine', key: null, n: null }),
+      // item
+      it: Object.assign({}, it, chipSrc),
+      steps, stores, kitsOpts,
+      isDone: inItem && isProposal && done,
+      receipt: isProposal ? it.receipt : '',
+      undoDone: () => set({ done: Object.assign({}, s.done, { [id]: false }) }),
+      isKits: inItem && id === 'kits' && !done,
+      isGloves: inItem && id === 'gloves' && !done,
+      kitsDirty: dirtyDot(!kitsHold), kitsOld: 'Disinfect again for 2 h', kitsShort: !kitsHold,
+      countText: s.count + ' of 3', countDirty: dirtyDot(s.count !== 3),
+      lessCount: () => set({ count: Math.max(1, s.count - 1) }), moreCount: () => set({ count: Math.min(3, s.count + 1) }),
+      lessCountOpacity: s.count <= 1 ? 0.4 : 1, moreCountOpacity: s.count >= 3 ? 0.4 : 1,
+      wetWarn: s.count === 3, wetHeld: s.count === 2,
+      holdWet: () => set({ count: 2 }),
+      storeDirty: dirtyDot(store !== 'Gestation store'),
+      // routine
+      routineSupplies, hasRcpt: !!rc, rcptText,
+      undoRoutine: () => { const k = rc.key; set({ vals: Object.assign({}, s.vals, { [k]: rc.from }), rcpt: null }); },
+      // change
+      ch, nText, nOld: oldText, nDirty: dirtyDot(changed),
+      lessN: () => set({ n: Math.max(def.min, n - 1) }), moreN: () => set({ n: Math.min(def.max, n + 1) }),
+      lessOpacity: n <= def.min ? 0.4 : 1, moreOpacity: n >= def.max ? 0.4 : 1,
+      runsFact: 'Farrowing supplies and Water line B fittings are soaking now. Both finish ' + hourText + ' ' + dirText + '.',
+      moves, hasMoves: moves.length > 0, noMoves: moves.length === 0,
+      noMovesText: changed ? 'Nothing of this kind is in a run now. New runs use the new time.' : '',
+      movesLabel: 'See the ' + movedCount + ' runs that change',
+      movesOpen: s.movesOpen, movesExpanded: s.movesOpen ? 'true' : 'false', movesRot: s.movesOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+      toggleMoves: () => set({ movesOpen: !s.movesOpen }),
+      // bar
+      showFooter, barText, barDot: 'inline-block',
+      primaryLabel: view === 'change' ? primaryChange : it.primary,
+      commit: view === 'change' ? commitChange : commitItem,
+      discard: view === 'change' ? (() => set({ view: 'routine', key: null, n: null })) : (() => set(Object.assign({ view: 'list' }, resetItem)))
+    };
+  }
+}
+</script>
+</body>
+</html>

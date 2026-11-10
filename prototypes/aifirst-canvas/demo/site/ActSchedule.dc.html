@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Task schedule</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+
+<!-- TODAY: by team -->
+<sc-if value="{{isToday}}" hint-placeholder-val="{{true}}">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Schedule</h1>
+    <div style="display: inline-flex; padding: 2px; border: 1px solid #E8EBE5; border-radius: 10px; flex-shrink: 0">
+      <button type="button" onClick="{{goToday}}" aria-pressed="true" style="height: 30px; padding: 0 14px; border: 0; border-radius: 8px; background: #F0F2EE; font: inherit; font-size: 13px; font-weight: 600; color: #121815; cursor: pointer">Today</button>
+      <button type="button" onClick="{{goWeek}}" aria-pressed="false" style="height: 30px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #626C66; cursor: pointer">Week</button>
+    </div>
+  </div>
+  <p style="margin: 4px 0 0; font-size: 14px; color: #626C66">Fri 30 Oct · {{todayLine}}</p>
+
+  <div style="margin-top: 22px; font-size: 13px; font-weight: 600; color: #626C66">Production tasks today</div>
+  <div style="margin-top: 8px; border-radius: 12px; box-shadow: 0 0 0 1px #E8EBE5; overflow: hidden">
+    <sc-for list="{{ptasks}}" as="p" hint-placeholder-count="6">
+      <button type="button" onClick="{{p.open}}" aria-label="Open {{p.name}} in the Farm view" style="display: grid; grid-template-columns: 8px minmax(0, 1fr) auto 16px; gap: 12px; align-items: center; width: 100%; min-height: 56px; box-sizing: border-box; padding: 8px 14px; border: 0; border-top: {{p.line}}; background: #FFFFFF; font: inherit; color: inherit; text-align: left; cursor: pointer">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: {{p.dot}}"></span>
+        <span style="min-width: 0"><span style="display: block; font-size: 14px; font-weight: 600">{{p.name}}</span><span style="display: block; font-size: 12.5px; color: #626C66">{{p.meta}}</span></span>
+        <span style="font-size: 13px; color: #626C66; white-space: nowrap">{{p.when}}</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #8A938C; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M9 6l6 6-6 6"></path></svg>
+      </button>
+    </sc-for>
+  </div>
+
+  <sc-for list="{{teams}}" as="t" hint-placeholder-count="4">
+    <div style="margin-top: 28px">
+      <button type="button" onClick="{{t.open}}" aria-label="{{t.aria}}" style="display: flex; width: 100%; box-sizing: border-box; align-items: center; gap: 12px; padding: 0 2px 12px; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+        <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; background: {{t.markBg}}; color: {{t.markInk}}; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{t.ini}}</span>
+        <span style="flex: 1; min-width: 0; display: block">
+          <span style="display: block; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">{{t.name}} <span style="font-weight: 400; color: #626C66">· {{t.barn}}</span></span>
+          <span style="display: block; font-size: 12.5px; color: #626C66">{{t.covers}}</span>
+        </span>
+        <span style="font-size: 13px; color: #3B4540; white-space: nowrap">{{t.progress}}</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg>
+      </button>
+      <div style="border-top: 1px solid #E8EBE5">
+        <sc-for list="{{t.jobs}}" as="j" hint-placeholder-count="3">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 12px 2px 12px 44px; border-bottom: 1px solid #EFF1EC">
+            <span aria-hidden="true" style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: {{j.dotBg}}; border: 1.5px solid {{j.dotLine}}">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="display: {{j.checkShow}}; width: 11px; height: 11px; fill: none; stroke: #FFFFFF; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+              <span style="display: {{j.innerShow}}; width: 6px; height: 6px; border-radius: 50%; background: #121815"></span>
+            </span>
+            <span style="flex: 1; min-width: 0; display: block">
+              <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{j.name}}</span>
+              <span style="display: block; font-size: 12.5px; color: #626C66">{{j.meta}}</span>
+            </span>
+            <span style="display: {{j.chipShow}}; flex-shrink: 0; padding: 2px 10px; border-radius: 999px; background: #F0F2EE; color: #3B4540; font-size: 12.5px; font-weight: 500; white-space: nowrap">{{j.chip}}</span>
+            <span style="min-width: 64px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: {{j.countInk}}; white-space: nowrap">{{j.count}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-for>
+
+  <p style="margin: 22px 0 0; font-size: 12.5px; color: #626C66">Counts are what was expected today and what the team has reported so far.</p>
+</div>
+</sc-if>
+
+<!-- TEAM DAY (record) -->
+<sc-if value="{{isTeam}}" hint-placeholder-val="{{false}}">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+  <button type="button" onClick="{{goToday}}" style="display: inline-flex; align-items: center; gap: 2px; margin: 0 0 14px -4px; padding: 2px 6px 2px 2px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevL}}"></path></svg>
+    Schedule
+  </button>
+  <div style="display: flex; align-items: center; gap: 14px">
+    <span aria-hidden="true" style="width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; background: {{tm.markBg}}; color: {{tm.markInk}}; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{tm.ini}}</span>
+    <div style="min-width: 0">
+      <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{tm.title}}</h1>
+      <p style="margin: 2px 0 0; font-size: 14px; color: #626C66">{{tm.sub}}</p>
+    </div>
+  </div>
+
+  <h2 style="margin: 28px 0 0; font-size: 15px; font-weight: 600">Today</h2>
+  <div style="margin-top: 8px; border-top: 1px solid #E8EBE5">
+    <sc-for list="{{tm.jobs}}" as="j" hint-placeholder-count="3">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 2px; border-bottom: 1px solid #EFF1EC">
+        <span aria-hidden="true" style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: {{j.dotBg}}; border: 1.5px solid {{j.dotLine}}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="display: {{j.checkShow}}; width: 11px; height: 11px; fill: none; stroke: #FFFFFF; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+          <span style="display: {{j.innerShow}}; width: 6px; height: 6px; border-radius: 50%; background: #121815"></span>
+        </span>
+        <span style="flex: 1; min-width: 0; display: block">
+          <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{j.name}}</span>
+          <span style="display: block; font-size: 12.5px; color: #626C66">{{j.meta}}</span>
+        </span>
+        <span style="display: {{j.chipShow}}; flex-shrink: 0; padding: 2px 10px; border-radius: 999px; background: #F0F2EE; color: #3B4540; font-size: 12.5px; font-weight: 500; white-space: nowrap">{{j.chip}}</span>
+        <span style="min-width: 64px; text-align: right; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: {{j.countInk}}; white-space: nowrap">{{j.count}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <h2 style="margin: 30px 0 0; font-size: 15px; font-weight: 600">Coming up · next 7 days</h2>
+  <div style="margin-top: 8px; border-top: 1px solid #E8EBE5">
+    <sc-for list="{{tm.upcoming}}" as="u" hint-placeholder-count="4">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 2px; border-bottom: 1px solid #EFF1EC">
+        <span style="width: 84px; flex-shrink: 0; white-space: nowrap; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; font-weight: 500; color: #3B4540">{{u.date}}</span>
+        <span style="flex: 1; min-width: 0; display: block">
+          <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{u.name}}</span>
+          <span style="display: block; font-size: 12.5px; color: #626C66">{{u.meta}}</span>
+        </span>
+        <span style="display: {{u.chipShow}}; flex-shrink: 0; padding: 2px 10px; border-radius: 999px; background: #F0F2EE; color: #3B4540; font-size: 12.5px; font-weight: 500; white-space: nowrap">{{u.chip}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+</div>
+</sc-if>
+
+<!-- WEEK: teams by day -->
+<sc-if value="{{isWeek}}" hint-placeholder-val="{{false}}">
+<div style="max-width: 1040px; margin: 0 auto; padding: 24px 12px 32px; box-sizing: border-box">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Schedule</h1>
+    <div style="display: inline-flex; padding: 2px; border: 1px solid #E8EBE5; border-radius: 10px; flex-shrink: 0">
+      <button type="button" onClick="{{goToday}}" aria-pressed="false" style="height: 30px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #626C66; cursor: pointer">Today</button>
+      <button type="button" onClick="{{goWeek}}" aria-pressed="true" style="height: 30px; padding: 0 14px; border: 0; border-radius: 8px; background: #F0F2EE; font: inherit; font-size: 13px; font-weight: 600; color: #121815; cursor: pointer">Week</button>
+    </div>
+  </div>
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px">
+    <p style="margin: 0; font-size: 14px; color: #626C66">{{weekName}} · {{weekRange}}</p>
+    <button type="button" onClick="{{page}}" style="display: inline-flex; align-items: center; gap: 2px; height: 30px; padding: 0 6px 0 10px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+      {{pageLabel}}
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{pageIcon}}"></path></svg>
+    </button>
+  </div>
+
+  <sc-if value="{{showClash}}" hint-placeholder-val="{{false}}">
+    <div style="margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: #FFF0D1; color: #7A4A00; font-size: 13.5px; line-height: 1.5">
+      <span style="font-weight: 600">Thu 5 Nov:</span> Li Wei's team has two jobs on one day, the weaning check for Batch 32 (50 sows) and the revaccination of Batch 29 (52 sows).
+    </div>
+  </sc-if>
+
+  <div style="margin-top: 20px">
+    <div style="display: grid; grid-template-columns: 80px repeat(7, minmax(0, 1fr)); border-bottom: 1px solid #E8EBE5">
+      <span></span>
+      <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+        <div style="padding: 0 2px 8px; text-align: center; background: {{d.fill}}">
+          <div style="font-size: 12px; font-weight: 500; color: #626C66">{{d.dow}}</div>
+          <div style="display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; border-radius: 13px; background: {{d.nBg}}; color: {{d.nInk}}; font-size: 15px; font-weight: 600; letter-spacing: -0.01em">{{d.n}}</div>
+        </div>
+      </sc-for>
+    </div>
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+      <div style="display: grid; grid-template-columns: 80px repeat(7, minmax(0, 1fr)); border-bottom: 1px solid #EFF1EC">
+        <div style="padding: 12px 6px 0 0; min-width: 0">
+          <div style="font-size: 13px; font-weight: 600; line-height: 1.3">{{r.name}}</div>
+          <div style="font-size: 12px; color: #626C66; line-height: 1.3">{{r.barn}}</div>
+        </div>
+        <sc-for list="{{r.cells}}" as="c" hint-placeholder-count="7">
+          <div style="padding: 6px 2px; background: {{c.fill}}; min-height: 64px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+            <sc-for list="{{c.chips}}" as="ch" hint-placeholder-count="1">
+              <div style="box-sizing: border-box; width: 100%; padding: 5px 2px 6px 5px; border-radius: 8px; background: {{ch.bg}}; border: 1px {{ch.bstyle}} {{ch.line}}; line-height: 1.25">
+                <div style="font-size: 12px; font-weight: 500; color: {{ch.ink}}">{{ch.name}}</div>
+                <div style="margin-top: 1px; font-size: 11.5px; color: {{ch.sub}}">{{ch.count}}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+  <p style="margin: 14px 0 0; font-size: 12.5px; color: #626C66">{{weekNote}}</p>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["today","team","week","next"],"default":"today"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  defaults(start) {
+    const base = { view: 'today', team: 'li', wk: 0, asked: false, startSeen: start };
+    if (start === 'team') base.view = 'team';
+    if (start === 'week') base.view = 'week';
+    if (start === 'next') { base.view = 'week'; base.wk = 1; }
+    return base;
+  }
+
+  icons() {
+    return {
+      chevR: 'M9 6l6 6-6 6',
+      chevL: 'M15 6l-6 6 6 6',
+      check: 'M5 12l5 5L20 7'
+    };
+  }
+
+  teamData() {
+    return [
+      {
+        key: 'zhao', name: 'Zhao Min', barn: 'Gestation', title: "Zhao Min's team", ini: 'ZM', markBg: '#F3E8F7', markInk: '#5B2D6E',
+        covers: 'Gestation 1–2, Quarantine 1',
+        next: 'Mon 2 Nov · Catch-up shots, 3 sows',
+        jobs: [
+          { name: 'Morning round', meta: 'Gestation 1 and 2 · done 07:05', got: 2, of: 2, unit: 'rooms', st: 'done', rep: 'Reported 07:05' },
+          { name: 'Heat check, gilts', meta: 'Quarantine 1 · done 07:20', got: 24, of: 24, unit: 'gilts', st: 'done', rep: 'Reported 07:20' },
+          { name: 'Lame sow round', meta: 'Gestation 2 · 204518 and 205102 seen', got: 2, of: 4, unit: 'sows', st: 'part', rep: 'Last report 08:40' }
+        ],
+        upcoming: [
+          { date: 'Mon 2 Nov', name: 'Catch-up shots', meta: 'Batch 31 · 3 sows', chip: 'Waiting for your yes' },
+          { date: 'Wed 4 Nov', name: 'Batch 33 sows out', meta: '48 sows · Gestation 1 to Farrowing Room 3' }
+        ]
+      },
+      {
+        key: 'li', name: 'Li Wei', barn: 'Farrowing', title: "Li Wei's team", ini: 'LW', markBg: '#FDE7C2', markInk: '#6B4300',
+        covers: 'Farrowing Rooms 1–4',
+        next: 'Wed 4 Nov · Batch 33 into Room 3',
+        jobs: [
+          { name: 'Morning round', meta: 'Room 2 · done 06:40', got: 1, of: 1, unit: 'room', st: 'done', rep: 'Reported 06:40' },
+          { name: 'Wash and disinfect Room 3', meta: 'Room 3 · ready Sat 31 Oct 08:40', got: 1, of: 1, unit: 'room', st: 'done', rep: 'Ticked 08:40' },
+          { name: 'Heat-lamp check', meta: 'Room 2 · 52 crates · done 07:30', got: 52, of: 52, unit: 'crates', st: 'done', rep: 'Reported 07:30' },
+          { name: 'Fostering checks', meta: 'Batch 32 · Room 2', got: 6, of: 8, unit: 'litters', st: 'part', chip: '2 not reported yet', rep: 'Last report 09:12' }
+        ],
+        upcoming: [
+          { date: 'Wed 4 Nov', name: 'Batch 33 into Room 3', meta: '48 sows from Gestation 1' },
+          { date: 'Thu 5 Nov', name: 'Weaning check', meta: 'Batch 32 · 50 sows' },
+          { date: 'Thu 5 Nov', name: 'Revaccinate Batch 29', meta: '52 sows', chip: 'Waiting for your yes' }
+        ]
+      },
+      {
+        key: 'wang', name: 'Wang Fang', barn: 'Nursery', title: "Wang Fang's team", ini: 'WF', markBg: '#E2F0DA', markInk: '#203D2B',
+        covers: 'Nursery 1 and 2',
+        next: 'Tue 3 Nov · Weigh Batch 30',
+        jobs: [
+          { name: 'Pen checks', meta: 'Nursery 1 · done 07:50', got: 40, of: 40, unit: 'pens', st: 'done', rep: 'Reported 07:50' },
+          { name: 'Pen checks', meta: 'Nursery 2 · batch 31', got: 22, of: 40, unit: 'pens', st: 'part', rep: 'Last report 09:05' }
+        ],
+        upcoming: [
+          { date: 'Tue 3 Nov', name: 'Weigh Batch 30', meta: '20 pigs · Nursery 1' },
+          { date: 'Fri 6 Nov', name: '2nd shot, Batch 31', meta: '488 pigs · Nursery 2' }
+        ]
+      },
+      {
+        key: 'gao', name: 'Gao Feng', barn: 'Maintenance', title: "Gao Feng's team", ini: 'GF', markBg: '#E4E6EC', markInk: '#2F3447',
+        covers: 'All barns',
+        next: 'Mon 2 Nov · Water line B follow-up',
+        jobs: [
+          { name: 'Check water line B', meta: 'Gestation 2 · feed intake is down 6% since Tue', got: 0, of: 1, unit: 'check', st: 'open', chip: 'Equipment asked', rep: 'Not started' }
+        ],
+        upcoming: [
+          { date: 'Mon 2 Nov', name: 'Water line B follow-up', meta: 'Gestation 2' }
+        ]
+      }
+    ];
+  }
+
+  renderVals() {
+    const start = this.props.start || 'today';
+    const cur = this.state || {};
+    const s = cur.startSeen !== start ? this.defaults(start) : Object.assign(this.defaults(start), cur);
+    const set = (p) => this.setState(Object.assign({ startSeen: start }, p));
+    const ic = this.icons();
+    const view = s.view;
+
+    const dot = (st) => ({
+      dotBg: st === 'done' ? '#2D7A4B' : '#FFFFFF',
+      dotLine: st === 'done' ? '#2D7A4B' : st === 'part' ? '#121815' : '#DADED6',
+      checkShow: st === 'done' ? 'block' : 'none',
+      innerShow: st === 'part' ? 'block' : 'none'
+    });
+    const jobRow = (j) => Object.assign({
+      name: j.name, meta: j.meta, chip: j.chip || '', chipShow: j.chip ? 'inline-block' : 'none',
+      count: j.got + ' of ' + j.of, countInk: j.st === 'done' ? '#1F5534' : '#121815'
+    }, dot(j.st));
+
+    // ---------- today ----------
+    const data = this.teamData();
+    const order = ['zhao', 'li', 'wang', 'gao'];
+    const sorted = order.map((k) => data.filter((t) => t.key === k)[0]);
+    let jobsTotal = 0, jobsDone = 0;
+    sorted.forEach((t) => t.jobs.forEach((j) => { jobsTotal += 1; if (j.st === 'done') jobsDone += 1; }));
+    const todayLine = jobsTotal + ' jobs, ' + jobsDone + ' done so far';
+    const teams = sorted.map((t) => {
+      const done = t.jobs.filter((j) => j.st === 'done').length;
+      return {
+        name: t.name, barn: t.barn, ini: t.ini, markBg: t.markBg, markInk: t.markInk, covers: t.covers,
+        progress: done + ' of ' + t.jobs.length + ' done',
+        aria: "Open " + t.title + " day",
+        open: () => set({ view: 'team', team: t.key, asked: false }),
+        jobs: t.jobs.map(jobRow)
+      };
+    });
+
+    // ---------- team record ----------
+    const cur2 = data.filter((t) => t.key === s.team)[0] || data[1];
+    const done2 = cur2.jobs.filter((j) => j.st === 'done').length;
+    const tm = {
+      title: cur2.title, ini: cur2.ini, markBg: cur2.markBg, markInk: cur2.markInk,
+      sub: cur2.covers + ' · ' + done2 + ' of ' + cur2.jobs.length + (cur2.jobs.length === 1 ? ' job' : ' jobs') + ' done today',
+      jobs: cur2.jobs.map((j) => Object.assign(jobRow(j), { meta: j.rep + (j.meta ? ' · ' + j.meta.split(' · ')[0] : '') })),
+      upcoming: cur2.upcoming.map((u) => ({ date: u.date, name: u.name, meta: u.meta, chip: u.chip || '', chipShow: u.chip ? 'inline-block' : 'none' }))
+    };
+
+    // ---------- week ----------
+    const wk = s.wk;
+    const WEEKEND = '#F6F7F4';
+    const dow = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const first = wk === 0 ? 26 : 2;
+    const MONTH0 = wk === 0 ? 'Oct' : 'Nov';
+    const dayNum = (i) => { const n = first + i; return wk === 0 && n > 31 ? n - 31 : n; };
+    const todayIdx = wk === 0 ? 4 : -1;
+    const days = dow.map((d, i) => ({
+      dow: d, n: dayNum(i),
+      fill: i > 4 ? WEEKEND : 'transparent',
+      nBg: i === todayIdx ? '#121815' : 'transparent',
+      nInk: i === todayIdx ? '#FFFFFF' : '#121815'
+    }));
+    const T = {
+      done: { bg: '#E7F4EA', line: '#E7F4EA', bstyle: 'solid', ink: '#1F5534', sub: '#1F5534' },
+      plan: { bg: '#F0F2EE', line: '#F0F2EE', bstyle: 'solid', ink: '#121815', sub: '#626C66' },
+      now: { bg: '#FFFFFF', line: '#121815', bstyle: 'solid', ink: '#121815', sub: '#3B4540' },
+      wait: { bg: '#FFFFFF', line: '#C9CEC5', bstyle: 'dashed', ink: '#3B4540', sub: '#626C66' },
+      clash: { bg: '#FFF0D1', line: '#D99A1E', bstyle: 'solid', ink: '#7A4A00', sub: '#7A4A00' }
+    };
+    const chip = (name, count, tone) => Object.assign({ name, count }, T[tone]);
+    const grid0 = {
+      zhao: { 4: [chip('Lame sow round', '2 of 4', 'now')] },
+      li: { 1: [chip('Processing', '493 of 493', 'done')], 4: [chip('Fostering checks', '6 of 8', 'now'), chip('Clean Room 3', 'done 08:40', 'done')] },
+      wang: { 3: [chip('Feed change', '40 of 40 pens', 'done')], 4: [chip('Nursery 2 pens', '22 of 40', 'now')] },
+      gao: { 0: [chip('Heat lamps', 'fixed', 'done')], 4: [chip('Water line B', '0 of 1', 'now')] },
+      chen: {}
+    };
+    const grid1 = {
+      zhao: { 0: [chip('Catch-up shots', '3 sows', 'wait')], 2: [chip('B33 sows out', '48 sows', 'plan')] },
+      li: {
+        2: [chip('B33 into Room 3', '48 sows', 'plan')],
+        3: [chip('Weaning check', 'B32 · 50 sows', 'clash'), chip('Revaccinate', 'B29 · 52 sows', 'wait')],
+        5: [chip('B33 litters', 'start Fri–Sat', 'plan')]
+      },
+      wang: { 1: [chip('Weigh B30', '20 pigs', 'plan')], 4: [chip('2nd shot, B31', '488 pigs', 'plan')] },
+      gao: { 0: [chip('Water line B', 'follow-up', 'plan')] },
+      chen: { 2: [chip('Herd check', 'weekly visit', 'plan')] }
+    };
+    const grid = wk === 0 ? grid0 : grid1;
+    const rowDefs = [
+      { key: 'zhao', name: 'Zhao Min', barn: 'Gestation' },
+      { key: 'li', name: 'Li Wei', barn: 'Farrowing' },
+      { key: 'wang', name: 'Wang Fang', barn: 'Nursery' },
+      { key: 'gao', name: 'Gao Feng', barn: 'Maintenance' }
+    ];
+    if (wk === 1) rowDefs.push({ key: 'chen', name: 'Dr. Chen', barn: 'Vet visit' });
+    const rows = rowDefs.map((r) => ({
+      name: r.name, barn: r.barn,
+      cells: dow.map((d, i) => ({
+        fill: i > 4 ? WEEKEND : 'transparent',
+        chips: (grid[r.key] && grid[r.key][i]) || []
+      }))
+    }));
+
+    const farm = (start) => () => { try { window.dispatchEvent(new CustomEvent('sentri:tab', { detail: { id: 'layout', start: start + '@' + Date.now() } })); } catch (e) {} };
+    const ptasks = [
+      ['Breeding', 'Batch 34 · Gestation 1 · 48 sows', 'Day 2 of 5', 'bt:34/breed', '#A99BEA'],
+      ['Move into Farrowing Room 4', 'Batch 33 · 26 of 48 sows in', 'Day 2 of 3', 'bt:33/move', '#E7B65C'],
+      ['Farrowing', 'Batch 32 · Farrowing Room 3 · 50 sows', 'Day 3 of 7', 'bt:32/farrow', '#E7B65C'],
+      ['Treatment RX-25G009', '4 lame sows · Gestation 2 · dose 2 due', '08:30', 'task:rx09', '#5CC2B7'],
+      ['PRRS vaccine', 'Batch 30 and 31 · Nursery 1 and 2', 'Running', 'task:prrs', '#5CC2B7'],
+      ['Nursery', 'Batch 31 · Nursery 1 · 488 pigs', 'Day 31 of 42', 'bt:31/nurs', '#86BB9C']
+    ].map(([name, meta, when, st, dot], i) => ({ name, meta, when, dot, open: farm(st), line: i ? '1px solid #F0F2EE' : '0' }));
+    return {
+      ic, ptasks,
+      isToday: view === 'today',
+      isTeam: view === 'team',
+      isWeek: view === 'week',
+      goToday: () => set({ view: 'today', asked: false }),
+      goWeek: () => set({ view: 'week', wk: 0, asked: false }),
+      page: () => set({ wk: wk === 0 ? 1 : 0, asked: false }),
+      pageLabel: wk === 0 ? 'Next week' : 'This week',
+      pageIcon: wk === 0 ? ic.chevR : ic.chevL,
+      weekName: wk === 0 ? 'This week' : 'Next week',
+      weekRange: wk === 0 ? 'Mon 26 Oct – Sun 1 Nov' : 'Mon 2 – Sun 8 Nov',
+      weekNote: wk === 0
+        ? 'Green is done. Outlined is today, done so far. Daily rounds are not drawn.'
+        : 'Dashed jobs wait for your yes in Decisions. Daily rounds are not drawn.',
+      showClash: wk === 1,
+      todayLine, teams, tm, days, rows,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Feed plans</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; min-height: calc(100vh - 68px); display: flex; flex-direction: column; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+<div style="width: 100%; flex: 1; max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+  <!-- saved strip -->
+  <sc-if value="{{showReceipt}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; gap: 10px; background: #E7F4EA; color: #1F5534; border-radius: 12px; padding: 9px 8px 9px 14px; margin-bottom: 20px; font-size: 13.5px; font-weight: 500; line-height: 1.45; animation: sentriRise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both">
+      <span style="width: 20px; height: 20px; border-radius: 50%; background: #2D7A4B; flex-shrink: 0; display: flex; align-items: center; justify-content: center">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      </span>
+      <span style="flex: 1; min-width: 0">Saved <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px">{{receiptTime}}</span> · {{receiptText}}</span>
+      <button type="button" onClick="{{undoDone}}" style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 11px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.75); font: inherit; font-size: 13px; font-weight: 500; color: #1F5534; cursor: pointer; flex-shrink: 0">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.undo}}"></path></svg>
+        Undo
+      </button>
+    </div>
+  </sc-if>
+
+  <!-- ===================== LISTS ===================== -->
+  <sc-if value="{{isList}}" hint-placeholder-val="{{true}}">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Production › Feed plans</span>
+      <h1 style="margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -0.025em; color: #121815">Feed plans</h1>
+      <div style="font-size: 14px; color: #3B4540; line-height: 1.5">What each stage is fed, and what is in the bins.</div>
+    </div>
+
+    <div style="display: flex; gap: 6px; margin-top: 22px">
+      <button type="button" onClick="{{showProgramme}}" aria-pressed="{{tabProgramme}}" style="display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: {{tabPBg}}; font: inherit; font-size: 14px; font-weight: {{tabPWeight}}; color: {{tabPInk}}; cursor: pointer">Programme</button>
+      <button type="button" onClick="{{showOnhand}}" aria-pressed="{{tabOnhand}}" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: {{tabHBg}}; font: inherit; font-size: 14px; font-weight: {{tabHWeight}}; color: {{tabHInk}}; cursor: pointer">
+        On hand
+        <sc-if value="{{needsOrder}}" hint-placeholder-val="{{true}}">
+          <span style="width: 7px; height: 7px; border-radius: 50%; background: #D99A1E"></span>
+          <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">One bin runs out soon</span>
+        </sc-if>
+      </button>
+    </div>
+
+    <!-- programme -->
+    <sc-if value="{{tabProgramme}}" hint-placeholder-val="{{true}}">
+      <sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+        <div>
+          <h2 style="margin: 0; padding: 28px 0 6px; font-size: 12px; font-weight: 500; color: #626C66">{{g.title}}</h2>
+          <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="4">
+            <button type="button" onClick="{{r.open}}" style="display: flex; align-items: center; gap: 16px; width: 100%; box-sizing: border-box; padding: 12px 0; border: 0; border-top: {{r.topLine}}; background: transparent; font: inherit; text-align: left; cursor: pointer">
+              <span style="flex: 1; min-width: 0">
+                <span style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+                  <span style="font-size: 14.5px; font-weight: 500; color: #121815">{{r.name}}</span>
+                  <sc-if value="{{r.chip}}" hint-placeholder-val="{{false}}">
+                    <span style="display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 9px 0 8px; border-radius: 999px; background: {{r.chipBg}}; color: {{r.chipInk}}; font-size: 12px; font-weight: 500">
+                      <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: {{r.chipDot}}"></span>{{r.chipText}}
+                    </span>
+                  </sc-if>
+                </span>
+                <span style="display: block; font-size: 12.5px; color: #626C66">{{r.where}}</span>
+              </span>
+              <span style="width: 118px; flex-shrink: 0; font-size: 13.5px; color: #3B4540">{{r.formula}}</span>
+              <span style="width: 96px; flex-shrink: 0; text-align: right">
+                <span style="display: block; font-size: 14px; font-weight: 500; color: #121815">{{r.amt}}</span>
+                <span style="display: block; font-size: 12px; color: #626C66">{{r.amtSub}}</span>
+              </span>
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevR}}"></path></svg>
+            </button>
+          </sc-for>
+        </div>
+      </sc-for>
+      <p style="margin: 28px 0 0; font-size: 12.5px; color: #626C66">Northfield Feed Services supplies every formula. Piglets feed ad lib, so their amounts are expected intake.</p>
+    </sc-if>
+
+    <!-- on hand -->
+    <sc-if value="{{tabOnhand}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; align-items: baseline; gap: 14px; padding: 26px 0 8px; font-size: 12px; font-weight: 500; color: #626C66">
+        <span style="flex: 1">Feed</span>
+        <span style="width: 56px; text-align: right">On hand</span>
+        <span style="width: 70px; text-align: right">Use a day</span>
+        <span style="width: 78px; text-align: right">Days left</span>
+        <span style="width: 64px"></span>
+      </div>
+      <sc-for list="{{binRows}}" as="b" hint-placeholder-count="6">
+        <div style="display: flex; align-items: center; gap: 14px; padding: 12px 0; border-top: {{b.topLine}}">
+          <span style="flex: 1; min-width: 0">
+            <span style="display: block; font-size: 14.5px; font-weight: 500; color: #121815">{{b.name}}</span>
+            <span style="display: block; font-size: 12.5px; color: {{b.subInk}}">{{b.sub}}</span>
+            <sc-if value="{{b.hasFact}}" hint-placeholder-val="{{false}}">
+              <span style="display: block; font-size: 12.5px; font-weight: 500; color: #7A4A00">{{b.fact}}</span>
+            </sc-if>
+          </span>
+          <span style="width: 56px; text-align: right; font-size: 14px; color: #121815">{{b.hand}}</span>
+          <span style="width: 70px; text-align: right; font-size: 14px; color: #121815">{{b.use}}</span>
+          <span style="width: 78px; display: flex; justify-content: flex-end">
+            <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 {{b.dPad}}; border-radius: 999px; background: {{b.dBg}}; color: {{b.dInk}}; font-size: 13.5px; font-weight: {{b.dWeight}}">{{b.days}}</span>
+          </span>
+          <span style="width: 64px; display: flex; justify-content: flex-end">
+            <button type="button" onClick="{{b.order}}" aria-label="{{b.orderAria}}" style="height: 32px; padding: 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">Order</button>
+          </span>
+        </div>
+      </sc-for>
+      <p style="margin: 22px 0 0; padding-top: 14px; border-top: 1px solid #EFF1EC; font-size: 12.5px; color: #626C66">Counted from deliveries minus planned use at this week's rations. Northfield usually delivers in 2 days.</p>
+    </sc-if>
+  </sc-if>
+
+  <!-- ===================== STAGE ===================== -->
+  <sc-if value="{{isStage}}" hint-placeholder-val="{{false}}">
+    <button type="button" onClick="{{backToList}}" style="display: inline-flex; align-items: center; gap: 2px; margin: 0 0 12px -4px; padding: 2px 6px 2px 2px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevL}}"></path></svg>
+      Feed plans
+    </button>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <h1 style="margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -0.025em; color: #121815">{{st.title}}</h1>
+      <div style="font-size: 14px; color: #3B4540; line-height: 1.5">{{st.lead}}</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; margin-top: 26px">
+      <sc-for list="{{st.facts}}" as="f" hint-placeholder-count="4">
+        <div style="min-width: 0">
+          <div style="font-size: 12px; font-weight: 500; color: #626C66">{{f.k}}</div>
+          <div style="margin-top: 2px; font-size: 14px; color: #121815">{{f.v}}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{st.hasCurve}}" hint-placeholder-val="{{true}}">
+      <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #EFF1EC">
+        <h2 style="margin: 0 0 12px; font-size: 15px; line-height: 1.4; font-weight: 600">Amount by day, kg per sow</h2>
+        <div style="display: grid; grid-template-columns: 112px repeat(6, minmax(0, 1fr)); gap: 0 8px; padding: 0 0 8px; font-size: 12px; font-weight: 500; color: #626C66">
+          <span>Day of lactation</span>
+          <sc-for list="{{st.days}}" as="d" hint-placeholder-count="6"><span style="text-align: right">{{d.t}}</span></sc-for>
+        </div>
+        <sc-for list="{{st.curveRows}}" as="cr" hint-placeholder-count="2">
+          <div style="display: grid; grid-template-columns: 112px repeat(6, minmax(0, 1fr)); gap: 0 8px; padding: 9px 0; border-top: 1px solid #EFF1EC; align-items: baseline">
+            <span style="font-size: 13px; color: {{cr.kInk}}">{{cr.k}}</span>
+            <sc-for list="{{cr.cells}}" as="c" hint-placeholder-count="6">
+              <span style="text-align: right; font-size: 14px; font-weight: {{c.w}}; color: {{c.ink}}">{{c.v}}</span>
+            </sc-for>
+          </div>
+        </sc-for>
+        <p style="margin: 8px 0 0; font-size: 12.5px; color: #626C66">{{st.curveNote}}</p>
+      </div>
+    </sc-if>
+
+    <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #EFF1EC">
+      <h2 style="margin: 0 0 6px; font-size: 15px; line-height: 1.4; font-weight: 600">Lately</h2>
+      <sc-for list="{{st.lately}}" as="l" hint-placeholder-count="2">
+        <div style="padding: 9px 0; border-top: {{l.topLine}}; font-size: 14px; color: #1E2622">{{l.t}}</div>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{canChange}}" hint-placeholder-val="{{true}}">
+      <div style="margin-top: 30px">
+        <button type="button" onClick="{{changePlan}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer">Change this plan…</button>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- ===================== FORMS (order, change) ===================== -->
+  <sc-if value="{{isProposal}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">
+        <button type="button" onClick="{{crumbBack}}" style="padding: 0; border: 0; background: transparent; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer">Feed plans</button>
+        <span aria-hidden="true">›</span>
+        <span>{{crumbHere}}</span>
+      </div>
+      <h1 style="margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -0.025em; color: #121815">{{prop.title}}</h1>
+      <div style="font-size: 14px; color: #3B4540; line-height: 1.5">{{prop.lead}}</div>
+    </div>
+
+    <!-- fields -->
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 16px; margin-top: 26px; align-items: start">
+      <sc-for list="{{fields}}" as="f" hint-placeholder-count="4">
+        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+          <div style="display: flex; align-items: center; gap: 8px; min-height: 20px">
+            <label for="{{f.id}}" style="font-size: 12px; font-weight: 500; color: #626C66">{{f.label}}</label>
+            <sc-if value="{{f.changed}}" hint-placeholder-val="{{false}}">
+              <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #626C66">
+                <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #121815"></span>
+                <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Changed from </span>
+                <span style="text-decoration: line-through">{{f.old}}</span>
+              </span>
+            </sc-if>
+          </div>
+          <sc-if value="{{f.isInput}}" hint-placeholder-val="{{false}}">
+            <input id="{{f.id}}" value="{{f.value}}" onChange="{{f.change}}" style="height: 42px; box-sizing: border-box; width: 100%; border: 1px solid #E2E5DF; background: #FFFFFF; border-radius: 11px; padding: 0 13px; font: inherit; font-size: 14px; color: #121815; outline: none">
+          </sc-if>
+          <sc-if value="{{f.isSelect}}" hint-placeholder-val="{{false}}">
+            <select id="{{f.id}}" onChange="{{f.change}}" style="width: 100%; box-sizing: border-box; height: 42px; border: 1px solid #E2E5DF; background: #FFFFFF; border-radius: 11px; padding: 0 11px; font: inherit; font-size: 14px; color: #121815; outline: none">
+              <sc-for list="{{f.options}}" as="o" hint-placeholder-count="3">
+                <option value="{{o.v}}" selected="{{o.sel}}">{{o.v}}</option>
+              </sc-for>
+            </select>
+          </sc-if>
+          <sc-if value="{{f.isStepper}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <button type="button" onClick="{{f.dec}}" aria-label="{{f.decAria}}" style="width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #DADED6; border-radius: 11px; background: #FFFFFF; cursor: pointer; display: flex; align-items: center; justify-content: center">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #121815; stroke-width: 2.2; stroke-linecap: round"><path d="M5 12h14"></path></svg>
+              </button>
+              <input id="{{f.id}}" value="{{f.value}}" onChange="{{f.change}}" style="height: 42px; box-sizing: border-box; flex: 1; min-width: 0; border: 1px solid #E2E5DF; background: #FFFFFF; border-radius: 11px; padding: 0 10px; text-align: center; font: inherit; font-size: 14px; color: #121815; outline: none">
+              <button type="button" onClick="{{f.inc}}" aria-label="{{f.incAria}}" style="width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #DADED6; border-radius: 11px; background: #FFFFFF; cursor: pointer; display: flex; align-items: center; justify-content: center">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #121815; stroke-width: 2.2; stroke-linecap: round"><path d="M5 12h14 M12 5v14"></path></svg>
+              </button>
+            </div>
+          </sc-if>
+          <sc-if value="{{f.isSeg}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; gap: 8px">
+              <sc-for list="{{f.segs}}" as="g" hint-placeholder-count="2">
+                <button type="button" onClick="{{g.pick}}" aria-pressed="{{g.on}}" style="flex: 1; height: 42px; box-sizing: border-box; padding: 0 12px; border: 1px solid {{g.border}}; border-radius: 11px; background: {{g.bg}}; font: inherit; font-size: 14px; font-weight: {{g.weight}}; color: #121815; cursor: pointer">{{g.label}}</button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{f.hasNote}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12.5px; line-height: 1.45; font-weight: {{f.noteWeight}}; color: {{f.noteInk}}">
+              <span>{{f.note}}</span>
+              <sc-if value="{{f.hasFix}}" hint-placeholder-val="{{false}}">
+                <button type="button" onClick="{{f.fix}}" style="height: 28px; padding: 0 10px; border: 1px solid #DADED6; border-radius: 9px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 500; color: #121815; cursor: pointer">{{f.fixLabel}}</button>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- change: curve before and after -->
+    <sc-if value="{{isChange}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #EFF1EC">
+        <h2 style="margin: 0 0 12px; font-size: 15px; line-height: 1.4; font-weight: 600">Amount by day, kg per sow</h2>
+        <div style="display: grid; grid-template-columns: 112px repeat(6, minmax(0, 1fr)); gap: 0 8px; padding: 0 0 8px; font-size: 12px; font-weight: 500; color: #626C66">
+          <span>Day of lactation</span>
+          <sc-for list="{{cv.days}}" as="d" hint-placeholder-count="6"><span style="text-align: right">{{d.t}}</span></sc-for>
+        </div>
+        <sc-for list="{{cv.rows}}" as="cr" hint-placeholder-count="2">
+          <div style="display: grid; grid-template-columns: 112px repeat(6, minmax(0, 1fr)); gap: 0 8px; padding: 9px 0; border-top: 1px solid #EFF1EC; align-items: baseline">
+            <span style="font-size: 13px; color: {{cr.kInk}}">{{cr.k}}</span>
+            <sc-for list="{{cr.cells}}" as="c" hint-placeholder-count="6">
+              <span style="text-align: right; font-size: 14px; font-weight: {{c.w}}; color: {{c.ink}}">{{c.v}}</span>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- quiet expandable: what it creates / what moves -->
+    <div style="margin-top: 28px; padding-top: 6px; border-top: 1px solid #EFF1EC">
+      <button type="button" onClick="{{toggleMore}}" aria-expanded="{{seeMore}}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 44px; padding: 0; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer">
+        <span style="font-size: 14px; color: #1E2622">{{moreLabel}}</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex-shrink: 0; fill: none; stroke: #3B4540; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: {{moreRot}}"><path d="M6 9l6 6 6-6"></path></svg>
+      </button>
+      <sc-if value="{{seeMore}}" hint-placeholder-val="{{false}}">
+        <sc-if value="{{isOrder}}" hint-placeholder-val="{{true}}">
+          <sc-for list="{{makes}}" as="m" hint-placeholder-count="4">
+            <div style="display: flex; align-items: baseline; gap: 16px; padding: 10px 0; border-top: 1px solid #EFF1EC">
+              <span style="width: 96px; flex-shrink: 0; font-size: 12.5px; color: #626C66">{{m.k}}</span>
+              <span style="flex: 1; min-width: 0; font-size: 14px; color: #1E2622">{{m.v}}</span>
+            </div>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{isChange}}" hint-placeholder-val="{{false}}">
+          <div style="display: grid; grid-template-columns: 76px minmax(0, 1fr) 110px 70px; gap: 0 10px; padding: 4px 0 8px; font-size: 12px; font-weight: 500; color: #626C66">
+            <span>Batch</span><span>Where</span><span>New curve from</span><span style="text-align: right">Extra feed</span>
+          </div>
+          <sc-for list="{{moves}}" as="m" hint-placeholder-count="3">
+            <div style="display: grid; grid-template-columns: 76px minmax(0, 1fr) 110px 70px; gap: 0 10px; padding: 9px 0; border-top: 1px solid #EFF1EC; align-items: baseline">
+              <span style="font-size: 14px; font-weight: 500; color: {{m.ink}}">{{m.batch}}</span>
+              <span style="font-size: 13.5px; color: {{m.ink}}">{{m.where}}</span>
+              <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: {{m.ink}}">{{m.from}}</span>
+              <span style="text-align: right; font-size: 13.5px; color: {{m.ink}}">{{m.extra}}</span>
+            </div>
+          </sc-for>
+          <p style="margin: 10px 0 0; padding-top: 12px; border-top: 1px solid #EFF1EC; font-size: 13.5px; color: #3B4540">{{movesNote}}</p>
+        </sc-if>
+      </sc-if>
+    </div>
+  </sc-if>
+
+</div>
+
+<!-- ===================== SAVE BAR ===================== -->
+<sc-if value="{{footShow}}" hint-placeholder-val="{{false}}">
+<div style="position: sticky; bottom: 0; background: #FFFFFF; border-top: 1px solid #E8EBE5">
+  <div style="max-width: 760px; margin: 0 auto; padding: 12px 32px 14px; box-sizing: border-box; display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+    <span style="flex: 1 1 180px; min-width: 0; font-size: 13.5px; color: #3B4540">{{foot.summary}}</span>
+    <button type="button" onClick="{{foot.discard}}" style="height: 40px; padding: 0 16px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #121815; cursor: pointer">Discard</button>
+    <button type="button" onClick="{{foot.go}}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 14px; border: 0; border-radius: 10px; background: #121815; font: inherit; font-size: 14px; font-weight: 500; color: #FFFFFF; cursor: pointer; white-space: nowrap; opacity: {{foot.opacity}}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #C5F06A; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+      {{foot.label}}
+    </button>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["programme","onhand","stage","order","ordered","change","changed"],"default":"programme"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      check: 'M20 6 9 17l-5-5',
+      chevL: 'M15 6l-6 6 6 6',
+      chevR: 'M9 6l6 6-6 6',
+      undo: 'M3 7v6h6 M21 17a9 9 0 0 0-15-6.7L3 13'
+    };
+  }
+
+  bins() {
+    // hand: t on hand · use: kg a day now · next: kg a day from Wed 4 Nov · price: per t now · last: last order price
+    return [
+      { key: 'gest', name: 'Sow Gestation', sub: 'Batches 34, 35, gilts, boars', hand: 5.9, use: 294, next: 294, days: 20, price: 3260, last: 3260 },
+      { key: 'late', name: 'Sow Late Gest', sub: 'Batch 33, then Batch 34', hand: 3.0, use: 134, next: 134, days: 22, price: 3390, last: 3390 },
+      { key: 'lact', name: 'Sow Lactation', sub: 'Batch 32, Batch 33 from Wed 4 Nov', hand: 4.4, use: 326, next: 520, days: 10, price: 3480, last: 3420 },
+      { key: 'starter', name: 'Pig Starter', sub: 'Batch 31', hand: 2.4, use: 122, next: 122, days: 19, price: 4120, last: 4120 },
+      { key: 'weaner', name: 'Pig Weaner', sub: 'Batch 30', hand: 5.4, use: 305, next: 305, days: 17, price: 3740, last: 3740 },
+      { key: 'grower', name: 'Pig Grower', sub: 'Batch 30 from Sun 1 Nov', hand: 7.0, use: 423, next: 423, days: 16, price: 3520, last: 3520 }
+    ];
+  }
+
+  deliveries() {
+    return [{ v: 'Mon 2 Nov', off: 3 }, { v: 'Tue 3 Nov', off: 4 }, { v: 'Wed 4 Nov', off: 5 }];
+  }
+
+  calc(b, q, off) {
+    const proj = b.hand - off * b.use / 1000;
+    const after = proj + q;
+    const pre = Math.max(0, 5 - off);
+    const preUse = pre * b.use / 1000;
+    const rest = after <= preUse ? after / (b.use / 1000) : pre + (after - preUse) / (b.next / 1000);
+    return { proj, after, lasts: Math.floor(rest), total: Math.floor(off + rest), max: Math.floor((10 - proj) * 10) / 10 };
+  }
+
+  orderDefaults(key) {
+    const b = this.bins().filter((x) => x.key === key)[0];
+    const proj = b.hand - 3 * b.use / 1000;
+    const q = key === 'lact' ? 6 : Math.max(0.5, Math.min(6, Math.floor((10 - proj) * 2) / 2));
+    return { qty: String(q), delivery: 'Mon 2 Nov', price: '¥' + b.price.toLocaleString('en-US') };
+  }
+
+  defaults(start) {
+    const od = this.orderDefaults('lact');
+    const base = {
+      startSeen: start, view: 'programme', stageId: 'lact', seeMore: false,
+      orderDone: '', orderBin: 'lact', orderedQty: '6', orderedDays: 21, orderedWhen: 'Mon 2 Nov',
+      qty: od.qty, delivery: od.delivery, price: od.price,
+      applied: null, amt: '0.5', startBatch: 33
+    };
+    if (start === 'onhand') return Object.assign(base, { view: 'onhand' });
+    if (start === 'stage') return Object.assign(base, { view: 'stage' });
+    if (start === 'order') return Object.assign(base, { view: 'order' });
+    if (start === 'ordered') return Object.assign(base, { view: 'onhand', orderDone: 'order' });
+    if (start === 'change') return Object.assign(base, { view: 'change' });
+    if (start === 'changed') return Object.assign(base, { view: 'stage', applied: { d: 0.5, from: 33 } });
+    return base;
+  }
+
+  cur() {
+    const start = this.props.start || 'programme';
+    const st = this.state || {};
+    const base = this.defaults(start);
+    return st.startSeen === start ? Object.assign(base, st) : base;
+  }
+
+  renderVals() {
+    const s = this.cur();
+    const set = (p) => this.setState(Object.assign({}, this.cur(), p));
+    const ic = this.icons();
+    const line = '1px solid #EFF1EC';
+    const money = (n) => '¥' + Math.round(n).toLocaleString('en-US');
+    const money100 = (n) => '¥' + (Math.round(n / 100) * 100).toLocaleString('en-US');
+    const t1 = (n) => String(Math.round(n * 10) / 10);
+    const view = s.view;
+    const isProposal = view === 'order' || view === 'change';
+    const mkField = (o) => Object.assign({ isInput: false, isSelect: false, isStepper: false, isSeg: false, options: [], segs: [], changed: false, old: '', hasNote: false, note: '', noteInk: '#626C66', noteWeight: 400, hasFix: false, fixLabel: '', fix: () => {}, value: '', change: () => {}, dec: () => {}, inc: () => {}, decAria: '', incAria: '' }, o);
+
+    // ---------- data
+    const lactBase = [['1', 2.0], ['2', 3.0], ['4', 4.5], ['6', 5.5], ['8', 6.5], ['10+', 7.0]];
+    const applied = s.applied;
+    const stages = {
+      gest: {
+        name: 'Gestation', group: 'Sows', where: 'Days 1–90 · Batches 34, 35 · 100 sows', formula: 'Sow Gestation', amt: '2.2 kg', amtSub: 'per sow',
+        lead: 'Sows in Gestation 1 and 2, from breeding to day 90.',
+        facts: [['Formula', 'Sow Gestation'], ['Amount a day', '2.2 kg per sow'], ['Switches', 'Day 91 · Batch 34 Wed 4 Nov'], ['On it now', 'Batches 34, 35 · 100 sows']],
+        lately: ['Gestation 2 is eating 2.07 kg of the 2.2 kg, 6% less since Tue.', 'Gestation 1 is eating the full amount.', 'Water line B pressure is linked to the drop. Equipment is watching it.']
+      },
+      late: {
+        name: 'Late gestation', group: 'Sows', where: 'Days 91–110 · Batch 33 · 48 sows', formula: 'Sow Late Gest', amt: '2.8 kg', amtSub: 'per sow',
+        lead: 'Sows in the last 20 days before farrowing.',
+        facts: [['Formula', 'Sow Late Gest'], ['Amount a day', '2.8 kg per sow'], ['Switches', 'Farrowing · Batch 33 Wed 4 Nov'], ['On it now', 'Batch 33 · 48 sows']],
+        lately: ['Batch 33 is eating the full 2.8 kg.', 'Batch 34 joins this stage on Wed 4 Nov, the day Batch 33 leaves.']
+      },
+      lact: {
+        name: 'Lactation', group: 'Sows', where: 'Days 1–28 · Batch 32 · 48 sows', formula: 'Sow Lactation', amt: '7.0 kg', amtSub: 'peak, per sow',
+        lead: 'Sows in Farrowing Rooms 1–4, from farrowing to weaning on day 28.',
+        facts: [['Formula', 'Sow Lactation'], ['Amount a day', applied ? '7.0 kg · ' + t1(7.0 + applied.d) + ' from Batch ' + applied.from : '7.0 kg per sow, from day 10'], ['Switches', 'Weaning day 28 · Batch 32 Fri 13 Nov'], ['On it now', 'Batch 32 · 48 sows · Room 2']],
+        lately: ['Batch 32 sows ate 97% of their plan yesterday: 6.6 of 6.8 kg.', 'Batch 33 joins on Wed 4 Nov. Use goes from 326 to about 520 kg a day.'], curve: true
+      },
+      gilt: {
+        name: 'Gilts and boars', group: 'Sows', where: '24 gilts · 6 boars', formula: 'Sow Gestation', amt: '2.4 kg', amtSub: 'gilts; boars 2.6',
+        lead: '24 gilts in Quarantine 1 ready to breed, and the 6 boars in Gestation 1.',
+        facts: [['Formula', 'Sow Gestation'], ['Amount a day', 'Gilts 2.4 kg · boars 2.6 kg'], ['Switches', 'Gilts: when bred'], ['On it now', '24 gilts · 6 boars']],
+        lately: ['All 30 are eating the full amount.']
+      },
+      starter: {
+        name: 'Starter', group: 'Piglets', where: 'Days 1–14 · Batch 31 · 488 pigs', formula: 'Pig Starter', amt: '250 g', amtSub: 'a pig, ad lib',
+        lead: 'Weaned pigs in their first 2 weeks in the nursery.',
+        facts: [['Formula', 'Pig Starter'], ['Expected intake', '250 g a pig, ad lib'], ['Switches', 'Day 15 · Batch 31 Sun 8 Nov'], ['On it now', 'Batch 31 · 488 pigs · Nursery 2']],
+        lately: ['Batch 31 is on day 6 and eating to plan.']
+      },
+      weaner: {
+        name: 'Weaner', group: 'Piglets', where: 'Days 15–28 · Batch 30 · 470 pigs', formula: 'Pig Weaner', amt: '650 g', amtSub: 'a pig, ad lib',
+        lead: 'Nursery pigs from day 15 to day 28.',
+        facts: [['Formula', 'Pig Weaner'], ['Expected intake', '650 g a pig, ad lib'], ['Switches', 'Day 29 · Batch 30 Sun 1 Nov'], ['On it now', 'Batch 30 · 470 pigs · Nursery 1']],
+        lately: ['Batch 30 is on day 27 and eating to plan.', 'It moves to Grower on Sun 1 Nov.']
+      },
+      grower: {
+        name: 'Grower', group: 'Piglets', where: 'Days 29–42 · Batch 30 from Sun 1 Nov', formula: 'Pig Grower', amt: '900 g', amtSub: 'a pig, ad lib',
+        lead: 'Nursery pigs from day 29 until they leave the nursery on day 42.',
+        facts: [['Formula', 'Pig Grower'], ['Expected intake', '900 g a pig, ad lib'], ['Switches', 'Leaves nursery · Batch 30 Wed 11 Nov'], ['On it now', 'No pigs today']],
+        lately: ['Batch 30 starts on Grower on Sun 1 Nov. Use goes to about 423 kg a day.']
+      }
+    };
+    const order = ['gest', 'late', 'lact', 'gilt', 'starter', 'weaner', 'grower'];
+    const bins = this.bins();
+    const orderedLact = s.orderDone === 'order' && s.orderBin === 'lact';
+    const needsOrder = !orderedLact;
+
+    // ---------- lists
+    const open = (id) => () => set({ view: 'stage', stageId: id });
+    const groups = ['Sows', 'Piglets'].map((gt) => {
+      const ids = order.filter((id) => stages[id].group === gt);
+      return {
+        title: gt,
+        rows: ids.map((id, i) => {
+          const x = stages[id];
+          let chip = false, chipText = '', chipBg = '#FFF0D1', chipInk = '#7A4A00', chipDot = '#D99A1E';
+          if (id === 'gest') { chip = true; chipText = 'Gestation 2 eating 6% less'; }
+          if (id === 'lact' && applied) { chip = true; chipText = 'From Batch ' + applied.from + ' +' + t1(applied.d) + ' kg'; chipBg = '#E7F4EA'; chipInk = '#1F5534'; chipDot = '#2D7A4B'; }
+          return { name: x.name, where: x.where, formula: x.formula, amt: x.amt, amtSub: x.amtSub, topLine: i ? line : '0', chip, chipText, chipBg, chipInk, chipDot, open: open(id) };
+        })
+      };
+    });
+
+    const startOrder = (key) => () => {
+      const od = this.orderDefaults(key);
+      set({ view: 'order', orderBin: key, qty: od.qty, delivery: od.delivery, price: od.price, seeMore: false });
+    };
+    const binRows = bins.map((b, i) => {
+      let days = b.days, sub = b.sub, subInk = '#626C66', fact = '', hasFact = false;
+      let dBg = 'transparent', dInk = '#121815', dWeight = 400, dPad = '0';
+      const ordered = s.orderDone === 'order' && s.orderBin === b.key;
+      if (ordered) {
+        days = s.orderedDays; sub = t1(parseFloat(s.orderedQty) || 0) + ' t arriving ' + s.orderedWhen; subInk = '#1F5534';
+      } else if (b.key === 'lact') {
+        hasFact = true; fact = 'Runs out around Tue 10 Nov';
+        dBg = '#FFF0D1'; dInk = '#7A4A00'; dWeight = 500; dPad = '10px';
+      }
+      return {
+        name: b.name, sub, subInk, fact, hasFact, hand: b.hand.toFixed(1) + ' t', use: b.use + ' kg', days: days + ' days', topLine: i ? line : '0', dBg, dInk, dWeight, dPad,
+        order: startOrder(b.key), orderAria: 'Order ' + b.name
+      };
+    });
+
+    // ---------- stage record
+    const sid = s.stageId;
+    const sx = stages[sid];
+    let curveRows = [], days = [], curveNote = '';
+    if (sx.curve) {
+      days = lactBase.map((p) => ({ t: p[0] }));
+      const nowCells = lactBase.map((p) => ({ v: p[1].toFixed(1), w: 400, ink: '#121815' }));
+      if (applied) {
+        const newCells = lactBase.map((p, i) => ({ v: (p[1] + (i >= 2 ? applied.d : 0)).toFixed(1), w: i >= 2 ? 600 : 400, ink: '#121815' }));
+        curveRows = [
+          { k: 'Before Batch ' + applied.from, kInk: '#626C66', cells: nowCells.map((c) => Object.assign({}, c, { ink: '#626C66' })) },
+          { k: 'From Batch ' + applied.from, kInk: '#121815', cells: newCells }
+        ];
+        curveNote = 'Batch 32 stays on the old curve. Day 9 today: 6.8 kg per sow.';
+      } else {
+        curveRows = [{ k: 'Per sow a day', kInk: '#3B4540', cells: nowCells }];
+        curveNote = 'Batch 32 is on day 9 today: 6.8 kg per sow. Amounts between the listed days step up evenly.';
+      }
+    }
+    const st = {
+      title: sx.name, lead: sx.lead,
+      facts: sx.facts.map((f) => ({ k: f[0], v: f[1] })),
+      hasCurve: !!sx.curve, days, curveRows, curveNote,
+      lately: sx.lately.map((t, i) => ({ t, topLine: i ? line : '0' }))
+    };
+
+    // ---------- order form
+    const ob = bins.filter((x) => x.key === s.orderBin)[0];
+    const od = this.orderDefaults(ob.key);
+    const dels = this.deliveries();
+    const dl = dels.filter((x) => x.v === s.delivery)[0] || dels[0];
+    const q = parseFloat(s.qty);
+    const qOk = q > 0;
+    const c = this.calc(ob, qOk ? q : 0, dl.off);
+    const overfill = qOk && c.after > 10.0001;
+    const p = parseInt(String(s.price).replace(/\D/g, ''), 10);
+    const pOk = p > 0;
+    const priceHigh = pOk && p > ob.last;
+    const qShow = qOk ? t1(q) : '';
+    const orderValid = qOk && !overfill && pOk;
+    const total = qOk && pOk ? money(q * p) : '—';
+    const qDefNum = parseFloat(od.qty);
+    const stepQ = (dir) => () => {
+      const cur = parseFloat(s.qty) || 0;
+      set({ qty: t1(Math.max(0.5, cur + dir * 0.5)) });
+    };
+
+    // ---------- change form
+    const d = parseFloat(String(s.amt).replace(/[^0-9.]/g, ''));
+    const peakHigh = d > 0 && 7.0 + d > 8.0001;
+    const dOk = d > 0 && d <= 2 && !peakHigh;
+    const dd = d > 0 ? d : 0;
+    const from = s.startBatch;
+    const perBatch = (sows) => sows * 24 * dd / 1000;
+    const costBatch = perBatch(48) * 3480;
+    const stepD = (dir) => () => {
+      const cur = parseFloat(s.amt) || 0;
+      set({ amt: t1(Math.min(2, Math.max(0.1, cur + dir * 0.1))) });
+    };
+    const newCells = lactBase.map((pt, i) => ({ v: (pt[1] + (i >= 2 ? dd : 0)).toFixed(1), w: i >= 2 && d > 0 ? 600 : 400, ink: '#121815' }));
+    const cv = {
+      days: lactBase.map((pt) => ({ t: pt[0] })),
+      rows: [
+        { k: 'Now', kInk: '#626C66', cells: lactBase.map((pt) => ({ v: pt[1].toFixed(1), w: 400, ink: '#626C66' })) },
+        { k: 'From Batch ' + from, kInk: '#121815', cells: newCells }
+      ]
+    };
+    const moves = [
+      { b: 33, batch: 'Batch 33', where: 'Farrowing Room 3', from: 'Wed 4 Nov', sows: 48 },
+      { b: 34, batch: 'Batch 34', where: 'Farrowing Room 4', from: 'Wed 25 Nov', sows: 48 },
+      { b: 35, batch: 'Batch 35', where: 'Farrowing Room 1', from: 'Wed 16 Dec', sows: 52 }
+    ].map((m) => {
+      const on = m.b >= from;
+      return { on, batch: m.batch, where: on ? m.where : m.where + ', stays', from: on ? m.from : '—', extra: on ? '+' + t1(perBatch(m.sows)) + ' t' : '—', ink: on ? '#121815' : '#626C66' };
+    });
+    const movesCount = moves.filter((m) => m.on).length;
+    const movesNote = "Crate amounts on the phones follow from each sow's day 4. Each batch costs about " + money100(costBatch) + ' more.';
+
+    // ---------- fields
+    let fields = [], prop, makes = [];
+    if (view === 'order') {
+      const qNote = overfill
+        ? 'The bin holds 10 t and will have ' + t1(c.proj) + ' t on ' + dl.v + ': ' + t1(c.max) + ' t at most.'
+        : (qOk ? t1(c.after) + ' t in the bin after delivery, enough for about ' + c.lasts + ' days.' : 'Enter how many tonnes.');
+      fields = [
+        mkField({
+          id: 'fd-feed', label: 'Feed', isSelect: true, value: ob.name,
+          options: bins.map((b) => ({ v: b.name, sel: b.key === ob.key })),
+          change: (e) => {
+            const nb = bins.filter((b) => b.name === e.target.value)[0];
+            const nd = this.orderDefaults(nb.key);
+            set({ orderBin: nb.key, qty: nd.qty, price: nd.price });
+          }
+        }),
+        mkField({
+          id: 'fd-qty', label: 'Quantity, tonnes', isStepper: true, value: s.qty,
+          change: (e) => set({ qty: e.target.value }),
+          dec: stepQ(-1), inc: stepQ(1), decAria: 'Half a tonne less', incAria: 'Half a tonne more',
+          changed: !(q === qDefNum), old: od.qty,
+          hasNote: true, note: qNote, noteInk: overfill ? '#7A4A00' : '#626C66', noteWeight: overfill ? 500 : 400,
+          hasFix: overfill, fixLabel: 'Order ' + t1(c.max) + ' t', fix: () => set({ qty: t1(c.max) })
+        }),
+        mkField({
+          id: 'fd-del', label: 'Delivery', isSelect: true, value: s.delivery,
+          options: dels.map((x) => ({ v: x.v, sel: x.v === dl.v })),
+          change: (e) => set({ delivery: e.target.value }),
+          changed: dl.v !== 'Mon 2 Nov', old: 'Mon 2 Nov'
+        }),
+        mkField({
+          id: 'fd-price', label: 'Price a tonne', isInput: true, value: s.price,
+          change: (e) => set({ price: e.target.value }),
+          changed: p !== parseInt(od.price.replace(/\D/g, ''), 10), old: od.price,
+          hasNote: priceHigh, note: priceHigh ? money(p - ob.last) + ' above your last order (Wed 14 Oct, ' + money(ob.last) + ').' : '',
+          noteInk: '#7A4A00', noteWeight: 500, hasFix: priceHigh, fixLabel: 'Use ' + money(ob.last), fix: () => set({ price: money(ob.last) })
+        })
+      ];
+      makes = [
+        { k: 'Order', v: (qOk ? qShow : '—') + ' t ' + ob.name + ' · ' + total + ' · Northfield Feed Services' },
+        { k: 'Delivery', v: dl.v + ', to the ' + ob.name.replace(/^(Sow|Pig) /, '').toLowerCase() + ' bin' },
+        { k: 'Bin after', v: qOk ? t1(c.after) + ' t, about ' + c.lasts + ' days' : '—' },
+        { k: 'Visitors', v: "The delivery driver goes on next week's list for " + dl.v + '.' }
+      ];
+      prop = { title: qOk ? 'Order ' + qShow + ' t of ' + ob.name + ' from Northfield' : 'Order ' + ob.name + ' from Northfield', lead: 'Northfield Feed Services delivers on ' + dl.v + '. ' + (ob.key === 'lact' ? 'Sow Lactation runs out around Tue 10 Nov.' : ob.name + ' has ' + ob.days + ' days left.') };
+    } else if (view === 'change') {
+      fields = [
+        mkField({
+          id: 'ch-amt', label: 'Extra a day, kg per sow', isStepper: true, value: s.amt,
+          change: (e) => set({ amt: e.target.value }),
+          dec: stepD(-1), inc: stepD(1), decAria: 'Tenth of a kilo less', incAria: 'Tenth of a kilo more',
+          changed: !(d === 0.5), old: '0.5',
+          hasNote: d > 0, note: peakHigh ? 'Peak would be ' + t1(7.0 + d) + ' kg. The crate feeder tops out at 8 kg.' : 'About ' + t1(perBatch(48)) + ' t more a batch. The 6 t Sow Lactation order covers it.',
+          noteInk: peakHigh ? '#7A4A00' : '#626C66', noteWeight: peakHigh ? 500 : 400,
+          hasFix: peakHigh, fixLabel: 'Use 1.0', fix: () => set({ amt: '1.0' })
+        }),
+        mkField({
+          id: 'ch-from', label: 'Starts with', isSeg: true,
+          segs: [33, 34].map((b) => ({ label: 'Batch ' + b, on: from === b, border: from === b ? '#121815' : '#E2E5DF', bg: from === b ? '#F0F2EE' : '#FFFFFF', weight: from === b ? 600 : 500, pick: () => set({ startBatch: b }) })),
+          changed: from !== 33, old: 'Batch 33',
+          hasNote: true, note: from === 33 ? 'Batch 32 stays on the current curve.' : 'Batch 33 farrows on the current curve.'
+        })
+      ];
+      prop = {
+        title: d > 0 ? 'Raise lactation feed by ' + t1(d) + ' kg a day from Batch ' + from : 'Change lactation feed',
+        lead: d > 0 ? 'Sows get ' + t1(d) + ' kg more a day from day 4, peaking at ' + t1(7.0 + d) + ' kg.' : 'Set the extra kilograms a day.'
+      };
+    } else {
+      prop = { title: '', lead: '' };
+    }
+
+    // ---------- save bar
+    const live = isProposal;
+    const goOrder = () => {
+      if (!orderValid) return;
+      set({ view: 'onhand', orderDone: 'order', orderedQty: qShow, orderedDays: c.total, orderedWhen: dl.v, seeMore: false });
+    };
+    const goChange = () => {
+      if (!dOk) return;
+      set({ view: 'stage', stageId: 'lact', applied: { d, from }, seeMore: false });
+    };
+    const orderLabel = qOk ? 'Order ' + qShow + ' t ' + ob.name : 'Order ' + ob.name;
+    const foot = view === 'order'
+      ? {
+        summary: 'New order · ' + (qOk ? qShow : '—') + ' t · ' + total, label: orderLabel, go: goOrder, opacity: orderValid ? 1 : 0.4,
+        discard: () => { const dd0 = this.orderDefaults('lact'); set({ view: 'onhand', orderBin: 'lact', qty: dd0.qty, delivery: dd0.delivery, price: dd0.price, seeMore: false }); }
+      }
+      : {
+        summary: movesCount + (movesCount === 1 ? ' batch moves' : ' batches move') + ' · about ' + money100(costBatch) + ' more feed each',
+        label: dOk ? 'Raise lactation feed from Batch ' + from : 'Raise lactation feed', go: goChange, opacity: dOk ? 1 : 0.4,
+        discard: () => set({ view: 'stage', stageId: 'lact', amt: '0.5', startBatch: 33, seeMore: false })
+      };
+    const moreLabel = view === 'order' ? 'See what this creates' : 'See the ' + movesCount + (movesCount === 1 ? ' batch' : ' batches') + ' that move';
+
+    // ---------- saved strip
+    const showReceipt = (view === 'onhand' && s.orderDone === 'order') || (view === 'stage' && sid === 'lact' && !!applied);
+    let receiptText = '', receiptTime = '08:52';
+    if (view === 'onhand' && s.orderDone === 'order') {
+      const ib = bins.filter((x) => x.key === s.orderBin)[0];
+      receiptText = t1(parseFloat(s.orderedQty) || 0) + ' t ' + ib.name + ' ordered from Northfield for ' + s.orderedWhen;
+    } else if (applied) {
+      receiptTime = '08:57';
+      receiptText = 'Lactation +' + t1(applied.d) + ' kg a day from Batch ' + applied.from;
+    }
+
+    const isList = view === 'programme' || view === 'onhand';
+    const tabProgramme = view === 'programme';
+    const tabOnhand = view === 'onhand';
+    const tabStyle = (on) => ({ bg: on ? '#F0F2EE' : 'transparent', weight: on ? 600 : 500, ink: on ? '#121815' : '#626C66' });
+
+    return {
+      ic, isList, isStage: view === 'stage', isProposal, isOrder: view === 'order', isChange: view === 'change',
+      tabProgramme, tabOnhand, needsOrder,
+      tabPBg: tabStyle(tabProgramme).bg, tabPWeight: tabStyle(tabProgramme).weight, tabPInk: tabStyle(tabProgramme).ink,
+      tabHBg: tabStyle(tabOnhand).bg, tabHWeight: tabStyle(tabOnhand).weight, tabHInk: tabStyle(tabOnhand).ink,
+      showProgramme: () => set({ view: 'programme' }),
+      showOnhand: () => set({ view: 'onhand' }),
+      groups, binRows,
+      st, backToList: () => set({ view: 'programme' }),
+      canChange: sid === 'lact',
+      changePlan: () => set({ view: 'change', startBatch: 33, amt: '0.5', seeMore: false }),
+      prop, fields, cv, makes, moves, movesNote,
+      seeMore: s.seeMore, toggleMore: () => set({ seeMore: !s.seeMore }), moreLabel, moreRot: s.seeMore ? 'rotate(180deg)' : 'none',
+      crumbBack: () => set({ view: view === 'order' ? 'onhand' : 'stage', stageId: 'lact' }),
+      crumbHere: view === 'order' ? 'Order' : 'Change lactation',
+      footShow: live, foot,
+      showReceipt, receiptText, receiptTime,
+      undoDone: () => {
+        if (view === 'onhand') set({ view: 'order', orderDone: '' });
+        else set({ view: 'change', applied: null, amt: applied ? t1(applied.d) : '0.5', startBatch: applied ? applied.from : 33 });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

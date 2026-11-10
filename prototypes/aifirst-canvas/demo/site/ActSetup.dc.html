@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Farm setup</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 32px; box-sizing: border-box">
+
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">Farm setup › Setup progress</span>
+    <h1 style="margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -0.025em; color: #121815">{{title}}</h1>
+    <div style="display: flex; align-items: baseline; gap: 9px; font-size: 14px; color: #3B4540; line-height: 1.5">
+      <sc-if value="{{allDone}}" hint-placeholder-val="{{false}}">
+        <span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #2D7A4B; flex-shrink: 0; align-self: center"></span>
+      </sc-if>
+      <span style="flex: 1; min-width: 0">{{lead}}</span>
+    </div>
+  </div>
+
+  <ol style="list-style: none; margin: 28px 0 0; padding: 0; display: flex; flex-direction: column">
+    <sc-for list="{{steps}}" as="st" hint-placeholder-count="4">
+      <li style="display: flex; gap: 16px; align-items: stretch">
+        <div style="width: 22px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center">
+          <sc-if value="{{st.isDone}}" hint-placeholder-val="{{true}}">
+            <span style="width: 22px; height: 22px; border-radius: 50%; background: #2D7A4B; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; fill: none; stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.check}}"></path></svg>
+            </span>
+          </sc-if>
+          <sc-if value="{{st.isWait}}" hint-placeholder-val="{{false}}">
+            <span style="width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; border: 2px solid #121815; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #121815"></span>
+            </span>
+          </sc-if>
+          <sc-if value="{{st.isLater}}" hint-placeholder-val="{{false}}">
+            <span style="width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; border: 2px solid #DADED6; background: #FFFFFF; flex-shrink: 0"></span>
+          </sc-if>
+          <sc-if value="{{st.hasLine}}" hint-placeholder-val="{{true}}">
+            <span aria-hidden="true" style="flex: 1; width: 2px; margin: 4px 0; border-radius: 2px; background: {{st.lineColor}}"></span>
+          </sc-if>
+        </div>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; padding-bottom: {{st.pad}}px">
+          <div style="display: flex; align-items: center; gap: 10px; min-height: 32px">
+            <span style="font-size: 15px; font-weight: 600; color: #121815; line-height: 22px"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">{{st.stateWord}}: </span>{{st.title}}</span>
+            <sc-if value="{{st.hasChip}}" hint-placeholder-val="{{false}}">
+              <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; color: {{st.chipInk}}; background: {{st.chipBg}}; border-radius: 999px; padding: 2px 10px 2px 8px; white-space: nowrap">
+                <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: {{st.chipDot}}"></span>
+                {{st.chip}}
+              </span>
+            </sc-if>
+            <span style="flex: 1"></span>
+            <sc-if value="{{st.hasBtn}}" hint-placeholder-val="{{true}}">
+              <button type="button" onClick="{{st.act}}" style="height: 32px; padding: 0 13px; border: 1px solid {{st.btnBorder}}; border-radius: 10px; background: {{st.btnBg}}; font: inherit; font-size: 13px; font-weight: 500; color: {{st.btnInk}}; cursor: pointer; white-space: nowrap; flex-shrink: 0">{{st.btn}}</button>
+            </sc-if>
+          </div>
+          <sc-if value="{{st.hasText}}" hint-placeholder-val="{{true}}">
+            <span style="font-size: 14px; line-height: 1.5; color: #3B4540">{{st.text}}</span>
+          </sc-if>
+          <div style="display: flex; align-items: center; gap: 7px; margin-top: 3px">
+            <span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 4px; background: {{st.whoColor}}; flex-shrink: 0"></span>
+            <span style="font-size: 12.5px; color: #626C66">{{st.who}}</span>
+          </div>
+        </div>
+      </li>
+    </sc-for>
+  </ol>
+
+</div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["progress","done"],"default":"progress"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  defaults(start) {
+    const base = { startSeen: start, s3: false, s4: false };
+    if (start === 'done') return Object.assign(base, { s3: true, s4: true });
+    return base;
+  }
+
+  icons() {
+    return { check: 'M20 6 9 17l-5-5' };
+  }
+
+  renderVals() {
+    const start = this.props.start || 'progress';
+    let s = Object.assign({}, this.defaults(start), this.state || {});
+    if (s.startSeen !== start) s = this.defaults(start);
+    const set = (p) => this.setState(Object.assign({}, s, p, { startSeen: start }));
+    const I = this.icons();
+
+    const INK = { GM: '#151B17', PR: '#6E4500', VT: '#0E5568' };
+    const WHO = { GM: 'General Manager', PR: 'Production', VT: 'Vet' };
+
+    const RAW = [
+      { k: 'layout', status: 'done', title: 'Farm layout', text: '9 rooms, 700 pens, from your floor plan and Barns 2026.xlsx.', who: 'GM', btn: 'Open' },
+      { k: 'pigs', status: 'done', title: 'Pigs', text: '612 sows and gilts, 6 boars, 6 running batches.', who: 'GM', btn: 'Open' },
+      s.s3
+        ? { k: 'line', status: 'done', title: 'Production line', text: 'Line 1: a batch every 3 weeks, 50 sows.', who: 'PR', btn: 'Open' }
+        : { k: 'line', status: 'wait', title: 'Production line', text: 'Your rooms fit 3 plans. One answer from you decides which.', who: 'PR', btn: 'Choose a plan', act: () => set({ s3: true }) },
+      s.s4
+        ? { k: 'team', status: 'done', title: 'Your team', text: '9 people from Staff list.xlsx are invited.', who: 'GM', btn: 'Open' }
+        : { k: 'team', status: 'todo', title: 'Your team', text: '9 people in Staff list.xlsx, not invited yet.', who: 'GM', btn: 'Review invites', act: () => set({ s4: true }) },
+    ];
+
+    const stateWord = { done: 'Done', wait: 'Waiting for you', todo: 'To do', opt: 'Optional' };
+    const reached = (st) => st === 'done' || st === 'wait';
+    const steps = RAW.map((r, i, arr) => {
+      const last = i === arr.length - 1;
+      const wait = r.status === 'wait';
+      const optional = false;
+      const nextReached = !last && r.status === 'done' && reached(arr[i + 1].status);
+      const chip = wait ? 'Waiting for you' : '';
+      return {
+        isDone: r.status === 'done',
+        isWait: wait,
+        isLater: r.status === 'todo' || optional,
+        stateWord: stateWord[r.status],
+        hasLine: !last,
+        lineColor: nextReached ? '#2D7A4B' : '#E2E5DF',
+        pad: last ? 0 : 22,
+        title: r.title,
+        hasChip: !!chip,
+        chip: chip,
+        chipInk: wait ? '#7A4A00' : '#3B4540',
+        chipBg: wait ? '#FFF0D1' : '#F0F2EE',
+        chipDot: wait ? '#D99A1E' : '#8E9C90',
+        hasBtn: true,
+        btnBg: wait ? '#121815' : '#FFFFFF',
+        btnInk: wait ? '#FFFFFF' : '#121815',
+        btnBorder: wait ? '#121815' : '#DADED6',
+        btn: r.btn || '',
+        act: r.act || (() => {}),
+        hasText: true,
+        text: r.text,
+        who: WHO[r.who],
+        whoColor: INK[r.who]
+      };
+    });
+
+    const required = RAW.filter((r) => r.status !== 'opt');
+    const requiredDone = required.filter((r) => r.status === 'done').length;
+    const doneCount = RAW.filter((r) => r.status === 'done').length;
+    const allDone = requiredDone === required.length;
+
+    return {
+      ic: I,
+      steps: steps,
+      allDone: allDone,
+      title: allDone ? 'Hillside is set up' : 'Setting up Hillside Sow Farm',
+      lead: allDone
+        ? 'All ' + required.length + ' steps are done.'
+        : doneCount + ' of ' + RAW.length + ' done. You can use Sentri already; the rest can wait.'
+    };
+  }
+}
+</script>
+</body>
+</html>

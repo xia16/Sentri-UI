@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Schedule</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}.sd-title:hover .sd-name{text-decoration:underline;text-underline-offset:3px}.sd-cell:hover .sd-slot{filter:brightness(.97)}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #F5F5F4; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #1C1917; font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; padding: 20px 20px 28px">
+<div style="max-width: 1180px; margin: 0 auto">
+
+  <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px">
+    <h1 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em">Schedule</h1>
+    <span style="font-size: 14px; font-weight: 600">{{range}}</span>
+    <span style="flex: 1"></span>
+    <div style="display: inline-flex; padding: 3px; border-radius: 9px; background: #EAEAE7">
+      <button type="button" onClick="{{goWeek}}" aria-pressed="{{weekOn}}" style="height: 28px; padding: 0 12px; border: 0; border-radius: 7px; font: inherit; font-size: 13px; cursor: pointer; background: {{weekBg}}; box-shadow: {{weekSh}}; color: {{weekInk}}; font-weight: {{weekW}}">Week</button>
+      <button type="button" onClick="{{goTwo}}" aria-pressed="{{twoOn}}" style="height: 28px; padding: 0 12px; border: 0; border-radius: 7px; font: inherit; font-size: 13px; cursor: pointer; background: {{twoBg}}; box-shadow: {{twoSh}}; color: {{twoInk}}; font-weight: {{twoW}}">2 weeks</button>
+    </div>
+  </div>
+
+  <div style="position: relative; background: #FFFFFF; border-radius: 14px; box-shadow: 0 1px 3px rgba(28,25,23,.06), 0 0 0 1px #ECEBE8">
+    <div style="display: grid; grid-template-columns: {{cols}}; height: 52px; border-bottom: 1px solid #EFEEEC">
+      <div></div>
+      <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-left: 1px solid #F1F0EE; background: {{d.fill}}; border-radius: {{d.rad}}">
+          <span style="font-size: 10.5px; font-weight: 500; letter-spacing: .03em; text-transform: uppercase; color: #57534E">{{d.dow}}</span>
+          <b style="display: grid; place-items: center; width: 25px; height: 25px; border-radius: 99px; font-size: 14px; font-weight: 600; background: {{d.nBg}}; color: {{d.nInk}}">{{d.n}}</b>
+        </div>
+      </sc-for>
+    </div>
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="10">
+      <div style="display: {{r.ghShow}}; grid-template-columns: {{cols}}; height: 30px; border-bottom: 1px solid #F1F0EE">
+        <div style="display: flex; align-items: flex-end; padding: 0 0 5px 16px; font-size: 12px; font-weight: 600; color: #57534E">{{r.group}}</div>
+        <sc-for list="{{days}}" as="d" hint-placeholder-count="7"><div style="background: {{d.fill}}"></div></sc-for>
+      </div>
+      <div style="display: grid; grid-template-columns: {{cols}}; height: 54px; border-bottom: {{r.line}}">
+        <div style="display: flex; align-items: center; min-width: 0; padding: 0 6px 0 16px">
+          <sc-if value="{{r.linked}}" hint-placeholder-val="{{true}}">
+            <button type="button" class="sd-title" onClick="{{r.open}}" aria-label="Open {{r.name}} in the Farm view" style="display: flex; flex-direction: column; gap: 2px; min-width: 0; width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+              <span class="sd-name" style="font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{r.name}}</span>
+              <span style="font-size: 12px; color: #57534E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{r.sub}}</span>
+            </button>
+          </sc-if>
+          <sc-if value="{{r.plain}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+              <span style="font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span>
+              <span style="font-size: 12px; color: #57534E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.sub}}</span>
+            </div>
+          </sc-if>
+        </div>
+        <sc-for list="{{r.cells}}" as="c" hint-placeholder-count="7">
+          <div style="position: relative; display: flex; align-items: center; border-left: 1px solid #F1F0EE; background: {{c.fill}}; padding: 0 {{c.padX}}">
+            <sc-if value="{{c.has}}" hint-placeholder-val="{{false}}">
+              <button type="button" class="sd-cell" onClick="{{c.toggle}}" aria-label="{{c.aria}}" aria-expanded="{{c.isOpen}}" style="position: relative; display: flex; gap: 2px; width: 100%; height: 32px; padding: 0; border: 0; background: transparent; font: inherit; cursor: pointer">
+                <sc-for list="{{c.parts}}" as="p" hint-placeholder-count="1">
+                  <span class="sd-slot" style="flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 2px; border-radius: {{p.rad}}; background: {{p.bg}}; color: {{p.ink}}; box-shadow: {{p.sh}}; font-size: {{p.fs}}; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" style="display: {{p.tick}}; width: 11px; height: 11px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>{{p.label}}
+                  </span>
+                </sc-for>
+                <span style="display: {{c.ring}}; position: absolute; inset: -4px; border-radius: 8px; box-shadow: 0 0 0 2px #1C1917; pointer-events: none"></span>
+              </button>
+              <sc-if value="{{c.isOpen}}" hint-placeholder-val="{{false}}">
+                <div role="dialog" aria-label="{{c.title}}" style="position: absolute; z-index: 20; width: 300px; box-sizing: border-box; left: {{c.pl}}; right: {{c.pr}}; top: {{c.pt}}; bottom: {{c.pb}}; background: #FFFFFF; border-radius: 14px; box-shadow: 0 14px 40px rgba(28,25,23,.20), 0 0 0 1px rgba(28,25,23,.06); padding: 14px 16px 12px; text-align: left; cursor: default">
+                  <div style="display: flex; align-items: flex-start; gap: 8px">
+                    <div style="flex: 1; min-width: 0">
+                      <div style="font-size: 15px; font-weight: 600">{{c.title}}</div>
+                      <div style="font-size: 12.5px; color: #57534E; margin-top: 2px">{{r.sub}}</div>
+                    </div>
+                    <button type="button" onClick="{{close}}" aria-label="Close" style="width: 28px; height: 28px; margin: -4px -6px 0 0; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: #A8A29E; cursor: pointer">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M7 7l10 10M17 7 7 17"></path></svg>
+                    </button>
+                  </div>
+                  <div style="margin-top: 10px; padding: 9px 11px; border-radius: 10px; background: {{c.stBg}}; color: {{c.stInk}}; font-size: 13px; font-weight: 600">{{c.status}}</div>
+                  <sc-for list="{{r.where}}" as="w" hint-placeholder-count="1">
+                    <div style="display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-items: center; min-height: 38px; border-bottom: 1px solid #F1F0EE; font-size: 13px">
+                      <span style="width: 24px; height: 24px; border-radius: 99px; display: grid; place-items: center; font-size: 10px; font-weight: 600; background: {{w.bg}}; color: {{w.ink}}">{{w.ini}}</span>
+                      <span><b style="font-weight: 600">{{w.room}}</b><span style="color: #57534E"> &middot; {{w.who}}</span></span>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{r.linked}}" hint-placeholder-val="{{true}}">
+                    <div style="display: flex; justify-content: flex-end; margin-top: 8px">
+                      <button type="button" onClick="{{r.open}}" style="display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 8px 0 10px; border: 0; border-radius: 8px; background: #F1F1EE; font: inherit; font-size: 13px; font-weight: 600; color: #1C1917; cursor: pointer">
+                        Open in Farm view
+                        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 6 6 6-6 6"></path></svg>
+                      </button>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-if>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 12px 4px 0; font-size: 12px; color: #57534E">
+    <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #E3F0E8"></span>Done</span>
+    <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #EAF1FC; box-shadow: inset 0 0 0 1.5px #3972B7"></span>Today</span>
+    <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #F1F3EE; box-shadow: inset 0 0 0 1px #E2E5DE"></span>Planned</span>
+    <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; box-shadow: inset 0 0 0 1px #9CA59D"></span>Expected</span>
+    <span style="flex: 1"></span>
+    <span>Click a day to see where and who. Daily feeds and look-ins aren&rsquo;t drawn.</span>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":980,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = Object.assign({ two: false, open: '' }, this.state || {});
+    const set = (p) => this.setState(Object.assign({}, s, p));
+    const TODAY = 4;
+    const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const DATES = [[26, 'Oct'], [27, 'Oct'], [28, 'Oct'], [29, 'Oct'], [30, 'Oct'], [31, 'Oct'], [1, 'Nov'], [2, 'Nov'], [3, 'Nov'], [4, 'Nov'], [5, 'Nov'], [6, 'Nov'], [7, 'Nov'], [8, 'Nov']];
+    const N = s.two ? 14 : 7;
+    const P = {
+      LW: ['Li Wei', '#FDE7C2', '#6B4300'], ZM: ['Zhao Min', '#F3E8F7', '#5B2D6E'], WF: ['Wang Fang', '#E2F0DA', '#203D2B'],
+      GF: ['Gao Feng', '#FBE5E3', '#A23B33'], DC: ['Dr. Chen', '#DCEEF2', '#0E5568']
+    };
+    // cells: index -> 'd20' done, 'o16' today, 'p8' planned, 'e8' expected; 'd12|o22' split; optional status text for today
+    const ROWS = [
+      { g: 'Production', name: 'Breeding', sub: 'Batch 34 · Gestation 1', start: 'bt:34/breed', unit: 'sows', where: [['Gestation 1', 'ZM']],
+        cells: { 3: 'd20', 4: 'o16', 5: 'p8', 6: 'p4' }, today: '16 sows to breed today · 20 bred yesterday' },
+      { g: 'Production', name: 'Move into Farrowing Room 4', sub: 'Batch 33 · 48 sows', start: 'bt:33/move', unit: 'sows', where: [['Gestation 1 → Farrowing Room 4', 'LW']],
+        cells: { 3: 'd14', 4: 'd12|o22' }, today: '26 of 48 sows in · 22 to move today' },
+      { g: 'Production', name: 'Farrowing', sub: 'Batch 32 · Farrowing Room 3', start: 'bt:32/farrow', unit: 'sows', where: [['Farrowing Room 3', 'LW']],
+        cells: { 2: 'd9', 3: 'd14', 4: 'o10', 5: 'e8', 6: 'e6', 7: 'e3' }, today: 'About 10 expected today · day 3 of 7' },
+      { g: 'Production', name: 'Fostering checks', sub: 'Batch 32 · Farrowing Room 3', start: 'bt:32/farrow', unit: 'litters', where: [['Farrowing Room 3', 'LW']],
+        cells: { 2: 'd8', 3: 'd12', 4: 'o8', 5: 'p8', 6: 'p8', 7: 'p6' }, today: '6 of 8 litters checked · 2 to go' },
+      { g: 'Production', name: 'Weigh', sub: 'Batch 30 · Nursery 1 · 20 pigs', start: 'bt:31/nurs', unit: 'pigs', where: [['Nursery 1', 'WF']],
+        cells: { 8: 'p20' } },
+      { g: 'Health', name: 'Treatment RX-25G009', sub: '4 lame sows · Gestation 2', start: 'task:rx09', unit: 'sows', where: [['Gestation 2', 'ZM']],
+        cells: { 3: 'd4', 4: 'o4', 5: 'p4' }, today: 'Dose 2 of 3, due 08:30' },
+      { g: 'Health', name: 'PRRS vaccine', sub: 'Batch 30, 31 · Nursery 1, 2', start: 'task:prrs', unit: 'pigs', where: [['Nursery 1', 'WF'], ['Nursery 2', 'WF']],
+        cells: { 3: 'd488', 4: 'o420', 11: 'p488' }, today: 'Batch 30 today, 420 pigs · Batch 31 done yesterday' },
+      { g: 'Health', name: 'Herd check', sub: 'Weekly vet visit', unit: 'visit', where: [['All barns', 'DC']],
+        cells: { 2: 'd1', 9: 'p1' } },
+      { g: 'Other', name: 'Wash and disinfect', sub: 'Farrowing Room 4', unit: 'room', where: [['Farrowing Room 4', 'LW']],
+        cells: { 1: 'd1' } },
+      { g: 'Other', name: 'Water line B', sub: 'Gestation 2', unit: 'job', where: [['Gestation 2', 'GF']],
+        cells: { 0: 'd1', 7: 'p1' } }
+    ];
+    const LOOK = {
+      d: ['#E3F0E8', '#28734F', 'none'], o: ['#EAF1FC', '#3972B7', 'inset 0 0 0 1.5px #3972B7'],
+      p: ['#F1F3EE', '#20291F', 'none'], e: ['transparent', '#657060', 'inset 0 0 0 1px #9CA59D']
+    };
+    const farm = (start) => () => { try { window.dispatchEvent(new CustomEvent('sentri:tab', { detail: { id: 'layout', start: start + '@' + Date.now() } })); } catch (e) {} };
+    const dayName = (i) => DOW[i % 7] + ' ' + DATES[i][0] + ' ' + DATES[i][1];
+    const statusOf = (r, code, i) => {
+      const parts = code.split('|');
+      const k = parts[parts.length - 1][0], n = +parts[parts.length - 1].slice(1);
+      if (k === 'o' || parts.length > 1) return [r.today || ('Today · ' + n + ' ' + r.unit), '#EAF1FC', '#2B5A93'];
+      if (k === 'd') return ['Done · ' + n + ' ' + r.unit, '#E3F0E8', '#28734F'];
+      if (k === 'e') return ['Expected · about ' + n + ' ' + r.unit, '#F4F4F2', '#57534E'];
+      return ['Planned · ' + n + ' ' + r.unit, '#F1F3EE', '#3B4540'];
+    };
+    const lastHalf = Math.ceil(ROWS.length / 2);
+    const rows = ROWS.map((r, ri) => {
+      const cells = [];
+      for (let i = 0; i < N; i++) {
+        const code = r.cells[i];
+        const key = ri + ':' + i, isOpen = s.open === key;
+        const fill = i === TODAY ? '#F5F9F5' : 'transparent';
+        if (!code) { cells.push({ has: false, fill, padX: '4px', isOpen: false, parts: [] }); continue; }
+        const ps0 = code.split('|'), ps = s.two ? ps0.slice(-1) : ps0;
+        const parts = ps.map((x, pi) => {
+          const k = x[0], n = x.slice(1), L = LOOK[k];
+          return {
+            bg: L[0], ink: L[1], sh: L[2],
+            rad: ps.length === 1 ? '5px' : pi === 0 ? '5px 1px 1px 5px' : '1px 5px 5px 1px',
+            fs: s.two ? (n.length > 2 ? '10.5px' : '11.5px') : '13px',
+            tick: k === 'd' && !s.two && ps.length === 1 ? 'block' : 'none',
+            label: (k === 'e' ? '~' : '') + n
+          };
+        });
+        const st = statusOf(r, code, i);
+        const right = i >= Math.floor(N / 2);
+        const up = ri >= lastHalf;
+        cells.push({
+          has: true, fill, padX: s.two ? '2px' : '5px', parts, isOpen,
+          ring: isOpen ? 'block' : 'none',
+          aria: r.name + ', ' + dayName(i) + ': ' + st[0],
+          title: r.name + ' · ' + dayName(i),
+          status: st[0], stBg: st[1], stInk: st[2],
+          pl: right ? 'auto' : '0', pr: right ? '0' : 'auto',
+          pt: up ? 'auto' : 'calc(100% - 6px)', pb: up ? 'calc(100% - 6px)' : 'auto',
+          toggle: () => set({ open: isOpen ? '' : key })
+        });
+      }
+      return {
+        name: r.name, sub: r.sub, group: r.g,
+        ghShow: ri === 0 || ROWS[ri - 1].g !== r.g ? 'grid' : 'none',
+        line: ri === ROWS.length - 1 ? '0' : '1px solid #F1F0EE',
+        linked: !!r.start, plain: !r.start,
+        open: r.start ? farm(r.start) : () => {},
+        where: r.where.map((w) => ({ room: w[0], who: P[w[1]][0], ini: w[1], bg: P[w[1]][1], ink: P[w[1]][2] })),
+        cells
+      };
+    });
+    const days = [];
+    for (let i = 0; i < N; i++) days.push({
+      dow: DOW[i % 7], n: DATES[i][0],
+      fill: i === TODAY ? '#F5F9F5' : 'transparent', rad: '0',
+      nBg: i === TODAY ? '#28734F' : 'transparent',
+      nInk: i === TODAY ? '#FFFFFF' : i < TODAY ? '#A8A29E' : '#1C1917'
+    });
+    const on = (b) => b ? ['#FFFFFF', '0 1px 2px rgba(28,25,23,.1)', '#1C1917', '600', 'true'] : ['transparent', 'none', '#57534E', '400', 'false'];
+    const w = on(!s.two), t = on(s.two);
+    return {
+      rows, days,
+      cols: (s.two ? 'minmax(168px, 200px)' : 'minmax(170px, 220px)') + ' repeat(' + N + ', minmax(0, 1fr))',
+      range: s.two ? 'Mon 26 Oct – Sun 8 Nov' : 'Mon 26 Oct – Sun 1 Nov',
+      goWeek: () => set({ two: false, open: '' }), goTwo: () => set({ two: true, open: '' }),
+      close: () => set({ open: '' }),
+      weekBg: w[0], weekSh: w[1], weekInk: w[2], weekW: w[3], weekOn: w[4],
+      twoBg: t[0], twoSh: t[1], twoInk: t[2], twoW: t[3], twoOn: t[4]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vaccination programme</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}.vp-btn{cursor:pointer;font:inherit;border:0;margin:0;color:inherit;background:none;padding:0;text-align:left}.vp-btn:active{transform:translateY(1px)}.vp-row:hover{background:#F6F7F3}@keyframes vpRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}@keyframes vpBeat{0%,100%{opacity:1}50%{opacity:.3}}@keyframes vpSweep{0%{background-position:200% 0}100%{background-position:-200% 0}}</style>
+</helmet>
+<div style="min-height: 100%; box-sizing: border-box; background: #F6F7F1; font-family: 'Geist', system-ui, sans-serif; color: #1B211C; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.45; padding: 20px 20px 28px">
+<div style="max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px">
+
+  <div style="padding: 2px 2px 2px">
+    <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.01em">Vaccination programme</div>
+    <div style="font-size: 13px; color: #5D665F; margin-top: 2px">{{headLine}}</div>
+  </div>
+
+  <!-- progress of the run -->
+  <div style="background: #fff; border-radius: 12px; box-shadow: 0 0 0 1px #E6E9E2; padding: 12px 16px; display: flex; align-items: center; gap: 12px">
+    <span style="width: 30px; height: 30px; flex: none; border-radius: 50%; background: #DDF1EF; color: #1F6F68; font-size: 11px; font-weight: 700; display: grid; place-items: center">VT</span>
+    <div style="flex: 1; min-width: 0">
+      <div style="font-size: 13px; font-weight: 600">{{runLine}}</div>
+      <div style="display: flex; gap: 3px; margin-top: 7px"><sc-for list="{{segs}}" as="g" hint-placeholder-count="6"><span style="flex: 1; height: 4px; border-radius: 2px; background: {{g.c}}; background-size: 200% 100%; animation: {{g.anim}}"></span></sc-for></div>
+    </div>
+    <sc-if value="{{canAll}}" hint-placeholder-val="{{false}}">
+      <button type="button" class="vp-btn" onClick="{{approveAll}}" style="height: 40px; padding: 0 14px; border-radius: 10px; background: #fff; box-shadow: 0 0 0 1px #D5DAD3; font-size: 13px; font-weight: 600; white-space: nowrap">Approve all ready</button>
+    </sc-if>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start">
+
+    <!-- the chain of plans -->
+    <div style="flex: 1 1 250px; min-width: 0; background: #fff; border-radius: 12px; box-shadow: 0 0 0 1px #E6E9E2; overflow: hidden">
+      <sc-for list="{{plans}}" as="p" hint-placeholder-count="6">
+        <button type="button" class="vp-btn vp-row" onClick="{{p.pick}}" style="display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; width: 100%; box-sizing: border-box; padding: 12px 14px; border-top: {{p.line}}; background: {{p.bg}}; box-shadow: {{p.sel}}; position: relative">
+          <span style="width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: {{p.dotBg}}; color: {{p.dotInk}}; font-size: 11px; font-weight: 700; animation: {{p.beat}}">{{p.mark}}</span>
+          <span style="min-width: 0">
+            <span style="display: block; font-size: 14px; font-weight: 600">{{p.name}}</span>
+            <span style="display: block; font-size: 12px; color: #5D665F">{{p.rule}}</span>
+            <span style="display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; font-size: 12px; font-weight: 600; color: {{p.stInk}}">{{p.st}}</span>
+          </span>
+        </button>
+      </sc-for>
+    </div>
+
+    <!-- the open plan -->
+    <div style="flex: 999 1 380px; min-width: 0">
+      <sc-for list="{{open}}" as="o" hint-placeholder-count="1">
+        <div style="background: #fff; border-radius: 12px; box-shadow: 0 0 0 1px #E6E9E2; padding: 16px 18px; animation: vpRise .25s ease-out">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+            <span style="height: 24px; padding: 0 9px; border-radius: 999px; background: #EEF0EA; color: #3B4540; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center">{{o.kind}}</span>
+            <span style="height: 24px; padding: 0 9px; border-radius: 999px; background: {{o.chipBg}}; color: {{o.chipInk}}; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center">{{o.st}}</span>
+          </div>
+          <div style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em; margin-top: 8px">{{o.name}}</div>
+          <div style="font-size: 13px; color: #5D665F; margin-top: 2px">{{o.what}}</div>
+
+          <sc-if value="{{o.drafting}}" hint-placeholder-val="{{false}}">
+            <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px">
+              <span style="height: 14px; width: 70%; border-radius: 6px; background: linear-gradient(90deg, #EEF0EA 0%, #F6F7F3 50%, #EEF0EA 100%); background-size: 200% 100%; animation: vpSweep 1.4s linear infinite"></span>
+              <span style="height: 14px; width: 90%; border-radius: 6px; background: linear-gradient(90deg, #EEF0EA 0%, #F6F7F3 50%, #EEF0EA 100%); background-size: 200% 100%; animation: vpSweep 1.4s linear infinite"></span>
+              <span style="height: 14px; width: 55%; border-radius: 6px; background: linear-gradient(90deg, #EEF0EA 0%, #F6F7F3 50%, #EEF0EA 100%); background-size: 200% 100%; animation: vpSweep 1.4s linear infinite"></span>
+              <span style="font-size: 12px; color: #5D665F; margin-top: 4px">{{o.working}}</span>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{o.ready}}" hint-placeholder-val="{{true}}">
+            <div style="margin-top: 14px">
+              <sc-for list="{{o.facts}}" as="f" hint-placeholder-count="4">
+                <div style="display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; padding: 8px 0; border-top: 1px solid #F0F1EC; font-size: 13px">
+                  <span style="color: #5D665F">{{f.k}}</span><span>{{f.v}}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-size: 12px; color: #8A938C; margin-top: 12px">Next rounds</div>
+            <sc-for list="{{o.rounds}}" as="r" hint-placeholder-count="3">
+              <div style="display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid #F0F1EC; font-size: 13px">
+                <span style="font-weight: 600; font-variant-numeric: tabular-nums">{{r.d}}</span><span style="color: #3B4540">{{r.who}}</span><span style="color: #5D665F; font-variant-numeric: tabular-nums">{{r.n}}</span>
+              </div>
+            </sc-for>
+            <div style="margin-top: 12px; display: flex; gap: 10px; background: {{o.noteBg}}; border-radius: 10px; padding: 10px 12px; font-size: 13px; line-height: 1.5">
+              <span style="width: 20px; height: 20px; flex: none; border-radius: 50%; background: #DDF1EF; color: #1F6F68; font-size: 9px; font-weight: 700; display: grid; place-items: center">VT</span>
+              <span>{{o.why}}</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; align-items: center">
+              <sc-if value="{{o.canApprove}}" hint-placeholder-val="{{true}}">
+                <button type="button" class="vp-btn" onClick="{{o.approve}}" style="height: 44px; padding: 0 18px; border-radius: 10px; background: #1F5C3F; color: #fff; font-size: 14px; font-weight: 600">Approve this plan</button>
+                <button type="button" class="vp-btn" onClick="{{o.ask}}" style="height: 44px; padding: 0 16px; border-radius: 10px; background: #fff; box-shadow: 0 0 0 1px #D5DAD3; font-size: 14px; font-weight: 500">Ask Vet</button>
+              </sc-if>
+              <sc-if value="{{o.approved}}" hint-placeholder-val="{{false}}">
+                <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: #1F5C3F; font-weight: 600"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: #1F5C3F; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="M20 6 9 17l-5-5"></path></svg>Approved. Tasks reach the team's phones 3 days before each round.</span>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["run","ready","done"],"default":"run"},"$preview":{"width":1040,"height":900}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    const st = this.props.start || 'run';
+    if (st !== 'run') return;
+    this.timers = [];
+    for (let i = 1; i <= 6; i++) this.timers.push(setTimeout(() => this.setState({ done: i }), 1500 * i + 300));
+  }
+  componentWillUnmount() { (this.timers || []).forEach(clearTimeout); }
+  renderVals() {
+    const s = this.state || {}, st = this.props.start || 'run';
+    const nDone = st === 'run' ? (s.done || 0) : 6;
+    const appr = Object.assign({}, st === 'done' ? { 0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 } : {}, s.appr || {});
+    const P = [
+      { name: 'PRRS, whole herd', kind: 'Farm-wide on dates', rule: 'Every sow, gilt and boar, every 4 months',
+        what: 'One day, the whole herd, so immunity stays level across every age.',
+        facts: [['Who', 'All 400 sows, 24 gilts and 6 boars'], ['Vaccine', 'PRRS modified live, 2 mL into the neck muscle'], ['Withdrawal', 'None'], ['Stock', '400 doses in the fridge; 30 short. I added 1 box to Friday’s order']],
+        rounds: [['Mon 7 Dec', 'Whole herd · Gestation, Farrowing, Quarantine', '430'], ['Mon 5 Apr', 'Whole herd', '430'], ['Mon 2 Aug', 'Whole herd', '430']],
+        why: 'Your herd is PRRS-stable. Vaccinating everyone on one day every 4 months beats doing it by batch: no sow is ever out of step, and one antibody check covers the herd.',
+        working: 'Counting every pig in every room on 7 Dec, checking the fridge…' },
+      { name: 'Scour vaccine, sows', kind: 'Follows breeding', rule: 'Day 85 of each pregnancy; gilts also day 64',
+        what: 'E. coli and clostridia, so colostrum protects piglets in their first week.',
+        facts: [['Who', 'Every pregnant sow in each batch; gilts get two shots'], ['Vaccine', 'E. coli and Clostridium, 2 mL into the neck muscle'], ['Withdrawal', 'None'], ['Moves with', 'Each batch’s service dates; a late batch moves its round with it']],
+        rounds: [['Thu 4 Feb', 'Batch 34 · Gestation 1 · day 85', '48'], ['Thu 25 Feb', 'Batch 35 · Gestation 2 · day 85', '50'], ['Thu 18 Mar', 'Batch 36 · Gestation 1 · day 85', '50']],
+        why: 'Your pre-weaning losses are 11.1%, and scours are a third of them. Two weeks before the sows move to farrowing is the latest it still reaches the colostrum.',
+        working: 'Reading service dates for Batches 34 to 41…' },
+      { name: 'Parvo, ery and lepto, sows', kind: 'Follows weaning', rule: 'Every sow at weaning, every cycle',
+        what: 'Protects the next litter before she is served again.',
+        facts: [['Who', 'Every sow weaned, about 50 a batch'], ['Vaccine', 'Parvovirus, erysipelas and leptospira, 2 mL into the neck muscle'], ['Withdrawal', 'None'], ['Moves with', 'Weaning day: Batch 32 already follows its new date']],
+        rounds: [['Mon 30 Nov', 'Batch 32 · Farrowing 3 · at weaning', '50'], ['Thu 17 Dec', 'Batch 33 · Farrowing 4 · at weaning', '48'], ['Thu 7 Jan', 'Next weaning · Farrowing 1', '50']],
+        why: 'At weaning the sows are already in hand, so it costs no extra handling. It lands a week before service, when it does the most good.',
+        working: 'Lining up with weaning days, including Batch 32’s new date…' },
+      { name: 'PCV2 and mycoplasma, piglets', kind: 'Follows weaning', rule: 'Every piglet, one shot at weaning',
+        what: 'One combined shot against circovirus and mycoplasma pneumonia.',
+        facts: [['Who', 'Every weaned piglet, about 600 a batch'], ['Vaccine', 'PCV2 and Mycoplasma combined, 2 mL into the neck muscle'], ['Withdrawal', 'None'], ['Team', 'Wang Fang’s team, as the piglets come into the nursery']],
+        rounds: [['Mon 30 Nov', 'Batch 32 piglets · Nursery 1', '580'], ['Thu 17 Dec', 'Batch 33 piglets · Nursery 2', '600'], ['Thu 7 Jan', 'Next weaning · Nursery 1', '600']],
+        why: 'One shot at weaning instead of two in the farrowing room saves about 1,200 handlings a batch, with the same protection.',
+        working: 'Counting piglets per litter in Batches 32 to 34…' },
+      { name: 'Gilts on arrival', kind: 'On arrival', rule: 'Each new gilt group in Quarantine 1',
+        what: 'Brings new gilts up to the herd before they meet it.',
+        facts: [['Who', 'Each gilt group, about 24'], ['Shots', 'PRRS on day 1; parvo, ery and lepto on days 21 and 42'], ['Withdrawal', 'None'], ['Then', 'They join the whole-herd PRRS dates']],
+        rounds: [['Thu 12 Nov', 'Gilts 35G · day 21 · parvo, ery, lepto', '24'], ['Thu 3 Dec', 'Gilts 35G · day 42 · second shot', '24'], ['Mon 7 Dec', 'Gilts 38G · day 1 · PRRS', '24']],
+        why: 'Quarantine is 42 days, so two shots fit inside it. Gilts walk into the herd already covered.',
+        working: 'Checking the gilt deliveries booked to May…' },
+      { name: 'PRRS antibody check', kind: 'After a round', rule: '28 days after each whole-herd round',
+        what: 'Blood from 30 sows proves the PRRS rounds are working.',
+        facts: [['Who', '30 sows, spread over every gestation room'], ['Sample', 'Blood, sent to the lab by Biosecurity'], ['Result', 'Comes back into Sentri in about 5 days'], ['If low', 'I tell you, and draft a booster for the sows that need it']],
+        rounds: [['Mon 4 Jan', '30 sows · after the 7 Dec round', '30'], ['Mon 3 May', '30 sows · after the 5 Apr round', '30'], ['Mon 30 Aug', '30 sows · after the 2 Aug round', '30']],
+        why: 'Batch 29 came back low in 14 of 30 this autumn. Checking after every round finds that early.',
+        working: 'Picking 30 sows across rooms and parities…' }
+    ];
+    const sel = s.sel != null ? s.sel : (st === 'run' ? Math.min(nDone, 5) : 0);
+    const pick = (i) => () => this.setState({ sel: i });
+    const plans = P.map((p, i) => {
+      const ready = i < nDone, drafting = i === nDone, ap = !!appr[i];
+      const state = ap ? 'Approved' : ready ? 'Ready for you' : drafting ? 'Vet is drafting…' : 'Waiting';
+      return { name: p.name, rule: p.rule, st: state,
+        stInk: ap ? '#1F5C3F' : ready ? '#8A5A12' : drafting ? '#1F6F68' : '#8A938C',
+        mark: ap ? '✓' : String(i + 1), dotBg: ap ? '#1F5C3F' : ready ? '#FBF1DD' : drafting ? '#DDF1EF' : '#EEF0EA', dotInk: ap ? '#fff' : ready ? '#8A5A12' : drafting ? '#1F6F68' : '#8A938C',
+        beat: drafting ? 'vpBeat 1.1s ease-in-out infinite' : 'none',
+        line: i ? '1px solid #F0F1EC' : '0', bg: sel === i ? '#F6F7F3' : '#fff', sel: sel === i ? 'inset 3px 0 0 #1B211C' : 'none', pick: pick(i) };
+    });
+    const o = P[sel], oReady = sel < nDone, oAp = !!appr[sel];
+    const approve = () => { const a = Object.assign({}, appr, { [sel]: 1 }); const nx = P.findIndex((x, j) => j < nDone && !a[j]); this.setState({ appr: a, sel: nx >= 0 ? nx : sel }); };
+    const open = [{
+      name: o.name, kind: o.kind, what: o.what, working: o.working,
+      st: oAp ? 'Approved' : oReady ? 'Ready for you' : sel === nDone ? 'Drafting' : 'Waiting',
+      chipBg: oAp ? '#EAF4EE' : oReady ? '#FBF1DD' : '#EEF0EA', chipInk: oAp ? '#1F5C3F' : oReady ? '#8A5A12' : '#5D665F',
+      drafting: !oReady, ready: oReady, approved: oAp, canApprove: oReady && !oAp, noteBg: '#F6F7F1',
+      facts: o.facts.map(([k, v]) => ({ k, v })), rounds: o.rounds.map(([d, who, n]) => ({ d, who, n })), why: o.why,
+      approve,
+      ask: () => { try { window.dispatchEvent(new CustomEvent('sentri:ask', { detail: { chat: 'vet', draft: 'About the ' + o.name + ' plan: ' } })); } catch (e) {} }
+    }];
+    const nAp = P.filter((x, i) => appr[i]).length, nReady = Math.min(nDone, 6);
+    const segs = P.map((x, i) => ({ c: appr[i] ? '#1F5C3F' : i < nDone ? '#E7B65C' : i === nDone ? 'linear-gradient(90deg, #9CCBB0 0%, #DDF1EF 50%, #9CCBB0 100%)' : '#E6E9E2', anim: i === nDone ? 'vpSweep 1.2s linear infinite' : 'none' }));
+    return {
+      plans, open, segs,
+      headLine: 'Set up by Vet from your herd, your rhythm and the last year’s results · about 6,800 doses to the end of May',
+      runLine: nAp === 6 ? 'All six plans approved. The programme runs from Thu 12 Nov.' : nDone < 6 ? 'Vet is drafting plan ' + (nDone + 1) + ' of 6 · ' + nReady + ' ready for you' : nReady - nAp + ' of 6 ready for you · ' + nAp + ' approved',
+      canAll: nDone >= 6 && nAp < 6,
+      approveAll: () => this.setState({ appr: { 0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 } })
+    };
+  }
+}
+</script>
+</body>
+</html>

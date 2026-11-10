@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cameras</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}@keyframes sentriPulseG{0%{box-shadow:0 0 0 0 rgba(47,163,107,.5)}70%{box-shadow:0 0 0 6px rgba(47,163,107,0)}100%{box-shadow:0 0 0 0 rgba(47,163,107,0)}}@keyframes sentriRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #FFFFFF; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #121815; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 900px">
+<div style="max-width: 760px; margin: 0 auto; padding: 24px 32px 40px; box-sizing: border-box">
+
+<!-- ============ CAMERA LIST ============ -->
+<sc-if value="{{v.list}}" hint-placeholder-val="{{true}}">
+  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">Cameras</h1>
+  <div style="margin-top: 6px; font-size: 14px; color: #3B4540">{{listLead}}</div>
+
+  <div style="margin-top: 24px; border: 1px solid #E8EBE5; border-radius: 14px; overflow: hidden; background: #FFFFFF; box-shadow: 0 1px 2px rgba(18,24,21,0.04)">
+    <sc-for list="{{places}}" as="p" hint-placeholder-count="7">
+      <button type="button" onClick="{{p.open}}" style="display: grid; grid-template-columns: minmax(0, 1fr) auto 16px; align-items: center; gap: 14px; width: 100%; box-sizing: border-box; padding: 13px 16px 13px 18px; border: 0; border-top: {{p.top}}; background: transparent; text-align: left; font: inherit; color: inherit; cursor: pointer">
+        <span style="display: flex; flex-direction: column; gap: 1px; min-width: 0">
+          <span style="font-size: 14.5px; font-weight: 500">{{p.name}}</span>
+          <span style="font-size: 12.5px; color: #626C66">{{p.meta}}</span>
+        </span>
+        <span style="display: inline-flex; align-items: center; justify-content: flex-end">
+          <sc-if value="{{p.hasChip}}" hint-placeholder-val="{{false}}">
+            <span style="display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 500; white-space: nowrap; background: #FCE7E2; color: #9A2C17">
+              <span style="width: 6px; height: 6px; border-radius: 999px; background: #D9583B"></span>
+              {{p.chip}}
+            </span>
+          </sc-if>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #8E9C90; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chev}}"></path></svg>
+      </button>
+    </sc-for>
+  </div>
+
+</sc-if>
+
+<!-- ============ LIVE / RECORDINGS ============ -->
+<sc-if value="{{v.watch}}" hint-placeholder-val="{{false}}">
+  <button type="button" onClick="{{backToList}}" style="display: inline-flex; align-items: center; gap: 3px; margin: 0 0 14px -4px; padding: 2px 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 500; color: #3B4540; cursor: pointer">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.chevLeft}}"></path></svg>
+    Cameras
+  </button>
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #626C66">{{w.crumb}}</span>
+    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2">{{w.title}}</h1>
+  </div>
+
+  <sc-if value="{{w.hasSwitch}}" hint-placeholder-val="{{true}}">
+    <div role="group" aria-label="Camera" style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px">
+      <sc-for list="{{w.cams}}" as="c" hint-placeholder-count="3">
+        <button type="button" aria-pressed="{{c.on}}" onClick="{{c.pick}}" style="display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; border-radius: 10px; font: inherit; font-size: 13.5px; cursor: pointer; border: 1px solid {{c.border}}; background: {{c.bg}}; color: {{c.ink}}; font-weight: {{c.weight}}">
+          <sc-if value="{{c.offline}}" hint-placeholder-val="{{false}}">
+            <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 999px; background: #D9583B"></span>
+          </sc-if>
+          {{c.label}}
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- the picture -->
+  <div style="position: relative; width: 100%; aspect-ratio: 16 / 9; margin-top: 16px; border-radius: 14px; overflow: hidden; background: #1B221E">
+    <svg viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%">
+      <rect x="0" y="0" width="640" height="360" fill="#1B221E"></rect>
+      <rect x="0" y="262" width="640" height="98" fill="#171D1A"></rect>
+      <path d="M0 96H640 M0 176H640" stroke="#2A332E" stroke-width="4" fill="none"></path>
+      <path d="M96 40V262 M224 40V262 M352 40V262 M480 40V262 M608 40V262" stroke="#2A332E" stroke-width="4" fill="none"></path>
+    </svg>
+    <sc-if value="{{w.showPigs}}" hint-placeholder-val="{{true}}">
+      <span aria-hidden="true" style="position: absolute; left: 18%; top: 54%; width: 15%; height: 15%; border-radius: 999px; background: #29332D"></span>
+      <span aria-hidden="true" style="position: absolute; left: 38%; top: 55.5%; width: 15%; height: 13.5%; border-radius: 999px; background: #29332D"></span>
+      <span aria-hidden="true" style="position: absolute; left: 58%; top: 54%; width: 15.5%; height: 15%; border-radius: 999px; background: #29332D"></span>
+      <span aria-hidden="true" style="position: absolute; left: 78%; top: 55.5%; width: 14%; height: 13.5%; border-radius: 999px; background: #29332D"></span>
+    </sc-if>
+    <sc-for list="{{w.people}}" as="pp" hint-placeholder-count="0">
+      <span aria-hidden="true" style="position: absolute; left: {{pp.hx}}%; top: 38%; width: 3.4%; aspect-ratio: 1; border-radius: 999px; background: #46524B"></span>
+      <span aria-hidden="true" style="position: absolute; left: {{pp.bx}}%; top: 48%; width: 5.8%; height: 30%; border-radius: 999px 999px 10px 10px; background: #46524B"></span>
+      <span aria-hidden="true" style="position: absolute; left: {{pp.fx}}%; top: 33%; width: 9.8%; height: 47%; box-sizing: border-box; border: 2px solid #C5F06A; border-radius: 8px"></span>
+    </sc-for>
+
+    <sc-if value="{{w.isLive}}" hint-placeholder-val="{{true}}">
+      <span style="position: absolute; left: 14px; top: 14px; display: inline-flex; align-items: center; gap: 8px; height: 26px; padding: 0 11px 0 10px; border-radius: 999px; background: rgba(18, 24, 21, 0.78); color: #FFFFFF; font-size: 12.5px; font-weight: 500">
+        <span style="width: 8px; height: 8px; border-radius: 999px; background: #2FA36B; animation: sentriPulseG 1.8s ease-out infinite"></span>
+        Live
+      </span>
+    </sc-if>
+    <sc-if value="{{w.isRec}}" hint-placeholder-val="{{false}}">
+      <span style="position: absolute; left: 14px; top: 14px; display: inline-flex; align-items: center; height: 26px; padding: 0 11px; border-radius: 999px; background: rgba(18, 24, 21, 0.78); color: #FFFFFF; font-size: 12.5px; font-weight: 500">Recorded</span>
+    </sc-if>
+    <sc-if value="{{w.isOffline}}" hint-placeholder-val="{{false}}">
+      <span style="position: absolute; left: 14px; top: 14px; display: inline-flex; align-items: center; gap: 8px; height: 26px; padding: 0 11px 0 10px; border-radius: 999px; background: #FCE7E2; color: #9A2C17; font-size: 12.5px; font-weight: 600">
+        <span style="width: 6px; height: 6px; border-radius: 999px; background: #D9583B"></span>
+        Offline
+      </span>
+      <div style="position: absolute; left: 0; right: 0; top: 38%; display: flex; flex-direction: column; align-items: center; gap: 4px">
+        <span style="font-size: 16px; font-weight: 500; color: #FFFFFF">No signal</span>
+        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: rgba(255, 255, 255, 0.78)">Since 02:10</span>
+      </div>
+    </sc-if>
+
+    <div style="position: absolute; left: 14px; bottom: 12px; display: flex; flex-direction: column; gap: 1px">
+      <span style="font-size: 13px; font-weight: 500; color: #FFFFFF">{{w.frameName}}</span>
+      <sc-if value="{{w.hasDetect}}" hint-placeholder-val="{{false}}">
+        <span style="font-size: 12.5px; color: #C5F06A">{{w.detect}}</span>
+      </sc-if>
+    </div>
+    <sc-if value="{{w.hasFrameTime}}" hint-placeholder-val="{{true}}">
+      <span style="position: absolute; right: 14px; bottom: 12px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: rgba(255, 255, 255, 0.85)">{{w.frameTime}}</span>
+    </sc-if>
+  </div>
+
+  <!-- live actions -->
+  <sc-if value="{{w.isLive}}" hint-placeholder-val="{{true}}">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px">
+      <button type="button" onClick="{{toRec}}" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; color: #121815; cursor: pointer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.clock}}"></path></svg>
+        Recordings
+      </button>
+    </div>
+  </sc-if>
+
+  <!-- offline note -->
+  <sc-if value="{{w.isOffline}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px">
+      <button type="button" onClick="{{toRec}}" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; color: #121815; cursor: pointer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{ic.clock}}"></path></svg>
+        Recordings until 02:10
+      </button>
+    </div>
+  </sc-if>
+
+  <!-- recordings -->
+  <sc-if value="{{w.isRec}}" hint-placeholder-val="{{false}}">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <button type="button" onClick="{{togglePlay}}" aria-label="{{w.playAria}}" style="width: 36px; height: 36px; padding: 0; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; color: #121815; cursor: pointer; display: flex; align-items: center; justify-content: center">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: {{w.playFill}}; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="{{w.playPath}}"></path></svg>
+        </button>
+        <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 18px; font-weight: 500; letter-spacing: 0.01em">{{rec.time}}</span>
+        <span style="font-size: 13px; color: #626C66">{{rec.dayLabel}}</span>
+      </div>
+      <button type="button" onClick="{{backToLive}}" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px 0 12px; border: 1px solid #DADED6; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13.5px; font-weight: 500; color: #121815; cursor: pointer">
+        <span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 999px; background: #2FA36B"></span>
+        Back to live
+      </button>
+    </div>
+
+    <div style="position: relative; height: 22px; margin-top: 10px">
+      <span aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 8px; height: 6px; border-radius: 999px; background: #EFF1EC"></span>
+      <span aria-hidden="true" style="position: absolute; left: 0; top: 8px; height: 6px; width: {{rec.fillW}}%; border-radius: 999px; background: #DADED6"></span>
+      <sc-for list="{{rec.ticks}}" as="tk" hint-placeholder-count="2">
+        <span aria-hidden="true" style="position: absolute; left: {{tk.left}}%; top: 4px; width: 3px; height: 14px; margin-left: -1px; border-radius: 2px; background: #121815"></span>
+      </sc-for>
+      <span aria-hidden="true" style="position: absolute; left: {{rec.handle}}%; top: 4px; width: 14px; height: 14px; margin-left: -7px; box-sizing: border-box; border-radius: 999px; background: #FFFFFF; border: 2px solid #121815"></span>
+    </div>
+    <div style="position: relative; height: 16px">
+      <span style="position: absolute; left: 0; top: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; line-height: 16px; color: #626C66">00</span>
+      <span style="position: absolute; left: calc(25% - 14px); top: 0; width: 28px; text-align: center; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; line-height: 16px; color: #626C66">06</span>
+      <span style="position: absolute; left: calc(50% - 14px); top: 0; width: 28px; text-align: center; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; line-height: 16px; color: #626C66">12</span>
+      <span style="position: absolute; left: calc(75% - 14px); top: 0; width: 28px; text-align: center; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; line-height: 16px; color: #626C66">18</span>
+      <span style="position: absolute; right: 0; top: 0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; line-height: 16px; color: #626C66">24</span>
+    </div>
+
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 18px">
+      <div role="group" aria-label="Day" style="display: inline-flex; gap: 2px; padding: 3px; border-radius: 11px; background: #F0F2EE">
+        <sc-for list="{{rec.days}}" as="d" hint-placeholder-count="3">
+          <button type="button" aria-pressed="{{d.on}}" onClick="{{d.pick}}" style="height: 32px; padding: 0 14px; border: 0; border-radius: 8px; background: {{d.bg}}; color: {{d.ink}}; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer">{{d.label}}</button>
+        </sc-for>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px">
+        <label for="cam-goto" style="font-size: 12px; font-weight: 500; color: #626C66">Go to</label>
+        <input id="cam-goto" type="text" inputmode="numeric" value="{{rec.time}}" onChange="{{gotoTime}}" style="width: 84px; box-sizing: border-box; height: 40px; border: 1px solid #E2E5DF; border-radius: 11px; padding: 0 13px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; color: #121815; background: #FFFFFF; outline: none">
+      </div>
+    </div>
+    <sc-if value="{{rec.badTime}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 8px; font-size: 12.5px; color: #9A2C17; text-align: right">{{rec.badTimeText}}</div>
+    </sc-if>
+
+    <div style="display: flex; align-items: baseline; gap: 10px; margin: 28px 0 8px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Moments</h2>
+      <span style="font-size: 12.5px; color: #626C66">{{rec.momentsHead}}</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <sc-for list="{{rec.moments}}" as="m" hint-placeholder-count="2">
+        <button type="button" aria-pressed="{{m.on}}" onClick="{{m.pick}}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 14px; width: 100%; box-sizing: border-box; padding: 11px 14px; border: 0; border-radius: 10px; background: {{m.bg}}; text-align: left; font: inherit; color: inherit; cursor: pointer">
+          <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500">{{m.time}}</span>
+          <span style="font-size: 14px; color: #1E2622">{{m.text}}</span>
+          <span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; color: #626C66; white-space: nowrap">{{m.len}}</span>
+        </button>
+      </sc-for>
+    </div>
+    <sc-if value="{{rec.noMoments}}" hint-placeholder-val="{{false}}">
+      <div style="font-size: 13.5px; color: #626C66">No people detected. Use Go to for any time.</div>
+    </sc-if>
+  </sc-if>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["list","live","recordings","offline"],"default":"list"},"$preview":{"width":680,"height":900}}'>
+class Component extends DCLogic {
+  icons() {
+    return {
+      chev: 'M9 18l6-6-6-6',
+      chevLeft: 'M15 18l-6-6 6-6',
+      chat: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+      clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 7v5l3 2'
+    };
+  }
+
+  places() {
+    const two = (a, b) => [{ id: 'a', name: a }, { id: 'b', name: b }];
+    return [
+      { id: 'n2', name: 'Nursery 2', crumb: 'Nursery zone › Nursery barn',
+        cams: [{ id: 'a', name: 'Pens 1–20' }, { id: 'b', name: 'Pens 21–40', offline: true }, { id: 'c', name: 'Entrance' }] },
+      { id: 'g1', name: 'Gestation 1', crumb: 'Breeding zone › Gestation barn',
+        cams: [{ id: 'a', name: 'Rows A–B' }, { id: 'b', name: 'Rows C–D' }, { id: 'c', name: 'Boar pens' }, { id: 'd', name: 'Entrance' }] },
+      { id: 'g2', name: 'Gestation 2', crumb: 'Breeding zone › Gestation barn',
+        cams: [{ id: 'a', name: 'Rows A–B' }, { id: 'b', name: 'Rows C–D' }, { id: 'c', name: 'Entrance' }] },
+      { id: 'fr1', name: 'Farrowing Room 1', crumb: 'Breeding zone › Farrowing barn', cams: two('Crates A', 'Crates B') },
+      { id: 'fr2', name: 'Farrowing Room 2', crumb: 'Breeding zone › Farrowing barn', cams: two('Crates A', 'Crates B') },
+      { id: 'fr3', name: 'Farrowing Room 3', crumb: 'Breeding zone › Farrowing barn', cams: two('Crates A', 'Crates B') },
+      { id: 'fr4', name: 'Farrowing Room 4', crumb: 'Breeding zone › Farrowing barn', cams: two('Crates A', 'Crates B') },
+      { id: 'n1', name: 'Nursery 1', crumb: 'Nursery zone › Nursery barn',
+        cams: [{ id: 'a', name: 'Pens 1–20' }, { id: 'b', name: 'Pens 21–40' }, { id: 'c', name: 'Entrance' }] },
+      { id: 'q1', name: 'Quarantine 1', crumb: 'Isolation zone › Gilt isolation', cams: [{ id: 'a', name: 'Pens 1–10' }] },
+      { id: 'gate', name: 'Farm gate and feed store', crumb: 'Farm entrance',
+        cams: [{ id: 'a', name: 'Gate' }, { id: 'b', name: 'Feed store' }, { id: 'c', name: 'Loading ramp' }] }
+    ];
+  }
+
+  // moments Equipment found: only on Gestation 2 · Rows A–B in this demo
+  moments(placeId, camId, day) {
+    if (placeId !== 'g2' || camId !== 'a') return [];
+    const byDay = [
+      [{ t: '06:12', n: 3, len: 12 }, { t: '07:48', n: 1, len: 7 }],
+      [{ t: '07:38', n: 1, len: 9 }, { t: '17:25', n: 1, len: 6 }],
+      [{ t: '16:38', n: 1, len: 8 }]
+    ];
+    return byDay[day].map((m) => ({ t: m.t, n: m.n, len: m.len, text: m.n + (m.n === 1 ? ' person detected' : ' people detected') }));
+  }
+
+  mins(t) { const p = t.split(':'); return parseInt(p[0], 10) * 60 + parseInt(p[1], 10); }
+
+  defaults(start) {
+    const base = { startSeen: start, view: 'list', place: 'g2', cam: 'a', day: 0, time: '06:12', playing: false, asked: {} };
+    if (start === 'live') return Object.assign(base, { view: 'live' });
+    if (start === 'recordings') return Object.assign(base, { view: 'rec' });
+    if (start === 'offline') return Object.assign(base, { view: 'live', place: 'n2', cam: 'b' });
+    return base;
+  }
+
+  renderVals() {
+    const start = this.props.start || 'list';
+    const fresh = !this.state || this.state.startSeen !== start;
+    const s = fresh ? this.defaults(start) : Object.assign(this.defaults(start), this.state);
+    const set = (p) => this.setState(Object.assign({ startSeen: start }, s, p));
+    const ic = this.icons();
+    const places = this.places();
+    const dayNames = ['Fri 30 Oct', 'Thu 29 Oct', 'Wed 28 Oct'];
+    const NOW = '08:41';
+
+    // ---------- list ----------
+    const total = places.reduce((a, p) => a + p.cams.length, 0);
+    const offN = places.reduce((a, p) => a + p.cams.filter((c) => c.offline).length, 0);
+    const ordered = places.filter((p) => p.cams.some((c) => c.offline)).concat(places.filter((p) => !p.cams.some((c) => c.offline)));
+    const rows = ordered.map((p, i) => {
+      const off = p.cams.filter((c) => c.offline);
+      const firstCam = off.length ? off[0] : p.cams[0];
+      return {
+        name: p.name,
+        meta: p.cams.length + (p.cams.length === 1 ? ' camera' : ' cameras'),
+        hasChip: off.length > 0,
+        chip: off.length ? off[0].name + ' offline' : '',
+        top: i === 0 ? '0' : '1px solid #EFF1EC',
+        open: () => set({ view: 'live', place: p.id, cam: firstCam.id, playing: false })
+      };
+    });
+
+    // ---------- watch ----------
+    const place = places.filter((p) => p.id === s.place)[0] || places[2];
+    const cam = place.cams.filter((c) => c.id === s.cam)[0] || place.cams[0];
+    const isRec = s.view === 'rec';
+    const isOffline = s.view === 'live' && !!cam.offline;
+    const isLive = s.view === 'live' && !cam.offline;
+    const day = s.day;
+    const mom = this.moments(place.id, cam.id, day);
+    const cur = this.mins(s.time);
+    const active = isRec ? mom.filter((m) => cur >= this.mins(m.t) && cur <= this.mins(m.t) + m.len)[0] : null;
+
+    const people = [];
+    if (active) {
+      const xs = active.n >= 3 ? [20, 45, 70] : active.n === 2 ? [30, 58] : [46];
+      xs.forEach((x) => people.push({ hx: x + 3.2, bx: x + 2, fx: x }));
+    }
+    const camChips = place.cams.map((c) => {
+      const on = c.id === cam.id;
+      return {
+        label: c.name, offline: !!c.offline, on: on ? 'true' : 'false',
+        border: on ? '#121815' : '#DADED6', bg: on ? '#121815' : '#FFFFFF', ink: on ? '#FFFFFF' : '#121815', weight: on ? 500 : 400,
+        pick: () => set({ cam: c.id, playing: false })
+      };
+    });
+
+    const maxToday = this.mins(NOW);
+    const ticks = mom.map((m) => ({ left: (this.mins(m.t) / 1440) * 100 }));
+    const w = {
+      crumb: place.crumb,
+      title: place.name,
+      hasSwitch: place.cams.length > 1,
+      cams: camChips,
+      isLive, isRec, isOffline,
+      showPigs: !people.length && !isOffline,
+      people,
+      frameName: place.name + ' · ' + cam.name,
+      hasDetect: !!active, detect: active ? active.text : '',
+      hasFrameTime: !isOffline,
+      frameTime: isRec ? dayNames[day] + ' · ' + s.time : 'Fri 30 Oct · ' + NOW,
+      playAria: s.playing ? 'Pause' : 'Play',
+      playPath: s.playing ? 'M8 5v14 M16 5v14' : 'M7 4.5l12 7.5-12 7.5z',
+      playFill: s.playing ? 'none' : 'currentColor'
+    };
+
+    const rec = {
+      time: s.time,
+      dayLabel: day === 0 ? 'Today, ' + dayNames[0] : dayNames[day],
+      fillW: day === 0 ? (maxToday / 1440) * 100 : 100,
+      handle: Math.min(100, (cur / 1440) * 100),
+      ticks,
+      days: dayNames.map((d, i) => ({
+        label: i === 0 ? 'Today' : d, on: i === day ? 'true' : 'false',
+        bg: i === day ? '#121815' : 'transparent', ink: i === day ? '#FFFFFF' : '#3B4540',
+        pick: () => {
+          const dm = this.moments(place.id, cam.id, i);
+          let nt = dm.length ? dm[0].t : s.time;
+          if (i === 0 && this.mins(nt) > maxToday) nt = NOW;
+          set({ day: i, time: nt, playing: false });
+        }
+      })),
+      momentsHead: mom.length ? 'People detected · ' + mom.length : 'None',
+      moments: mom.map((m) => ({
+        time: m.t, text: m.text, len: m.len + ' min',
+        on: active && active.t === m.t ? 'true' : 'false', bg: active && active.t === m.t ? '#F6F7F4' : 'transparent',
+        pick: () => set({ time: m.t, playing: false })
+      })),
+      noMoments: mom.length === 0,
+      badTime: !!s.badTime,
+      badTimeText: s.badTime ? 'Use a time like 06:12' + (day === 0 ? ', up to ' + NOW : '') + '.' : ''
+    };
+
+    return {
+      ic,
+      v: { list: s.view === 'list', watch: s.view !== 'list' },
+      listLead: total + ' cameras. ' + offN + ' offline.',
+      places: rows,
+
+      w, rec,
+      backToList: () => set({ view: 'list', playing: false, badTime: false }),
+      toRec: () => set({ view: 'rec', playing: false, badTime: false }),
+      backToLive: () => set({ view: 'live', playing: false, badTime: false }),
+      togglePlay: () => set({ playing: !s.playing }),
+      gotoTime: (e) => {
+        const v = String(e.target.value || '').trim();
+        const m = /^([01]?\d|2[0-3]):([0-5]\d)$/.exec(v);
+        if (!m) { set({ badTime: true }); return; }
+        const t = (m[1].length === 1 ? '0' + m[1] : m[1]) + ':' + m[2];
+        if (day === 0 && this.mins(t) > maxToday) { set({ badTime: true }); return; }
+        set({ time: t, badTime: false, playing: false });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

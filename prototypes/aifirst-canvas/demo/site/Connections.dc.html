@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Connections</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}.cx-btn{cursor:pointer;font:inherit;border:0;margin:0;color:inherit;background:none;padding:0;text-align:left}.cx-btn:active{transform:translateY(1px)}.cx-tile:hover{box-shadow:0 0 0 1px #D5DAD0,0 2px 8px rgba(17,21,17,.07)}@keyframes cxRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}@keyframes cxBeat{0%,100%{opacity:1}50%{opacity:.35}}</style>
+</helmet>
+<div style="min-height: 100%; box-sizing: border-box; background: #F6F7F1; font-family: 'Geist', system-ui, sans-serif; color: #1B211C; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.45; padding: 20px 20px 28px">
+<div style="max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px">
+
+  <div style="padding: 2px 2px 4px">
+    <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.01em">Connections</div>
+    <div style="font-size: 13px; color: #5D665F; margin-top: 2px">The systems your farm already runs. Your AI team reads them and keeps Sentri up to date; nothing is written back without your OK.</div>
+  </div>
+
+  <div style="background: #fff; border-radius: 12px; box-shadow: 0 0 0 1px #E6E9E2; padding: 6px 18px">
+    <sc-for list="{{live}}" as="c" hint-placeholder-count="4">
+      <div style="display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 11px 0; border-top: {{c.line}}">
+        <span style="width: 36px; height: 36px; border-radius: 10px; background: #EEF0EA; display: grid; place-items: center"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: #3B4540; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{c.icon}}"></path></svg></span>
+        <span style="min-width: 0">
+          <span style="display: block; font-size: 14px; font-weight: 500">{{c.name}}</span>
+          <span style="display: block; font-size: 12px; color: #5D665F">{{c.brings}}</span>
+        </span>
+        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #5D665F; white-space: nowrap"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{c.dot}}"></span>{{c.state}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{picking}}" hint-placeholder-val="{{true}}">
+    <div>
+      <div style="font-size: 13px; font-weight: 600; color: #5D665F; margin: 6px 2px 8px">Add a system</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px">
+        <sc-for list="{{more}}" as="m" hint-placeholder-count="6">
+          <button type="button" class="cx-btn cx-tile" onClick="{{m.pick}}" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 13px; min-height: 84px; box-sizing: border-box; border-radius: 12px; background: #fff; box-shadow: 0 0 0 1px #E6E9E2">
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: #28734F; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="{{m.icon}}"></path></svg>
+            <span style="font-size: 14px; font-weight: 600">{{m.name}}</span>
+            <span style="font-size: 12px; color: #5D665F">{{m.what}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{adding}}" hint-placeholder-val="{{false}}">
+    <div style="background: #fff; border-radius: 12px; box-shadow: 0 0 0 1px #E6E9E2; padding: 16px 18px; animation: cxRise .25s ease-out">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+        <div style="font-size: 16px; font-weight: 600">Accounting</div>
+        <sc-if value="{{canBack}}" hint-placeholder-val="{{true}}"><button type="button" class="cx-btn" onClick="{{back}}" style="height: 32px; padding: 0 10px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #3B4540">Back</button></sc-if>
+      </div>
+
+      <sc-if value="{{stepHow}}" hint-placeholder-val="{{true}}">
+        <div style="font-size: 13px; color: #5D665F; margin-top: 2px">How should the General Manager get in?</div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px">
+          <sc-for list="{{ways}}" as="w" hint-placeholder-count="3">
+            <button type="button" class="cx-btn cx-tile" onClick="{{w.pick}}" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 12px 14px; min-height: 56px; box-sizing: border-box; border-radius: 10px; background: #F6F7F1">
+              <span><span style="display: block; font-size: 14px; font-weight: 500">{{w.name}}</span><span style="display: block; font-size: 12px; color: #5D665F">{{w.note}}</span></span>
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: #8A938C; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M9 6l6 6-6 6"></path></svg>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{stepRead}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 13px; color: #5D665F">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #2FA36B; animation: cxBeat 1s infinite"></span>Reading Ledger 2024-2026.xlsx · {{readLine}}
+        </div>
+      </sc-if>
+
+      <sc-if value="{{stepMap}}" hint-placeholder-val="{{false}}">
+        <div style="font-size: 14px; margin-top: 8px; line-height: 1.5"><span style="font-weight: 600">26 months of costs, 1,284 lines.</span> I matched them to your cost groups. 12 lines were unclear; I put them under Other for you to check later.</div>
+        <div style="margin-top: 10px">
+          <sc-for list="{{maps}}" as="r" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 8px 0; border-top: {{r.line}}; font-size: 13px">
+              <span style="color: #5D665F; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{r.theirs}}</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: #8A938C; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M5 12h14 M13 6l6 6-6 6"></path></svg>
+              <span style="font-weight: 500">{{r.ours}}</span>
+              <span style="font-size: 12px; color: #8A938C; font-variant-numeric: tabular-nums">{{r.n}}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px">
+          <button type="button" class="cx-btn" onClick="{{connect}}" style="height: 44px; padding: 0 18px; border-radius: 10px; background: #1F5C3F; color: #fff; font-size: 14px; font-weight: 600">Connect</button>
+          <button type="button" class="cx-btn" onClick="{{back}}" style="height: 44px; padding: 0 16px; border-radius: 10px; background: #fff; box-shadow: 0 0 0 1px #D5DAD3; font-size: 14px; font-weight: 500">Not now</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{stepDone}}" hint-placeholder-val="{{false}}">
+        <div style="margin-top: 12px; display: flex; gap: 10px; align-items: flex-start; background: #EAF4EE; border-radius: 10px; padding: 11px 12px">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; fill: none; stroke: #1F5C3F; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="M20 6 9 17l-5-5"></path></svg>
+          <div style="font-size: 13px"><span style="font-weight: 600">Accounting is connected.</span> Farm on Home now shows spending against budget, and cost per kg updates each month when the new file comes in.</div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["list","map","done"],"default":"list"},"$preview":{"width":720,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const st = this.state || {};
+    const step = st.step || ({ map: 'map', done: 'done' }[this.props.start] || 'pick');
+    const set = (o) => this.setState(o);
+    const I = {
+      feed: 'M3 21h18 M5 21V9l7-5 7 5v12 M9 21v-6h6v6', temp: 'M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z', drop: 'M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z',
+      file: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6', coin: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z M12 6v12 M15 9.5c0-1.4-1.3-2.5-3-2.5s-3 1-3 2.3c0 3 6 1.7 6 4.7 0 1.3-1.3 2.5-3 2.5s-3-1.1-3-2.5',
+      tube: 'M9 2v14a3 3 0 0 0 6 0V2 M8 2h8 M9 10h6', truck: 'M1 3h15v13H1z M16 8h4l3 3v5h-7z M5.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z M18.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
+      gov: 'M3 21h18 M4 10h16 M12 3l9 7H3z M6 10v11 M10 10v11 M14 10v11 M18 10v11', scale: 'M12 3v18 M5 21h14 M3 7h18 M6 7l-3 7a4 4 0 0 0 6 0z M18 7l-3 7a4 4 0 0 0 6 0z', cam: 'M23 7l-7 5 7 5z M1 5h15v14H1z'
+    };
+    const live = [
+      ['Feed system', 'Silo levels and feed delivered, every hour', 'Live', I.feed],
+      ['Climate control', 'Temperature, humidity and fans in 9 rooms', 'Live', I.temp],
+      ['Water meters', 'Litres per room, every 15 minutes', 'Live', I.drop],
+      ['Old farm records', '3 years of services and litters, imported', 'Imported 2 Nov', I.file]
+    ].concat(step === 'done' ? [['Accounting', 'Costs by group, every month', 'Just now', I.coin]] : [])
+      .map(([name, brings, state, icon], i) => ({ name, brings, state, icon, dot: state === 'Live' || state === 'Just now' ? '#2FA36B' : '#B9C0B8', line: i ? '1px solid #F0F1EC' : '0' }));
+    const more = [
+      ['Accounting', 'Costs against budget', I.coin], ['Lab results', 'Blood and fluid tests', I.tube], ['Pig buyer', 'Prices, trucks, weights', I.truck],
+      ['Government registry', 'Movement reports', I.gov], ['Weighing scales', 'Weights at the door', I.scale], ['Cameras', 'Counts and alerts', I.cam]
+    ].map(([name, what, icon]) => ({ name, what, icon, pick: () => set({ step: 'how' }) }));
+    const ways = [
+      { name: 'Upload an export', note: 'A spreadsheet from your accounting program', pick: () => { set({ step: 'read', read: 0 }); this.tick(); } },
+      { name: 'Sign in for me', note: 'I read it each month; you approve the sign-in', pick: () => { set({ step: 'read', read: 0 }); this.tick(); } },
+      { name: 'Email me the monthly file', note: 'Forward it to your farm’s Sentri inbox', pick: () => { set({ step: 'read', read: 0 }); this.tick(); } }
+    ];
+    const reads = ['finding the columns', 'matching suppliers', 'sorting 1,284 lines into cost groups'];
+    const maps = [
+      ['Feed – Northfield Mills', 'Feed', '412'], ['Vet & medicines', 'Vet', '188'], ['Electricity, gas', 'Energy', '96'], ['Payroll', 'Labour', '52'], ['Repairs, parts', 'Maintenance', '374'], ['Sundry', 'Other', '12']
+    ].map(([theirs, ours, n], i) => ({ theirs, ours, n, line: i ? '1px solid #F0F1EC' : '0' }));
+    return {
+      live, more, ways, maps,
+      picking: step === 'pick', adding: step !== 'pick',
+      stepHow: step === 'how', stepRead: step === 'read', stepMap: step === 'map', stepDone: step === 'done',
+      canBack: step === 'how' || step === 'map',
+      readLine: reads[Math.min(2, st.read || 0)],
+      back: () => set({ step: 'pick' }),
+      connect: () => set({ step: 'done' })
+    };
+  }
+  tick() {
+    clearTimeout(this.t1); clearTimeout(this.t2); clearTimeout(this.t3);
+    this.t1 = setTimeout(() => this.setState({ read: 1 }), 700);
+    this.t2 = setTimeout(() => this.setState({ read: 2 }), 1400);
+    this.t3 = setTimeout(() => this.setState({ step: 'map' }), 2200);
+  }
+  componentWillUnmount() { clearTimeout(this.t1); clearTimeout(this.t2); clearTimeout(this.t3); }
+}
+</script>
+</body>
+</html>

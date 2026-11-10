@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Production setup</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}.ps-stop{position:relative}.ps-tip{position:absolute;z-index:20;opacity:0;pointer-events:none;transition:opacity .12s;background:#fff;border:1px solid #E6E9E2;border-radius:8px;padding:7px 10px 8px;box-shadow:0 20px 25px -5px rgba(17,21,17,.10),0 8px 10px -6px rgba(17,21,17,.10);font-size:12px;line-height:1.45;color:#1B211C;width:220px;white-space:normal;text-align:left}.ps-stop:hover .ps-tip{opacity:1}.ps-btn{cursor:pointer;font:inherit}.ps-btn:active{transform:translateY(1px)}@keyframes psRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</style>
+</helmet>
+<div style="min-height: 100%; box-sizing: border-box; background: #F6F7F1; font-family: 'Geist', system-ui, sans-serif; color: #1B211C; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.45; padding: 20px 20px 28px">
+<div style="max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px">
+
+  <!-- heading -->
+  <div style="padding: 2px 2px 4px">
+    <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.01em">Production setup</div>
+    <div style="font-size: 13px; color: #5D665F; margin-top: 2px">Worked out from your farm layout · Hillside Sow Farm</div>
+  </div>
+
+  <!-- the recommendation -->
+  <div style="background: #fff; border-radius: 12px; box-shadow: 0 0 0 1px #E6E9E2; padding: 18px 18px 16px; animation: psRise .3s ease-out">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px">
+      <span style="display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px; border-radius: 999px; background: {{chipBg}}; color: {{chipInk}}; font-size: 12px; font-weight: 600">
+        <span style="width: 7px; height: 7px; border-radius: 50%; background: {{chipDot}}"></span>{{chip}}
+      </span>
+      <span style="font-size: 12px; color: #8A938C">General Manager · {{when}}</span>
+    </div>
+    <div style="font-size: 24px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.2">A batch every 3 weeks</div>
+    <div style="font-size: 14px; color: #5D665F; margin-top: 4px">50 sows a batch · weaned at 28 days · 35 days in the nursery</div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 16px">
+      <sc-for list="{{figs}}" as="f" hint-placeholder-count="4">
+        <div class="ps-stop" tabindex="0" style="background: #F6F7F1; border-radius: 10px; padding: 10px 12px 11px; cursor: default">
+          <div style="font-size: 22px; font-weight: 600; letter-spacing: -0.01em; font-variant-numeric: tabular-nums">{{f.v}}</div>
+          <div style="font-size: 12px; color: #5D665F">{{f.l}}</div>
+          <div class="ps-tip" style="left: 0; top: calc(100% + 6px)"><div style="font-weight: 500; margin-bottom: 3px">{{f.tt}}</div><div style="color: #5D665F">{{f.tip}}</div></div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top: 16px; font-size: 14px; line-height: 1.55">
+      <span style="font-weight: 600">Your two nursery rooms set the pace.</span> Each takes one batch, about 600 pigs, and has to be empty, washed and dry before the next one arrives. Weaning at 28 days means pigs reach 25 kg after 35 nursery days instead of 42, so a room turns in 38 days, inside the 42 days between its batches. Nothing on the farm ever has to share a room.
+    </div>
+
+    <sc-if value="{{done}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top: 14px; display: flex; gap: 10px; align-items: flex-start; background: #EAF4EE; border-radius: 10px; padding: 11px 12px; animation: psRise .3s ease-out">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; fill: none; stroke: #1F5C3F; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="M20 6 9 17l-5-5"></path></svg>
+        <div style="font-size: 13px; color: #1B211C"><span style="font-weight: 600">Line 1 is set up.</span> The first group is served Mon 16 Nov. 26 weeks of room moves are planned, and the first tasks are on the Gestation team's phones.</div>
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- every room, 12 weeks -->
+  <div style="background: #fff; border-radius: 12px; box-shadow: 0 0 0 1px #E6E9E2; padding: 16px 18px 14px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+      <div style="font-size: 15px; font-weight: 600">Every room, 12 weeks</div>
+      <div style="font-size: 12px; color: #8A938C">Weeks · hover a batch</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 84px minmax(0, 1fr); margin-top: 12px; row-gap: 6px">
+      <div></div>
+      <div style="position: relative; height: 16px">
+        <sc-for list="{{weeks}}" as="w" hint-placeholder-count="12">
+          <span style="position: absolute; left: {{w.left}}; font-size: 11px; color: #8A938C; transform: translateX(2px)">{{w.l}}</span>
+        </sc-for>
+      </div>
+      <sc-for list="{{rooms}}" as="r" hint-placeholder-count="6">
+        <div style="font-size: 12px; color: #5D665F; height: 26px; display: flex; align-items: center; white-space: nowrap">{{r.name}}</div>
+        <div style="position: relative; height: 26px; background: #F6F7F1; border-radius: 6px">
+          <sc-for list="{{r.bars}}" as="b" hint-placeholder-count="2">
+            <div class="ps-stop" style="position: absolute; top: 3px; bottom: 3px; left: {{b.left}}; width: {{b.width}}; z-index: {{b.z}}">
+              <div style="position: absolute; inset: 0; display: flex; border-radius: 5px; overflow: hidden">
+                <div style="flex: {{b.use}}; background: {{b.bg}}; display: flex; align-items: center; padding-left: 6px; font-size: 11px; font-weight: 600; color: {{b.ink}}; white-space: nowrap; overflow: hidden">{{b.label}}</div>
+                <div style="flex: {{b.wash}}; background: repeating-linear-gradient(135deg, #DDE1DA 0 3px, #F6F7F1 3px 6px)"></div>
+              </div>
+              <div class="ps-tip" style="left: {{b.tipLeft}}; top: calc(100% + 6px)"><div style="font-weight: 500; margin-bottom: 3px">{{b.tt}}</div><div style="color: #5D665F">{{b.tip}}</div></div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; font-size: 12px; color: #5D665F">
+      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #9CCBB0"></span>Sows and litters</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #C9D8EE"></span>Weaners</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: repeating-linear-gradient(135deg, #DDE1DA 0 2px, #fff 2px 4px)"></span>Wash and dry</span>
+    </div>
+    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #F0F1EC; font-size: 13px; color: #1B211C; line-height: 1.5">
+      <span style="font-weight: 600">You have twice the farrowing space this needs.</span> <span style="color: #5D665F">A batch needs one room for 36 days. Rotating all four gives every room seven weeks empty between batches, your best protection against scours. The spare space can't take bigger batches: the nursery couldn't hold them.</span>
+    </div>
+  </div>
+
+  <!-- why not the others -->
+  <div style="background: #fff; border-radius: 12px; box-shadow: 0 0 0 1px #E6E9E2; padding: 16px 18px 8px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+      <div style="font-size: 15px; font-weight: 600">Every rhythm, on your farm</div>
+      <div style="font-size: 12px; color: #8A938C">Litters a year</div>
+    </div>
+    <div style="margin-top: 6px">
+      <sc-for list="{{opts}}" as="o" hint-placeholder-count="5">
+        <div class="ps-stop" tabindex="0" style="display: grid; grid-template-columns: minmax(0, 1fr) 96px 40px; align-items: center; gap: 12px; padding: 10px 0; border-top: {{o.line}}; cursor: default">
+          <div style="min-width: 0">
+            <div style="font-size: 14px; font-weight: {{o.w}}">{{o.name}}</div>
+            <div style="font-size: 12px; color: #5D665F">{{o.why}}</div>
+          </div>
+          <div style="height: 8px; background: #F0F1EC; border-radius: 4px; overflow: hidden"><div style="height: 100%; width: {{o.pct}}; background: {{o.bar}}; border-radius: 4px"></div></div>
+          <div style="font-size: 14px; font-weight: {{o.w}}; text-align: right; font-variant-numeric: tabular-nums">{{o.v}}</div>
+          <div class="ps-tip" style="left: 0; top: calc(100% - 2px); width: 280px"><div style="font-weight: 500; margin-bottom: 3px">{{o.tt}}</div><div style="color: #5D665F">{{o.tip}}</div></div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- the team's three weeks -->
+  <div style="background: #fff; border-radius: 12px; box-shadow: 0 0 0 1px #E6E9E2; padding: 16px 18px">
+    <div style="font-size: 15px; font-weight: 600">Your team's three weeks</div>
+    <div style="font-size: 12px; color: #5D665F; margin-top: 2px">The same three weeks, every three weeks. One big job a week.</div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px">
+      <sc-for list="{{rhythm}}" as="r" hint-placeholder-count="3">
+        <div style="background: #F6F7F1; border-radius: 10px; padding: 11px 12px">
+          <div style="font-size: 12px; color: #8A938C">{{r.wk}}</div>
+          <div style="font-size: 15px; font-weight: 600; margin-top: 1px">{{r.big}}</div>
+          <sc-for list="{{r.jobs}}" as="j" hint-placeholder-count="2">
+            <div style="font-size: 12px; color: #5D665F; margin-top: 4px">{{j}}</div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- what setting it up does -->
+  <div style="background: #fff; border-radius: 12px; box-shadow: 0 0 0 1px #E6E9E2; padding: 16px 18px">
+    <div style="font-size: 15px; font-weight: 600">When you set it up</div>
+    <sc-for list="{{steps}}" as="st" hint-placeholder-count="3">
+      <div style="display: flex; gap: 10px; margin-top: 10px; font-size: 13px; line-height: 1.5">
+        <span style="width: 20px; height: 20px; flex-shrink: 0; border-radius: 50%; background: #F0F1EC; color: #5D665F; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{st.n}}</span>
+        <span>{{st.t}}</span>
+      </div>
+    </sc-for>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px">
+      <sc-if value="{{notDone}}" hint-placeholder-val="{{true}}">
+        <button type="button" class="ps-btn" onClick="{{setUp}}" style="height: 44px; padding: 0 18px; border: 0; border-radius: 10px; background: #1F5C3F; color: #fff; font-size: 14px; font-weight: 600">Set up Line 1</button>
+      </sc-if>
+      <button type="button" class="ps-btn" onClick="{{ask}}" style="height: 44px; padding: 0 16px; border: 0; border-radius: 10px; background: #fff; box-shadow: 0 0 0 1px #D5DAD3; color: #1B211C; font-size: 14px; font-weight: 500">Ask about it</button>
+    </div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["proposal","done"],"default":"proposal"},"$preview":{"width":760,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const st = this.state || {};
+    const done = !!st.done || this.props.start === 'done';
+    // the farm: 4 farrowing rooms x 52 crates, 400 gestation places, 2 nursery rooms x ~600 places, 6 quarantine pens
+    // the rhythm: batch every 21 days; sows in 5 days before farrowing, 28 days suckling, 3 days wash and dry;
+    // weaners 35 days in the nursery to 25 kg, then 3 days wash and dry
+    const SPAN = 84;
+    const pct = (d) => (Math.max(0, Math.min(SPAN, d)) / SPAN * 100).toFixed(2) + '%';
+    const rooms = [
+      { name: 'Farrowing 1', bars: [] }, { name: 'Farrowing 2', bars: [] }, { name: 'Farrowing 3', bars: [] }, { name: 'Farrowing 4', bars: [] },
+      { name: 'Nursery 1', bars: [] }, { name: 'Nursery 2', bars: [] }
+    ];
+    const bar = (row, b, start, use, wash, bg, ink, tt, tip) => {
+      const s = Math.max(0, start), e = Math.min(SPAN, start + use + wash);
+      if (e <= 0 || s >= SPAN) return;
+      const vis = e - s;
+      const useVis = Math.max(0, Math.min(start + use, SPAN) - s);
+      const washVis = vis - useVis;
+      rooms[row].bars.push({ left: pct(s), width: ((vis / SPAN) * 100).toFixed(2) + '%', use: String(useVis), wash: String(washVis), bg, ink,
+        label: useVis >= 9 ? 'B' + b : '', tt, tip, z: 1, tipLeft: s > 48 ? 'auto' : '0' });
+    };
+    for (let k = -3; k <= 4; k++) {
+      const b = 37 + k, f = 9 + 21 * k; // farrowing day of batch b
+      bar(((k % 4) + 4) % 4, b, f - 5, 33, 3, '#9CCBB0', '#1F5C3F', 'Batch ' + b + ' · Farrowing ' + ((((k % 4) + 4) % 4) + 1),
+        '50 sows move in 5 days before farrowing, suckle 28 days, and the room is washed and dry 3 days later. Then it rests until its next batch, 48 days on.');
+      bar(4 + (((k % 2) + 2) % 2), b, f + 28, 35, 3, '#C9D8EE', '#2F4A6B', 'Batch ' + b + ' · Nursery ' + ((((k % 2) + 2) % 2) + 1),
+        'About 600 weaners for 35 days, out at 25 kg. The room is washed and dry in 3 days, and the next batch arrives 4 days after that.');
+    }
+    const weeks = Array.from({ length: 12 }, (_, i) => ({ l: String(i + 1), left: pct(i * 7) }));
+    const figs = [
+      { v: '869', l: 'litters a year', tt: '17.4 batches × 50 litters', tip: 'A batch every 21 days is 17.4 batches a year. 50 litters each, one farrowing room per batch.' },
+      { v: '10,200', l: 'pigs sold at 25 kg', tt: '12 weaned a litter, 2% lost in nursery', tip: 'About 600 pigs leave the nursery every three weeks, one full truck.' },
+      { v: '400', l: 'sows in 7 groups', tt: '57 served a batch, 88% farrow', tip: 'A sow cycles in 147 days: 115 pregnant, 28 suckling, 4 to service. That is 7 batches of three weeks.' },
+      { v: '312 of 400', l: 'gestation places used', tt: 'Room for gilts and repeats', tip: '57 sows a batch spend 115 days in gestation: 312 places. The other 88 take gilts, repeats and sows waiting on a pregnancy check.' }
+    ];
+    const opts = [
+      ['Every week', "Needs 6 farrowing rooms; you have 4", 0, '—', 'A batch every 7 days', 'With 28 days suckling a room is busy 36 days, so 6 batches are in at once. Rooms never empty, so disease rides from one batch to the next.'],
+      ['Every 2 weeks', 'Two batches would share each nursery room', 650, '650', '25 litters a batch, 26 batches', 'A nursery room turns in 45 days, so 4 batches need it at once. Only half-rooms fit, sharing air between ages.'],
+      ['Every 3 weeks', 'Recommended: every room empties between batches', 869, '869', '50 litters a batch, 17.4 batches', 'Wean at 28 days, 35 days in the nursery. Farrowing rooms rest 7 weeks; nursery rooms have 4 days to spare.'],
+      ['Every 4 weeks', 'Same batch size, fewer batches', 650, '650', '50 litters a batch, 13 batches', 'The nursery still caps a batch at about 600 pigs, so you lose 4 batches a year for nothing.'],
+      ['Every 5 weeks', 'Rooms sit empty most of the time', 520, '520', '50 litters a batch, 10.4 batches', 'Only one farrowing room is ever in use. Simple, but 40% fewer pigs.']
+    ].map(([name, why, n, v, tt, tip], i) => {
+      const best = i === 2;
+      return { name, why, v, tt, tip, pct: (n / 869 * 100).toFixed(1) + '%', bar: best ? '#1F5C3F' : '#D5DAD3', w: best ? 600 : 500, line: i ? '1px solid #F0F1EC' : '0' };
+    });
+    const rhythm = [
+      { wk: 'Week 1', big: 'Farrowing', jobs: ['50 sows farrow, Mon to Fri', 'Nursery out on Thu, then wash'] },
+      { wk: 'Week 2', big: 'Weaning', jobs: ['Wean on Thu, about 600 pigs', 'Wash the farrowing room'] },
+      { wk: 'Week 3', big: 'Service', jobs: ['Serve 57 sows, Mon to Wed', 'Gilts in, vaccinations'] }
+    ];
+    const steps = [
+      { n: '1', t: 'Line 1 is made: Gestation 1 and 2, Farrowing 1 to 4 in turn, Nursery 1 and 2 in turn.' },
+      { n: '2', t: 'Every room move for 26 weeks is planned, and each becomes a task on the right team’s phones.' },
+      { n: '3', t: 'Your sows are sorted into 7 groups. The first is served Mon 16 Nov and farrows from Thu 11 Mar.' }
+    ];
+    return {
+      done, notDone: !done,
+      chip: done ? 'Set up' : 'Recommended', chipBg: done ? '#EAF4EE' : '#EEF0EA', chipInk: done ? '#1F5C3F' : '#3B4540', chipDot: done ? '#2FA36B' : '#8A938C',
+      when: done ? 'set up just now' : 'from your layout',
+      figs, rooms, weeks, opts, rhythm, steps,
+      setUp: () => { this.setState({ done: true }); try { window.dispatchEvent(new CustomEvent('sentri:said', { detail: { chat: 'gm', text: "Line 1 is set up. The first group is served Mon 16 Nov; I've planned 26 weeks of room moves and put the first tasks on the Gestation team's phones." } })); } catch (e) {} },
+      ask: () => { try { window.dispatchEvent(new CustomEvent('sentri:ask', { detail: { chat: 'gm', draft: 'Why wean at 28 days and not 21?' } })); } catch (e) {} }
+    };
+  }
+}
+</script>
+</body>
+</html>

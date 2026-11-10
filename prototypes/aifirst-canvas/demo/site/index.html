@@ -1,0 +1,80 @@
+<title>Sentri Demo</title>
+<style>
+:root{--bg:#E9ECE6;--ink:#1B211C;--muted:#5D665F}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1A1F1B;--ink:#F3F4F1;--muted:#AEB6AF}}
+:root[data-theme="dark"]{--bg:#1A1F1B;--ink:#F3F4F1;--muted:#AEB6AF}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
+#stage{position:fixed;inset:0;overflow:hidden}
+#wrap{position:absolute;left:50%;top:50%;width:1440px;height:900px;transform-origin:center center;box-shadow:0 30px 60px -20px rgba(17,21,17,.25);border-radius:14px;overflow:hidden;background:#F3F4F1}
+#app{width:1440px;height:900px;border:0;display:block}
+#small{display:none;position:fixed;inset:0;padding:24px 16px;font:15px/1.5 system-ui,sans-serif;color:var(--ink);text-align:center;place-items:center}
+@media (max-width:640px){#stage{display:none}#small{display:grid}}
+</style>
+<div id="stage"><div id="wrap"><iframe id="app" src="Demo.dc.html" title="Sentri console"></iframe></div></div>
+<div id="small"><div><b>Sentri demo</b><br><span style="color:var(--muted)">Open this on a laptop or a bigger screen.</span></div></div>
+<script>
+(() => {
+  const wrap = document.getElementById('wrap'), frame = document.getElementById('app');
+  const fit = () => { const k = Math.min((innerWidth - 24) / 1440, (innerHeight - 24) / 900, 1.25); wrap.style.transform = 'translate(-50%, -50%) scale(' + Math.max(0.3, k) + ')'; };
+  addEventListener('resize', fit); fit();
+
+  const PAGES = {
+    home: ['Home', 'home', ''], layout: ['Farm view', 'map', 'view'], prodsetup: ['Production setup', 'layers', 'proposal', true],
+    late: ['Batch 31 is 4 days behind', 'arrows', 'proposal', true], treatment: ['New treatment · 4 sows', 'clipboard', 'proposal'],
+    vax: ['Vaccination plan · Batch 34', 'syringe', 'proposal'], decisions: ['For you', 'inbox', 'list'], batches: ['Batches', 'layers', 'list'],
+    pigs: ['Pigs', 'list', 'list'], transfers: ['Transfers', 'arrows', 'list'], schedule: ['Task schedule', 'calendar', 'today'],
+    feed: ['Feed plans', 'bowl', 'programme'], people: ['People', 'users', 'list'], systems: ['Connections', 'plug', 'list', true],
+    autos: ['Automations', 'zap', 'list'], vaxprog: ['Vaccination programme', 'syringe', 'ready', true], medicines: ['Medicines', 'pill', 'list'], sampling: ['Sampling and results', 'tube', 'list'], disinfect: ['Disinfection', 'shield', 'list']
+  };
+  const FARM = [
+    'You are an AI teammate inside Sentri, an AI-first operating console for pig farms. The person typing is the farm owner, showing Sentri to customers in a live demo.',
+    'AI teammates: General Manager (runs the farm with the owner, morning report), Production (batches, breeding, farrowing, transfers), Vet (health, treatments, vaccinations), Biosecurity (visitors, sampling), Equipment (feed, water, climate).',
+    'Today is Tuesday 10 November 2026. Farm: Hillside Sow Farm, a farrow-to-nursery sow farm. Rooms: Gestation 1 and 2 (400 stalls), Farrowing 1 to 4 (52 crates each), Nursery 1 and 2 (about 600 places each), Quarantine 1 (6 pens). 11 people work here.',
+    'Production line: a batch every 3 weeks, 50 sows a batch, weaned at 28 days, 35 days in the nursery, pigs sold at 25 kg. 869 litters and about 10,200 pigs a year; 400 sows in 7 groups. The nursery sets the pace: each room takes one batch and must be empty, washed and dry (3 days) before the next. Farrowing rooms rotate and rest 7 weeks between batches. Weekly rhythm: week 1 farrowing, week 2 weaning, week 3 service.',
+    'Now: Batch 31 in Nursery 1, day 31, 488 pigs, 19.6 kg against 20.3 planned, growing 360 g a day against 430 since a diet change on day 21; 4 days behind. Suggested fix waiting for approval: wean Batch 32 four days later (Mon 30 Nov), 9 tasks move on 4 phones, buyer truck moves to Thu 26 Nov. Alternatives: ship Batch 31 on time at 23.6 kg (about ¥8,800 less), or split it (mixes ages, Biosecurity advises against).',
+    'Batch 32: lactating, day 9, 50 sows, 580 piglets; piglet losses 9.8% against 8%, mostly crushing in Farrowing 2 and 3 during a heat-lamp fault 21 to 26 Oct, now fixed. Batch 33 moving into Farrowing 4. Batch 34 breeding; its PRRS booster plan is drafted (due today 10:00).',
+    'Health: the team marked six sows lame in Gestation 2 since Monday; four worst in stalls B15, B20, D40, D41, two at 39.8 °C. Vet drafted a treatment: Amoxicillin 15% LA, 15 mL into the neck muscle, 3 doses a day apart, not issued yet. Amoxicillin runs out in about 4 days. 0.9% of pigs died this week (goal under 1.0%); 22 tagged, 12 on treatment, 18 in withdrawal.',
+    'Equipment: Gestation 2 feed intake down 6% since Tuesday with low pressure on water line B; maintenance checks it today. Production figures: PSY 29.2 (goal 30), farrowing rate 88%, born alive 13.3, stillborn 1.0, pre-wean deaths 11.1%. Money: November spend ¥1.21M of a ¥3.90M budget, ¥90k under pace; cost per kg sold ¥13.8 against a ¥14.0 budget.',
+    'Vaccination programme (Vet): six plans: PRRS whole herd every 4 months on fixed dates (next Mon 7 Dec, 430 pigs); scour vaccine at day 85 of each pregnancy (gilts also day 64); parvo, erysipelas and leptospira for every sow at weaning; PCV2 and mycoplasma for every piglet at weaning; gilts on arrival in quarantine (PRRS day 1, parvo day 21 and 42); PRRS antibody check on 30 sows 28 days after each whole-herd round. About 6,800 doses to the end of May. Each plan waits for approval from the owner.',
+    'Connected systems: feed system, climate control, water meters, old farm records (imported). Eight items wait for the owner in For you; the first, due 10:00, is approving the PRRS booster plan for Batch 34. 14 people are on the farm today.',
+    'How to answer: you are speaking as {AGENT}. Plain text only: no markdown, no lists, no headings, no emoji. At most three short sentences. Use the farm numbers above; be concrete and calm, like an experienced farm manager. If a page shows what they asked about, call open_page once with the page that fits. Never say you saved, sent, ordered or changed anything: say what you prepared and that it waits for the owner\'s approval. If something is not in the data, give a sensible answer and say what you would check. Reply in the language the owner writes in.'
+  ].join('\n\n');
+
+  let samplePromise = null;
+  const getSample = () => { if (!samplePromise) samplePromise = (window.claude && window.claude.use) ? window.claude.use('sample').catch(() => null) : Promise.resolve(null); return samplePromise; };
+  getSample();
+  const post = (msg) => { try { frame.contentWindow.postMessage(msg, '*'); } catch (e) {} };
+  const merge = (turns) => { const out = []; turns.forEach((t) => { if (!t || !t.content) return; const last = out[out.length - 1]; if (last && last.role === t.role) last.content += '\n\n' + t.content; else out.push({ role: t.role, content: String(t.content) }); }); return out; };
+  const busy = {};
+
+  addEventListener('message', async (e) => {
+    if (e.source !== frame.contentWindow) return;
+    const d = e.data; if (!d || d.type !== 'sentri-ask' || !d.id || busy[d.id]) return;
+    busy[d.id] = true;
+    post({ type: 'sentri-ack', id: d.id });
+    const sample = await getSample();
+    if (!sample) { post({ type: 'sentri-error', id: d.id, text: "Live answers aren't switched on for this page, so I can only answer the rehearsed questions here." }); return; }
+    let opened = null;
+    const tools = [{
+      name: 'open_page',
+      description: 'Open a page of the Sentri console beside the chat, so the owner and customers can see it. Use when a page shows what they asked about. Pages: ' + Object.keys(PAGES).map((k) => k + ' (' + PAGES[k][0] + ')').join(', ') + '.',
+      inputSchema: { type: 'object', properties: { page: { type: 'string', enum: Object.keys(PAGES) } }, required: ['page'] },
+      execute: (input) => { const k = input && input.page; const p = PAGES[k]; if (!p) throw new Error('unknown page'); opened = k; post({ type: 'sentri-open', tab: k, start: p[2], wide: false }); return { opened: p[0] }; }
+    }];
+    const pre = FARM.replace('{AGENT}', d.agent || 'General Manager');
+    const turns = merge([{ role: 'user', content: pre }, { role: 'assistant', content: 'Understood. I will answer as ' + (d.agent || 'General Manager') + '.' }]
+      .concat(Array.isArray(d.history) ? d.history.slice(-10) : []).concat([{ role: 'user', content: String(d.text || '') }]));
+    if (turns[0].role !== 'user') turns.unshift({ role: 'user', content: pre });
+    try {
+      const res = await sample(turns, { cache: false, modelTier: 'default', tools, onText: ({ text }) => post({ type: 'sentri-delta', id: d.id, text }) });
+      const p = opened && PAGES[opened];
+      post({ type: 'sentri-done', id: d.id, text: (res && res.text) || 'Done.', card: p && opened !== 'home' ? { iconKey: p[1], title: p[0], sub: 'Opened beside the chat', tab: opened, start: p[2], wide: !!p[3] } : null });
+    } catch (err) {
+      const code = err && err.code;
+      const text = code === 'not_granted' ? "Live answers were not allowed on this page, so I can only answer the rehearsed questions."
+        : code === 'rate_limited' ? 'Give me a moment, then ask again.' : (err && err.text) || "I couldn't answer that just now. Ask me again.";
+      post({ type: 'sentri-error', id: d.id, text });
+    }
+  });
+})();
+</script>
