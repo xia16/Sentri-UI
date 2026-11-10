@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work schedule</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.wd-drag{touch-action:none;-webkit-user-select:none;user-select:none;cursor:grab}
+.wd-drag:active{cursor:grabbing}
+[data-drop]{transition:background-color .12s}
+[data-drop][data-over]{background:#EEF3EF !important;box-shadow:inset 0 0 0 2px #1C1917 !important}
+.wd-row:hover .wd-name{text-decoration:underline;text-underline-offset:3px}
+.wd-scroll{scrollbar-width:none}.wd-scroll::-webkit-scrollbar{display:none}
+@keyframes wdIn{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; background: #F5F5F4; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #1C1917; font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; padding: 20px 20px 28px">
+<div style="max-width: 1180px; margin: 0 auto">
+
+  <div style="display: flex; align-items: center; gap: 10px 12px; flex-wrap: wrap; margin-bottom: 12px">
+    <h1 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em">Work schedule</h1>
+    <span style="font-size: 14px; font-weight: 600">Fri 30 Oct</span>
+    <span style="font-size: 13px; color: #57534E">today</span>
+    <span style="flex: 1"></span>
+    <span role="status" style="display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 99px; font-size: 13px; font-weight: 600; background: {{cov.bg}}; color: {{cov.ink}}; box-shadow: {{cov.sh}}">
+      <span style="display: {{cov.q}}; width: 18px; height: 18px; border-radius: 99px; place-items: center; background: #FFFFFF; box-shadow: inset 0 0 0 1.5px #7A5410; font-size: 11px; font-weight: 700">?</span>
+      <span style="display: {{cov.ok}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></span>{{cov.text}}
+    </span>
+    <div style="display: inline-flex; padding: 3px; border-radius: 9px; background: #EAEAE7">
+      <button type="button" onClick="{{goRooms}}" aria-pressed="{{rOn}}" style="height: 30px; padding: 0 14px; border: 0; border-radius: 7px; font: inherit; font-size: 13px; cursor: pointer; background: {{rBg}}; box-shadow: {{rSh}}; color: {{rInk}}; font-weight: {{rW}}">Rooms</button>
+      <button type="button" onClick="{{goPeople}}" aria-pressed="{{pOn}}" style="height: 30px; padding: 0 14px; border: 0; border-radius: 7px; font: inherit; font-size: 13px; cursor: pointer; background: {{pBg}}; box-shadow: {{pSh}}; color: {{pInk}}; font-weight: {{pW}}">People</button>
+    </div>
+  </div>
+
+  <sc-if value="{{isRooms}}" hint-placeholder-val="{{true}}">
+    <div style="background: #FFFFFF; border-radius: 14px; box-shadow: 0 1px 3px rgba(28,25,23,.06), 0 0 0 1px #ECEBE8; padding: 10px 12px; margin-bottom: 12px">
+      <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap">
+        <sc-for list="{{team}}" as="t" hint-placeholder-count="5">
+          <span class="wd-drag" data-drag="p:{{t.k}}" aria-label="{{t.aria}}" title="Drag onto a room" style="display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 12px 0 6px; border-radius: 99px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E7E5E4; font-size: 13px; white-space: nowrap">
+            <span style="width: 28px; height: 28px; flex: none; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: {{t.bg}}; color: {{t.ink}}">{{t.k}}</span>
+            <b style="font-weight: 600">{{t.name}}</b>
+            <span style="color: {{t.loadInk}}; font-weight: {{t.loadW}}; font-variant-numeric: tabular-nums">{{t.load}}</span>
+          </span>
+        </sc-for>
+        <span style="flex: 1"></span>
+        <span style="font-size: 12.5px; color: #57534E; padding: 0 4px">Drag someone onto a room, or tap a room.</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start">
+      <sc-for list="{{cols}}" as="col" hint-placeholder-count="2">
+        <div style="flex: 1 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+          <sc-for list="{{col.secs}}" as="sec" hint-placeholder-count="2">
+            <div style="background: #FFFFFF; border-radius: 14px; box-shadow: 0 1px 3px rgba(28,25,23,.06), 0 0 0 1px #ECEBE8; overflow: hidden">
+              <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px 8px; font-size: 12px; font-weight: 600; color: #57534E">
+                <span style="flex: 1">{{sec.name}}</span>
+                <span style="display: inline-flex; align-items: center; gap: 5px; font-weight: 400"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path></svg>{{sec.tgt}}</span>
+              </div>
+              <sc-for list="{{sec.rows}}" as="r" hint-placeholder-count="2">
+                <div class="wd-row" data-drop="room:{{r.id}}" style="display: grid; grid-template-columns: minmax(0, 1fr) auto 148px; gap: 10px; align-items: center; min-height: 58px; padding: 0 10px 0 14px; border-top: 1px solid #F1F0EE; background: {{r.bg}}">
+                  <button type="button" onClick="{{r.tap}}" aria-expanded="{{r.open}}" aria-label="{{r.aria}}" style="display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 8px 0; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer">
+                    <span class="wd-name" style="font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; color: {{r.nameInk}}">{{r.name}}</span>
+                    <span style="font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; color: #57534E">{{r.sub}} &middot; <span style="color: {{r.seenInk}}; font-weight: {{r.seenW}}">{{r.seen}}</span></span>
+                  </button>
+                  <span style="display: flex; gap: 4px; justify-content: flex-end; min-width: 0; overflow: hidden">
+                    <sc-for list="{{r.due}}" as="d" hint-placeholder-count="1">
+                      <span title="{{d.title}}" style="display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 7px; border-radius: 6px; background: {{d.bg}}; color: {{d.ink}}; font-size: 12px; font-weight: 600; white-space: nowrap">
+                        <span aria-hidden="true" style="width: 13px; height: 13px; flex: none; background: currentColor; -webkit-mask: {{d.mask}} center / contain no-repeat; mask: {{d.mask}} center / contain no-repeat"></span>{{d.label}}
+                      </span>
+                    </sc-for>
+                  </span>
+                  <sc-if value="{{r.has}}" hint-placeholder-val="{{true}}">
+                    <button type="button" class="wd-drag" data-drag="k:{{r.id}}" onClick="{{r.tap}}" aria-label="{{r.keeperAria}}" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 6px; border: 0; border-radius: 10px; background: #F5F5F3; font: inherit; font-size: 13px; color: #1C1917; text-align: left; min-width: 0">
+                      <span style="width: 28px; height: 28px; flex: none; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: {{r.kp.bg}}; color: {{r.kp.ink}}">{{r.kp.k}}</span>
+                      <b style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.kp.name}}</b>
+                    </button>
+                  </sc-if>
+                  <sc-if value="{{r.none}}" hint-placeholder-val="{{false}}">
+                    <button type="button" onClick="{{r.tap}}" aria-label="{{r.name}} has no one. Give it to someone" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 6px; border: 0; border-radius: 10px; background: #FCF4E2; box-shadow: inset 0 0 0 1px #EBD9AE; font: inherit; font-size: 13px; color: #7A5410; text-align: left; cursor: pointer">
+                      <span style="width: 28px; height: 28px; flex: none; border-radius: 99px; display: grid; place-items: center; background: #FFFFFF; box-shadow: inset 0 0 0 1.5px #7A5410; font-size: 13px; font-weight: 700">?</span>
+                      <b style="font-weight: 600; white-space: nowrap">No one</b>
+                    </button>
+                  </sc-if>
+                </div>
+                <sc-if value="{{r.open}}" hint-placeholder-val="{{false}}">
+<div style="border-top: 1px solid #F1F0EE; background: #FAFAF8; padding: 12px 14px 12px" role="group" aria-label="{{pk.title}}">
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px">
+    <div style="flex: 1; min-width: 0">
+      <div style="font-size: 13.5px; font-weight: 600">{{pk.title}}</div>
+      <div style="font-size: 12px; color: #57534E; margin-top: 1px">{{pk.sub}}</div>
+    </div>
+    <button type="button" onClick="{{closePick}}" aria-label="Close" style="width: 36px; height: 36px; margin: -6px -8px 0 0; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: #A8A29E; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; gap: 6px">
+    <sc-for list="{{pk.people}}" as="q" hint-placeholder-count="5">
+      <button type="button" onClick="{{q.give}}" aria-pressed="{{q.on}}" aria-label="{{q.aria}}" style="display: inline-flex; align-items: center; gap: 7px; height: 44px; padding: 0 12px 0 6px; border: 0; border-radius: 10px; background: #FFFFFF; box-shadow: {{q.ring}}; font: inherit; font-size: 13px; color: #1C1917; cursor: pointer; white-space: nowrap">
+        <span style="width: 28px; height: 28px; flex: none; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: {{q.bg}}; color: {{q.ink}}">{{q.k}}</span>
+        <b style="font-weight: 600">{{q.name}}</b>
+        <span style="color: {{q.loadInk}}; font-variant-numeric: tabular-nums">{{q.load}}</span>
+        <span style="display: {{q.tick}}; color: #1C1917"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></span>
+      </button>
+    </sc-for>
+  </div>
+  <div style="display: flex; align-items: center; gap: 6px; margin-top: 10px">
+    <sc-if value="{{pk.has}}" hint-placeholder-val="{{true}}">
+      <button type="button" onClick="{{pk.clear}}" style="height: 36px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 13px; font-weight: 600; color: #57534E; cursor: pointer; text-decoration: underline; text-underline-offset: 3px">Take {{pk.keeperName}} off</button>
+    </sc-if>
+    <span style="flex: 1"></span>
+    <button type="button" onClick="{{farm}}" style="display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px 0 12px; border: 0; border-radius: 8px; background: #EFEFEC; font: inherit; font-size: 13px; font-weight: 600; color: #1C1917; cursor: pointer">Open in Farm view <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 6 6 6-6 6"></path></svg></button>
+  </div>
+</div></sc-if>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isPeople}}" hint-placeholder-val="{{false}}">
+    <sc-if value="{{tray.show}}" hint-placeholder-val="{{true}}">
+    <div style="background: {{tray.bg}}; border-radius: 14px; box-shadow: {{tray.sh}}; margin-bottom: 12px; overflow: hidden">
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 12px; min-height: 40px">
+        <b style="font-size: 13px; font-weight: 600; color: {{tray.ink}}; padding: 0 4px">{{tray.title}}</b>
+        <sc-for list="{{tray.rooms}}" as="c" hint-placeholder-count="2">
+          <button type="button" class="wd-drag" data-drag="r:{{c.id}}" onClick="{{c.tap}}" aria-label="{{c.aria}}" style="display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px 0 8px; border: 0; border-radius: 10px; background: #FFFFFF; box-shadow: inset 0 0 0 1.5px #D9BE80; font: inherit; font-size: 13px; font-weight: 600; color: #7A5410; white-space: nowrap">
+            <span style="width: 20px; height: 20px; border-radius: 99px; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px #7A5410; font-size: 11px; font-weight: 700">?</span>{{c.name}}
+          </button>
+        </sc-for>
+        <span style="flex: 1"></span>
+        <span style="font-size: 12.5px; color: #57534E; padding: 0 4px">{{tray.hint}}</span>
+      </div>
+      <sc-if value="{{tray.open}}" hint-placeholder-val="{{false}}">
+<div style="border-top: 1px solid #F1F0EE; background: #FAFAF8; padding: 12px 14px 12px" role="group" aria-label="{{pk.title}}">
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px">
+    <div style="flex: 1; min-width: 0">
+      <div style="font-size: 13.5px; font-weight: 600">{{pk.title}}</div>
+      <div style="font-size: 12px; color: #57534E; margin-top: 1px">{{pk.sub}}</div>
+    </div>
+    <button type="button" onClick="{{closePick}}" aria-label="Close" style="width: 36px; height: 36px; margin: -6px -8px 0 0; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: #A8A29E; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; gap: 6px">
+    <sc-for list="{{pk.people}}" as="q" hint-placeholder-count="5">
+      <button type="button" onClick="{{q.give}}" aria-pressed="{{q.on}}" aria-label="{{q.aria}}" style="display: inline-flex; align-items: center; gap: 7px; height: 44px; padding: 0 12px 0 6px; border: 0; border-radius: 10px; background: #FFFFFF; box-shadow: {{q.ring}}; font: inherit; font-size: 13px; color: #1C1917; cursor: pointer; white-space: nowrap">
+        <span style="width: 28px; height: 28px; flex: none; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: {{q.bg}}; color: {{q.ink}}">{{q.k}}</span>
+        <b style="font-weight: 600">{{q.name}}</b>
+        <span style="color: {{q.loadInk}}; font-variant-numeric: tabular-nums">{{q.load}}</span>
+        <span style="display: {{q.tick}}; color: #1C1917"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></span>
+      </button>
+    </sc-for>
+  </div>
+  <div style="display: flex; align-items: center; gap: 6px; margin-top: 10px">
+    <sc-if value="{{pk.has}}" hint-placeholder-val="{{true}}">
+      <button type="button" onClick="{{pk.clear}}" style="height: 36px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 13px; font-weight: 600; color: #57534E; cursor: pointer; text-decoration: underline; text-underline-offset: 3px">Take {{pk.keeperName}} off</button>
+    </sc-if>
+    <span style="flex: 1"></span>
+    <button type="button" onClick="{{farm}}" style="display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px 0 12px; border: 0; border-radius: 8px; background: #EFEFEC; font: inherit; font-size: 13px; font-weight: 600; color: #1C1917; cursor: pointer">Open in Farm view <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 6 6 6-6 6"></path></svg></button>
+  </div>
+</div></sc-if>
+    </div>
+    </sc-if>
+
+    <div style="background: #FFFFFF; border-radius: 14px; box-shadow: 0 1px 3px rgba(28,25,23,.06), 0 0 0 1px #ECEBE8; overflow: hidden">
+      <div style="display: grid; grid-template-columns: 176px minmax(0, 1fr); height: 36px; border-bottom: 1px solid #EFEEEC; font-size: 12px; font-weight: 600; color: #57534E">
+        <div style="display: flex; align-items: center; padding-left: 16px">5 people</div>
+        <div style="display: flex; align-items: center; gap: 14px; padding: 0 14px; border-left: 1px solid #F1F0EE; min-width: 0; overflow: hidden; white-space: nowrap">Their rooms, then their day in order
+          <span style="flex: 1"></span>
+          <span style="display: inline-flex; align-items: center; gap: 5px; font-weight: 400"><span style="width: 12px; height: 12px; border-radius: 3px; background: #F4F4F2"></span>Care</span>
+          <span style="display: inline-flex; align-items: center; gap: 5px; font-weight: 400"><span style="width: 12px; height: 12px; border-radius: 3px; box-shadow: inset 0 0 0 1px #E7E5E4"></span>Task</span>
+        </div>
+      </div>
+      <sc-for list="{{ppl}}" as="p" hint-placeholder-count="5">
+        <div data-drop="person:{{p.k}}" style="display: grid; grid-template-columns: 176px minmax(0, 1fr); border-bottom: {{p.line}}">
+          <div style="display: flex; align-items: center; gap: 10px; padding: 12px 10px 12px 16px; min-width: 0">
+            <span style="width: 34px; height: 34px; flex: none; border-radius: 99px; display: grid; place-items: center; font-size: 12px; font-weight: 600; background: {{p.bg}}; color: {{p.ink}}">{{p.k}}</span>
+            <span style="min-width: 0">
+              <span style="display: block; font-size: 13.5px; font-weight: 600; white-space: nowrap">{{p.name}}</span>
+              <span style="display: flex; align-items: center; gap: 6px; margin-top: 4px">
+                <span style="width: 44px; height: 5px; border-radius: 3px; background: #EDECEA; overflow: hidden"><span style="display: block; height: 100%; width: {{p.pct}}; background: {{p.barBg}}"></span></span>
+                <span style="font-size: 12px; color: {{p.loadInk}}; font-weight: {{p.loadW}}; font-variant-numeric: tabular-nums; white-space: nowrap">{{p.load}}</span>
+              </span>
+            </span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; padding: 10px 0 12px 12px; border-left: 1px solid #F1F0EE; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding-right: 12px">
+              <sc-for list="{{p.rooms}}" as="c" hint-placeholder-count="2">
+                <button type="button" class="wd-drag" data-drag="r:{{c.id}}" onClick="{{c.tap}}" aria-label="{{c.aria}}" style="display: inline-flex; align-items: center; height: 36px; padding: 0 12px; border: 0; border-radius: 9px; background: {{c.bg}}; box-shadow: {{c.ring}}; font: inherit; font-size: 13px; font-weight: 600; color: #1C1917; white-space: nowrap">{{c.name}}</button>
+              </sc-for>
+              <sc-if value="{{p.noRooms}}" hint-placeholder-val="{{false}}">
+                <span style="display: inline-flex; align-items: center; height: 36px; padding: 0 12px; border-radius: 9px; box-shadow: inset 0 0 0 1px #E7E5E4; font-size: 12.5px; color: #78716C">{{p.empty}}</span>
+              </sc-if>
+            </div>
+            <div class="wd-scroll" style="display: flex; gap: 6px; overflow-x: auto; padding: 2px 28px 2px 1px; -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent)">
+              <sc-for list="{{p.day}}" as="j" hint-placeholder-count="4">
+                <div style="flex: none; width: {{j.w}}; box-sizing: border-box; height: 64px; padding: 0 10px; border-radius: 9px; display: flex; flex-direction: column; justify-content: center; gap: 3px; background: {{j.bg}}; box-shadow: {{j.ring}}">
+                  <span style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: {{j.ink}}">{{j.title}}</span>
+                  <span style="font-size: 12px; color: #57534E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{j.place}}</span>
+                  <span style="font-size: 11.5px; color: #57534E; font-weight: {{j.whenW}}; font-variant-numeric: tabular-nums; white-space: nowrap">{{j.when}}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <sc-if value="{{p.open}}" hint-placeholder-val="{{false}}">
+<div style="border-top: 1px solid #F1F0EE; background: #FAFAF8; padding: 12px 14px 12px" role="group" aria-label="{{pk.title}}">
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px">
+    <div style="flex: 1; min-width: 0">
+      <div style="font-size: 13.5px; font-weight: 600">{{pk.title}}</div>
+      <div style="font-size: 12px; color: #57534E; margin-top: 1px">{{pk.sub}}</div>
+    </div>
+    <button type="button" onClick="{{closePick}}" aria-label="Close" style="width: 36px; height: 36px; margin: -6px -8px 0 0; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: #A8A29E; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; gap: 6px">
+    <sc-for list="{{pk.people}}" as="q" hint-placeholder-count="5">
+      <button type="button" onClick="{{q.give}}" aria-pressed="{{q.on}}" aria-label="{{q.aria}}" style="display: inline-flex; align-items: center; gap: 7px; height: 44px; padding: 0 12px 0 6px; border: 0; border-radius: 10px; background: #FFFFFF; box-shadow: {{q.ring}}; font: inherit; font-size: 13px; color: #1C1917; cursor: pointer; white-space: nowrap">
+        <span style="width: 28px; height: 28px; flex: none; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: {{q.bg}}; color: {{q.ink}}">{{q.k}}</span>
+        <b style="font-weight: 600">{{q.name}}</b>
+        <span style="color: {{q.loadInk}}; font-variant-numeric: tabular-nums">{{q.load}}</span>
+        <span style="display: {{q.tick}}; color: #1C1917"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></span>
+      </button>
+    </sc-for>
+  </div>
+  <div style="display: flex; align-items: center; gap: 6px; margin-top: 10px">
+    <sc-if value="{{pk.has}}" hint-placeholder-val="{{true}}">
+      <button type="button" onClick="{{pk.clear}}" style="height: 36px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 13px; font-weight: 600; color: #57534E; cursor: pointer; text-decoration: underline; text-underline-offset: 3px">Take {{pk.keeperName}} off</button>
+    </sc-if>
+    <span style="flex: 1"></span>
+    <button type="button" onClick="{{farm}}" style="display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px 0 12px; border: 0; border-radius: 8px; background: #EFEFEC; font: inherit; font-size: 13px; font-weight: 600; color: #1C1917; cursor: pointer">Open in Farm view <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 6 6 6-6 6"></path></svg></button>
+  </div>
+</div></sc-if>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toast.show}}" hint-placeholder-val="{{false}}">
+    <div style="position: sticky; bottom: 14px; z-index: 30; display: flex; justify-content: center; margin-top: 14px; pointer-events: none">
+      <div role="status" style="pointer-events: auto; display: inline-flex; align-items: center; gap: 12px; max-width: 100%; box-sizing: border-box; min-height: 48px; padding: 6px 6px 6px 16px; border-radius: 12px; background: #1C1917; color: #FFFFFF; font-size: 13.5px; box-shadow: 0 10px 30px rgba(28,25,23,.25); animation: wdIn .18s ease-out">
+        <span>{{toast.text}}</span>
+        <button type="button" onClick="{{undo}}" style="height: 36px; padding: 0 12px; border: 0; border-radius: 8px; background: rgba(255,255,255,.12); font: inherit; font-size: 13px; font-weight: 600; color: #FFFFFF; cursor: pointer">Undo</button>
+        <button type="button" onClick="{{dismiss}}" aria-label="Dismiss" style="width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: rgba(255,255,255,.6); cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1180,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = {
+      ZM: ['Zhao Min', '#F3E8F7', '#5B2D6E'], LW: ['Li Wei', '#FDE7C2', '#6B4300'], WF: ['Wang Fang', '#E2F0DA', '#203D2B'],
+      GF: ['Gao Feng', '#FBE5E3', '#A23B33'], DC: ['Dr. Chen', '#DCEEF2', '#0E5568']
+    };
+    const PK = ['ZM', 'LW', 'WF', 'GF', 'DC'];
+    const IC = {
+      birth: 'M4 16a8 8 0 0 1 16 0M12 4v3M5.5 7.5l2 2M18.5 7.5l-2 2M3 20h18', foster: 'M7 7h11l-3-3M17 17H6l3 3',
+      heat: 'M12 3c3 4 5 6 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.5 2 1.5 3 3 3-1-3 0-6 0-8.5Z', dose: 'm18 3 3 3M16.5 4.5l3 3M15 6l3 3-8.5 8.5-3-3L15 6ZM7 17l-4 4',
+      vax: 'M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z', move: 'M4 12h14M13 6l6 6-6 6'
+    };
+    // the rooms; care = rough hours a day of feeding and looking in; due = today's tasks [icon, chip, task, place, hours, clock]
+    const SECS = [
+      ['Farrowing', 4, 1, ['F1', 'F2', 'F3', 'F4']], ['Gestation', 12, 0.75, ['G1', 'G2']],
+      ['Nursery', 8, 0.75, ['N1', 'N2']], ['Quarantine', 12, 0.5, ['Q1']]
+    ];
+    const R = {
+      F1: ['Farrowing Room 1', '14 sows with litters', 70, []],
+      F2: ['Farrowing Room 2', '16 sows with litters', 280, []],
+      F3: ['Farrowing Room 3', 'Batch 32', 25, [['birth', 'Farrowing', 'Farrowing', 'Batch 32 · about 10', 2], ['foster', 'Fostering', 'Fostering checks', 'Batch 32 · 2 litters', 1]]],
+      F4: ['Farrowing Room 4', 'Batch 33', 15, [['move', 'Move in', 'Move sows in', 'Batch 33 · 22 sows', 2.5]]],
+      G1: ['Gestation 1', 'Batch 34', 50, [['heat', 'Breeding', 'Breeding', 'Batch 34 · 16 sows', 2]]],
+      G2: ['Gestation 2', '40 sows', 130, [['dose', 'Dose 08:30', 'RX-25G009', '4 lame sows · dose 2', 0.5, '08:30']]],
+      N1: ['Nursery 1', 'Batch 30', 30, [['vax', 'PRRS', 'PRRS vaccine', 'Batch 30 · 420 pigs', 3]]],
+      N2: ['Nursery 2', 'Batch 31', 200, []],
+      Q1: ['Quarantine 1', '12 gilts', 610, []]
+    };
+    const SEC_OF = {}, TGT = {}, CARE = {}, ORDER = [];
+    SECS.forEach((x) => x[3].forEach((id) => { SEC_OF[id] = x[0]; TGT[id] = x[1]; CARE[id] = x[2]; ORDER.push(id); }));
+    const START = { F1: '', F2: '', F3: 'LW', F4: 'LW', G1: 'ZM', G2: 'ZM', N1: 'WF', N2: 'WF', Q1: '' };
+    const OWN = { GF: [['Repairs', 'Feed line · Gestation 2', 3]], DC: [] };
+    START.F1 = 'GF';
+
+    const s = Object.assign({ view: 'rooms', keep: START, open: '', hist: [], last: null, toast: '' }, this.state || {});
+    const set = (p) => this.setState(Object.assign({}, s, p));
+    const keep = s.keep;
+    const nm = (id) => R[id][0];
+    const fh = (h) => { const w = Math.floor(h), f = h - w; return (w || (f ? '' : '0')) + (f >= 0.74 ? '¾' : f >= 0.49 ? '½' : f >= 0.24 ? '¼' : '') + ' h'; };
+    const roomsOf = (k, kp) => ORDER.filter((id) => (kp || keep)[id] === k);
+    const loadOf = (k, kp) => roomsOf(k, kp).reduce((a, id) => a + CARE[id] + R[id][3].reduce((b, d) => b + d[4], 0), 0) + (OWN[k] || []).reduce((a, o) => a + o[2], 0);
+    const mins = (m) => m < 60 ? m + ' min' : Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) : '');
+    const places = (ids) => {
+      const g = {}; ids.forEach((id) => { const n = nm(id), i = n.lastIndexOf(' '); const base = n.slice(0, i).replace(' Room', ''); (g[base] = g[base] || []).push(n.slice(i + 1)); });
+      return Object.keys(g).map((b) => b + ' ' + g[b].join(', ')).join(' · ');
+    };
+
+    const commit = (nk, text, hl) => set({ keep: nk, hist: s.hist.concat([{ keep: keep, last: s.last }]), last: hl || null, toast: text, open: '' });
+    const give = (id, k) => {
+      if (keep[id] === k) { set({ open: '' }); return; }
+      const nk = Object.assign({}, keep, { [id]: k });
+      commit(nk, keep[id] ? nm(id) + ' → ' + P[k][0] + ', from ' + P[keep[id]][0] : nm(id) + ' → ' + P[k][0], { room: id, who: k });
+    };
+    const clear = (id) => {
+      const was = keep[id]; if (!was) return;
+      commit(Object.assign({}, keep, { [id]: '' }), P[was][0] + ' is off ' + nm(id) + '. It has no one now.', null);
+    };
+    const move = (a, b) => {
+      const k = keep[a]; if (!k || a === b) return;
+      const nk = Object.assign({}, keep, { [a]: '', [b]: k });
+      commit(nk, P[k][0] + ' moved from ' + nm(a) + ' to ' + nm(b) + (keep[b] && keep[b] !== k ? ', instead of ' + P[keep[b]][0] : ''), { room: b, who: k });
+    };
+    const drop = (src, dst) => {
+      const [st, sv] = src.split(':'), [dt, dv] = dst.split(':');
+      if (dt === 'room' && st === 'p') give(dv, sv);
+      else if (dt === 'room' && st === 'k') move(sv, dv);
+      else if (dt === 'person' && (st === 'r' || st === 'k')) give(sv, dv);
+    };
+    window.__wdDrop = drop;
+    this.installDrag();
+
+    const farm = () => { try { window.dispatchEvent(new CustomEvent('sentri:tab', { detail: { id: 'layout', start: 'view@' + Date.now() } })); } catch (e) {} };
+    const toggle = (id) => () => set({ open: s.open === id ? '' : id });
+
+    // the picker for the open room
+    const pk = (() => {
+      const id = s.open; if (!id) return { title: '', sub: '', people: [], has: false };
+      const cur = keep[id];
+      return {
+        title: 'Give ' + nm(id) + ' to',
+        sub: R[id][1] + ' · ' + (R[id][3].length ? R[id][3].map((d) => d[2]).join(', ') + ' today' : 'feeding and look-ins only'),
+        has: !!cur, keeperName: cur ? P[cur][0] : '', clear: () => clear(id),
+        people: PK.map((k) => {
+          const on = cur === k, l = loadOf(k), after = on ? l : l + CARE[id] + R[id][3].reduce((b, d) => b + d[4], 0);
+          return {
+            k, name: P[k][0], bg: P[k][1], ink: P[k][2], on: on ? 'true' : 'false',
+            load: on ? fh(l) : fh(l) + ' → ' + fh(after), loadInk: after > 8 && !on ? '#7A5410' : '#57534E',
+            ring: on ? 'inset 0 0 0 2px #1C1917' : 'inset 0 0 0 1px #E7E5E4', tick: on ? 'inline-flex' : 'none',
+            aria: on ? P[k][0] + ' has it' : 'Give it to ' + P[k][0] + ', ' + fh(l) + ' today, ' + fh(after) + ' with it',
+            give: () => give(id, k)
+          };
+        })
+      };
+    })();
+
+    const hl = s.last;
+    const empty = ORDER.filter((id) => !keep[id]);
+
+    // Rooms
+    const row = (id) => {
+      const k = keep[id], late = R[id][2] > TGT[id] * 60, open = s.open === id, fresh = hl && hl.room === id;
+      return {
+        id, name: nm(id), sub: R[id][1], seen: 'seen ' + mins(R[id][2]) + ' ago',
+        seenInk: late ? '#7A5410' : '#57534E', seenW: late ? 600 : 400,
+        nameInk: k ? '#1C1917' : '#7A5410',
+        bg: open ? '#FAFAF8' : fresh ? '#F1F7F2' : 'transparent',
+        has: !!k, none: !k, open,
+        kp: k ? { k, name: P[k][0], bg: P[k][1], ink: P[k][2] } : { k: '', name: '', bg: '', ink: '' },
+        keeperAria: k ? P[k][0] + ' has ' + nm(id) + '. Drag to another room, or tap to change' : '',
+        aria: nm(id) + (k ? ', ' + P[k][0] : ', no one') + '. Tap to give it to someone',
+        tap: toggle(id),
+        due: R[id][3].map((d) => ({ mask: 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + IC[d[0]] + '"/></svg>') + '")', label: d[1], title: d[2] + ' · ' + d[3], bg: k ? '#F4F4F2' : '#FCF4E2', ink: k ? '#1C1917' : '#7A5410' }))
+      };
+    };
+    const secOut = (x) => ({ name: x[0], tgt: 'look in every ' + x[1] + ' h', rows: x[3].map(row) });
+    const cols = [{ secs: [secOut(SECS[0])] }, { secs: SECS.slice(1).map(secOut) }];
+    const team = PK.map((k) => { const l = loadOf(k), n = roomsOf(k).length;
+      return { k, name: P[k][0], bg: P[k][1], ink: P[k][2], load: fh(l), loadInk: l > 8 ? '#7A5410' : '#57534E', loadW: l > 8 ? 600 : 400,
+        aria: P[k][0] + ', ' + n + (n === 1 ? ' room, ' : ' rooms, ') + fh(l) + ' today. Drag onto a room' }; });
+
+    // People
+    const dayOf = (k) => {
+      const ids = roomsOf(k), out = [];
+      const isNew = (id) => hl && hl.who === k && hl.room === id;
+      const care = (t, ps, when, newer) => ({ t: 'c', title: t, place: ps, when, ring: newer ? 'inset 0 0 0 2px #28734F' : 'none' });
+      if (ids.length) out.push(care('Feed', places(ids), '06:30', ids.some(isNew)));
+      const tasks = [];
+      ids.forEach((id) => R[id][3].forEach((d) => tasks.push({ id, d })));
+      (OWN[k] || []).forEach((o) => tasks.push({ id: '', d: ['', '', o[0], o[1], o[2]] }));
+      tasks.sort((a, b) => (a.d[5] ? 0 : 1) - (b.d[5] ? 0 : 1));
+      tasks.forEach((x) => out.push({ t: 't', title: x.d[2], place: x.id ? nm(x.id) : x.d[3], when: x.d[5] ? 'at ' + x.d[5] : 'about ' + fh(x.d[4]), ring: isNew(x.id) ? 'inset 0 0 0 2px #28734F' : 'inset 0 0 0 1px #E7E5E4' }));
+      const quiet = ids.filter((id) => !R[id][3].length);
+      if (quiet.length) out.push(care('Look in', places(quiet), 'through the day', quiet.some(isNew)));
+      if (ids.length) out.push(care('Feed', places(ids), '14:00', ids.some(isNew)));
+      return out.map((j) => ({ title: j.title, place: j.place, when: j.when, whenW: j.when.indexOf(':') > 0 ? 600 : 400,
+        bg: j.t === 'c' ? '#F4F4F2' : '#FFFFFF', ink: j.t === 'c' ? '#57534E' : '#1C1917', ring: j.ring, w: '180px' }));
+    };
+    const ppl = PK.map((k, i) => {
+      const ids = roomsOf(k), l = loadOf(k);
+      return {
+        k, name: P[k][0], bg: P[k][1], ink: P[k][2],
+        load: fh(l) + (l > 8 ? ' · over a day' : ''), loadInk: l > 8 ? '#7A5410' : '#57534E', loadW: l > 8 ? 600 : 400,
+        pct: Math.min(100, Math.round(l / 8 * 100)) + '%', barBg: l > 8 ? '#D9A13B' : '#8F8A84',
+        line: i === PK.length - 1 ? '0' : '1px solid #F1F0EE',
+        rooms: ids.map((id) => ({ id, name: nm(id), tap: toggle(id), aria: nm(id) + '. Drag onto someone else, or tap to change',
+          bg: s.open === id ? '#F4F4F2' : '#FFFFFF', ring: s.open === id ? 'inset 0 0 0 2px #1C1917' : (hl && hl.room === id ? 'inset 0 0 0 2px #28734F' : 'inset 0 0 0 1px #E7E5E4') })),
+        noRooms: !ids.length, empty: k === 'DC' ? 'Vet · no rooms today. Drop one here' : 'No rooms. Drop one here',
+        day: dayOf(k),
+        open: !!s.open && keep[s.open] === k
+      };
+    });
+    const tray = empty.length ? { show: true,
+      bg: '#FCF4E2', sh: 'inset 0 0 0 1px #EBD9AE', ink: '#7A5410', title: 'No one yet',
+      hint: 'Drag a room onto someone, or tap it.',
+      rooms: empty.map((id) => ({ id, name: nm(id), tap: toggle(id), aria: nm(id) + ' has no one. Drag onto someone, or tap to pick' })),
+      open: !!s.open && !keep[s.open]
+    } : { show: false, bg: '#FFFFFF', sh: '0 1px 3px rgba(28,25,23,.06), 0 0 0 1px #ECEBE8', ink: '#57534E', title: 'Every room has someone', hint: '', rooms: [], open: false };
+
+    const on = (b) => b ? ['#FFFFFF', '0 1px 2px rgba(28,25,23,.1)', '#1C1917', '600', 'true'] : ['transparent', 'none', '#57534E', '400', 'false'];
+    const r1 = on(s.view === 'rooms'), p1 = on(s.view === 'people');
+    const cov = empty.length
+      ? { bg: '#FCF4E2', ink: '#7A5410', sh: 'inset 0 0 0 1px #EBD9AE', q: 'grid', ok: 'none', text: empty.length === 1 ? nm(empty[0]) + ' has no one' : empty.length + ' rooms with no one' }
+      : { bg: '#FFFFFF', ink: '#57534E', sh: 'inset 0 0 0 1px #E7E5E4', q: 'none', ok: 'inline-flex', text: 'Every room has someone' };
+
+    return {
+      isRooms: s.view === 'rooms', isPeople: s.view === 'people',
+      goRooms: () => set({ view: 'rooms', open: '' }), goPeople: () => set({ view: 'people', open: '' }),
+      rBg: r1[0], rSh: r1[1], rInk: r1[2], rW: r1[3], rOn: r1[4], pBg: p1[0], pSh: p1[1], pInk: p1[2], pW: p1[3], pOn: p1[4],
+      cov, team, cols, ppl, tray, pk, farm,
+      closePick: () => set({ open: '' }),
+      toast: { show: !!s.toast, text: s.toast },
+      undo: () => { const h = s.hist[s.hist.length - 1]; if (!h) return; set({ keep: h.keep, last: h.last, hist: s.hist.slice(0, -1), toast: '', open: '' }); },
+      dismiss: () => set({ toast: '' })
+    };
+  }
+
+  // pointer drag: works for mouse, pen and touch. A press that moves less than 6px stays a tap.
+  installDrag() {
+    if (window.__wdInstalled) return;
+    window.__wdInstalled = true;
+    let d = null;
+    const clearOver = () => document.querySelectorAll('[data-over]').forEach((el) => el.removeAttribute('data-over'));
+    const targetAt = (x, y) => {
+      const el = document.elementFromPoint(x, y);
+      const t = el && el.closest('[data-drop]');
+      if (!t || !d) return null;
+      const kind = t.getAttribute('data-drop').split(':')[0], st = d.src.split(':')[0];
+      if (kind === 'room' && (st === 'p' || st === 'k')) return t;
+      if (kind === 'person' && (st === 'r' || st === 'k')) return t;
+      return null;
+    };
+    document.addEventListener('pointerdown', (e) => {
+      if (e.button !== undefined && e.button !== 0) return;
+      const src = e.target.closest && e.target.closest('[data-drag]');
+      if (!src) return;
+      d = { src: src.getAttribute('data-drag'), el: src, x: e.clientX, y: e.clientY, id: e.pointerId, on: false, ghost: null };
+    }, true);
+    window.addEventListener('pointermove', (e) => {
+      if (!d || e.pointerId !== d.id) return;
+      if (!d.on) {
+        if (Math.hypot(e.clientX - d.x, e.clientY - d.y) < 6) return;
+        d.on = true;
+        const r = d.el.getBoundingClientRect();
+        const g = d.el.cloneNode(true);
+        g.removeAttribute('data-drag');
+        g.setAttribute('aria-hidden', 'true');
+        Object.assign(g.style, { position: 'fixed', left: '0', top: '0', width: r.width + 'px', height: r.height + 'px', margin: '0', zIndex: '9999', pointerEvents: 'none',
+          boxShadow: '0 12px 28px rgba(28,25,23,.28), inset 0 0 0 1px #E7E5E4', background: '#FFFFFF', borderRadius: '12px', opacity: '0.96', boxSizing: 'border-box' });
+        d.dx = d.x - r.left; d.dy = d.y - r.top;
+        document.body.appendChild(g); d.ghost = g;
+        d.el.style.opacity = '0.4';
+        document.documentElement.style.cursor = 'grabbing';
+      }
+      e.preventDefault();
+      d.ghost.style.transform = 'translate(' + (e.clientX - d.dx) + 'px,' + (e.clientY - d.dy) + 'px) rotate(-1.5deg)';
+      clearOver();
+      const t = targetAt(e.clientX, e.clientY);
+      if (t) t.setAttribute('data-over', '');
+    }, { passive: false });
+    const end = (e, cancel) => {
+      if (!d || e.pointerId !== d.id) return;
+      const was = d; d = null;
+      if (!was.on) return;
+      const t = cancel ? null : (() => { d = was; const x = targetAt(e.clientX, e.clientY); d = null; return x; })();
+      clearOver();
+      if (was.ghost) was.ghost.remove();
+      was.el.style.opacity = '';
+      document.documentElement.style.cursor = '';
+      window.__wdSuppress = Date.now();
+      if (t && window.__wdDrop) window.__wdDrop(was.src, t.getAttribute('data-drop'));
+    };
+    window.addEventListener('pointerup', (e) => end(e, false));
+    window.addEventListener('pointercancel', (e) => end(e, true));
+    window.addEventListener('click', (e) => { if (window.__wdSuppress && Date.now() - window.__wdSuppress < 60) { e.stopPropagation(); e.preventDefault(); window.__wdSuppress = 0; } }, true);
+  }
+}
+</script>
+</body>
+</html>

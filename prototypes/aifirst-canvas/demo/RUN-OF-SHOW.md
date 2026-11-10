@@ -16,7 +16,7 @@ The phrases below are rehearsed. They answer instantly and open the right page. 
   - **Decide 17** (left) opens For you, the full list.
   - The item on the right opens that item.
   - The bar underneath jumps to an item.
-- **Day plan** opens the people plan (each team and its jobs). **Task schedule** opens the task grid.
+- **Day plan** opens the Work schedule. Drag a person onto a room (or tap a room and pick); People shows each day. **Task schedule** opens the task grid.
 - Pages open beside the chat. Use expand (top right) when you want a page full width. Older pages collect under **+N** in the tab bar.
 - Production / Health / Farm show at a glance; hover any number.
 
