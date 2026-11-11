@@ -1,0 +1,91 @@
+{
+  "base": "http://localhost:49468",
+  "commit": "df82ba5dbaf690fab32cfd4437c66457c4e17b9e",
+  "runs": [
+    {
+      "screen": "move.tagged",
+      "feature": "move",
+      "lang": "en",
+      "width": 390,
+      "file": "move.tagged/en-390.png",
+      "ok": true
+    },
+    {
+      "screen": "move.tagged",
+      "feature": "move",
+      "lang": "zh",
+      "width": 390,
+      "file": "move.tagged/zh-390.png",
+      "ok": true,
+      "zh": "ignored"
+    },
+    {
+      "screen": "move.picker",
+      "feature": "move",
+      "lang": "en",
+      "width": 390,
+      "file": "move.picker/en-390.png",
+      "ok": true
+    },
+    {
+      "screen": "move.picker",
+      "feature": "move",
+      "lang": "zh",
+      "width": 390,
+      "file": "move.picker/zh-390.png",
+      "ok": true,
+      "zh": "ignored"
+    },
+    {
+      "screen": "move.mixed",
+      "feature": "move",
+      "lang": "en",
+      "width": 390,
+      "file": "move.mixed/en-390.png",
+      "ok": true
+    },
+    {
+      "screen": "move.mixed",
+      "feature": "move",
+      "lang": "zh",
+      "width": 390,
+      "file": "move.mixed/zh-390.png",
+      "ok": true,
+      "zh": "ignored"
+    },
+    {
+      "screen": "move.after",
+      "feature": "move",
+      "lang": "en",
+      "width": 390,
+      "file": "move.after/en-390.png",
+      "ok": true
+    },
+    {
+      "screen": "move.after",
+      "feature": "move",
+      "lang": "zh",
+      "width": 390,
+      "file": "move.after/zh-390.png",
+      "ok": true,
+      "zh": "ignored"
+    },
+    {
+      "screen": "move.transfer-sow",
+      "feature": "move",
+      "lang": "en",
+      "width": 390,
+      "file": "move.transfer-sow/en-390.png",
+      "ok": true
+    },
+    {
+      "screen": "move.transfer-sow",
+      "feature": "move",
+      "lang": "zh",
+      "width": 390,
+      "file": "move.transfer-sow/zh-390.png",
+      "ok": true,
+      "zh": "rendered"
+    }
+  ]
+}

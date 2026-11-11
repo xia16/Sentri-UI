@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="claude:viewport-fit-sides" content="cover">
+  <title>转舍 · 负责人场景与产品决策评审</title>
+  <style>
+    :root{--ground:#f3f5ef;--paper:#fff;--ink:#1e2520;--muted:#58645c;--line:#d9dfd6;--green:#225b3d;--amber:#80530a;--warn:#fff4dd;--mono:ui-monospace,SFMono-Regular,Menlo,monospace}
+    *{box-sizing:border-box}body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.48 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+    main{max-width:1920px;margin:auto;padding:32px clamp(18px,3vw,48px) 72px}header{display:grid;gap:12px;max-width:900px;margin-bottom:34px}h1{font-size:30px;line-height:1.2;margin:0}h2{font-size:21px;margin:0}h3{font-size:17px;margin:0}p{margin:0}.eyebrow,.meta,.art-title{font:600 12px/1.35 var(--mono);letter-spacing:.06em}.eyebrow{color:var(--green);text-transform:uppercase}.meta{color:var(--muted);letter-spacing:0}.intro{font-size:16px;color:var(--muted)}.legend{display:flex;gap:8px;flex-wrap:wrap}.pill{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 10px;color:var(--muted);font-size:12px}.pill.important{border-color:#d6bc85;background:var(--warn);color:#654614}
+    section{margin:30px 0 42px;display:grid;gap:16px}.section-head{max-width:950px;display:grid;gap:5px}.section-head p{color:var(--muted)}.lane{display:flex;gap:16px;overflow-x:auto;align-items:start;padding:2px 2px 16px;scroll-snap-type:x proximity}.artboard{flex:none;width:390px;margin:0;scroll-snap-align:start}.art-title{display:block;margin-bottom:7px;color:var(--green)}.artboard img{display:block;width:390px;height:844px;object-fit:contain;background:#fafbf8;border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 30px #1c302011}.artboard figcaption{font-size:13px;color:var(--muted);margin-top:9px;min-height:42px}.artboard figcaption strong{color:var(--ink)}.note{flex:none;width:min(380px,90vw);min-height:300px;background:var(--paper);border:1px solid var(--line);border-left:4px solid #bd913d;border-radius:14px;padding:18px;display:grid;align-content:start;gap:12px}.note h3{color:#61440e}.note ul{margin:0;padding-left:20px;display:grid;gap:9px}.note li{padding-left:2px}.note strong{color:var(--ink)}.note .meta{margin-top:4px}.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.summary article{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:17px;display:grid;gap:8px}.summary article h3{color:var(--green)}.summary article p{color:var(--muted)}footer{border-top:1px solid var(--line);padding-top:20px;color:var(--muted);max-width:1050px}a{color:var(--green)}@media(max-width:600px){main{padding-top:22px}.artboard{width:300px}.artboard img{width:300px;height:auto;aspect-ratio:390/844}.note{width:300px}.art-title{font-size:11px}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">Move · 转舍 · 决策画布</span>
+    <h1>先确认猪只、头数与回执，再定转舍画面</h1>
+    <p class="intro">下面五张 390 × 844 实图来自当前仓库页面。它们是待评审的设计基线，状态均为 <strong>in-design</strong>。本轮先请负责人裁定影响业务结果的规则；画布达成一致前，不把新设计写进原型或 atlas。</p>
+    <div class="legend"><span class="pill">来源：live pages · 当前分支基线</span><span class="pill">30 项操作 · 62 条场景</span><span class="pill important">15 条未裁定分支</span><span class="pill important">转舍 deck 的 4 页未渲染中文</span></div>
+    <span class="meta">Sentri-UI origin/main df82ba5d · 2026-11-11 · canvas draft · no screen approval recorded</span>
+  </header>
+
+  <section>
+    <div class="section-head"><h2>1 · 现场发起 → 选栏 → 核对 → 结果</h2><p>从左到右是一笔按需转舍的现有四张实图。第 1 张只显示有身份猪；第 3 张展示有身份与无身份头数混选。目的栏选择填回核对页，最后的主按钮才提交。</p></div>
+    <div class="lane">
+      <figure class="artboard"><span class="art-title">now · move.tagged</span><img src="shots/move.tagged/en-390.png" alt="当前设计中的两头有身份猪转舍核对页，目的栏为空"><figcaption><strong>核对对象。</strong> 两头有身份猪从 C3 转出；原型用一个目的栏字段和主按钮。</figcaption></figure>
+      <figure class="artboard"><span class="art-title">now · move.picker</span><img src="shots/move.picker/en-390.png" alt="当前设计中的目的栏选择器，原栏灰置，当前单元在前"><figcaption><strong>选目的栏。</strong> 原栏 C3 灰置；跨单元结果必须带完整路径。</figcaption></figure>
+      <figure class="artboard"><span class="art-title">now · move.mixed</span><img src="shots/move.mixed/en-390.png" alt="当前设计中的混选转舍核对页，含群记录去留与多批次头数分配"><figcaption><strong>复杂核对。</strong> 3 头有身份猪加 9 头无身份猪；群记录与批次分配在同一次提交前确认。</figcaption></figure>
+      <figure class="artboard"><span class="art-title">now · move.after</span><img src="shots/move.after/en-390.png" alt="当前设计中的转舍后栏位列表，来源与目的数量变化"><figcaption><strong>结果。</strong> 原栏和目的栏数量变化；多头结果按现行反馈规则还需要数量提示。</figcaption></figure>
+      <aside class="note"><h3>这条路线请先裁定</h3><ul><li><strong>Q5 · 原子性：</strong>建议有身份、无身份、批次和群记录作为一笔操作整体接受；失败时保留可核对记录。</li><li><strong>Q9 · 群记录 Both：</strong>需要明确复制后的记录身份、头数与历史；后端不能表达前不要提交。</li><li><strong>Q1 · 满栏：</strong>建议可靠确认满栏时阻止；容量未知的处理仍须定规则。</li><li><strong>Q8 · 多来源：</strong>建议本轮一笔只从一个来源栏位转出。</li></ul><p class="meta">场景：A-9、B-9、C-5、C-12、E-10</p></aside>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>2 · 从母猪档案发起</h2><p>这张实图由母猪记录进入 Actions，再点 Transfer sow 得到；现有 `move.transfer-sow` 的 atlas step 只停在 Actions，未到本表单。表单使用“单元 → 栏位”两字段，与上面的统一目的栏选择器不同。</p></div>
+    <div class="lane">
+      <figure class="artboard"><span class="art-title">now · move.transfer-sow</span><img src="shots/move.transfer-sow/en-390.png" alt="从母猪档案进入的当前转舍表单，分别选择目的单元和栏位"><figcaption><strong>现有母猪路径。</strong> 原位 Unit 7 · B1；目的单元与目的栏分开选择，未选前主按钮禁用。</figcaption></figure>
+      <aside class="note"><h3>母猪与入口的建议</h3><ul><li><strong>Q4 · 泌乳状态：</strong>建议单纯搬走母猪不静默记录断奶或改变生产状态；明确生产动作另记。</li><li><strong>Q10 · 权限：</strong>建议服务器分别校验普通转舍、计划任务和更正权。</li><li><strong>设计统一：</strong>同一目的栏语义建议使用同一 picker；分别从单猪和多选入口进入同一核对逻辑。</li><li><strong>Q7 · 更正：</strong>建议错误转舍用一笔关联的补偿记录，不改写原历史。</li></ul><p class="meta">场景：B-10、D-1、F-1、F-5、F-6</p></aside>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>3 · 画布外的业务状态，先在这里决策</h2><p>静态页面无法证明真实保存与跨设备结果。下面这些状态进入场景树和决定表；本轮画布不把它们画成已经可用的原型。</p></div>
+    <div class="summary">
+      <article><h3>离线与结果不明 · Q6</h3><p>建议每笔转舍有稳定操作 ID、来源版本和结果查询。断网只说“保存在本机”，回执未明不能重发后宣称成功；第二位工人先转走时保留冲突供核对。</p></article>
+      <article><h3>计划任务 · Q2</h3><p>生产线“状态、任务或节点触发”目前只有字段帮助文字。触发、目标、指派、生命周期及完成口径定下后，再从 Workbench 连接到转舍执行。</p></article>
+      <article><h3>Console 转舍单 · Q3</h3><p>目前只有菜单和历史抽屉。建议它生成带稳定 ID 与目标群体的任务；在契约明确前，不能把菜单文案当移动端执行规则。</p></article>
+      <article><h3>本轮范围</h3><p>支持移动端按需转舍的单猪、多猪、无身份头数和混选场景。Console 制单、生产线配置、离场与库存移动列为本功能暂不支持，跨功能入口各自交接。</p></article>
+    </div>
+  </section>
+
+  <footer>评审依据：<a href="../PRD.md">PRD</a> · <a href="../operations.md">操作清单</a> · <a href="../scenario-tree.md">场景树</a> · <a href="../decisions.md">全部问题、选项与受影响状态</a>。本地单文件版本内嵌全部图片；链接指向同目录源文件，分享单文件时请以决策画布中的摘要为准。</footer>
+</main>
+</body>
+</html>
