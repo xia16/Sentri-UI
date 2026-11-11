@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Work schedule, merged</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 3008px; box-sizing: border-box; padding: 48px 48px 64px; background: #ECEEE9; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #1B211C; font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased">
+
+  <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em">Work schedule, merged: the demo version as the base, with what the board does better (mock-up, 11 Nov)</h1>
+  <p style="margin: 8px 0 0; max-width: 1500px; font-size: 15px; line-height: 22px; color: #5D665F">One farm, one day: Thu 5 Nov, 10:40, the board&rsquo;s full farm of 24 rooms. Left is the demo as it is today. Everything after it is the proposal. Each frame says what it takes from the board.</p>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 72px 64px; align-items: flex-start; margin-top: 40px">
+    <sc-for list="{{panes}}" as="pn" hint-placeholder-count="3">
+      <div style="flex: none; width: {{pn.w}}">
+        <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px">
+          <span style="font-size: 13px; font-weight: 600; color: {{pn.tagInk}}">{{pn.n}}</span>
+          <span style="font-size: 17px; font-weight: 600">{{pn.title}}</span>
+        </div>
+        <ul style="margin: 0 0 16px; padding-left: 18px; min-height: 66px; font-size: 13.5px; line-height: 20px; color: #3B4540">
+          <sc-for list="{{pn.notes}}" as="t" hint-placeholder-count="2"><li>{{t.text}}</li></sc-for>
+        </ul>
+
+        <div style="box-sizing: border-box; width: 100%; padding: 20px 20px 24px; border-radius: 16px; background: {{pn.c.bg}}; box-shadow: 0 0 0 1px rgba(17,21,17,.08), 0 20px 40px -24px rgba(17,21,17,.25); color: {{pn.c.ink}}">
+
+          <div style="display: flex; align-items: center; gap: 10px 12px; flex-wrap: wrap; margin-bottom: 12px">
+            <h2 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em">Work schedule</h2>
+            <sc-if value="{{pn.nav}}" hint-placeholder-val="{{true}}">
+              <span style="display: inline-flex; align-items: center; gap: 2px">
+                <button type="button" style="height: 32px; padding: 0 11px; border: 0; border-radius: 8px; background: #FFFFFF; box-shadow: inset 0 0 0 1px {{pn.c.ring}}; font: inherit; font-size: 13px; font-weight: 600; color: {{pn.c.ink}}">Today</button>
+                <button type="button" aria-label="Day before" style="width: 32px; height: 32px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: {{pn.c.ink}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m15 6-6 6 6 6"></path></svg></button>
+                <button type="button" aria-label="Day after" style="width: 32px; height: 32px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: {{pn.c.ink}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 6 6 6-6 6"></path></svg></button>
+                <span style="margin-left: 4px; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums">{{pn.date}}</span>
+              </span>
+            </sc-if>
+            <sc-if value="{{pn.noNav}}" hint-placeholder-val="{{false}}">
+              <span style="font-size: 14px; font-weight: 600">{{pn.date}}</span>
+              <span style="font-size: 13px; color: {{pn.c.mut}}">today</span>
+            </sc-if>
+            <span style="flex: 1"></span>
+            <span role="status" style="display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 99px; font-size: 13px; font-weight: 600; background: #FCF4E2; color: {{pn.c.amber}}; box-shadow: inset 0 0 0 1px #EBD9AE">
+              <span style="width: 18px; height: 18px; display: grid; place-items: center; border-radius: 99px; background: #FFFFFF; box-shadow: inset 0 0 0 1.5px {{pn.c.amber}}; font-size: 11px; font-weight: 700">?</span>{{pn.warn}}
+            </span>
+            <span style="display: inline-flex; padding: 3px; border-radius: 9px; background: {{pn.c.seg}}">
+              <span style="height: 30px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 7px; font-size: 13px; font-weight: 600; background: #FFFFFF; box-shadow: 0 1px 2px rgba(17,21,17,.1)">Rooms</span>
+              <span style="height: 30px; display: inline-flex; align-items: center; padding: 0 14px; font-size: 13px; color: {{pn.c.mut}}">People</span>
+            </span>
+          </div>
+
+          <div style="background: #FFFFFF; border-radius: 14px; box-shadow: 0 0 0 1px {{pn.c.ring}}; padding: 10px 12px; margin-bottom: 12px">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap">
+              <sc-for list="{{pn.team}}" as="t" hint-placeholder-count="5">
+                <span style="position: relative; display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 12px 0 6px; border-radius: 99px; background: #FFFFFF; box-shadow: inset 0 0 0 1px {{t.ring}}; font-size: 13px; white-space: nowrap; opacity: {{t.op}}">
+                  <span style="width: 28px; height: 28px; flex: none; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: {{t.bg}}; color: {{t.ink}}">{{t.k}}</span>
+                  <b style="font-weight: 600">{{t.name}}</b>
+                  <span style="color: {{pn.c.mut}}; font-variant-numeric: tabular-nums">{{t.load}}</span>
+                </span>
+              </sc-for>
+              <span style="flex: 1"></span>
+              <span style="font-size: 12.5px; color: {{pn.c.mut}}; padding: 0 4px">Drag someone onto a room, or tap a room.</span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; align-items: flex-start">
+            <sc-for list="{{pn.cols}}" as="col" hint-placeholder-count="1">
+              <div style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+                <sc-for list="{{col.secs}}" as="sec" hint-placeholder-count="2">
+                  <div style="background: #FFFFFF; border-radius: 14px; box-shadow: 0 0 0 1px {{pn.c.ring}}; overflow: visible">
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px 8px; font-size: 12px; font-weight: 600; color: {{pn.c.mut}}">
+                      <span style="flex: 1">{{sec.name}}</span>
+                      <span style="display: inline-flex; align-items: center; gap: 5px; font-weight: 400"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path></svg>{{sec.tgt}}</span>
+                    </div>
+                    <sc-for list="{{sec.rows}}" as="r" hint-placeholder-count="3">
+
+                      <sc-if value="{{r.isRoom}}" hint-placeholder-val="{{true}}">
+                        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto 148px; gap: 10px; align-items: center; min-height: 58px; padding: 0 10px 0 14px; border-top: 1px solid {{pn.c.line}}; background: {{r.bg}}">
+                          <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 8px 0">
+                            <span style="font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: {{r.nameInk}}; text-decoration: {{r.under}}; text-underline-offset: 3px">{{r.name}}</span>
+                            <span style="font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: {{pn.c.mut}}">{{r.sub}} &middot; <span style="color: {{r.seenInk}}; font-weight: {{r.seenW}}">{{r.seen}}</span></span>
+                          </span>
+                          <span style="display: flex; gap: 4px; justify-content: flex-end; min-width: 0">
+                            <sc-for list="{{r.due}}" as="d" hint-placeholder-count="1">
+                              <span style="position: relative; display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 7px; border-radius: 6px; background: {{d.bg}}; color: {{d.ink}}; font-size: 12px; font-weight: 600; white-space: nowrap; box-shadow: {{d.ring}}">
+                                <span aria-hidden="true" style="width: 13px; height: 13px; flex: none; background: currentColor; -webkit-mask: {{d.mask}} center / contain no-repeat; mask: {{d.mask}} center / contain no-repeat"></span>{{d.label}}
+                                <span role="tooltip" style="display: {{d.tip}}; position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); z-index: 5; font-size: 11.5px; font-weight: 600; line-height: 20px; padding: 0 7px; border-radius: 6px; background: #1E2A22; color: #FFFFFF; white-space: nowrap">{{d.title}}</span>
+                                <span role="tooltip" style="display: {{d.nat}}; position: absolute; left: 30%; top: calc(100% + 10px); z-index: 5; font: 12px/18px -apple-system, system-ui, sans-serif; font-weight: 400; padding: 2px 6px; background: #F2F2F2; color: #333333; border: 1px solid #BDBDBD; box-shadow: 1px 2px 3px rgba(0,0,0,.18); white-space: nowrap">{{d.title}}</span>
+                              </span>
+                            </sc-for>
+                          </span>
+                          <sc-if value="{{r.has}}" hint-placeholder-val="{{true}}">
+                            <span style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 6px; border-radius: 10px; background: {{pn.c.keep}}; font-size: 13px; min-width: 0">
+                              <span style="width: 28px; height: 28px; flex: none; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: {{r.kp.bg}}; color: {{r.kp.ink}}">{{r.kp.k}}</span>
+                              <b style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.kp.name}}</b>
+                            </span>
+                          </sc-if>
+                          <sc-if value="{{r.none}}" hint-placeholder-val="{{false}}">
+                            <span style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 6px; border-radius: 10px; background: #FCF4E2; box-shadow: inset 0 0 0 1px #EBD9AE; font-size: 13px; color: {{pn.c.amber}}">
+                              <span style="width: 28px; height: 28px; flex: none; border-radius: 99px; display: grid; place-items: center; background: #FFFFFF; box-shadow: inset 0 0 0 1.5px {{pn.c.amber}}; font-size: 13px; font-weight: 700">?</span>
+                              <b style="font-weight: 600">No one</b>
+                            </span>
+                          </sc-if>
+                        </div>
+                      </sc-if>
+
+                      <sc-if value="{{r.isOpen}}" hint-placeholder-val="{{false}}">
+                        <div style="border-top: 1px solid {{pn.c.line}}; background: #FAFBF8; padding: 12px 14px 14px">
+                          <div style="font-size: 13.5px; font-weight: 600">Give {{r.name}} to</div>
+                          <div style="margin-top: 2px; font-size: 12.5px; color: {{pn.c.amber}}; font-weight: 600">{{r.why}}</div>
+                          <div style="display: flex; flex-direction: column; gap: 6px; margin: 10px 0 12px">
+                            <sc-for list="{{r.dueList}}" as="x" hint-placeholder-count="2">
+                              <span style="display: flex; align-items: center; gap: 8px; font-size: 13px">
+                                <span aria-hidden="true" style="width: 14px; height: 14px; flex: none; background: currentColor; -webkit-mask: {{x.mask}} center / contain no-repeat; mask: {{x.mask}} center / contain no-repeat"></span>
+                                <b style="font-weight: 600">{{x.task}}</b><span style="color: {{pn.c.mut}}">{{x.place}}</span><span style="flex: 1"></span><span style="color: {{pn.c.mut}}; font-variant-numeric: tabular-nums">{{x.when}}</span>
+                              </span>
+                            </sc-for>
+                          </div>
+                          <div style="display: flex; flex-wrap: wrap; gap: 6px">
+                            <sc-for list="{{r.pick}}" as="q" hint-placeholder-count="4">
+                              <span style="display: inline-flex; align-items: center; gap: 7px; height: 44px; padding: 0 12px 0 6px; border-radius: 10px; background: #FFFFFF; box-shadow: {{q.ring}}; font-size: 13px; white-space: nowrap">
+                                <span style="width: 28px; height: 28px; flex: none; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: {{q.bg}}; color: {{q.ink}}">{{q.k}}</span>
+                                <b style="font-weight: 600">{{q.name}}</b>
+                                <span style="color: {{q.loadInk}}; font-variant-numeric: tabular-nums">{{q.load}}</span>
+                                <span style="display: {{q.sug}}; height: 20px; align-items: center; padding: 0 6px; border-radius: 6px; background: #E5F0E8; color: #1F5C3F; font-size: 11.5px; font-weight: 600">{{q.why}}</span>
+                              </span>
+                            </sc-for>
+                          </div>
+                          <div style="display: flex; justify-content: flex-end; margin-top: 10px">
+                            <span style="display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px 0 12px; border-radius: 8px; background: #EEF0EB; font-size: 13px; font-weight: 600">Open in Farm view <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 6 6 6-6 6"></path></svg></span>
+                          </div>
+                        </div>
+                      </sc-if>
+
+                      <sc-if value="{{r.isFold}}" hint-placeholder-val="{{false}}">
+                        <div style="display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 14px; border-top: 1px solid {{pn.c.line}}; font-size: 13px; color: {{pn.c.mut}}">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 6 6 6-6 6"></path></svg>
+                          <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"><b style="font-weight: 600; color: {{pn.c.ink}}">{{r.name}}</b> &middot; {{r.sub}}</span>
+                          <span style="flex: 1"></span>
+                          <span style="display: inline-flex">
+                            <sc-for list="{{r.who}}" as="w" hint-placeholder-count="2">
+                              <span style="width: 24px; height: 24px; margin-left: -4px; border-radius: 99px; display: grid; place-items: center; font-size: 10px; font-weight: 600; background: {{w.bg}}; color: {{w.ink}}; box-shadow: 0 0 0 2px #FFFFFF">{{w.k}}</span>
+                            </sc-for>
+                          </span>
+                        </div>
+                      </sc-if>
+
+                      <sc-if value="{{r.isNote}}" hint-placeholder-val="{{false}}">
+                        <div style="padding: 11px 14px 12px; border-top: 1px solid {{pn.c.line}}; font-size: 12.5px; color: #8A938C">{{r.name}}</div>
+                      </sc-if>
+
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+
+    <div style="flex: none; width: 700px">
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px"><span style="font-size: 13px; font-weight: 600; color: #1F5C3F">5</span><span style="font-size: 17px; font-weight: 600">People, same day</span></div>
+      <ul style="margin: 0 0 16px; padding-left: 18px; min-height: 66px; font-size: 13.5px; line-height: 20px; color: #3B4540">
+        <li>The demo&rsquo;s People view as it is: each person&rsquo;s rooms, then their day in order.</li>
+        <li>From the board: someone away stays in the list, greyed, so their rooms visibly need covering.</li>
+      </ul>
+      <div style="box-sizing: border-box; padding: 20px 20px 24px; border-radius: 16px; background: #F6F7F1; box-shadow: 0 0 0 1px rgba(17,21,17,.08), 0 20px 40px -24px rgba(17,21,17,.25)">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 10px 12px; border-radius: 14px; background: #FCF4E2; box-shadow: inset 0 0 0 1px #EBD9AE">
+          <b style="font-size: 13px; color: #8A5A12">No one yet</b>
+          <span style="display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px 0 8px; border-radius: 10px; background: #FFFFFF; box-shadow: inset 0 0 0 1.5px #D9BE80; font-size: 13px; font-weight: 600; color: #8A5A12"><span style="width: 20px; height: 20px; border-radius: 99px; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px #8A5A12; font-size: 11px; font-weight: 700">?</span>Farrowing 4</span>
+          <span style="flex: 1"></span><span style="font-size: 12.5px; color: #5D665F">Drag a room onto someone, or tap it.</span>
+        </div>
+        <div style="background: #FFFFFF; border-radius: 14px; box-shadow: 0 0 0 1px #E6E9E2; overflow: hidden">
+          <div style="display: grid; grid-template-columns: 168px minmax(0, 1fr); height: 36px; border-bottom: 1px solid #F0F1EC; font-size: 12px; font-weight: 600; color: #5D665F">
+            <div style="display: flex; align-items: center; padding-left: 16px">7 people</div>
+            <div style="display: flex; align-items: center; padding: 0 14px; border-left: 1px solid #F0F1EC">Their rooms, then their day in order</div>
+          </div>
+          <sc-for list="{{ppl}}" as="p" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: 168px minmax(0, 1fr); border-bottom: 1px solid #F0F1EC; opacity: {{p.op}}">
+              <div style="display: flex; align-items: center; gap: 10px; padding: 12px 10px 12px 16px; min-width: 0">
+                <span style="width: 34px; height: 34px; flex: none; border-radius: 99px; display: grid; place-items: center; font-size: 12px; font-weight: 600; background: {{p.bg}}; color: {{p.ink}}">{{p.k}}</span>
+                <span style="min-width: 0"><span style="display: block; font-size: 13.5px; font-weight: 600; white-space: nowrap">{{p.name}}</span><span style="display: block; margin-top: 2px; font-size: 12px; color: #5D665F; font-variant-numeric: tabular-nums">{{p.load}}</span></span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px; padding: 10px 0 12px 12px; border-left: 1px solid #F0F1EC; min-width: 0">
+                <div style="display: flex; gap: 6px; flex-wrap: wrap; padding-right: 12px">
+                  <sc-for list="{{p.rooms}}" as="c" hint-placeholder-count="2"><span style="display: inline-flex; align-items: center; height: 32px; padding: 0 11px; border-radius: 9px; box-shadow: inset 0 0 0 1px #E6E9E2; font-size: 13px; font-weight: 600">{{c.name}}</span></sc-for>
+                </div>
+                <div style="display: flex; gap: 6px; overflow: hidden; padding-right: 12px">
+                  <sc-for list="{{p.day}}" as="j" hint-placeholder-count="3">
+                    <div style="flex: none; width: 150px; box-sizing: border-box; height: 58px; padding: 0 10px; border-radius: 9px; display: flex; flex-direction: column; justify-content: center; gap: 2px; background: {{j.bg}}; box-shadow: {{j.ring}}">
+                      <span style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: {{j.ink}}">{{j.title}}</span>
+                      <span style="font-size: 11.5px; color: #5D665F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{j.when}}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex: none; width: 2912px">
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px"><span style="font-size: 13px; font-weight: 600; color: #1F5C3F">6</span><span style="font-size: 17px; font-weight: 600">Tooltips: the browser&rsquo;s own today, shadcn&rsquo;s in the proposal</span></div>
+      <ul style="margin: 0 0 16px; padding-left: 18px; min-height: 66px; font-size: 13.5px; line-height: 20px; color: #3B4540">
+        <li>Both versions use the browser&rsquo;s own tooltip (a <code>title</code>): grey, late, and drawn by the system, not by us.</li>
+        <li>The Home UI guide already names two, from shadcn: the label tooltip (dark, one short line) and the data tooltip (white card, anything with numbers).</li>
+      </ul>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+        <sc-for list="{{tips}}" as="tp" hint-placeholder-count="3">
+          <div style="box-sizing: border-box; height: 300px; padding: 22px 24px; border-radius: 16px; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(17,21,17,.08)">
+            <div style="font-size: 15px; font-weight: 600">{{tp.title}}</div>
+            <div style="margin-top: 4px; font-size: 13px; line-height: 19px; color: #5D665F">{{tp.sub}}</div>
+            <div style="position: relative; height: 170px; margin-top: 16px; border-radius: 12px; background: #F6F7F1">
+
+              <sc-if value="{{tp.chip}}" hint-placeholder-val="{{true}}">
+                <span style="position: absolute; left: 50%; top: {{tp.chipTop}}; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 7px; border-radius: 6px; background: #F0F1EC; box-shadow: inset 0 0 0 1px #E6E9E2; font-size: 12px; font-weight: 600; white-space: nowrap">
+                  <span aria-hidden="true" style="width: 13px; height: 13px; background: currentColor; -webkit-mask: {{fosterMask}} center / contain no-repeat; mask: {{fosterMask}} center / contain no-repeat"></span>Fostering
+                </span>
+              </sc-if>
+              <sc-if value="{{tp.native}}" hint-placeholder-val="{{false}}">
+                <span style="position: absolute; left: calc(50% - 10px); top: 108px; font: 12px/18px -apple-system, system-ui, sans-serif; padding: 2px 6px; background: #F2F2F2; color: #333333; border: 1px solid #BDBDBD; box-shadow: 1px 2px 3px rgba(0,0,0,.18); white-space: nowrap">Fostering checks · Batch 32 · 2 litters</span>
+              </sc-if>
+              <sc-if value="{{tp.label}}" hint-placeholder-val="{{false}}">
+                <span style="position: absolute; left: 50%; top: 66px; transform: translateX(-50%); font-size: 11.5px; font-weight: 600; line-height: 20px; padding: 0 7px; border-radius: 6px; background: #1E2A22; color: #FFFFFF; white-space: nowrap">Fostering checks · Batch 32 · 2 litters</span>
+              </sc-if>
+
+              <sc-if value="{{tp.data}}" hint-placeholder-val="{{false}}">
+                <span style="position: absolute; left: 24px; top: 112px; display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 12px 0 6px; border-radius: 99px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E6E9E2; font-size: 13px; white-space: nowrap">
+                  <span style="width: 28px; height: 28px; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: #FDE7C2; color: #6B4300">LW</span><b style="font-weight: 600">Li Wei</b><span style="color: #5D665F">6 h</span>
+                </span>
+                <span style="position: absolute; left: 150px; top: 12px; display: inline-flex; flex-direction: column; gap: 6px; min-width: 220px; padding: 7px 10px 8px; border-radius: 8px; border: 1px solid #E6E9E2; background: #FFFFFF; box-shadow: 0 20px 25px -5px rgba(17,21,17,.10), 0 8px 10px -6px rgba(17,21,17,.10); font-size: 12px; line-height: 16px">
+                  <span style="font-weight: 500">Li Wei today · 6 h of 8</span>
+                  <sc-for list="{{lwTip}}" as="y" hint-placeholder-count="3">
+                    <span style="display: flex; align-items: center; gap: 8px"><span style="width: 10px; height: 10px; border-radius: 2px; background: {{y.c}}"></span><span style="color: #5D665F">{{y.n}}</span><span style="margin-left: auto; font-weight: 500; font-variant-numeric: tabular-nums">{{y.v}}</span></span>
+                  </sc-for>
+                  <span style="padding-top: 6px; border-top: 1px solid #F0F1EC; font-weight: 500; color: #8A5A12">Farrowing 4 would make it 7½ h</span>
+                </span>
+              </sc-if>
+
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 40px">
+        <sc-for list="{{verdict}}" as="v" hint-placeholder-count="2">
+          <div style="box-sizing: border-box; padding: 22px 24px 18px; border-radius: 16px; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(17,21,17,.08)">
+            <div style="font-size: 15px; font-weight: 600; color: {{v.ink}}">{{v.title}}</div>
+            <ul style="margin: 10px 0 0; padding-left: 18px; font-size: 13.5px; line-height: 21px; color: #3B4540">
+              <sc-for list="{{v.items}}" as="t" hint-placeholder-count="4"><li style="margin-bottom: 4px">{{t.text}}</li></sc-for>
+            </ul>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":3008,"height":4040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = {
+      LW: ['Li Wei', '#FDE7C2', '#6B4300'], LY: ['Liu Yang', '#E3EAF8', '#2B4A86'], SQ: ['Sun Qing', '#ECEDEA', '#5D665F'],
+      WF: ['Wang Fang', '#E2F0DA', '#203D2B'], ZM: ['Zhao Min', '#F3E8F7', '#5B2D6E'], ML: ['Ma Lin', '#DFF1EC', '#1F5C4A'],
+      GF: ['Gao Feng', '#FBE5E3', '#A23B33'], DC: ['Dr. Chen', '#DCEEF2', '#0E5568']
+    };
+    const IC = {
+      birth: 'M4 16a8 8 0 0 1 16 0M12 4v3M5.5 7.5l2 2M18.5 7.5l-2 2M3 20h18', foster: 'M7 7h11l-3-3M17 17H6l3 3',
+      heat: 'M12 3c3 4 5 6 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.5 2 1.5 3 3 3-1-3 0-6 0-8.5Z', dose: 'm18 3 3 3M16.5 4.5l3 3M15 6l3 3-8.5 8.5-3-3L15 6ZM7 17l-4 4',
+      vax: 'M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z', move: 'M4 12h14M13 6l6 6-6 6', wash: 'M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11Z'
+    };
+    const mask = (k) => 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + IC[k] + '"/></svg>') + '")';
+    const mins = (m) => m < 60 ? m + ' min' : Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) : '');
+
+    // palettes: the demo's stone greys today, the Home UI guide's tokens in the proposal
+    const STONE = { bg: '#F5F5F4', ink: '#1C1917', mut: '#57534E', ring: '#ECEBE8', line: '#F1F0EE', keep: '#F5F5F3', seg: '#EAEAE7', chip: '#F4F4F2', amber: '#7A5410' };
+    const HOME = { bg: '#F6F7F1', ink: '#1B211C', mut: '#5D665F', ring: '#E6E9E2', line: '#F0F1EC', keep: '#F3F4EF', seg: '#E8EBE4', chip: '#F0F1EC', amber: '#8A5A12' };
+
+    // the board's farm, Thu 5 Nov 10:40: [name, what is in it, keeper, minutes since seen, due [icon, chip, task, place, when]]
+    const R = {
+      F1: ['Farrowing 1', 'Batch 33 · 14 sows', 'LW', 25, [['birth', 'Farrowing', 'Farrowing', 'Batch 33 · about 6 due', 'about 2 h']]],
+      F2: ['Farrowing 2', 'Batch 33 · 12 sows', 'LW', 70, []],
+      F3: ['Farrowing 3', 'Batch 32 · 16 litters', 'LW', 170, [['foster', 'Fostering', 'Fostering checks', 'Batch 32 · 2 litters', 'about 1 h'], ['dose', '15:00', 'Pen-strep', '3 piglets · dose 2', 'at 15:00']]],
+      F4: ['Farrowing 4', 'Batch 32 · 15 litters', '', 270, [['foster', 'Fostering', 'Fostering checks', 'Batch 32 · 2 litters', 'about 1 h'], ['dose', '15:00', 'Pen-strep', '2 piglets · dose 2', 'at 15:00']]],
+      F5: ['Farrowing 5', 'Batch 31 · weaning Mon', 'LY', 15, []],
+      F6: ['Farrowing 6', 'Batch 31 · 14 litters', 'LY', 60, []],
+      F7: ['Farrowing 7', 'Batch 31 · 13 litters', 'LY', 180, []],
+      F8: ['Farrowing 8', 'Empty · wash and dry', 'LY', 220, [['wash', 'Wash', 'Wash and dry', 'ready Sat', 'about 3 h']]],
+      G1: ['Gestation 1', 'Batch 34 · 50 sows', 'ZM', 50, [['heat', 'Breeding', 'Breeding', 'Batch 34 · 16 sows', 'about 2 h']]],
+      G2: ['Gestation 2', '40 sows', 'ZM', 50, [['dose', '15:00', 'RX-25G009', '4 lame sows · dose 2', 'at 15:00']]],
+      G3: ['Gestation 3', '48 sows', 'ZM', 60, []], G4: ['Gestation 4', '46 sows', 'ML', 30, []],
+      G5: ['Gestation 5', '44 sows', 'ML', 30, []], G6: ['Gestation 6', '45 sows', 'ML', 35, []],
+      N1: ['Nursery 1', 'Batch 30 · 420 pigs', 'WF', 20, [['vax', 'PRRS', 'PRRS vaccine', 'Batch 30 · 420 pigs', 'about 3 h']]],
+      N2: ['Nursery 2', 'Batch 29 · 410 pigs', 'WF', 120, []],
+      N3: ['Nursery 3', 'Empty · Batch 31 moves in', 'WF', 125, [['move', 'Move in', 'Move in', 'Batch 31 · from Farrowing 5–7', 'Mon']]],
+      N4: ['Nursery 4', 'Batch 28 · 398 pigs', 'WF', 1110, []],
+      N5: ['Nursery 5', 'Batch 27 · 405 pigs', 'WF', 130, []], N6: ['Nursery 6', 'Batch 26 · 400 pigs', 'WF', 130, []],
+      X1: ['Finisher 1', '520 pigs', 'GF', 1290, []], X2: ['Finisher 2', '515 pigs', 'GF', 1290, []],
+      X3: ['Finisher 3', '510 pigs', 'GF', 1300, []], X4: ['Finisher 4', '505 pigs', 'GF', 1300, []]
+    };
+    const SECS = [
+      ['Farrowing', 4, ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8']], ['Gestation', 12, ['G1', 'G2', 'G3', 'G4', 'G5', 'G6']],
+      ['Nursery', 8, ['N1', 'N2', 'N3', 'N4', 'N5', 'N6']], ['Finisher', 24, ['X1', 'X2', 'X3', 'X4']]
+    ];
+    const TGT = {}; SECS.forEach((s) => s[2].forEach((id) => { TGT[id] = s[1]; }));
+    const late = (id) => R[id][3] > TGT[id] * 60;
+
+    const room = (id, c, opt) => {
+      const r = R[id], k = r[2], o = opt || {};
+      return {
+        isRoom: true, isFold: false, isNote: false, isOpen: false,
+        name: r[0], sub: r[1], seen: 'seen ' + mins(r[3]) + ' ago',
+        seenInk: late(id) ? c.amber : c.mut, seenW: late(id) ? 600 : 400, nameInk: k ? c.ink : c.amber,
+        under: o.open ? 'underline' : 'none', bg: o.open ? '#FAFBF8' : 'transparent',
+        has: !!k, none: !k, kp: k ? { k, name: P[k][0], bg: P[k][1], ink: P[k][2] } : { k: '', name: '', bg: '', ink: '' },
+        due: r[4].map((d) => ({ mask: mask(d[0]), label: d[1], title: d[2] + ' · ' + d[3],
+          bg: k ? c.chip : '#FCF4E2', ink: k ? c.ink : c.amber, ring: 'none',
+          tip: o.tip === d[0] ? 'block' : 'none', nat: o.nat === d[0] ? 'block' : 'none' }))
+      };
+    };
+    // quiet = someone has it, nothing due, seen in time: folded into one line per section
+    const quiet = (id) => R[id][2] && !R[id][4].length && !late(id);
+    const nums = (ids) => {
+      const base = R[ids[0]][0].replace(/ \d+$/, '');
+      return base + ' ' + ids.map((id) => R[id][0].replace(/^.* /, '')).join(', ');
+    };
+    const fold = (ids) => {
+      const who = []; ids.forEach((id) => { if (who.indexOf(R[id][2]) < 0) who.push(R[id][2]); });
+      return { isRoom: false, isFold: true, isNote: false, isOpen: false, name: nums(ids), sub: ids.length + ' rooms, all seen in time, nothing due',
+        who: who.map((k) => ({ k, bg: P[k][1], ink: P[k][2] })), due: [] };
+    };
+    const note = (t) => ({ isRoom: false, isFold: false, isNote: true, isOpen: false, name: t, due: [] });
+    const secRows = (s, c, opts) => {
+      const o = opts || {}, out = [], q = [];
+      s[2].forEach((id) => {
+        if (o.fold && quiet(id)) { q.push(id); return; }
+        out.push(room(id, c, o.room && o.room[id]));
+        if (o.openId === id) out.push(openPanel(id, c));
+      });
+      if (q.length) out.push(fold(q));
+      if (s[0] === 'Finisher' && o.fold) out.push(note('Finisher 5–10 · contract barns, looked after by the grower'));
+      return out;
+    };
+    const sec = (s, c, opts) => ({ name: s[0], tgt: 'look in every ' + s[1] + ' h', rows: secRows(s, c, opts) });
+
+    const openPanel = (id, c) => {
+      const r = R[id];
+      const pick = [['LW', '6 h → 7½ h', 'next door, has Farrowing 1–3'], ['LY', '7 h → 8½ h', ''], ['GF', '5 h → 6½ h', ''], ['ML', '5 h → 6½ h', '']];
+      return { isRoom: false, isFold: false, isNote: false, isOpen: true, name: r[0], due: [],
+        why: 'Seen 4 h 30 ago, every 4 h is the aim. Last record: feeding at 06:10, Liu Yang.',
+        dueList: r[4].map((d) => ({ mask: mask(d[0]), task: d[2], place: d[3], when: d[4] })),
+        pick: pick.map((p, i) => ({ k: p[0], name: P[p[0]][0], bg: P[p[0]][1], ink: P[p[0]][2], load: p[1], loadInk: c.mut,
+          ring: i === 0 ? 'inset 0 0 0 2px #1F5C3F' : 'inset 0 0 0 1px ' + c.ring, sug: p[2] ? 'inline-flex' : 'none', why: p[2] })) };
+    };
+
+    const team = (c, withAway) => [['LW', '6 h'], ['LY', '7 h'], ['ZM', '6½ h'], ['WF', '7½ h'], ['GF', '5 h'], ['ML', '5 h']]
+      .concat(withAway ? [['SQ', 'Away']] : [])
+      .map((t) => ({ k: t[0], name: P[t[0]][0], bg: P[t[0]][1], ink: P[t[0]][2], load: t[1], ring: c.ring, op: t[0] === 'SQ' ? 0.55 : 1 }));
+
+    const roomTips = { F3: { tip: 'foster' } };
+    const panes = [
+      { n: '1', tagInk: '#5D665F', title: 'The demo today, on the full farm', w: '700px', c: STONE, nav: false, noNav: true, date: 'Thu 5 Nov',
+        warn: 'Farrowing 4 has no one',
+        notes: [{ text: 'Every room is a row: 24 rows, one under the other. Quiet rooms take as much room as busy ones.' }, { text: 'Hover on a chip shows the browser’s own grey tooltip (drawn on Farrowing 3).' }],
+        team: team(STONE, false),
+        cols: [{ secs: SECS.map((s) => sec(s, STONE, { room: { F3: { nat: 'foster' } } })) }] },
+      { n: '2', tagInk: '#1F5C3F', title: 'Proposed: Rooms, beside the chat', w: '700px', c: HOME, nav: true, noNav: false, date: 'Thu 5 Nov · 10:40',
+        warn: 'Farrowing 4 has no one',
+        notes: [{ text: 'From the board: Today ‹ › to plan tomorrow, and the time. Quiet rooms fold into one line per section; the contract barns are a note.' }, { text: 'From the board: someone away stays in the strip, greyed. Home UI guide colours; the label tooltip on chips.' }],
+        team: team(HOME, true),
+        cols: [{ secs: SECS.map((s) => sec(s, HOME, { fold: true, room: roomTips })) }] },
+      { n: '3', tagInk: '#1F5C3F', title: 'Proposed: Rooms, expanded to full width', w: '1384px', c: HOME, nav: true, noNav: false, date: 'Thu 5 Nov · 10:40',
+        warn: 'Farrowing 4 has no one',
+        notes: [{ text: 'From the board: at full width the sections flow into two columns, so the whole farm fits on one screen.' }, { text: 'The rows stay the same as beside the chat; only the columns change.' }],
+        team: team(HOME, true),
+        cols: [{ secs: [sec(SECS[0], HOME, { fold: true }), sec(SECS[2], HOME, { fold: true })] }, { secs: [sec(SECS[1], HOME, { fold: true }), sec(SECS[3], HOME, { fold: true })] }] }
+    ];
+
+    // frame 4 sits in the second row: a room up close
+    panes.push({ n: '4', tagInk: '#1F5C3F', title: 'Proposed: tap a room', w: '700px', c: HOME, nav: true, noNav: false, date: 'Thu 5 Nov · 10:40',
+      warn: 'Farrowing 4 has no one',
+      notes: [{ text: 'From the board’s room up close: why it is amber, what is due and the last record, above the people to give it to.' }, { text: 'New: Sentri marks the person it suggests and why (next door). Picking still yours.' }],
+      team: team(HOME, true),
+      cols: [{ secs: [sec(SECS[0], HOME, { fold: true, openId: 'F4', room: { F4: { open: true } } })] }] });
+    // wraps as 1, 2, 4 on the first row; the wide 3 beside People on the second
+    const order = [panes[0], panes[1], panes[3], panes[2]];
+
+    const day = (items) => items.map((x) => ({ title: x[0], when: x[1], bg: x[2] ? '#F3F4EF' : '#FFFFFF', ink: x[2] ? '#5D665F' : '#1B211C', ring: x[2] ? 'none' : 'inset 0 0 0 1px #E6E9E2' }));
+    const ppl = [
+      ['LW', '6 h of 8', ['Farrowing 1', 'Farrowing 2', 'Farrowing 3'], [['Feed', '06:30', 1], ['Farrowing', 'Farrowing 1 · about 2 h'], ['Fostering checks', 'Farrowing 3 · about 1 h'], ['Pen-strep', 'Farrowing 3 · at 15:00']]],
+      ['LY', '7 h of 8', ['Farrowing 5', 'Farrowing 6', 'Farrowing 7', 'Farrowing 8'], [['Feed', '06:30', 1], ['Wash and dry', 'Farrowing 8 · about 3 h'], ['Look in', 'Farrowing 5–7', 1]]],
+      ['ZM', '6½ h of 8', ['Gestation 1', 'Gestation 2', 'Gestation 3'], [['Feed', '06:30', 1], ['Breeding', 'Gestation 1 · about 2 h'], ['RX-25G009', 'Gestation 2 · at 15:00']]],
+      ['WF', '7½ h of 8', ['Nursery 1–6'], [['Feed', '06:30', 1], ['PRRS vaccine', 'Nursery 1 · about 3 h'], ['Look in', 'Nursery 4 first', 1]]],
+      ['GF', '5 h of 8', ['Finisher 1–4'], [['Feed', '06:30', 1], ['Look in', 'Finisher 1–4', 1]]],
+      ['ML', '5 h of 8', ['Gestation 4', 'Gestation 5', 'Gestation 6'], [['Feed', '06:30', 1], ['Look in', 'Gestation 4–6', 1]]],
+      ['SQ', 'Away today', [], [['Away', 'back Mon 9 Nov', 1]]]
+    ].map((p) => ({ k: p[0], name: P[p[0]][0], bg: P[p[0]][1], ink: P[p[0]][2], load: p[1], op: p[0] === 'SQ' ? 0.55 : 1,
+      rooms: p[2].map((n) => ({ name: n })), day: day(p[3]) }));
+
+    const tips = [
+      { title: 'Today: the browser’s own', sub: 'A title attribute. Grey, shows after a second, looks different on every computer.', chip: true, chipTop: '72px', native: true, label: false, data: false },
+      { title: 'Label tooltip, on a chip', sub: 'shadcn’s plain tooltip: dark #1E2A22, white 11.5 px, 6 px corners, at once. One short line, no numbers to read across.', chip: true, chipTop: '96px', native: false, label: true, data: false },
+      { title: 'Data tooltip, on a person', sub: 'shadcn’s chart tooltip: white card, square, name, value. A person’s hours are numbers, so they get this one.', chip: false, native: false, label: false, data: true }
+    ];
+    const lwTip = [['#9CCBB0', 'Feeding, look-ins', '3 h'], ['#1F5C3F', 'Farrowing · F1', '2 h'], ['#D5DAD3', 'Fostering, Pen-strep · F3', '1 h']].map((x) => ({ c: x[0], n: x[1], v: x[2] }));
+
+    const verdict = [
+      { title: 'Taken from the board', ink: '#1F5C3F', items: [
+        { text: 'Today ‹ › and the time, so tomorrow can be planned the same way.' },
+        { text: 'Quiet rooms folded: someone has them, nothing due, seen in time. 24 rooms become 12 lines beside the chat.' },
+        { text: 'Two columns when the page is expanded to full width.' },
+        { text: 'Away people stay in the strip and in People, greyed.' },
+        { text: 'Tapping a room says why it is amber, what is due and the last record, above who to give it to.' },
+        { text: 'The contract barns as a quiet note at the end of their section.' } ] },
+      { title: 'Left on the board', ink: '#8A5A12', items: [
+        { text: 'The three counts at the top (rooms with someone, seen in time, tasks): one warning only, a room with no one (rule of 10 Nov).' },
+        { text: 'The last-seen bar: the row already says it in words, amber when late. Said once.' },
+        { text: 'Icon-only chips: words read without hovering.' },
+        { text: 'Two people on one room (Liu Yang and Gao Feng): still an open question on this page.' },
+        { text: 'The demo’s stone greys: the proposal uses the Home UI guide’s colours, so the pane matches Home.' } ] }
+    ];
+
+    return { panes: order, ppl, tips, lwTip, verdict, fosterMask: mask('foster') };
+  }
+}
+</script>
+</body>
+</html>

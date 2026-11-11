@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Work schedule, round 2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 3008px; box-sizing: border-box; padding: 48px 48px 64px; background: #ECEEE9; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #1B211C; font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased">
+
+  <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em">Work schedule, round 2: the room row, the room up close, and a task on click (mock-up, 11 Nov)</h1>
+  <p style="margin: 8px 0 0; max-width: 1600px; font-size: 15px; line-height: 22px; color: #5D665F">Same farm and day as the merged board (Thu 5 Nov, 10:40). A row says two things: how many pigs, and whether today&rsquo;s checks are done. Everything else is one hover or one click away, and numbers are drawn, not written.</p>
+
+  <div style="display: flex; gap: 64px; align-items: flex-start; margin-top: 40px">
+
+    <!-- 1 · the rows -->
+    <div style="flex: none; width: 700px">
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px"><span style="font-size: 13px; font-weight: 600; color: #1F5C3F">1</span><span style="font-size: 17px; font-weight: 600">The row: pigs and checks</span></div>
+      <ul style="margin: 0 0 16px; padding-left: 18px; min-height: 86px; font-size: 13.5px; line-height: 20px; color: #3B4540">
+        <li>Under the name only the pig count. Hover it for the breakdown (data tooltip, drawn on Farrowing 4).</li>
+        <li>&ldquo;Seen 4 h ago&rdquo; and &ldquo;look in every 4 h&rdquo; go. Farms record checks, not a clock: two dots, morning and afternoon. Farrowing 1 is farrowing, so it is checked every 3 h.</li>
+      </ul>
+      <div style="box-sizing: border-box; padding: 20px 20px 24px; border-radius: 16px; background: #F6F7F1; box-shadow: 0 0 0 1px rgba(17,21,17,.08), 0 20px 40px -24px rgba(17,21,17,.25)">
+        <sc-for list="{{secs}}" as="sec" hint-placeholder-count="2">
+          <div style="background: #FFFFFF; border-radius: 14px; box-shadow: 0 0 0 1px #E6E9E2; margin-bottom: 12px">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px 8px; font-size: 12px; font-weight: 600; color: #5D665F">
+              <span style="flex: 1">{{sec.name}}</span>
+              <span style="font-weight: 400">{{sec.rule}}</span>
+            </div>
+            <sc-for list="{{sec.rows}}" as="r" hint-placeholder-count="3">
+              <sc-if value="{{r.isRoom}}" hint-placeholder-val="{{true}}">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) 72px auto 148px; gap: 12px; align-items: center; min-height: 60px; padding: 0 10px 0 14px; border-top: 1px solid #F0F1EC">
+                  <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0; padding: 8px 0">
+                    <span style="font-size: 14px; font-weight: 600; color: {{r.nameInk}}">{{r.name}}</span>
+                    <span style="position: relative; align-self: flex-start; font-size: 12.5px; color: #5D665F; font-variant-numeric: tabular-nums; text-decoration: underline dotted #B9C0B9; text-underline-offset: 3px">{{r.count}}
+                      <sc-if value="{{r.tip}}" hint-placeholder-val="{{false}}">
+                        <span role="tooltip" style="position: absolute; left: -6px; top: calc(100% + 8px); z-index: 6; display: flex; flex-direction: column; gap: 6px; width: 236px; padding: 7px 10px 8px; border-radius: 8px; border: 1px solid #E6E9E2; background: #FFFFFF; box-shadow: 0 20px 25px -5px rgba(17,21,17,.10), 0 8px 10px -6px rgba(17,21,17,.10); font-size: 12px; line-height: 16px; color: #1B211C; text-decoration: none">
+                          <span style="font-weight: 500">Farrowing 4 &middot; Batch 32, day 9</span>
+                          <sc-for list="{{f4tip}}" as="y" hint-placeholder-count="3">
+                            <span style="display: flex; align-items: center; gap: 8px"><span style="width: 10px; height: 10px; border-radius: 2px; background: {{y.c}}"></span><span style="color: #5D665F">{{y.n}}</span><span style="margin-left: auto; font-weight: 500; font-variant-numeric: tabular-nums">{{y.v}}</span></span>
+                          </sc-for>
+                          <span style="padding-top: 6px; border-top: 1px solid #F0F1EC; font-weight: 500; color: #8A5A12">2 litters over 13: fostering today</span>
+                        </span>
+                      </sc-if>
+                    </span>
+                  </span>
+                  <span style="display: flex; align-items: center; gap: 4px" aria-label="{{r.checkAria}}">
+                    <sc-for list="{{r.checks}}" as="c" hint-placeholder-count="2">
+                      <span style="width: 10px; height: 10px; border-radius: 99px; box-sizing: border-box; background: {{c.fill}}; box-shadow: inset 0 0 0 1.5px {{c.ring}}"></span>
+                    </sc-for>
+                  </span>
+                  <span style="display: flex; gap: 4px; justify-content: flex-end">
+                    <sc-for list="{{r.due}}" as="d" hint-placeholder-count="1">
+                      <span style="display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 8px; border-radius: 7px; background: {{d.bg}}; color: {{d.ink}}; box-shadow: {{d.ring}}; font-size: 12px; font-weight: 600; white-space: nowrap">
+                        <span aria-hidden="true" style="width: 13px; height: 13px; background: currentColor; -webkit-mask: {{d.mask}} center / contain no-repeat; mask: {{d.mask}} center / contain no-repeat"></span>{{d.label}}
+                      </span>
+                    </sc-for>
+                  </span>
+                  <sc-if value="{{r.has}}" hint-placeholder-val="{{true}}">
+                    <span style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 6px; border-radius: 10px; background: #F3F4EF; font-size: 13px">
+                      <span style="width: 28px; height: 28px; flex: none; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: {{r.kp.bg}}; color: {{r.kp.ink}}">{{r.kp.k}}</span><b style="font-weight: 600; white-space: nowrap">{{r.kp.name}}</b>
+                    </span>
+                  </sc-if>
+                  <sc-if value="{{r.none}}" hint-placeholder-val="{{false}}">
+                    <span style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 6px; border-radius: 10px; background: #FCF4E2; box-shadow: inset 0 0 0 1px #EBD9AE; font-size: 13px; color: #8A5A12">
+                      <span style="width: 28px; height: 28px; flex: none; border-radius: 99px; display: grid; place-items: center; background: #FFFFFF; box-shadow: inset 0 0 0 1.5px #8A5A12; font-weight: 700">?</span><b style="font-weight: 600">No one</b>
+                    </span>
+                  </sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{r.isFold}}" hint-placeholder-val="{{false}}">
+                <div style="display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 14px; border-top: 1px solid #F0F1EC; font-size: 13px; color: #5D665F">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 6 6 6-6 6"></path></svg>
+                  <span><b style="font-weight: 600; color: #1B211C">{{r.name}}</b> &middot; {{r.sub}}</span>
+                </div>
+              </sc-if>
+            </sc-for>
+          </div>
+        </sc-for>
+        <div style="display: flex; align-items: center; gap: 16px; padding: 4px 4px 0; font-size: 12px; color: #5D665F">
+          <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 99px; background: #1F5C3F"></span>Checked</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 99px; box-shadow: inset 0 0 0 1.5px #B9C0B9"></span>Not due yet</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 99px; box-shadow: inset 0 0 0 1.5px #C98A1F; background: #FCF4E2"></span>Missed (morning check by 10:00)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 · the room up close -->
+    <div style="flex: none; width: 700px">
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px"><span style="font-size: 13px; font-weight: 600; color: #1F5C3F">2</span><span style="font-size: 17px; font-weight: 600">Tap a room: the room up close</span></div>
+      <ul style="margin: 0 0 16px; padding-left: 18px; min-height: 86px; font-size: 13.5px; line-height: 20px; color: #3B4540">
+        <li>Three blocks, one question each: what is in it, are today&rsquo;s checks done, who takes it.</li>
+        <li>The day is a line with its checks on it. Each task shows its progress. Each person&rsquo;s day is a bar, with the room added in green (amber over 8 h).</li>
+      </ul>
+      <div style="box-sizing: border-box; border-radius: 16px; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(17,21,17,.08), 0 20px 40px -24px rgba(17,21,17,.25); overflow: hidden">
+        <div style="display: flex; align-items: flex-start; gap: 12px; padding: 18px 20px 16px">
+          <div style="flex: 1; min-width: 0">
+            <div style="font-size: 18px; font-weight: 600; color: #8A5A12">Farrowing 4</div>
+            <div style="margin-top: 2px; font-size: 13px; color: #5D665F">Batch 32 &middot; day 9 of 28</div>
+          </div>
+          <span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 99px; background: #FCF4E2; box-shadow: inset 0 0 0 1px #EBD9AE; color: #8A5A12; font-size: 12.5px; font-weight: 600"><span style="width: 16px; height: 16px; display: grid; place-items: center; border-radius: 99px; background: #FFFFFF; box-shadow: inset 0 0 0 1.5px #8A5A12; font-size: 10px; font-weight: 700">?</span>No one has it</span>
+          <button type="button" aria-label="Close" style="width: 32px; height: 32px; margin: -4px -8px 0 0; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: #8A938C"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 20px; padding: 0 20px 18px">
+          <div>
+            <div style="font-size: 12px; font-weight: 600; color: #5D665F">In the room</div>
+            <div style="display: flex; align-items: baseline; gap: 6px; margin-top: 4px"><span style="font-size: 30px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">183</span><span style="font-size: 13px; color: #5D665F">pigs</span></div>
+            <div style="display: flex; height: 8px; margin-top: 8px; border-radius: 3px; overflow: hidden; gap: 2px">
+              <span style="width: 8%; background: #1F5C3F"></span><span style="flex: 1; background: #9CCBB0"></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; color: #5D665F; font-variant-numeric: tabular-nums"><span>15 sows</span><span>168 piglets</span></div>
+          </div>
+          <div>
+            <div style="display: flex; align-items: baseline; font-size: 12px; font-weight: 600; color: #5D665F"><span style="flex: 1">Checks today</span><span style="font-weight: 400">twice a day</span></div>
+            <div style="position: relative; height: 54px; margin-top: 10px">
+              <span style="position: absolute; left: 0; right: 0; top: 14px; height: 2px; border-radius: 2px; background: #E6E9E2"></span>
+              <span style="position: absolute; left: 0; width: 29%; top: 14px; height: 2px; border-radius: 2px; background: #B9C0B9"></span>
+              <span style="position: absolute; left: 29%; top: 4px; width: 2px; height: 22px; border-radius: 2px; background: #1B211C"></span>
+              <span style="position: absolute; left: 29%; top: -14px; transform: translateX(-50%); font-size: 11px; font-weight: 600">now</span>
+              <sc-for list="{{marks}}" as="m" hint-placeholder-count="3">
+                <span style="position: absolute; left: {{m.x}}; top: 9px; transform: translateX(-50%); width: 12px; height: 12px; border-radius: 99px; box-sizing: border-box; background: {{m.fill}}; box-shadow: inset 0 0 0 1.5px {{m.ring}}, 0 0 0 2px #FFFFFF"></span>
+                <span style="position: absolute; left: {{m.x}}; top: 28px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; font-size: 11px; line-height: 13px; white-space: nowrap"><b style="font-weight: 600; color: {{m.ink}}">{{m.t}}</b><span style="color: #5D665F">{{m.l}}</span></span>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding: 14px 20px 16px; border-top: 1px solid #F0F1EC">
+          <div style="font-size: 12px; font-weight: 600; color: #5D665F; margin-bottom: 8px">Due today</div>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+            <sc-for list="{{f4due}}" as="d" hint-placeholder-count="2">
+              <span style="display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 10px; box-shadow: inset 0 0 0 1px #E6E9E2">
+                <span style="display: flex; align-items: center; gap: 7px"><span aria-hidden="true" style="width: 14px; height: 14px; background: currentColor; -webkit-mask: {{d.mask}} center / contain no-repeat; mask: {{d.mask}} center / contain no-repeat"></span><b style="font-size: 13.5px; font-weight: 600">{{d.task}}</b><span style="margin-left: auto; font-size: 12px; color: #5D665F; font-variant-numeric: tabular-nums">{{d.when}}</span></span>
+                <span style="display: flex; gap: 3px">
+                  <sc-for list="{{d.steps}}" as="s" hint-placeholder-count="3"><span style="flex: 1; height: 6px; border-radius: 3px; background: {{s.c}}"></span></sc-for>
+                </span>
+                <span style="font-size: 12px; color: #5D665F">{{d.note}}</span>
+              </span>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="padding: 14px 20px 18px; border-top: 1px solid #F0F1EC">
+          <div style="display: flex; align-items: baseline; font-size: 12px; font-weight: 600; color: #5D665F; margin-bottom: 6px"><span style="flex: 1">Give it to</span><span style="font-weight: 400">their day, with Farrowing 4 added</span></div>
+          <sc-for list="{{pick}}" as="q" hint-placeholder-count="4">
+            <button type="button" style="display: grid; grid-template-columns: 28px 96px minmax(0, 1fr) 76px; gap: 10px; align-items: center; width: 100%; min-height: 48px; padding: 0 10px; margin-top: 4px; border: 0; border-radius: 10px; background: {{q.bg}}; box-shadow: {{q.ring}}; font: inherit; font-size: 13px; color: #1B211C; text-align: left">
+              <span style="width: 28px; height: 28px; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: {{q.abg}}; color: {{q.aink}}">{{q.k}}</span>
+              <span style="display: flex; flex-direction: column"><b style="font-weight: 600">{{q.name}}</b><span style="display: {{q.sugShow}}; font-size: 11.5px; font-weight: 600; color: #1F5C3F">Suggested</span></span>
+              <span style="position: relative; display: flex; height: 8px; border-radius: 4px; background: #F0F1EC; overflow: visible">
+                <span style="width: {{q.now}}; background: #B9C0B9; border-radius: 4px 0 0 4px"></span>
+                <span style="width: {{q.add}}; background: {{q.addC}}; border-radius: 0 4px 4px 0"></span>
+                <span style="position: absolute; left: 88.9%; top: -4px; width: 0; height: 16px; border-left: 1.5px dashed #8A938C"></span>
+              </span>
+              <span style="text-align: right; font-variant-numeric: tabular-nums; color: {{q.ink}}; font-weight: {{q.w}}">{{q.load}}</span>
+            </button>
+          </sc-for>
+          <div style="margin-top: 8px; font-size: 12px; color: #5D665F">Li Wei is next door with Farrowing 1&ndash;3, and the fostering is between his litters. The dashed line is an 8 h day.</div>
+          <div style="display: flex; justify-content: flex-end; margin-top: 12px">
+            <span style="display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px 0 12px; border-radius: 8px; background: #EEF0EB; font-size: 13px; font-weight: 600">Open in Farm view <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 6 6 6-6 6"></path></svg></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 · a task on click -->
+    <div style="flex: none; width: 1350px">
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px"><span style="font-size: 13px; font-weight: 600; color: #1F5C3F">3</span><span style="font-size: 17px; font-weight: 600">Click a task: the Schedule&rsquo;s pop-over, with its progress drawn</span></div>
+      <ul style="margin: 0 0 16px; padding-left: 18px; min-height: 86px; font-size: 13.5px; line-height: 20px; color: #3B4540">
+        <li>The same pop-over as a Schedule cell (title, the room, a status band, who, Open in Farm view), so a task looks the same wherever it is clicked.</li>
+        <li>Added: one small chart each, built from parts the console already has: the Home figure bars, the batch progress bar, and a course of doses.</li>
+      </ul>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start">
+        <sc-for list="{{pops}}" as="p" hint-placeholder-count="3">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px; height: 40px; margin-bottom: 8px; padding: 0 12px; border-radius: 10px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2; font-size: 13px">
+              <b style="font-weight: 600">{{p.room}}</b><span style="flex: 1"></span>
+              <span style="display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 8px; border-radius: 7px; background: {{p.chipBg}}; color: {{p.chipInk}}; box-shadow: 0 0 0 2px #1B211C; font-size: 12px; font-weight: 600"><span aria-hidden="true" style="width: 13px; height: 13px; background: currentColor; -webkit-mask: {{p.mask}} center / contain no-repeat; mask: {{p.mask}} center / contain no-repeat"></span>{{p.chip}}</span>
+            </div>
+            <div role="dialog" aria-label="{{p.title}}" style="box-sizing: border-box; padding: 14px 16px 12px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 14px 40px rgba(17,21,17,.18), 0 0 0 1px rgba(17,21,17,.06)">
+              <div style="display: flex; align-items: flex-start; gap: 8px">
+                <div style="flex: 1; min-width: 0"><div style="font-size: 15px; font-weight: 600">{{p.title}}</div><div style="margin-top: 2px; font-size: 12.5px; color: #5D665F">{{p.sub}}</div></div>
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; margin-top: 2px; fill: none; stroke: #8A938C; stroke-width: 2; stroke-linecap: round"><path d="M7 7l10 10M17 7 7 17"></path></svg>
+              </div>
+              <div style="margin-top: 10px; padding: 9px 11px; border-radius: 10px; background: {{p.stBg}}; color: {{p.stInk}}; font-size: 13px; font-weight: 600">{{p.status}}</div>
+
+              <sc-if value="{{p.isLitters}}" hint-placeholder-val="{{true}}">
+                <div style="margin-top: 14px">
+                  <div style="display: flex; align-items: baseline; font-size: 12px; color: #5D665F"><span style="flex: 1; font-weight: 600">Piglets a litter</span><span>teats 13</span></div>
+                  <div style="position: relative; display: flex; align-items: flex-end; gap: 4px; height: 84px; margin-top: 8px">
+                    <span style="position: absolute; left: 0; right: 0; bottom: 65px; border-top: 1.5px dashed #8A938C"></span>
+                    <sc-for list="{{litters}}" as="b" hint-placeholder-count="15">
+                      <span style="flex: 1; height: {{b.h}}; border-radius: 3px 3px 0 0; background: {{b.c}}"></span>
+                    </sc-for>
+                  </div>
+                  <div style="display: flex; gap: 4px; margin-top: 4px; font-size: 10.5px; color: #8A938C; font-variant-numeric: tabular-nums">
+                    <sc-for list="{{litters}}" as="b" hint-placeholder-count="15"><span style="flex: 1; text-align: center; color: {{b.lc}}; font-weight: {{b.lw}}">{{b.n}}</span></sc-for>
+                  </div>
+                  <div style="margin-top: 8px; font-size: 12.5px; line-height: 18px">Move 2 from crate 4 to crate 15, and 1 from crate 12 to crate 6.</div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{p.isCourse}}" hint-placeholder-val="{{false}}">
+                <div style="margin-top: 14px">
+                  <div style="display: flex; align-items: baseline; font-size: 12px; color: #5D665F"><span style="flex: 1; font-weight: 600">The course</span><span>withdrawal to Thu 19 Nov</span></div>
+                  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px">
+                    <sc-for list="{{course}}" as="s" hint-placeholder-count="3">
+                      <span style="display: flex; flex-direction: column; gap: 6px">
+                        <span style="height: 8px; border-radius: 4px; background: {{s.c}}; box-shadow: {{s.ring}}"></span>
+                        <span style="font-size: 12px; line-height: 16px"><b style="font-weight: 600">{{s.t}}</b><br><span style="color: #5D665F">{{s.l}}</span></span>
+                      </span>
+                    </sc-for>
+                  </div>
+                  <div style="margin-top: 10px; font-size: 12.5px; line-height: 18px">Crates 3, 8 and 14 &middot; 0.5 mL each, into the neck.</div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{p.isBatch}}" hint-placeholder-val="{{false}}">
+                <div style="margin-top: 14px">
+                  <div style="display: flex; align-items: baseline; font-size: 12px; color: #5D665F"><span style="flex: 1; font-weight: 600">Batch 34 &middot; 50 sows</span><span>day 3 of 5</span></div>
+                  <div style="display: flex; gap: 2px; height: 10px; margin-top: 8px; border-radius: 4px; overflow: hidden">
+                    <span style="width: 40%; background: #1F5C3F"></span><span style="width: 32%; background: #6F95D1"></span><span style="flex: 1; background: #E6E9E2"></span>
+                  </div>
+                  <div style="display: flex; gap: 14px; margin-top: 6px; font-size: 12px; color: #5D665F; font-variant-numeric: tabular-nums">
+                    <span style="display: inline-flex; align-items: center; gap: 5px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #1F5C3F"></span>20 bred</span>
+                    <span style="display: inline-flex; align-items: center; gap: 5px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #6F95D1"></span>16 today</span>
+                    <span style="display: inline-flex; align-items: center; gap: 5px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #E6E9E2"></span>14 to come</span>
+                  </div>
+                  <div style="display: flex; align-items: flex-end; gap: 6px; height: 56px; margin-top: 14px">
+                    <sc-for list="{{breed}}" as="b" hint-placeholder-count="5">
+                      <span style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px"><span style="font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums">{{b.v}}</span><span style="width: 100%; height: {{b.h}}; border-radius: 3px 3px 0 0; background: {{b.c}}; box-shadow: {{b.ring}}"></span></span>
+                    </sc-for>
+                  </div>
+                  <div style="display: flex; gap: 6px; margin-top: 4px; font-size: 11px; color: #5D665F"><sc-for list="{{breed}}" as="b" hint-placeholder-count="5"><span style="flex: 1; text-align: center; font-weight: {{b.w}}">{{b.d}}</span></sc-for></div>
+                </div>
+              </sc-if>
+
+              <div style="display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center; min-height: 40px; margin-top: 12px; border-top: 1px solid #F0F1EC; font-size: 13px">
+                <span style="width: 24px; height: 24px; border-radius: 99px; display: grid; place-items: center; font-size: 10px; font-weight: 700; background: {{p.wBg}}; color: {{p.wInk}}; box-shadow: {{p.wRing}}">{{p.wIni}}</span>
+                <span><b style="font-weight: 600">{{p.wWho}}</b><span style="color: #5D665F"> &middot; {{p.wTime}}</span></span>
+                <span style="display: {{p.giveShow}}; height: 28px; align-items: center; padding: 0 10px; border-radius: 8px; background: #1B211C; color: #FFFFFF; font-size: 12.5px; font-weight: 600">Give to Li Wei</span>
+              </div>
+              <div style="display: flex; justify-content: flex-end; margin-top: 8px">
+                <span style="display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 8px 0 10px; border-radius: 8px; background: #EEF0EB; font-size: 13px; font-weight: 600">Open in Farm view <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 6 6 6-6 6"></path></svg></span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="margin-top: 32px; padding: 22px 24px 20px; border-radius: 16px; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(17,21,17,.08)">
+        <div style="font-size: 15px; font-weight: 600">How farms check rooms, and what the row shows</div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 12px; font-size: 13.5px; line-height: 20px; color: #3B4540">
+          <div><b style="font-weight: 600; color: #1B211C">The law: once a day.</b> UK, EU and Australian rules ask for every pig to be looked over at least once a day by a trained person, and US farm SOPs record that daily check (date, who, where).</div>
+          <div><b style="font-weight: 600; color: #1B211C">In practice: twice.</b> A thorough walk in the morning, a quicker one in the afternoon or evening, usually with feeding. That is the two dots.</div>
+          <div><b style="font-weight: 600; color: #1B211C">While farrowing: every 2&ndash;4 h.</b> Around farrowing, rooms are checked every few hours and each birth is noted on the sow card. Only then does the row show more dots.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":3008,"height":1030}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = {
+      LW: ['Li Wei', '#FDE7C2', '#6B4300'], LY: ['Liu Yang', '#E3EAF8', '#2B4A86'], ZM: ['Zhao Min', '#F3E8F7', '#5B2D6E'],
+      WF: ['Wang Fang', '#E2F0DA', '#203D2B'], GF: ['Gao Feng', '#FBE5E3', '#A23B33'], ML: ['Ma Lin', '#DFF1EC', '#1F5C4A']
+    };
+    const IC = {
+      birth: 'M4 16a8 8 0 0 1 16 0M12 4v3M5.5 7.5l2 2M18.5 7.5l-2 2M3 20h18', foster: 'M7 7h11l-3-3M17 17H6l3 3',
+      heat: 'M12 3c3 4 5 6 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.5 2 1.5 3 3 3-1-3 0-6 0-8.5Z', dose: 'm18 3 3 3M16.5 4.5l3 3M15 6l3 3-8.5 8.5-3-3L15 6ZM7 17l-4 4',
+      vax: 'M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z', wash: 'M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11Z'
+    };
+    const mask = (k) => 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + IC[k] + '"/></svg>') + '")';
+
+    // a check: d done, o not due yet, m missed
+    const DOT = { d: { fill: '#1F5C3F', ring: '#1F5C3F' }, o: { fill: 'transparent', ring: '#B9C0B9' }, m: { fill: '#FCF4E2', ring: '#C98A1F' } };
+    const room = (name, count, kp, checks, due, opt) => {
+      const o = opt || {};
+      return { isRoom: true, isFold: false, name, count, tip: !!o.tip, nameInk: kp ? '#1B211C' : '#8A5A12',
+        has: !!kp, none: !kp, kp: kp ? { k: kp, name: P[kp][0], bg: P[kp][1], ink: P[kp][2] } : { k: '', name: '', bg: '', ink: '' },
+        checks: checks.split('').map((c) => DOT[c]),
+        checkAria: checks.split('').map((c) => c === 'd' ? 'checked' : c === 'm' ? 'missed' : 'not due yet').join(', '),
+        due: due.map((d) => ({ mask: mask(d[0]), label: d[1], bg: kp ? '#F0F1EC' : '#FCF4E2', ink: kp ? '#1B211C' : '#8A5A12', ring: o.sel === d[0] ? '0 0 0 2px #1B211C' : 'none' })) };
+    };
+    const fold = (name, sub) => ({ isRoom: false, isFold: true, name, sub, checks: [], due: [] });
+    const secs = [
+      { name: 'Farrowing', rule: 'checked twice a day, every 3 h while farrowing', rows: [
+        room('Farrowing 1', '226 pigs', 'LW', 'dddoo', [['birth', 'Farrowing']]),
+        room('Farrowing 3', '203 pigs', 'LW', 'do', [['foster', 'Fostering'], ['dose', '15:00']]),
+        room('Farrowing 4', '183 pigs', '', 'mo', [['foster', 'Fostering'], ['dose', '15:00']], { tip: true }),
+        room('Farrowing 8', 'Empty', 'LY', 'do', [['wash', 'Wash']]),
+        fold('Farrowing 2, 5, 6, 7', '4 rooms, checked this morning, nothing due') ] },
+      { name: 'Gestation', rule: 'checked twice a day', rows: [
+        room('Gestation 1', '50 sows', 'ZM', 'do', [['heat', 'Breeding']], { sel: 'heat' }),
+        room('Gestation 2', '40 sows', 'ZM', 'do', [['dose', '15:00']]),
+        fold('Gestation 3, 4, 5, 6', '4 rooms, checked this morning, nothing due') ] }
+    ];
+    const f4tip = [['#1F5C3F', 'Sows', '15'], ['#9CCBB0', 'Piglets', '168'], ['#D5DAD3', 'A litter, on average', '11.2'], ['#F0C273', 'Lost since birth', '9']].map((x) => ({ c: x[0], n: x[1], v: x[2] }));
+
+    // the day from 06:00 to 22:00; now is 10:40
+    const at = (h, m) => (((h - 6) * 60 + m) / (16 * 60) * 100).toFixed(1) + '%';
+    const marks = [
+      { x: at(6, 10), fill: '#1F5C3F', ring: '#1F5C3F', ink: '#1B211C', t: '06:10', l: 'fed, Liu Yang' },
+      { x: at(10, 0), fill: '#FCF4E2', ring: '#C98A1F', ink: '#8A5A12', t: 'by 10:00', l: 'morning check' },
+      { x: at(16, 0), fill: '#FFFFFF', ring: '#B9C0B9', ink: '#5D665F', t: '16:00', l: 'afternoon' }
+    ];
+    const steps = (done, now, all) => Array.from({ length: all }, (_, i) => ({ c: i < done ? '#1F5C3F' : i < done + now ? '#6F95D1' : '#E6E9E2' }));
+    const f4due = [
+      { mask: mask('foster'), task: 'Fostering checks', when: 'about 1 h', steps: steps(0, 0, 2), note: '0 of 2 litters done' },
+      { mask: mask('dose'), task: 'Pen-strep', when: 'at 15:00', steps: steps(1, 1, 3), note: 'Dose 2 of 3, 2 piglets' }
+    ];
+    const pick = [['LW', 6, 'Suggested'], ['GF', 5, ''], ['ML', 5, ''], ['LY', 7, '']].map((p, i) => {
+      const after = p[1] + 1.5, over = after > 8;
+      const fh = (h) => Math.floor(h) + (h % 1 ? '½' : '') + ' h';
+      return { k: p[0], name: P[p[0]][0], abg: P[p[0]][1], aink: P[p[0]][2], sugShow: p[2] ? 'block' : 'none',
+        now: (p[1] / 9 * 100).toFixed(1) + '%', add: (1.5 / 9 * 100).toFixed(1) + '%', addC: over ? '#C98A1F' : '#1F5C3F',
+        load: fh(p[1]) + ' → ' + fh(after), ink: over ? '#8A5A12' : '#1B211C', w: over ? 600 : 500,
+        bg: i === 0 ? '#F4F8F5' : '#FFFFFF', ring: i === 0 ? 'inset 0 0 0 2px #1F5C3F' : 'inset 0 0 0 1px #E6E9E2' };
+    });
+
+    // fostering: piglets a litter in the 15 crates; 13 teats
+    const L = [12, 11, 12, 15, 10, 9, 11, 12, 10, 11, 12, 14, 11, 10, 9];
+    const litters = L.map((n, i) => ({ n: i + 1, h: (n / 15 * 84).toFixed(0) + 'px', c: n > 13 ? '#C98A1F' : n < 10 ? '#9CCBB0' : '#D5DAD3',
+      lc: n > 13 ? '#8A5A12' : '#8A938C', lw: n > 13 ? 600 : 400 }));
+    const course = [
+      { t: 'Wed 15:00', l: 'dose 1 · Li Wei', c: '#1F5C3F', ring: 'none' },
+      { t: 'Today 15:00', l: 'dose 2', c: '#6F95D1', ring: 'none' },
+      { t: 'Fri 15:00', l: 'dose 3', c: '#FFFFFF', ring: 'inset 0 0 0 1.5px #B9C0B9' }
+    ];
+    const breed = [['Tue', 6, 'd'], ['Wed', 14, 'd'], ['Thu', 16, 't'], ['Fri', 10, 'p'], ['Sat', 4, 'p']].map((b) => ({ d: b[0], v: b[1], h: (b[1] / 16 * 40).toFixed(0) + 'px',
+      c: b[2] === 'd' ? '#1F5C3F' : b[2] === 't' ? '#6F95D1' : '#FFFFFF', ring: b[2] === 'p' ? 'inset 0 0 0 1.5px #B9C0B9' : 'none', w: b[2] === 't' ? 600 : 400 }));
+
+    const pops = [
+      { room: 'Farrowing 4', chip: 'Fostering', mask: mask('foster'), chipBg: '#FCF4E2', chipInk: '#8A5A12', title: 'Fostering checks · today', sub: 'Farrowing 4 · Batch 32, day 9',
+        stBg: '#FCF4E2', stInk: '#8A5A12', status: '2 litters over 13 piglets · about 1 h', isLitters: true, isCourse: false, isBatch: false,
+        wIni: '?', wBg: '#FFFFFF', wInk: '#8A5A12', wRing: 'inset 0 0 0 1.5px #8A5A12', wWho: 'No one', wTime: 'Farrowing 4 has no one', giveShow: 'inline-flex' },
+      { room: 'Farrowing 3', chip: '15:00', mask: mask('dose'), chipBg: '#F0F1EC', chipInk: '#1B211C', title: 'Pen-strep · 15:00', sub: 'Farrowing 3 · 3 piglets with joint ill',
+        stBg: '#E8EEF8', stInk: '#2E5C9A', status: 'Dose 2 of 3 · today at 15:00', isLitters: false, isCourse: true, isBatch: false,
+        wIni: 'LW', wBg: '#FDE7C2', wInk: '#6B4300', wRing: 'none', wWho: 'Li Wei', wTime: 'has Farrowing 3', giveShow: 'none' },
+      { room: 'Gestation 1', chip: 'Breeding', mask: mask('heat'), chipBg: '#F0F1EC', chipInk: '#1B211C', title: 'Breeding · today', sub: 'Gestation 1 · Batch 34',
+        stBg: '#E8EEF8', stInk: '#2E5C9A', status: '16 sows to breed today · 20 bred so far', isLitters: false, isCourse: false, isBatch: true,
+        wIni: 'ZM', wBg: '#F3E8F7', wInk: '#5B2D6E', wRing: 'none', wWho: 'Zhao Min', wTime: 'has Gestation 1', giveShow: 'none' }
+    ];
+
+    return { secs, f4tip, marks, f4due, pick, litters, course, breed, pops };
+  }
+}
+</script>
+</body>
+</html>

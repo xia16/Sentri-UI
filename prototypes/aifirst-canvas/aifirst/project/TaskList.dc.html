@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tasks in Sentri</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 3008px; box-sizing: border-box; padding: 48px 48px 56px; background: #ECEEE9; font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #1B211C; font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased">
+  <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em">Tasks in Sentri: what is a task, and what is not (reference, 11 Nov)</h1>
+  <p style="margin: 8px 0 0; max-width: 1700px; font-size: 15px; line-height: 22px; color: #5D665F">A task is work the system plans and follows to done, on a group of pigs or a room: it has a list, a progress and an end. Every board names only these. Anything else is an action inside a task, a finding on the walk, or guidance, and is never drawn as a task. From <code>features/</code>, <code>ux/model/unified-task-list.md</code>, the old UI&rsquo;s task tabs (<code>Task references/</code>) and the handover flows.</p>
+
+  <div style="display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 32px; margin-top: 32px; align-items: start">
+
+    <div style="background: #FFFFFF; border-radius: 16px; box-shadow: 0 0 0 1px rgba(17,21,17,.08); overflow: hidden">
+      <div style="display: grid; grid-template-columns: 220px 120px 210px 190px minmax(0, 1fr) 150px; gap: 16px; padding: 14px 20px 10px; font-size: 12px; font-weight: 600; color: #5D665F; border-bottom: 1px solid #F0F1EC">
+        <span>Task (name today)</span><span>中文</span><span>Suggested name</span><span>Works on</span><span>When, and what it records</span><span>Spec</span>
+      </div>
+      <sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+        <div style="padding: 12px 20px 4px; font-size: 12px; font-weight: 600; color: #1F5C3F; background: #F6F7F1; border-bottom: 1px solid #F0F1EC">{{g.name}}</div>
+        <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="4">
+          <div style="display: grid; grid-template-columns: 220px 120px 210px 190px minmax(0, 1fr) 150px; gap: 16px; align-items: baseline; padding: 11px 20px; border-bottom: 1px solid #F0F1EC; font-size: 13.5px; line-height: 19px">
+            <b style="font-weight: 600">{{r.name}}</b>
+            <span style="color: #5D665F">{{r.zh}}</span>
+            <span style="color: {{r.sugInk}}; font-weight: {{r.sugW}}">{{r.sug}}</span>
+            <span>{{r.on}}</span>
+            <span style="color: #3B4540">{{r.when}}</span>
+            <span><span style="display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: {{r.stBg}}; color: {{r.stInk}}">{{r.st}}</span></span>
+          </div>
+        </sc-for>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 24px">
+      <div style="background: #FFFFFF; border-radius: 16px; box-shadow: 0 0 0 1px rgba(17,21,17,.08); padding: 18px 20px 8px">
+        <div style="font-size: 15px; font-weight: 600">Not tasks: never on the Schedule or as a task chip</div>
+        <sc-for list="{{nots}}" as="n" hint-placeholder-count="5">
+          <div style="padding: 11px 0; border-top: 1px solid #F0F1EC; font-size: 13.5px; line-height: 19px; margin-top: {{n.mt}}">
+            <b style="font-weight: 600">{{n.name}}</b> <span style="color: #5D665F">{{n.zh}}</span>
+            <div style="margin-top: 2px; color: #3B4540">{{n.what}}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="background: #FFFFFF; border-radius: 16px; box-shadow: 0 0 0 1px rgba(17,21,17,.08); padding: 18px 20px 14px">
+        <div style="font-size: 15px; font-weight: 600">Names on the boards, corrected</div>
+        <div style="display: grid; grid-template-columns: 180px 18px minmax(0, 1fr); gap: 8px 10px; margin-top: 12px; font-size: 13.5px; line-height: 19px">
+          <sc-for list="{{fixes}}" as="f" hint-placeholder-count="6">
+            <span style="color: #8A5A12; text-decoration: line-through; text-decoration-color: rgba(138,90,18,.5)">{{f.was}}</span>
+            <span style="color: #8A938C">&rarr;</span>
+            <span>{{f.now}}</span>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="background: #FFFFFF; border-radius: 16px; box-shadow: 0 0 0 1px rgba(17,21,17,.08); padding: 18px 20px 16px">
+        <div style="font-size: 15px; font-weight: 600">Open</div>
+        <ul style="margin: 8px 0 0; padding-left: 18px; font-size: 13.5px; line-height: 20px; color: #3B4540">
+          <li>The suggested names follow what farm software and vets say (service, heat detection, pregnancy check, weaning). Nothing is renamed until they are agreed.</li>
+          <li>Wash and disinfect is a task (owner, 11 Nov) with no spec yet.</li>
+          <li>Treatment course, End-nursery and End-finishing checks, and Sampling have placeholders only.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":3008,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const ST = {
+      designed: ['Designed', '#E5F0E8', '#1F5C3F'], draft: ['Draft', '#EEF0EB', '#3B4540'],
+      old: ['Old UI only', '#EEF0EB', '#5D665F'], none: ['Not designed', '#FCF4E2', '#8A5A12']
+    };
+    const row = (name, zh, sug, on, when, st) => ({ name, zh, sug: sug || 'same', sugInk: sug ? '#1B211C' : '#8A938C', sugW: sug ? 500 : 400,
+      on, when, st: ST[st][0], stBg: ST[st][1], stInk: ST[st][2] });
+    const groups = [
+      { name: 'Breeding and farrowing (the phone tasks)', rows: [
+        row('Heat check', '查情', 'Heat detection', 'Sows', 'Once or twice a day, standing. A sow in heat moves to Breeding.', 'draft'),
+        row('Breeding', '配种', 'Service', 'Sows: mating 1 of N, semen batch', 'As sows come into heat. Closes sow by sow, no End.', 'draft'),
+        row('Return-heat check', '查返情', 'Return check', 'Sows', 'Days 18–24 after service. A return goes back to Service.', 'draft'),
+        row('Pregnancy check', '孕检', 'Pregnancy check (scan)', 'Sows', 'A set sweep. Pregnant, uncertain (again in 3 days) or open.', 'draft'),
+        row('Farrowing', '分娩', '', 'Sows and litters', 'Around the due date (service + 114). Born alive, dead by cause.', 'designed'),
+        row('Post-farrowing check', '母猪产后检查', '', 'Sows', 'Days after farrowing: condition, udder, milk, feeding.', 'draft'),
+        row('Piglet processing', '仔猪处理', 'Processing', 'Litters', 'By age: iron and tail day 2–4, castrate 3–7, coccidiosis 3–5, ID 3–7. Moving piglets (fostering) is inside it.', 'designed'),
+        row('Weaning check', '断奶检查', 'Weaning', 'Litters and sows', 'Weaning day: piglets weaned, average weight, kept for breeding, sow status.', 'draft') ] },
+      { name: 'Growing', rows: [
+        row('End-nursery check', '结束保育检查', 'Nursery exit', 'Groups', 'End of nursery, before moving on or selling.', 'old'),
+        row('End-finishing check', '结束育肥检查', 'Finisher exit', 'Groups', 'End of finishing, before sale.', 'old'),
+        row('Transfer', '转群', '', 'Groups or sows', 'From the production plan: from a room to a room, counted in.', 'draft') ] },
+      { name: 'Health and biosecurity', rows: [
+        row('Vaccination', '疫苗接种任务', '', 'Pigs or groups', 'From the vaccination plan. E.g. Vaccination · PRRS, Nursery 1.', 'old'),
+        row('Treatment course', '治疗用药任务', '', 'Pigs', 'A prescribed course, dose by dose. E.g. Treatment RX-25G009, dose 2 of 3.', 'none'),
+        row('Sampling', '采样', '', 'Pigs', 'From the vet or a vaccination review: samples taken, sent, results.', 'none'),
+        row('Wash and disinfect', '清洗消毒', '', 'Rooms', 'After a room empties, before the next batch: washed, disinfected, dry.', 'none') ] }
+    ];
+    const nots = [
+      { name: 'Inspection walk', zh: '巡检', what: 'The daily walk of a unit, checked in, with no done state. What it finds is recorded on the walk: a fault (Water line B), a pen note, a pig to treat, the vet’s weekly herd check. Findings that need someone go to Decide.' },
+      { name: 'Feeding', zh: '饲喂', what: 'Follows the feed plan. Guidance, never done or not done.' },
+      { name: 'Fostering', zh: '寄养', what: 'Moving piglets between litters: an action inside Farrowing or Piglet processing.' },
+      { name: 'Weight', zh: '体重', what: 'An action on a pig or a pen. Weaning weights belong to the Weaning check.' },
+      { name: 'Treatment on the spot', zh: '治疗', what: 'A worker treats a sick pig they see: a record, not a task. Only a prescribed course is a task.' },
+      { name: 'Equipment faults', zh: '设备', what: 'Water line B, heat lamps, the feed line: Equipment’s, raised from the walk or a sensor.' }
+    ].map((n, i) => Object.assign(n, { mt: i ? '0' : '8px' }));
+    const fixes = [
+      ['Fostering checks', 'removed: inside Piglet processing'], ['Pen-strep, Amox', 'Treatment RX-… (the medicine is inside it)'],
+      ['Move into Farrowing 4', 'Transfer · Batch 33 to Farrowing 4'], ['PRRS vaccine', 'Vaccination · PRRS'],
+      ['Weigh', 'End-nursery check (Batch 31), or nothing'], ['Herd check', 'removed: the vet’s walk'],
+      ['Water line B, Heat lamps, Repairs', 'removed: Equipment, from the walk'], ['Look in', 'Inspection walk'],
+      ['Feed', 'removed as a block: routine with the room'], ['Get ready to wash', 'Wash and disinfect']
+    ].map((f) => ({ was: f[0], now: f[1] }));
+    return { groups, nots, fixes };
+  }
+}
+</script>
+</body>
+</html>

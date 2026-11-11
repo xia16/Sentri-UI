@@ -106,7 +106,7 @@
     <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #F1F3EE; box-shadow: inset 0 0 0 1px #E2E5DE"></span>Planned</span>
     <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; box-shadow: inset 0 0 0 1px #9CA59D"></span>Expected</span>
     <span style="flex: 1"></span>
-    <span>Click a day to see where and who. Daily feeds and look-ins aren&rsquo;t drawn.</span>
+    <span>Click a day to see where and who. Feeding and the walk are not tasks, so they are not drawn.</span>
   </div>
 
 </div>
@@ -129,24 +129,18 @@ class Component extends DCLogic {
     const ROWS = [
       { g: 'Production', name: 'Breeding', sub: 'Batch 34 · Gestation 1', start: 'bt:34/breed', unit: 'sows', where: [['Gestation 1', 'ZM']],
         cells: { 3: 'd20', 4: 'o16', 5: 'p8', 6: 'p4' }, today: '16 sows to breed today · 20 bred yesterday' },
-      { g: 'Production', name: 'Move into Farrowing Room 4', sub: 'Batch 33 · 48 sows', start: 'bt:33/move', unit: 'sows', where: [['Gestation 1 → Farrowing Room 4', 'LW']],
+      { g: 'Production', name: 'Transfer', sub: 'Batch 33 · into Farrowing Room 4 · 48 sows', start: 'bt:33/move', unit: 'sows', where: [['Gestation 1 → Farrowing Room 4', 'LW']],
         cells: { 3: 'd14', 4: 'd12|o22' }, today: '26 of 48 sows in · 22 to move today' },
       { g: 'Production', name: 'Farrowing', sub: 'Batch 32 · Farrowing Room 3', start: 'bt:32/farrow', unit: 'sows', where: [['Farrowing Room 3', 'LW']],
         cells: { 2: 'd9', 3: 'd14', 4: 'o10', 5: 'e8', 6: 'e6', 7: 'e3' }, today: 'About 10 expected today · day 3 of 7' },
-      { g: 'Production', name: 'Fostering checks', sub: 'Batch 32 · Farrowing Room 3', start: 'bt:32/farrow', unit: 'litters', where: [['Farrowing Room 3', 'LW']],
-        cells: { 2: 'd8', 3: 'd12', 4: 'o8', 5: 'p8', 6: 'p8', 7: 'p6' }, today: '6 of 8 litters checked · 2 to go' },
-      { g: 'Production', name: 'Weigh', sub: 'Batch 30 · Nursery 1 · 20 pigs', start: 'bt:31/nurs', unit: 'pigs', where: [['Nursery 1', 'WF']],
-        cells: { 8: 'p20' } },
+      { g: 'Production', name: 'Piglet processing', sub: 'Batch 32 · Farrowing Room 3', start: 'bt:32/farrow', unit: 'litters', where: [['Farrowing Room 3', 'LW']],
+        cells: { 3: 'd3', 4: 'o8', 5: 'p10', 6: 'p8' }, today: '8 litters due today · iron and tails' },
       { g: 'Health', name: 'Treatment RX-25G009', sub: '4 lame sows · Gestation 2', start: 'task:rx09', unit: 'sows', where: [['Gestation 2', 'ZM']],
         cells: { 3: 'd4', 4: 'o4', 5: 'p4' }, today: 'Dose 2 of 3, due 08:30' },
-      { g: 'Health', name: 'PRRS vaccine', sub: 'Batch 30, 31 · Nursery 1, 2', start: 'task:prrs', unit: 'pigs', where: [['Nursery 1', 'WF'], ['Nursery 2', 'WF']],
+      { g: 'Health', name: 'Vaccination · PRRS', sub: 'Batch 30, 31 · Nursery 1, 2', start: 'task:prrs', unit: 'pigs', where: [['Nursery 1', 'WF'], ['Nursery 2', 'WF']],
         cells: { 3: 'd488', 4: 'o420', 11: 'p488' }, today: 'Batch 30 today, 420 pigs · Batch 31 done yesterday' },
-      { g: 'Health', name: 'Herd check', sub: 'Weekly vet visit', unit: 'visit', where: [['All barns', 'DC']],
-        cells: { 2: 'd1', 9: 'p1' } },
-      { g: 'Other', name: 'Wash and disinfect', sub: 'Farrowing Room 4', unit: 'room', where: [['Farrowing Room 4', 'LW']],
-        cells: { 1: 'd1' } },
-      { g: 'Other', name: 'Water line B', sub: 'Gestation 2', unit: 'job', where: [['Gestation 2', 'GF']],
-        cells: { 0: 'd1', 7: 'p1' } }
+      { g: 'Rooms', name: 'Wash and disinfect', sub: 'Farrowing Room 4', unit: 'room', where: [['Farrowing Room 4', 'LW']],
+        cells: { 1: 'd1' } }
     ];
     const LOOK = {
       d: ['#E3F0E8', '#28734F', 'none'], o: ['#EAF1FC', '#3972B7', 'inset 0 0 0 1.5px #3972B7'],
