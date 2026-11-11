@@ -1,0 +1,518 @@
+{
+  "feature": "move",
+  "source": "scenario-tree.md",
+  "created": "2026-11-11T06:33:00.203Z",
+  "cap": 4,
+  "knownQuestions": [
+    "Q8",
+    "Q1",
+    "Q9",
+    "Q5",
+    "Q6",
+    "Q4",
+    "Q2",
+    "Q3",
+    "Q7",
+    "Q10"
+  ],
+  "marks": 0,
+  "rows": [
+    {
+      "id": "A-1",
+      "tree": "A-1",
+      "label": "T1 L0 D0, pig record: Open Transfer",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "A-2",
+      "tree": "A-2",
+      "label": "T2 L0 D1, pen or walk selection: Open Transfer",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "A-3",
+      "tree": "A-3",
+      "label": "U1 L0 D1, group row: Select n of N head and open Transfer",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "A-4",
+      "tree": "A-4",
+      "label": "U2 L0 D1, multi-batch group: Select n of N head and open Transfer",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "A-5",
+      "tree": "A-5",
+      "label": "M L0 D1, tagged and head: Open Transfer",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "A-6",
+      "tree": "A-6",
+      "label": "T1/T2/M D1, Inspection Actions: Open Transfer and return without saving",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "A-7",
+      "tree": "A-7",
+      "label": "X D0, deceased sow record: Open Actions",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "A-8",
+      "tree": "A-8",
+      "label": "T1/T2/U1/U2/M D1: Untick the last selected subject",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "A-9",
+      "tree": "A-9",
+      "label": "T1/T2/U1/U2/M from more than one source pen: Open one Transfer",
+      "kind": "blocker",
+      "question": "Q8",
+      "status": "pending"
+    },
+    {
+      "id": "B-1",
+      "tree": "B-1",
+      "label": "D2 L0, current unit: Open picker",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "B-2",
+      "tree": "B-2",
+      "label": "D2 L1, source pen: Tap origin pen",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "B-3",
+      "tree": "B-3",
+      "label": "D2 L2, another current-unit pen: Tap destination",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "B-4",
+      "tree": "B-4",
+      "label": "D2 L3, other unit with duplicate pen code: Search and tap destination",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "B-5",
+      "tree": "B-5",
+      "label": "D2 L3: Scan a unique registered pen plate",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "B-6",
+      "tree": "B-6",
+      "label": "D2 L4: Search or scan has no exact registered match",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "B-7",
+      "tree": "B-7",
+      "label": "D2 L4, duplicate or ambiguous plate: Scan plate",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "B-8",
+      "tree": "B-8",
+      "label": "D2 L2/L3, empty pen: View picker",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "B-9",
+      "tree": "B-9",
+      "label": "D3 L5, destination full or capacity unknown: Try to continue",
+      "kind": "blocker",
+      "question": "Q1",
+      "status": "pending"
+    },
+    {
+      "id": "B-10",
+      "tree": "B-10",
+      "label": "S D2, sow record uses unit then pen fields: Choose destination",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "C-1",
+      "tree": "C-1",
+      "label": "T1/T2 D3, all identified: Review before commit",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "C-2",
+      "tree": "C-2",
+      "label": "U1/M D3 G0: Review before commit",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "C-3",
+      "tree": "C-3",
+      "label": "U1/M D3 G1: Review open source-pen records",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "C-4",
+      "tree": "C-4",
+      "label": "U1/M D3 G1: Change one verdict to Goes",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "C-5",
+      "tree": "C-5",
+      "label": "U1/M D3 G1: Change one verdict to Both",
+      "kind": "blocker",
+      "question": "Q9",
+      "status": "pending"
+    },
+    {
+      "id": "C-6",
+      "tree": "C-6",
+      "label": "U1/M D3 G2, all unidentified head leave: Review group records",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "C-7",
+      "tree": "C-7",
+      "label": "U1 D3, one source batch: Review head allocation",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "C-8",
+      "tree": "C-8",
+      "label": "U2/M D3, several source batches: Enter counts whose sum equals moved head",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "C-9",
+      "tree": "C-9",
+      "label": "U2/M D3, several source batches: Enter counts whose sum differs from moved head",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "C-10",
+      "tree": "C-10",
+      "label": "U2/M D3, source batch has fewer head than requested: Increase that batch above available count",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "C-11",
+      "tree": "C-11",
+      "label": "T1/T2/U1/U2/M D3: Tap primary without a destination",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "C-12",
+      "tree": "C-12",
+      "label": "M D3, tagged and head together: Commit once",
+      "kind": "blocker",
+      "question": "Q5",
+      "status": "pending"
+    },
+    {
+      "id": "D-1",
+      "tree": "D-1",
+      "label": "T1 D4 N0: Farm confirms move",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "D-2",
+      "tree": "D-2",
+      "label": "T2 D4 N0: Farm confirms move",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "D-3",
+      "tree": "D-3",
+      "label": "U1/U2 D4 N0: Farm confirms move",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "D-4",
+      "tree": "D-4",
+      "label": "M D4 N0 G1: Farm confirms mixed move",
+      "kind": "blocker",
+      "question": "Q9",
+      "status": "pending"
+    },
+    {
+      "id": "D-5",
+      "tree": "D-5",
+      "label": "T1 D5, changed row visible on return: Return to origin or pig record",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "D-6",
+      "tree": "D-6",
+      "label": "T2/M D5, several pigs: Return after confirmation",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "D-7",
+      "tree": "D-7",
+      "label": "T1 D5, result off screen or barely visible: Return after confirmation",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "D-8",
+      "tree": "D-8",
+      "label": "Any D5: Later read pig and pen history",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "E-1",
+      "tree": "E-1",
+      "label": "D2/D3, unsaved: Tap Back midway",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "E-2",
+      "tree": "E-2",
+      "label": "D3, unsaved: Close and reopen app",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "E-3",
+      "tree": "E-3",
+      "label": "D3 N1, offline: Commit",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "E-4",
+      "tree": "E-4",
+      "label": "D6 N1: Reopen app offline",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "E-5",
+      "tree": "E-5",
+      "label": "D6 N2: Network returns and upload is accepted",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "E-6",
+      "tree": "E-6",
+      "label": "D4 N0/N1: Double tap primary",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "E-7",
+      "tree": "E-7",
+      "label": "D4 N0: App closes before response, then reopens",
+      "kind": "blocker",
+      "question": "Q6",
+      "status": "pending"
+    },
+    {
+      "id": "E-8",
+      "tree": "E-8",
+      "label": "D6 N2, worker B moved same pig first: Upload A's earlier offline move",
+      "kind": "blocker",
+      "question": "Q6",
+      "status": "pending"
+    },
+    {
+      "id": "E-9",
+      "tree": "E-9",
+      "label": "D6 N2, destination changed by another worker: Upload head-count move",
+      "kind": "blocker",
+      "question": "Q6",
+      "status": "pending"
+    },
+    {
+      "id": "E-10",
+      "tree": "E-10",
+      "label": "M D4/D6: One part fails or the response is partial",
+      "kind": "blocker",
+      "question": "Q5",
+      "status": "pending"
+    },
+    {
+      "id": "E-11",
+      "tree": "E-11",
+      "label": "D7, explicit farm rejection: Worker returns to transfer",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "E-12",
+      "tree": "E-12",
+      "label": "D5, accepted move: Worker immediately starts another move for same pig",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "F-1",
+      "tree": "F-1",
+      "label": "S lactating, source pen contains piglets: Move sow out",
+      "kind": "blocker",
+      "question": "Q4",
+      "status": "pending"
+    },
+    {
+      "id": "F-2",
+      "tree": "F-2",
+      "label": "K1, production line trigger matches batch: System creates transfer task",
+      "kind": "blocker",
+      "question": "Q2",
+      "status": "pending"
+    },
+    {
+      "id": "F-3",
+      "tree": "F-3",
+      "label": "K1, Workbench task opened: Worker executes a planned transfer",
+      "kind": "blocker",
+      "question": "Q2",
+      "status": "pending"
+    },
+    {
+      "id": "F-4",
+      "tree": "F-4",
+      "label": "K2, Console order with source, target and head count: Open on mobile",
+      "kind": "blocker",
+      "question": "Q3",
+      "status": "pending"
+    },
+    {
+      "id": "F-5",
+      "tree": "F-5",
+      "label": "D5, accepted move went to wrong pen: Try to correct",
+      "kind": "blocker",
+      "question": "Q7",
+      "status": "pending"
+    },
+    {
+      "id": "F-6",
+      "tree": "F-6",
+      "label": "Any subject, worker lacks move permission: Open or commit Transfer",
+      "kind": "blocker",
+      "question": "Q10",
+      "status": "pending"
+    },
+    {
+      "id": "G-1",
+      "tree": "G-1",
+      "label": "D6/D7, local pending or rejected record: Open Data sync",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "G-2",
+      "tree": "G-2",
+      "label": "K1, assigned transfer task: Open Workbench entry",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "G-3",
+      "tree": "G-3",
+      "label": "Piglets in a farrowing litter: Choose a litter or crate move",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "G-4",
+      "tree": "G-4",
+      "label": "Console order setup or transfer-plan configuration: Request it in this mobile feature",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "G-5",
+      "tree": "G-5",
+      "label": "Pig leaving the farm or feed stock move: Request it through Transfer",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    }
+  ],
+  "rounds": []
+}
