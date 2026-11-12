@@ -104,45 +104,44 @@ body{margin:0}
                   </sc-if>
                 </div>
                 <sc-if value="{{r.taskOpen}}" hint-placeholder-val="{{false}}">
-<div style="display: flex; justify-content: flex-end; padding: 4px 10px 12px; border-top: 1px solid #F1F0EE; background: #FAFAF8">
-  <div role="dialog" aria-label="{{tk.title}}" style="width: 340px; box-sizing: border-box; margin-top: 8px; padding: 14px 16px 12px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 14px 40px rgba(17,21,17,.18), 0 0 0 1px rgba(17,21,17,.06); animation: wdIn .14s ease-out">
-    <div style="display: flex; align-items: flex-start; gap: 8px">
-      <div style="flex: 1; min-width: 0"><div style="font-size: 15px; font-weight: 600">{{tk.title}}</div><div style="margin-top: 2px; font-size: 12.5px; color: #5D665F">{{tk.sub}}</div></div>
-      <button type="button" onClick="{{closeTask}}" aria-label="Close" style="width: 28px; height: 28px; margin: -4px -6px 0 0; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: #8A938C; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
+<div style="display: flex; justify-content: flex-end; padding: 4px 10px 14px; border-top: 1px solid #F1F0EE; background: #FAFAF8">
+  <div role="dialog" aria-label="{{tk.title}}" style="width: 360px; margin-top: 8px; border-radius: 16px; background: #F6F7F1; box-shadow: 0 18px 44px rgba(17,21,17,.18), 0 0 0 1px rgba(17,21,17,.07); animation: wdIn .14s ease-out">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 14px 10px 10px 16px">
+      <span style="width: 32px; height: 32px; flex: none; display: grid; place-items: center; border-radius: 9px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2"><span aria-hidden="true" style="width: 16px; height: 16px; background: #1B211C; -webkit-mask: {{tk.mask}} center / contain no-repeat; mask: {{tk.mask}} center / contain no-repeat"></span></span>
+      <span style="flex: 1; min-width: 0"><b style="display: block; font-size: 15px; font-weight: 600">{{tk.title}}</b><span style="font-size: 12.5px; color: #5D665F">{{tk.sub}}</span></span>
+      <button type="button" onClick="{{closeTask}}" aria-label="Close" style="width: 32px; height: 32px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: #8A938C; cursor: pointer"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
     </div>
-    <div style="margin-top: 10px; padding: 9px 11px; border-radius: 10px; background: #E8EEF8; color: #2E5C9A; font-size: 13px; font-weight: 600">{{tk.status}}</div>
-    <sc-if value="{{tk.hasBars}}" hint-placeholder-val="{{true}}">
-      <div style="display: flex; flex-direction: column; gap: 9px; margin-top: 14px">
-        <div style="display: flex; font-size: 12px; color: #5D665F"><span style="flex: 1; font-weight: 600">{{tk.barsTitle}}</span><span>{{tk.barsNote}}</span></div>
-        <sc-for list="{{tk.bars}}" as="b" hint-placeholder-count="3">
-          <div style="display: grid; grid-template-columns: {{tk.labelW}} minmax(0, 1fr) 52px; gap: 10px; align-items: center; font-size: 12.5px">
-            <span><b style="font-weight: 600">{{b.n}}</b> <span style="color: #8A938C">{{b.win}}</span></span>
-            <span style="display: flex; gap: 2px; height: 8px; border-radius: 3px; overflow: hidden; background: #F0F1EC"><span style="width: {{b.d}}; background: #1F5C3F"></span><span style="width: {{b.t}}; background: #6F95D1"></span></span>
-            <span style="text-align: right; color: #5D665F; font-variant-numeric: tabular-nums">{{b.v}}</span>
-          </div>
+    <div style="margin: 0 10px; padding: 14px 14px 14px; border-radius: 12px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(17,21,17,.05), 0 0 0 1px #E6E9E2">
+      <div style="font-size: 12px; font-weight: 600; color: #5D665F">{{tk.label}}</div>
+      <div style="display: flex; align-items: baseline; gap: 6px; margin-top: 2px"><span style="font-size: 30px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">{{tk.big}}</span><span style="font-size: 13px; color: #5D665F">{{tk.unit}}</span></div>
+      <div style="display: flex; gap: 3px; height: 8px; margin-top: 12px">
+        <sc-for list="{{tk.segs}}" as="g" hint-placeholder-count="3">
+          <span class="wd-has" style="position: relative; flex: {{g.f}}; border-radius: 4px; background: {{g.c}}">
+            <span class="wd-tip" role="tooltip" style="position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); z-index: 25; font-size: 11.5px; font-weight: 600; line-height: 20px; padding: 0 7px; border-radius: 6px; background: #1E2A22; color: #FFFFFF; white-space: nowrap; pointer-events: none">{{g.tip}}</span>
+          </span>
         </sc-for>
-        <div style="display: flex; gap: 14px; font-size: 12px; color: #5D665F">
-          <span style="display: inline-flex; align-items: center; gap: 5px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #1F5C3F"></span>done</span>
-          <span style="display: inline-flex; align-items: center; gap: 5px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #6F95D1"></span>today</span>
-        </div>
       </div>
-    </sc-if>
-    <sc-if value="{{tk.hasCourse}}" hint-placeholder-val="{{false}}">
-      <div style="margin-top: 14px">
-        <div style="display: flex; font-size: 12px; color: #5D665F"><span style="flex: 1; font-weight: 600">The course</span><span>Amoxicillin 15% LA · 15 mL</span></div>
-        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px">
-          <sc-for list="{{tk.course}}" as="c" hint-placeholder-count="3">
-            <span style="display: flex; flex-direction: column; gap: 6px"><span style="height: 8px; border-radius: 4px; background: {{c.c}}; box-shadow: {{c.ring}}"></span><span style="font-size: 12px; line-height: 16px"><b style="font-weight: 600">{{c.t}}</b><br><span style="color: #5D665F">{{c.l}}</span></span></span>
-          </sc-for>
-        </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font-size: 12px; color: #5D665F">
+        <sc-for list="{{tk.segs}}" as="g" hint-placeholder-count="3"><span style="display: inline-flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 99px; background: {{g.c}}"></span>{{g.key}}</span></sc-for>
       </div>
-    </sc-if>
-    <div style="display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-items: center; min-height: 40px; margin-top: 12px; border-top: 1px solid #F0F1EC; font-size: 13px">
-      <span style="width: 24px; height: 24px; border-radius: 99px; display: grid; place-items: center; font-size: 10px; font-weight: 700; background: {{tk.wBg}}; color: {{tk.wInk}}; box-shadow: {{tk.wRing}}">{{tk.wIni}}</span>
-      <span><b style="font-weight: 600">{{tk.wWho}}</b><span style="color: #5D665F"> &middot; {{tk.wNote}}</span></span>
     </div>
-    <div style="display: flex; justify-content: flex-end; margin-top: 8px">
-      <button type="button" onClick="{{tk.farm}}" style="display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 8px 0 10px; border: 0; border-radius: 8px; background: #EEF0EB; font: inherit; font-size: 13px; font-weight: 600; color: #1B211C; cursor: pointer">Open in Farm view <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 6 6 6-6 6"></path></svg></button>
+    <sc-if value="{{tk.hasExtra}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; align-items: center; gap: 8px; margin: 8px 10px 0; padding: 0 12px; height: 40px; border-radius: 10px; background: #FFFFFF; box-shadow: 0 0 0 1px #E6E9E2; font-size: 13px">
+        <span style="color: #5D665F">{{tk.extraLabel}}</span>
+        <span class="wd-has" style="position: relative; font-weight: 600; text-decoration: underline dotted #B9C0B9; text-underline-offset: 3px; cursor: default">{{tk.extra}}
+          <span class="wd-tip" role="tooltip" style="position: absolute; left: 0; top: calc(100% + 8px); z-index: 25; flex-direction: column; gap: 6px; width: 240px; padding: 7px 10px 8px; border-radius: 8px; border: 1px solid #E6E9E2; background: #FFFFFF; box-shadow: 0 20px 25px -5px rgba(17,21,17,.12), 0 8px 10px -6px rgba(17,21,17,.10); font-size: 12px; line-height: 16px; font-weight: 400; text-decoration: none; color: #1B211C">
+            <span style="font-weight: 500">{{tk.tipTitle}}</span>
+            <sc-for list="{{tk.tip}}" as="y" hint-placeholder-count="3">
+              <span style="display: flex; gap: 8px"><span style="color: #5D665F">{{y.n}}</span><span style="margin-left: auto; font-weight: 500; font-variant-numeric: tabular-nums">{{y.v}}</span></span>
+            </sc-for>
+          </span>
+        </span>
+      </div>
+    </sc-if>
+    <div style="display: flex; align-items: center; gap: 8px; padding: 12px 10px 12px 16px">
+      <span style="width: 26px; height: 26px; border-radius: 99px; display: grid; place-items: center; font-size: 10.5px; font-weight: 700; background: {{tk.wBg}}; color: {{tk.wInk}}; box-shadow: {{tk.wRing}}">{{tk.wIni}}</span>
+      <span style="flex: 1; font-size: 13px; font-weight: 600; color: {{tk.wInk2}}">{{tk.wWho}}</span>
+      <button type="button" onClick="{{tk.farm}}" style="display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px 0 12px; border: 0; border-radius: 9px; background: #1B211C; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer">Open in Farm view <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="m9 6 6 6-6 6"></path></svg></button>
     </div>
   </div>
 </div></sc-if>
@@ -348,15 +347,19 @@ class Component extends DCLogic {
       N1: ['Batch 30, day 24', [['#9CCBB0', 'Pigs', '420']]], N2: ['Batch 31, day 31', [['#9CCBB0', 'Pigs', '488']]],
       Q1: ['Gilts, arrived 26 Oct', [['#1F5C3F', 'Gilts', '12']]]
     };
-    // what each task's pop-over says, and the Farm view start that opens it
+    // what each task's pop-over says: one number and its bar (each part has a hover label); the rest in one hover
+    // segs: [share, d done | t today | n not yet, hover label, key]
     const TASK = {
-      'F3:birth': { status: 'About 10 expected today · 9 of 16 farrowed', bars: [['Sows farrowed', '', 6, 3, 16, '6 + 3']], title: 'Batch 32 · 16 sows', start: 'bt:32/farrow' },
-      'F3:proc': { status: '8 litters due today · iron and tails', title: '16 litters, by job', note: 'days of age', start: 'bt:32/farrow', w: '130px',
-        bars: [['Iron', '2–4', 3, 5, 16, '3 + 5'], ['Tail', '2–4', 3, 5, 16, '3 + 5'], ['Castrate', '3–7', 0, 3, 16, '0 + 3'], ['Coccidiosis', '3–5', 0, 3, 16, '0 + 3'], ['ID', '3–7', 0, 3, 16, '0 + 3']] },
-      'F4:move': { status: '26 of 48 sows in · 22 to move today', bars: [['Sows in', '', 26, 22, 48, '26 + 22']], title: 'Batch 33 · from Gestation 1', start: 'bt:33/move' },
-      'G1:heat': { status: '16 sows to mate today · 20 done', bars: [['Sows done', '2 of 2', 20, 16, 50, '20 + 16']], title: 'Batch 34 · 50 sows', note: 'from the Heat check', start: 'bt:34/breed' },
-      'G2:dose': { status: 'Dose 2 of 3 · today at 08:30', course: true, start: 'task:rx09' },
-      'N1:vax': { status: 'Batch 30 today · 420 pigs', bars: [['Batch 31', '', 488, 0, 488, 'done'], ['Batch 30', '', 0, 420, 420, 'today']], title: 'From the vaccination plan', start: 'task:prrs' }
+      'F3:birth': { big: '7', unit: 'sows still to farrow · of 16', segs: [[9, 'd', '9 sows farrowed', '9 farrowed'], [7, 'n', '7 sows to go, about 10 piglets today', '7 to go']],
+        extra: ['Born so far', '112 alive', 'Batch 32 · born so far', [['Born alive', '112'], ['Born dead', '6'], ['A litter, on average', '12.4']]], start: 'bt:32/farrow' },
+      'F3:proc': { big: '8', unit: 'litters due · of 16', segs: [[3, 'd', '3 litters done', '3 done'], [8, 't', '8 litters due today', '8 today'], [5, 'n', '5 litters not due yet', '5 later']],
+        extra: ['Jobs', 'Iron, tails and 3 more', 'Due today, by job', [['Iron · day 2–4', '5 litters'], ['Tail · day 2–4', '5 litters'], ['Castrate · day 3–7', '3 litters'], ['Coccidiosis · day 3–5', '3 litters'], ['ID · day 3–7', '3 litters']]], start: 'bt:32/farrow' },
+      'F4:move': { big: '22', unit: 'sows to move · 26 of 48 in', segs: [[26, 'd', '26 sows in, Thu and this morning', '26 in'], [22, 't', '22 sows to move today', '22 today']], start: 'bt:33/move' },
+      'G1:heat': { big: '16', unit: 'sows to mate · of 50', segs: [[20, 'd', '20 sows done, 2 of 2 matings', '20 done'], [16, 't', '16 sows to mate today', '16 today'], [14, 'n', '14 sows not in heat yet', '14 not in heat']],
+        extra: ['Next', 'G1-12 · mating 2 · 11:00', 'Next matings', [['G1-12 · mating 2 · D-1104', '11:00'], ['G1-07 · mating 1 · D-1104', '11:00'], ['G1-31 · mating 1 · D-1107', '15:00']]], start: 'bt:34/breed' },
+      'G2:dose': { label: 'Today at 08:30', big: 'Dose 2', unit: 'of 3', segs: [[1, 'd', 'Dose 1 · Thu 08:30 · Zhao Min', 'Thu'], [1, 't', 'Dose 2 · today 08:30', 'today'], [1, 'n', 'Dose 3 · Sat 08:30', 'Sat']],
+        extra: ['Medicine', 'Amoxicillin · 15 mL', 'Amoxicillin 15% LA', [['Dose', '15 mL, into the neck'], ['Sows', 'B15, B20, D40, D41'], ['Withdrawal', 'from dose 3, on the label']]], start: 'task:rx09' },
+      'N1:vax': { big: '420', unit: 'pigs today · Batch 30', segs: [[488, 'd', 'Batch 31 · 488 pigs, done Thu', 'Batch 31 done'], [420, 't', 'Batch 30 · 420 pigs today', 'Batch 30 today']], start: 'task:prrs' }
     };
     const SEC_OF = {}, CARE = {}, ORDER = [];
     SECS.forEach((x) => x[3].forEach((id) => { SEC_OF[id] = x[0]; CARE[id] = x[2]; ORDER.push(id); }));
@@ -451,18 +454,18 @@ class Component extends DCLogic {
       };
     };
     // the open task's pop-over
+    const SEG = { d: '#1F5C3F', t: '#6F95D1', n: '#E6E9E2' };
     const tk = (() => {
       const key = s.task, id = key.split(':')[0], d = id && R[id] ? R[id][3].find((x) => id + ':' + x[0] === key) : null;
-      if (!d) return { title: '', sub: '', status: '', hasBars: false, hasCourse: false, bars: [], course: [], labelW: '0', barsTitle: '', barsNote: '', wIni: '', wBg: '', wInk: '', wRing: 'none', wWho: '', wNote: '', farm: () => {} };
-      const T = TASK[key], k = keep[id], pc = (n, all) => (n / all * 100).toFixed(1) + '%';
+      if (!d) return { title: '', sub: '', mask: '', label: '', big: '', unit: '', segs: [], hasExtra: false, extraLabel: '', extra: '', tipTitle: '', tip: [], wIni: '', wBg: '', wInk: '', wInk2: '', wRing: 'none', wWho: '', farm: () => {} };
+      const T = TASK[key], k = keep[id], X = T.extra;
       return {
-        title: d[2] + (d[5] ? ' · ' + d[5] : ' · today'), sub: nm(id) + ' · ' + d[3], status: T.status,
-        hasBars: !!T.bars, barsTitle: T.title || '', barsNote: T.note || '', labelW: T.w || '110px',
-        bars: (T.bars || []).map((b) => ({ n: b[0], win: b[1], d: pc(b[2], b[4]), t: pc(b[3], b[4]), v: b[5] })),
-        hasCourse: !!T.course,
-        course: [{ t: 'Thu 08:30', l: 'dose 1 · Zhao Min', c: '#1F5C3F', ring: 'none' }, { t: 'Today 08:30', l: 'dose 2', c: '#6F95D1', ring: 'none' }, { t: 'Sat 08:30', l: 'dose 3', c: '#FFFFFF', ring: 'inset 0 0 0 1.5px #B9C0B9' }],
-        wIni: k || '?', wBg: k ? P[k][1] : '#FFFFFF', wInk: k ? P[k][2] : '#7A5410', wRing: k ? 'none' : 'inset 0 0 0 1.5px #7A5410',
-        wWho: k ? P[k][0] : 'No one', wNote: k ? 'has ' + nm(id) : nm(id) + ' has no one',
+        title: d[2], sub: nm(id), label: T.label || 'Today', big: T.big, unit: T.unit,
+        mask: 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + IC[d[0]] + '"/></svg>') + '")',
+        segs: T.segs.map((g) => ({ f: g[0], c: SEG[g[1]], tip: g[2], key: g[3] })),
+        hasExtra: !!X, extraLabel: X ? X[0] : '', extra: X ? X[1] : '', tipTitle: X ? X[2] : '', tip: X ? X[3].map((y) => ({ n: y[0], v: y[1] })) : [],
+        wIni: k || '?', wBg: k ? P[k][1] : '#FFFFFF', wInk: k ? P[k][2] : '#7A5410', wInk2: k ? '#1B211C' : '#7A5410', wRing: k ? 'none' : 'inset 0 0 0 1.5px #7A5410',
+        wWho: k ? P[k][0] : 'No one has ' + nm(id),
         farm: () => { try { window.dispatchEvent(new CustomEvent('sentri:tab', { detail: { id: 'layout', start: T.start + '@' + Date.now() } })); } catch (e) {} }
       };
     })();
