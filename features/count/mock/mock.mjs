@@ -401,7 +401,9 @@ async function taskMap(name, o) {
     let dock = null; for (let d = document.querySelector('[data-action="room-scan"]'); d && d !== document.body; d = d.parentElement) if (/dock/i.test(d.className)) dock = d;
     if (!o.scan) {
       const foot = document.createElement('div'); foot.className = 'sheet-footer st-scan-foot'; foot.dataset.ds = 'Sheet';
-      foot.innerHTML = U.button({ label: 'Scan', icon: window.SentriIcons.icon('scan'), register: 'primary', className: 'st-scan-toggle', action: 'x' });
+      // The footer says how the page works (owner, 2026-11-16: a tip, not a description): tap a pen to count it; Scan to place tagged pigs.
+      foot.className = 'sheet-footer m-scanfoot';
+      foot.innerHTML = '<div class="m-left"><strong>Tap a pen to count it</strong></div>' + U.button({ label: 'Scan', icon: window.SentriIcons.icon('scan'), register: 'primary', className: 'st-scan-toggle', action: 'x' });
       dock.replaceWith(foot);
     }
     if (o.scan) {
@@ -427,7 +429,7 @@ async function taskMap(name, o) {
   await p.close();
 }
 const keyOf = (counted) => '<p class="m-plankey">' + (counted ? '<span><i style="background:var(--done-fill,#d5e8cc)"></i>Counted</span>' : '')
-  + '<span><i class="m-k-plan"></i>Planned</span><span>Pens hold <b>15</b> · sick <b>4</b></span></p>';
+  + '<span><i class="m-k-plan"></i>Planned</span></p>'; // no "Pens hold 15 · sick 4" (owner, 2026-11-16: not needed; the fill line says it)
 const unit9 = (over) => {
   const t = { A1: ['0/15', 'm-plan'], A2: ['0/15', 'm-plan'], A3: ['0/15', 'm-plan'], A4: ['0/15', 'm-plan'], B1: ['0/15', 'm-plan'], B2: ['0/15', 'm-plan'],
     B3: ['0/15', 'm-free'], B4: ['0/15', 'm-free'], C1: ['15/15', 'm-free'], C2: ['9/15', 'm-free'], C3: ['0/15', 'm-free'], C4: ['0/15', 'm-free'],
@@ -657,4 +659,65 @@ for (const [name, ticked] of [['mock-16d-not-arrived.png', []], ['mock-16e-not-a
   await shoot(p, name);
 }
 
+// 17. Entrances (owner, 2026-11-16: "the main page entrances for the transfer task, the unit level one, and the task overview").
+//     Home already lists transfers under Other as rows (main, PR 225): the transfer shows there in both sections, Pigs to move at the
+//     source, Receive pigs at the destination. Home's overview row opens the Task overview; the unit page's card opens the unit's map.
+//     Home's sample farm calls the nursery units 12 and 13; the mocks say Unit 9 and 10, as the rest of this round.
+const HOME = `http://localhost:${port}/ux/system/home-astra-prototype.html?layout=focus`;
+async function homePage(name, query, fn, arg) {
+  const p = await newPage();
+  await p.goto(HOME + query);
+  await p.waitForTimeout(1200);
+  await p.evaluate(fn, arg);
+  await p.waitForTimeout(400);
+  await p.screenshot({ path: path.join(out, name) });
+  await p.close();
+}
+const otherRow = ({ title, line, n }) => {
+  for (const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); w.nextNode();) w.currentNode.nodeValue = w.currentNode.nodeValue.replace(/Units 6, 7|Unit 12/g, (m) => m === 'Unit 12' ? 'Unit 9' : m);
+  const s = document.querySelectorAll('.ov-section'), other = s[s.length - 1];
+  const rows = window.SentriUI.rowGroup(window.SentriUI.row({ variant: 'navigation', icon: window.SentriIcons.icon('transfer'), title, description: line, trailing: { text: n }, action: 'task', value: 'x' }));
+  other.querySelector('.st-panel').outerHTML = rows;
+  const sc = other.closest('.app-scroll'); if (sc) sc.scrollTop = other.offsetTop - 140;
+};
+if (want('17a')) await homePage('mock-17a-home-receive.png', '&section=nursery', otherRow, { title: 'Receive pigs · Batch 25', line: 'From Farrowing room 3', n: '93 of 120' });
+if (want('17b')) await homePage('mock-17b-home-move-out.png', '&section=farrowing', otherRow, { title: 'Pigs to move · Batch 25', line: 'To Units 9 and 10', n: '120 pigs' });
+// The unit page: Today's work gets the transfer as a task card (Home's own card, as Farrowing's): what came in, and the bar for this unit.
+if (want('17c')) await homePage('mock-17c-unit-receive.png', '&section=nursery&view=unit&unit=12', () => {
+  const ic = (k) => window.SentriIcons.icon(k);
+  for (const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); w.nextNode();) if (w.currentNode.nodeValue.includes('Unit 12')) w.currentNode.nodeValue = w.currentNode.nodeValue.replace('Unit 12', 'Unit 9');
+  const ins = document.querySelector('.uhi-title small'); if (ins) ins.textContent = '96 pigs · 15 pens';
+  const card = '<div class="home-task-list"><button class="home-task-card active  hc-unit" data-card="x" data-scope="unit" aria-label="Open Receive pigs, Unit 9">'
+    + '<div class="hc-identity"><span class="hc-symbol">' + ic('transfer') + '</span><span class="hc-heading"><strong>Receive pigs</strong><small>Batch 25 · From Farrowing room 3</small></span><span class="hc-header-meta"><span class="hc-unit-arrow">' + ic('chevron') + '</span></span></div>'
+    + '<div class="hc-action"><span class="hc-action-value">63</span><span class="hc-action-copy"><span class="hc-action-label">pigs in</span><small>5 pens counted</small></span></div>'
+    + '<div class="hc-progress"><div class="hc-progress-caption"><span>Received</span><span><b>63</b> / 90</span></div><div role="progressbar" aria-label="Received" aria-valuemin="0" aria-valuemax="90" aria-valuenow="63"><div class="hc-track" aria-hidden="true"><span style="width:70%"></span></div></div></div></button></div>';
+  const empty = document.querySelector('.app-scroll .empty-state'); if (empty) empty.outerHTML = card;
+});
+// The Task overview: Farrowing's, its own parts. The bar and figures over the batch's pigs (Received, Not arrived, as End task says it);
+// one row per receiving unit; End task early. No performance card: a transfer has no outcome beyond where the pigs are.
+if (want('17d')) {
+  const p = await newPage();
+  await p.goto(`http://localhost:${port}/ux/system/farrowing-astra-concept.html?layout=focus&screen=farrowing.room`);
+  await p.waitForSelector('html.atlas-ready', { timeout: 15000 });
+  await p.getByText('Task overview', { exact: true }).first().click();
+  await p.waitForTimeout(800);
+  await p.evaluate(() => {
+    const sh = document.querySelector('.task-overview-sheet'), chev = sh.querySelector('.unit-route svg').outerHTML;
+    const line = document.createElement('p'); line.className = 'st-header-line'; line.textContent = 'Transfer · batch 25'; sh.querySelector('.st-page-titles').append(line);
+    sh.querySelector('.task-progress .st-heading-meta').textContent = '120 pigs';
+    sh.querySelector('.task-status-bar').innerHTML = '<i class="task-status-farrowed" style="width:77.5%"></i><i class="task-status-awaiting" style="width:22.5%"></i>';
+    const m = sh.querySelector('.task-metrics'); m.style.setProperty('--status-count', 2);
+    m.innerHTML = '<div><strong>93</strong><span><i class="task-status-dot task-status-farrowed"></i>Received</span></div><div><strong>27</strong><span><i class="task-status-dot task-status-awaiting"></i>Not arrived</span></div>';
+    sh.querySelector('.unit-routing-columns').innerHTML = '<span>Unit</span><span>Received</span><span>Not arrived</span><span></span>';
+    const route = (u, cur, a, b) => '<div role="listitem"><button type="button" class="unit-route"' + (cur ? ' aria-current="true"' : '') + ' aria-label="Open ' + u + '"><span class="unit-route-name"><strong>' + u + '</strong>' + (cur ? '<small>Current unit</small>' : '') + '</span><span class="unit-route-number" aria-hidden="true">' + a + '</span><span class="unit-route-number" aria-hidden="true">' + b + '</span>' + chev + '</button></div>';
+    sh.querySelector('.unit-routing [role="list"]').innerHTML = route('Unit 9', true, 63, 27) + route('Unit 10', false, 30, 0);
+    sh.querySelector('.task-overview-details')?.remove();
+    const st = document.createElement('style'); st.textContent = '.task-overview-sheet .unit-routing-columns,.task-overview-sheet .unit-route{grid-template-columns:minmax(78px,1.5fr) repeat(2,minmax(0,1fr)) 18px}'; document.head.append(st);
+  });
+  await p.waitForTimeout(400);
+  await p.screenshot({ path: path.join(out, 'mock-17d-task-overview.png') });
+  await p.close();
+}
+
 await b.close(); server.kill();
+
