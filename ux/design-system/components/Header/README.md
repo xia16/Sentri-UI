@@ -43,6 +43,14 @@ Nothing else goes in a header: no counts in the title or line, no status, Save o
 
 **On a task screen** the page header is `SentriTask.header({ title, back, backLabel, line })` (`.st-page-header.tk-header`, `data-ds="Header"`): Back always, going where the task came from (Today); the title is the task (`Farrowing`, `Piglet processing`), never the unit, which lives on [TaskSummary](../TaskSummary/README.md); the optional line is the fact the next worker needs to trust the screen (`Last record` **`08:41`** `· G.H`), or `No records yet`. It is `SentriUI.pageHeader` at `level: 1`; TaskHeader is its old name (archived).
 
+**Home's shell** (owner, 2026-11-16, Home look; built in the Home prototype, `header()` and `nav()`). Home has no page header: its top is the section chooser, and its foot the bottom bar. Their looks live here:
+- `st-kicker`: the farm line over the section name, 11px / 500, tracking .12em, `muted`.
+- `st-home-title`: the section name, 30px / 500, tracking -.025em. Nothing on Home is bold: the area colours separate the headings.
+- `st-dock`: the bottom bar, white, on `shadow-dock` instead of a top line.
+- `st-dock-agent`: the bar's middle button, the agent (the Assistant): the spark, white on `green`, a 5px white ring, radius 22, `shadow-agent`. 68px, rising 23px above the bar.
+- `st-float-action`: one floating white action above the bar, bottom right (Home's Search): 60px, radius 20, the icon in ink, `shadow-float`. The host places it and slides it off while the page scrolls down.
+- `data-raised` on any card-like surface (Home's Overview / unit switch): no outline, `shadow-card`, as [Panel](../Panel/README.md) raised.
+
 ## States
 
 | State | Rendering |
@@ -67,6 +75,8 @@ Nothing else goes in a header: no counts in the title or line, no status, Save o
 The gate runs it on changed screens and changed component pages, base against candidate.
 
 ## Changelog
+
+2026-11-16 (Home look): Home's shell documented (kicker, section name, bottom bar, agent button, floating action, raised surfaces).
 
 2026-10-16 (owner ruling B): a drawer with levels drops "‹ Parent" (Up). Its title names the level, a ✕ at the top left closes the whole drawer, and the footer's Back goes up one level. The sheet variant's "Up (a drawer with levels)" state is now "Levels: ✕ closes, Back goes up".
 

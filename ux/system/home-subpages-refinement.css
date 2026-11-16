@@ -226,7 +226,6 @@ body:has(#detail) #detail .lifecycle-actions [data-confirm-end] {
 .device :is(.bottom-nav button:not(.active):not(.dock-agent):not(.float-search),.hc-action-copy>small,.hc-footer,.hc-route,.hc-quiet-line){color:var(--muted)}
 .device .scope-switch button:not([aria-pressed="true"]){color:var(--ink-2)}
 .device :is(.work-section-heading>span,.uhi-title small,.unit-hub-inspect .unit-check-row>small,.unit-hub-unified .unit-hub-inspect .uhi-title small,.unit-environment-label){font-size:13px}
-.device .bottom-nav .dock-agent{color:#fff}
 /* Inspect unit is not a done state: neutral surface, ink title, the same icon tile as every row. */
 .device .unit-hub-unified{background:var(--paper);border-color:var(--line)}
 .device .unit-hub-unified .unit-hub-inspect .uhi-title{color:var(--ink)}

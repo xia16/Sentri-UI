@@ -269,6 +269,7 @@ body{background:var(--ground);color:var(--ink)}
 .st-panel .st-panel{--st-panel-bg:transparent}
 /* raised (Home's Overview, owner 2026-11-16): the card lifts off the tint on a soft shadow instead of its outline. */
 .st-panel.st-panel.st-panel[data-raised]{border-color:transparent;box-shadow:var(--shadow-card)}
+[data-raised][data-raised]{border-color:transparent;box-shadow:var(--shadow-card)}
 /* A note read in full (Panel · note, 2026-11-03 proposal): it reads like a message. Who and when on top, quiet; the note itself at reading
    size; how long it shows (or that it was closed) at its foot under a rule; the pencil top right edits it. Writing: a row Stepper of days. */
 .st-panel.st-note{padding:var(--space-14) var(--space-16) var(--space-16)}
@@ -1327,6 +1328,17 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
    soft card shadow instead of a hairline, as Home's other cards (owner, 2026-11-16) */
 .st-text-action.st-text-action.st-text-action--framed{min-height:var(--tap-min);padding:0 14px 0 12px;border:var(--border-width) solid transparent;border-radius:var(--radius-panel);background:var(--paper);box-shadow:var(--shadow-card)}
 .st-text-action.st-text-action.st-text-action--framed:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){background:var(--press);border-radius:var(--radius-panel)}
+
+/* Home's shell (owner, 2026-11-16, Home look; components/Header/README.md, "Home's shell"): the farm line as a small kicker over the
+   section name, nothing bold; the bottom bar on a soft shadow instead of its top line; the agent in its middle, white on Sentri green;
+   a floating white action above it (Search). Placement is the host's. */
+.st-kicker.st-kicker{font-size:11px;font-weight:500;letter-spacing:.12em;color:var(--muted)}
+.st-home-title.st-home-title{font-size:30px;font-weight:500;letter-spacing:-.025em}
+.st-dock.st-dock{border-top-color:transparent;box-shadow:var(--shadow-dock)}
+.st-dock-agent.st-dock-agent{color:var(--paper);background:var(--green);border:5px solid var(--paper);border-radius:22px;box-shadow:var(--shadow-agent)}
+.st-float-action.st-float-action{display:grid;place-items:center;width:60px;height:60px;min-height:0;padding:0;border:0;border-radius:20px;background:var(--paper);color:var(--ink);box-shadow:var(--shadow-float)}
+.st-float-action svg{width:24px;height:24px}
+.st-float-action:active{background:var(--press)}
 
 /* TaskTile: one open task on the Overview (components/TaskTile/README.md). Four fixed slots at the same height in every tile. */
 .st-tile{display:grid;grid-template-rows:auto auto auto auto auto;align-content:start;min-width:0;width:100%;text-align:left;padding:14px;border:1px solid transparent;border-radius:var(--radius-panel);background:var(--paper);box-shadow:var(--shadow-card);color:var(--ink);font-family:var(--font-sans);cursor:pointer}

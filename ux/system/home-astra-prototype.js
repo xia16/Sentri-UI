@@ -191,7 +191,7 @@
   }
   // Home look (owner, 2026-11-16): the middle button is the agent, its spark white on Sentri green; it opens the Assistant. Search and scan
   // (one page, owner 2026-10-22) floats bottom right above the bar: a white button with the magnifier, off while the page scrolls down.
-  function nav(active='home'){return `<nav class="bottom-nav" aria-label="Main navigation">${btn('home',icon('home')+'Home',active==='home'?'active':'')}${btn('assistant',icon('spark'),'dock-agent','','aria-label="Assistant"')}${btn('toolbox',icon('toolbox')+'Toolbox',active==='toolbox'?'active':'','',state.unit?'data-entry="environment" data-entry-via="toolbox"':'')}${btn('search',icon('search'),'float-search','','aria-label="Search"')}</nav>`;}
+  function nav(active='home'){return `<nav class="bottom-nav st-dock" aria-label="Main navigation">${btn('home',icon('home')+'Home',active==='home'?'active':'')}${btn('assistant',icon('spark'),'dock-agent st-dock-agent','','aria-label="Assistant"')}${btn('toolbox',icon('toolbox')+'Toolbox',active==='toolbox'?'active':'','',state.unit?'data-entry="environment" data-entry-via="toolbox"':'')}${btn('search',icon('search'),'float-search st-float-action','','aria-label="Search"')}</nav>`;}
   // The floating Search slides off while the page scrolls down and comes back on the way up; off, it is inert.
   let lastScroll=0;
   app.addEventListener('scroll',e=>{
@@ -209,8 +209,8 @@
      legibility floors (10px text, 9px chart labels), and a change that moves a screen brings it up to the floors; that is its own
      task. features/environment and features/assistant budget.md, ## Headers. */
   function legacyHead(title,sub='',extra='',showBack=true){return `<header class="page-head">${showBack?ib('back','back','Back'):''}<div class="head-copy">${SentriUI.heading({title,description:sub,kind:'page',level:2})}</div>${extra}</header>`;}
-  function header(){return `<header class="app-header">${btn('sections',`<span class="farm-label">GREEN VALLEY FARM</span><strong>${section().name}${icon('down')}</strong>`,'section-trigger','','aria-label="Change section, '+section().name+'"')}</header>`;}
-  function scopeRail(){return `<nav class="scope-switch" aria-label="Work scope">${btn('scope','Overview','scope-overview','',`aria-pressed="${!state.unit}"`)}${btn('units',`<span>${state.unit?'Unit '+state.unit:'Choose unit'}</span>${icon('down')}`,'scope-unit','',`${state.section==='farrowing'?'data-entry="farrowing" data-entry-via="choose-unit" ':''}aria-haspopup="dialog" aria-label="${state.unit?'Change unit, Unit '+state.unit:'Choose unit'}, ${section().units.length} units" aria-pressed="${!!state.unit}"`)}</nav>`;}
+  function header(){return `<header class="app-header">${btn('sections',`<span class="farm-label st-kicker">GREEN VALLEY FARM</span><strong class="st-home-title">${section().name}${icon('down')}</strong>`,'section-trigger','','aria-label="Change section, '+section().name+'"')}</header>`;}
+  function scopeRail(){return `<nav class="scope-switch" data-raised="" aria-label="Work scope">${btn('scope','Overview','scope-overview','',`aria-pressed="${!state.unit}"`)}${btn('units',`<span>${state.unit?'Unit '+state.unit:'Choose unit'}</span>${icon('down')}`,'scope-unit','',`${state.section==='farrowing'?'data-entry="farrowing" data-entry-via="choose-unit" ':''}aria-haspopup="dialog" aria-label="${state.unit?'Change unit, Unit '+state.unit:'Choose unit'}, ${section().units.length} units" aria-pressed="${!!state.unit}"`)}</nav>`;}
   // Illustrative task windows. Unit selection changes counts, not batch time.
   const cardFields = {
     preg31:{context:'First check',day:1,days:3,label:'Checks recorded',verb:'sows ready to check',due:{7:2,8:2,9:1},nextAt:1440},
