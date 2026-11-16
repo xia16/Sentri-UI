@@ -251,11 +251,24 @@ body{background:var(--ground);color:var(--ink)}
 [data-st-context="drawer"] .st-heading[data-kind="page"] .st-heading-title,[data-st-context="menu"] .st-heading[data-kind="page"] .st-heading-title{font-size:var(--type-sheet-title-size)}
 .st-heading[data-kind="group"]{margin-bottom:var(--space-8)}
 .st-heading[data-kind="group"] .st-heading-title{font-size:var(--type-group-label-size);color:var(--st-muted)}
+/* An area (Home's Overview, owner 2026-11-16): colour that says where you are, never a status. data-st-area on the section sets the
+   area's wash and ink; its section heading's icon sits on a 28px chip of the wash and the title steps up to 18px, ink; every Row icon
+   inside takes the same tint. Tiles and cards stay white. */
+[data-st-area="production"]{--st-area-wash:var(--area-production-wash);--st-area-ink:var(--area-production-ink)}
+[data-st-area="health"]{--st-area-wash:var(--area-health-wash);--st-area-ink:var(--area-health-ink)}
+[data-st-area="other"]{--st-area-wash:var(--area-other-wash);--st-area-ink:var(--area-other-ink)}
+[data-st-area]{--row-icon-bg:var(--st-area-wash);--row-icon-ink:var(--st-area-ink)}
+[data-st-area] .st-heading[data-kind="section"] .st-heading-title{font-size:var(--size-18);gap:var(--space-10);color:var(--st-ink)}
+[data-st-area] .st-heading[data-kind="section"] .st-heading-icon{width:var(--size-28);height:var(--size-28);border-radius:var(--radius-9);background:var(--st-area-wash);color:var(--st-area-ink)}
+[data-st-area] .st-heading[data-kind="section"][data-has-icon="true"] .st-heading-description{margin-left:calc(var(--size-28) + var(--space-10))}
+[data-st-area] .st-heading[data-kind="section"] .st-heading-aside{min-height:var(--size-28)}
 /* Class specificity deliberately beats retained legacy information-grid skins.
    Component layout and content semantics remain independent. */
 .st-panel.st-panel.st-panel{background:var(--st-panel-bg);border:var(--border-width) solid var(--st-line);border-radius:var(--st-radius);box-shadow:none;color:var(--st-ink)}
 .st-panel{padding:var(--space-panel)}
 .st-panel .st-panel{--st-panel-bg:transparent}
+/* raised (Home's Overview, owner 2026-11-16): the card lifts off the tint on a soft shadow instead of its outline. */
+.st-panel.st-panel.st-panel[data-raised]{border-color:transparent;box-shadow:var(--shadow-card)}
 /* A note read in full (Panel · note, 2026-11-03 proposal): it reads like a message. Who and when on top, quiet; the note itself at reading
    size; how long it shows (or that it was closed) at its foot under a rule; the pencil top right edits it. Writing: a row Stepper of days. */
 .st-panel.st-note{padding:var(--space-14) var(--space-16) var(--space-16)}
@@ -1310,16 +1323,18 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-text-action[data-chevron] .st-button-label{flex:1;min-width:0;text-align:left}
 .st-text-action[data-chevron]>.st-button-chevron{display:inline-flex;color:var(--muted)}
 .st-text-action[data-chevron] svg{width:14px;height:14px;flex:none}
-/* framed: the quiet line with a hairline edge, so it reads as a target on the tint (Home's "1 closed today", owner 2026-10-20) */
-.st-text-action.st-text-action.st-text-action--framed{min-height:var(--tap-min);padding:0 14px 0 12px;border:var(--border-width) solid var(--line);border-radius:var(--radius-panel)}
+/* framed: the quiet line as a white card on the tint, so it reads as a target (Home's "1 closed today", owner 2026-10-20); on the
+   soft card shadow instead of a hairline, as Home's other cards (owner, 2026-11-16) */
+.st-text-action.st-text-action.st-text-action--framed{min-height:var(--tap-min);padding:0 14px 0 12px;border:var(--border-width) solid transparent;border-radius:var(--radius-panel);background:var(--paper);box-shadow:var(--shadow-card)}
+.st-text-action.st-text-action.st-text-action--framed:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){background:var(--press);border-radius:var(--radius-panel)}
 
 /* TaskTile: one open task on the Overview (components/TaskTile/README.md). Four fixed slots at the same height in every tile. */
-.st-tile{display:grid;grid-template-rows:auto auto auto auto auto;align-content:start;min-width:0;width:100%;text-align:left;padding:14px;border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper);color:var(--ink);font-family:var(--font-sans);cursor:pointer}
+.st-tile{display:grid;grid-template-rows:auto auto auto auto auto;align-content:start;min-width:0;width:100%;text-align:left;padding:14px;border:1px solid transparent;border-radius:var(--radius-panel);background:var(--paper);box-shadow:var(--shadow-card);color:var(--ink);font-family:var(--font-sans);cursor:pointer}
 .st-tile:active{background:var(--press)}
-.st-tile-name{font-size:16px;line-height:22px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-tile-name{font-size:17px;line-height:22px;font-weight:500;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .st-tile-sub{font-size:13px;line-height:18px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .st-tile-todo{display:flex;align-items:baseline;gap:6px;height:28px;margin-top:14px;white-space:nowrap}
-.st-tile-todo b{font:400 26px/28px var(--font-mono);letter-spacing:-.5px;color:var(--ink)}
+.st-tile-todo b{font:500 32px/28px var(--font-mono);letter-spacing:-.03em;color:var(--ink)}
 .st-tile-todo span{font-size:13px;color:var(--muted)}
 .st-tile-todo[data-none] b,.st-tile-todo[data-done] b{font:500 16px/28px var(--font-sans);letter-spacing:0;color:var(--ink-2)}
 .st-tile-todo[data-done]{align-items:center}

@@ -189,8 +189,19 @@
     const update=()=>{state.page='home';navStack=[];render();};
     if(fromSections)sectionMotion('back',update);else update();
   }
-  // The middle button opens Search and scan; its magnifier says it without a word (owner, 2026-10-22).
-  function nav(active='home'){return `<nav class="bottom-nav" aria-label="Main navigation">${btn('home',icon('home')+'Home',active==='home'?'active':'')}${btn('search',icon('search'),'scan-button','','aria-label="Search and scan"')}${btn('toolbox',icon('toolbox')+'Toolbox',active==='toolbox'?'active':'','',state.unit?'data-entry="environment" data-entry-via="toolbox"':'')}</nav>`;}
+  // Home look (owner, 2026-11-16): the middle button is the agent, its spark white on Sentri green; it opens the Assistant. Search and scan
+  // (one page, owner 2026-10-22) floats bottom right above the bar: a white button with the magnifier, off while the page scrolls down.
+  function nav(active='home'){return `<nav class="bottom-nav" aria-label="Main navigation">${btn('home',icon('home')+'Home',active==='home'?'active':'')}${btn('assistant',icon('spark'),'dock-agent','','aria-label="Assistant"')}${btn('toolbox',icon('toolbox')+'Toolbox',active==='toolbox'?'active':'','',state.unit?'data-entry="environment" data-entry-via="toolbox"':'')}${btn('search',icon('search'),'float-search','','aria-label="Search"')}</nav>`;}
+  // The floating Search slides off while the page scrolls down and comes back on the way up; off, it is inert.
+  let lastScroll=0;
+  app.addEventListener('scroll',e=>{
+    const sc=e.target;if(!sc.classList?.contains('app-scroll'))return;
+    const fab=app.querySelector('.float-search');if(!fab)return;
+    const y=sc.scrollTop,dy=y-lastScroll;lastScroll=y;
+    if(Math.abs(dy)<4&&y>0)return;
+    const off=dy>0&&y>8;
+    if(fab.hasAttribute('data-off')!==off){fab.toggleAttribute('data-off',off);fab.inert=off;}
+  },true);
   /* The page header (Headers law, 2026-10-13): Back at the top left, the title, no line on these pages (scope, sources and
      descriptions are not header facts); 24px to the body. Every page has Back; its footer has none. */
   function head(title,extra=''){const h=SentriUI.pageHeader({title,back:{action:'back',label:'Back'},level:2});return extra?h.replace(/<\/header>$/,extra+'</header>'):h;}
@@ -198,7 +209,7 @@
      legibility floors (10px text, 9px chart labels), and a change that moves a screen brings it up to the floors; that is its own
      task. features/environment and features/assistant budget.md, ## Headers. */
   function legacyHead(title,sub='',extra='',showBack=true){return `<header class="page-head">${showBack?ib('back','back','Back'):''}<div class="head-copy">${SentriUI.heading({title,description:sub,kind:'page',level:2})}</div>${extra}</header>`;}
-  function header(){return `<header class="app-header">${btn('sections',`<span class="farm-label">GREEN VALLEY FARM</span><strong>${section().name}${icon('down')}</strong>`,'section-trigger','','aria-label="Change section, '+section().name+'"')}${btn('assistant',`${icon('spark')}Assistant`,'assistant-door','','aria-label="Assistant"')}</header>`;}
+  function header(){return `<header class="app-header">${btn('sections',`<span class="farm-label">GREEN VALLEY FARM</span><strong>${section().name}${icon('down')}</strong>`,'section-trigger','','aria-label="Change section, '+section().name+'"')}</header>`;}
   function scopeRail(){return `<nav class="scope-switch" aria-label="Work scope">${btn('scope','Overview','scope-overview','',`aria-pressed="${!state.unit}"`)}${btn('units',`<span>${state.unit?'Unit '+state.unit:'Choose unit'}</span>${icon('down')}`,'scope-unit','',`${state.section==='farrowing'?'data-entry="farrowing" data-entry-via="choose-unit" ':''}aria-haspopup="dialog" aria-label="${state.unit?'Change unit, Unit '+state.unit:'Choose unit'}, ${section().units.length} units" aria-pressed="${!!state.unit}"`)}</nav>`;}
   // Illustrative task windows. Unit selection changes counts, not batch time.
   const cardFields = {
@@ -342,7 +353,7 @@
   const sectionIcons={Production:'production',Health:'health',Other:'transfer'};
   function overviewHeading(title,link){return SentriUI.heading({title,kind:'section',level:2,icon:icon(sectionIcons[title]),className:'ov-heading',action:link?{label:'Schedule',action:'schedule',value:link,ariaLabel:'Schedule, '+title}:''});}
   // Home keeps its three sections (owner, 2026-10-20): an empty one says so in its own card, one quiet line (README, "empty is absent").
-  const emptyCard=text=>SentriUI.panel('',{empty:text});
+  const emptyCard=text=>SentriUI.panel('',{empty:text,raised:true});
   function overview(){
     const all=tasks.filter(t=>t.section===state.section),open=all.filter(t=>!t.completedAt&&!t.terminatedAt),closed=all.filter(t=>t.completedAt||t.terminatedAt);
     const prod=open.filter(t=>!t.category).sort(byStage),health=open.filter(t=>t.category==='health').sort(byStage),other=open.filter(t=>t.category==='other').sort((a,b)=>a.type.localeCompare(b.type)||a.batch.localeCompare(b.batch));
@@ -353,12 +364,12 @@
     // A zero row is absent; with no marks and no planned health work, the section's card says so.
     const careRows=(m.treat?SentriUI.row({variant:'navigation',icon:icon('treat'),title:'To treat',description:m.sinceYesterday?`${m.sinceYesterday} waiting since yesterday`:unitList(m.treatUnits),trailing:{text:String(m.treat)},action:'to-treat'}):'')+
       (m.monitor?SentriUI.row({variant:'navigation',icon:icon('monitor'),title:'Monitoring',description:unitList(m.monitorUnits),trailing:{text:String(m.monitor)},action:'monitoring'}):'');
-    const care=careRows?SentriUI.rowGroup(careRows):health.length?'':emptyCard('No pigs marked to treat or watch');
-    const otherRows=other.length?SentriUI.rowGroup(other.map(t=>SentriUI.row({variant:'navigation',icon:icon(t.icon||'note'),title:t.title||`${t.type} · ${t.batch}`,description:t.warn?[t.line,{text:t.warn,tone:'red'}]:(t.line||''),trailing:{text:`${t.due} ${t.unit}`},action:'task',value:t.id})).join('')):emptyCard('Nothing else open');
+    const care=careRows?SentriUI.rowGroup(careRows,{raised:true}):health.length?'':emptyCard('No pigs marked to treat or watch');
+    const otherRows=other.length?SentriUI.rowGroup(other.map(t=>SentriUI.row({variant:'navigation',icon:icon(t.icon||'note'),title:t.title||`${t.type} · ${t.batch}`,description:t.warn?[t.line,{text:t.warn,tone:'red'}]:(t.line||''),trailing:{text:`${t.due} ${t.unit}`},action:'task',value:t.id})).join(''),{raised:true}):emptyCard('Nothing else open');
     return header()+scopeRail()+`<div class="app-scroll screen-enter ov-page">
-      <section class="ov-section">${overviewHeading('Production','production')}${prod.length?tiles(prod):emptyCard('No production work open')}${closedLine}</section>
-      <section class="ov-section">${overviewHeading('Health','health')}${care}${health.length?tiles(health):''}</section>
-      <section class="ov-section">${overviewHeading('Other','')}${otherRows}</section>
+      <section class="ov-section" data-st-area="production">${overviewHeading('Production','production')}${prod.length?tiles(prod):emptyCard('No production work open')}${closedLine}</section>
+      <section class="ov-section" data-st-area="health">${overviewHeading('Health','health')}${care}${health.length?tiles(health):''}</section>
+      <section class="ov-section" data-st-area="other">${overviewHeading('Other','')}${otherRows}</section>
     </div>`+nav();
   }
 
@@ -552,7 +563,7 @@
   }
   function assistant(){const showFinding=!state.answered;return legacyHead('Assistant',state.workUnit?`${section().name} · Unit ${state.workUnit}`:section().name,'<span class="preview-badge">PREVIEW</span>')+`<div class="app-scroll screen-enter"><div class="assistant-hero"><div class="assistant-orbit">${icon('spark')}</div><h3>A second look.<br>A little less to carry.</h3><p>Ask about your work, or pick up a finding from the overnight review.</p></div><div class="assistant-tabs">${btn('assistant-tab','Needs you'+(showFinding?' · 1':''),'','findings',`aria-pressed="${state.assistantTab==='findings'}"`)}${btn('assistant-tab','Conversations','','chat',`aria-pressed="${state.assistantTab==='chat'}"`)}</div>${state.assistantTab==='findings'?(showFinding?btn('finding',`<span class="overline">INPUT NEEDED · OVERNIGHT REVIEW</span><h3>Where did the 4 pigs from Unit 7 go?</h3><p>A movement note names Pen A2, but its destination is missing.</p><footer><span>Gestation · reviewed at 05:30</span>${icon('arrow')}</footer>`,'finding'):`<div class="empty-state"><div class="complete-mark">${icon('check')}</div><h3>You're up to date</h3><p>Your answer is saved in this preview. There are no other decisions waiting.</p></div>`)+`<div class="evidence"><strong>Overnight review</strong><p>Sample finding for this design. A background agent is not connected to this prototype.</p></div>`:`${state.chat.length?state.chat.map(m=>`<div class="message ${m.who}">${esc(m.text)}</div>`).join(''):`<p class="work-note">What would you like to look into?</p>${btn('suggestion','Help me plan a move','choice','Help me plan a move')}${btn('suggestion','Review records in this unit','choice','Review records in this unit')}`}`}</div><footer class="page-footer"><form id="ask-form" class="composer"><input name="question" aria-label="Ask Assistant" placeholder="Ask about your work…" autocomplete="off" required maxlength="1000" value="${esc(state.askDraft||'')}"><button aria-label="Send preview request">${icon('send')}</button></form><p class="helper">Preview only · requests are not sent to an agent.</p></footer>`;}
   function finding(){return legacyHead('Movement needs clarification','Assistant · overnight review','<span class="preview-badge">PREVIEW</span>',false)+`<div class="app-scroll screen-enter"><div class="scope-label">${icon('place')}Gestation / Unit 7 / Pen A2</div><div class="assistant-hero"><p class="overline">YOUR INPUT NEEDED</p><h3>Where did these pigs go?</h3><p>The overnight review found a movement note without a destination.</p></div><div class="evidence"><strong>Movement note · yesterday, 15:40</strong><p>“Moved 4 pigs out of A2.”<br>Recorded by G. Hansen · Unit 7</p></div><div class="evidence"><strong>What is missing</strong><p>The destination unit and pen. No movement record has been changed.</p></div>${state.answered?`<div class="message">Your answer: ${esc(state.answer)}<br>Saved in this preview. No live record was changed.</div>`:`<form id="answer-form">${SentriUI.field({label:`Destination or clarification`,control:`<textarea id="answer" name="answer" placeholder="For example: Unit 8, pen B3" required maxlength="500">${esc(state.answerDraft||'')}</textarea>`})}</form>`}<p class="work-note">Sample decision for reviewing the Assistant experience.</p>${btn('finding-unit','View Unit 7','secondary')}</div>${SentriUI.sheetFooter({content:SentriUI.backButton({action:'back'})+(state.answered?'':'<button class="primary" type="submit" form="answer-form">Send clarification</button>'),className:'page-footer'})}`;}
-  function toolbox(){const rows=[...(state.unit?[{action:'maintenance',icon:icon('wrench'),title:'Maintenance',description:'Unit '+state.unit+' · equipment issues'}]:[]),{action:'records',icon:icon('history'),title:'Records',description:'Updates made in this preview'},{action:'sections',icon:icon('barn'),title:'Sections & units',description:'Browse the farm'},{action:'assistant',icon:icon('spark'),title:'Assistant',description:'Questions, findings and decisions'}];return head('Toolbox')+'<div class="app-scroll screen-enter">'+SentriUI.panel(rows.map(r=>SentriUI.row(r)).join(''),{className:'st-row-group'})+'</div>'+nav('toolbox');}
+  function toolbox(){const rows=[...(state.unit?[{action:'maintenance',icon:icon('wrench'),title:'Maintenance',description:'Unit '+state.unit+' · equipment issues'}]:[]),{action:'records',icon:icon('history'),title:'Records',description:'Updates made in this preview'},{action:'sections',icon:icon('barn'),title:'Sections & units',description:'Browse the farm'}];return head('Toolbox')+'<div class="app-scroll screen-enter">'+SentriUI.panel(rows.map(r=>SentriUI.row(r)).join(''),{className:'st-row-group'})+'</div>'+nav('toolbox');}
   function recordLog(){return head('Records')+'<div class="app-scroll screen-enter">'+SentriUI.log(SentriUI.logGroups(state.log.map(l=>({title:l.title,detail:l.context,at:l.at,by:'G. Hansen'}))),{empty:'No new records yet. Answers to overnight findings will appear here.'})+'</div>'+nav('toolbox');}
   const pages={home,sections:sectionChooser,placeholder,environment,maintenance,assistant,finding,toolbox,records:recordLog,schedule:schedulePage,marked:markedPage,find:findPage,pig:pigPage};
   // The atlas follows the demo (?screen=): the screen whose url holds this scope (view, section, unit, work, attention), else null.
@@ -597,6 +608,7 @@
   function render(){
     const badge=globalSync();
     app.innerHTML=(pages[state.page]||home)();
+    lastScroll=0;
     app.classList.toggle('schedule-open',state.page==='schedule');
     if(['marked','find'].includes(state.page)&&SentriUI.rowFitTags)requestAnimationFrame(()=>SentriUI.rowFitTags(app));
     // The list page holds no records of its own, so its one header corner stays free (Headers law), as on the Schedule.

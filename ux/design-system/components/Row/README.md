@@ -86,6 +86,8 @@ Component, absorbing TaskRow's animal/tick/door/door+act faces as variants. The 
 
 The repository [component standard](../../../../docs/design-workflow/research/component-standard.md) records primary ADM List and TDesign Cell references, with Material 3 and Apple list guidance. This pass unifies the family, adds state specimens and migrates the real callers; human approval remains separate from implementation checks.
 
+2026-11-16 (Home look): inside an area (`data-st-area` on the enclosing section, see Heading) the leading icon tile takes the area's wash and ink (`area-*-wash`, `area-*-ink`) instead of `row-icon-bg` / `row-icon-ink`. Home's Health and Other rows only.
+
 2026-11-03 (Conditions, canvas B3): `count` draws the number of ticked items inside a navigation door as a green badge before the chevron (`st-count-badge`, read "N selected"), in place of a muted "N selected" description.
 
 2026-11-06 (owner: "when a sow died, the actions should just be grey"): Tile gains `disabled` and `reason`, greyed in place; a disabled navigation row takes the same grey icon tile and muted words. Actions's "Unavailable actions (n) ›" link and its page are gone.

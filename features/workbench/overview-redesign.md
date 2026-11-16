@@ -75,6 +75,17 @@ The Overview showed the same full cards as the Unit page, so it was a second Uni
   - The hub shrinks to 2 rows: Inspect unit with Feed and Maintenance, then Environment. The "Health" hub chip, "Next" and "Coming up" are cut.
   - Alternatives: U1 (current card, tidied) and U3 (compact rows).
 
+## Home look (owner, 2026-11-16)
+
+The owner found Home "really dull". The look was settled on the phone canvas (https://claude.ai/artifact/UNXAnopBzeWSC5jTNFTm28, board "HomeLook", first frame) and built in the prototype:
+- **Header:** the Assistant button is gone; the saved-work button stays top right.
+- **Bottom bar:** the middle button is the Assistant (the agent): the spark, white on a solid Sentri green tile with a soft green shadow. Home and Toolbox are unchanged. Toolbox drops its Assistant row (the spark once per page).
+- **Search floats:** the one search+scan page opens from a white 60px button bottom right above the bar (ink magnifier, soft shadow, accessible name "Search"). It slides off while the page scrolls down and comes back on the way up.
+- **Area colours:** each section heading's icon sits on a 28px chip of its area's wash (Production green, Health rose, Other sand); Health and Other row icons take the same wash. Tiles stay white. Tokens `area-*-wash` / `area-*-ink`; the section sets `data-st-area`.
+- **Type, nothing bold** (the colour separates the headings): section name 30px/500; section headings 18px/500 ink; tile names 17px/500; tile numbers 32px/500 mono; the farm line an 11px kicker, .12em tracking, muted.
+- **Depth:** tiles, cards, row groups, the Overview/unit switch and "1 closed today" drop their outline for `shadow-card`; the bottom bar drops its top line for `shadow-dock`.
+- Not in it: the violet agent line; the transfer rows ("Pigs to move" / "Receive pigs") ship with Transfer.
+
 ## Open
 
 - **Treatment courses.** Without them there's no "2nd dose due".

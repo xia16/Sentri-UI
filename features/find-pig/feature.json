@@ -30,9 +30,9 @@
   "entryPoints": [
     {
       "section": "Home",
-      "label": "via the bottom bar",
+      "label": "via the floating Search",
       "from": "workbench.today",
-      "control": "Search and scan (the middle button, a magnifier)",
+      "control": "Search (floats bottom right above the bar: a white button with the magnifier; owner 2026-11-16)",
       "lands": "find-pig.search"
     }
   ],
@@ -77,7 +77,7 @@
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation",
       "steps": [
-        "Search and scan"
+        "Search"
       ],
       "figma": "",
       "notes": {
@@ -111,11 +111,11 @@
           "(raw) Type part of an ear tag or a pen, or scan a tag. Searches every unit."
         ],
         "rules": [
-          "Owner, 2026-10-22: Home searches and scans on one page. The middle button of the bottom bar opens it (a magnifier, no word); the field searches, and its scan icon turns it into the scan bar, as Choose pigs does. Each read ticks the pig; the ticks stay through searching and Stop.",
+          "Owner, 2026-10-22: Home searches and scans on one page. The floating Search button opens it (a magnifier, no word; it was the bottom bar's middle button until the Home look, owner 2026-11-16); the field searches, and its scan icon turns it into the scan bar, as Choose pigs does. Each read ticks the pig; the ticks stay through searching and Stop.",
           "Owner decision 2026-10-12: search and scan are different jobs (type, tap one; hands-free reads). Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig). One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20).",
           "Replaces Home's two ways in (Toolbox › Find a pig or pen, and the Scan ear tags page from the bottom bar's Scan)."
         ],
-        "purpose": "Reach any pig of the section by her ear tag or pen, from the bottom bar's middle button: type to search, or tap the scan icon to scan. The page as it opens: nothing typed, nothing ticked."
+        "purpose": "Reach any pig of the section by her ear tag or pen, from the floating Search button above the bottom bar: type to search, or tap the scan icon to scan. The page as it opens: nothing typed, nothing ticked."
       }
     },
     {
@@ -125,7 +125,7 @@
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation",
       "steps": [
-        "Search and scan",
+        "Search",
         {
           "fill": "[data-find-input]",
           "text": "4318"
@@ -162,7 +162,7 @@
           "(raw) Unit 7 · B2 · 1 pig"
         ],
         "rules": [
-          "Owner, 2026-10-22: Home searches and scans on one page. The middle button of the bottom bar opens it (a magnifier, no word); the field searches, and its scan icon turns it into the scan bar, as Choose pigs does. Each read ticks the pig; the ticks stay through searching and Stop.",
+          "Owner, 2026-10-22: Home searches and scans on one page. The floating Search button opens it (a magnifier, no word; it was the bottom bar's middle button until the Home look, owner 2026-11-16); the field searches, and its scan icon turns it into the scan bar, as Choose pigs does. Each read ticks the pig; the ticks stay through searching and Stop.",
           "Owner decision 2026-10-12: search and scan are different jobs (type, tap one; hands-free reads). Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig). One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20).",
           "Owner, 2026-10-20: from Home a pig opens her pig record."
         ],
@@ -176,7 +176,7 @@
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation",
       "steps": [
-        "Search and scan",
+        "Search",
         {
           "fill": "[data-find-input]",
           "text": "909"
@@ -214,7 +214,7 @@
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation",
       "steps": [
-        "Search and scan",
+        "Search",
         "Scan ear tag"
       ],
       "figma": "",
@@ -262,7 +262,7 @@
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&scan=none",
       "steps": [
-        "Search and scan",
+        "Search",
         "Scan ear tag"
       ],
       "figma": "",
@@ -298,7 +298,7 @@
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&scan=list",
       "steps": [
-        "Search and scan",
+        "Search",
         "Scan ear tag"
       ],
       "figma": "",
@@ -352,7 +352,7 @@
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&scan=ticked",
       "steps": [
-        "Search and scan",
+        "Search",
         "Scan ear tag"
       ],
       "figma": "",
@@ -387,7 +387,7 @@
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&scan=list",
       "steps": [
-        "Search and scan"
+        "Search"
       ],
       "figma": "",
       "notes": {
@@ -421,7 +421,7 @@
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&scan=list",
       "steps": [
-        "Search and scan",
+        "Search",
         "Actions"
       ],
       "figma": "",

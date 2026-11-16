@@ -126,11 +126,13 @@
     return `<div class="st-heading ${esc(className)}" data-ds="Heading" data-kind="${k}"${icon?' data-has-icon="true"':''}><div class="st-heading-main"><h${h} class="st-heading-title">${icon?`<span class="st-heading-icon">${icon}</span>`:''}<span${sa(strs&&strs.title,args&&args.title)}>${esc(title)}</span></h${h}>${showDesc?`<p class="st-heading-description">${tx(description,o,'description')}</p>`:''}</div>${showMeta||act?`<div class="st-heading-aside">${showMeta?`<span class="st-heading-meta">${tx(meta,o,'meta')}</span>`:''}${act?`<span class="st-heading-action">${act}</span>`:''}</div>`:''}</div>`;
   }
   /* empty: a panel with nothing in it is absent, unless the host keeps its place and names what is missing: then it is one quiet
-     line with a tick ("No production work open"; Home's Overview, owner 2026-10-20). */
-  function panel(content,{className='',tag='div',ds='Panel',empty=''}={}){
-    if(!content||!String(content).trim())return empty?`<div class="st-panel st-panel--empty ${esc(className)}" data-ds="${esc(ds)}"><span aria-hidden="true">${check}</span><p>${esc(empty)}</p></div>`:'';
+     line with a tick ("No production work open"; Home's Overview, owner 2026-10-20).
+     raised: the card lifts off the tint on the soft card shadow instead of its outline (Home's Overview, owner 2026-11-16). */
+  function panel(content,{className='',tag='div',ds='Panel',empty='',raised=false}={}){
+    const r=raised?' data-raised=""':'';
+    if(!content||!String(content).trim())return empty?`<div class="st-panel st-panel--empty ${esc(className)}" data-ds="${esc(ds)}"${r}><span aria-hidden="true">${check}</span><p>${esc(empty)}</p></div>`:'';
     const t=['div','section','article','aside','dl'].includes(tag)?tag:'div';
-    return `<${t} class="st-panel ${esc(className)}" data-ds="${esc(ds)}">${content}</${t}>`;
+    return `<${t} class="st-panel ${esc(className)}" data-ds="${esc(ds)}"${r}>${content}</${t}>`;
   }
   /* Facts: read-only label–value pairs. They never act: no button or link in a value (valueHtml is for markup such as an
      ID in mono, and is refused when it holds a control). columns: 2 (default), 3 (short counts) or 1 (a long value that needs the full width). mono: true sets an ID. */
@@ -153,8 +155,8 @@
     const rec=variant==='record';
     return `<dl class="${rec?'':'st-panel '}st-facts ${esc(className)}" data-ds="Facts" data-columns="${cols}"${variant?` data-variant="${esc(variant)}"`:''}>${items.map(i=>`<div class="st-fact${i.inline?' st-fact-inline':''}"><dt>${lead(i)}</dt><dd>${valueOf(i)}</dd>${i.meta||has(i,'meta')?`<small>${tx(i.meta,i,'meta')}</small>`:''}</div>`).join('')}</dl>`;
   }
-  function rowGroup(content,{title='',level=5,className='',strs,args}={}){
-    return panel((title||has({strs},'title')?heading({title,kind:'group',level,className:'st-row-group-label',strs,args}):'')+content,{className:'st-row-group '+className,ds:'Row'});
+  function rowGroup(content,{title='',level=5,className='',strs,args,raised=false}={}){
+    return panel((title||has({strs},'title')?heading({title,kind:'group',level,className:'st-row-group-label',strs,args}):'')+content,{className:'st-row-group '+className,ds:'Row',raised});
   }
   /* Row tile (owner, 2026-10-19): one action as an icon well over one word, for the grid of everyday verbs in More actions.
      The word is the short verb ("Treat"); the accessible name always contains that word (label in name: voice control says what it sees):

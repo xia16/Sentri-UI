@@ -27,16 +27,9 @@
   "entryPoints": [
     {
       "section": "Home",
-      "label": "via the header",
+      "label": "via the bottom bar",
       "from": "workbench.today",
-      "control": "Assistant (header)",
-      "lands": "assistant.needs-you"
-    },
-    {
-      "section": "Home",
-      "label": "via Toolbox",
-      "from": "workbench.toolbox",
-      "control": "Assistant row",
+      "control": "Assistant (the bottom bar's middle button: the spark, white on Sentri green; owner 2026-11-16)",
       "lands": "assistant.needs-you"
     }
   ],

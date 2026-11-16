@@ -20,12 +20,12 @@ Classification: **component** (a new job: the Overview needs every open task at 
 
 Four fixed slots, each with one kind of message, at the same height in every tile:
 
-1. **Task**: 16px / 500 (15px at 370px and below, where the tile also pads 12px), one line, a short name of at most about 15 characters ("Return heat", "Processing"); ellipsis is only a guard.
+1. **Task**: 17px / 500, tracking -0.01em (15px at 370px and below, where the tile also pads 12px), one line, a short name of at most about 15 characters ("Return heat", "Processing"); ellipsis is only a guard.
 2. **Batch**: 13px muted, one line ("Batch 31"; for health work what and where: "PRRS · Units 7, 8").
-3. **To-do**: one line that says it all (owner, 2026-10-19: no second line under it). The count due now in 26px mono with a 13px word ("10 to watch"); when part is overdue, the overdue part follows on the same line and only it is red ("5 now · 2 overdue"). When nothing is due yet, the next count in grey ("8 tomorrow"), or "None now". When everything is recorded, a tick and "Ready to close" (16px / 500, ink-2). Timers and later windows ("4 more from Sat") live in the task and on the Schedule, not the tile.
+3. **To-do**: one line that says it all (owner, 2026-10-19: no second line under it). The count due now in 32px / 500 mono (tracking -0.03em; owner 2026-11-16, nothing bold) with a 13px word ("10 to watch"); when part is overdue, the overdue part follows on the same line and only it is red ("5 now · 2 overdue"). When nothing is due yet, the next count in grey ("8 tomorrow"), or "None now". When everything is recorded, a tick and "Ready to close" (16px / 500, ink-2). Timers and later windows ("4 more from Sat") live in the task and on the Schedule, not the tile.
 4. **Run**: a hairline, then one 6px segment per planned day (filled up to today) and "Day N of N". A task past its planned end adds one red segment per day over and reads "1 day overdue"; its to-do says how many are overdue ("6 overdue"). The red segment is the only colour on that tile. When the task has records still on this phone, "↑ N" (an upload glyph and the count of that task's records, 13px mono, ink-2) sits at the right end of the day line (owner, 2026-10-18: the Home header shows the icon alone; the tiles carry the counts). Nothing when the task has none.
 
-White on the tinted page, 1px `line` border, `radius-panel`, 14px padding. **One coloured signal at most** (owner, 2026-10-19): red only on the overdue part or the days over; no red edge, no red words beside it.
+White on the tinted page, no outline: the tile lifts off the tint on `shadow-card` (owner, 2026-11-16, Home look); `radius-panel`, 14px padding. **One coloured signal at most** (owner, 2026-10-19): red only on the overdue part or the days over; no red edge, no red words beside it.
 
 ## Variants
 

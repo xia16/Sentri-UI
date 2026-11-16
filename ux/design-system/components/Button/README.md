@@ -91,6 +91,7 @@ Generic component, used across sections. Registers are variants of this componen
 
 2026-10-19 (workbench): text register, quiet (`className: 'st-text-action--quiet'`): a settled line that still opens something, muted 13px / 400 in the same 48px target (Home's "1 closed today").
 2026-10-20 (workbench): text register, quiet and framed (`className: 'st-text-action--quiet st-text-action--framed'`): the quiet line gains a hairline edge (`line`, `radius-panel`, no fill), so a settled line still reads as a target on the tint (Home's "1 closed today ›", owner's pick of three).
+2026-11-16 (workbench): framed drops its hairline for the soft card shadow (`shadow-card`) and takes a white fill, as every card on Home's Overview (owner, Home look).
 2026-10-19 (workbench): text register, `chevron: true`: the button spans the content width and ends in the row chevron, so a quiet line reads as a tap (Home's "1 closed today ›").
 
 2026-10-17 (medicines): text register `align` ('start' | 'end'), so a short text action lines up with the content edge instead of centring in its target.

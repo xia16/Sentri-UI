@@ -26,7 +26,7 @@ One block has one heading: never stack a section heading over a group heading, a
 ## Anatomy
 
 - **Title** (required): an `h1`–`h6` (`level`, default 4). Sentence case, a noun.
-- **Icon** (section only): 16px, `muted`, only where the icon names the subject (`SentriIcons.icon('feed')` for Feeding).
+- **Icon** (section only): 16px, `muted`, only where the icon names the subject (`SentriIcons.icon('feed')` for Feeding). In an **area** (`data-st-area="production|health|other"` on the enclosing section; Home's Overview, owner 2026-11-16) the icon sits on a 28px chip of the area's wash (radius 9) in the area's ink, and the title steps up to 18px / 500, ink: colour that says where you are, never a status.
 - **Description** (section and group): one `muted` line under the title, only when it tells the worker something the title does not. A page or sheet title has none; a hub's header line is its [Header](../Header/README.md)'s.
 - **Meta** (section only): a short `muted` aside at the top right ("3 tasks", "Mon 09:42").
 - **Action** (section only): one text link with its ›, at the top right. A 48px target.

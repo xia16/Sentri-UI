@@ -30,13 +30,14 @@ The enclosing `data-st-context="page|drawer|menu"` chooses the variant. The defa
 | --- | --- |
 | Default | Bordered surface, no shadow |
 | Empty | Absent; `panel('')` returns an empty string |
+| Raised | `panel(content, { raised: true })` (also `rowGroup(..., { raised: true })` and with `empty`): no outline, the card lifts off the tint on `shadow-card`. Only Home's Overview (owner, 2026-11-16, Home look); every other card keeps its hairline |
 | Empty, place kept | `panel('', { empty: 'No production work open' })`: one quiet line with a tick (16px / 400 in `ink-2`, the tick `muted`, 56px tall). Only where the host keeps its sections in place: Home's Overview (owner, 2026-10-20) |
 | Long label / Chinese | Content wraps using the consumer's copy rules |
 | Pressed, active, disabled, error, loading | Owned by the contained control; Panel is static |
 
 ## Behaviour
 
-`SentriUI.panel(content, {tag, className, ds})` returns a semantic container. It has no events, navigation or async work. Separate grouped blocks with space-section. Nested panels are not a supported composition; replace the inner surface with a heading and rules.
+`SentriUI.panel(content, {tag, className, ds, empty, raised})` returns a semantic container. It has no events, navigation or async work. Separate grouped blocks with space-section. Nested panels are not a supported composition; replace the inner surface with a heading and rules.
 
 ## Content rules
 

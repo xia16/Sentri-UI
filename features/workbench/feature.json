@@ -1130,7 +1130,7 @@
         "Toolbox"
       ],
       "notes": {
-        "purpose": "The tools that are not today's work: records, the farm's sections, the Assistant (finding a pig is the bottom bar's middle button, Search and scan).",
+        "purpose": "The tools that are not today's work: records and the farm's sections. The Assistant is the bottom bar's middle button and Search floats above the bar (Home look, owner 2026-11-16), so neither has a row here: the spark appears once on the page.",
         "states": [],
         "elements": [
           {

@@ -41,6 +41,10 @@ export interface HeadingProps {
 export interface PanelOptions {
   className?: string;
   tag?: 'div' | 'section' | 'article' | 'aside' | 'dl';
+  /** One quiet line naming what is missing, drawn when the content is empty. */
+  empty?: string;
+  /** The card lifts off the tint on `shadow-card` instead of its outline (Home's Overview). */
+  raised?: boolean;
 }
 
 export interface Fact {
@@ -654,7 +658,7 @@ export interface SentriUI {
   rowTile(props: { label: string; title?: string; icon?: string; action?: string; value?: string; tone?: 'danger' | ''; attrs?: Record<string, string>; className?: string; /** greyed in place: a real disabled button, no press (owner, 2026-11-06) */ disabled?: boolean; /** why, read in the accessible name only */ reason?: string }): string;
   /** Tiles in one panel: always two rows split evenly, at most five across, danger last; over ten, nine plus `more`. */
   rowGrid(tiles: Array<{ label: string; title?: string; icon?: string; action?: string; value?: string; tone?: 'danger' | ''; attrs?: Record<string, string> }>, options?: { more?: { action: string; value?: string; label?: string; title?: string } | null; expanded?: boolean; label?: string; className?: string }): string;
-  rowGroup(content: string, options?: { title?: string; level?: number; className?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
+  rowGroup(content: string, options?: { title?: string; level?: number; className?: string; strs?: Strs<'title'>; args?: StrArgs<'title'>; raised?: boolean }): string;
   /** Today · Yesterday · weekday within a week · "Jul 8" (with the year when not this year). */
   logDay(at: Date | number | string, options?: LogDayOptions): string;
   /** "07:14 · G.H"; a missing time or author is left out. */

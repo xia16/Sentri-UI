@@ -30,6 +30,12 @@
   --tab-ink-active: #263823;
   --row-icon-bg: #eef2e7;
   --row-icon-ink: #53674a;
+  --area-production-wash: #dcebd3;
+  --area-production-ink: #285a35;
+  --area-health-wash: #f7dfe0;
+  --area-health-ink: #8a2f3a;
+  --area-other-wash: #efe6d3;
+  --area-other-ink: #6a5124;
   --press: #f1f5eb;
   --choice-press: #eaf0e2;
   --log-line: #cbd6c2;
@@ -132,6 +138,10 @@
   --shadow-sheet: 0 -10px 40px #27351d0b;
   --shadow-dialog: 0 -15px 55px #17290d30;
   --shadow-handle: 0 2px 5px #20301920;
+  --shadow-card: 0 1px 2px rgba(31,41,30,.05), 0 8px 20px rgba(31,41,30,.06);
+  --shadow-dock: 0 -6px 20px rgba(31,41,30,.06);
+  --shadow-agent: 0 6px 16px rgba(39,102,64,.25);
+  --shadow-float: 0 6px 18px rgba(31,41,30,.16), 0 1px 3px rgba(31,41,30,.12);
   --tap-min: 48px;
   --control-height: 48px;
   --footer-height: 56px;
