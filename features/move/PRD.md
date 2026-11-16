@@ -47,7 +47,6 @@ Out: Transfer (a console task; its receiving is Count's); pigs leaving the farm;
 
 Open questions and items to confirm:
 
-- Medication given to part of a group without ID, then part of it moves: the teammate branch `codex/move-design-scenarios` records the owner's 2026-11-16 ruling (attribution unknown; both groups show a possible-medication notice; no invented counts). Its scenario tree and decisions (capacity, offline conflicts, correction, permissions) describe the old Transfer drawer and need moving onto this design.
 - A pen without ID holding several batches: which batches shrink when some move (the old rule: steppers per batch, summing to the count).
 - Pen capacity on To pen (a full pen): not shown yet.
 
