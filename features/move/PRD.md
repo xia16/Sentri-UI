@@ -1,8 +1,8 @@
 # Move 转移
 
-> Draft — compiled from existing docs, not yet confirmed.
+> Draft — compiled from existing docs. The two owner rulings of 2026-11-16 are recorded below; other product rules remain unconfirmed.
 
-This PRD indexes the mobile on-demand move. Its five screens are all `in-design`; the [operations cut](operations.md), [scenario tree](scenario-tree.md) and [decision packet](decisions.md) are preparation for owner review, not approvals of the business rules below.
+This PRD indexes the mobile on-demand move. Its five screens are all `in-design`; the [operations cut](operations.md), [scenario tree](scenario-tree.md), [health attribution proposal](health-attribution.md) and [decision packet](decisions.md) are preparation for owner review, not approvals of the remaining business rules below.
 
 ## Problem
 
@@ -21,9 +21,14 @@ Anchor: The placement of a pig or a counted group.
 - An identified pig's records live on the animal: cases, treatments and marks travel with her silently, so the whole event is one Picker.
 - The sheet is the confirmation: the subject header restates scope, view > filters the list to the selection, and the primary commits. Production's confirmation dialog is cut.
 - The destination tree survives as labels only. The current unit is pinned first and the source cell dimmed; cross-unit groups carry their full path; search reaches any pen and the scan reads a pen plate. Tapping a pen fills the review Picker and closes the destination sheet; the review's primary commits the transfer. An empty pen prints dashed.
-- Mixed selection: tagged pigs move as placement events, un-identified head move as a count. Each open group record on the source pen gets a verdict (Stays, Goes, Both; default stays) and the checklist folds to a footnote when the whole population leaves.
+- Mixed selection: tagged pigs move as placement events, un-identified head move as a count. The existing deck gives each open group record a Stays / Goes / Both verdict, but that choice cannot establish which unrecognisable head carried a record. It is a baseline to replace in the next canvas, not an approved rule for partial moves.
 - A pen's un-identified count is fully partitioned by (line, batch), so a multi-batch move must say which batches shrink (steppers, sum = n). A single-batch group rides silently.
 - Visible changed rows and counts confirm a single-pig result. Several-pig results or results not visible where the worker lands use a toast under the later owner feedback law. The source card re-derives down and the destination up (derived for tagged pigs, set by count for head).
+
+## Confirmed product rules · owner, 2026-11-16
+
+- Assume the worker cannot recognise a particular pig without an ear tag when the group is revisited or partly moved. A phone-only pig ID must not be used as proof of physical identity.
+- Allow a partial move when medication was given to only some head and the worker cannot identify which ones moved. The medication attribution is **unknown**: show a conservative notice for **both** source and destination groups, without assigning either an exact treated count. Keep the administration as one historical event; moving pigs does not administer the medicine again. The detailed proposal and affected states are in [health-attribution.md](health-attribution.md).
 
 ## Scope
 

@@ -96,6 +96,8 @@ the old catalogue).
 
 Known, not new: entering a picker level keeps the last level's scroll; PR #183 fixes it in the component.
 
+**Cross-feature gap, owner identification ruling 2026-11-16:** a worker cannot recognise a particular pig without an ear tag on a later walk or partial move. The `n of N` condition record is an observation about the group, not individual identities. [Move's health attribution proposal](../move/health-attribution.md) shows uncertain current attribution on both groups after a partial move. Group Care and Resolve, and whether a later observation replaces or adds to the earlier count, still need a product contract; the existing individual-pig forms do not settle them.
+
 ## Questions
 
 - ~~Q1. Who may tag a disease?~~ Answered (owner, 2026-10-18): anyone may tag and add a disease; the role switch is gone.

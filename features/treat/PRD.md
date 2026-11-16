@@ -106,6 +106,7 @@ Open:
 Follow-ups (other features, not built here):
 
 - Show a pig's or pen's withdrawal on the pig (pig-profile) and the pen, and flag a pig under withdrawal when it is moved or sold for slaughter (move). The record already keeps the date.
+- **Pigs without ear tags:** the present form and Dose per pig list address individually selectable pigs, while Conditions can record `n of N` affected head on a group row. There is no group treatment entry, dose/recipient model, or later Care/Resolve link for that group yet. Owner rulings on 2026-11-16 say workers cannot recognise those individuals on a later partial move; the move is allowed with unknown medication attribution and conservative notices on both groups. The treatment administration remains one historical event, not a new dose in each pen. See [Move health attribution](../move/health-attribution.md). The group treatment form and withdrawal notice lifecycle need their own design round.
 
 Sources: the owner's rulings above; the ops requirements `ux/research/ops/health.md` and `ux/research/ops/SYNTHESIS.md`; the retired deck `ux/system/workflows/health.html` (rendered in `ux/archive/workflows.html`).
 

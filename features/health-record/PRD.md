@@ -29,6 +29,8 @@ Recording, editing and the pickers can happen in any status; so can Record treat
 - Recovery keeps the case in history; entered in error marks a correction. Recovering a finding linked to a feed adjustment ends that adjustment.
 - Hospital pen is a care choice only; no move is made.
 
+**Known group gap (owner identification ruling, 2026-11-16):** Record health can save a counted condition on a group of pigs without ear tags, but the current Care and Resolve flows address identifiable pig findings. A partial move cannot infer which unrecognisable head carried the condition or received treatment. Move's [health attribution proposal](../move/health-attribution.md) records the owner's unknown-medication rule and the affected states; group Care/Resolve and later observation semantics remain to be designed.
+
 ## Scope
 
 In: the pig record as a health view (needs attention, ongoing, several ongoing, care levels), the finding and its edit and resolve forms, Record health with its catalogue picker, Care instructions and Edit conditions, Resolve conditions. The condition chooser inside Record treatment is this feature's picker.

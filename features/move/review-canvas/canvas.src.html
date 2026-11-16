@@ -16,10 +16,10 @@
 <main>
   <header>
     <span class="eyebrow">Move · 转舍 · 决策画布</span>
-    <h1>先确认猪只、头数与回执，再定转舍画面</h1>
-    <p class="intro">下面五张 390 × 844 实图来自当前仓库页面。它们是待评审的设计基线，状态均为 <strong>in-design</strong>。本轮先请负责人裁定影响业务结果的规则；画布达成一致前，不把新设计写进原型或 atlas。</p>
-    <div class="legend"><span class="pill">来源：live pages · 当前分支基线</span><span class="pill">30 项操作 · 62 条场景</span><span class="pill important">15 条未裁定分支</span><span class="pill important">转舍 deck 的 4 页未渲染中文</span></div>
-    <span class="meta">Sentri-UI origin/main df82ba5d · 2026-11-11 · canvas draft · no screen approval recorded</span>
+    <h1>转舍后，谁可能已给药？</h1>
+    <p class="intro">下面五张 390 × 844 实图来自当前仓库页面，均为 <strong>in-design</strong> 基线。负责人已确定：工人无法再次认出无耳标个体；部分给药后仍可部分转舍，但给药归属未知，来源和目的两组都需保守提示。旧群记录的去留选择尚未体现这条规则。</p>
+    <div class="legend"><span class="pill">来源：live pages · 当前分支基线</span><span class="pill">31 项操作 · 67 条场景</span><span class="pill important">15 条待裁定分支</span><span class="pill important">转舍 deck 的 4 页未渲染中文</span></div>
+    <span class="meta">Sentri-UI origin/main df82ba5d · 2026-11-16 · canvas draft · no screen approval recorded</span>
   </header>
 
   <section>
@@ -27,9 +27,9 @@
     <div class="lane">
       <figure class="artboard"><span class="art-title">now · move.tagged</span><img src="shots/move.tagged/en-390.png" alt="当前设计中的两头有身份猪转舍核对页，目的栏为空"><figcaption><strong>核对对象。</strong> 两头有身份猪从 C3 转出；原型用一个目的栏字段和主按钮。</figcaption></figure>
       <figure class="artboard"><span class="art-title">now · move.picker</span><img src="shots/move.picker/en-390.png" alt="当前设计中的目的栏选择器，原栏灰置，当前单元在前"><figcaption><strong>选目的栏。</strong> 原栏 C3 灰置；跨单元结果必须带完整路径。</figcaption></figure>
-      <figure class="artboard"><span class="art-title">now · move.mixed</span><img src="shots/move.mixed/en-390.png" alt="当前设计中的混选转舍核对页，含群记录去留与多批次头数分配"><figcaption><strong>复杂核对。</strong> 3 头有身份猪加 9 头无身份猪；群记录与批次分配在同一次提交前确认。</figcaption></figure>
-      <figure class="artboard"><span class="art-title">now · move.after</span><img src="shots/move.after/en-390.png" alt="当前设计中的转舍后栏位列表，来源与目的数量变化"><figcaption><strong>结果。</strong> 原栏和目的栏数量变化；多头结果按现行反馈规则还需要数量提示。</figcaption></figure>
-      <aside class="note"><h3>这条路线请先裁定</h3><ul><li><strong>Q5 · 原子性：</strong>建议有身份、无身份、批次和群记录作为一笔操作整体接受；失败时保留可核对记录。</li><li><strong>Q9 · 群记录 Both：</strong>需要明确复制后的记录身份、头数与历史；后端不能表达前不要提交。</li><li><strong>Q1 · 满栏：</strong>建议可靠确认满栏时阻止；容量未知的处理仍须定规则。</li><li><strong>Q8 · 多来源：</strong>建议本轮一笔只从一个来源栏位转出。</li></ul><p class="meta">场景：A-9、B-9、C-5、C-12、E-10</p></aside>
+      <figure class="artboard"><span class="art-title">now · move.mixed</span><img src="shots/move.mixed/en-390.png" alt="当前设计中的混选转舍核对页，含旧群记录去留选择与多批次头数分配"><figcaption><strong>复杂核对。</strong> 当前图仍让工人判断群记录“留／去／两边”；无耳标个体无法辨认时，这一步不能判断给药落在哪头。</figcaption></figure>
+      <figure class="artboard"><span class="art-title">now · move.after</span><img src="shots/move.after/en-390.png" alt="当前设计中的转舍后栏位列表，来源与目的数量变化"><figcaption><strong>结果。</strong> 当前图只展示头数变化；部分给药后部分转舍，两组还需显示“给药归属未知”。</figcaption></figure>
+      <aside class="note"><h3>已裁定 · 无耳标给药归属</h3><ul><li><strong>现场身份：</strong>工人无法在后续认出同一头无耳标猪；手机内部编号不代表现场可辨认。</li><li><strong>部分转舍：</strong>允许提交。若 14 头中 2 头给药、转走 4 头，两组都提示“可能包含已给药猪”，不给任一组编造准确给药头数。</li><li><strong>Q9 仍待定：</strong>保留一条原给药记录；需评审未知归属的存储、提示解除与后续转舍，以及 Condition/Care 的处理。</li><li><strong>Q5 / Q1 / Q8：</strong>原子性、满栏和多来源规则仍待裁定。</li></ul><p class="meta">场景：A-9、B-9、C-5、C-12、C-13、D-9</p></aside>
     </div>
   </section>
 
@@ -44,6 +44,7 @@
   <section>
     <div class="section-head"><h2>3 · 画布外的业务状态，先在这里决策</h2><p>静态页面无法证明真实保存与跨设备结果。下面这些状态进入场景树和决定表；本轮画布不把它们画成已经可用的原型。</p></div>
     <div class="summary">
+      <article><h3>给药归属未知 · 已裁定 + Q9</h3><p>部分给药且无法辨认时允许部分转舍。来源和目的两组都提示可能包含已给药猪，原给药只记一次。如何保存这种不确定性、何时解除提示、再次转舍如何传递，仍待评审。</p></article>
       <article><h3>离线与结果不明 · Q6</h3><p>建议每笔转舍有稳定操作 ID、来源版本和结果查询。断网只说“保存在本机”，回执未明不能重发后宣称成功；第二位工人先转走时保留冲突供核对。</p></article>
       <article><h3>计划任务 · Q2</h3><p>生产线“状态、任务或节点触发”目前只有字段帮助文字。触发、目标、指派、生命周期及完成口径定下后，再从 Workbench 连接到转舍执行。</p></article>
       <article><h3>Console 转舍单 · Q3</h3><p>目前只有菜单和历史抽屉。建议它生成带稳定 ID 与目标群体的任务；在契约明确前，不能把菜单文案当移动端执行规则。</p></article>
@@ -51,7 +52,7 @@
     </div>
   </section>
 
-  <footer>评审依据：<a href="../PRD.md">PRD</a> · <a href="../operations.md">操作清单</a> · <a href="../scenario-tree.md">场景树</a> · <a href="../decisions.md">全部问题、选项与受影响状态</a>。本地单文件版本内嵌全部图片；链接指向同目录源文件，分享单文件时请以决策画布中的摘要为准。</footer>
+  <footer>评审依据：<a href="../PRD.md">PRD</a> · <a href="../health-attribution.md">给药归属方案</a> · <a href="../operations.md">操作清单</a> · <a href="../scenario-tree.md">场景树</a> · <a href="../decisions.md">全部问题、选项与受影响状态</a>。本地单文件版本内嵌全部图片；链接指向同目录源文件，分享单文件时请以决策画布中的摘要为准。</footer>
 </main>
 </body>
 </html>

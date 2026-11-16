@@ -1,13 +1,13 @@
 {
   "feature": "move",
   "source": "scenario-tree.md",
-  "created": "2026-11-11T06:33:00.203Z",
+  "created": "2026-11-16T03:43:22.236Z",
   "cap": 4,
   "knownQuestions": [
     "Q8",
     "Q1",
-    "Q9",
     "Q5",
+    "Q9",
     "Q6",
     "Q4",
     "Q2",
@@ -188,7 +188,7 @@
     {
       "id": "C-3",
       "tree": "C-3",
-      "label": "U1/M D3 G1: Review open source-pen records",
+      "label": "U1/M D3 G1, unrecognisable head: Review open group records",
       "kind": "tree",
       "question": null,
       "status": "pending"
@@ -196,7 +196,7 @@
     {
       "id": "C-4",
       "tree": "C-4",
-      "label": "U1/M D3 G1: Change one verdict to Goes",
+      "label": "U1/M D3 G2, entire source population moves: Review group history",
       "kind": "tree",
       "question": null,
       "status": "pending"
@@ -204,9 +204,9 @@
     {
       "id": "C-5",
       "tree": "C-5",
-      "label": "U1/M D3 G1: Change one verdict to Both",
-      "kind": "blocker",
-      "question": "Q9",
+      "label": "U1/M D3 G1/H2, partial move: Try the old Stays / Goes / Both choice for an administered treatment",
+      "kind": "tree",
+      "question": null,
       "status": "pending"
     },
     {
@@ -266,6 +266,22 @@
       "status": "pending"
     },
     {
+      "id": "C-13",
+      "tree": "C-13",
+      "label": "U1 D3 H2, D4 has 14 head and 2 were given medication: Move 4 head to E2 without physical identification",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "C-14",
+      "tree": "C-14",
+      "label": "U1 D3 H0/H1: Move part of a group with none or all treated",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
       "id": "D-1",
       "tree": "D-1",
       "label": "T1 D4 N0: Farm confirms move",
@@ -292,9 +308,9 @@
     {
       "id": "D-4",
       "tree": "D-4",
-      "label": "M D4 N0 G1: Farm confirms mixed move",
-      "kind": "blocker",
-      "question": "Q9",
+      "label": "M D4 N0 G1/H2: Farm confirms mixed move",
+      "kind": "tree",
+      "question": null,
       "status": "pending"
     },
     {
@@ -327,6 +343,30 @@
       "label": "Any D5: Later read pig and pen history",
       "kind": "tree",
       "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "D-9",
+      "tree": "D-9",
+      "label": "U1/M D5 H2: Read source and destination after accepted partial move",
+      "kind": "tree",
+      "question": null,
+      "status": "pending"
+    },
+    {
+      "id": "D-10",
+      "tree": "D-10",
+      "label": "U1/M D5 H2, a possibly exposed group is partly moved again: Review the next move and its result",
+      "kind": "blocker",
+      "question": "Q9",
+      "status": "pending"
+    },
+    {
+      "id": "D-11",
+      "tree": "D-11",
+      "label": "U1/M D5 H2, notice remains after time passes: Try to clear or retire the possible-exposure notice",
+      "kind": "blocker",
+      "question": "Q9",
       "status": "pending"
     },
     {

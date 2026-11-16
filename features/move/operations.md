@@ -1,6 +1,6 @@
 # Move 转舍 — operations inventory and 95% cut
 
-This inventory is for a **mobile move of pigs between registered pens or units**. `S` means a source describes the operation, not that the owner has approved the draft. `I` is a reasoned scenario, not a measured farm frequency. The old transfer deck, current five `in-design` screens, [place and identity research](../../ux/research/ops/place-identity.md), [synthesis](../../ux/research/ops/SYNTHESIS.md), and [handover](../../references/handover/flows/pig-transfer.md) are the baseline. Product questions and affected screens are in [decisions.md](decisions.md).
+This inventory is for a **mobile move of pigs between registered pens or units**. `S` means a source describes the operation, not that the owner has approved the draft. `I` is a reasoned scenario, not a measured farm frequency. `O` is an owner ruling. The old transfer deck, current five `in-design` screens, [place and identity research](../../ux/research/ops/place-identity.md), [synthesis](../../ux/research/ops/SYNTHESIS.md), and [handover](../../references/handover/flows/pig-transfer.md) are the baseline. Product questions and affected screens are in [decisions.md](decisions.md); the confirmed partial-move rule is in [health-attribution.md](health-attribution.md).
 
 | Operation | How often | At stake | Recorded? | Where | Least UI | Reason |
 |---|---|---|---|---|---|---|
@@ -13,18 +13,19 @@ This inventory is for a **mobile move of pigs between registered pens or units**
 | Find a pen in another unit | S — place.html slide 2 | Wrong unit with duplicate pen code | yes | here | Search with complete location path | |
 | Scan a pen plate to choose destination | S — place-identity §2.1 | Scan maps to wrong or ambiguous pen | yes | here | Scan entry and exact matched pen with path | |
 | Check an empty destination pen | S — feature.json move.picker | Worker misses a suitable empty pen | derived | here | Empty state on pen choice | |
-| Decide where each open group record belongs | S — PRD Rules and move.mixed | Condition or treatment attached to wrong population | yes | here | Per-record Stays, Goes or Both verdict | |
-| Move the whole unidentified population | S — feature.json move.mixed | Open records stranded on an empty source | yes | here | Show all-head scope and record verdict summary | |
+| Show unknown attribution for a partly moved, unrecognisable group | I — when a partly treated group is split; O — owner 2026-11-16 | Treatment falsely assigned to one pen or duplicated as a new dose | yes | here | One original administration; both groups show possible exposure, neither claims an exact treated count | |
+| Reconcile open group Condition and Care after partial movement | I — identification ruling applies to current group state | Exact affected head invented on either pen | yes | here | Show current attribution as uncertain; later observation can establish new current counts | Cross-feature group Care and Resolve need a separate contract |
+| Move the whole unidentified population | S — feature.json move.mixed | Open records stranded on an empty source | yes | here | Show all-head scope, history and current-attribution summary | |
 | Split moved head across multiple batches | S — synthesis §4 and move.mixed | Wrong batch membership or count | yes | here | One stepper per source batch; total equals moved head | |
 | Move a single-batch unidentified group | S — PRD Rules | Extra allocation step slows routine work | yes | here | Carry known batch without another choice | |
-| Review source and destination after saving | S — move.after and PRD Rules | Worker cannot tell which move was accepted | derived | here | Updated location and counts where visible; feedback follows current law | |
+| Review source and destination after saving | S — move.after and PRD Rules; O — owner 2026-11-16 | Worker cannot tell which move was accepted or whether a group may contain treated pigs | derived | here | Updated location and counts plus possible-exposure notice on both groups where attribution is unknown | |
 | Keep location history for a moved identified pig | S — handover Rules 2 | Later worker cannot trace where pig went | yes | here | Readable movement entry on the pig record | |
 | Leave a draft and return before saving | I — mobile Back and interruption are normal | Accidental transfer or lost selection | no | here | Back leaves without committing; return restores or clearly discards draft | |
 | Double tap the commit control | I — gloved touch and slow network | Duplicate placement and count changes | yes | here | One pending operation and one result | |
 | Save while offline and later reconcile | S — handover Edge cases, transferTask store | Local move mistaken for shared farm location | yes | here | Distinguish saved on phone from confirmed on farm | |
 | Handle a failed or partly accepted mixed move | I — mixed payload and unreliable network | One side moves without the other | yes | here | Keep explicit pending or failure state; atomic result is Q5 | |
-| Handle another worker moving the same pig first | I — multiworker farm and handover conflict gap | Wrong location or overwritten history | yes | here | Show conflict and recoverable record; policy is Q5 | |
-| Correct an accepted move to the wrong pen | I — mistaken pen or scan can occur | History and counts stay wrong | yes | here | Record a correction linked to the first move; authority is Q6 | |
+| Handle another worker moving the same pig first | I — multiworker farm and handover conflict gap | Wrong location or overwritten history | yes | here | Show conflict and recoverable record; policy is Q6 | |
+| Correct an accepted move to the wrong pen | I — mistaken pen or scan can occur | History and counts stay wrong | yes | here | Record a correction linked to the first move; authority is Q7/Q10 | |
 | Move a lactating sow away from piglets | S — handover Open question 4 | Wrong production status or litter relationship | yes | here | Show movement effect before commit; status rule is Q4 | |
 | Check a destination at capacity | S — handover Open question 1 cites conflicting sources | Overcrowding or an unjustified block | derived | here | Capacity signal or block, according to Q1 | |
 | Open a scheduled transfer task from Workbench | S — handover describes implied task and Workbench entry | Worker cannot find assigned move | derived | handoff:workbench | Task row opens the identified move context; execution contract is Q2 | |
