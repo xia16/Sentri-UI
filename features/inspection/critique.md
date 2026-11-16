@@ -324,3 +324,28 @@ Scope: the words only. At `?lang=zh` these screens read in English where the Ins
 ## Attention budget
 
 Unchanged: each screen shows the same information in the same order as on main, in Chinese. Cut list: nothing is cut.
+
+# PenMap propagation to Inspection (2026-11-16)
+
+## Keep
+
+- The current 4 × 6 walk map, amber/white/quiet colour mapping, peek, and landing cue remain the baseline. Inspection has no blue level or per-pen checked state.
+
+## Problems
+
+- **Major:** the host fixes the map to the 4 × 6 sample, so the current PenMap's long and mixed room rules do not appear on an Inspection screen.
+- **Major:** the generic host click handler redraws the sheet on Whole room, resetting the new component view. The approved canvas shows the failure and correction.
+- **Minor:** the screen metadata and budget omit Whole room and room-shape variants.
+
+## Parts
+
+| Part | Drawn by | Call |
+|---|---|---|
+| Colour key, Entrance, tiles, peek, Whole room | Shared PenMap and Sheet | Keep; pass the sampled room's PenMap props. |
+| Footer Back | Shared PenMapFooter | Keep; remove obsolete range parameters. |
+| Dock Pen map entry | TaskDock | Keep for a room with more than one pen; omit for a one-pen room. |
+| Tap to pen and landing cue | Host plus shared PenMap | Keep; leave Whole room and shared-tile taps to PenMap. |
+
+## Self-crit
+
+Pending final renders after the approved canvas is built. The long-room view must preserve Inspection's status mapping and leave the current 4 × 6 face unchanged.
