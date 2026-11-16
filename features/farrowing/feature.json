@@ -61,7 +61,8 @@
           "farrowing.piglets-sow",
           "farrowing.piglets-filter",
           "farrowing.piglets-confirm",
-          "farrowing.piglets-pen"
+          "farrowing.piglets-pen",
+          "farrowing.piglets-room"
         ]
       }
     ],
@@ -731,7 +732,7 @@
     [
       "farrowing.piglets-pen",
       "farrowing.piglets",
-      "tap a pen, or read its plate (they leave her list)"
+      "Move to B1 (they leave her list)"
     ],
     [
       "farrowing.piglets-pen",
@@ -817,6 +818,16 @@
       "farrowing.history",
       "farrowing.details",
       "Back (opened from Details)"
+    ],
+    [
+      "farrowing.piglets-pen",
+      "farrowing.piglets-room",
+      "tap the room"
+    ],
+    [
+      "farrowing.piglets-room",
+      "farrowing.piglets-pen",
+      "tap a room"
     ]
   ],
   "screens": [
@@ -2223,20 +2234,30 @@
       "preset": "piglets-pen",
       "figma": "",
       "notes": {
-        "purpose": "Move's destination picker for the ticked piglets.",
+        "purpose": "Move's To pen step for the ticked piglets (owner, 2026-11-16: one Move everywhere).",
         "states": [],
         "elements": [
           {
-            "name": "Move to a pen",
-            "at": "Pen",
-            "shows": "A drawer: \"Move to a pen\", line \"From <ID>\"; search a pen with scan inside (a plate read moves them there); pens by unit, her unit first, her own crate dimmed (\"Her crate\"); Back.",
-            "logic": "A tap moves them and returns to her list: they leave her litter, her record logs \"3 piglets moved to Pen B1 · Unit 7 · ID …\", and Sent and moved gains the row.",
-            "source": "farrowing-astra-concept.js allocPenPage(), act allocPen"
+            "name": "To pen",
+            "at": "Page",
+            "shows": "\"Move 3 piglets\", line \"From B3 · Unit 7\"; the room row (Unit 7 · \"This room\"); the room's Pen map, every pen neutral, her crate greyed; Back and \"Move to B1\".",
+            "logic": "A tap chooses a pen; Move to B1 moves them and returns to her list: they leave her litter, her record logs \"3 piglets moved to Pen B1 · Unit 7 · ID …\", and Sent and moved gains the row.",
+            "source": "farrowing-astra-concept.js allocPenPage(), act allocPenPick / allocPenSave"
           }
         ],
         "controls": [
           {
             "control": "a pen",
+            "does": "chooses it; the commit names it",
+            "goesTo": "farrowing.piglets-pen"
+          },
+          {
+            "control": "Unit 7",
+            "does": "opens the room list",
+            "goesTo": "farrowing.piglets-room"
+          },
+          {
+            "control": "Move to B1",
             "does": "moves the ticked piglets there; back to her piglets",
             "goesTo": "farrowing.piglets"
           },
@@ -2247,16 +2268,45 @@
           }
         ],
         "copy": [
-          "Move to a pen",
-          "Pen",
-          "Her crate"
+          "Move 3 piglets",
+          "From B3 · Unit 7",
+          "This room",
+          "Choose a pen",
+          "Move to B1"
         ],
         "edge": [],
         "issues": [],
         "rules": [
-          "Owner, 2026-11-03: no Allocate step; a sow's record leads to her piglets, Inspection's pen list for one litter. Tick some, then Actions: Foster or Move; piglets nobody moves stay with her."
+          "Owner, 2026-11-03: no Allocate step; a sow's record leads to her piglets. Tick some, then Actions: Foster or Move.",
+          "Owner, 2026-11-16: the same Move as everywhere (features/move To pen), not a list of pens."
         ]
       }
+    },
+    {
+      "id": "farrowing.piglets-room",
+      "name": "Piglets · choose room",
+      "zh": "选择房间",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "piglets-pen",
+      "figma": "",
+      "notes": {
+        "purpose": "Move's room list: the rooms, hers first (\"This room · 4 pens\").",
+        "controls": [
+          {
+            "control": "a room",
+            "does": "shows its Pen map",
+            "goesTo": "farrowing.piglets-pen"
+          }
+        ],
+        "copy": [
+          "Choose room",
+          "This room · 4 pens"
+        ]
+      },
+      "steps": [
+        "[data-action=\"allocRooms\"]"
+      ]
     },
     {
       "id": "farrowing.ended",

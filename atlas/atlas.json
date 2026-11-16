@@ -3264,7 +3264,8 @@
            "farrowing.piglets-sow",
            "farrowing.piglets-filter",
            "farrowing.piglets-confirm",
-           "farrowing.piglets-pen"
+           "farrowing.piglets-pen",
+           "farrowing.piglets-room"
           ]
          }
         ],
@@ -3934,7 +3935,7 @@
         [
          "farrowing.piglets-pen",
          "farrowing.piglets",
-         "tap a pen, or read its plate (they leave her list)"
+         "Move to B1 (they leave her list)"
         ],
         [
          "farrowing.piglets-pen",
@@ -4020,6 +4021,16 @@
          "farrowing.history",
          "farrowing.details",
          "Back (opened from Details)"
+        ],
+        [
+         "farrowing.piglets-pen",
+         "farrowing.piglets-room",
+         "tap the room"
+        ],
+        [
+         "farrowing.piglets-room",
+         "farrowing.piglets-pen",
+         "tap a room"
         ]
        ],
        "screens": [
@@ -5434,20 +5445,30 @@
          "preset": "piglets-pen",
          "figma": "",
          "notes": {
-          "purpose": "Move's destination picker for the ticked piglets.",
+          "purpose": "Move's To pen step for the ticked piglets (owner, 2026-11-16: one Move everywhere).",
           "states": [],
           "elements": [
            {
-            "name": "Move to a pen",
-            "at": "Pen",
-            "shows": "A drawer: \"Move to a pen\", line \"From <ID>\"; search a pen with scan inside (a plate read moves them there); pens by unit, her unit first, her own crate dimmed (\"Her crate\"); Back.",
-            "logic": "A tap moves them and returns to her list: they leave her litter, her record logs \"3 piglets moved to Pen B1 · Unit 7 · ID …\", and Sent and moved gains the row.",
-            "source": "farrowing-astra-concept.js allocPenPage(), act allocPen"
+            "name": "To pen",
+            "at": "Page",
+            "shows": "\"Move 3 piglets\", line \"From B3 · Unit 7\"; the room row (Unit 7 · \"This room\"); the room's Pen map, every pen neutral, her crate greyed; Back and \"Move to B1\".",
+            "logic": "A tap chooses a pen; Move to B1 moves them and returns to her list: they leave her litter, her record logs \"3 piglets moved to Pen B1 · Unit 7 · ID …\", and Sent and moved gains the row.",
+            "source": "farrowing-astra-concept.js allocPenPage(), act allocPenPick / allocPenSave"
            }
           ],
           "controls": [
            {
             "control": "a pen",
+            "does": "chooses it; the commit names it",
+            "goesTo": "farrowing.piglets-pen"
+           },
+           {
+            "control": "Unit 7",
+            "does": "opens the room list",
+            "goesTo": "farrowing.piglets-room"
+           },
+           {
+            "control": "Move to B1",
             "does": "moves the ticked piglets there; back to her piglets",
             "goesTo": "farrowing.piglets"
            },
@@ -5458,16 +5479,45 @@
            }
           ],
           "copy": [
-           "Move to a pen",
-           "Pen",
-           "Her crate"
+           "Move 3 piglets",
+           "From B3 · Unit 7",
+           "This room",
+           "Choose a pen",
+           "Move to B1"
           ],
           "edge": [],
           "issues": [],
           "rules": [
-           "Owner, 2026-11-03: no Allocate step; a sow's record leads to her piglets, Inspection's pen list for one litter. Tick some, then Actions: Foster or Move; piglets nobody moves stay with her."
+           "Owner, 2026-11-03: no Allocate step; a sow's record leads to her piglets. Tick some, then Actions: Foster or Move.",
+           "Owner, 2026-11-16: the same Move as everywhere (features/move To pen), not a list of pens."
           ]
          }
+        },
+        {
+         "id": "farrowing.piglets-room",
+         "name": "Piglets · choose room",
+         "zh": "选择房间",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "piglets-pen",
+         "figma": "",
+         "notes": {
+          "purpose": "Move's room list: the rooms, hers first (\"This room · 4 pens\").",
+          "controls": [
+           {
+            "control": "a room",
+            "does": "shows its Pen map",
+            "goesTo": "farrowing.piglets-pen"
+           }
+          ],
+          "copy": [
+           "Choose room",
+           "This room · 4 pens"
+          ]
+         },
+         "steps": [
+          "[data-action=\"allocRooms\"]"
+         ]
         },
         {
          "id": "farrowing.ended",
@@ -25681,11 +25731,13 @@
        "duplicates": "",
        "groups": [
         [
-         "Transfer",
+         "From a pen",
          [
           "move.tagged",
-          "move.picker",
           "move.mixed",
+          "move.picker",
+          "move.picked",
+          "move.rooms",
           "move.after"
          ]
         ],
@@ -25699,132 +25751,227 @@
        "screens": [
         {
          "id": "move.tagged",
-         "name": "Transfer · tagged pigs",
-         "zh": "转移",
+         "name": "Which pigs",
+         "zh": "选择猪只",
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-transfer&slide=1",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "walk",
+         "steps": [
+          "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+          "[data-action=\"pen-move\"]"
+         ],
+         "figma": "",
          "notes": {
-          "purpose": "Two tagged pigs, one field.",
-          "rules": [
-           "The sheet is the confirmation: production's dialog is cut.",
-           "Triage's hospital set is drained here; the mark's execution needs no screen of its own."
-          ]
-         }
-        },
-        {
-         "id": "move.picker",
-         "name": "Destination picker",
-         "zh": "选择位置",
-         "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-transfer&slide=2",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
-         "notes": {
-          "purpose": "Choose the destination pen.",
+          "purpose": "Move from a pen: say which pigs go. Shown only when the pen holds more than one pig or pigs without ID; one tagged pig goes straight to To pen.",
           "elements": [
            {
-            "name": "Pen list",
-            "shows": "Units and pens as labels, not navigation",
-            "logic": "The current unit is pinned first and the source cell dimmed (\"where they are now\"); cross-unit groups wear their full path; search results are flat with the path trailing.",
-            "states": [
-             {
-              "state": "Source pen",
-              "when": "Pen the pigs are in",
-              "shows": "Dimmed"
-             },
-             {
-              "state": "Empty pen",
-              "when": "No pigs",
-              "shows": "Dashed (for a hospital drain it is the answer)"
-             }
-            ],
-            "rule": "Tap commits: the sheet closes and the drawer's Picker is filled."
+            "name": "With ID",
+            "shows": "The pen's tagged pigs behind the search with scan, ticked by ID, \"0 of 2\"",
+            "logic": "Farrowing's Send piglets parts: a read ticks."
+           },
+           {
+            "name": "Without ID",
+            "shows": "A count \"of 14\" when the pen has pigs without ear tags; its hint \"Moving clears their conditions.\" when that group has conditions",
+            "logic": "Conditions on pigs without ID are on a number, not on pigs: the moved ones arrive with none (owner, 2026-11-16)."
            }
+          ],
+          "controls": [
+           {
+            "control": "Choose pen",
+            "does": "opens To pen; off until a pig is ticked or counted",
+            "goesTo": "move.picker"
+           },
+           {
+            "control": "Back",
+            "does": "back to the pen; nothing moved",
+            "goesTo": "inspection.pen"
+           }
+          ],
+          "copy": [
+           "Move pigs",
+           "From D4 · Unit 7",
+           "With ID",
+           "Without ID",
+           "of 14",
+           "Moving clears their conditions.",
+           "Choose pen"
+          ],
+          "rules": [
+           "Owner, 2026-11-09: Move is the ad hoc move; Transfer is a planned task sent only from the console.",
+           "Owner, 2026-11-16: one Move everywhere, one pig or many pigs, with or without ID."
           ]
          }
         },
         {
          "id": "move.mixed",
-         "name": "Transfer · tagged and head",
-         "zh": "转移 · 含无ID",
+         "name": "Which pigs · one ticked",
+         "zh": "选择猪只 · 已选",
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-transfer&slide=3",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "walk",
+         "steps": [
+          "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+          "[data-action=\"pen-move\"]",
+          "[data-action=\"move-id\"][data-value=\"000801\"]"
+         ],
+         "figma": "",
          "notes": {
-          "purpose": "Three tagged pigs and nine head: both conditionals under one commit.",
+          "purpose": "A tagged pig ticked: Choose pen turns on.",
+          "controls": [
+           {
+            "control": "Choose pen",
+            "does": "opens To pen with the ticked pigs and the count",
+            "goesTo": "move.picker"
+           }
+          ],
+          "copy": [
+           "1 of 2",
+           "Choose pen"
+          ]
+         }
+        },
+        {
+         "id": "move.picker",
+         "name": "To pen",
+         "zh": "选择栏位",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "walk",
+         "steps": [
+          "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+          "[data-action=\"pen-move\"]",
+          "[data-action=\"move-id\"][data-value=\"000801\"]",
+          "[data-action=\"move-choose\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "The destination: the room as a row, then its Pen map with every pen neutral and the pen the pigs are in greyed.",
           "elements": [
            {
-            "name": "Group verdicts",
-            "shows": "Each open group record on the source pen",
-            "states": [
-             {
-              "state": "Stays",
-              "when": "Default",
-              "shows": "Record stays on the source pen"
-             },
-             {
-              "state": "Goes",
-              "when": "Chosen, or when the whole population leaves (n = N)",
-              "shows": "Record moves; the checklist folds to a footnote"
-             },
-             {
-              "state": "Both",
-              "when": "Chosen",
-              "shows": "Record on both pens"
-             }
-            ]
+            "name": "Room row",
+            "shows": "Unit 7 · \"Gestation · this room\"",
+            "logic": "Opens the room list; the pigs' own room is the default (owner, 2026-11-09)."
            },
            {
-            "name": "Which batches the head leave",
-            "shows": "Per-batch steppers",
-            "logic": "Appears for a multi-batch group only; the steppers must sum to n (4 + 5 = 9). Single-batch groups ride silently. No block prints for an all-tagged selection."
+            "name": "Pen map",
+            "shows": "PenMap, neutral: no status colours; the source pen disabled (\"the pigs are here\")",
+            "logic": "Tap a pen to choose it; the footer names it."
            }
+          ],
+          "controls": [
+           {
+            "control": "a pen",
+            "does": "chooses it",
+            "goesTo": "move.picked"
+           },
+           {
+            "control": "Unit 7",
+            "does": "opens the room list",
+            "goesTo": "move.rooms"
+           },
+           {
+            "control": "Back",
+            "does": "back to Which pigs",
+            "goesTo": "move.mixed"
+           }
+          ],
+          "copy": [
+           "Move 1 pig",
+           "Choose a pen"
+          ]
+         }
+        },
+        {
+         "id": "move.picked",
+         "name": "To pen · a pen chosen",
+         "zh": "选择栏位 · 已选",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "walk",
+         "steps": [
+          "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+          "[data-action=\"pen-move\"]",
+          "[data-action=\"move-id\"][data-value=\"000801\"]",
+          "[data-action=\"move-choose\"]",
+          "[data-action=\"move-pen\"][data-value=\"D5\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "D5 chosen: a 2px ink ring; the commit names the pen.",
+          "controls": [
+           {
+            "control": "Move to D5",
+            "does": "moves the pigs; back to the pen, both pens' logs say moved",
+            "goesTo": "move.after"
+           }
+          ],
+          "copy": [
+           "Move to D5"
+          ]
+         }
+        },
+        {
+         "id": "move.rooms",
+         "name": "Choose room",
+         "zh": "选择房间",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "walk",
+         "steps": [
+          "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+          "[data-action=\"pen-move\"]",
+          "[data-action=\"move-id\"][data-value=\"000801\"]",
+          "[data-action=\"move-choose\"]",
+          "[data-action=\"move-rooms\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Another room, even in another section: rooms grouped by section, the pigs' own section first and their room at its top.",
+          "copy": [
+           "Choose room",
+           "This room · 24 pens"
           ]
          }
         },
         {
          "id": "move.after",
-         "name": "After · the cards are the receipt",
-         "zh": "转移 · 完成",
+         "name": "After · back on the pen",
+         "zh": "转移后",
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-transfer&slide=4",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "walk",
+         "steps": [
+          "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+          "[data-action=\"pen-move\"]",
+          "[data-action=\"move-id\"][data-value=\"000801\"]",
+          "[data-action=\"move-choose\"]",
+          "[data-action=\"move-pen\"][data-value=\"D5\"]",
+          "[data-action=\"move-save\"]"
+         ],
+         "figma": "",
          "notes": {
-          "purpose": "The pen cards after the move.",
+          "purpose": "Back on the pen the pigs left: its count is down, its log says \"Moved out · 1 pig to D5\"; D5's says \"Moved in\".",
           "rules": [
-           "Counts re-derive from placements for tagged pigs and are set by count for head (one-number law).",
-           "A case arrived with the pig; head arrive under their own batches as a group row with a count trail."
+           "Log lines say moved, never transferred (owner, 2026-11-09)."
           ]
          }
         },
         {
          "id": "move.transfer-sow",
-         "name": "Transfer sow · from a sow record",
+         "name": "Move a sow · from her record",
          "zh": "转移母猪",
          "status": "in-design",
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "count",
          "steps": [
-          "Actions",
+          "[data-action=\"sowActions\"]",
           "[data-action=\"sow-host-action\"][data-value=\"transfer\"]"
          ],
          "figma": "",
          "notes": {
-          "purpose": "Moving one sow from her Farrowing record: Actions, then Transfer sow.",
-          "elements": [
-           {
-            "name": "Transfer sow button",
-            "at": "Transfer sow",
-            "shows": "Destination unit and destination pen, with the origin shown above",
-            "rule": "Disabled until a unit and a pen are chosen and the destination differs from her current pen. The pen field stays disabled until a unit is chosen, and the current pen is left out of the list in her own unit. Saving moves her, writes \"Transferred · origin to destination\" to her log and returns to her record.",
-            "source": "inspection-astra-concept.js transferReady / transferPage"
-           }
-          ],
+          "purpose": "A sow's Actions: Move this sow to another pen. The same To pen step (her pen greyed, Move to …).",
           "rules": [
-           "Not offered for a sow that has died."
-          ],
-          "issues": [
-           "Two unit and pen select fields, not the destination picker of the Transfer deck (current unit pinned, search, scan); the two designs differ."
+           "Farrowing's piglets move on the same step (farrowing.piglets-pen, farrowing.piglets-room)."
           ]
          }
         }
@@ -25832,26 +25979,36 @@
        "flow": [
         [
          "move.tagged",
-         "move.picker",
-         "tap the destination"
-        ],
-        [
-         "move.picker",
-         "move.tagged",
-         "tap a pen"
-        ],
-        [
-         "move.tagged",
-         "move.after",
-         "tap Transfer"
+         "move.mixed",
+         "tick a pig"
         ],
         [
          "move.mixed",
+         "move.picker",
+         "Choose pen"
+        ],
+        [
+         "move.picker",
+         "move.picked",
+         "tap a pen"
+        ],
+        [
+         "move.picker",
+         "move.rooms",
+         "tap the room"
+        ],
+        [
+         "move.rooms",
+         "move.picker",
+         "tap a room"
+        ],
+        [
+         "move.picked",
          "move.after",
-         "tap Transfer"
+         "Move to D5"
         ]
        ],
-       "prd": "# Move 转移\n\n> Draft — compiled from existing docs, not yet confirmed.\n\n## Problem\n\nProduction moved pigs through a tree page, a two-wheel drawer and a confirmation dialog, and a separate full page for groups with uncounted head.\n\n## Who\n\nThe stockperson moving pigs between pens or units; the supervisor reading pen counts.\n\n## Anchor\n\nAnchor: The placement of a pig or a counted group.\n\n## Rules\n\n- An identified pig's records live on the animal: cases, treatments and marks travel with her silently, so the whole event is one Picker.\n- The sheet is the confirmation: the subject header restates scope, view > filters the list to the selection, and the primary commits. Production's confirmation dialog is cut.\n- The destination tree survives as labels only. The current unit is pinned first and the source cell dimmed; cross-unit groups carry their full path; search reaches any pen and the scan reads a pen plate. Tap commits and closes. An empty pen prints dashed.\n- Mixed selection: tagged pigs move as placement events, un-identified head move as a count. Each open group record on the source pen gets a verdict (Stays, Goes, Both; default stays) and the checklist folds to a footnote when the whole population leaves.\n- A pen's un-identified count is fully partitioned by (line, batch), so a multi-batch move must say which batches shrink (steppers, sum = n). A single-batch group rides silently.\n- No toast: counts are the feedback. The source card re-derives down and the destination up (derived for tagged pigs, set by count for head).\n\n## Scope\n\nIn: Transfer · tagged pigs; Destination picker; Transfer · tagged and head; After · the cards are the receipt; Transfer sow · from a sow record.\n\nOut: see the neighbouring features of the same section for what the same sheet does elsewhere; nothing outside the screens above is designed here.\n\n## Decisions\n\nOpen questions and items to confirm:\n\n- Whether Transfer on a sow's record is the same design as this page (the sow transfer in Farrowing and in the Pig profile uses a unit and pen pair of fields; see the screen).\n- The deck flags this as the worst-case container for a drawer.\n\nSources:\n\n- The event workflow deck: `ux/system/workflows/place.html` (all decks render in `ux/archive/workflows.html`).\n- The ops requirements: `ux/research/ops/place-identity.md` and `ux/research/ops/SYNTHESIS.md`.\n",
+       "prd": "# Move 转移\n\n> In design: the owner reviews it on the canvas (https://claude.ai/artifact/BdBXnZEAP8nLSYJKSexVck); nothing here is merged.\n\n## Problem\n\nProduction moved pigs through a tree page, a two-wheel drawer and a confirmation dialog, and a separate full page for groups with uncounted head. The new app then grew three different moves: Inspection's Transfer drawer, Farrowing's sow transfer with unit and pen fields, and a list of pens for her piglets.\n\n## Who\n\nThe stockperson moving pigs between pens or rooms, on the spot; the supervisor reading pen counts and pen logs.\n\n## Anchor\n\nAnchor: The placement of a pig or a counted group.\n\n## Move and Transfer\n\n- **Move is the ad hoc move**: a worker moves pigs now, from the phone (owner, 2026-11-09).\n- **Transfer is a planned task** the console sends; it never appears in the phone's Actions. Its receiving end is Count's ([features/count](../count/PRD.md)).\n\n## One Move everywhere (owner, 2026-11-16)\n\nThe same steps wherever pigs are moved from: a pen page's Move tile, ticked pigs' Actions, a sow's Actions (Farrowing), her ticked piglets' Actions (Farrowing). One variable decides the shape: **one pig or many**, with or without ID.\n\n1. **Which pigs** (only from a pen that holds more than one pig, or pigs without ID): *With ID* is the pen's tagged pigs, ticked by ID behind the search with scan (Farrowing's Send piglets parts); *Without ID* is a count, *of 14*. **Choose pen** is off until a pig is ticked or counted.\n2. **To pen**: the room as a row (the pigs' own room by default, *This room*), then that room's **Pen map, neutral**: every pen white, no status colours, the pen the pigs are in greyed. Tap a pen: a 2px ink ring, and the footer names it, **Move to D5**.\n3. **Choose room**: another room, even in another section; rooms grouped by section, the pigs' own section first and their room at its top (*This room · 24 pens*).\n4. **After**: back where the move started; a toast, *Moved 000801 to D5*; both pens' logs say **moved**, never transferred.\n\nOne pig, or pigs already ticked, skip Which pigs and open on To pen (*Move 000267*, *Move 3 piglets*).\n\n## Rules\n\n- **Conditions on pigs without ID do not move with them** (owner, 2026-11-16): they sit on a number, not on pigs, so the moved head arrive with none and the pen they left keeps its own. When the group has conditions, Which pigs says so in the count's hint: **Moving clears their conditions.** Inspection records them again. Pigs with ID carry everything with them.\n- The source pen is never a destination: greyed (*the pigs are here*; *her crate* for a sow or her piglets).\n- No confirmation dialog: To pen is the confirmation, and its commit names the pen.\n- Pen codes are lane labels (A14), never \"Pen 14\".\n\n## Scope\n\nIn: Which pigs; Which pigs · one ticked; To pen; To pen · a pen chosen; Choose room; After · back on the pen; Move a sow · from her record. Farrowing's piglets move on the same step (farrowing.piglets-pen, farrowing.piglets-room).\n\nOut: Transfer (a console task; its receiving is Count's); pigs leaving the farm; feed stock.\n\n## Decisions\n\nOpen questions and items to confirm:\n\n- Medication given to part of a group without ID, then part of it moves: the teammate branch `codex/move-design-scenarios` records the owner's 2026-11-16 ruling (attribution unknown; both groups show a possible-medication notice; no invented counts). Its scenario tree and decisions (capacity, offline conflicts, correction, permissions) describe the old Transfer drawer and need moving onto this design.\n- A pen without ID holding several batches: which batches shrink when some move (the old rule: steppers per batch, summing to the count).\n- Pen capacity on To pen (a full pen): not shown yet.\n\nSources:\n\n- Owner rulings 2026-11-09 (Move vs Transfer, rooms by section, *moved*) and 2026-11-16 (one Move everywhere; conditions cleared).\n- History, not the design: `ux/system/workflows/place.html`, `ux/research/ops/place-identity.md`, `ux/research/ops/SYNTHESIS.md`.\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,

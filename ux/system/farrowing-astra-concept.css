@@ -27,3 +27,6 @@
 /* End task early is the red-wash act everywhere (the overview button and the hold); solid red stays for End task. */
 .farrowing-phone .button.button.st-hold.task-end-confirm:not(:disabled):not([aria-disabled="true"]){background:var(--red-wash);border-color:var(--red);color:var(--ink)}
 .farrowing-phone .button.button.st-hold.task-end-confirm:not([aria-disabled="true"])::before{background:var(--red)}
+
+/* Move (2026-11-16): her piglets move on Move's own To pen step, the same stack as Inspection's. */
+.move-page .move-stack{display:flex;flex-direction:column;gap:var(--space-16)}

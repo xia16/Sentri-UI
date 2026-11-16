@@ -610,7 +610,7 @@ function moveIdList(c,m,list){
 }
 function movePigsPage(c){
  const m=c.mv,pe=pen(c,m.penId),untagged=pe.untagged?.count||0,list=pe.pigs.slice().sort(moveByCode);
- const without=untagged?`<section class="foster-ids" aria-label="Without ID"><p class="foster-ids-head"><span>Without ID</span><span class="foster-ids-count">of ${untagged}</span></p>${SentriUI.stepper({variant:'well',label:'Pigs without ID',value:m.count,min:0,max:untagged,action:'move-count',key:'count',reserveHint:false,className:'move-stepper'})}</section>`:'';
+ const without=untagged?`<section class="foster-ids" aria-label="Without ID"><p class="foster-ids-head"><span>Without ID</span><span class="foster-ids-count">of ${untagged}</span></p>${SentriUI.stepper({variant:'well',label:'Pigs without ID',value:m.count,min:0,max:untagged,action:'move-count',key:'count',reserveHint:false,hint:(pe.untagged.cases||[]).length?'Moving clears their conditions.':'',className:'move-stepper'})}</section>`:'';   // conditions on pigs without ID are on a number, not on pigs: they do not travel (owner, 2026-11-16)
  const body='<div class="move-stack">'+(list.length?moveIdList(c,m,list):'')+without+'</div>';
  return sheet(c,'Move pigs','',body,footer(SentriUI.backButton({action:'move-back'}),button('move-choose','Choose pen','button primary','',!(m.draftIds.length+m.count))),'',moveLine(pe.id,unitName(c)));
 }
