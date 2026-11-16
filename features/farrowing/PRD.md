@@ -49,7 +49,7 @@ From RULINGS.md, quoted short:
 
 In:
 
-- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Pen map, Scan ear tag, Search.
+- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Pen map, Scan ear tag, Search. Pen map uses the saved room layout through the [pen-map contract](../../ux/model/pen-map-contract.md) and the shared [PenMap](../../ux/design-system/components/PenMap/README.md): a room with one pen or none has no map entry; a map more than two screens tall offers Whole room, then returns to individual pens. The current prototype's 4 × 6 room is sample layout data.
 - Find a sow (a full page that searches every unit) and Scan ear tags (a full page, always listening, that collects scanned sows). A sow in any unit opens her farrowing drawer.
 - The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.
 - Death entry (piglets and the sow), Undo of the last save (during and after Finish), the Farrowing log.

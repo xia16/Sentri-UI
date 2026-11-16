@@ -63,9 +63,9 @@ Built on the shared PenMap component. Owner design, chosen over mockup rounds on
 Every fact the map could show, per pen and per state:
 - Header: the title, `Pen map`, and one header line, the colour key: the pens that need her and the pens farrowing now, each a count with its swatch. Owner ruling, 2026-10-14: a surface whose body is colour-coded may use its colour key as the header line (plain text, never tappable, one line at 360 in EN and ZH, the only header line). It is an exception to the three tests of the Headers law; it is named here with its question.
 - The entrance band, saying which end of the map is the door.
-- The map: column letters, row numbers, one tile per pen with its pen code. The tile's colour is its status.
+- The map: one tile per pen with its code and status colour, arranged from the room layout as the worker meets the pens from the main door. Letter lanes and uniform pens keep the column letters and row numbers. Mixed pen sizes keep each lane in its own column, with tile height showing relative pen length; rows across the room appear before or after the lanes, and lane A may be on either side. The room shape comes from the [pen-map contract](../../ux/model/pen-map-contract.md), not the task's status data.
 - Peek (hold a tile): the pen code and its sow count, and for each sow her ear tag, state word and figure.
-- Footer: Back; and, only when a row has more than 20 pens, the range control (`1–20`, `21–40`…).
+- Footer: Back; when the map is more than two screens tall, Whole room beside Back. Whole room groups neighbouring pens of the same run into shared tiles with a status mark per pen; tapping one returns to pen by pen at that group. A one-pen or open room has no Pen map entry.
 - Could have shown and does not: a fact line in every tile (Active, Overdue, Due today, N born, No sows, No match), a sow count per tile, the ear tags, the unit name, a count of empty pens, a ring on the current pen, the current pen number on the dock's Pen map button (2026-10-17: the button is the icon and the label), an intro line ("Tap a pen to go to its pigs. Hold to peek."), a note about the layout, the filter in force.
 
 ## Questions
@@ -88,8 +88,8 @@ Every fact the map could show, per pen and per state:
 | White tile with a line | **Settled** | Which pens have sows shown in the current tab and filter. |
 | Quiet empty tile (disabled) | **Settled** | Which pens have nothing to go to. No text but the pen code. |
 | `Entrance` band | **Settled** | Which end of the map is the door (pen 1 is nearest it, at the top). |
-| Column letters and row numbers | **Settled** | Which lane and which row. Muted, 13px mono, on the tint. |
-| Range buttons (`1–20`…) | **Watch** | Where in a long row am I, and how do I jump? Only when a row has more than 20 pens. |
+| Column letters and row numbers, when sizes align | **Settled** | Which lane and which row. In a mixed-size room the pen codes carry the numbers and the row-number column goes. |
+| Whole room / Pen by pen | **Watch** | Where are the pens in a room more than two screens tall? One zoom out, then back to individual pens; no range buttons. |
 | Peek: pen code and sow count (`B3 · 2 sows`) | **Settled** | Which pen is this, and how many sows does the list show in it? |
 | Peek: ear tag, state word and figure (`000418 · Overdue · 2 days`) | the animal row's own levels | Who is in it, and does anyone need me? The same words and levels as the room list (`sowFacts`). |
 
