@@ -15,6 +15,9 @@
         "inspection.animal-types",
         "inspection.filters",
         "inspection.go-to-pen",
+        "inspection.go-to-pen-long",
+        "inspection.go-to-pen-whole",
+        "inspection.walk-single",
         "inspection.pen-landed",
         "inspection.pen-landed-plain",
         "inspection.search",
@@ -344,6 +347,11 @@
       "inspection.farrowing-pen-fault",
       "inspection.farrowing-pen",
       "Report fault or Back"
+    ],
+    [
+      "inspection.go-to-pen-long",
+      "inspection.go-to-pen-whole",
+      "tap Whole room"
     ]
   ],
   "screens": [
@@ -459,12 +467,12 @@
           },
           {
             "name": "Dock",
-            "shows": "Pen map, Scan ear tag, Search; or the selection",
+            "shows": "Pen map when the layout has several pens, Scan ear tag, Search; or the selection.",
             "states": [
               {
                 "state": "Nothing selected",
                 "when": "No pig or pen ticked",
-                "shows": "Pen map (a framed button: the grid icon and \"Pen map\", as Farrowing's room), Scan ear tag, Search"
+                "shows": "Pen map (a framed button) when the layout has several pens; Scan ear tag and Search. One-pen and open rooms omit Pen map."
               },
               {
                 "state": "Selection",
@@ -830,7 +838,7 @@
       ],
       "figma": "",
       "notes": {
-        "purpose": "Jump to a pen by where it is, not by scrolling the walk: a map of the unit, one tile per pen, coloured by the pigs the walk list shows in it. It is the design system's PenMap, as Farrowing's Pen map; drawn as seen from the door, pen 1 nearest the entrance, at the top.",
+        "purpose": "Find a pen by its position in the saved unit layout and see the status of the pigs shown in the walk list. The 4 × 6 view is sample data; long and mixed rooms use the same PenMap.",
         "elements": [
           {
             "name": "Colour key",
@@ -867,7 +875,7 @@
               },
               {
                 "state": "Empty",
-                "when": "No pen there, or no pigs in it",
+                "when": "A pen in the layout has no pigs",
                 "shows": "quiet tile on the well, muted code, disabled"
               },
               {
@@ -881,10 +889,22 @@
             "source": "inspection-astra-concept.js penMapSheet(), penLevels(); ux/design-system/components/PenMap/README.md"
           },
           {
+            "name": "Room layout",
+            "at": "Entrance",
+            "shows": "The door is at the top; uniform lanes use letter columns and numbered rows. Mixed pen sizes use relative tile heights and a separate row before or after the lanes.",
+            "logic": "The host passes the saved layout’s lanes, runs, sizes, rows, door orientation and standalone pens to PenMap; the walk supplies status levels separately."
+          },
+          {
             "name": "Peek",
             "at": "C2",
             "shows": "The pen code and its pig count, then the pen's rows as the walk draws them (ID over the stage line, condition tags; the group of pigs without tags after the struck tag), the most urgent first, at most four, then \"+N more\".",
             "rule": "Hold a tile 350 ms; read-only. Moving more than 12 px, scrolling or lifting hides it; the tap after a peek only closes it."
+          },
+          {
+            "name": "Whole room",
+            "at": "Whole room",
+            "shows": "A secondary button beside Back only when the map is more than two screens tall; it reads Pen by pen in the grouped view.",
+            "rule": "Shared tiles group neighbouring pens in one run and keep each pen’s status mark. Tap a shared tile to return to its first individual pen; the host leaves these taps to PenMap."
           }
         ],
         "controls": [],
@@ -896,9 +916,53 @@
         "edge": [
           "The lens and the filter stay on: a pen whose pigs they hide is drawn empty and cannot be opened; the walk list gives the way back (another lens, or Clear)."
         ],
-        "issues": [
-          "Same four-column, six-row layout as Farrowing's; the positions are sample positions, not the unit's real layout."
-        ]
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.go-to-pen-long",
+      "name": "Pen map · long room",
+      "zh": "栏位图 · 长房间",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus&penmap=long",
+      "preset": "walk",
+      "figma": "",
+      "notes": {
+        "purpose": "A four-lane, 50-pen room keeps individual tiles at glove size and adds Whole room beside Back.",
+        "issues": []
+      },
+      "steps": [
+        ".dock-map"
+      ]
+    },
+    {
+      "id": "inspection.go-to-pen-whole",
+      "name": "Pen map · Whole room",
+      "zh": "栏位图 · 整栋",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus&penmap=long",
+      "preset": "walk",
+      "figma": "",
+      "notes": {
+        "purpose": "The room in one view, with amber, white and quiet status marks in each shared tile; no blue or checked state.",
+        "issues": []
+      },
+      "steps": [
+        ".dock-map",
+        ".st-pen-whole-toggle"
+      ]
+    },
+    {
+      "id": "inspection.walk-single",
+      "name": "Walk · one pen",
+      "zh": "巡检 · 单栏",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus&penmap=single",
+      "preset": "walk",
+      "figma": "",
+      "notes": {
+        "purpose": "One-pen unit: the walk list is the place view and the dock has no Pen map entry.",
+        "issues": []
       }
     },
     {

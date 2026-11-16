@@ -977,4 +977,4 @@ Inspection's pen list and its No tags row (Row · select-door with a count), the
 
 ## Self-crit
 
-Pending final renders after the approved canvas is built. The 4 × 6 face must remain as strong; the longer room must expose Whole room and return to individual pens without changing sow facts or landing.
+After the owner agreed to the offline canvas on 2026-11-16, the built 4 × 6 map was byte-identical to its canvas baseline at 390 EN. The long room exposes Whole room, its shared B1–10 tile returns to B1, and the mixed room gives group pens taller tiles and row C after the lanes. The one-pen room has no Pen map entry. The host interaction test checks that Whole room survives the host click handler and that a pen tap still lands in the list. Forty atlas shots across the two features at 390/360, EN/ZH rendered successfully; Farrowing's colour key and sow levels stayed with the room data.

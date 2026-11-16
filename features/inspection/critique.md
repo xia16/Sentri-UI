@@ -348,4 +348,4 @@ Unchanged: each screen shows the same information in the same order as on main, 
 
 ## Self-crit
 
-Pending final renders after the approved canvas is built. The long-room view must preserve Inspection's status mapping and leave the current 4 × 6 face unchanged.
+After the owner agreed to the offline canvas on 2026-11-16, the built 4 × 6 map remained visually the same. The long room adds Whole room, and shared tiles keep amber/white/quiet marks without a blue or checked state; a shared C1–10 tile returns to C1. A one-pen walk omits the map entry. Forty atlas shots across the two features at 390/360, EN/ZH rendered successfully. The Chinese map title and legend exposed an old host translation collision during review; the host now supplies 栏位图 and 需处理 directly, and the 360px Chinese Whole room shot reads correctly.
