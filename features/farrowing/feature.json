@@ -70,6 +70,11 @@
       "farrowing.history",
       "farrowing.filter",
       "farrowing.pen-map",
+      "farrowing.pen-map-long",
+      "farrowing.pen-map-whole",
+      "farrowing.pen-map-group",
+      "farrowing.pen-map-mixed",
+      "farrowing.room-single",
       "farrowing.pen-landed",
       "farrowing.pen-landed-live",
       "farrowing.pen-landed-plain",
@@ -817,6 +822,16 @@
       "farrowing.history",
       "farrowing.details",
       "Back (opened from Details)"
+    ],
+    [
+      "farrowing.pen-map-long",
+      "farrowing.pen-map-whole",
+      "tap Whole room"
+    ],
+    [
+      "farrowing.pen-map-whole",
+      "farrowing.pen-map-group",
+      "tap a shared tile"
     ]
   ],
   "screens": [
@@ -1010,16 +1025,21 @@
           },
           {
             "name": "Dock",
-            "shows": "Pen map (left, framed), Scan ear tag (primary), Search (icon only).",
+            "shows": "Pen map (left, framed) when the room has more than one pen; Scan ear tag (primary); Search (icon only).",
             "states": [
               {
-                "state": "Pen map tile",
-                "when": "Each A–D × 1–6 pen in the Pen map sheet",
-                "shows": "One-word fact: \"Active\" / \"2 active\"; else \"Overdue\" / \"2 overdue\"; else \"N born\" when all finished; else \"Due today\" or the due text without \"Due\" (\"Tomorrow\", \"In 2 days\"); \"No match\" (the pen has sows, none pass the view, disabled); \"No sows\" (not in the task, disabled). One line, never wraps. A disabled tile stays readable: ink name, muted word, quiet surface."
+                "state": "Several pens",
+                "when": "The saved room layout has more than one pen",
+                "shows": "A framed Pen map button; its map follows that layout."
+              },
+              {
+                "state": "One pen or open room",
+                "when": "The layout has one pen or none",
+                "shows": "No Pen map button; the room list is the place view."
               }
             ],
-            "rule": "Pen map: tap goes to the pen, the list already placed under the sheet as it slides away (180ms), and the pen's header takes the tapped tile's colour (a white tile: a 2px ink ring), held 0.9 s and faded by 1.6 s; hold 0.35 s peeks at its sows. The tab bar and filter line stay stuck at the top while the list scrolls. Scan ear tag opens Scan ear tags, a full page where the reader is always listening; the Search icon opens Find a sow, a full page that searches every unit.",
-            "source": "farrowing-astra-concept.js room() dock, penFact(), roomAfterRender(), scroll handler",
+            "rule": "Pen map: tap a tile to settle the room list on that pen; its header takes the tile colour (a white tile gets a 2px ink ring), held 0.9 s and faded by 1.6 s. Hold 0.35 s for a peek. The tab bar and filter line stay stuck above the list. Scan ear tag opens its listening page; Search opens Find a sow across units.",
+            "source": "farrowing-astra-concept.js room(), penMapSheet(), roomAfterRender(); ux/design-system/components/PenMap/README.md",
             "at": "Pen map"
           }
         ],
@@ -3308,7 +3328,7 @@
       ],
       "figma": "",
       "notes": {
-        "purpose": "Jump to a pen by where it is, not by scrolling the list: a map of the room, one tile per pen, coloured by the status of the sows the list shows in it. It is drawn as seen from the door: pen 1 is nearest the entrance, at the top.",
+        "purpose": "Find a pen by its position in the saved room layout and see the status of the sows shown in the room list. The 4 × 6 view is sample data; longer and mixed rooms use the same PenMap.",
         "elements": [
           {
             "name": "Colour key",
@@ -3364,29 +3384,113 @@
                 "shows": "the empty face, disabled (screen reader: no sows match)"
               }
             ],
-            "logic": "A pen takes the loudest level among the sows the room list currently shows in it, from the same levels as the animal row (the room list’s sowFacts level); there is no second mapping. The facts follow the current tab and filter, so the same pen can change colour between Active and All. The layout is fixed and independent of both.",
+            "logic": "A pen takes the loudest level among the sows the room list currently shows in it, from the same levels as the animal row (the room list’s sowFacts level); there is no second mapping. The facts follow the current tab and filter, so the same pen can change colour between Active and All. The saved room layout is independent of both.",
             "rule": "Tap goes to the room list with that pen pinned just under the sticky tab row; its tint fades within 900 ms. Hold 350 ms for a peek (below). Empty and no-match tiles cannot be opened. There is no current-pen marker: the map opens scrolled so the pen at the top of the room list (also named on the dock) is in view, centred.",
             "source": "farrowing-astra-concept.js penMapSheet(), room-pen; ux/design-system/components/PenMap/README.md"
           },
           {
             "name": "Entrance band",
             "at": "Entrance",
-            "shows": "Which end of the map is the door. Letters are always the columns and numbers the rows, so the map uses the phone’s height.",
-            "logic": "Column letters stick to the top and row numbers to the left as the map scrolls. A room too wide to fit tiles of 56 px scrolls sideways and the tiles never shrink; a row of more than 20 pens adds range buttons beside Back that follow the map’s scroll and jump to a range. This room (4 by 6) never needs either; they are shown on the PenMap component page."
+            "shows": "The main door and the direction the worker meets the pens. Uniform lanes keep letters above and row numbers beside the tiles; mixed sizes stack each lane, and a row across the room sits before or after the lanes.",
+            "logic": "The host passes the saved layout’s lanes, runs, sizes, rows, door orientation and standalone pens to PenMap. Tiles stay at least 56 px wide; a wide room scrolls sideways. The current 4 × 6 view is one sample room."
           },
           {
             "name": "Peek",
             "at": "B3",
             "shows": "A white card over the lower part of the map, clear of the footer: the pen code and its sow count, then each shown sow’s ear tag, state word and figure, as in the room list.",
             "rule": "Hold a tile 350 ms; read-only. Moving more than 12 px, scrolling or lifting hides it. The tap after a peek only closes it and does not go to the pen. When the held tile sits where the card would be, the card shows over the upper part of the map instead."
+          },
+          {
+            "name": "Whole room",
+            "at": "Whole room",
+            "shows": "A secondary button beside Back only when the map is more than two screens tall. It changes to Pen by pen while the room is shown whole.",
+            "rule": "Whole room groups neighbouring pens from the same run into shared tiles. Each tile keeps status marks in pen order; tap a group to return to its first individual pen. Pen by pen returns to the previous map position. The host leaves these taps to PenMap."
           }
         ],
         "edge": [
           "A pen hidden by the tab or filter stays on the map in the empty face and cannot be opened; the room list gives the way back (another tab, or Clear in the filter summary)."
         ],
-        "issues": [
-          "The prototype draws every room as 4 lanes by 6 rows. A barn with a longer row (range buttons, sideways scroll) is shown on the PenMap component page only."
-        ]
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.pen-map-long",
+      "name": "Pen map · long room",
+      "zh": "栏位图 · 长房间",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus&penmap=long",
+      "preset": "room",
+      "figma": "",
+      "notes": {
+        "purpose": "Individual 56 px pen tiles in a four-lane, 50-pen room; Whole room appears beside Back.",
+        "issues": []
+      },
+      "steps": [
+        ".dock-map"
+      ]
+    },
+    {
+      "id": "farrowing.pen-map-whole",
+      "name": "Pen map · Whole room",
+      "zh": "栏位图 · 整栋",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus&penmap=long",
+      "preset": "room",
+      "figma": "",
+      "notes": {
+        "purpose": "The long room in one view: shared tiles carry ordered status marks and Pen by pen returns to the prior position.",
+        "issues": []
+      },
+      "steps": [
+        ".dock-map",
+        ".st-pen-whole-toggle"
+      ]
+    },
+    {
+      "id": "farrowing.pen-map-group",
+      "name": "Pen map · shared tile opened",
+      "zh": "栏位图 · 返回逐栏",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus&penmap=long",
+      "preset": "room",
+      "figma": "",
+      "notes": {
+        "purpose": "A shared tile returns to individual pens at its first pen, B1.",
+        "issues": []
+      },
+      "steps": [
+        ".dock-map",
+        ".st-pen-whole-toggle",
+        ".st-pen-group[data-from=\"B1\"]"
+      ]
+    },
+    {
+      "id": "farrowing.pen-map-mixed",
+      "name": "Pen map · mixed pens",
+      "zh": "栏位图 · 混合栏位",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus&penmap=mixed",
+      "preset": "room",
+      "figma": "",
+      "notes": {
+        "purpose": "Ten group pens and twelve stalls in each lane use relative tile heights; row C follows the lanes.",
+        "issues": []
+      },
+      "steps": [
+        ".dock-map"
+      ]
+    },
+    {
+      "id": "farrowing.room-single",
+      "name": "Room list · one pen",
+      "zh": "产房列表 · 单栏",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus&penmap=single",
+      "preset": "room",
+      "figma": "",
+      "notes": {
+        "purpose": "One-pen room: the list is the place view and the dock has no Pen map entry.",
+        "issues": []
       }
     },
     {

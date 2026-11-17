@@ -324,3 +324,28 @@ Scope: the words only. At `?lang=zh` these screens read in English where the Ins
 ## Attention budget
 
 Unchanged: each screen shows the same information in the same order as on main, in Chinese. Cut list: nothing is cut.
+
+# PenMap propagation to Inspection (2026-11-16)
+
+## Keep
+
+- The current 4 × 6 walk map, amber/white/quiet colour mapping, peek, and landing cue remain the baseline. Inspection has no blue level or per-pen checked state.
+
+## Problems
+
+- **Major:** the host fixes the map to the 4 × 6 sample, so the current PenMap's long and mixed room rules do not appear on an Inspection screen.
+- **Major:** the generic host click handler redraws the sheet on Whole room, resetting the new component view. The approved canvas shows the failure and correction.
+- **Minor:** the screen metadata and budget omit Whole room and room-shape variants.
+
+## Parts
+
+| Part | Drawn by | Call |
+|---|---|---|
+| Colour key, Entrance, tiles, peek, Whole room | Shared PenMap and Sheet | Keep; pass the sampled room's PenMap props. |
+| Footer Back | Shared PenMapFooter | Keep; remove obsolete range parameters. |
+| Dock Pen map entry | TaskDock | Keep for a room with more than one pen; omit for a one-pen room. |
+| Tap to pen and landing cue | Host plus shared PenMap | Keep; leave Whole room and shared-tile taps to PenMap. |
+
+## Self-crit
+
+After the owner agreed to the offline canvas on 2026-11-16, the built 4 × 6 map remained visually the same. The long room adds Whole room, and shared tiles keep amber/white/quiet marks without a blue or checked state; a shared C1–10 tile returns to C1. A one-pen walk omits the map entry. Forty atlas shots across the two features at 390/360, EN/ZH rendered successfully. The Chinese map title and legend exposed an old host translation collision during review; the host now supplies 栏位图 and 需处理 directly, and the 360px Chinese Whole room shot reads correctly.
