@@ -227,7 +227,7 @@
   }
   /* rowSelectDoor: a list that both selects (a bulk act) and opens. Two sibling targets, none nested: the checkbox (48px hit area,
      the same box as rowSelect) toggles; the door (copy + ›) opens. contentHtml: trusted markup in place of the title/description copy. */
-  function rowSelectDoor({title='',description='',code='',mono=false,wrap=false,tight=false,checked=false,action='select',value='',openAction='open',openValue='',label='',id='',className='',doorClass='',attrs={},strs,args,inputAttrs={},contentHtml='',right=null,contextWidth='',lead='',count=null}={}){
+  function rowSelectDoor({title='',description='',code='',mono=false,wrap=false,tight=false,checked=false,selectDisabled=false,action='select',value='',openAction='open',openValue='',label='',id='',className='',doorClass='',attrs={},strs,args,inputAttrs={},contentHtml='',right=null,contextWidth='',lead='',count=null}={}){
     const o={strs,args},c=rowCopy({title,description,code,mono,tight,o});
     const an=right?animalBody({code,description,right,contextWidth,tight,o}):null;
     /* Group (an Animal row for animals without an ID, owner 2026-10-18): a lead glyph before the name, the tags on the line under it,
@@ -235,7 +235,7 @@
     if(an&&lead)an.html=an.html.replace('<strong class="st-animal-id">','<strong class="st-animal-id">'+(root.SentriIcons?root.SentriIcons.icon(lead):''));
     const countHtml=count?`<label class="st-row-count"${count.idle?' data-idle=""':''}><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" value="${esc(String(count.value??''))}"${safeAttr(count.attrs||{})}></label>`:'';
     const copy=contentHtml||(an?an.html:'')||`${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>`;
-    return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door"${an?` data-animal="${an.kind}"`:''}${count?' data-group=""':''} data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><label class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${safeAttr(inputAttrs)}></label><button type="button" class="st-row-door ${esc(doorClass)}" data-action="${esc(openAction)}" data-value="${esc(openValue)}"${label?` aria-label="${esc(label)}"`:''}>${copy}<span class="st-row-chevron">${arrow}</span></button>${countHtml}</div>`;
+    return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door"${an?` data-animal="${an.kind}"`:''}${count?' data-group=""':''} data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><label class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${selectDisabled?' disabled':''}${safeAttr(inputAttrs)}></label><button type="button" class="st-row-door ${esc(doorClass)}" data-action="${esc(openAction)}" data-value="${esc(openValue)}"${label?` aria-label="${esc(label)}"`:''}>${copy}<span class="st-row-chevron">${arrow}</span></button>${countHtml}</div>`;
   }
   function rowSelectChange(ev){
     const t=ev&&ev.target;

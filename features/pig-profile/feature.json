@@ -717,7 +717,7 @@
       "notes": {
         "purpose": "Everything a worker can do to one pig, in a menu drawer over her record: the everyday verbs (Health, Routine) as one grid of icon tiles, then Production as described rows. The same drawer opens for several pigs (inspection.actions).",
         "states": [
-          "Opened from Farrowing (embedded): rows added by Farrowing are mixed in (piglet processing, piglet deaths, reconcile count, foster, edit litter, sow death, remove from batch, mark not in pig, transfer)."
+          "Opened from Farrowing (embedded): Farrowing adds Piglet processing (Care and identity), the shared Record dead flow, Foster, sow death, remove from batch, mark not in pig and transfer. Reconcile remains visible but greyed until Count has an approved destination; Edit litter was removed."
         ],
         "elements": [
           {

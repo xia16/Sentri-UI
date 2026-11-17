@@ -42,7 +42,7 @@
 | Scan → Not in pig (substituted reader tag) | `farrowing.scan-read` | `farrowing.scan-read` | history · 000392 · not-in-pig | ✓ |
 | Scan → Removed from batch (substituted reader tag) | `farrowing.scan-read` | `farrowing.scan-read` | history · 000392 · removed | ✓ |
 | Scan → Aborted without a live piglet (substituted reader tag) | `farrowing.pig-not-in-task` | `farrowing.pig-not-in-task` | roomPig · 000392 | ✓ |
-| Scan → sow died with no piglets (substituted reader tag) | `farrowing.pig-gone` | `farrowing.pig-not-in-task` | roomPig · 000399 | 差异 |
+| Scan → sow died with no piglets (substituted reader tag) | `farrowing.pig-gone` | `farrowing.pig-gone` | roomPig · 000399 | ✓ |
 | Scan → sow → Back still listening | `farrowing.scan` | `farrowing.scan` | roomScan · 000431 | ✓ |
 | Scan without reader | `farrowing.scan-no-reader` | `farrowing.scan-no-reader` | roomScan · 000418 | ✓ |
 | Scan stopped | `farrowing.scan-stopped` | `farrowing.scan-stopped` | roomScan · 000418 | ✓ |
@@ -52,16 +52,26 @@
 | Farrowing Actions → Note | `farrowing.note` | `farrowing.note` | marker · 000418 | ✓ |
 | Farrowing Actions → Piglet processing | `farrowing.piglet-care` | `farrowing.piglet-care` | pigletCare · 000418 | ✓ |
 | Farrowing Actions → Foster | `farrowing.foster` | `farrowing.foster` | foster · 000418 | ✓ |
-| Farrowing Actions → Reconcile | `farrowing.reconcile` | `farrowing.reconcile` | countReconcile · 000418 | ✓ |
+| Farrowing Actions → Reconcile unavailable | `farrowing.sow-actions` | `farrowing.sow-actions` | profile · 000418 | ✓ |
 | Finished Actions → Note | `farrowing.note` | `farrowing.note` | marker · 000418 | ✓ |
 | Finished Actions → Piglet processing | `farrowing.piglet-care` | `farrowing.piglet-care` | pigletCare · 000418 | ✓ |
 | Finished Actions → Foster | `farrowing.foster` | `farrowing.foster` | foster · 000418 | ✓ |
-| Finished Actions → Reconcile | `farrowing.reconcile` | `farrowing.reconcile` | countReconcile · 000418 | ✓ |
+| Finished Actions → Reconcile unavailable | `farrowing.sow-actions` | `farrowing.sow-actions` | profile · 000418 | ✓ |
+| Sow died Actions → Note | `farrowing.note` | `farrowing.note` | marker · 000418 | ✓ |
+| Sow died Actions → Reconcile unavailable | `farrowing.sow-actions` | `farrowing.sow-actions` | profile · 000418 | ✓ |
+| Sow died Actions → piglet actions unavailable | `farrowing.sow-actions` | `farrowing.sow-actions` | profile · 000418 | ✓ |
+| Farrowing Actions → Piglet records → Record dead | `farrowing.death-selected` | `farrowing.death-selected` | death · 000418 | ✓ |
+| Finished Actions → Piglet records → Record dead | `farrowing.death-selected` | `farrowing.death-selected` | death · 000418 | ✓ |
+| Farrowing selected death → visit draft | `farrowing.count-draft` | `farrowing.count-draft` | count · 000418 | ✓ |
+| Farrowing selected death → Save visit | `farrowing.count-saved` | `farrowing.count-saved` | count · 000418 | ✓ |
+| Finished selected death → Save directly | `farrowing.piglet-care` | `farrowing.piglet-care` | pigletCare · 000418 | ✓ |
+| Piglet identity requires tag or notch | `farrowing.piglet-identity` | `farrowing.piglet-identity` | pigletEdit · 000418 | ✓ |
 | Finished record → Piglets | `farrowing.piglets` | `farrowing.piglets` | pigletList · 000418 | ✓ |
 | Sow died record → Piglets | `farrowing.piglets` | `farrowing.piglets` | pigletList · 000418 | ✓ |
+| Sow died record → Record dead | `farrowing.death` | `farrowing.death` | death · 000418 | ✓ |
 | Farrowing record → Details → log | `farrowing.history` | `farrowing.history` | history · 000418 | ✓ |
 | Finished record → Details → log | `farrowing.history` | `farrowing.history` | history · 000418 | ✓ |
 | Task overview → End task blocked | `farrowing.task-blocked` | `farrowing.task-blocked` | roomEndTask · 000418 | ✓ |
-| Task outcomes preset → End task | `farrowing.task-outcomes` | `farrowing.task-ready` | roomEndTask · 000418 | 差异 |
+| Task outcomes preset → End task | `farrowing.task-outcomes` | `farrowing.task-outcomes` | roomEndTask · 000418 | ✓ |
 
-共 59 条，57 条对齐，2 条差异。详情和可重跑结果见 [route-results.json](route-results.json)。
+共 69 条，69 条对齐，0 条差异。详情和可重跑结果见 [route-results.json](route-results.json)。

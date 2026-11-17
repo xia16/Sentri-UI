@@ -7,7 +7,7 @@ later rules for the other pages. Farrowing and Inspection remain **in-design**.
 Historic rulings are retained as history; the dated later decision wins where
 they conflict.
 
-The second pass starts from [all 71 Farrowing screens and their entrances](page-entry-matrix.md), including PR 317's five PenMap states. It compares both Home ways in, the `anchor` status/any/Find and scan bands, all 134 declared `flow` edges, the current prototype and shared components. Every screen was replayed at 390 × 844 ([render evidence](entry-render-results.json)); the independent [route matrix](route-matrix.md) follows actual Home, Room, status, Find, Scan, Actions, Piglets and End task controls. A passed current-prototype route does not prove that its older metadata or product rule is still correct.
+The baseline inventory had 71 Farrowing screens and 134 internal flow edges, including PR 317's five PenMap states. It compared both Home ways in, the `anchor` status/any/Find and scan bands, the current prototype and shared components. After synchronization, the [page and entrance matrix](page-entry-matrix.md) has 69 screens, 156 flow edges and two Home entries. Every screen was replayed at 390 × 844 ([render evidence](entry-render-results.json)); the independent [route matrix](route-matrix.md) follows real Home, Room, status, Find, Scan, Actions, Piglets and End task controls. A passed prototype route alone cannot establish that older metadata or product rules are current, so both were updated.
 
 ## Differences found before synchronization
 
@@ -29,21 +29,25 @@ The second pass starts from [all 71 Farrowing screens and their entrances](page-
 
 ## Component propagation checked
 
-- PR 315's greyed `Row · Tile` and white Stepper/Panel card are already used by the current sow Actions, Record dead, Report death, Foster Send and Reconcile screens.
-- PR 314's `Panel · Note` is present on pen notes, but not on the sow Note (difference 5).
-- PR 310's `Row` select face is used by Piglets, but not by the older Piglet records (difference 4).
-- The component card text itself has older references: `Row/README.md` still gives "to allocate" as an act-now sow example; `Stepper/README.md` mentions six causes and a live-count correction although the current death list has seven causes and the correction door was removed. `ChoiceList/README.md` still names Edit finish details. These are documentation updates, not component approval upgrades.
-- PR 317's PenMap canvas was agreed by the owner on 2026-11-16 and its branch is combined here. The long, Whole room, shared-tile, mixed-size and one-pen states are now the PenMap source for Farrowing and Inspection. Their Atlas runtime IDs have been synchronized with their screen bindings; the shared component's interaction remains the same.
-- Home's two Farrowing entries were checked against `features/farrowing/feature.json`, `ux/system/home-astra-prototype.js` and actual entrance scenarios; both land on the room list. Room's Awaiting/Active/Done/Sow died rows, Find's same-/other-unit and generic-pig results, Scan's single-action read/back states, PenMap and the current Row/Stepper surfaces were rechecked against the merged version. The live PenMap landing frames are visually correct; the three runtime IDs return to Room because they are transient, not a separate page.
+- PR 315's greyed Actions rows and white Stepper/Panel card remain the baseline. Reconcile now stays greyed in place; its obsolete write form is removed.
+- PR 314's message-style `Panel · Note` and 7-day `Show for` Stepper now appear on the sow Note for Farrowing, Finished and Sow died, as on pen notes. Back keeps the note and duration drafts.
+- PR 310's `Row` select face now appears on Piglet records. The shared `rowSelectDoor` gained `selectDisabled` so a dead piglet's checkbox is disabled while the identity door still opens. The Row card records that contract; the Row, Stepper, ChoiceList and Lookup card examples were brought up to date.
+- PR 317's PenMap canvas was agreed by the owner on 2026-11-16 and its branch is combined here. The long, Whole room, shared-tile, mixed-size and one-pen states are now the PenMap source for Farrowing and Inspection. Their Atlas runtime IDs match their screen bindings. Three landing frames correctly return to Room after the animation.
 
-## Review boundary
+## Agreement and synchronization result
 
-The [consistency canvas](canvas.html) pairs current screens with the approved/current counterpart or a proposed use of the shared part. Items 3–7, 9 and 10 affect product semantics, status access or cross-feature ownership; the canvas keeps their questions visible with a recommendation. The owner has agreed to the separate [PenMap canvas](../penmap-sync-round/canvas.html), so its prototype, Atlas and screen metadata changes are included. The other proposed prototype, Atlas and screen-binding changes await agreement on the consistency canvas.
+The owner agreed to the [consistency canvas](canvas.html) on 2026-11-17 and chose to keep Care and identity at **Sow record → Actions → Piglet processing** for this round. The separate pen-by-pen Piglet processing task remains **in-design**; its broader ownership is not promoted here. The dead sow's Actions still greys piglet production rows under PR 315, while her record opens Piglets and Record dead. The cross-task search/scan ownership question stays in `review/populate-farrowing.json`.
 
-## Synchronization status
-
-| Completed in the combined branch | Waiting for consistency canvas agreement |
+| Difference | Synchronized result |
 |---|---|
-| PenMap propagation in Farrowing and Inspection, including its five new Farrowing screen states and the runtime ID binding | Actions replay steps and the remaining screen/flow metadata (#1, #2, #7–#13), including Scan of a dead sow with no live piglets reporting `pig-gone` |
-| Current-rule and historical-round notes in Farrowing, Fostering and Pig profile PRDs; Fostering placeholder references and review copy | Farrowing's two invalid `foster-count` screen targets (#7), one Note composition and duration across sow states (#5), one Piglets/care ownership path (#4), and one death flow with seven-cause metrics (#3) |
-| Row, Stepper, ChoiceList and Lookup component-card copy corrected against live users | Reconcile/Count destination (#6), outcome example (#9), and retiring the orphaned Death breakdown (#10) |
+| #1, #13 · wrong sow Actions binding and status placement | Screen steps now start at the sow's Actions; `anchor` groups shared pages by their real entrances and statuses. |
+| #2 · old Undo rule and graph | PRD, screen notes, scenario authority and flow edges use Details → Farrowing log → top-action Undo → log. |
+| #3 · three death forms and wrong cause slot | Piglet records opens the same seven-cause Record dead flow; selected IDs and no-ID deaths save with the count. Put down and Other have separate slots in End task and receipt metrics. |
+| #4 · different piglet rows and weak identity validation | Piglet records uses shared Row selection and requires tag or notch. Births, deaths, identity and Undo keep identified/without-ID counts aligned. |
+| #5 · old sow Note | Sow Note uses the message-style Panel and 1–60-day Show for control across accessible statuses. |
+| #6 · Reconcile changing locked Born | The old form and route are removed; the Actions row remains greyed until Count has an approved destination. |
+| #7, #8 · Foster target and Pig profile handoff | Invalid `foster-count` destinations now point to `foster-send`; the Fostering placeholder and Pig profile handoff state the current Farrowing path without upgrading their maturity. |
+| #9, #10 · orphaned End task/Death breakdown states | The outcomes preset reaches its own page with no Awaiting sows; Death breakdown is removed because Details carries the causes, and `details-first` has an incoming flow. |
+| #11, #12 · stale Room/Find/Scan copy and flow graph | Current Row/Lookup copy, the gone-pig Scan ID and actual return routes are in the metadata. No flow edge targets a missing Farrowing screen. |
+
+The final [replay](entry-render-results.json) matches all 66 stable page IDs; the other three are correct transient PenMap landing frames. The [69 real entrance checks](route-matrix.md) all align, including 2 Home ways in, status-specific Find/Scan, greyed Actions, selected death save behavior and the task outcome. The branch contains both this round and the approved PenMap propagation in PR 317.

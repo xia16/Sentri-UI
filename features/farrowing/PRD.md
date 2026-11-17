@@ -30,8 +30,10 @@ Later owner decisions below supersede the older quotes and round notes where the
 - Farrowing's single-action Scan opens the status-specific sow record on each read, or the generic pig record for a pig outside this task; it keeps no scanned-sow selection list. Scanning for a batch action is different: Choose pigs ticks each eligible read (2026-10-22).
 - Foster piglets is available from a living sow's Actions and from selected piglets on the dead or finished sow's Piglets list (2026-11-03).
 - The shared Actions sheet keeps unavailable actions visible and greyed in place. Record dead, Report death, Foster Send and Reconcile use the current white-card surfaces (2026-11-09).
+- The 2026-11-17 consistency canvas keeps Care and identity in Sow record → Actions → Piglet processing. Piglet records uses the shared Row selection face; Save identity requires a tag or notch. Its Record dead door opens the same seven-cause death flow as the sow record, carrying selected IDs and a count without ID. During farrowing the deaths join the visit draft; after Finish or sow death they save directly. The separate Piglet processing task remains in-design.
+- Reconcile piglet count stays visible but greyed in Sow Actions while the Count feature has no approved destination. It cannot change a finished litter's Born figure (2026-11-17).
 
-The Piglet processing, Piglet identity, Report mortality and Reconcile pages that still live inside this prototype conflict with parts of this baseline; the entrances and product decisions are recorded in [the consistency audit](consistency-round/audit.md). They are not an additional approval.
+The page-by-page comparison, entrance paths and resolved differences are recorded in [the consistency audit](consistency-round/audit.md).
 
 ## Rules
 
@@ -64,18 +66,19 @@ From RULINGS.md, quoted short:
 In:
 
 - Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Pen map, Scan ear tag, Search. Pen map uses the saved room layout through the [pen-map contract](../../ux/model/pen-map-contract.md) and the shared [PenMap](../../ux/design-system/components/PenMap/README.md): a room with one pen or none has no map entry; a map more than two screens tall offers Whole room, then returns to individual pens. The current prototype's 4 × 6 room is sample layout data.
-- Find a sow (a full page that searches every unit) and Scan ear tags (a full page, always listening, that collects scanned sows). A sow in any unit opens her farrowing drawer.
+- Find a sow (a full page that searches every unit) and single-action Scan ear tags (each read opens the matching record; Stop and Resume control listening). A sow in any unit opens her status-specific Farrowing record.
 - The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.
 - Death entry (piglets and the sow), Undo of the top eligible log action (Finish is the floor), the Farrowing log.
 - Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.
 - Farrowing's rows on the pig's Actions sheet (Record abortion, Mark not in pig).
 - When a sow dies: her record (the finished record, its head band saying she died) and her piglets, Inspection's pen list for one litter, with Foster (the sow picker, then a confirm) and Move (Move's pen picker) on the ticked ones; her row's life after (see Decisions, 2026-11-03).
 - Fostering from a living sow: Foster piglets (Send piglets · Receive piglets, the sow picker, Filter sows) and her piglet list from her record.
+- Sow record → Actions → Piglet processing: Care, Piglet records and tag-or-notch identity entry; Record dead from selected piglets uses the same seven-cause death flow as the sow record.
 
 Out:
 
 - ~~Fostering outside the sow-died case~~ In scope since 2026-11-03 (Decisions).
-- Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision "Piglet processing is drawn in Farrowing and as its own feature".
+- The separate pen-by-pen Piglet processing task and its unresolved feature-wide ownership rules; this Farrowing round keeps the sow Actions entry above without upgrading the separate feature's maturity.
 - The sow page itself and the rest of the Actions sheet (pig-profile).
 - The pen page and its tools (Note, Feed guidance, equipment fault, pen log): Inspection's (owner, 2026-10-22). Farrowing's pen header `›` is the door; the pages Farrowing's prototype draws are mapped under Inspection, in its band "Pen in Farrowing".
 - Console reporting, anomaly queues, per-hand audit views, merge-review UI, notifications.

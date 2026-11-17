@@ -24,28 +24,15 @@
           "farrowing.count-draft",
           "farrowing.count-saved",
           "farrowing.undo",
-          "farrowing.litter",
-          "farrowing.death",
           "farrowing.finish",
-          "farrowing.foster",
-          "farrowing.foster-search",
-          "farrowing.foster-scanning",
-          "farrowing.foster-send",
-          "farrowing.foster-filter",
-          "farrowing.reconcile",
-          "farrowing.piglet-care",
-          "farrowing.piglet-identity",
-          "farrowing.piglet-death"
+          "farrowing.litter"
         ]
       },
       {
         "id": "finished",
         "name": "Finished",
         "screens": [
-          "farrowing.locked",
-          "farrowing.details",
-          "farrowing.details-first",
-          "farrowing.death-breakdown"
+          "farrowing.locked"
         ]
       }
     ],
@@ -54,14 +41,7 @@
         "id": "died",
         "name": "Died",
         "screens": [
-          "farrowing.ended",
-          "farrowing.piglets",
-          "farrowing.piglets-ticked",
-          "farrowing.piglets-actions",
-          "farrowing.piglets-sow",
-          "farrowing.piglets-filter",
-          "farrowing.piglets-confirm",
-          "farrowing.piglets-pen"
+          "farrowing.ended"
         ]
       }
     ],
@@ -80,7 +60,8 @@
       "farrowing.pen-landed-plain",
       "farrowing.today",
       "farrowing.sow-actions",
-      "farrowing.note"
+      "farrowing.note",
+      "farrowing.death"
     ],
     "groups": [
       [
@@ -111,6 +92,33 @@
           "farrowing.batch-missed",
           "farrowing.batch-form",
           "farrowing.batch-saved"
+        ]
+      ],
+      [
+        "Litter recorded · Actions",
+        [
+          "farrowing.piglet-care",
+          "farrowing.piglet-identity",
+          "farrowing.death-selected",
+          "farrowing.foster",
+          "farrowing.foster-search",
+          "farrowing.foster-scanning",
+          "farrowing.foster-send",
+          "farrowing.foster-filter"
+        ]
+      ],
+      [
+        "Finished or Sow died · Piglets",
+        [
+          "farrowing.details",
+          "farrowing.details-first",
+          "farrowing.piglets",
+          "farrowing.piglets-ticked",
+          "farrowing.piglets-actions",
+          "farrowing.piglets-sow",
+          "farrowing.piglets-filter",
+          "farrowing.piglets-confirm",
+          "farrowing.piglets-pen"
         ]
       ]
     ],
@@ -385,23 +393,13 @@
     ],
     [
       "farrowing.foster-send",
-      "farrowing.count",
-      "Send N piglets"
+      "farrowing.sow-actions",
+      "Save Send piglets, returning to sow Actions"
     ],
     [
       "farrowing.foster-send",
       "farrowing.foster",
       "Back"
-    ],
-    [
-      "farrowing.count",
-      "farrowing.reconcile",
-      "More actions, Reconcile piglet count"
-    ],
-    [
-      "farrowing.reconcile",
-      "farrowing.count",
-      "Save, or Back"
     ],
     [
       "farrowing.room",
@@ -644,19 +642,9 @@
       "Piglet records, then Add piglet or a piglet row"
     ],
     [
-      "farrowing.piglet-care",
-      "farrowing.piglet-death",
-      "Piglet records, tick piglets, Report mortality"
-    ],
-    [
       "farrowing.piglet-identity",
       "farrowing.piglet-care",
       "Save identity or Back"
-    ],
-    [
-      "farrowing.piglet-death",
-      "farrowing.piglet-care",
-      "Save mortality or Back"
     ],
     [
       "farrowing.note",
@@ -789,21 +777,6 @@
       "Save"
     ],
     [
-      "farrowing.count-saved",
-      "farrowing.undo",
-      "Undo"
-    ],
-    [
-      "farrowing.undo",
-      "farrowing.count-draft",
-      "Undo: the save comes back unsaved"
-    ],
-    [
-      "farrowing.undo",
-      "farrowing.count-saved",
-      "Back"
-    ],
-    [
       "farrowing.locked",
       "farrowing.details",
       "tap the litter card"
@@ -832,6 +805,151 @@
       "farrowing.pen-map-whole",
       "farrowing.pen-map-group",
       "tap a shared tile"
+    ],
+    [
+      "farrowing.count-saved",
+      "farrowing.litter",
+      "Details after Save"
+    ],
+    [
+      "farrowing.history",
+      "farrowing.undo",
+      "Undo on the top saved action"
+    ],
+    [
+      "farrowing.undo",
+      "farrowing.history",
+      "Undo or Back returns to the log"
+    ],
+    [
+      "farrowing.locked",
+      "farrowing.details-first",
+      "Details on a first litter"
+    ],
+    [
+      "farrowing.piglets",
+      "farrowing.locked",
+      "Back from a finished sow"
+    ],
+    [
+      "farrowing.search-results",
+      "farrowing.pig-not-in-task",
+      "open an out-of-task pig"
+    ],
+    [
+      "farrowing.sow-actions",
+      "farrowing.death",
+      "Record piglet deaths"
+    ],
+    [
+      "farrowing.sow-actions",
+      "farrowing.foster",
+      "Foster piglets"
+    ],
+    [
+      "farrowing.foster",
+      "farrowing.sow-actions",
+      "Back"
+    ],
+    [
+      "farrowing.foster",
+      "farrowing.foster-search",
+      "type sow tag or pen"
+    ],
+    [
+      "farrowing.foster",
+      "farrowing.foster-scanning",
+      "scan receiving sow"
+    ],
+    [
+      "farrowing.foster-search",
+      "farrowing.foster",
+      "clear search"
+    ],
+    [
+      "farrowing.foster-scanning",
+      "farrowing.foster",
+      "stop scan"
+    ],
+    [
+      "farrowing.foster-filter",
+      "farrowing.foster",
+      "Show sows, Reset or Back"
+    ],
+    [
+      "farrowing.foster-send",
+      "farrowing.piglets",
+      "Save after selecting piglets from a finished sow"
+    ],
+    [
+      "farrowing.piglet-care",
+      "farrowing.sow-actions",
+      "Back or Save care"
+    ],
+    [
+      "farrowing.piglet-care",
+      "farrowing.death-selected",
+      "select piglets then Record dead"
+    ],
+    [
+      "farrowing.death-selected",
+      "farrowing.count",
+      "Done joins the current visit"
+    ],
+    [
+      "farrowing.death-selected",
+      "farrowing.piglet-care",
+      "Back or Save after Finish"
+    ],
+    [
+      "farrowing.piglets-ticked",
+      "farrowing.piglets",
+      "clear selection"
+    ],
+    [
+      "farrowing.piglets-actions",
+      "farrowing.piglets-ticked",
+      "Back"
+    ],
+    [
+      "farrowing.piglets-sow",
+      "farrowing.piglets-actions",
+      "Back"
+    ],
+    [
+      "farrowing.search-results",
+      "farrowing.pig-gone",
+      "find a dead sow that left the list"
+    ],
+    [
+      "farrowing.pen-map",
+      "farrowing.pen-landed",
+      "tap a pen; transient highlight"
+    ],
+    [
+      "farrowing.pen-landed",
+      "farrowing.room",
+      "highlight settles on Room"
+    ],
+    [
+      "farrowing.pen-map",
+      "farrowing.pen-landed-live",
+      "tap a pen; transient highlight"
+    ],
+    [
+      "farrowing.pen-landed-live",
+      "farrowing.room",
+      "highlight settles on Room"
+    ],
+    [
+      "farrowing.pen-map",
+      "farrowing.pen-landed-plain",
+      "tap a pen; transient highlight"
+    ],
+    [
+      "farrowing.pen-landed-plain",
+      "farrowing.room",
+      "highlight settles on Room"
     ]
   ],
   "screens": [
@@ -853,7 +971,7 @@
         "elements": [
           {
             "name": "Sow row",
-            "shows": "One row per task sow, grouped under her pen (owner-approved 2026-10-12): the ear tag over 13px muted context on the left, the figure over the state word on the right, weighted by level (act now red with the one \"!\" icon, live bold, coming up ink, settled muted), one chevron. The same row in Scan results (the context leads with the pen, and says only \"Unit 6 · Pen A2\" for a sow in another unit); Find a sow's rows use the same Row with her place on the right instead of her state. It is the design system's Row, animal variant.",
+            "shows": "One shared Row · Animal per sow: tag and context on the left, current figure and state on the right. A dead sow with piglets stays as a settled N piglets row. Find shows the state beside the place; Scan opens one record per read.",
             "states": [
               {
                 "state": "Awaiting · not yet due",
@@ -1069,7 +1187,7 @@
           "(raw) No awaiting sows · No matching sows"
         ],
         "edge": [
-          "A sow with an unsaved Edit draft blocks ending the task, but her row shows nothing about the draft",
+          "An unsaved visit draft blocks ending the task; the room row does not expose it.",
           "Filter that hides every sow: empty state with the filter hint; Clear or Reset recovers"
         ],
         "rules": [
@@ -1226,12 +1344,8 @@
         ],
         "controls": [
           {
-            "control": "Undo",
-            "does": "asks Undo the 09:41 save? (farrowing.undo)"
-          },
-          {
             "control": "Details ›",
-            "does": "opens Details"
+            "does": "opens Details, then Farrowing log; Undo is on the top saved action there"
           }
         ],
         "copy": [
@@ -1272,11 +1386,11 @@
         "controls": [
           {
             "control": "Undo",
-            "does": "the save comes back unsaved (farrowing.count-draft)"
+            "does": "withdraws the top saved action; counts revert and the log keeps a Withdrawn line"
           },
           {
             "control": "Back",
-            "does": "closes the question"
+            "does": "returns to Farrowing log"
           }
         ],
         "copy": [
@@ -1286,8 +1400,7 @@
           "(raw) Back · Undo"
         ],
         "edge": [
-          "Clear after Undo withdraws the save; the log keeps it as Withdrawn",
-          "Saved again after a change: one log line marked Corrected, with Was +3 born alive"
+          "Any worker may repeat Undo on the standing top action down to Finish; it does not return as an unsaved draft."
         ],
         "rules": [
           "No Edit record (owner, 2026-11-02)",
@@ -1415,7 +1528,9 @@
       "notes": {
         "purpose": "Report deaths while she farrows, as a level of her drawer: what died, then how many by cause. The counts join this visit's draft; the sow's own death is recorded here too.",
         "states": [
-          "After Finish or after the sow died: the earlier Record dead drawer (all six causes, saved straight away), unchanged"
+          "During farrowing: seven cause counters join the visit draft.",
+          "After Finish or sow death: Record dead saves the seven causes directly.",
+          "From Piglet processing: selected IDs and additional deaths without ID use this same flow."
         ],
         "elements": [
           {
@@ -1428,7 +1543,7 @@
           {
             "name": "Causes",
             "at": "Crushed",
-            "shows": "Born dead: Stillborn, Mummified. Died after birth: Crushed, Scours, Starve-out, Put down, Other (Put down: owner, 2026-11-03). Each a Stepper from 0.",
+            "shows": "Born dead: Stillborn and Mummified. Died after birth: Crushed, Scours, Starve-out, Put down and Other. Seven slots in total.",
             "logic": "Died after birth stops when it would take Alive below 0 (saved Alive + born drafted).",
             "source": "farrowing-astra-concept.js act(\"deadStep\")"
           },
@@ -1456,6 +1571,41 @@
           "A draft kept on the record reopens here with its counts"
         ],
         "issues": []
+      }
+    },
+    {
+      "id": "farrowing.death-selected",
+      "name": "Record dead · selected piglets",
+      "zh": "已选仔猪死亡记录",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "count",
+      "steps": [
+        "[data-action=\"sowActions\"]",
+        "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
+        "Piglet records",
+        "[data-action=\"togglePiglet\"][data-value=\"418001\"]",
+        "[data-action=\"openMortality\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "The same Record dead flow, reached from Piglet records with selected identified piglets and a count without ID.",
+        "states": [
+          "During farrowing, cause counts join the visit draft.",
+          "After Finish, Record dead saves directly."
+        ],
+        "elements": [
+          {
+            "name": "Selected piglets",
+            "at": "1 identified selected",
+            "shows": "Selected identity and deaths without ID appear above the current cause steppers; saving waits until the causes account for the selected piglets.",
+            "source": "farrowing-astra-concept.js mortalitySelection()",
+            "rule": "At least one after-birth cause must account for every selected piglet; any additional deaths are from the without-ID count. Back discards this draft."
+          }
+        ],
+        "edge": [
+          "Back preserves the Piglet records selection and discards this death draft."
+        ]
       }
     },
     {
@@ -2659,14 +2809,14 @@
         "elements": [
           {
             "name": "Closure card",
-            "shows": "Heading \"Ready to end early\" · N sows; the task's sows as one bar; under it a row per part in the bar's order: Done (light green count, with what else happened: sow deaths, aborted, not in pig, removed earlier), Still farrowing (light blue count, opens the sows), Leave the batch (an outlined count and the amber \"!\" after its title, opens the sows).",
+            "shows": "All sows are Done. The Done row names death and abortion; no Awaiting row remains. The performance card uses all seven death causes.",
             "logic": "Aborted, not in pig and removed-earlier sows count as Done and are named in its line (\"1 sow died · 1 aborted · rest finished\"). Counts: Still farrowing = active, Leave the batch = awaiting, Done = every other sow in the task. Status convention (owner, 2026-11-02): the bar is done-mark · progress-mark · the empty track; a count holds a number, so it is its status's light fill with same-hue ink (done-fill, progress-fill), and waiting is an outline; the \"!\" says ending removes those sows. Red stays for deaths and the destructive hold.",
             "source": "farrowing-astra-concept.js taskClosure()",
-            "at": "Ready to end early"
+            "at": "Ready to end"
           },
           {
             "name": "End task hold",
-            "shows": "Hold button in the bar.",
+            "shows": "Hold End task when every sow is Done.",
             "states": [
               {
                 "state": "Waiting",
@@ -2686,7 +2836,7 @@
             ],
             "logic": "An 850 ms hold commits; a tap does nothing. Red only when ending removes sows from the batch.",
             "source": "farrowing-astra-concept.js hold(), taskEndSheet()",
-            "at": "End task early"
+            "at": "End task"
           },
           {
             "name": "Performance metrics",
@@ -2999,7 +3149,7 @@
           {
             "control": "A sow",
             "does": "opens the count, sending to her",
-            "goesTo": "farrowing.foster-count"
+            "goesTo": "farrowing.foster-send"
           },
           {
             "control": "Scan icon",
@@ -3129,7 +3279,7 @@
           {
             "control": "A read",
             "does": "opens the count for the sow read",
-            "goesTo": "farrowing.foster-count"
+            "goesTo": "farrowing.foster-send"
           }
         ],
         "copy": [
@@ -3166,7 +3316,7 @@
           {
             "control": "Send N piglets",
             "does": "saves both litters; back to her Actions",
-            "goesTo": "farrowing.count"
+            "goesTo": "farrowing.sow-actions"
           },
           {
             "control": "Back",
@@ -3222,43 +3372,6 @@
         "rules": [
           "Owner, 2026-11-03: fostering's filter is the farrowing filter plus Unit."
         ]
-      }
-    },
-    {
-      "id": "farrowing.reconcile",
-      "name": "Reconcile piglet count",
-      "zh": "核对仔猪数",
-      "status": "in-design",
-      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "reconcile",
-      "figma": "",
-      "notes": {
-        "purpose": "Explain a mismatch: count the piglets in the litter and say why it differs from the system count.",
-        "states": [],
-        "elements": [
-          {
-            "name": "Count the piglets in this litter",
-            "shows": "Large - and + keys around the counted number; a warning says how many piglets will be added or removed.",
-            "states": [
-              {
-                "state": "Default",
-                "when": "Value equals what the system holds",
-                "shows": "Number in ink"
-              },
-              {
-                "state": "Changed",
-                "when": "Value differs from the system count",
-                "shows": "Number in amber with the difference written out"
-              }
-            ],
-            "source": "farrowing-astra-concept.js",
-            "at": "Count the piglets in this litter"
-          }
-        ],
-        "controls": [],
-        "copy": [],
-        "edge": [],
-        "issues": []
       }
     },
     {
@@ -3773,7 +3886,7 @@
         "issues": [],
         "purpose": "A read of a sow on the farrowing list opens her farrowing drawer at once, over Scan: Farrowing is a single-action task (owner, 2026-10-22).",
         "states": [
-          "A sow on the list, in this unit or another: her drawer"
+          "A listed sow in this or another unit opens over Scan; an outcome sow may open her Production log."
         ],
         "elements": [
           {
@@ -3836,7 +3949,8 @@
         "purpose": "A read of a pig that died or was sold opens her pig record with that fact first.",
         "states": [
           "Died (\"Died 14 Oct\")",
-          "Sold (\"Sold 2 Oct\")"
+          "Sold (\"Sold 2 Oct\")",
+          "A dead sow with no live piglets has left the list; scanning her reports pig-gone."
         ],
         "elements": [
           {
@@ -3894,16 +4008,16 @@
       "preset": "scan-stopped",
       "figma": "",
       "notes": {
-        "purpose": "Show that scanning is paused, with the list kept, and how to resume.",
+        "purpose": "Show that scanning is paused and how to resume.",
         "states": [
-          "Stopped, nothing ticked: the footer's primary is \"Resume scanning\" (scan glyph); it is the only stopped status"
+          "Stopped: Resume scanning is the only stopped status; Scan has no result or selection list."
         ],
         "elements": [
           {
             "name": "Resume scanning",
             "at": "Resume scanning",
             "shows": "The footer's one full-width button, now primary with the scan glyph.",
-            "rule": "While stopped the reader adds nothing (a scan is ignored). The list and any ticks stay, and ticking still works. Resume scanning listens again.",
+            "rule": "While stopped the reader adds nothing (a scan is ignored). Resume scanning listens again; each eligible read opens that pig's record.",
             "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup), scanAction()"
           }
         ],
@@ -3911,7 +4025,7 @@
           "(raw) Resume scanning"
         ],
         "edge": [
-          "While sows are ticked the footer is the selection bar, so Resume scanning comes back when the last sow is unticked."
+          "While stopped the reader adds nothing; Resume scanning listens again."
         ],
         "rules": [],
         "issues": []
@@ -4285,34 +4399,6 @@
       }
     },
     {
-      "id": "farrowing.death-breakdown",
-      "name": "Death breakdown",
-      "zh": "死亡明细",
-      "status": "in-design",
-      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "locked",
-      "steps": [
-        "Death causes"
-      ],
-      "figma": "",
-      "notes": {
-        "purpose": "The dead piglets of one litter by cause.",
-        "elements": [
-          {
-            "name": "Causes",
-            "at": "Total dead",
-            "shows": "One fact per cause that has a count, then \"Total dead\".",
-            "logic": "The seven causes are Stillborn, Mummified, Crushed, Scours, Starve-out, Put down and Other; a cause with 0 is left out. The total is the same figure as the record's Dead.",
-            "source": "farrowing-astra-concept.js deathBreakdown()"
-          }
-        ],
-        "edge": [
-          "Opened only from the link under the facts of a finished litter, and only while Dead is above zero."
-        ],
-        "issues": []
-      }
-    },
-    {
       "id": "farrowing.today",
       "name": "Today",
       "zh": "今日",
@@ -4354,14 +4440,14 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "count",
       "steps": [
-        "Actions"
+        "[data-action=\"sowActions\"]"
       ],
       "figma": "",
       "notes": {
         "purpose": "All other things to do for one sow, in the More actions drawer opened from her drawer: the everyday verbs as a grid of icon tiles (Note and Transfer come from Farrowing), then Production as described rows grouped by task.",
         "states": [
           "Awaiting (nothing counted): Record abortion, Remove from batch, Mark not in pig, Record sow death, note and transfer are open; the piglet rows are closed.",
-          "Farrowing: the piglet rows and Foster piglets open; Remove from batch and Mark not in pig close.",
+          "Farrowing: Piglet processing, Record piglet deaths and Foster piglets open; Remove from batch and Mark not in pig close. Reconcile remains greyed until Count has an approved destination.",
           "Finished: Record abortion also closes.",
           "Sow died or outcome recorded: most rows close with the reason."
         ],
@@ -4374,7 +4460,7 @@
               {
                 "state": "Record the litter first.",
                 "when": "No piglets recorded yet",
-                "shows": "Closes Piglet processing, Record piglet deaths, Reconcile piglet count"
+                "shows": "Closes Piglet processing and Record piglet deaths; Reconcile is already greyed while Count has no approved destination"
               },
               {
                 "state": "No live piglets recorded.",
@@ -4399,7 +4485,7 @@
               {
                 "state": "This sow has died.",
                 "when": "Farrowing ended by her death",
-                "shows": "Closes abortion, note, transfer, remove, not in pig"
+                "shows": "Closes production actions and transfer on the sow Actions sheet; Note stays available. Her record still opens Piglets and Record dead while live piglets remain."
               },
               {
                 "state": "No destination farrowing batches are connected in this preview.",
@@ -4426,22 +4512,23 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "count",
       "steps": [
-        "Actions",
+        "[data-action=\"sowActions\"]",
         "[data-action=\"sow-host-action\"][data-value=\"marker\"]"
       ],
       "figma": "",
       "notes": {
         "purpose": "Leave the sow a handover note or describe a visible marker (a red line on the shoulder).",
         "states": [
-          "Add note: no current note; the field is empty.",
-          "Edit note: a \"Current note\" card with the text and its stamp, and the field filled with that text."
+          "Add note: message input with Show for 7 days by default.",
+          "Edit note: message-style Panel · Note above the draft; Show for keeps its chosen 1–60 days.",
+          "The same Farrowing note opens from Actions on active, finished and dead sows."
         ],
         "elements": [
           {
             "name": "Save note",
             "at": "Save note",
-            "shows": "Primary action, disabled while the field is empty.",
-            "rule": "A sow keeps one note: Save replaces it and writes \"Note updated · text\" to her history, so the previous text is only in the log. Closed once the sow has died (\"This sow has died.\").",
+            "shows": "Primary action, disabled while empty; a white Show for Stepper chooses 1–60 days.",
+            "rule": "Save replaces the note, records text and display duration in history, and returns to Actions. Back keeps both drafts.",
             "source": "farrowing-astra-concept.js saveMarker"
           }
         ],
@@ -4459,7 +4546,7 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "count",
       "steps": [
-        "Actions",
+        "[data-action=\"sowActions\"]",
         "[data-action=\"sow-host-action\"][data-value=\"piglets\"]"
       ],
       "figma": "",
@@ -4493,11 +4580,10 @@
           }
         ],
         "edge": [
-          "Opens only when a litter has been recorded; otherwise the action is closed with \"Record the litter first.\""
+          "Care and identity stay in the sow Actions entry. Piglet records uses the shared Row select + door used by approved Piglets.",
+          "Record dead here opens the same death flow as the sow record."
         ],
-        "issues": [
-          "A second design of piglet processing: the Piglet processing task feature has its own (see the decision \"Piglet processing is drawn in Farrowing and as its own feature\")."
-        ]
+        "issues": []
       }
     },
     {
@@ -4508,7 +4594,7 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "count",
       "steps": [
-        "Actions",
+        "[data-action=\"sowActions\"]",
         "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
         "Piglet records",
         "Add piglet"
@@ -4524,8 +4610,8 @@
           {
             "name": "Save identity",
             "at": "Save identity",
-            "shows": "Primary action, disabled while all four fields are empty.",
-            "rule": "Enabled as soon as any one of tag, notch, sex or weight has a value. A new identity moves one piglet from \"Without identity\" to \"Identified\" and writes \"Piglet identity added · tag\" to the sow's history; the list then shows the Piglet records tab.",
+            "shows": "Save is disabled until an ear tag or ear notch is entered.",
+            "rule": "Tag or notch identifies the piglet; sex and weight alone cannot save. A new identity moves one piglet out of Without identity.",
             "logic": "Scan tag and Ear notch on the Piglet records tab open this form pre-filled with a sample tag (418001 plus the number identified) or a \"Choose notch\" placeholder.",
             "source": "farrowing-astra-concept.js savePiglet"
           }
@@ -4533,56 +4619,7 @@
         "edge": [
           "Dead piglets stay in the list but cannot be selected."
         ],
-        "issues": [
-          "Save accepts sex or weight alone, so a row can be saved with neither tag nor notch; RULINGS (Piglet processing, Q3) says tag or notch identifies and sex and weight are optional."
-        ]
-      }
-    },
-    {
-      "id": "farrowing.piglet-death",
-      "name": "Report piglet mortality",
-      "zh": "仔猪死亡",
-      "status": "in-design",
-      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "count",
-      "steps": [
-        "Actions",
-        "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
-        "Piglet records",
-        "Report mortality"
-      ],
-      "figma": "",
-      "notes": {
-        "purpose": "Record piglet deaths in one pass: the identified piglets ticked on the Piglet records tab, plus any without identity.",
-        "elements": [
-          {
-            "name": "Unidentified piglets",
-            "at": "Unidentified piglets",
-            "shows": "A stepper, shown only while the litter has piglets without identity.",
-            "logic": "Maximum = the smaller of piglets without identity and alive piglets minus those already ticked. Total to report = ticked piglets + this stepper.",
-            "source": "farrowing-astra-concept.js mortalityCount"
-          },
-          {
-            "name": "Cause",
-            "at": "Cause",
-            "shows": "A picker: Cause unknown, Crushed, Scours, Starve-out, Put down, Other.",
-            "logic": "One cause applies to the whole save (\"Use another pass when the causes differ\"). The litter's counters have six types: Cause unknown is counted under Other, and Stillborn and Mummified are not offered here.",
-            "source": "farrowing-astra-concept.js mortalityCauses, savePigletMortality"
-          },
-          {
-            "name": "Save mortality",
-            "at": "Save mortality",
-            "shows": "Primary action, \"Save mortality · 3\".",
-            "rule": "Disabled until a cause is chosen and the total is above zero. Saving marks the ticked piglets Dead, lowers Alive by the total, adds the total to that cause's dead counter, never lowers Born, and writes \"N piglets died · cause\" (with any photos) to the history.",
-            "source": "farrowing-astra-concept.js savePigletMortality"
-          }
-        ],
-        "edge": [
-          "Reachable with nothing ticked when the litter has piglets without identity (\"0 identified selected\"); Save stays disabled until the stepper or a tick gives a total."
-        ],
-        "issues": [
-          "A third place to record piglet deaths in the same prototype: the sow's Record dead drawer (staged, with Stillborn and Mummified), the Record piglet deaths row on More actions, and this form. RULINGS says \"ONE dead drawer product-wide\"."
-        ]
+        "issues": []
       }
     }
   ]

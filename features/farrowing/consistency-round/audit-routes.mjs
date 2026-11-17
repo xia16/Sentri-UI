@@ -229,27 +229,90 @@ try {
   for (const [state, start] of [['Farrowing', 'count'], ['Finished', 'locked'], ['Sow died', 'ended']]) {
     await check(`${state} record → sow Actions`, 'farrowing.sow-actions', page => tap(page, 'sowActions'), { start });
   }
-  for (const [state, start] of [['Farrowing', 'count'], ['Finished', 'locked']]) {
+  for (const [state, start] of [['Farrowing', 'count'], ['Finished', 'locked'], ['Sow died', 'ended']]) {
     await check(`${state} Actions → Note`, 'farrowing.note', async page => {
       await tap(page, 'sowActions');
       await page.frameLocator('[data-card="0"] iframe.sow-detail-frame').locator('[data-action="sow-host-action"][data-value="marker"]').first().click();
     }, { start, iframe: true });
-    await check(`${state} Actions → Piglet processing`, 'farrowing.piglet-care', async page => {
+    if (state !== 'Sow died') await check(`${state} Actions → Piglet processing`, 'farrowing.piglet-care', async page => {
       await tap(page, 'sowActions');
       await page.frameLocator('[data-card="0"] iframe.sow-detail-frame').locator('[data-action="sow-host-action"][data-value="piglets"]').first().click();
     }, { start, iframe: true });
-    await check(`${state} Actions → Foster`, 'farrowing.foster', async page => {
+    if (state !== 'Sow died') await check(`${state} Actions → Foster`, 'farrowing.foster', async page => {
       await tap(page, 'sowActions');
       await page.frameLocator('[data-card="0"] iframe.sow-detail-frame').locator('[data-action="sow-host-action"][data-value="foster"]').first().click();
     }, { start, iframe: true });
-    await check(`${state} Actions → Reconcile`, 'farrowing.reconcile', async page => {
+    await check(`${state} Actions → Reconcile unavailable`, 'farrowing.sow-actions', async page => {
       await tap(page, 'sowActions');
-      await page.frameLocator('[data-card="0"] iframe.sow-detail-frame').locator('[data-action="sow-host-action"][data-value="countReconcile"]').first().click();
+      const action = page.frameLocator('[data-card="0"] iframe.sow-detail-frame').locator('[data-action="sow-host-action"][data-value="countReconcile"]').first();
+      if (!await action.isDisabled()) throw new Error('Reconcile can still change this litter');
+    }, { start, iframe: true });
+    if (state === 'Sow died') await check('Sow died Actions → piglet actions unavailable', 'farrowing.sow-actions', async page => {
+      await tap(page, 'sowActions');
+      const frame = page.frameLocator('[data-card="0"] iframe.sow-detail-frame');
+      for (const value of ['piglets', 'foster']) {
+        if (!await frame.locator(`[data-action="sow-host-action"][data-value="${value}"]`).first().isDisabled()) throw new Error(`${value} is open on the dead sow's Actions`);
+      }
     }, { start, iframe: true });
   }
+  async function openPigletRecords(page) {
+    await tap(page, 'sowActions');
+    await page.frameLocator('[data-card="0"] iframe.sow-detail-frame').locator('[data-action="sow-host-action"][data-value="piglets"]').first().click();
+    await tap(page, 'pigletTab', 'records');
+  }
+  for (const [state, start] of [['Farrowing', 'count'], ['Finished', 'locked']]) {
+    await check(`${state} Actions → Piglet records → Record dead`, 'farrowing.death-selected', async page => {
+      await openPigletRecords(page);
+      await tap(page, 'togglePiglet', '418001');
+      await tap(page, 'openMortality');
+      const selected = await page.evaluate(() => window.FarrowingStudy.states[0].deathSelected);
+      if (selected?.[0] !== '418001') throw new Error(`selected piglet lost: ${JSON.stringify(selected)}`);
+    }, { start, iframe: true });
+  }
+  await check('Farrowing selected death → visit draft', 'farrowing.count-draft', async page => {
+    await openPigletRecords(page);
+    await tap(page, 'togglePiglet', '418001');
+    await tap(page, 'openMortality');
+    await tap(page, 'deadStep', '2,1');
+    await tap(page, 'doneDeath');
+    const state = await page.evaluate(() => window.FarrowingStudy.states[0]);
+    if (state.pendingMortality?.ids?.[0] !== '418001' || state.piglets[0].state !== 'Alive') throw new Error('visit did not hold the selected identity as a draft');
+  }, { start: 'count', iframe: true });
+  await check('Farrowing selected death → Save visit', 'farrowing.count-saved', async page => {
+    await openPigletRecords(page);
+    await tap(page, 'togglePiglet', '418001');
+    await tap(page, 'openMortality');
+    await tap(page, 'deadStep', '2,1');
+    await tap(page, 'doneDeath');
+    await tap(page, 'saveVisit');
+    const state = await page.evaluate(() => window.FarrowingStudy.states[0]);
+    if (state.piglets[0].state !== 'Dead' || state.alive !== 8 || state.dead[2] !== 3 || state.unidentified !== 6) throw new Error('saved visit has inconsistent piglet identity or count');
+  }, { start: 'count', iframe: true });
+  await check('Finished selected death → Save directly', 'farrowing.piglet-care', async page => {
+    await openPigletRecords(page);
+    await tap(page, 'togglePiglet', '418001');
+    await tap(page, 'openMortality');
+    await tap(page, 'deadStep', '2,1');
+    await tap(page, 'saveDeath');
+    const state = await page.evaluate(() => window.FarrowingStudy.states[0]);
+    if (state.piglets[0].state !== 'Dead' || state.alive !== 7 || state.dead[2] !== 4 || state.unidentified !== 5) throw new Error('direct save has inconsistent piglet identity or count');
+    if (!await page.locator('[data-card="0"] .piglet-roster input[value="418001"]').isDisabled()) throw new Error('dead piglet can still be selected');
+  }, { start: 'locked', iframe: true });
+  await check('Piglet identity requires tag or notch', 'farrowing.piglet-identity', async page => {
+    await openPigletRecords(page);
+    await tap(page, 'addPiglet');
+    await page.locator('[data-card="0"] [data-piglet-field="weight"]').fill('1.4');
+    if (!await page.locator(action('savePiglet')).isDisabled()) throw new Error('weight alone enabled Save identity');
+    await page.locator('[data-card="0"] [data-piglet-field="tag"]').fill('418009');
+    if (await page.locator(action('savePiglet')).isDisabled()) {
+      const debug = await page.evaluate(() => ({ draft: window.FarrowingStudy.states[0].pigletDraft, button: document.querySelector('[data-card="0"] [data-action="savePiglet"]')?.outerHTML }));
+      throw new Error(`tag did not enable Save identity: ${JSON.stringify(debug)}`);
+    }
+  }, { start: 'count', iframe: true });
   for (const [state, start] of [['Finished', 'locked'], ['Sow died', 'ended']]) {
     await check(`${state} record → Piglets`, 'farrowing.piglets', page => tap(page, 'pigletList'), { start });
   }
+  await check('Sow died record → Record dead', 'farrowing.death', page => tap(page, 'death'), { start: 'ended' });
   await check('Farrowing record → Details → log', 'farrowing.history', async page => {
     await tap(page, 'litter');
     await tap(page, 'history');

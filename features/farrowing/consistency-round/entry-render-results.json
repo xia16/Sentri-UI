@@ -70,6 +70,22 @@
     "errors": []
   },
   {
+    "id": "farrowing.death-selected",
+    "name": "Record dead · selected piglets",
+    "preset": "count",
+    "steps": [
+      "[data-action=\"sowActions\"]",
+      "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
+      "Piglet records",
+      "[data-action=\"togglePiglet\"][data-value=\"418001\"]",
+      "[data-action=\"openMortality\"]"
+    ],
+    "current": "farrowing.death-selected",
+    "view": "death",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
     "id": "farrowing.litter",
     "name": "Details · while she farrows",
     "preset": "litter",
@@ -244,9 +260,9 @@
     "name": "End task · production outcomes",
     "preset": "task-outcomes",
     "steps": [],
-    "current": "farrowing.task-ready",
+    "current": "farrowing.task-outcomes",
     "view": "roomEndTask",
-    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 10 / 18 Done · all units Awaiting 4 Active 0 Done 3 All 7 B1 · 1 sow 000418 09:35 · G.H 9 ali",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 18 / 18 Done · all units Awaiting 0 Active 0 Done 7 All 7 B1 · 1 sow 000418 09:35 · G.H 9 ali",
     "errors": []
   },
   {
@@ -273,7 +289,7 @@
     ],
     "current": "farrowing.task-receipt",
     "view": "roomTaskReceipt",
-    "text": "9:41 All units Today Ended tasks Farrowing Task ended · 18 finished View receipt 9:41 Task ended Farrowing · Nov 17 · 16:02 · G.H Performance metrics 18 finished litters Born alive",
+    "text": "9:41 All units Today Ended tasks Farrowing Task ended · 18 finished View receipt 9:41 Task ended Farrowing · Nov 17 · 18:34 · G.H Performance metrics 18 finished litters Born alive",
     "errors": []
   },
   {
@@ -323,16 +339,6 @@
     "steps": [],
     "current": "farrowing.foster-filter",
     "view": "foster",
-    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
-    "errors": []
-  },
-  {
-    "id": "farrowing.reconcile",
-    "name": "Reconcile piglet count",
-    "preset": "reconcile",
-    "steps": [],
-    "current": "farrowing.reconcile",
-    "view": "countReconcile",
     "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
     "errors": []
   },
@@ -677,20 +683,6 @@
     "errors": []
   },
   {
-    "id": "farrowing.death-breakdown",
-    "name": "Death breakdown",
-    "preset": "locked",
-    "steps": [
-      "Death causes"
-    ],
-    "current": "farrowing.locked",
-    "view": "locked",
-    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 9 / 19 Done · all units Awaiting 4 Active 0 Done 3 All 7 B1 · 1 sow 000418 08:12 · G.H 8 aliv",
-    "errors": [
-      "atlas-bare: step not found: Death causes"
-    ]
-  },
-  {
     "id": "farrowing.today",
     "name": "Today",
     "preset": "room",
@@ -707,10 +699,10 @@
     "name": "Actions",
     "preset": "count",
     "steps": [
-      "Actions"
+      "[data-action=\"sowActions\"]"
     ],
-    "current": "farrowing.batch",
-    "view": "roomBatch",
+    "current": "farrowing.sow-actions",
+    "view": "profile",
     "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
     "errors": []
   },
@@ -719,67 +711,40 @@
     "name": "Sow note",
     "preset": "count",
     "steps": [
-      "Actions",
+      "[data-action=\"sowActions\"]",
       "[data-action=\"sow-host-action\"][data-value=\"marker\"]"
     ],
-    "current": "farrowing.batch",
-    "view": "roomBatch",
+    "current": "farrowing.note",
+    "view": "marker",
     "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
-    "errors": [
-      "atlas-bare: step not found: [data-action=\"sow-host-action\"][data-value=\"marker\"]"
-    ]
+    "errors": []
   },
   {
     "id": "farrowing.piglet-care",
     "name": "Piglet processing",
     "preset": "count",
     "steps": [
-      "Actions",
+      "[data-action=\"sowActions\"]",
       "[data-action=\"sow-host-action\"][data-value=\"piglets\"]"
     ],
-    "current": "farrowing.batch",
-    "view": "roomBatch",
+    "current": "farrowing.piglet-care",
+    "view": "pigletCare",
     "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
-    "errors": [
-      "atlas-bare: step not found: [data-action=\"sow-host-action\"][data-value=\"piglets\"]"
-    ]
+    "errors": []
   },
   {
     "id": "farrowing.piglet-identity",
     "name": "Piglet identity",
     "preset": "count",
     "steps": [
-      "Actions",
+      "[data-action=\"sowActions\"]",
       "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
       "Piglet records",
       "Add piglet"
     ],
-    "current": "farrowing.batch",
-    "view": "roomBatch",
+    "current": "farrowing.piglet-identity",
+    "view": "pigletEdit",
     "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
-    "errors": [
-      "atlas-bare: step not found: [data-action=\"sow-host-action\"][data-value=\"piglets\"]",
-      "atlas-bare: step not found: Piglet records",
-      "atlas-bare: step not found: Add piglet"
-    ]
-  },
-  {
-    "id": "farrowing.piglet-death",
-    "name": "Report piglet mortality",
-    "preset": "count",
-    "steps": [
-      "Actions",
-      "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
-      "Piglet records",
-      "Report mortality"
-    ],
-    "current": "farrowing.batch",
-    "view": "roomBatch",
-    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
-    "errors": [
-      "atlas-bare: step not found: [data-action=\"sow-host-action\"][data-value=\"piglets\"]",
-      "atlas-bare: step not found: Piglet records",
-      "atlas-bare: step not found: Report mortality"
-    ]
+    "errors": []
   }
 ]

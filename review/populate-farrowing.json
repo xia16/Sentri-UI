@@ -1,43 +1,16 @@
 [
- {
-  "id": "populate-farrowing-2",
-  "target": { "kind": "feature", "id": "farrowing" },
-  "kind": "decision",
-  "severity": "medium",
-  "title": "Piglet processing is drawn in Farrowing and as its own feature",
-  "detail": "A sow's Actions opens Piglet processing, Piglet identity and Report mortality inside the Farrowing prototype (farrowing.piglet-care, piglet-identity, piglet-death), while a finished or dead sow's record opens the newer Piglets list approved 2026-11-03. The Farrowing PRD puts piglet processing and identity work out of scope, and piglet-processing has its own prototype. The old Piglet records uses a local checkbox instead of the newer Row selection face. Its mortality form offers Cause unknown and a single cause per save, unlike Record dead's seven cause counters; it maps Other and Cause unknown to Put down after that cause was added. RULINGS (Round 10) says per-piglet work may become universal features with a proposal before a decision. The shared-flow ownership question remains open.",
-  "options": [
-   "Retire the Farrowing copies; More actions opens the piglet-processing task for that litter",
-   "Keep the Farrowing copies as the sow-level door and align them with piglet-processing",
-   "Wait for the per-piglet-work proposal, keep both for now"
-  ],
-  "source": "populate batch 3; features/farrowing/PRD.md Scope (Out); ux/research/farrowing/RULINGS.md (Surfaces & entrances; Piglet processing Round 10)"
- },
- {
-  "id": "populate-farrowing-3",
-  "target": { "kind": "feature", "id": "farrowing" },
-  "kind": "decision",
-  "severity": "low",
-  "title": "Search, scan, filter and Go to pen are drawn once per prototype",
-  "detail": "Farrowing's room has its own Find a sow, Scan ear tag, Filter sows and Go to pen sheets (farrowing.search, scan, filter, pen-map). Inspection draws filters, a pen map and find-or-scan (inspection.filters, go-to-pen, find-pig), and Home draws find-pig.search, scan and results. They look alike but are different markup with different content (Farrowing's filter has a due-date slider and parity; its scan is a non-working preview). Each is limited to its own unit's sows.",
-  "options": [
-   "Keep them per task: each filters its own task's data",
-   "Share one search and scan component, with the task passing its scope",
-   "Make Home's find-pig the only search and scan; tasks keep filter and Go to pen"
-  ],
-  "source": "populate batch 3; features/find-pig, features/inspection"
- },
- {
-  "id": "populate-farrowing-4",
-  "target": { "kind": "screen", "id": "farrowing.piglet-identity" },
-  "kind": "unclear",
-  "severity": "low",
-  "title": "Piglet identity saves with only a sex or a weight",
-  "detail": "Save identity is enabled as soon as any of tag, notch, sex or weight has a value, so a piglet can be saved with neither tag nor notch. RULINGS (Piglet processing, Q3) says tag or notch identifies, and sex and weight are optional and never block a row. Recorded only; the design is not changed here.",
-  "options": [
-    "Require a tag or a notch before Save is enabled",
-    "Keep it: the row is a record of what is known, identity or not"
-  ],
-  "source": "populate batch 3; ux/system/farrowing-astra-concept.js savePiglet; RULINGS.md"
- }
+  {
+    "id": "populate-farrowing-3",
+    "target": { "kind": "feature", "id": "farrowing" },
+    "kind": "decision",
+    "severity": "low",
+    "title": "Search, scan and filter ownership across tasks",
+    "detail": "Farrowing, Inspection and Home each provide a scoped Find, Scan and Filter route. Farrowing's Find searches every unit; its single-action Scan opens one record per read, while Choose pigs scanning ticks eligible reads. Their screens use shared Lookup and Row components but task-specific content and filters. Whether their future search and scan flows should have one feature owner remains open. The 2026-11-17 Farrowing consistency round settled its own entrance and screen mismatches; it did not decide that cross-task ownership question.",
+    "options": [
+      "Keep task-specific routes with shared components",
+      "Make one shared search and scan feature with task scope",
+      "Use Home search and scan as the only doors; tasks keep filters"
+    ],
+    "source": "populate batch 3; features/find-pig, features/inspection; features/farrowing/consistency-round/audit.md"
+  }
 ]
