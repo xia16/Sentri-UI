@@ -194,6 +194,8 @@
 .tk-day-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); padding: var(--space-row-y) var(--space-row-x); background: var(--app-background); }
 .tk-day-head > strong { font: 700 var(--type-row-title-size)/1.25 var(--font-sans); color: var(--ink); }
 .tk-day-head > span { font: var(--type-meta-size)/1.3 var(--font-mono); color: var(--muted); }
+/* The original Farrowing Care day card still uses its .processing-task host markup. Its completed mark uses the shared success colour. */
+.processing-task > svg { color: var(--green); }
 
 /* TaskDock unit: the labelled place control (frameless, with a caption) or, framed, farrowing's Pen map: the IconButton frame around the icon and a label. */
 
