@@ -91,7 +91,7 @@
     </section>
 
     <section class="step">
-      <div class="step-head"><h2>6 · End task 的 outcome screen 重放成 Ready</h2><p><code>farrowing.task-outcomes</code> 的当前 preset 仍有 8 头 Awaiting 母猪，所以实际运行态是 <code>task-ready</code>；这是 66 页逐页重放发现的错配。</p></div>
+      <div class="step-head"><h2>6 · End task 的 outcome screen 重放成 Ready</h2><p><code>farrowing.task-outcomes</code> 的当前 preset 仍有 8 头 Awaiting 母猪，所以实际运行态是 <code>task-ready</code>；这是 71 页逐页重放发现的错配。</p></div>
       <div class="row">
         <figure><h3><span>old</span> 当前 outcomes 重放</h3><img class="artboard" src="task-outcomes-replay.png" alt="当前 task-outcomes 实际为 Ready to end early，8 头待产母猪将离开"><figcaption>画面含 1 头流产，但仍有 8 头 Leave the batch；运行态归入 task-ready。</figcaption></figure>
         <figure><h3><span class="new">new</span> 独立 outcome 状态</h3><img class="artboard" src="task-outcomes-proposed.png" alt="建议的 outcome 示例，所有母猪已完成，Done 行写 1 sow died 1 aborted"><figcaption>同一现行组件；没有 Awaiting，Done 行明确包含死亡与流产，运行态才是 task-outcomes。</figcaption></figure>
@@ -114,7 +114,8 @@
     <li>Foster：<code>farrowing.foster-count</code> 是不存在的目标，改为 <code>.foster-send</code>；独立 Fostering 占位功能标明 11 月 3 日批准的 Farrowing 版本，成熟度仍保持占位/待设计。</li>
     <li>Pig profile 的嵌入 Actions 交接还列有已删除的 Edit litter record；同步其说明，保留 Pig profile 自身的设计状态。</li>
     <li>组件卡片：Row 的 “to allocate”、Stepper 的旧死因个数与 correction、ChoiceList 的 Edit finish details 文字按当前使用者更新；不改变共享组件视觉。</li>
-    <li>66 个页面、132 条内部 flow、两条 Home 入口的逐页对照见<a href="page-entry-matrix.md">页面 × 入口矩阵</a>；差异与受影响状态见<a href="audit.md">差异审计</a>。原型、Atlas、screen metadata 待本画布同意后再改。</li>
+    <li>Scan 一头死亡且没有活仔猪的母猪会打开正确的 gone-pig 内容，但运行态仍报 <code>pig-not-in-task</code>；同步 screen 绑定后应报 <code>pig-gone</code>。</li>
+    <li>71 个页面、134 条内部 flow、两条 Home 入口的逐页对照见<a href="page-entry-matrix.md">页面 × 入口矩阵</a>；59 条真实入口见<a href="route-matrix.md">入口 → 页面矩阵</a>；差异与受影响状态见<a href="audit.md">差异审计</a>。已同意的 <a href="../penmap-sync-round/canvas.html">PenMap 画布</a> 已在同一分支同步；本画布提出的其他原型、Atlas 和 screen metadata 修改等负责人决定。</li>
   </ul></div>
 </main>
 </html>

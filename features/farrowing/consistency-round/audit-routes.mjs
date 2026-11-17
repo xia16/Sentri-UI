@@ -44,6 +44,7 @@ async function current(page) {
     pig: window.FarrowingStudy?.room?.(0)?.pig || null,
     locked: !!window.FarrowingStudy?.states?.[0]?.locked,
     ended: !!window.FarrowingStudy?.states?.[0]?.ended,
+    outcome: window.FarrowingStudy?.states?.[0]?.productionOutcome || null,
     title: document.querySelector('[data-card="0"] .phone .sheet-title, [data-card="0"] .phone .st-page-header h1')?.textContent?.trim() || null
   }));
 }
@@ -72,6 +73,14 @@ const roomTags = [
   ['Finished', '000406', 'farrowing.locked'],
   ['Sow died', '000399', 'farrowing.ended']
 ];
+async function setOutcome(page, tag, outcome, alive) {
+  await page.evaluate(({ tag, outcome, alive }) => {
+    const record = window.FarrowingStudy.room(0).records.find(r => r.tag === tag);
+    Object.assign(record, { productionOutcome: outcome, locked: true, alive, frozen: alive, pending: 0 });
+    record.events.unshift({ text: `${outcome} recorded`, day: 'Today', time: '09:41', who: 'G. Hansen' });
+  }, { tag, outcome, alive });
+  await tap(page, 'room-lens', 'Done');
+}
 
 try {
   // The two actual Home cards, then the room's four status-specific sow doors.
@@ -108,6 +117,31 @@ try {
       await tap(page, 'room-sow', tag);
     });
   }
+  for (const [state, outcome, expected] of [
+    ['Aborted with a live piglet', 'abortion', 'farrowing.locked'],
+    ['Not in pig', 'not-in-pig', 'farrowing.history'],
+    ['Removed from batch', 'removed', 'farrowing.history']
+  ]) {
+    await check(`Room Done → ${state}`, expected, async page => {
+      await setOutcome(page, '000392', outcome, outcome === 'abortion' ? 1 : 0);
+      await tap(page, 'room-sow', '000392');
+    });
+    await check(`Find → ${state}`, expected, async page => {
+      await setOutcome(page, '000392', outcome, outcome === 'abortion' ? 1 : 0);
+      await tap(page, 'room-search');
+      await page.locator('[data-card="0"] [data-room-search]').fill('000392');
+      await tap(page, 'room-sow', '000392');
+    });
+  }
+  await check('Aborted without a live piglet leaves Room', 'farrowing.room', async page => {
+    await setOutcome(page, '000392', 'abortion', 0);
+    if (await page.locator(action('room-sow', '000392')).count()) throw new Error('aborted sow still listed');
+  });
+  await check('Aborted without a live piglet leaves Find', 'farrowing.search-none', async page => {
+    await setOutcome(page, '000392', 'abortion', 0);
+    await tap(page, 'room-search');
+    await page.locator('[data-card="0"] [data-room-search]').fill('000392');
+  });
   await check('Find → same-unit non-task pig', 'farrowing.pig-not-in-task', async page => {
     await tap(page, 'room-search');
     await page.locator('[data-card="0"] [data-room-search]').fill('004305');
@@ -160,6 +194,30 @@ try {
       if (got.tag !== tag || !got.locked || got.ended !== ended) throw new Error(`wrong record: ${JSON.stringify(got)}`);
     }, { scanTag: tag });
   }
+  for (const [label, outcome, alive, expected] of [
+    ['Aborted with a live piglet', 'abortion', 1, 'farrowing.scan-read'],
+    ['Not in pig', 'not-in-pig', 0, 'farrowing.scan-read'],
+    ['Removed from batch', 'removed', 0, 'farrowing.scan-read'],
+    ['Aborted without a live piglet', 'abortion', 0, 'farrowing.pig-not-in-task']
+  ]) {
+    await check(`Scan → ${label} (substituted reader tag)`, expected, async page => {
+      await setOutcome(page, '000392', outcome, alive);
+      await tap(page, 'room-scan');
+      await page.locator('[data-card="0"] [data-demo-scan]').evaluate(button => button.click());
+      await page.waitForTimeout(40);
+      const got = await current(page);
+      if (got.tag !== '000392' && got.pig !== '000392') throw new Error(`wrong record: ${JSON.stringify(got)}`);
+    }, { scanTag: '000392' });
+  }
+  await check('Scan → sow died with no piglets (substituted reader tag)', 'farrowing.pig-gone', async page => {
+    await page.evaluate(() => { window.FarrowingStudy.room(0).records.find(r => r.tag === '000399').alive = 0; });
+    await tap(page, 'room-lens', 'Done');
+    await tap(page, 'room-scan');
+    await page.locator('[data-card="0"] [data-demo-scan]').evaluate(button => button.click());
+    await page.waitForTimeout(40);
+    const got = await current(page);
+    if (got.pig !== '000399') throw new Error(`wrong record: ${JSON.stringify(got)}`);
+  }, { scanTag: '000399' });
   await check('Scan → sow → Back still listening', 'farrowing.scan', async page => {
     await tap(page, 'room-scan');
     await page.locator('[data-card="0"] [data-demo-scan]').evaluate(button => button.click());
@@ -211,6 +269,19 @@ try {
 
   const output = path.join(here, 'route-results.json');
   writeFileSync(output, JSON.stringify(results, null, 2) + '\n');
+  const matrix = [
+    '# Farrowing 实际入口 → 页面矩阵 · 2026-11-17',
+    '',
+    '从真实控件进入，每行独立重开 390 × 844 原型。期望页面按本轮确认的最新版规则填写；`运行态` 是 Atlas 当前 ID。Scan 示例中没有 Finished、Sow died 和生产结果耳标，相关行只在浏览器内替换一条读卡样例，仍使用原型的扫描事件与路由；仓库文件未因此改动。',
+    '',
+    '| 入口与状态 | 期望页面 | 运行态 | 打开的内容 | 核对 |',
+    '|---|---|---|---|---|',
+    ...results.map(r => `| ${r.label} | \`${r.expected}\` | ${r.id ? `\`${r.id}\`` : '—'} | ${[r.view, r.pig || r.tag, r.outcome].filter(Boolean).join(' · ') || '—'} | ${r.pass ? '✓' : '差异'} |`),
+    '',
+    `共 ${results.length} 条，${results.filter(r => r.pass).length} 条对齐，${results.filter(r => !r.pass).length} 条差异。详情和可重跑结果见 [route-results.json](route-results.json)。`,
+    ''
+  ].join('\n');
+  writeFileSync(path.join(here, 'route-matrix.md'), matrix);
   console.log(`Checked ${results.length} routes; ${results.filter(x => !x.pass).length} differences → ${path.relative(root, output)}`);
 } finally {
   await browser.close();

@@ -74,4 +74,22 @@ test('Inspection names the map and its legend in Chinese at 360 px', async () =>
   } finally { await page.close(); }
 });
 
+test('PenMap screen variants report their own atlas screen ID', async () => {
+  const variants = [
+    ['farrowing', 'long', 'farrowing.pen-map-long'],
+    ['farrowing', 'long', 'farrowing.pen-map-whole'],
+    ['farrowing', 'long', 'farrowing.pen-map-group'],
+    ['farrowing', 'mixed', 'farrowing.pen-map-mixed'],
+    ['farrowing', 'single', 'farrowing.room-single'],
+    ['inspection', 'long', 'inspection.go-to-pen-long'],
+    ['inspection', 'long', 'inspection.go-to-pen-whole'],
+    ['inspection', 'single', 'inspection.walk-single']
+  ];
+  for (const [task, shape, screen] of variants) {
+    const page = await open(task, shape, screen);
+    try { assert.equal(await page.evaluate(() => AtlasBare.current()), screen); }
+    finally { await page.close(); }
+  }
+});
+
 test.after(async () => { await browser.close(); server.kill(); });

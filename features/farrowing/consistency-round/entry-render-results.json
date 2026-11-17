@@ -147,9 +147,7 @@
     "current": "farrowing.piglets-ticked",
     "view": "pigletList",
     "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
-    "errors": [
-      "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED"
-    ]
+    "errors": []
   },
   {
     "id": "farrowing.piglets-actions",
@@ -275,7 +273,7 @@
     ],
     "current": "farrowing.task-receipt",
     "view": "roomTaskReceipt",
-    "text": "9:41 All units Today Ended tasks Farrowing Task ended · 18 finished View receipt 9:41 Task ended Farrowing · Nov 17 · 11:52 · G.H Performance metrics 18 finished litters Born alive",
+    "text": "9:41 All units Today Ended tasks Farrowing Task ended · 18 finished View receipt 9:41 Task ended Farrowing · Nov 17 · 16:02 · G.H Performance metrics 18 finished litters Born alive",
     "errors": []
   },
   {
@@ -360,6 +358,67 @@
     "current": "farrowing.pen-map",
     "view": "roomGrid",
     "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pen-map-long",
+    "name": "Pen map · long room",
+    "preset": "room",
+    "steps": [
+      ".dock-map"
+    ],
+    "current": "farrowing.pen-map-long",
+    "view": "roomGrid",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pen-map-whole",
+    "name": "Pen map · Whole room",
+    "preset": "room",
+    "steps": [
+      ".dock-map",
+      ".st-pen-whole-toggle"
+    ],
+    "current": "farrowing.pen-map-whole",
+    "view": "roomGrid",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pen-map-group",
+    "name": "Pen map · shared tile opened",
+    "preset": "room",
+    "steps": [
+      ".dock-map",
+      ".st-pen-whole-toggle",
+      ".st-pen-group[data-from=\"B1\"]"
+    ],
+    "current": "farrowing.pen-map-group",
+    "view": "roomGrid",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pen-map-mixed",
+    "name": "Pen map · mixed pens",
+    "preset": "room",
+    "steps": [
+      ".dock-map"
+    ],
+    "current": "farrowing.pen-map-mixed",
+    "view": "roomGrid",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.room-single",
+    "name": "Room list · one pen",
+    "preset": "room",
+    "steps": [],
+    "current": "farrowing.room-single",
+    "view": "room",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 6 / 15 Done · all units Awaiting 3 Active 0 Done 0 All 3 B4 · 3 sows 000455 Parity 2 Today Du",
     "errors": []
   },
   {
@@ -553,9 +612,7 @@
     "current": "farrowing.batch-filter",
     "view": "roomBatchPick",
     "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
-    "errors": [
-      "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED"
-    ]
+    "errors": []
   },
   {
     "id": "farrowing.batch-waiting",

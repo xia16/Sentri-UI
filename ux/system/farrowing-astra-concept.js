@@ -8,6 +8,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const assistanceLabel=value=>value===true?'Yes':value===false?'No':'Not recorded';
 const icon=k=>SentriIcons.icon(k);
 const taskSyncPreview=typeof location==='undefined'?null:new URLSearchParams(location.search).get('taskSync');
+const penMapShape=typeof location==='undefined'?null:new URLSearchParams(location.search).get('penmap');
 // The task's saved-work badge (owner, 2026-10-13 and 2026-10-18): an upload icon and this task's record count, as the page action of
 // every page in the task; nothing when this task has no records on this phone, even if other tasks do (Home holds the whole phone).
 // Red only when signed out. ?taskSync= offline | syncing | failed (read as uploading with some not accepted) | expired | other | done.
@@ -236,7 +237,7 @@ if(typeof document==='undefined')return;
 function atlasScreen(s,c){
  const v=s.view;
  if(!/^room/.test(v)&&c.returnToTaskReview==='roomScan')return 'farrowing.scan-read';   // a sow the reader opened, over Scan
- if(v==='room')return c.toast?.title?'farrowing.batch-saved':'farrowing.room';
+ if(v==='room')return c.toast?.title?'farrowing.batch-saved':penMapShape==='single'?'farrowing.room-single':'farrowing.room';
  if(s.popup?.kind==='undo')return 'farrowing.undo';
  if(v==='count')return visitDraft(s)?'farrowing.count-draft':lastSave(s)?.who===ME&&s.events[0]===lastSave(s)&&s.events[0].time==='09:41'?'farrowing.count-saved':born(s)?'farrowing.count':'farrowing.before';
  if(v==='death')return 'farrowing.death';
@@ -252,6 +253,11 @@ function atlasScreen(s,c){
  if(v==='countReconcile')return 'farrowing.reconcile';
  if(v==='roomOverview')return 'farrowing.overview';
  if(v==='roomTaskReceipt')return 'farrowing.task-receipt';
+ if(v==='roomGrid'){
+  if(penMapShape==='mixed')return 'farrowing.pen-map-mixed';
+  if(penMapShape==='long')return document.querySelector('[data-card="0"] .st-pen-whole')?'farrowing.pen-map-whole':c.penMapGroupOpened?'farrowing.pen-map-group':'farrowing.pen-map-long';
+  return 'farrowing.pen-map';
+ }
  if(v==='roomEndTask'){const r=taskClosureReview(c);return r.blocked?'farrowing.task-blocked':r.awaiting.length?'farrowing.task-ready':r.abortions.length?'farrowing.task-outcomes':'farrowing.task-complete';}
  if(v==='roomSearch'){const f=findHits(c);return !f?'farrowing.search':f.hits.length?'farrowing.search-results':'farrowing.search-none';}
  if(v==='roomScan'){const sc=c.scan;return !sc.connected?'farrowing.scan-no-reader':!sc.listening?'farrowing.scan-stopped':c.toast?.on==='roomScan'?'farrowing.scan-unknown':'farrowing.scan';}
@@ -821,7 +827,7 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
  if(a==='room-reset-filter')c.filterDraft=defaultRoomFilter();
  if(a==='room-apply-filter'){c.filterKeep=null;c.filter=clone(c.filterDraft);c.scroll=nextScroll;c.tailSpace=0;s.view='room';}
  if(a==='room-clear-filter'){c.filterKeep=null;c.filter=defaultRoomFilter();c.scroll=nextScroll;c.tailSpace=0;}
- if(a==='room-grid')s.view='roomGrid';
+ if(a==='room-grid'){c.penMapGroupOpened=false;s.view='roomGrid';}
  if(a==='room-pen'){const L=landMs();c.currentPen=v;c.jump=v;c.highlightUntil=Date.now()+L.hold+L.fade;c.highlightPen=v;c.highlightLevel=penLevels(c)[v]||'plain';s.view='room';}
 
  if(a==='room-search'||a==='room-scan'){c.scanFrom=a==='room-scan'&&s.view==='roomSearch'?'roomSearch':'';if(!c.scanFrom)c.query='';s.view=a==='room-search'?'roomSearch':'roomScan';}   // Scan opened from Find a sow goes back to it, with what was typed
@@ -1345,6 +1351,7 @@ gallery.addEventListener('keydown',e=>{const pi=e.target.closest?.('[data-card]'
 // Record dead: opening the sow's Details grows the body; keep the danger banner whole above the footer (crit round 2).
 gallery.addEventListener('click',e=>{const row=e.target.closest('.sheet[data-view=death] [data-st-optional]');if(row)requestAnimationFrame(()=>row.closest('.sheet-body')?.querySelector(':scope > .st-banner')?.scrollIntoView({block:'nearest'}));});
 let noteStep=0;gallery.addEventListener('click',e=>{noteStep=+(e.target.closest('[data-step]')?.dataset.step||0);},true);
+window.addEventListener('click',e=>{const group=e.target.closest('.st-pen-group'),toggle=e.target.closest('.st-pen-whole-toggle');if(!group&&!toggle)return;const card=e.target.closest('[data-card]');if(card)roomContext(states[+card.dataset.card]).penMapGroupOpened=!!group;},true);
 gallery.addEventListener('click',e=>{if(e.target.closest('.st-pen-whole-toggle,.st-pen-group'))return;const el=e.target.closest('[data-action]');if(!el||el.disabled||el.classList.contains('st-hold'))return;
  // Finish waits while a draft is open; the tap brings the worker to Record dead, where the draft is said ("1 unsaved") and can be saved.
  if(el.dataset.action==='finish'&&el.getAttribute('aria-disabled')==='true'){const k=+el.closest('[data-card]').dataset.card,w=states[k];if(hasDraft(w)){act(w,'death');render(k);}return;}

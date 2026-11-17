@@ -9,6 +9,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pathname": "/ux/system/farrowing-astra-concept.html",
     "entry": "overview",
@@ -25,6 +26,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pathname": "/ux/system/farrowing-astra-concept.html",
     "entry": "unit",
@@ -41,6 +43,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -54,6 +57,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -67,6 +71,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing record",
     "pass": true
   },
@@ -80,6 +85,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -93,6 +99,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -106,6 +113,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing record",
     "pass": true
   },
@@ -119,6 +127,7 @@
     "pig": null,
     "locked": true,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -132,6 +141,7 @@
     "pig": null,
     "locked": true,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -145,6 +155,7 @@
     "pig": null,
     "locked": true,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing record",
     "pass": true
   },
@@ -158,6 +169,7 @@
     "pig": null,
     "locked": true,
     "ended": true,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -171,6 +183,7 @@
     "pig": null,
     "locked": true,
     "ended": true,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -184,7 +197,120 @@
     "pig": null,
     "locked": true,
     "ended": true,
+    "outcome": null,
     "title": "Farrowing record",
+    "pass": true
+  },
+  {
+    "label": "Room Done → Aborted with a live piglet",
+    "start": "room",
+    "expected": "farrowing.locked",
+    "id": "farrowing.locked",
+    "view": "locked",
+    "tag": "000392",
+    "pig": null,
+    "locked": true,
+    "ended": false,
+    "outcome": "abortion",
+    "title": "Farrowing",
+    "pass": true
+  },
+  {
+    "label": "Find → Aborted with a live piglet",
+    "start": "room",
+    "expected": "farrowing.locked",
+    "id": "farrowing.locked",
+    "view": "locked",
+    "tag": "000392",
+    "pig": null,
+    "locked": true,
+    "ended": false,
+    "outcome": "abortion",
+    "title": "Farrowing record",
+    "pass": true
+  },
+  {
+    "label": "Room Done → Not in pig",
+    "start": "room",
+    "expected": "farrowing.history",
+    "id": "farrowing.history",
+    "view": "history",
+    "tag": "000392",
+    "pig": null,
+    "locked": true,
+    "ended": false,
+    "outcome": "not-in-pig",
+    "title": "Farrowing",
+    "pass": true
+  },
+  {
+    "label": "Find → Not in pig",
+    "start": "room",
+    "expected": "farrowing.history",
+    "id": "farrowing.history",
+    "view": "history",
+    "tag": "000392",
+    "pig": null,
+    "locked": true,
+    "ended": false,
+    "outcome": "not-in-pig",
+    "title": null,
+    "pass": true
+  },
+  {
+    "label": "Room Done → Removed from batch",
+    "start": "room",
+    "expected": "farrowing.history",
+    "id": "farrowing.history",
+    "view": "history",
+    "tag": "000392",
+    "pig": null,
+    "locked": true,
+    "ended": false,
+    "outcome": "removed",
+    "title": "Farrowing",
+    "pass": true
+  },
+  {
+    "label": "Find → Removed from batch",
+    "start": "room",
+    "expected": "farrowing.history",
+    "id": "farrowing.history",
+    "view": "history",
+    "tag": "000392",
+    "pig": null,
+    "locked": true,
+    "ended": false,
+    "outcome": "removed",
+    "title": null,
+    "pass": true
+  },
+  {
+    "label": "Aborted without a live piglet leaves Room",
+    "start": "room",
+    "expected": "farrowing.room",
+    "id": "farrowing.room",
+    "view": "room",
+    "tag": "000418",
+    "pig": null,
+    "locked": false,
+    "ended": false,
+    "outcome": null,
+    "title": "Farrowing",
+    "pass": true
+  },
+  {
+    "label": "Aborted without a live piglet leaves Find",
+    "start": "room",
+    "expected": "farrowing.search-none",
+    "id": "farrowing.search-none",
+    "view": "roomSearch",
+    "tag": "000418",
+    "pig": null,
+    "locked": false,
+    "ended": false,
+    "outcome": null,
+    "title": null,
     "pass": true
   },
   {
@@ -197,6 +323,7 @@
     "pig": "004305",
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": null,
     "pass": true
   },
@@ -210,6 +337,7 @@
     "pig": "000434",
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": null,
     "pass": true
   },
@@ -223,6 +351,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": null,
     "pass": true
   },
@@ -236,6 +365,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": null,
     "pass": true
   },
@@ -249,6 +379,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": null,
     "pass": true
   },
@@ -262,6 +393,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing record",
     "pass": true
   },
@@ -275,6 +407,7 @@
     "pig": "000434",
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": null,
     "pass": true
   },
@@ -288,6 +421,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing record",
     "pass": true
   },
@@ -301,6 +435,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": null,
     "pass": true
   },
@@ -314,6 +449,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing record",
     "pass": true
   },
@@ -327,6 +463,7 @@
     "pig": null,
     "locked": true,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing record",
     "pass": true
   },
@@ -340,8 +477,79 @@
     "pig": null,
     "locked": true,
     "ended": true,
+    "outcome": null,
     "title": "Farrowing record",
     "pass": true
+  },
+  {
+    "label": "Scan → Aborted with a live piglet (substituted reader tag)",
+    "start": "room",
+    "expected": "farrowing.scan-read",
+    "id": "farrowing.scan-read",
+    "view": "locked",
+    "tag": "000392",
+    "pig": null,
+    "locked": true,
+    "ended": false,
+    "outcome": "abortion",
+    "title": "Farrowing record",
+    "pass": true
+  },
+  {
+    "label": "Scan → Not in pig (substituted reader tag)",
+    "start": "room",
+    "expected": "farrowing.scan-read",
+    "id": "farrowing.scan-read",
+    "view": "history",
+    "tag": "000392",
+    "pig": null,
+    "locked": true,
+    "ended": false,
+    "outcome": "not-in-pig",
+    "title": null,
+    "pass": true
+  },
+  {
+    "label": "Scan → Removed from batch (substituted reader tag)",
+    "start": "room",
+    "expected": "farrowing.scan-read",
+    "id": "farrowing.scan-read",
+    "view": "history",
+    "tag": "000392",
+    "pig": null,
+    "locked": true,
+    "ended": false,
+    "outcome": "removed",
+    "title": null,
+    "pass": true
+  },
+  {
+    "label": "Scan → Aborted without a live piglet (substituted reader tag)",
+    "start": "room",
+    "expected": "farrowing.pig-not-in-task",
+    "id": "farrowing.pig-not-in-task",
+    "view": "roomPig",
+    "tag": "000418",
+    "pig": "000392",
+    "locked": false,
+    "ended": false,
+    "outcome": null,
+    "title": null,
+    "pass": true
+  },
+  {
+    "label": "Scan → sow died with no piglets (substituted reader tag)",
+    "start": "room",
+    "expected": "farrowing.pig-gone",
+    "id": "farrowing.pig-not-in-task",
+    "view": "roomPig",
+    "tag": "000418",
+    "pig": "000399",
+    "locked": false,
+    "ended": false,
+    "outcome": null,
+    "title": null,
+    "pass": false
   },
   {
     "label": "Scan → sow → Back still listening",
@@ -353,6 +561,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": null,
     "pass": true
   },
@@ -366,6 +575,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": null,
     "pass": true
   },
@@ -379,6 +589,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": null,
     "pass": true
   },
@@ -392,6 +603,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -405,6 +617,7 @@
     "pig": null,
     "locked": true,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -418,6 +631,7 @@
     "pig": null,
     "locked": true,
     "ended": true,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -431,6 +645,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -444,6 +659,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -457,6 +673,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -470,6 +687,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -483,6 +701,7 @@
     "pig": null,
     "locked": true,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -496,6 +715,7 @@
     "pig": null,
     "locked": true,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -509,6 +729,7 @@
     "pig": null,
     "locked": true,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -522,6 +743,7 @@
     "pig": null,
     "locked": true,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -535,6 +757,7 @@
     "pig": null,
     "locked": true,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -548,6 +771,7 @@
     "pig": null,
     "locked": true,
     "ended": true,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -561,6 +785,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -574,6 +799,7 @@
     "pig": null,
     "locked": true,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -587,6 +813,7 @@
     "pig": null,
     "locked": false,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": true
   },
@@ -600,6 +827,7 @@
     "pig": null,
     "locked": true,
     "ended": false,
+    "outcome": null,
     "title": "Farrowing",
     "pass": false
   }
