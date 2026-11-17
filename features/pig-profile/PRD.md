@@ -18,7 +18,7 @@ No anchor. The record is the same for a pig at any stage; what changes is which 
 - The blocks follow the animal type (Sow cycle, Gilt breeding, Boar breeding, Piglet growth, Growth).
 - An empty production-average section is absent; facts missing from the registry show a dash.
 - The Actions sheet has three groups, Production, Health and General. Production is for one pig only and holds only the rows that fit her stage and tasks; an action she can't take stays in its place, greyed (a tile, or a Production row with its reason as line 2; owner, 2026-11-06), and there is no Unavailable actions page.
-- Farrowing opens the shared health and measurement flows rather than copying them; it adds its own Production rows when embedded (piglet processing, piglet deaths, count reconciliation, fostering, litter edit, remove from batch, not in pig, transfer).
+- Farrowing opens the shared health and measurement flows rather than copying them; it adds Production rows when embedded (piglet processing, piglet deaths, count reconciliation, fostering, remove from batch, not in pig, transfer). The former Edit litter record door was removed by the Farrowing owner decision on 2026-11-02. The piglet processing / mortality and count-reconciliation rows still overlap newer Farrowing flows; see the [Farrowing consistency audit](../farrowing/consistency-round/audit.md) before treating them as a handoff.
 - Not in pig, abortion and batch removal take a sow out of her batch and return her to rebreed watch; saved records are kept.
 - Weight, temperature and backfat take one value per pig.
 - A dead sow offers a note only.
