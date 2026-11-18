@@ -34,5 +34,19 @@
     "date": "2026-10-12",
     "by": "owner",
     "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12"
+  },
+  {
+    "screen": "farrowing.search",
+    "commit": "f368b433945e2c7957b89525ae8c078f26553407",
+    "date": "2026-11-18",
+    "by": "owner",
+    "note": "Owner explicitly confirmed the existing full-page Find a sow and Scan ear tags as Atlas defaults on 2026-11-18 after reviewing the historical/current comparison; task Actions keep concrete operations and suppress reopening the current task."
+  },
+  {
+    "screen": "farrowing.scan",
+    "commit": "f368b433945e2c7957b89525ae8c078f26553407",
+    "date": "2026-11-18",
+    "by": "owner",
+    "note": "Owner explicitly confirmed the existing full-page Find a sow and Scan ear tags as Atlas defaults on 2026-11-18 after reviewing the historical/current comparison; task Actions keep concrete operations and suppress reopening the current task."
   }
 ]

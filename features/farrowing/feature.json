@@ -4444,23 +4444,23 @@
       ],
       "figma": "",
       "notes": {
-        "purpose": "All other things to do for one sow, in the More actions drawer opened from her drawer: the everyday verbs as a grid of icon tiles (Note and Transfer come from Farrowing), then Production as described rows grouped by task.",
+        "purpose": "The shared sow Actions sheet: everyday verbs as icon tiles, her note preview, and concrete Production operations grouped by stage or task. Inside Farrowing it omits reopening the current Farrowing task and keeps one Care and identity entrance.",
         "states": [
-          "Awaiting (nothing counted): Record abortion, Remove from batch, Mark not in pig, Record sow death, note and transfer are open; the piglet rows are closed.",
-          "Farrowing: Piglet processing, Record piglet deaths and Foster piglets open; Remove from batch and Mark not in pig close. Reconcile remains greyed until Count has an approved destination.",
-          "Finished: Record abortion also closes.",
-          "Sow died or outcome recorded: most rows close with the reason."
+          "Awaiting (nothing counted): Record abortion, Mark not in pig and Batch membership are listed; the Piglet processing group is not listed before that production scope applies. Note and transfer stay available.",
+          "Farrowing: Piglet processing (Care and identity) is available after the litter is recorded; Foster piglets requires live piglets. Mark not in pig is greyed after a litter is recorded. Reconcile remains greyed until Count has an approved destination.",
+          "Finished: Care and identity and Foster retain their litter-dependent availability; Record abortion is greyed.",
+          "Sow died: Production operations and transfer are greyed; Note remains available. A recorded outcome filters Production rows by the remaining tasks and stage."
         ],
         "elements": [
           {
             "name": "Production rows",
             "at": "Piglet processing",
-            "shows": "Record abortion, Piglet processing, Record piglet deaths, Reconcile piglet count, Foster piglets, Remove from batch, Mark not in pig, Move to another farrowing batch.",
+            "shows": "For an active litter: Record abortion, Mark not in pig, Piglet processing (Care and identity), Reconcile piglet count, Foster piglets and Batch membership. The last row contains batch move/remove operations. Record piglet deaths and Record sow death belong to the sow record's own controls, not duplicate rows in this sheet.",
             "states": [
               {
                 "state": "Record the litter first.",
                 "when": "No piglets recorded yet",
-                "shows": "Closes Piglet processing and Record piglet deaths; Reconcile is already greyed while Count has no approved destination"
+                "shows": "The piglet-production group is not listed until that scope applies; a host action that is listed retains its availability reason. Reconcile is always greyed while Count has no approved destination."
               },
               {
                 "state": "No live piglets recorded.",
@@ -4470,7 +4470,7 @@
               {
                 "state": "A litter has already been recorded.",
                 "when": "Born above zero",
-                "shows": "Closes Remove from batch and Mark not in pig"
+                "shows": "Greys Mark not in pig; batch removal is handled inside Batch membership"
               },
               {
                 "state": "Farrowing is already finished.",
@@ -4480,7 +4480,7 @@
               {
                 "state": "A production outcome is already recorded.",
                 "when": "Abortion, not in pig or removed",
-                "shows": "Closes most production rows"
+                "shows": "Production rows are filtered by the remaining tasks and stage; Batch membership stays listed"
               },
               {
                 "state": "This sow has died.",
@@ -4490,11 +4490,11 @@
               {
                 "state": "No destination farrowing batches are connected in this preview.",
                 "when": "Always, in the prototype",
-                "shows": "Closes Move to another farrowing batch"
+                "shows": "The host's batch move operation is unavailable; Batch membership is the shared entrance"
               }
             ],
-            "logic": "Greyed in place (owner, 2026-11-06: \"when a sow died, the actions should just be grey\"): every action keeps its place in a live pig's order; one that does not apply is a disabled tile (its reason in the accessible name only, no reason line) or, in Production, a disabled row with the reason as line 2. No \"Unavailable actions\" link or page. Farrowing's own rows hand back to the room (the host) to open their screens; Health and the rest run inside the embedded Inspection sheet.",
-            "source": "farrowing-astra-concept.js sowActionCatalogue(); ASTRA-SOW-ACTIONS-MOBBIN.md"
+            "logic": "Only the pig's current production tasks and stage supply Production groups. Within an applicable group, unavailable actions stay greyed in place with their usual descriptions; the reason is in the accessible name only, with no reason line or separate Unavailable actions page. Owner confirmed 2026-11-18: suppress reopening the current Farrowing task and deduplicate generic Piglet processing against the host's Care and identity action, while retaining concrete operations. Farrowing's own rows hand back to the host; Health and the rest run inside the embedded Inspection sheet.",
+            "source": "farrowing-astra-concept.js sowActionCatalogue(), connectSowDetail(); inspection-astra-concept.js productionActionsForPig(), actionCatalogue()"
           }
         ],
         "edge": [
