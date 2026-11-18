@@ -3,7 +3,7 @@
 2026-11-18。已按确认的范围修正原型。本轮点击验证使用网页原型的独立样例，截图为 390 × 844。
 
 - [更新后的操作截图和 Production 状态表](review.html)
-- [66 个当前登记页面的入口逐项表](screen-inventory.md)
+- [67 个当前登记页面的入口逐项表](screen-inventory.md)
 - [实际菜单验证数据](production-states.json) · [截图索引](screenshots.json)
 - [修正前复核记录](https://github.com/xia16/Sentri-UI/blob/97c16425d163b5d0414e6aede0b2677ac4ccb6c5/features/farrowing/actions-scope-round/README.md)
 
@@ -15,7 +15,7 @@
 
 | 依据 | 结论 |
 | --- | --- |
-| [main PRD · In，57–59 行](https://github.com/xia16/Sentri-UI/blob/df82ba5dbaf690fab32cfd4437c66457c4e17b9e/features/farrowing/PRD.md#L57) | 分娩自己的 Actions 包括 Record abortion、Mark not in pig；活母猪寄养、死亡母猪仔猪的 Foster / Move 也在范围内。 |
+| [main PRD · In，57–59 行](https://github.com/xia16/Sentri-UI/blob/df82ba5dbaf690fab32cfd4437c66457c4e17b9e/features/farrowing/PRD.md#L57) | 旧基线列出 Record abortion 和 Mark not in pig；11 月 18 日的后续决定将后者改为通过批次管理移除。寄养及仔猪移栏保留。 |
 | [main PRD · Out，64–66 行](https://github.com/xia16/Sentri-UI/blob/df82ba5dbaf690fab32cfd4437c66457c4e17b9e/features/farrowing/PRD.md#L64) | Piglet processing 与身份工作是独立功能；照原型登记的 processing / identity / mortality 页面不等于批准范围。母猪档案其余 Actions 属 pig-profile，栏位工具属 Inspection。 |
 | [main PRD · 2026-11-03，189–195 行](https://github.com/xia16/Sentri-UI/blob/df82ba5dbaf690fab32cfd4437c66457c4e17b9e/features/farrowing/PRD.md#L189) | 分娩中寄养放在母猪 Actions；结束分娩后有 Piglets；选中仔猪后的 Actions 只有 Foster / Move；活母猪的寄养保留 Send / Receive。此决定取代更早的“fostering parked”。 |
 | [Piglet processing PRD](../../piglet-processing/PRD.md) | 按日龄的处理、给予或修改身份、性别、体重与该任务的计数等由仔猪处理任务定义；其中仍有未决项，不能在本轮提升成熟度。 |
@@ -25,7 +25,7 @@
 | 入口 | 对谁操作 | 修正后内容 | 使用条件 |
 | --- | --- | --- | --- |
 | Room 底部 → Actions，副标题 Pigs in Unit 7 | 当前单元选中的一头或多头猪，包括不在分娩任务里的猪 | Condition、Treat、Care、Note、Measure、Feed、Transfer，共 7 项；与 main 菜单相同 | 保持这 7 项通用菜单，不加入生产任务、流产、寄养、身份、死亡登记。这里的 Care 是健康护理指示。Feed 按已有饲喂计划判断可用性，Transfer 显示可返回的占位页。 |
-| 点某头母猪 → 分娩记录 → Actions | 当前母猪 | 通用健康/日常操作、备注。Production 按状态显示流产、未孕、寄养和共享 Batch membership | 分娩自己的操作保留流产、未孕和已批准的寄养。仔猪处理、身份和 Reconcile 由对应任务定义。其余共享操作沿用 pig-profile 的规则，不能借本轮扩充为分娩批准范围。 |
+| 点某头母猪 → 分娩记录 → Actions | 当前母猪 | 通用健康/日常操作、备注。Production 按状态显示流产、寄养和共享 Batch membership | 分娩操作包括流产和寄养。待产母猪可经 Batch membership 移出。仔猪处理、身份和 Reconcile 由对应任务定义。其余共享操作沿用 pig-profile 的规则，不能借本轮扩充为分娩批准范围。 |
 | 已结束/母猪死亡 → Piglets → 选仔猪 → Actions · N | 已选中的仔猪 | Foster、Move，只有这两项 | 保留。搜索/扫描已有编号只是选仔猪；无编号行填数量只是选择要转出的只数，不创建身份，也不核对整窝数量。 |
 
 共享 Batch membership 当前确实可见。它管理猪的批次，归属 pig-profile；本轮不新增批次功能，也不把“移出批次”混写成分娩结束操作。是否改变共享菜单由其所属功能处理。
@@ -77,7 +77,7 @@ Choose pigs 只选择当前单元的在场活猪。筛选可以区分“在分�
 | 本次计数 → Save / Clear | 保存 / 清除本次草稿 | 有草稿时不能跨过 Finish。 |
 | Alive 卡片 → Details → Farrowing log | 看这一窝的明细、过程记录 | 日志顶端符合条件的记录可 Undo，逐条撤销，保留撤销痕迹；Finish 是不可跨越的底线。 |
 | 母猪记录 → Actions → Record abortion | 登记流产与原因 | 分娩未结束时可用；有活仔时母猪仍留在 Room，从 Piglets 送出或移栏。 |
-| 母猪记录 → Actions → Mark not in pig | 登记未孕与原因 | 已经记过一窝时不可用；不能拿它清空已有产仔记录。 |
+| 待产母猪记录 → Actions → Batch membership | 查看当前批次，选择原因，移出批次 | 尚无产仔记录和未保存计数时可用。保存后打开 Production log。 |
 | 母猪记录 → Actions → Foster piglets | 送出仔猪，或从别的母猪接收仔猪 | 有活仔时可用。登记过一窝但活仔为零时置灰。 |
 | 母猪记录 → Actions → 健康/日常操作、备注 | 给这头母猪做健康记录、治疗、护理指示、测量、饲喂、备注、母猪转移等共享操作 | 按所属功能的可用条件；母猪死亡后这些操作置灰，备注保留。母猪 Transfer 与仔猪列表中的 Move 对象不同。 |
 
@@ -117,14 +117,14 @@ Choose pigs 只选择当前单元的在场活猪。筛选可以区分“在分�
 
 母猪自己的 Actions 中健康、日常和生产操作置灰，备注仍可加/改；仔猪的 Foster / Move 通过 Piglets 进入。不能据“母猪操作不可用”禁止剩余仔猪被处理。见 E 组。
 
-### 8. 流产、未孕、移出批次等退出状态
+### 8. 流产和移出批次等退出状态
 
 | 状态 | 现状与边界 |
 | --- | --- |
 | 流产但仍有活仔 | 保留 Room 行。打开可查看流产原因、窝汇总和日志，可从 Record dead 登记死亡，也可通过 Piglets 选仔猪寄养送出或移栏。母猪 Actions 的 Production 仅列共享 Batch membership。 |
 | 流产且没有活仔 | 离开 Room，在任务结果/日志保留记录。 |
-| 未孕 | 看 Production log；不是继续数仔猪。 |
-| 移出批次 | 当前共享 Batch membership 有此路径；归 pig-profile，结果保留在任务汇总。不能把其存在当成新批准的分娩任务操作。 |
+| 历史未孕结果 | 旧记录仍可在 Production log 查询。新结果在孕检任务记录。 |
+| 移出批次 | 从待产母猪的 Batch membership 移出，必须选择原因。母猪从 Awaiting 转到 Done，保留移除记录和任务汇总，不计入分娩完成窝数。 |
 | 母猪死亡且没有剩余活仔 | 离开 Room；任务结果仍保留。 |
 
 ### 9. 栏位与整个任务
@@ -146,7 +146,7 @@ Choose pigs 只选择当前单元的在场活猪。筛选可以区分“在分�
 ## 修正结果
 
 - 移除 Farrowing 的仔猪处理、身份、从 Care 进入的选仔猪死亡记录及 Reconcile 入口，并清理任务跳转和 Atlas 登记。
-- 在单头母猪 Production 中保留按条件可用的流产、未孕、寄养和共享 Batch membership。Piglets 的选择、Foster / Move 使用既有共享组件。
+- 在单头母猪 Production 中保留按条件可用的流产、寄养和共享 Batch membership。已移除标记未孕，待产母猪可在批次管理中填写原因后移出。Piglets 的选择、Foster / Move 使用既有共享组件。
 - 恢复分娩 Record dead 和 Report death 按活仔数登记。若剩余活仔少于记录里的编号数量，Piglets 提示先核对编号后再寄养或移栏。
 - 流产后有活仔时保留 Piglets 和仅送出的寄养入口。流产确认页说明记录何时留在产房。
 - 批量 Feed 进入共享编辑器。样例缺少饲喂计划时显示原因。Transfer 提供占位和返回路径。

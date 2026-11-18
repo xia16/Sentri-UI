@@ -212,7 +212,7 @@ function closeTask(c,at=new Date().toISOString()){
  if(c.completion)return false;
  const review=taskClosureReview(c);if(review.blocked)return false;
  // A task closure receipt, not a frozen copy of the animals' live records.
- c.completion={early:review.awaiting.length>0,at,who:'G. Hansen',total:review.rows.length,finished:review.finished.length,removed:review.awaiting.length+review.removed.length,ended:review.ended.length,abortions:review.abortions.length,notInPig:review.notInPig.length,performance:review.performance};
+ c.completion={early:review.awaiting.length>0,at,who:'G. Hansen',total:review.rows.length,finished:review.finished.length,awaiting:review.awaiting.length,removed:review.removed.length,ended:review.ended.length,abortions:review.abortions.length,notInPig:review.notInPig.length,performance:review.performance};
  review.awaiting.forEach(({record})=>{record.taskDisposition='removed-at-close';});
  review.finished.forEach(({record})=>{fold(record);record.taskDisposition='retained';});
  return true;
@@ -243,7 +243,7 @@ function atlasScreen(s,c){
   if(penMapShape==='long')return document.querySelector('[data-card="0"] .st-pen-whole')?'farrowing.pen-map-whole':c.penMapGroupOpened?'farrowing.pen-map-group':'farrowing.pen-map-long';
   return 'farrowing.pen-map';
  }
- if(v==='roomEndTask'){const r=taskClosureReview(c);return r.blocked?'farrowing.task-blocked':r.awaiting.length?'farrowing.task-ready':r.abortions.length?'farrowing.task-outcomes':'farrowing.task-complete';}
+ if(v==='roomEndTask'){const r=taskClosureReview(c);return r.blocked?'farrowing.task-blocked':r.awaiting.length?'farrowing.task-ready':(r.abortions.length||r.removed.length||r.notInPig.length)?'farrowing.task-outcomes':'farrowing.task-complete';}
  if(v==='roomSearch'){const f=findHits(c);return !f?'farrowing.search':f.hits.length?'farrowing.search-results':'farrowing.search-none';}
  if(v==='roomScan'){const sc=c.scan;return !sc.connected?'farrowing.scan-no-reader':!sc.listening?'farrowing.scan-stopped':c.toast?.on==='roomScan'?'farrowing.scan-unknown':'farrowing.scan';}
  if(v==='roomPig')return farmPigs.find(p=>p.tag===c.pig)?.gone||c.units.some(u=>u.records.some(r=>r.tag===c.pig&&r.ended))?'farrowing.pig-gone':'farrowing.pig-not-in-task';
@@ -253,6 +253,7 @@ function atlasScreen(s,c){
  if(v==='litter'&&s.locked&&!s.ended&&!s.productionOutcome)return pastLitters(s).length?'farrowing.details':'farrowing.details-first';
  const more={roomFilter:'filter',roomGrid:'pen-map',roomPenDetail:'pen',roomPenLog:'pen-log',roomPenNote:'pen-note',roomPenReadNote:'pen-read-note',roomPenFeed:'pen-feed',roomPenFault:'pen-fault',roomPenFaultRecord:'pen-fault-record',roomTaskSows:'task-sows',roomHome:'today',litter:'litter',marker:'note'};
  if(more[v])return 'farrowing.'+more[v];
+ if(v==='profile'&&sowDetailContexts.get(s)?.view==='batch-membership')return 'farrowing.batch-membership';
  if(v==='profile'&&s.actionsEntry)return 'farrowing.sow-actions';
  return null;
 }
@@ -774,7 +775,7 @@ function taskEndSheet(s,c){
   const end=c.completion;if(!end)return '';
   const at=new Date(end.at),when=at.toLocaleString('en-US',{month:'short'})+' '+at.getDate()+' · '+at.toLocaleString('en-GB',{hour:'2-digit',minute:'2-digit'});
   // Who closed the task and when is the receipt's own fact: the first line of its body (never the header).
-  return sheet(end.early?'Task ended early':'Task ended',`${bodyLead(`Farrowing · ${when} · ${initials(end.who)}`)}${taskPerformance(end.performance)}${taskOutcomeSummary({...end,awaiting:end.removed})}`,false,'task-end-expanded task-receipt-sheet');
+  return sheet(end.early?'Task ended early':'Task ended',`${bodyLead(`Farrowing · ${when} · ${initials(end.who)}`)}${taskPerformance(end.performance)}${taskOutcomeSummary(end)}`,false,'task-end-expanded task-receipt-sheet');
  }
  const r=taskClosureReview(c);
  if(s.view==='roomTaskSows'){
@@ -1065,8 +1066,6 @@ function sowActionCatalogue(s){return [
  {id:'miscarriage',title:'Record abortion',group:'production',icon:'pregnancy',scope:'farrowing',sub:'Record a pregnancy loss',livePiglets:s.alive,reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':s.locked?'Farrowing is already finished.':''},
  ...(born(s)>0?[{id:'foster',title:'Foster piglets',group:'production',scope:'farrowing',sub:'Send or receive piglets between litters',icon:'pig',reason:s.ended?'This sow has died.':!s.alive?'No live piglets recorded.':''}]:[]),
  {id:'remove-batch',title:'Remove from batch',group:'production',scope:'other',sub:'Remove this sow without recording a litter',icon:'close',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':''},
- {id:'not-in-pig',title:'Mark not in pig',group:'production',scope:'farrowing',sub:'Record the outcome and return to rebreed watch',icon:'pregnancy',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':''},
- {id:'move-batch',title:'Move to another farrowing batch',group:'production',scope:'other',sub:'Keep the sow in the production plan',icon:'batch',reason:'No destination farrowing batches are connected in this preview.'},
  {id:'marker',title:s.markers.length?'Edit note':'Add note',content:s.markers.length>0,group:'routine',sub:s.markers[0]?.text||'Leave a note or describe a visible marker',icon:'note',reason:''},
  {id:'transfer',title:'Transfer sow',group:'routine',sub:'Move this sow to another unit or pen',icon:'transfer',reason:s.ended?'This sow has died.':''}
 ];}
@@ -1079,22 +1078,22 @@ function connectSowDetail(root,s){
   const events=s.pending?[{text:(s.pending>0?'+':'')+s.pending+' alive · this visit',day:'Today',time:s.stamp,who:'G. Hansen'},...s.events]:s.events;
   const tasks=!s.productionOutcome&&!s.ended?[{id:'farrowing',title:'Farrowing',type:'Production',status:s.locked?'Finished':born(s)?'In progress':'Awaiting',summary:born(s)?s.alive+' alive · '+sum(s.dead)+' dead':'Record this sow’s litter'},...(s.tag==='000418'?[{id:'vaccination',title:'Vaccination',type:'Health',status:'Due today',summary:'Scheduled vaccination'},{id:'treatment-task',title:'Treatment',type:'Health',status:'Due today',summary:'Scheduled treatment'}]:[])]:[];
   if(s.deepLink){const key=s.deepLink;s.deepLink='';deepLinkInto(frame,key);}
-  frame.contentWindow.postMessage({type:'open-sow-detail',record:{id:s.tag,pen:s.pen,unit:(roomContext(s).units.find(u=>u.records.includes(s))||roomContext(s).unit).name,parity:s.parity,batch:'28',breed:'Landrace × Large White',serviceDate:'2026-05-21',expectedFarrowing:'2026-09-12',stage:s.ended?'Sow died':s.locked?'Lactating':born(s)?'Farrowing':'Gestating',events},tasks,destinations:roomContext(s).units.map(u=>({id:u.id,name:u.name,pens:[...new Set(u.records.map(r=>r.pen))]})),context:sowDetailContexts.get(s),entry:s.actionsEntry?'actions':'pig',actions:sowActionCatalogue(s)},location.origin);
+  frame.contentWindow.postMessage({type:'open-sow-detail',record:{id:s.tag,pen:s.pen,unit:(roomContext(s).units.find(u=>u.records.includes(s))||roomContext(s).unit).name,parity:s.parity,batch:s.productionOutcome?'':'28',breed:'Landrace × Large White',serviceDate:'2026-05-21',expectedFarrowing:'2026-09-12',stage:s.ended?'Sow died':s.locked?'Lactating':born(s)?'Farrowing':'Gestating',events},tasks,destinations:roomContext(s).units.map(u=>({id:u.id,name:u.name,pens:[...new Set(u.records.map(r=>r.pen))]})),context:sowDetailContexts.get(s),entry:s.actionsEntry?'actions':'pig',actions:sowActionCatalogue(s)},location.origin);
  },{once:true});
 }
 window.addEventListener('message',e=>{
  if(e.origin!==location.origin||!['sow-detail-state','sow-detail-close','sow-action'].includes(e.data?.type))return;
  const i=states.findIndex((s,i)=>s.view==='profile'&&document.querySelector(`[data-card="${i}"] .sow-detail-frame`)?.contentWindow===e.source);
  if(i<0)return;const s=states[i];sowDetailContexts.set(s,e.data.context);
+ if(i===0&&e.data.type==='sow-detail-state'&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(s,roomContext(s)));
  // Scan's Actions opened one of her flows directly: leaving that flow goes back to the scan list in one Back, not via her Actions sheet.
  if(e.data.type==='sow-detail-state'&&s.scanDeep){const v=e.data.context?.view;if(v&&v!=='actions')s.scanDeep='in';else if(s.scanDeep==='in'&&v==='actions'){s.scanDeep=false;s.actionsEntry=false;act(s,'back');render(i);return;}}
  const viaScan=!!s.scanDeep;if(e.data.type!=='sow-detail-state')s.scanDeep=false;
  if(e.data.type==='sow-action'){
-  const a=e.data.action;if(a==='current-task'&&e.data.taskId==='farrowing'&&!s.productionOutcome&&!s.ended){s.actionReturn=false;s.actionsEntry=false;s.view=s.locked?'locked':'count';render(i);return;}const actionId={'save-miscarriage':'miscarriage','save-transfer':'transfer','save-batch-removal':'remove-batch','save-not-in-pig':'not-in-pig'}[a]||a,entry=sowActionCatalogue(s).find(x=>x.id===actionId&&!x.reason);if(!entry)return;
+  const a=e.data.action;if(a==='current-task'&&e.data.taskId==='farrowing'&&!s.productionOutcome&&!s.ended){s.actionReturn=false;s.actionsEntry=false;s.view=s.locked?'locked':'count';render(i);return;}const actionId={'save-miscarriage':'miscarriage','save-transfer':'transfer','save-batch-removal':'remove-batch'}[a]||a,entry=sowActionCatalogue(s).find(x=>x.id===actionId&&!x.reason);if(!entry)return;
   if(a==='save-transfer'){const c=roomContext(s),from=c.units.find(u=>u.records.includes(s)),to=c.units.find(u=>u.id===e.data.unit),pen=String(e.data.pen||'');if(!from||!to||!to.records.some(r=>r.pen===pen)||(from===to&&s.pen===pen))return;const origin=from.name+' · '+s.pen;if(from!==to){from.records.splice(from.records.indexOf(s),1);to.records.push(s);}s.pen=pen;switchRoomUnit(c,to.id);c.currentPen=pen;event(s,'Transferred · '+origin+' → '+to.name+' · '+pen,'milestone');s.actionsEntry=true;s.view='profile';}
   else if(a==='save-miscarriage'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.frozen=born(s);s.productionOutcome='abortion';s.locked=true;event(s,'Abortion · '+reason,'danger');s.actionsEntry=false;s.view='history';s.pageBack='room';}
-  else if(a==='save-batch-removal'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.productionOutcome='removed';s.locked=true;s.frozen=0;s.alive=0;s.pending=0;event(s,'Removed from farrowing batch · '+reason+(e.data.note?' · '+String(e.data.note).trim():''),'milestone');s.actionsEntry=false;s.view='history';s.pageBack='room';}
-  else if(a==='save-not-in-pig'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.productionOutcome='not-in-pig';s.locked=true;s.frozen=0;s.alive=0;s.pending=0;event(s,'Not in pig · '+reason+(e.data.note?' · '+String(e.data.note).trim():''),'milestone');s.actionsEntry=false;s.view='history';s.pageBack='room';}
+  else if(a==='save-batch-removal'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.productionOutcome='removed';s.locked=true;s.frozen=0;event(s,'Removed from farrowing batch · '+reason+(e.data.note?' · '+String(e.data.note).trim():''),'milestone');s.actionsEntry=false;s.view='history';s.pageBack='room';}
   else {s.actionReturn=true;s.scanReturn=viaScan;s.view=s.locked?'locked':'count';act(s,a);}
   render(i);return;
  }

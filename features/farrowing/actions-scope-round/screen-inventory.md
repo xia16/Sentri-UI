@@ -1,4 +1,4 @@
-# Farrowing 66 个登记页面：入口与范围逐项表
+# Farrowing 67 个登记页面：入口与范围逐项表
 
 2026-11-18，按修正后的 feature.json 登记、实际状态分支、main 的范围和后续明确决定核对。
 
@@ -70,5 +70,6 @@
 | `farrowing.batch-saved` · Actions · saved | 共享通用表单 → Save | 返回 Room 显示保存反馈；登记样例不证明每个菜单后续都走通 | 共享通用表单 |
 | `farrowing.task-sows` · Task sows list | End task → Still farrowing / Awaiting / 生产结果分组 | 开对应母猪记录，Back 回原复核列表 | 分娩范围 |
 | `farrowing.today` · Today | Room → Back；已结束任务的各入口 | 任务运行时继续原位置；结束后看回执 | Home/Workbench 交接示意 |
-| `farrowing.sow-actions` · Actions | 某头母猪记录 → Actions | 通用操作、备注；分娩自己批准流产/未孕/寄养；按状态显示，已移除 processing 和 Reconcile | 共享菜单 + 分娩操作 |
+| `farrowing.sow-actions` · Actions | 某头母猪记录 → Actions | 通用操作、备注；分娩自己批准流产/寄养；按状态显示，已移除 processing 和 Reconcile | 共享菜单 + 分娩操作 |
+| `farrowing.batch-membership` · Batch membership · remove awaiting sow | 待产母猪 → Actions → Batch membership | 查当前批次，选择原因和可选备注，保存移除并打开 Production log | 已记录产仔时只读 |
 | `farrowing.note` · Sow note | 母猪记录 → Actions → Add/Edit note | 填写备注和展示天数，保存回 Actions | 共享猪备注 |

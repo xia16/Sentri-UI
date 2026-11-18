@@ -196,7 +196,7 @@ test('batch membership is one production entrance for add, move and remove', () 
 test('farrowing operations stay together inside Production', () => {
   const s = farrowing.seed('count');
   const actions = farrowing.sowActionCatalogue(s);
-  for (const id of ['miscarriage', 'not-in-pig', 'foster']) {
+  for (const id of ['miscarriage', 'foster']) {
     const entry = actions.find(action => action.id === id);
     assert.equal(entry.group, 'production', id);
     assert.equal(entry.scope, 'farrowing', id);
@@ -208,7 +208,7 @@ test('farrowing operations stay together inside Production', () => {
   const html = model.overlay(c);
   assert.match(html, /aria-label="Farrowing actions"/);
   assert.match(html, /Foster piglets/);
-  assert.doesNotMatch(html, /Piglet processing|Reconcile piglet count|Edit litter record/);
+  assert.doesNotMatch(html, /Piglet processing|Reconcile piglet count|Edit litter record|Mark not in pig/);
   assert.ok(html.indexOf('aria-label="Farrowing actions"') < html.indexOf('aria-label="Shared actions"'));
   assert.equal(farrowing.sowActionCatalogue(farrowing.seed('before')).some(action => action.id === 'foster'), false);
   assert.ok(farrowing.sowActionCatalogue(farrowing.seed('ended')).find(action => action.id === 'foster').reason);
@@ -217,8 +217,16 @@ test('farrowing operations stay together inside Production', () => {
     assert.equal(entry.group, 'production', id);
     assert.equal(entry.scope, 'other', id);
   }
-  assert.equal(actions.find(action => action.id === 'not-in-pig').scope, 'farrowing');
-  assert.ok(actions.find(action => action.id === 'move-batch').reason);
+  assert.ok(actions.find(action => action.id === 'remove-batch').reason);
+});
+test('farrowing receipt counts earlier removals separately from removals at close', () => {
+  const awaiting = farrowing.seed('before');
+  const removed = { ...farrowing.seed('before'), locked: true, frozen: 0, productionOutcome: 'removed' };
+  const room = { units: [{ id: '7', records: [awaiting, removed] }] };
+  assert.equal(farrowing.closeTask(room), true);
+  assert.equal(room.completion.awaiting, 1);
+  assert.equal(room.completion.removed, 1);
+  assert.equal(room.completion.total, 2);
 });
 test('Farrowing actions use one note, one measurements entrance and no Feed category', () => {
   const s = farrowing.seed('count');

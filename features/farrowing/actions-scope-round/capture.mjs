@@ -13,7 +13,7 @@ const control = (page, name, value) => page.locator('[data-card="0"] '+action(na
 const tap = (page, name, value) => control(page, name, value).first().click();
 const state = page => page.evaluate(() => {
   const s = FarrowingStudy.states[0];
-  return { alive: s.alive, draft: s.deathDraft, view: s.view, events: s.events.map(e => e.text) };
+  return { alive: s.alive, draft: s.deathDraft, view: s.view, outcome: s.productionOutcome, born: FarrowingStudy.born(s), events: s.events.map(e => e.text) };
 });
 const embedded = page => page.frameLocator('iframe.sow-detail-frame');
 const hostTap = (page, value) => embedded(page).locator(action('sow-host-action', value)).click();
@@ -76,8 +76,8 @@ async function sendFromList(page, ids, prefix, after) {
   assert.match(await page.locator('.litter-page').innerText(), /Sent and moved/);
   await shot(page, prefix[3]);
 }
-const options = (abortion, notInPig, foster, batch = false) => ({
-  'Record abortion': abortion, 'Mark not in pig': notInPig,
+const options = (abortion, foster, batch = false) => ({
+  'Record abortion': abortion,
   ...(foster === undefined ? {} : { 'Foster piglets': foster }),
   'Batch membership': batch
 });
@@ -85,7 +85,7 @@ const options = (abortion, notInPig, foster, batch = false) => ({
 try {
   let page = await open('count');
   await shot(page, 'a01-active-record');
-  await menu(page, 'Farrowing', options(false, true, false));
+  await menu(page, 'Farrowing', options(false, false));
   await shot(page, 'a02-active-sow-actions-current');
   await showProduction(page);
   await shot(page, 'a03-active-actions-production-current');
@@ -137,7 +137,7 @@ try {
 
   page = await open('ended');
   await shot(page, 'e01-sow-died-record');
-  await menu(page, 'Sow died', options(true, true, true, true));
+  await menu(page, 'Sow died', options(true, true, true));
   await showProduction(page);
   await shot(page, 'e06-sow-died-actions-greyed');
   await closeMenu(page);
@@ -149,7 +149,7 @@ try {
   await page.close();
 
   page = await open('locked');
-  await menu(page, 'Finished', options(true, true, false));
+  await menu(page, 'Finished', options(true, false));
   await showProduction(page);
   await shot(page, 'f01-finished-sow-actions-current');
   await fosterDirection(page, 'Receive');
@@ -226,9 +226,47 @@ try {
 
   page = await open('before');
   await shot(page, 'j01-awaiting-record');
-  await menu(page, 'Awaiting', options(false, false, undefined));
+  await menu(page, 'Awaiting', options(false, undefined));
   await showProduction(page);
   await shot(page, 'j02-awaiting-sow-actions');
+  await embedded(page).locator(action('batch-membership')).click();
+  const form = embedded(page).locator('[data-card="0"] .sheet[aria-label="Batch membership"]');
+  await form.waitFor();
+  assert.match(await form.innerText(), /Batch 28/);
+  const remove = form.locator(action('save-batch-removal'));
+  assert.equal(await remove.isDisabled(), true);
+  await shot(page, 'j03-awaiting-batch-membership');
+  await form.locator('[data-picker-key="dispositionReason"]').click();
+  const reason = 'Assigned to this batch in error';
+  await embedded(page).locator(action('picker-select', reason)).click();
+  assert.equal(await remove.isEnabled(), true);
+  await shot(page, 'j04-awaiting-removal-reason');
+  await remove.click();
+  await page.getByRole('heading', { name: 'Production log', exact: true }).waitFor();
+  const removed = await state(page);
+  assert.equal(removed.outcome, 'removed');
+  assert.equal(removed.born, 0);
+  assert.match(removed.events[0], /Removed from farrowing batch · Assigned to this batch in error/);
+  await shot(page, 'j05-removal-production-log');
+  await label(page, 'Back').click();
+  await tap(page, 'room-lens', 'Awaiting');
+  assert.equal(await control(page, 'room-sow', '000455').count(), 0);
+  await tap(page, 'room-lens', 'Done');
+  await control(page, 'room-sow', '000455').waitFor();
+  await shot(page, 'j06-removed-sow-in-done');
+  await tap(page, 'room-overview');
+  await control(page, 'room-task-list', 'removed').waitFor();
+  await shot(page, 'j07-overview-removal-count');
+  await tap(page, 'room-task-list', 'removed');
+  await tap(page, 'room-task-sow', '7:000455');
+  await page.getByRole('heading', { name: 'Production log', exact: true }).waitFor();
+  await page.close();
+
+  page = await open('count');
+  await tap(page, 'sowActions');
+  await embedded(page).locator(action('batch-membership')).click();
+  await embedded(page).getByText('A litter has already been recorded.', { exact: true }).waitFor();
+  assert.equal(await embedded(page).locator(action('save-batch-removal')).count(), 0);
   await page.close();
 
   // Boundary case: a living sow with a recorded litter but no live piglets.
@@ -239,7 +277,7 @@ try {
   await tap(page, 'saveDeath');
   assert.equal((await state(page)).alive, 0);
   assert.equal(await control(page, 'pigletList').count(), 0);
-  await menu(page, 'Finished with no live piglets', options(true, true, true));
+  await menu(page, 'Finished with no live piglets', options(true, true));
   await showProduction(page);
   await shot(page, 'f04-finished-zero-live-actions');
   await page.close();

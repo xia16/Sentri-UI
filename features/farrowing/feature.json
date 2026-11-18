@@ -13,7 +13,8 @@
         "id": "awaiting",
         "name": "Awaiting",
         "screens": [
-          "farrowing.before"
+          "farrowing.before",
+          "farrowing.batch-membership"
         ]
       },
       {
@@ -931,12 +932,22 @@
     [
       "farrowing.sow-actions",
       "farrowing.history",
-      "save Record abortion or Mark not in pig"
+      "save Record abortion"
     ],
     [
       "farrowing.piglets",
       "farrowing.locked",
       "Back to the finished or aborted sow’s record"
+    ],
+    [
+      "farrowing.sow-actions",
+      "farrowing.batch-membership",
+      "tap Batch membership"
+    ],
+    [
+      "farrowing.batch-membership",
+      "farrowing.history",
+      "choose a reason and save Remove from batch"
     ]
   ],
   "screens": [
@@ -4404,23 +4415,50 @@
       "notes": {
         "purpose": "Shared everyday operations and stage-appropriate Production rows on one sow’s record.",
         "states": [
-          "Awaiting: Record abortion and Mark not in pig are available. Foster is absent before a litter is recorded. Batch membership is shared.",
-          "Farrowing: Record abortion is available. Mark not in pig is greyed. Foster piglets opens Send / Receive while live piglets remain.",
-          "Finished: Record abortion and Mark not in pig are greyed. Foster piglets still opens Send / Receive while live piglets remain.",
+          "Awaiting: Record abortion is available. Batch membership lets you remove the sow with a reason before recording a litter.",
+          "Farrowing: Record abortion is available. Foster piglets opens Send / Receive while live piglets remain. Batch membership shows the current batch.",
+          "Finished: Record abortion is greyed. Foster piglets opens Send / Receive while live piglets remain. Batch membership is read-only.",
           "Sow died: Production rows and transfer are greyed. Note remains available; remaining piglets are managed from Piglets.",
-          "Abortion with live piglets: only shared Batch membership remains under Production. Piglets opens Foster (send) or Move from the record."
+          "Abortion with live piglets: Batch membership shows that the sow has left the batch. Piglets opens Foster (send) or Move."
         ],
         "elements": [
           {
             "name": "Production rows",
             "at": "Production",
-            "shows": "Record abortion, Mark not in pig and Foster piglets when appropriate; shared Batch membership.",
+            "shows": "Record abortion and Foster piglets when appropriate; shared Batch membership.",
             "logic": "Foster piglets is scoped to Farrowing. The shared sheet greys applicable operations that are unavailable.",
             "source": "farrowing-astra-concept.js sowActionCatalogue(), connectSowDetail(); inspection-astra-concept.js actionCatalogue()"
           }
         ],
         "edge": [
-          "The main record has Report death / Record dead. Piglet processing and identity belong to the independent Piglet processing task."
+          "The main record has Report death / Record dead. Piglet processing and identity belong to the independent Piglet processing task.",
+          "Farrowing removes a sow through Batch membership. Pregnancy results are recorded in Pregnancy check."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.batch-membership",
+      "name": "Batch membership · remove awaiting sow",
+      "zh": "批次管理 · 移除待产母猪",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "before",
+      "steps": [
+        "[data-action=\"sowActions\"]",
+        "[data-action=\"batch-membership\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Remove an awaiting sow from the current farrowing batch with a reason.",
+        "states": [
+          "Awaiting without a draft: show the current batch, reason, optional note and Remove from batch.",
+          "A litter was recorded: show current membership and why removal is unavailable.",
+          "An outcome has already been recorded: show no current batch and the existing outcome restriction."
+        ],
+        "edge": [
+          "Saving opens the Production log. The sow is counted in Done as Removed from batch and excluded from finished-litter metrics.",
+          "A reason is required. The operation records batch membership, leaving any existing pregnancy or return-heat records intact."
         ],
         "issues": []
       }

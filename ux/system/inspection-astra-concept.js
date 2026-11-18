@@ -1248,7 +1248,7 @@ function productionTaskScope(task,p){
 }
 function hostProductionScope(action){
  if(action.scope)return action.scope;
- if(['miscarriage','edit','not-in-pig','foster'].includes(action.id))return 'farrowing';
+ if(['miscarriage','edit','foster'].includes(action.id))return 'farrowing';
  if(['piglets','death','countReconcile'].includes(action.id))return 'piglet-processing';
  return 'other';
 }
@@ -1273,9 +1273,9 @@ function productionActionsForPig(c,p){
   else rows.push({a:task.id==='piglet-processing'?'sow-current-task':'production-task',k:'production',title:task.title,sub:[task.status,task.summary].filter(Boolean).join(' · '),value:task.id,section:productionTaskScope(task,p)});
  }
  if(!gone&&!(c.hostActions||[]).some(action=>action.id==='miscarriage')&&/gestat|in heat|breeding/i.test(p.stage||''))rows.push({a:'miscarriage',k:'pregnancy',title:'Record abortion',sub:'Record a pregnancy loss',value:'miscarriage',section:'gestation'});
- const hostBatch=(c.hostActions||[]).some(action=>['remove-batch','move-batch'].includes(action.id)&&!action.reason);
+ const hostBatch=(c.hostActions||[]).some(action=>action.id==='remove-batch');
  const localBatches=(c.batches||[]).filter(batch=>batch.id!==p.batchId);
- rows.push({a:'batch-membership',k:'batch',title:'Batch membership',sub:p.batchId?'Batch '+p.batchId+' · move or remove':'Add this pig to a batch',value:p.id,section:'other',reason:!p.batchId&&!localBatches.length&&!hostBatch?'No production batches are available.':''});
+ rows.push({a:'batch-membership',k:'batch',title:'Batch membership',sub:hostBatch?(p.batchId?'Batch '+p.batchId:'No batch'):p.batchId?'Batch '+p.batchId+' · move or remove':'Add this pig to a batch',value:p.id,section:'other',reason:!p.batchId&&!localBatches.length&&!hostBatch?'No production batches are available.':''});
  return rows;
 }
 /* Greyed in place (owner, 2026-11-06: "when a sow died, the actions should just be grey"). Every action keeps its place in the order a
@@ -1357,13 +1357,30 @@ function miscarriagePage(c){
  const headline=alive?'Farrowing ends':'Sow leaves this batch';
  const consequence=alive?'Her record stays in Farrowing while she has live piglets.':'Saved records are kept.';
  return sheet(c,'Record abortion',picked(c)[0].id+' · '+penOf(c,picked(c)[0].id).id,`${SentriUI.banner({tone:'danger',headline,consequence,icon:'alert'})}<label class="sow-action-field">Reason<input data-loss-reason value="${esc(c.lossReason||'')}" placeholder="Enter the reason" autocomplete="off"></label>`,footer(back(),button('save-miscarriage','Save','button primary','',!c.lossReason?.trim())));}
-function productionDispositionPage(c){
- const removing=c.view==='batch-removal',f=c.form||{},options=removing?[['','Choose a reason'],['assignment','Assigned to this batch in error'],['timing','Not due in this farrowing window'],['other','Other production reason']]:[['','Choose evidence'],['pregnancy-check','Pregnancy check result'],['returned-to-heat','Returned to heat'],['other','Other observation']];
- const title=removing?'Remove from batch':'Mark not in pig';
- return sheet(c,title,picked(c)[0].id+' · '+penOf(c,picked(c)[0].id).id,SentriUI.banner({tone:'danger',headline:removing?'Sow leaves the current batch':'Sow returns to rebreed watch',consequence:removing?'No litter or pregnancy outcome is created.':'A production outcome is recorded and she leaves this batch.',icon:'alert'})+fieldSelect(c,'Reason','dispositionReason',options,f.dispositionReason||'')+optNote('Note',SentriUI.field({label:'Note',labelHidden:true,variant:'textarea',control:'<textarea aria-label="Note" data-v2="dispositionNote">'+esc(f.dispositionNote||'')+'</textarea>'}),f.dispositionNote),footer(back(),button(removing?'save-batch-removal':'save-not-in-pig',removing?'Remove from batch':'Save outcome','button primary','',!f.dispositionReason)));
+const farrowingRemovalReasons=[
+ ['', 'Choose a reason'],
+ ['Assigned to this batch in error', 'Assigned to this batch in error'],
+ ['Not due in this farrowing window', 'Not due in this farrowing window'],
+ ['Other production reason', 'Other production reason']
+];
+function farrowingBatchMembershipPage(c,p,removal){
+ const f=c.form;
+ const batch=p.batchId?'Batch '+p.batchId:'No batch';
+ const subject=p.id+' · '+penOf(c,p.id).id;
+ const membership=`<section class="batch-membership-card facts-surface"><span>Current batch</span><strong>${esc(batch)}</strong><small>${esc(subject)}</small></section>`;
+ if(!p.batchId||removal.reason){
+  return sheet(c,'Batch membership',p.id,membership+'<p class="detail-empty">'+esc(removal.reason||'This sow has no production batch.')+'</p>',footer(back(),''));
+ }
+ const consequence=SentriUI.banner({tone:'danger',headline:'Remove from this batch',consequence:'This ends her participation in this farrowing task.'});
+ const reason=fieldSelect(c,'Reason','dispositionReason',farrowingRemovalReasons,f.dispositionReason||'');
+ const note=optNote('Note',SentriUI.field({label:'Note',labelHidden:true,variant:'textarea',control:'<textarea aria-label="Note" data-v2="dispositionNote">'+esc(f.dispositionNote||'')+'</textarea>'}),f.dispositionNote);
+ return sheet(c,'Batch membership',p.id,membership+consequence+reason+note,footer(back(),button('save-batch-removal','Remove from batch','button primary','',!f.dispositionReason)));
 }
 function batchMembershipPage(c){
- const f=c.form||{},p=pig(c,f.subjects?.[0]||c.pigId),current=c.batches?.find(batch=>batch.id===p?.batchId),choices=(c.batches||[]).filter(batch=>batch.id!==p?.batchId).map(batch=>[batch.id,'Batch '+batch.id+' · '+batch.stage]);
+ const f=c.form||{},p=pig(c,f.subjects?.[0]||c.pigId);
+ const removal=c.hostActions?.find(action=>action.id==='remove-batch');
+ if(removal&&p)return farrowingBatchMembershipPage(c,p,removal);
+ const current=c.batches?.find(batch=>batch.id===p?.batchId),choices=(c.batches||[]).filter(batch=>batch.id!==p?.batchId).map(batch=>[batch.id,'Batch '+batch.id+' · '+batch.stage]);
  if(current)choices.push(['__none__','Remove from batch']);
  const body='<section class="batch-membership-card facts-surface"><span>Current batch</span><strong>'+(current?'Batch '+esc(current.id):'No batch')+'</strong>'+(current?'<small>'+esc(current.stage)+' · '+current.pigIds.length+' pigs</small>':'<small>This pig is not assigned to a production batch.</small>')+'</section>'+(choices.length?fieldSelect(c,current?'Change membership':'Add to batch','batchTarget',[['','Choose a batch'],...choices],f.batchTarget||''):'<p class="detail-empty">No production batches are available.</p>')+optNote('Note',SentriUI.field({label:'Note',labelHidden:true,variant:'textarea',control:'<textarea aria-label="Note" data-v2="batchNote" placeholder="Why is this changing?">'+esc(f.batchNote||'')+'</textarea>'}),f.batchNote);
  return sheet(c,'Batch membership',p?.id||'',body,footer(back(),button('save-batch-membership',f.batchTarget==='__none__'?'Remove from batch':current?'Move pig':'Add to batch','button primary','',!f.batchTarget)));
@@ -1429,7 +1446,7 @@ function scanPage(c){
  return SentriUI.scanPage({title:'Scan ear tags',back:{action:'back'},connected:sc.connected,listening:sc.listening,groups,picked:c.selected.size,selected:n=>countLabel(n)+' selected',actions:{action:'actions',label:'Actions'},toggle:{action:'scan-toggle'},empty:{text:'Each pig you scan is ticked here.',stoppedText:'Resume scanning to add pigs.'},bar:status()});
 }
 
-function overlay(c){if(c.view==='medicines')return medicinesPage(c);if(c.view==='medicine-sheet'&&!c.isDrawerBackground)return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+medicinesPage(c).replace(/ aria-modal="true"/g,'')+'</div>'+medicineSheet(c);if(c.view==='medicine-sheet')return medicineSheet(c);if(c.logDatePicker)return '<div class="drawer-background" inert aria-hidden="true">'+overlay({...c,logDatePicker:false})+'</div>'+logDatePicker(c);if(['record-optional','feed-date','feed-note','medicine-picker','brand-picker','bulk-health-picker','picker'].includes(c.view)&&!c.isDrawerBackground){const parent={...c,view:c.view==='picker'?c.form.pickerReturn:c.view==='record-optional'?c.form.optionalReturn:['medicine-picker','brand-picker'].includes(c.view)?'treatment':c.view==='bulk-health-picker'?'health':'feed-editor',isDrawerBackground:true};if(!AstraSurfaces.isPage('inspection',parent.view,parent))return overlay({...c,isDrawerBackground:true});return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+overlay(parent).replace(/ aria-modal="true"/g,'')+'</div>'+overlay({...c,isDrawerBackground:true});}if(c.view==='medicine-picker')return medicinePicker(c);if(c.view==='brand-picker')return brandPicker(c);if(c.view==='pig-doses')return customDosesPage(c);if(c.view==='picker')return pickerPage(c);if(c.view==='record-optional')return recordOptionalEditor(c);if(c.form?.recordEditor&&bulkActionKinds.includes(c.view))return bulkActionPage(c);if(c.view==='bulk-health-picker')return bulkHealthPicker(c);if(c.view==='sow-transfer')return transferPage(c);if(c.view==='measurements-menu')return measurementsMenu(c);if(c.view==='miscarriage')return miscarriagePage(c);if(c.view==='production-task')return productionTaskPage(c);if(c.view==='batch-membership')return batchMembershipPage(c);if(['batch-removal','not-in-pig'].includes(c.view))return productionDispositionPage(c);if(c.view==='feed-date'||c.view==='feed-note')return feedOptionalEditor(c);if(c.view==='feed-breakdown')return feedBreakdown(c);if(c.view==='pig-production-batch')return productionBatchPage(c);if(c.view==='feed-editor')return feedEditor(c);const recordView=recordFlowOverlay(c);if(recordView!==null)return recordView;const revised=round3Overlay(c);if(revised!==null)return revised;const f=c.form;
+function overlay(c){if(c.view==='medicines')return medicinesPage(c);if(c.view==='medicine-sheet'&&!c.isDrawerBackground)return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+medicinesPage(c).replace(/ aria-modal="true"/g,'')+'</div>'+medicineSheet(c);if(c.view==='medicine-sheet')return medicineSheet(c);if(c.logDatePicker)return '<div class="drawer-background" inert aria-hidden="true">'+overlay({...c,logDatePicker:false})+'</div>'+logDatePicker(c);if(['record-optional','feed-date','feed-note','medicine-picker','brand-picker','bulk-health-picker','picker'].includes(c.view)&&!c.isDrawerBackground){const parent={...c,view:c.view==='picker'?c.form.pickerReturn:c.view==='record-optional'?c.form.optionalReturn:['medicine-picker','brand-picker'].includes(c.view)?'treatment':c.view==='bulk-health-picker'?'health':'feed-editor',isDrawerBackground:true};if(!AstraSurfaces.isPage('inspection',parent.view,parent))return overlay({...c,isDrawerBackground:true});return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+overlay(parent).replace(/ aria-modal="true"/g,'')+'</div>'+overlay({...c,isDrawerBackground:true});}if(c.view==='medicine-picker')return medicinePicker(c);if(c.view==='brand-picker')return brandPicker(c);if(c.view==='pig-doses')return customDosesPage(c);if(c.view==='picker')return pickerPage(c);if(c.view==='record-optional')return recordOptionalEditor(c);if(c.form?.recordEditor&&bulkActionKinds.includes(c.view))return bulkActionPage(c);if(c.view==='bulk-health-picker')return bulkHealthPicker(c);if(c.view==='sow-transfer')return transferPage(c);if(c.view==='measurements-menu')return measurementsMenu(c);if(c.view==='miscarriage')return miscarriagePage(c);if(c.view==='production-task')return productionTaskPage(c);if(c.view==='batch-membership')return batchMembershipPage(c);if(c.view==='feed-date'||c.view==='feed-note')return feedOptionalEditor(c);if(c.view==='feed-breakdown')return feedBreakdown(c);if(c.view==='pig-production-batch')return productionBatchPage(c);if(c.view==='feed-editor')return feedEditor(c);const recordView=recordFlowOverlay(c);if(recordView!==null)return recordView;const revised=round3Overlay(c);if(revised!==null)return revised;const f=c.form;
  if(c.view==='actions')return actionsPage(c);
  if(c.view==='treatment')return sheet(c,f.taskId==='vaccination'?'Record vaccination':'Record treatment',f.returnFinding?c.pigId+' · '+f.returnFinding:scope(c),(SentriUI.field({label:(f.taskId==='vaccination'?'Vaccine':'Medicine'),control:"<input data-v2=\"medicine\" value=\""+(esc(f.medicine||''))+"\" placeholder=\""+(f.taskId==='vaccination'?'Vaccine administered':'Medicine administered')+"\">"}))+(fieldSelect(c,'Method','method',[['','Choose method'],['Injection','Injection'],['Oral','Oral'],['Topical','Topical'],['In feed','In feed'],['In water','In water']],f.method||''))+(fieldSelect(c,'Unit','doseUnit',[['','Choose unit'],['mL','mL'],['mg','mg'],['g','g']],f.doseUnit||''))+(SentriUI.field({label:'Dose per pig',unit:f.doseUnit||'',variant:'number',control:`<input type="number" inputmode="decimal" min="0" step="any" data-v2="dose" value="${esc(f.dose||'')}">`}))+(f.taskId==='vaccination'?'':f.returnFinding?'<div class="detail-line"><span>For this finding</span><strong>'+esc(f.returnFinding)+'</strong></div>':optionalSelect(c,'Condition','target',[['','No linked condition'],...[...new Set(f.subjects.flatMap(id=>cases(pig(c,id)).map(k=>k.name)))].map(n=>[n,n])],f.target||''))+"<p class=\"quiet-note\">"+(f.taskId==='vaccination'?'Record the vaccination administered for this task.':'Records the treatment already administered to these pigs. A target links only to pigs carrying that condition.')+"</p>",footer(back(),button('save-treatment',f.taskId?'Save':`Record · ${countLabel(f.subjects.length)}`,'button primary','',!valid(c))));
  if(c.view==='health')return healthForm(c);
@@ -1932,7 +1949,7 @@ function showMobileScrollIndicator(scroller){
 function sowDetailContext(record,previous){
  const c=previous||seed(),existing=previous&&pig(c,record.id);
  const p=existing||{id:record.id,base:0,factor:1,cases:[],registry:{type:'Sow'},initialRecords:[]};
- Object.assign(p,{id:record.id,parity:record.parity,stage:record.stage});if(record.batch)p.batchId=record.batch;p.registry=Object.assign({},p.registry,{type:'Sow'},record.breed?{breed:record.breed,onFarm:true}:{},record.serviceDate?{serviceDate:record.serviceDate,expectedFarrowing:record.expectedFarrowing}:{});
+ Object.assign(p,{id:record.id,parity:record.parity,stage:record.stage});if(record.batch!==undefined)p.batchId=record.batch;p.registry=Object.assign({},p.registry,{type:'Sow'},record.breed?{breed:record.breed,onFarm:true}:{},record.serviceDate?{serviceDate:record.serviceDate,expectedFarrowing:record.expectedFarrowing}:{});
  p.initialRecords=(record.events||[]).map(e=>({category:'Production',title:e.text,time:[e.day,e.time].filter(Boolean).join(' · '),who:e.who}));
  const pe=previous&&penOf(c,p.id)||{mode:'unknown',formula:'',faults:[],pigs:[]};
  pe.id=record.pen;pe.pigs=[p];c.pens=[pe];c.batches=[];c.unitLabel=record.unit;
@@ -2011,7 +2028,7 @@ function drawerSize(view,c){
   'pen-note':'short','pen-observe':'medium','read-pen-note':'short','selected-pen-note':'medium',
   'choose-fault-pen':'medium',note:'long','read-pig-note':'short',weight:'medium',triage:'medium',
   equipment:'medium','switch-feed':'medium',
-  'sow-transfer':'medium',actions:'long',miscarriage:'medium','production-task':'medium','batch-membership':'medium','batch-removal':'medium','not-in-pig':'medium',pig:'medium','pig-profile':'medium',feed:'medium',health:'long',
+  'sow-transfer':'medium',actions:'long',miscarriage:'medium','production-task':'medium','batch-membership':'medium',pig:'medium','pig-profile':'medium',feed:'medium',health:'long',
   'pig-production-batch':'medium','feed-breakdown':'medium','feed-editor':'long',body:'medium','individual-plan':'medium',treatment:'long',resolve:'medium',review:'medium',
   filters:'medium',history:'medium','unit-detail':'medium',environment:'medium',grid:'long',
   search:'medium',scan:'medium',condition:'medium',plan:'medium',report:'medium',exception:'medium'
@@ -2257,10 +2274,18 @@ gallery.addEventListener('click',e=>{
  const el=e.target.closest('[data-action]'),root=el?.closest('[data-card]');if(!el||!root)return;const i=+root.dataset.card,c=states[i],a=el.dataset.action,v=el.dataset.value;
  if(a==='open-farrowing'){e.stopImmediatePropagation();if(embeddedSow)window.parent.postMessage({type:'sow-action',action:'current-task',taskId:'farrowing',context:{...c,toastTimer:undefined}},location.origin);else location.href='farrowing-astra-concept.html?layout=focus';return;}
  if(a==='sow-current-task'){e.stopImmediatePropagation();const subject=pig(c,c.pigId)||picked(c)[0],task=currentTasksForPig(c,subject).find(t=>t.id===v);if(!task||!subject||c.selectedPens.size)return;c.selected=new Set([subject.id]);c.actionMenuScroll=root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0;if(['farrowing','piglet-processing'].includes(task.id)&&embeddedSow)window.parent.postMessage({type:'sow-action',action:'current-task',taskId:task.id,context:{...c,toastTimer:undefined}},location.origin);else{c.navTrail=c.navTrail||[];c.navTrail.push({...detailLocation(c),sheetScroll:c.actionMenuScroll});if((task.type||'').toLowerCase()==='health'||/vaccin/i.test(task.title||'')){openBulkAction(c,'treatment');c.form.taskId=task.id;}else openProductionTask(c,task,subject);render(i);}return;}
- if(a==='sow-host-action'){e.stopImmediatePropagation();if(picked(c).length!==1||c.selectedPens.size)return;const entry=c.hostActions?.find(x=>x.id===v&&!x.reason);if(!entry||!embeddedSow)return;c.actionMenuScroll=root.querySelector('.phone > .sheet > .sheet-body').scrollTop;if(v==='transfer'){c.navTrail=c.navTrail||[];c.navTrail.push({...detailLocation(c),sheetScroll:c.actionMenuScroll});c.transferDraft={unit:'',pen:''};c.view='sow-transfer';render(i);}else if(v==='miscarriage'){c.navTrail=c.navTrail||[];c.navTrail.push({...detailLocation(c),sheetScroll:c.actionMenuScroll});c.view='miscarriage';c.lossReason='';render(i);}else if(['remove-batch','not-in-pig'].includes(v)){c.navTrail=c.navTrail||[];c.navTrail.push({...detailLocation(c),sheetScroll:c.actionMenuScroll});c.form={dispositionReason:'',dispositionNote:''};c.view=v==='remove-batch'?'batch-removal':'not-in-pig';render(i);}else window.parent.postMessage({type:'sow-action',action:v,context:{...c,toastTimer:undefined}},location.origin);return;}
+ if(a==='sow-host-action'){e.stopImmediatePropagation();if(picked(c).length!==1||c.selectedPens.size)return;const entry=c.hostActions?.find(x=>x.id===v&&!x.reason);if(!entry||!embeddedSow)return;c.actionMenuScroll=root.querySelector('.phone > .sheet > .sheet-body').scrollTop;if(v==='transfer'){c.navTrail=c.navTrail||[];c.navTrail.push({...detailLocation(c),sheetScroll:c.actionMenuScroll});c.transferDraft={unit:'',pen:''};c.view='sow-transfer';render(i);}else if(v==='miscarriage'){c.navTrail=c.navTrail||[];c.navTrail.push({...detailLocation(c),sheetScroll:c.actionMenuScroll});c.view='miscarriage';c.lossReason='';render(i);}else window.parent.postMessage({type:'sow-action',action:v,context:{...c,toastTimer:undefined}},location.origin);return;}
  if(a==='save-transfer'){e.stopImmediatePropagation();if(picked(c).length===1&&!c.selectedPens.size&&transferReady(c))window.parent.postMessage({type:'sow-action',action:'save-transfer',unit:c.transferDraft.unit,pen:c.transferDraft.pen,context:{...c,toastTimer:undefined}},location.origin);return;}
  if(a==='save-miscarriage'){e.stopImmediatePropagation();if(picked(c).length!==1||c.selectedPens.size||!c.lossReason?.trim())return;if(embeddedSow&&c.hostActions?.some(x=>x.id==='miscarriage'&&!x.reason))window.parent.postMessage({type:'sow-action',action:'save-miscarriage',reason:c.lossReason.trim(),context:{...c,toastTimer:undefined}},location.origin);else {saveMiscarriage(c);render(i);}return;}
- if(['save-batch-removal','save-not-in-pig'].includes(a)){e.stopImmediatePropagation();if(picked(c).length===1&&!c.selectedPens.size&&c.form.dispositionReason)window.parent.postMessage({type:'sow-action',action:a,reason:c.form.dispositionReason,note:(c.form.dispositionNote||'').trim(),context:{...c,toastTimer:undefined}},location.origin);return;}
+ if(a==='save-batch-removal'){
+  e.stopImmediatePropagation();
+  const removal=c.hostActions?.find(action=>action.id==='remove-batch');
+  const reason=farrowingRemovalReasons.find(([value])=>value&&value===c.form.dispositionReason);
+  if(embeddedSow&&c.view==='batch-membership'&&removal&&!removal.reason&&picked(c).length===1&&!c.selectedPens.size&&reason){
+   window.parent.postMessage({type:'sow-action',action:a,reason:reason[1],note:(c.form.dispositionNote||'').trim(),context:{...c,toastTimer:undefined}},location.origin);
+  }
+  return;
+ }
  if(c.actionEntry&&a.startsWith('save-')&&!el.disabled)c.returnAfterActionSave=true;
  if(c.view==='actions')c.actionMenuScroll=root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0;
 },true);

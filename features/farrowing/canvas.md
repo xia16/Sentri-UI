@@ -1,5 +1,7 @@
 # Canvas
 
+- [Farrowing batch removal walkthrough](actions-scope-round/review.html#j) (2026-11-18): owner confirmed removing Mark not in pig and using Batch membership to remove an awaiting sow with a reason. The walkthrough shows the real form, saved log and task outcome.
+
 - [Corrected Actions and operation-chain screenshots](actions-scope-round/review.html) (2026-11-18): the owner instructed the build from the scope review. The prototype removes the Care/identity exception, preserves active and finished foster routes, restores death count entry, and opens Piglets on aborted records with live piglets. The [previous review](https://github.com/xia16/Sentri-UI/blob/97c16425d163b5d0414e6aede0b2677ac4ccb6c5/features/farrowing/actions-scope-round/README.md) records the original findings.
 
 - [Actions and Find/Scan version verification](consistency-followup-round/review.html) (2026-11-18): actual Atlas screenshots compare the historical default Find/Scan sheets with the existing current full-page versions. The owner confirmed suppressing the current-task entry while retaining concrete Production operations, and explicitly approved both full-page screens as Atlas defaults. The two approval records and generated Atlas now use that agreed version. [Evidence and affected sources](consistency-followup-round/README.md).

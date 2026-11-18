@@ -32,7 +32,7 @@ Later owner decisions below supersede the older quotes and round notes where the
 - Farrowing's single-action Scan opens the status-specific sow record on each read, or the generic pig record for a pig outside this task; it keeps no scanned-sow selection list. Scanning for a batch action is different: Choose pigs ticks each eligible read (2026-10-22).
 - Foster piglets is available from a living sow's Actions and from selected piglets on the dead or finished sow's Piglets list (2026-11-03).
 - The shared Actions sheet keeps applicable but unavailable actions visible and greyed in place. The 2026-11-09 surface agreement covered white cards; it did not move the separate Piglet processing work into Farrowing's scope.
-- Inside Farrowing, the sow's Actions omits reopening the current Farrowing task. Farrowing's own outcome actions are Record abortion and Mark not in pig; the 2026-11-03 fostering decisions also apply. The Room dock's Pigs in this unit Actions has only the seven generic verbs, with no Production operations.
+- Inside Farrowing, the sow's Actions omits reopening the current Farrowing task. Farrowing offers Record abortion and scoped fostering. Awaiting sows can leave the current farrowing batch through Batch membership with a required reason. The Room dock's Pigs in this unit Actions has only the seven generic verbs, with no Production operations.
 - Piglet processing, Care and identity remain the separate feature's work (owner scope clarification, 2026-11-18, superseding the 2026-11-17 exception). Their prototype screens being mapped does not approve them here. The Farrowing processing entrance and its task fallback have been removed. The sow’s Actions offers Foster Send / Receive for eligible live litters. The record’s death flow uses the live count.
 - Reconcile piglet count belongs to a separate task. The Farrowing Actions sheet omits its former placeholder and the finished Born figure stays locked.
 
@@ -73,7 +73,7 @@ In:
 - The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.
 - Death entry (piglets and the sow), Undo of the top eligible log action (Finish is the floor), the Farrowing log.
 - Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.
-- Farrowing's rows on the pig's Actions sheet (Record abortion, Mark not in pig).
+- Record abortion on the pig’s Actions sheet. An awaiting sow with no litter or unsaved visit can be removed through Actions → Batch membership with a required reason and optional note.
 - When a sow dies: her record (the finished record, its head band saying she died) and her piglets, Inspection's pen list for one litter, with Foster (the sow picker, then a confirm) and Move (Move's pen picker) on the ticked ones; her row's life after (see Decisions, 2026-11-03).
 - An abortion with live piglets retains the record in the room and opens Piglets for Foster (send) / Move. The abortion confirmation explains why the record stays.
 - Fostering from a living sow: Foster piglets (Send piglets · Receive piglets, the sow picker, Filter sows) and her piglet list from her record.
@@ -82,12 +82,14 @@ Out:
 
 - ~~Fostering outside the sow-died case~~ In scope since 2026-11-03 (Decisions).
 - Piglet processing and its identity work (separate feature; Move opens after the lock). The earlier prototype mapped Piglet processing, identity and mortality as screens. Those three Farrowing screen registrations were removed in the scope correction. The owner's 2026-11-18 clarification withdraws this branch's earlier sow-Actions exception. See the decision "Piglet processing is drawn in Farrowing and as its own feature" and the [scope audit](actions-scope-round/README.md).
-- The sow page itself and the rest of the Actions sheet (pig-profile).
+- The sow page itself and the rest of the Actions sheet (pig-profile). Recording a pregnancy outcome belongs to Pregnancy check.
 - The pen page and its tools (Note, Feed guidance, equipment fault, pen log): Inspection's (owner, 2026-10-22). Farrowing's pen header `›` is the door; the pages Farrowing's prototype draws are mapped under Inspection, in its band "Pen in Farrowing".
 - Console reporting, anomaly queues, per-hand audit views, merge-review UI, notifications.
 - Role gates, batch-close disposition doors beyond what the End task reviews show.
 
 ## Decisions
+
+- **Batch removal replaces the Farrowing Mark not in pig entrance** (owner, 2026-11-18). The removal form shows the sow’s current batch, requires a reason and records membership removal. Pregnancy and return-heat results belong to their respective workflows. The removed sow leaves Awaiting, opens a Production log from Done, and counts once under Removed from batch in the overview and receipt. Historical pregnancy outcomes are still readable.
 
 - Born is derived and frozen at Finish; Alive and the dead types are the observations — RULINGS *Model*.
 - Born floor: "+" free, "−" clamps at B\* minus current dead — RULINGS *Model*.

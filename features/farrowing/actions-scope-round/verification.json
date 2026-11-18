@@ -1,13 +1,13 @@
 {
   "date": "2026-11-18",
-  "prototype": "corrected Farrowing Actions",
-  "screenshots": 45,
+  "prototype": "Farrowing Actions without Mark not in pig",
+  "screenshots": 50,
   "screenshotSize": [
     390,
     844
   ],
   "brokenImages": 0,
-  "registeredScreens": 66,
+  "registeredScreens": 67,
   "verifiedProductionStates": 6,
   "routes": {
     "activeSend": "9 → 6",
@@ -17,7 +17,8 @@
     "deadSowSend": "7 → 5",
     "finishedReceive": "8 → 9",
     "abortedSowSend": "9 → 8",
-    "finishedRecordDead": "8 → 2; +6 recorded; Born 14"
+    "finishedRecordDead": "8 → 2; +6 recorded; Born 14",
+    "awaitingBatchRemoval": "Batch 28 · required reason → Production log → Done and Task overview"
   },
   "unitActions": {
     "feed": "shared editor; no plan in sample; Back keeps selection",
@@ -33,7 +34,8 @@
       "reproducedBeforeChange": 6
     },
     "actionsSurfaceTests": {
-      "passed": 44
-    }
+      "passed": 45
+    },
+    "batchMembershipAtlasReplay": "pass"
   }
 }

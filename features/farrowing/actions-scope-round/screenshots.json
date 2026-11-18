@@ -7,7 +7,7 @@
       "id": "a",
       "title": "分娩中：送出仔猪",
       "path": "分娩中母猪记录 → Actions → Foster piglets → Send piglets → 选接收母猪 → 选仔猪 → Send → 回记录",
-      "note": "Foster piglets 归在 Production 的 Farrowing 分组，分娩中送出后活仔 9 → 6。",
+      "note": "Foster piglets 显示在 Production，分娩中送出后活仔 9 → 6。",
       "screenshots": [
         {
           "file": "screenshots/a01-active-record.jpg",
@@ -24,7 +24,7 @@
         {
           "file": "screenshots/a03-active-actions-production-current.jpg",
           "title": "分娩中的 Production 区",
-          "caption": "流产可点，未孕置灰，Foster piglets 可点。Batch membership 是共享猪档案入口。",
+          "caption": "流产可点，Foster piglets 可点。Batch membership 是共享猪档案入口。",
           "version": "corrected"
         },
         {
@@ -176,7 +176,7 @@
         {
           "file": "screenshots/e06-sow-died-actions-greyed.jpg",
           "title": "母猪自己的 Actions",
-          "caption": "流产、未孕、寄养和共享批次管理均置灰。仔猪从记录里的 Piglets 进入。",
+          "caption": "流产、寄养和共享批次管理均置灰。仔猪从记录里的 Piglets 进入。",
           "version": "corrected"
         }
       ]
@@ -190,7 +190,7 @@
         {
           "file": "screenshots/f01-finished-sow-actions-current.jpg",
           "title": "已结束，有活仔",
-          "caption": "流产、未孕置灰。Foster piglets 和共享 Batch membership 可点。",
+          "caption": "流产置灰。Foster piglets 和共享 Batch membership 可点。",
           "version": "corrected"
         },
         {
@@ -208,7 +208,7 @@
         {
           "file": "screenshots/f04-finished-zero-live-actions.jpg",
           "title": "已结束，活仔为 0",
-          "caption": "流产、未孕、Foster 均置灰。共享 Batch membership 可点。",
+          "caption": "流产、Foster 均置灰。共享 Batch membership 可点。",
           "version": "corrected"
         }
       ]
@@ -335,9 +335,9 @@
     },
     {
       "id": "j",
-      "title": "待产：尚未记录一窝",
-      "path": "Room → 待产母猪 → 分娩记录 / 母猪 Actions",
-      "note": "未记录过产仔时，Production 有流产、未孕和共享 Batch membership。",
+      "title": "待产母猪：从批次管理移除",
+      "path": "待产母猪 → Actions → Batch membership → 选择原因 → Remove from batch → Production log",
+      "note": "待产且未记录产仔的母猪可以从批次移除。移除原因保存在日志，母猪在任务里计为已移出批次。",
       "screenshots": [
         {
           "file": "screenshots/j01-awaiting-record.jpg",
@@ -348,7 +348,37 @@
         {
           "file": "screenshots/j02-awaiting-sow-actions.jpg",
           "title": "待产母猪 Actions",
-          "caption": "分娩结果操作有 Record abortion、Mark not in pig；Batch membership 为共享猪档案操作。",
+          "caption": "Production 显示 Record abortion 和 Batch membership。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/j03-awaiting-batch-membership.jpg",
+          "title": "查看当前批次",
+          "caption": "页面显示 Batch 28。选择原因后才能移出。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/j04-awaiting-removal-reason.jpg",
+          "title": "选择原因",
+          "caption": "示例选择误入批次，确认后结束该猪在本批次的分娩任务。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/j05-removal-production-log.jpg",
+          "title": "保存后查看生产日志",
+          "caption": "日志记录移出操作及原因。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/j06-removed-sow-in-done.jpg",
+          "title": "已移出的母猪出现在 Done",
+          "caption": "母猪从 Awaiting 移出，Done 可以查看结果。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/j07-overview-removal-count.jpg",
+          "title": "任务总览显示移出计数",
+          "caption": "可从 Removed from batch 找到对应母猪和日志。",
           "version": "corrected"
         }
       ]
