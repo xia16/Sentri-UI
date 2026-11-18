@@ -1,5 +1,7 @@
 # Canvas
 
+- [Actions and Find/Scan version verification](consistency-followup-round/review.html) (2026-11-18): actual Atlas screenshots compare the historical default Find/Scan sheets with the existing current full-page versions. The current-task entry is already suppressed inside Farrowing; concrete Production actions retain their approved entrances. Promoting the two full-page defaults is awaiting explicit owner confirmation; this follow-up has changed no prototype or Atlas screen. [Evidence and affected sources](consistency-followup-round/README.md).
+
 - [Farrowing entrance and component consistency](consistency-round/canvas.html) (2026-11-17): offline canvas, because claude.ai required sign-in in this session. Seven current/old/proposed screen pairs cover Actions, Note, Piglets, mortality, Reconcile, End task outcomes and Death breakdown. Owner agreed on 2026-11-17, then clarified that Sow record → Actions → Piglet processing retains Care and identity in this round. The PenMap propagation is combined in the same branch. [Page and entrance matrix](consistency-round/page-entry-matrix.md) · [Difference audit](consistency-round/audit.md).
 
 - [PenMap propagation · Farrowing and Inspection](penmap-sync-round/canvas.html) (2026-11-16, offline canvas): current 4 × 6 maps beside long and mixed rooms, Whole room, shared-tile return, and the host click fix. Rendered from the live prototypes by `penmap-sync-round/mock.mjs`; owner agreed on 2026-11-16. Claude Design was unavailable because claude.ai showed Sign in.

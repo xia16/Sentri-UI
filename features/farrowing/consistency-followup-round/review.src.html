@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Farrowing · Actions 与 Find/Scan 逻辑确认</title>
+<style>
+body{margin:0;background:#f6f7f1;color:#20291f;font:16px/1.6 system-ui,sans-serif}main{max-width:1320px;margin:auto;padding:32px 24px 64px}h1{font-size:28px;line-height:1.3}h2{font-size:22px;margin-top:40px}p{max-width:1000px}code{overflow-wrap:anywhere}.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}figure{margin:0}img{display:block;width:100%;border:1px solid #dfe4d8;border-radius:12px}figcaption{margin:10px 0 20px;color:#657060}a{color:#276640}.note{padding:16px 20px;background:white;border:1px solid #dfe4d8;border-radius:12px}@media(max-width:800px){.pair{grid-template-columns:1fr}}
+</style>
+<main>
+<h1>Farrowing：Actions 与 Find/Scan 逻辑确认</h1>
+<p>2026-11-18 · PR #317 当前提交 <code>f368b433</code>。以下来自真实 Atlas 的核对截图，包含顶部版本选择，便于确认为什么同一功能从不同入口进入会显示不同版本。</p>
+<h2>1. 任务入口与具体生产操作</h2>
+<p>Farrowing 内母猪 Actions 已隐藏再次打开 Farrowing 的入口；Production 区域保留流产、仔猪处理、寄养、批次管理等具体操作。其中 Care 与身份录入位于上一轮确认保留的 Piglet processing 入口。</p>
+<div class="note">建议规则：任务内不重复提供“打开当前任务”；具体生产记录操作按母猪状态提供。是否整体删除 Production 是另一项产品范围变化，会影响已经保留的 Care/身份入口。</div>
+<h2>2. Find a sow：历史默认与当前全屏</h2>
+<div class="pair"><figure><img src="find-approved-old.jpg" alt="Atlas 默认 Approved 2026-10-12：旧 Find sheet 与 7 sows in this unit"><figcaption>old · 默认 Approved · 2026-10-12：底部 sheet，限定 Unit 7，未输入时列出母猪。</figcaption></figure><figure><img src="find-current.jpg" alt="Changed since：当前全屏 Find，搜索所有单元，空输入不展示母猪"><figcaption>now · Changed since：当前全屏 Find；搜索所有单元，空输入不列结果。</figcaption></figure></div>
+<h2>3. Scan ear tags：历史默认与当前全屏</h2>
+<div class="pair"><figure><img src="scan-approved-old.jpg" alt="Atlas 默认 Approved 2026-10-12：旧 Scan sheet 与 Try sample tag"><figcaption>old · 默认 Approved · 2026-10-12：旧 Scanner preview、Try sample tag 与母猪列表。</figcaption></figure><figure><img src="scan-current.jpg" alt="Changed since：当前全屏 Scan，等待读取与 Stop scanning"><figcaption>now · Changed since：当前全屏 Scan；读到一个耳标便打开对应记录，没有扫描结果列表。</figcaption></figure></div>
+<div class="note"><strong>建议同步的范围</strong><p>将 <code>farrowing.search</code> 和 <code>farrowing.scan</code> 的批准记录更新到已有的当前全屏版本，让 Atlas 默认入口与 results、其他 Scan 状态及 App 的全屏逻辑一致。当前原型已是右侧画面；本次核对尚未改动批准记录或 Atlas。</p></div>
+<p><a href="http://127.0.0.1:4317/ux/system/farrowing-astra-concept.html?layout=focus&amp;screen=farrowing.search">打开当前 Find</a> · <a href="http://127.0.0.1:4317/ux/system/farrowing-astra-concept.html?layout=focus&amp;screen=farrowing.scan">打开当前 Scan</a> · <a href="README.md">核对依据</a></p>
+</main>

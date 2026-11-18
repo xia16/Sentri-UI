@@ -51,3 +51,11 @@ The owner agreed to the [consistency canvas](canvas.html) on 2026-11-17 and chos
 | #11, #12 · stale Room/Find/Scan copy and flow graph | Current Row/Lookup copy, the gone-pig Scan ID and actual return routes are in the metadata. No flow edge targets a missing Farrowing screen. |
 
 The final [replay](entry-render-results.json) matches all 66 stable page IDs; the other three are correct transient PenMap landing frames. The [69 real entrance checks](route-matrix.md) all align, including 2 Home ways in, status-specific Find/Scan, greyed Actions, selected death save behavior and the task outcome. The branch contains both this round and the approved PenMap propagation in PR 317.
+
+## Follow-up · 2026-11-18: Atlas's default approved versions
+
+The owner reported that the Atlas's Find a sow and Scan ear tags entrances still show old bottom sheets, including `N sows in this unit` and `Try sample tag`. Reproducing the Atlas UI confirmed a fourteenth difference: `features/farrowing/approvals.json` still defaults both screens to the historical `fc98e360` snapshot. Selecting **Changed since** reaches the existing current full-page Find and single-action Scan. Results and the other Scan states have no such historical default.
+
+The passing replay and route audits above cover the current prototype, not the Atlas's approved-snapshot selection. This was a gap in that entrance audit. [Visual evidence and correction scope](../consistency-followup-round/review.html) compare both actual versions. Updating the two approval records is awaiting explicit owner confirmation; no prototype or Atlas screen has been changed by this follow-up.
+
+The separate Actions question was also checked in the live embedded page: Farrowing already suppresses its own **Open Farrowing** task-entry row, while retaining the concrete Production recording operations, including the Care and identity entrance the owner kept on 2026-11-17. Removing the whole Production group would change that agreed scope.
