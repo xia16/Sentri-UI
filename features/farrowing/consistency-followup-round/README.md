@@ -1,5 +1,7 @@
 # Farrowing follow-up verification · 2026-11-18
 
+Later scope clarification on 2026-11-18 supersedes the Care/identity retention described in section 1 below: Piglet processing and identity remain outside Farrowing. See the [latest Actions scope audit and current-state screenshots](../actions-scope-round/README.md). The full-page Find/Scan approval in section 2 remains valid; this note does not withdraw it. Prototype corrections for the new scope findings are pending.
+
 The before/current comparison was captured from implementation commit `f368b433945e2c7957b89525ae8c078f26553407` in the local Atlas at `http://127.0.0.1:4317/atlas/`. The owner confirmed both decisions below on 2026-11-18; the correction stays in PR 317.
 
 ## 1. Actions inside a production task

@@ -1,5 +1,7 @@
 # Farrowing 页面 × 入口复核矩阵 · 2026-11-17
 
+2026-11-18 范围纠正：负责人最新澄清将仔猪处理及身份工作排除在分娩外，取代本表此前的 V7 保留口径。下表保留为当时原型的回放证据；screen 登记和回放通过不代表范围批准。现行边界、69 页逐项说明和操作截图见[新复核清单](../actions-scope-round/README.md)。当前原型尚待按清单修正。
+
 当前分支的 **69 个 screen、156 条内部 flow、2 条 Home ways in** 均列在下方。每页的最新版按已同意的画布、当前原型和组件来源判定；“Flow 来源”从当前 `feature.json` 的入边生成。每页 preset/steps 在 390 × 844 真实原型中重放，结果见 [entry-render-results.json](entry-render-results.json)。另从 Home、Room、各状态、Find、Scan、Actions、Piglets 和 End task 控件逐条进入，见 [实际入口矩阵](route-matrix.md)及 [JSON 证据](route-results.json)。
 
 - **V1 入口与列表**：PR 289 的单任务 Find/Scan 与批量 Actions；Room 状态色由 PR 297，Row 由 PR 310 更新。

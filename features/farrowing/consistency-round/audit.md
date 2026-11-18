@@ -1,5 +1,7 @@
 # Farrowing consistency audit · 2026-11-17
 
+Scope superseded, 2026-11-18: the owner clarified that Piglet processing and identity work are outside Farrowing. The Care/identity retention and greyed Reconcile conclusions below are historical, not the current approved scope. See the [latest scope audit](../actions-scope-round/README.md) and [36 operation-chain screenshots](../actions-scope-round/review.html). The current implementation still needs the listed corrections; the earlier replay/gate passes do not settle product scope.
+
 Baseline: `origin/main` at `df82ba5d` (PR 315), with the owner-approved PenMap
 propagation from PR 317 (`8371e5b0`) combined into this branch. The owner's
 2026-11-03 and 2026-11-09 decisions in `features/farrowing/PRD.md` remain the
