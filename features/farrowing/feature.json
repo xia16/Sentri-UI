@@ -97,9 +97,6 @@
       [
         "Litter recorded · Actions",
         [
-          "farrowing.piglet-care",
-          "farrowing.piglet-identity",
-          "farrowing.death-selected",
           "farrowing.foster",
           "farrowing.foster-search",
           "farrowing.foster-scanning",
@@ -194,7 +191,7 @@
     [
       "farrowing.room",
       "farrowing.history",
-      "tap an abortion / not in pig / removed row"
+      "tap a not-in-pig or removed-from-batch row"
     ],
     [
       "farrowing.room",
@@ -632,21 +629,6 @@
       "Add / Edit note"
     ],
     [
-      "farrowing.sow-actions",
-      "farrowing.piglet-care",
-      "Piglet processing"
-    ],
-    [
-      "farrowing.piglet-care",
-      "farrowing.piglet-identity",
-      "Piglet records, then Add piglet or a piglet row"
-    ],
-    [
-      "farrowing.piglet-identity",
-      "farrowing.piglet-care",
-      "Save identity or Back"
-    ],
-    [
       "farrowing.note",
       "farrowing.sow-actions",
       "Save note or Back"
@@ -882,26 +864,6 @@
       "Save after selecting piglets from a finished sow"
     ],
     [
-      "farrowing.piglet-care",
-      "farrowing.sow-actions",
-      "Back or Save care"
-    ],
-    [
-      "farrowing.piglet-care",
-      "farrowing.death-selected",
-      "select piglets then Record dead"
-    ],
-    [
-      "farrowing.death-selected",
-      "farrowing.count",
-      "Done joins the current visit"
-    ],
-    [
-      "farrowing.death-selected",
-      "farrowing.piglet-care",
-      "Back or Save after Finish"
-    ],
-    [
       "farrowing.piglets-ticked",
       "farrowing.piglets",
       "clear selection"
@@ -950,6 +912,31 @@
       "farrowing.pen-landed-plain",
       "farrowing.room",
       "highlight settles on Room"
+    ],
+    [
+      "farrowing.before",
+      "farrowing.sow-actions",
+      "Actions"
+    ],
+    [
+      "farrowing.ended",
+      "farrowing.sow-actions",
+      "Actions"
+    ],
+    [
+      "farrowing.sow-actions",
+      "farrowing.foster",
+      "Foster piglets (a living sow with live piglets)"
+    ],
+    [
+      "farrowing.sow-actions",
+      "farrowing.history",
+      "save Record abortion or Mark not in pig"
+    ],
+    [
+      "farrowing.piglets",
+      "farrowing.locked",
+      "Back to the finished or aborted sow’s record"
     ]
   ],
   "screens": [
@@ -1571,41 +1558,6 @@
           "A draft kept on the record reopens here with its counts"
         ],
         "issues": []
-      }
-    },
-    {
-      "id": "farrowing.death-selected",
-      "name": "Record dead · selected piglets",
-      "zh": "已选仔猪死亡记录",
-      "status": "in-design",
-      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "count",
-      "steps": [
-        "[data-action=\"sowActions\"]",
-        "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
-        "Piglet records",
-        "[data-action=\"togglePiglet\"][data-value=\"418001\"]",
-        "[data-action=\"openMortality\"]"
-      ],
-      "figma": "",
-      "notes": {
-        "purpose": "The same Record dead flow, reached from Piglet records with selected identified piglets and a count without ID.",
-        "states": [
-          "During farrowing, cause counts join the visit draft.",
-          "After Finish, Record dead saves directly."
-        ],
-        "elements": [
-          {
-            "name": "Selected piglets",
-            "at": "1 identified selected",
-            "shows": "Selected identity and deaths without ID appear above the current cause steppers; saving waits until the causes account for the selected piglets.",
-            "source": "farrowing-astra-concept.js mortalitySelection()",
-            "rule": "At least one after-birth cause must account for every selected piglet; any additional deaths are from the without-ID count. Back discards this draft."
-          }
-        ],
-        "edge": [
-          "Back preserves the Piglet records selection and discards this death draft."
-        ]
       }
     },
     {
@@ -4061,6 +4013,9 @@
         ],
         "rules": [
           "Owner, 2026-10-22: in a single-action task a scan opens that sow; in a multi-select place a scan ticks; search rows follow task membership. Search and scan is one feature set (features/find-pig)."
+        ],
+        "edge": [
+          "Feed opens the shared Adjust feed editor. Pigs without a feed plan cannot be adjusted. Transfer shows an explicit preview placeholder and Back returns to the selection."
         ]
       }
     },
@@ -4330,6 +4285,9 @@
         ],
         "rules": [
           "Owner, 2026-10-22: in a single-action task a scan opens that sow; in a multi-select place a scan ticks; search rows follow task membership. Search and scan is one feature set (features/find-pig)."
+        ],
+        "edge": [
+          "Feed opens the shared Adjust feed editor. Pigs without a feed plan cannot be adjusted. Transfer shows an explicit preview placeholder and Back returns to the selection."
         ]
       }
     },
@@ -4444,62 +4402,25 @@
       ],
       "figma": "",
       "notes": {
-        "purpose": "The shared sow Actions sheet: everyday verbs as icon tiles, her note preview, and concrete Production operations grouped by stage or task. Inside Farrowing it omits reopening the current Farrowing task and keeps one Care and identity entrance.",
+        "purpose": "Shared everyday operations and stage-appropriate Production rows on one sow’s record.",
         "states": [
-          "Awaiting (nothing counted): Record abortion, Mark not in pig and Batch membership are listed; the Piglet processing group is not listed before that production scope applies. Note and transfer stay available.",
-          "Farrowing: Piglet processing (Care and identity) is available after the litter is recorded; Foster piglets requires live piglets. Mark not in pig is greyed after a litter is recorded. Reconcile remains greyed until Count has an approved destination.",
-          "Finished: Care and identity and Foster retain their litter-dependent availability; Record abortion is greyed.",
-          "Sow died: Production operations and transfer are greyed; Note remains available. A recorded outcome filters Production rows by the remaining tasks and stage."
+          "Awaiting: Record abortion and Mark not in pig are available. Foster is absent before a litter is recorded. Batch membership is shared.",
+          "Farrowing: Record abortion is available. Mark not in pig is greyed. Foster piglets opens Send / Receive while live piglets remain.",
+          "Finished: Record abortion and Mark not in pig are greyed. Foster piglets still opens Send / Receive while live piglets remain.",
+          "Sow died: Production rows and transfer are greyed. Note remains available; remaining piglets are managed from Piglets.",
+          "Abortion with live piglets: only shared Batch membership remains under Production. Piglets opens Foster (send) or Move from the record."
         ],
         "elements": [
           {
             "name": "Production rows",
-            "at": "Piglet processing",
-            "shows": "For an active litter: Record abortion, Mark not in pig, Piglet processing (Care and identity), Reconcile piglet count, Foster piglets and Batch membership. The last row contains batch move/remove operations. Record piglet deaths and Record sow death belong to the sow record's own controls, not duplicate rows in this sheet.",
-            "states": [
-              {
-                "state": "Record the litter first.",
-                "when": "No piglets recorded yet",
-                "shows": "The piglet-production group is not listed until that scope applies; a host action that is listed retains its availability reason. Reconcile is always greyed while Count has no approved destination."
-              },
-              {
-                "state": "No live piglets recorded.",
-                "when": "Alive is 0",
-                "shows": "Closes Foster piglets"
-              },
-              {
-                "state": "A litter has already been recorded.",
-                "when": "Born above zero",
-                "shows": "Greys Mark not in pig; batch removal is handled inside Batch membership"
-              },
-              {
-                "state": "Farrowing is already finished.",
-                "when": "Litter locked",
-                "shows": "Closes Record abortion"
-              },
-              {
-                "state": "A production outcome is already recorded.",
-                "when": "Abortion, not in pig or removed",
-                "shows": "Production rows are filtered by the remaining tasks and stage; Batch membership stays listed"
-              },
-              {
-                "state": "This sow has died.",
-                "when": "Farrowing ended by her death",
-                "shows": "Closes production actions and transfer on the sow Actions sheet; Note stays available. Her record still opens Piglets and Record dead while live piglets remain."
-              },
-              {
-                "state": "No destination farrowing batches are connected in this preview.",
-                "when": "Always, in the prototype",
-                "shows": "The host's batch move operation is unavailable; Batch membership is the shared entrance"
-              }
-            ],
-            "logic": "Only the pig's current production tasks and stage supply Production groups. Within an applicable group, unavailable actions stay greyed in place with their usual descriptions; the reason is in the accessible name only, with no reason line or separate Unavailable actions page. Owner confirmed 2026-11-18: suppress reopening the current Farrowing task and deduplicate generic Piglet processing against the host's Care and identity action, while retaining concrete operations. Farrowing's own rows hand back to the host; Health and the rest run inside the embedded Inspection sheet.",
-            "source": "farrowing-astra-concept.js sowActionCatalogue(), connectSowDetail(); inspection-astra-concept.js productionActionsForPig(), actionCatalogue()"
+            "at": "Production",
+            "shows": "Record abortion, Mark not in pig and Foster piglets when appropriate; shared Batch membership.",
+            "logic": "Foster piglets is scoped to Farrowing. The shared sheet greys applicable operations that are unavailable.",
+            "source": "farrowing-astra-concept.js sowActionCatalogue(), connectSowDetail(); inspection-astra-concept.js actionCatalogue()"
           }
         ],
         "edge": [
-          "The sheet is Inspection's embedded sow page (?embed=sow): its Health and Routine rows are the same as in a pig's Actions; Farrowing adds the Production rows and the note preview.",
-          "Returning from a saved action lands back on this list, not on the room."
+          "The main record has Report death / Record dead. Piglet processing and identity belong to the independent Piglet processing task."
         ],
         "issues": []
       }
@@ -4534,90 +4455,6 @@
         ],
         "edge": [
           "Back returns to More actions and keeps the draft on the device."
-        ],
-        "issues": []
-      }
-    },
-    {
-      "id": "farrowing.piglet-care",
-      "name": "Piglet processing",
-      "zh": "仔猪处理",
-      "status": "in-design",
-      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "count",
-      "steps": [
-        "[data-action=\"sowActions\"]",
-        "[data-action=\"sow-host-action\"][data-value=\"piglets\"]"
-      ],
-      "figma": "",
-      "notes": {
-        "purpose": "Work through the litter's processing items day by day and tick what was done.",
-        "elements": [
-          {
-            "name": "Care items",
-            "at": "Day 3",
-            "shows": "A summary (\"2 of 5 care items done\"), then a card per day with its items.",
-            "states": [
-              {
-                "state": "Recorded",
-                "when": "A day before the sample day",
-                "shows": "Day 1 \"Recorded\"; items ticked with who and when"
-              },
-              {
-                "state": "Due today",
-                "when": "Day 3",
-                "shows": "Open circles, meta \"Due today\" (Iron supplement, Ear tag, notch and weight)"
-              },
-              {
-                "state": "In N days",
-                "when": "Later days",
-                "shows": "\"In 2 days\" (Day 5, Health check)"
-              }
-            ],
-            "logic": "The day labels are computed against a fixed sample \"today = day 3\". Ticking an item sets its meta to \"This visit · G.H\"; un-ticking restores \"Due today\" or \"In 2 days\".",
-            "rule": "Nothing is saved on a tick: \"Save care updates\" is disabled until something changes and writes one history entry, \"Piglet processing updated · n of 5 items done\". Due items stay visible until the litter is saved.",
-            "source": "farrowing-astra-concept.js processingCare(), saveProcessing"
-          }
-        ],
-        "edge": [
-          "Care and identity stay in the sow Actions entry. Piglet records uses the shared Row select + door used by approved Piglets.",
-          "Record dead here opens the same death flow as the sow record."
-        ],
-        "issues": []
-      }
-    },
-    {
-      "id": "farrowing.piglet-identity",
-      "name": "Piglet identity",
-      "zh": "仔猪身份",
-      "status": "in-design",
-      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "count",
-      "steps": [
-        "[data-action=\"sowActions\"]",
-        "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
-        "Piglet records",
-        "Add piglet"
-      ],
-      "figma": "",
-      "notes": {
-        "purpose": "Give one piglet its identity, or edit one: ear tag, ear notch, sex and weight.",
-        "states": [
-          "Add piglet identity: \"New identity\" card, empty fields.",
-          "Piglet identity: the same form filled from a piglet row."
-        ],
-        "elements": [
-          {
-            "name": "Save identity",
-            "at": "Save identity",
-            "shows": "Save is disabled until an ear tag or ear notch is entered.",
-            "rule": "Tag or notch identifies the piglet; sex and weight alone cannot save. A new identity moves one piglet out of Without identity.",
-            "logic": "Scan tag and Ear notch on the Piglet records tab open this form pre-filled with a sample tag (418001 plus the number identified) or a \"Choose notch\" placeholder.",
-            "source": "farrowing-astra-concept.js savePiglet"
-          }
-        ],
-        "edge": [
-          "Dead piglets stay in the list but cannot be selected."
         ],
         "issues": []
       }

@@ -196,37 +196,22 @@ test('batch membership is one production entrance for add, move and remove', () 
 test('farrowing operations stay together inside Production', () => {
   const s = farrowing.seed('count');
   const actions = farrowing.sowActionCatalogue(s);
-  for (const id of ['miscarriage', 'not-in-pig']) {
+  for (const id of ['miscarriage', 'not-in-pig', 'foster']) {
     const entry = actions.find(action => action.id === id);
     assert.equal(entry.group, 'production', id);
     assert.equal(entry.scope, 'farrowing', id);
   }
-  for (const id of ['piglets', 'death', 'countReconcile', 'foster']) {
-    const entry = actions.find(action => action.id === id);
-    assert.equal(entry.group, 'production', id);
-    assert.equal(entry.scope, 'piglet-processing', id);
-  }
-  actions.find(action => action.id === 'remove-batch').reason = '';
-  const c = context('actions'); c.selected.add(c.pigId); c.hostActions = actions;
-  c.hostTasks = [
-    { id: 'farrowing', title: 'Farrowing', type: 'Production', status: 'In progress' },
-    { id: 'piglet-processing', title: 'Piglet processing', type: 'Production', status: 'Due today' }
-  ];
+  const c = context('actions');
+  c.selected.add(c.pigId);
+  c.hostActions = actions;
+  c.hostTasks = [{ id: 'farrowing', title: 'Farrowing', type: 'Production', status: 'In progress' }];
   const html = model.overlay(c);
   assert.match(html, /aria-label="Farrowing actions"/);
-  assert.match(html, /aria-label="Piglet processing actions"/);
-  assert.match(html, /aria-label="Farrowing actions">[\s\S]*?<h5[^>]*><span>Farrowing<\/span><\/h5>/);
-  assert.match(html, /aria-label="Piglet processing actions">[\s\S]*?<h5[^>]*><span>Piglet processing<\/span><\/h5>/);
-  assert.doesNotMatch(html, /Current task ·/);
-  assert.match(html, /Record abortion/);
-  assert.doesNotMatch(html, /Edit litter record/, 'no Edit record (owner, 2026-11-02)');
-  assert.ok(html.indexOf('aria-label="Farrowing actions"') < html.indexOf('aria-label="Piglet processing actions"'));
-  assert.ok(html.indexOf('aria-label="Piglet processing actions"') < html.indexOf('aria-label="Shared actions"'));
-  assert.doesNotMatch(html, /Other production actions|aria-label="Other actions"/);
-  c.hostActions = actions.map(({ scope, ...action }) => action);
-  const legacyHtml = model.overlay(c);
-  assert.match(legacyHtml, /aria-label="Farrowing actions"/);
-  assert.match(legacyHtml, /aria-label="Piglet processing actions"/);
+  assert.match(html, /Foster piglets/);
+  assert.doesNotMatch(html, /Piglet processing|Reconcile piglet count|Edit litter record/);
+  assert.ok(html.indexOf('aria-label="Farrowing actions"') < html.indexOf('aria-label="Shared actions"'));
+  assert.equal(farrowing.sowActionCatalogue(farrowing.seed('before')).some(action => action.id === 'foster'), false);
+  assert.ok(farrowing.sowActionCatalogue(farrowing.seed('ended')).find(action => action.id === 'foster').reason);
   for (const id of ['remove-batch']) {
     const entry = actions.find(action => action.id === id);
     assert.equal(entry.group, 'production', id);
@@ -288,7 +273,7 @@ test('Production hides actions from conflicting stages and shares only batch mem
   assert.equal(growerProduction.filter(item => item.a === 'batch-membership').length, 1);
 });
 test('farrowing surface policy includes substantial pages but preserves review drawers', () => {
-  for (const view of ['history', 'roomOverview', 'roomEndTask', 'roomTaskReceipt', 'roomTaskSows', 'roomPenDetail', 'roomPenFeed', 'roomPenLog', 'marker', 'pigletCare', 'pigletEdit', 'foster', 'pigletDeath', 'countReconcile']) assert.equal(surfaces.isPage('farrowing', view), true, view);
+  for (const view of ['history', 'roomOverview', 'roomEndTask', 'roomTaskReceipt', 'roomTaskSows', 'roomPenDetail', 'roomPenFeed', 'roomPenLog', 'marker', 'pigletList', 'fosterSend', 'foster']) assert.equal(surfaces.isPage('farrowing', view), true, view);
   for (const view of ['count', 'finish', 'locked', 'death', 'edit', 'editFinish', 'deathBreakdown']) assert.equal(surfaces.isPage('farrowing', view), false, view);
 });
 

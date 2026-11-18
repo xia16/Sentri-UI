@@ -1248,8 +1248,8 @@ function productionTaskScope(task,p){
 }
 function hostProductionScope(action){
  if(action.scope)return action.scope;
- if(['miscarriage','edit','not-in-pig'].includes(action.id))return 'farrowing';
- if(['piglets','death','countReconcile','foster'].includes(action.id))return 'piglet-processing';
+ if(['miscarriage','edit','not-in-pig','foster'].includes(action.id))return 'farrowing';
+ if(['piglets','death','countReconcile'].includes(action.id))return 'piglet-processing';
  return 'other';
 }
 function eligibleProductionScopes(c,p){
@@ -1272,7 +1272,7 @@ function productionActionsForPig(c,p){
   else if(task.id==='piglet-processing'&&(c.hostActions||[]).some(action=>action.id==='piglets'&&!action.reason))continue;
   else rows.push({a:task.id==='piglet-processing'?'sow-current-task':'production-task',k:'production',title:task.title,sub:[task.status,task.summary].filter(Boolean).join(' · '),value:task.id,section:productionTaskScope(task,p)});
  }
- if(!gone&&/gestat|in heat|breeding/i.test(p.stage||''))rows.push({a:'miscarriage',k:'pregnancy',title:'Record abortion',sub:'Record a pregnancy loss',value:'miscarriage',section:'gestation'});
+ if(!gone&&!(c.hostActions||[]).some(action=>action.id==='miscarriage')&&/gestat|in heat|breeding/i.test(p.stage||''))rows.push({a:'miscarriage',k:'pregnancy',title:'Record abortion',sub:'Record a pregnancy loss',value:'miscarriage',section:'gestation'});
  const hostBatch=(c.hostActions||[]).some(action=>['remove-batch','move-batch'].includes(action.id)&&!action.reason);
  const localBatches=(c.batches||[]).filter(batch=>batch.id!==p.batchId);
  rows.push({a:'batch-membership',k:'batch',title:'Batch membership',sub:p.batchId?'Batch '+p.batchId+' · move or remove':'Add this pig to a batch',value:p.id,section:'other',reason:!p.batchId&&!localBatches.length&&!hostBatch?'No production batches are available.':''});
@@ -1317,7 +1317,7 @@ function sowTaskCard(c){if(picked(c).length!==1||c.selectedPens.size)return '';c
    grey"; six rows each saying "This sow has died." is the same fact six times). */
 function actionRows(items){return items.map(x=>action(x.a,x.k,x.title,x.sub,x.value,!!x.reason,x.reason)).join('');}
 function productionActionGroups(c,items){
- const farrowingIds=new Set(['miscarriage','edit']),processingIds=new Set(['piglets','death','countReconcile','foster']);
+ const farrowingIds=new Set(['miscarriage','edit']),processingIds=new Set(['piglets','death','countReconcile']);
  const taskScope=x=>['farrowing','piglet-processing','pregnancy-check','gestation','breeding','lactation','growth','other'].includes(x.section)?x.section:farrowingIds.has(x.value)?'farrowing':processingIds.has(x.value)?'piglet-processing':'other';
  const byScope=scope=>items.filter(x=>taskScope(x)===scope),farrowing=byScope('farrowing'),processing=byScope('piglet-processing'),pregnancy=byScope('pregnancy-check'),gestation=byScope('gestation'),breeding=byScope('breeding'),lactation=byScope('lactation'),growth=byScope('growth'),other=byScope('other');
  const cluster=(title,rows)=>rows.length?'<section class="production-action-cluster" aria-label="'+title+' actions">'+stHeading({title,kind:'group',level:5})+'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(rows)+'</div></section>':'';
@@ -1352,7 +1352,11 @@ function measurementsMenu(c){
  return sheet(c,'Measurements',single?rows[0].id:selectionLabel(c),'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(items)+'</div>',footer(back(),''),'menu',single?pigRoute(c,rows[0]):null);
 }
 
-function miscarriagePage(c){return sheet(c,'Record abortion',picked(c)[0].id+' · '+penOf(c,picked(c)[0].id).id,`${SentriUI.banner({tone:'danger',headline:'Sow leaves this batch',consequence:'Saved records are kept.',icon:'alert'})}<label class="sow-action-field">Reason<input data-loss-reason value="${esc(c.lossReason||'')}" placeholder="Enter the reason" autocomplete="off"></label>`,footer(back(),button('save-miscarriage','Save','button primary','',!c.lossReason?.trim())));}
+function miscarriagePage(c){
+ const alive=c.hostActions?.find(action=>action.id==='miscarriage')?.livePiglets||0;
+ const headline=alive?'Farrowing ends':'Sow leaves this batch';
+ const consequence=alive?'Her record stays in Farrowing while she has live piglets.':'Saved records are kept.';
+ return sheet(c,'Record abortion',picked(c)[0].id+' · '+penOf(c,picked(c)[0].id).id,`${SentriUI.banner({tone:'danger',headline,consequence,icon:'alert'})}<label class="sow-action-field">Reason<input data-loss-reason value="${esc(c.lossReason||'')}" placeholder="Enter the reason" autocomplete="off"></label>`,footer(back(),button('save-miscarriage','Save','button primary','',!c.lossReason?.trim())));}
 function productionDispositionPage(c){
  const removing=c.view==='batch-removal',f=c.form||{},options=removing?[['','Choose a reason'],['assignment','Assigned to this batch in error'],['timing','Not due in this farrowing window'],['other','Other production reason']]:[['','Choose evidence'],['pregnancy-check','Pregnancy check result'],['returned-to-heat','Returned to heat'],['other','Other observation']];
  const title=removing?'Remove from batch':'Mark not in pig';
@@ -1472,7 +1476,7 @@ function installV2(){
  else if(a==='batch-detail'){c.batchId=v;c.view='batch-detail';}
  else if(a==='show-batch'){c.filterKeep=false;c.batchFilter=v;c.stage='All';c.healthFilter='All';c.healthStatus='All';c.manualOnly=false;c.triageFilter='All';c.lens='All';c.scroll=0;c.view='list';}
  else if(a==='environment')c.view='environment';
- else if(a==='back'&&c.batchHost&&['health','treatment','note','body','triage','weight','temperature','backfat'].includes(c.view)){c.form={};c.view='list';}   // a host's form for several animals: Back returns to the host (its Choose sows)
+ else if(a==='back'&&c.batchHost&&['health','treatment','note','body','triage','weight','temperature','backfat','feed-editor'].includes(c.view)){c.form={};c.view='list';}   // a host's form for several animals: Back returns to the host (its Choose sows)
  else if(a==='back'&&['selected-pen-note','choose-fault-pen'].includes(c.view))c.view='actions';
  else if(a==='stage'){c.filterKeep=false;c.stage=c.stage===v?'All':v;c.scroll=0;}
  else if(a==='scope-stage'){c.filterKeep=false;c.stage=v;c.scroll=0;c.view='list';}
@@ -2315,7 +2319,9 @@ if(embeddedSow)window.addEventListener('message',e=>{
  const c=seed();c.pens=[];c.batches=[];
  for(const r of list){let pe=c.pens.find(x=>x.id===r.pen);if(!pe)c.pens.push(pe={id:r.pen,mode:'unknown',formula:'',faults:[],pigs:[],untagged:{count:0,cases:[]}});pe.pigs.push({id:r.id,base:0,factor:1,cases:[],registry:{type:'Sow'},initialRecords:[],parity:r.parity,stage:r.stage});}
  hostNoun=Array.isArray(e.data.noun)?e.data.noun:null;Object.assign(c,{unitLabel:list[0].unit,hostNoun:e.data.noun,batchHost:true,navTrail:[],toast:'',scroll:0});c.selected=new Set(list.map(r=>r.id));c.selectedPens.clear();
- openBulkAction(c,e.data.view);states[0]=c;embeddedSowReady=true;document.documentElement.classList.add('inspection-embedded-ready');document.documentElement.removeAttribute('data-atlas-pending');render(0);
+ if(e.data.view==='feed')openFeedEditor(c,'pigs',[...c.selected]);
+ else openBulkAction(c,e.data.view);
+ states[0]=c;embeddedSowReady=true;document.documentElement.classList.add('inspection-embedded-ready');document.documentElement.removeAttribute('data-atlas-pending');render(0);
 });
 states.forEach((_,i)=>render(i));if(new URLSearchParams(location.search).get('layout')==='overview')document.querySelector('[data-layout="overview"]').click();
 })();

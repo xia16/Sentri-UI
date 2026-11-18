@@ -1,8 +1,8 @@
-# Farrowing 69 个登记页面：入口与范围逐项表
+# Farrowing 66 个登记页面：入口与范围逐项表
 
-2026-11-18，基于候选 `af1f54bd` 的 feature.json 登记、实际状态分支、main 的范围和后续明确决定核对。
+2026-11-18，按修正后的 feature.json 登记、实际状态分支、main 的范围和后续明确决定核对。
 
-此表覆盖登记页，不把“能回放”“有 screen ID”当成产品批准。本轮关键交互实走并提供 [36 张截图](review.html)；其余项依据入口和状态分支检查，本轮没有重跑一次 69 页 UI 自动回放。全部业务链路和待修正项见 [复核清单](README.md)。
+此表覆盖登记页，不把“能回放”“有 screen ID”当成产品批准。本轮关键交互实走并提供 [更新后的截图](review.html)；其余项依据入口和状态分支检查，本轮没有重跑一次 66 页 UI 自动回放。全部业务链路和待修正项见 [复核清单](README.md)。
 
 | 页面登记 | 实际入口 / 状态 | 可做的操作、保存与返回 | 范围或缺口 |
 | --- | --- | --- | --- |
@@ -13,10 +13,9 @@
 | `farrowing.undo` · Undo the last save | Details → Farrowing log → 顶端 Undo | 确认撤销符合条件的顶端记录；Finish 为底线 | 分娩范围 |
 | `farrowing.before` · Before first count | Room/Find/Scan/任务复核 → 待产母猪 | 开始出生计数、报告死亡、母猪 Actions；不能空窝 Finish | 分娩范围 |
 | `farrowing.death` · Report death | 母猪计数 → Death；已结束/死亡记录 → Record dead | 分娩中 Done 带回草稿；已结束直接保存；母猪死亡要选原因长按保存 | 分娩范围 |
-| `farrowing.death-selected` · Record dead · selected piglets | 当前分娩母猪 Actions → Piglet processing → Piglet records → 选仔猪 → Record dead | 这是本轮借 Care 增加的身份相关入口，不能据登记当成分娩范围 | 撤回范围扩张；保留核心分娩死亡入口 |
 | `farrowing.litter` · Details · while she farrows | 分娩中 Alive 卡片 → Details | 看这一窝明细，进入 Farrowing log/Undo | 分娩范围 |
 | `farrowing.finish` · Finish | 计数已保存 → Finish farrowing | Weak/Deformed、Assisted、可选窝重；长按完成并锁 Born | 分娩范围 |
-| `farrowing.locked` · Locked record | Room/Find/Scan/任务复核 → 正常已结束母猪；有活仔的流产母猪也路由到这里 | 正常完成有 Details、Piglets、Actions、Record dead；流产分支当前缺 Piglets | 分娩范围 |
+| `farrowing.locked` · Locked record | Room/Find/Scan/任务复核 → 正常已结束母猪；有活仔的流产母猪也路由到这里 | 正常完成有 Details、Piglets、Actions、Record dead；有活仔的流产记录也有 Piglets | 分娩范围 |
 | `farrowing.details` · Details · a finished sow | 正常结束/母猪死亡记录卡片 → Details | 查看本窝、批次比较、过往窝、Farrowing log；没有历史时保留占位 | 分娩范围 |
 | `farrowing.details-first` · Details · no earlier litters | 正常结束/母猪死亡记录卡片 → Details | 查看本窝、批次比较、过往窝、Farrowing log；没有历史时保留占位 | 分娩范围 |
 | `farrowing.history` · Farrowing log | Details → Farrowing log；未孕/移出批次记录；流产保存后 | 看日志；符合条件的顶端分娩记录可 Undo；生产退出结果不继续计数 | 分娩范围 |
@@ -59,7 +58,7 @@
 | `farrowing.pig-gone` · A pig no longer on the farm | Find/Scan → 已死亡或售出的猪 | 受限/只读猪档案；不能勾入本单元通用选择 | 共享 pig-profile 交接 |
 | `farrowing.scan-unknown` · Scan · a tag with no pig | Scan → 未知耳标 | 提示耳标未知/未同步，继续扫描；不造数据 | 分娩范围 |
 | `farrowing.scan-stopped` · Scan · stopped | Scan → Stop scanning | Resume 后继续逐头打开 | 分娩范围 |
-| `farrowing.batch` · Actions · pigs in this unit | Room 底部 Actions | Pigs in this unit：7 项通用操作；无生产任务/身份/寄养/死亡 | 共享通用操作；Feed/Transfer 当前中断 |
+| `farrowing.batch` · Actions · pigs in this unit | Room 底部 Actions | Pigs in this unit：7 项通用操作；无生产任务/身份/寄养/死亡 | 共享通用操作；Feed 按饲喂计划判断，Transfer 为占位 |
 | `farrowing.batch-pick-none` · Choose pigs | Room Actions → 选通用操作 | 在当前单元选猪；未选择不能 Next | 共享通用选择 |
 | `farrowing.batch-pick` · Choose pigs · 3 chosen | Choose pigs → 勾猪 | Next 进入对应通用表单 | 共享通用选择 |
 | `farrowing.batch-search` · Choose pigs · search | Choose pigs → 输入耳号/栏位 | 过滤可选猪，不额外开放生产操作 | 共享通用选择 |
@@ -67,15 +66,9 @@
 | `farrowing.batch-waiting` · Choose pigs · waiting for the reader | Choose pigs → Scan，未连接 | 等连接，不添加未知/离场/其他单元猪 | 共享通用选择 |
 | `farrowing.batch-scanning` · Choose pigs · scanning | Choose pigs → Scan，已连接 | 读到合格猪勾选，支持多头；不同于逐头开记录的 Scan | 共享通用选择 |
 | `farrowing.batch-missed` · Choose pigs · reads that can't join | Choose pigs → Scan 读到不能加入的耳标 | 显示原因和可查看的记录，不加入选择 | 共享通用选择 |
-| `farrowing.batch-form` · Actions · the form | Choose pigs → Next | 共享表单；当前示例 Condition；Feed/Transfer 未走通 | 共享通用表单 |
+| `farrowing.batch-form` · Actions · the form | Choose pigs → Next | 共享表单；当前示例 Condition；Feed 使用共享饲喂编辑器，Transfer 提供占位 | 共享通用表单 |
 | `farrowing.batch-saved` · Actions · saved | 共享通用表单 → Save | 返回 Room 显示保存反馈；登记样例不证明每个菜单后续都走通 | 共享通用表单 |
 | `farrowing.task-sows` · Task sows list | End task → Still farrowing / Awaiting / 生产结果分组 | 开对应母猪记录，Back 回原复核列表 | 分娩范围 |
 | `farrowing.today` · Today | Room → Back；已结束任务的各入口 | 任务运行时继续原位置；结束后看回执 | Home/Workbench 交接示意 |
-| `farrowing.sow-actions` · Actions | 某头母猪记录 → Actions | 通用操作、备注；分娩自己批准流产/未孕/寄养；当前混入待撤回 processing/Reconcile | 共享菜单 + 分娩操作；范围待收紧 |
+| `farrowing.sow-actions` · Actions | 某头母猪记录 → Actions | 通用操作、备注；分娩自己批准流产/未孕/寄养；按状态显示，已移除 processing 和 Reconcile | 共享菜单 + 分娩操作 |
 | `farrowing.note` · Sow note | 母猪记录 → Actions → Add/Edit note | 填写备注和展示天数，保存回 Actions | 共享猪备注 |
-| `farrowing.piglet-care` · Piglet processing | 当前母猪记录 → Actions → Piglet processing | 按日龄 Care、Piglet records 等不应纳入分娩范围 | 独立仔猪处理；本轮撤回范围扩张 |
-| `farrowing.piglet-identity` · Piglet identity | 当前 Care → Piglet records → Add/Edit/Scan/Notch | 给予/修改身份、性别和体重；属于独立任务 | 独立仔猪处理；本轮撤回范围扩张 |
-
-main 另登记过 `farrowing.piglet-death`（旧 Report piglet mortality）。本分支用 `farrowing.death-selected` 替代了它；两者的登记均不能证明整段独立仔猪处理/身份工作属于分娩。本次应撤回越界路径，并保留、修正分娩自己的 Report death / Record dead。
-
-元数据另有一处冲突：flow 把 abortion 同时登记为 Room → history 和有活仔时 Room → locked。实际为保存流产后打开 Production log；回 Room 后，有活仔的流产行打开 locked 的 abortion 分支，当前缺 Piglets。不可把这两个状态用一个笼统边代替。

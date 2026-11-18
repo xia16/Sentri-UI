@@ -1,72 +1,39 @@
 {
-  "verifiedAt": "2026-11-18T06:04:36.551532+00:00",
-  "candidateImplementation": "af1f54bd03719a547fbb9c2a489de29df62b6006",
-  "mainBaseline": "df82ba5dbaf690fab32cfd4437c66457c4e17b9e",
-  "artifactChecks": {
-    "screenshots": 36,
-    "screenSize": [
-      390,
-      844
-    ],
-    "galleryImagesBroken": 0,
-    "inventoryScreenIds": 69,
-    "allRegisteredScreenIdsCovered": true,
-    "localLinks": "pass",
-    "json": "pass",
-    "gitDiffCheck": "pass",
-    "atlasBuildCheck": "pass"
+  "date": "2026-11-18",
+  "prototype": "corrected Farrowing Actions",
+  "screenshots": 45,
+  "screenshotSize": [
+    390,
+    844
+  ],
+  "brokenImages": 0,
+  "registeredScreens": 66,
+  "verifiedProductionStates": 6,
+  "routes": {
+    "activeSend": "9 → 6",
+    "activeReceive": "9 → 11",
+    "finishedSend": "8 → 5",
+    "finishedMove": "8 → 6",
+    "deadSowSend": "7 → 5",
+    "finishedReceive": "8 → 9",
+    "abortedSowSend": "9 → 8",
+    "finishedRecordDead": "8 → 2; +6 recorded; Born 14"
   },
-  "observedSavedRoutes": [
-    {
-      "route": "active record → Actions → Foster → Send",
-      "identified": 2,
-      "withoutId": 1,
-      "aliveBefore": 9,
-      "aliveAfter": 6
+  "unitActions": {
+    "feed": "shared editor; no plan in sample; Back keeps selection",
+    "transfer": "placeholder; Back keeps selection"
+  },
+  "checks": {
+    "englishScenarios": {
+      "passed": 136,
+      "failed": 0
     },
-    {
-      "route": "active record → Actions → Foster → Receive",
-      "identified": 0,
-      "withoutId": 2,
-      "aliveBefore": 9,
-      "aliveAfter": 11
+    "chineseScenarioFailures": {
+      "count": 6,
+      "reproducedBeforeChange": 6
     },
-    {
-      "route": "finished record → Piglets → selected → Foster",
-      "identified": 3,
-      "withoutId": 0,
-      "aliveBefore": 8,
-      "aliveAfter": 5
-    },
-    {
-      "route": "finished record → Piglets → selected → Move to B2",
-      "identified": 2,
-      "withoutId": 0,
-      "aliveBefore": 8,
-      "aliveAfter": 6
-    },
-    {
-      "route": "sow died record → Piglets → selected → Foster",
-      "identified": 2,
-      "withoutId": 0,
-      "aliveBefore": 7,
-      "aliveAfter": 5
+    "actionsSurfaceTests": {
+      "passed": 44
     }
-  ],
-  "observedOtherRoutes": [
-    "finished living sow Actions → Foster → Receive direction available (not submitted)",
-    "awaiting sow record and Actions",
-    "sow died Actions: disabled except Note",
-    "abortion with live piglets: no Piglets door and no Foster in Actions",
-    "direct Record dead: candidate cannot add beyond 5 deaths with 8 alive / 5 without ID; main still allows increase at +5",
-    "unit Transfer → Choose pigs → Next: blank form",
-    "unit Feed → Choose pigs → Next: missing penId TypeError",
-    "unit Condition → Choose pigs → Next: shared Record health form (not submitted)"
-  ],
-  "notRun": [
-    "full gate on this documentation-only audit commit",
-    "new 69-screen automated UI replay",
-    "Android app acceptance"
-  ],
-  "implementationStatus": "Product prototype corrections remain pending. Current-state screenshots are not new design approval."
+  }
 }

@@ -1,0 +1,94 @@
+{
+  "Farrowing": [
+    {
+      "title": "Record abortion",
+      "disabled": false
+    },
+    {
+      "title": "Foster piglets",
+      "disabled": false
+    },
+    {
+      "title": "Mark not in pig",
+      "disabled": true
+    },
+    {
+      "title": "Batch membership",
+      "disabled": false
+    }
+  ],
+  "Sow died": [
+    {
+      "title": "Record abortion",
+      "disabled": true
+    },
+    {
+      "title": "Foster piglets",
+      "disabled": true
+    },
+    {
+      "title": "Mark not in pig",
+      "disabled": true
+    },
+    {
+      "title": "Batch membership",
+      "disabled": true
+    }
+  ],
+  "Finished": [
+    {
+      "title": "Record abortion",
+      "disabled": true
+    },
+    {
+      "title": "Foster piglets",
+      "disabled": false
+    },
+    {
+      "title": "Mark not in pig",
+      "disabled": true
+    },
+    {
+      "title": "Batch membership",
+      "disabled": false
+    }
+  ],
+  "Aborted with live piglets": [
+    {
+      "title": "Batch membership",
+      "disabled": false
+    }
+  ],
+  "Awaiting": [
+    {
+      "title": "Batch membership",
+      "disabled": false
+    },
+    {
+      "title": "Record abortion",
+      "disabled": false
+    },
+    {
+      "title": "Mark not in pig",
+      "disabled": false
+    }
+  ],
+  "Finished with no live piglets": [
+    {
+      "title": "Record abortion",
+      "disabled": true
+    },
+    {
+      "title": "Foster piglets",
+      "disabled": true
+    },
+    {
+      "title": "Mark not in pig",
+      "disabled": true
+    },
+    {
+      "title": "Batch membership",
+      "disabled": false
+    }
+  ]
+}
