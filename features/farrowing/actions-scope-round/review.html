@@ -11,7 +11,15 @@
 <main>
 <div class="intro">
 <h1>分娩操作链路与状态截图</h1>
-<p>修正后的网页原型，共 50 张操作截图。各组独立使用样例数据。</p>
+<p>修正后的网页原型，共 51 张操作截图。各组独立使用样例数据。</p>
+<section id="record-footer">
+<h2>分娩记录底部按钮对齐</h2>
+<p>上下两排的三列宽度比为 1 : 2.4 : 1，间距为 8px。左侧的减号与 Back 对齐，中间的 Born alive 与 Finish farrowing 或 Save 对齐，右侧的 Death 与 Actions 对齐。打开 Actions 再返回会保留草稿。登记流产、寄养或移出批次之前，先保存或清空本次计数。</p>
+<div class="shots">
+<figure><a href="screenshots/a01-active-record.jpg" target="_blank" rel="noopener"><img src="screenshots/a01-active-record.jpg" alt="分娩记录，尚无计数草稿" width="390" height="844"></a><figcaption><h3>没有草稿</h3><p>中间是 Finish farrowing。</p></figcaption></figure>
+<figure><a href="screenshots/k01-find-active-draft.jpg" target="_blank" rel="noopener"><img src="screenshots/k01-find-active-draft.jpg" alt="从搜索进入分娩记录，录数后等待保存" width="390" height="844"></a><figcaption><h3>从 Find a sow 进入，录数后等待保存</h3><p>中间换成 Save，其他按钮保持原位。</p></figcaption></figure>
+</div>
+</section>
 <h2>单头母猪 Actions 的 Production 入口</h2>
 <div class="matrix-wrap"><table class="matrix"><thead><tr><th>母猪状态</th><th>可点击的分娩操作</th><th>置灰的分娩操作</th></tr></thead><tbody><tr><td>待产，未记过产仔</td><td>流产、批次管理 → 移除批次</td><td>—</td></tr><tr><td>分娩中，有活仔</td><td>流产、寄养（送出／接收）</td><td>—</td></tr><tr><td>分娩中，曾记录产仔，活仔为 0</td><td>流产</td><td>寄养</td></tr><tr><td>已结束，有活仔</td><td>寄养（送出／接收）</td><td>流产</td></tr><tr><td>已结束，活仔为 0</td><td>—</td><td>流产、寄养</td></tr><tr><td>母猪死亡，有剩余活仔</td><td>—</td><td>流产、寄养</td></tr><tr><td>流产后有活仔</td><td>—</td><td>—</td></tr><tr><td>移出批次</td><td>打开 Production log</td><td>—</td></tr></tbody></table></div>
 <p>共享的 Batch membership 也列在单头母猪的 Production 区。待产且尚未记录产仔时，可选择原因后移除。已记录产仔时可查看批次。母猪死亡时置灰。产房底部的单元 Actions 只有 7 项通用操作。Piglets 中选中仔猪后的 Actions 提供 Foster 和 Move。</p>

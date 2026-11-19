@@ -282,6 +282,16 @@ try {
   await shot(page, 'f04-finished-zero-live-actions');
   await page.close();
 
+  page = await open('room');
+  await tap(page, 'room-search');
+  await page.locator('[data-card="0"] [data-room-search]').fill('000418');
+  await tap(page, 'room-sow', '000418');
+  await tap(page, 'bornAlive', '1');
+  assert.equal(await control(page, 'saveVisit').isEnabled(), true);
+  assert.equal(await control(page, 'sowActions').isEnabled(), true);
+  await shot(page, 'k01-find-active-draft');
+  await page.close();
+
   assert.deepEqual(errors, []);
   writeFileSync(new URL('production-states.json', import.meta.url), JSON.stringify(results, null, 2) + '\n');
   console.log('Verified Actions across six conditions and captured current prototype screenshots.');

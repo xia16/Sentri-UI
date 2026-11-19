@@ -1220,7 +1220,7 @@
       "notes": {
         "purpose": "Count her litter while she farrows: alive now as one figure and one row of keys (−, + Born alive, Death), all held as this visit's draft until Save (owner, 2026-10-23; keys 2026-11-02). The last save is taken back in the Farrowing log, not here (2026-11-03).",
         "states": [
-          "Nothing entered: the card is Alive, Details › and the figure; the bar is Back · Finish farrowing · ···",
+          "Nothing entered: the card is Alive, Details › and the figure; the bar is Back · Finish farrowing · Actions, aligned with − · Born alive · Death.",
           "A visit entered: see Counting · not saved yet (farrowing.count-draft)"
         ],
         "elements": [
@@ -1301,7 +1301,7 @@
           {
             "name": "Save",
             "at": "Save",
-            "shows": "Back · Save in the bar.",
+            "shows": "Back · Save · Actions in the same columns as − · Born alive · Death.",
             "logic": "Save adds the births to Alive, takes died after birth off it, adds every death to Dead, and writes one log line (\"+3 born alive · 1 stillborn · 1 crushed\"). The card then reads ✓ Saved.",
             "source": "farrowing-astra-concept.js act(\"saveVisit\")"
           }
@@ -1310,10 +1310,11 @@
           "(raw) Alive · Not saved yet",
           "(raw) +3 born · −1 died · 1 born dead",
           "(raw) Clear",
-          "(raw) Back · Save"
+          "(raw) Back · Save · Actions"
         ],
         "edge": [
-          "Back closes the drawer and keeps the draft"
+          "Back closes the drawer and keeps the draft. Opening and leaving Actions also keeps it.",
+          "Record abortion, Foster piglets and removal from the batch wait until the visit is saved or cleared."
         ],
         "issues": []
       }

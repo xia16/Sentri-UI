@@ -902,8 +902,10 @@ function count(s){
  // One row of keys under the card (owner, 2026-11-02): − takes back a + not yet saved, + Born alive, Death opens Report death.
  const n=s.bornDraft||0;
  const keys=`<div class="count-keys" role="group" aria-label="Count this visit"><button type="button" class="count-key" data-action="bornAlive" data-value="-1" aria-label="Take back one born alive"${n?'':' aria-disabled="true"'}>${icon('minus')}</button><button type="button" class="count-key" data-tone="plus" data-action="bornAlive" data-value="1">${icon('plus')}<span>Born alive</span></button><button type="button" class="count-key" data-tone="death" data-action="death" aria-label="Report death">${icon('death')}<span>Death</span></button></div>`;
- const body=aliveCard(s)+keys;
- return {cls:'count-body',body,corner:dr?cornerClear('clearVisit'):null,footer:dr?footer(back,SentriUI.button({label:'Save',register:'primary',action:'saveVisit',disabled:!visitSaveAllowed(s)}),'execution-completion'):footer(back,SentriUI.button({label:'Finish farrowing',register:'primary',action:'finish',disabled:!born(s)})+SentriUI.iconButton({action:'sowActions',icon:icon('more'),label:'Actions for sow '+s.tag}),'execution-completion count-footer')};
+ const primary=dr?SentriUI.button({label:'Save',register:'primary',action:'saveVisit',disabled:!visitSaveAllowed(s)})
+  :SentriUI.button({label:'Finish farrowing',register:'primary',action:'finish',disabled:!born(s)});
+ const actions=SentriUI.iconButton({action:'sowActions',icon:icon('more'),label:'Actions for sow '+s.tag});
+ return {cls:'count-body',body:aliveCard(s)+keys,corner:dr?cornerClear('clearVisit'):null,footer:footer(back,primary+actions,'execution-completion count-footer')};
 }
 function finish(s){
  const rows=row('Weak',s.weak,'classify','weak,',s.weak===0,s.weak+s.deformed>=s.alive)+row('Deformed',s.deformed,'classify','deformed,',s.deformed===0,s.weak+s.deformed>=s.alive)+finishDetails(s);
@@ -1062,10 +1064,12 @@ return '';
 function litter(s){return finishedDetails(s);}
 function profile(s){return `<iframe class="sow-detail-frame" title="Sow details · ${esc(s.tag)}" src="inspection-astra-concept.html?layout=focus&embed=sow&v=stage-actions-15${ZH?'&lang=zh':''}"></iframe>`;}
 const sowDetailContexts=new WeakMap();
-function sowActionCatalogue(s){return [
- {id:'miscarriage',title:'Record abortion',group:'production',icon:'pregnancy',scope:'farrowing',sub:'Record a pregnancy loss',livePiglets:s.alive,reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':s.locked?'Farrowing is already finished.':''},
- ...(born(s)>0?[{id:'foster',title:'Foster piglets',group:'production',scope:'farrowing',sub:'Send or receive piglets between litters',icon:'pig',reason:s.ended?'This sow has died.':!s.alive?'No live piglets recorded.':''}]:[]),
- {id:'remove-batch',title:'Remove from batch',group:'production',scope:'other',sub:'Remove this sow without recording a litter',icon:'close',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':''},
+function sowActionCatalogue(s){
+ const draftReason=visitDraft(s)?(ZH?'请先保存或清空本次记录。':'Save or clear this visit first.'):'';
+ return [
+ {id:'miscarriage',title:'Record abortion',group:'production',icon:'pregnancy',scope:'farrowing',sub:'Record a pregnancy loss',livePiglets:s.alive,reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':s.locked?'Farrowing is already finished.':draftReason},
+ ...(born(s)>0?[{id:'foster',title:'Foster piglets',group:'production',scope:'farrowing',sub:'Send or receive piglets between litters',icon:'pig',reason:s.ended?'This sow has died.':!s.alive?'No live piglets recorded.':draftReason}]:[]),
+ {id:'remove-batch',title:'Remove from batch',group:'production',scope:'other',sub:'Remove this sow without recording a litter',icon:'close',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':draftReason},
  {id:'marker',title:s.markers.length?'Edit note':'Add note',content:s.markers.length>0,group:'routine',sub:s.markers[0]?.text||'Leave a note or describe a visible marker',icon:'note',reason:''},
  {id:'transfer',title:'Transfer sow',group:'routine',sub:'Move this sow to another unit or pen',icon:'transfer',reason:s.ended?'This sow has died.':''}
 ];}

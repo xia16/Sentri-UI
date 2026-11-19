@@ -1,5 +1,7 @@
 # Canvas
 
+- [Farrowing record footer alignment](actions-scope-round/review.html#record-footer) (2026-11-19): implementation feedback requested by the owner. The Android A layout and its 1 : 2.4 : 1 refinement are documented in the sibling Sentri-Android-App repository (`docs/farrowing-ui-polish.md`, “底部等宽列”). Counting and the footer share the three columns on all record entrances.
+
 - [Farrowing batch removal walkthrough](actions-scope-round/review.html#j) (2026-11-18): owner confirmed removing Mark not in pig and using Batch membership to remove an awaiting sow with a reason. The walkthrough shows the real form, saved log and task outcome.
 
 - [Corrected Actions and operation-chain screenshots](actions-scope-round/review.html) (2026-11-18): the owner instructed the build from the scope review. The prototype removes the Care/identity exception, preserves active and finished foster routes, restores death count entry, and opens Piglets on aborted records with live piglets. The [previous review](https://github.com/xia16/Sentri-UI/blob/97c16425d163b5d0414e6aede0b2677ac4ccb6c5/features/farrowing/actions-scope-round/README.md) records the original findings.

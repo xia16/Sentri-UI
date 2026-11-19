@@ -382,6 +382,20 @@
           "version": "corrected"
         }
       ]
+    },
+    {
+      "id": "record-footer",
+      "title": "分娩记录底部按钮对齐",
+      "path": "Find a sow → 点开分娩中母猪 → Born alive → Save",
+      "note": "2026-11-19，同步 Android 的三列对齐。",
+      "screenshots": [
+        {
+          "file": "screenshots/k01-find-active-draft.jpg",
+          "title": "录数后等待保存",
+          "caption": "Finish farrowing 换成 Save，Back 和 Actions 保持原位。",
+          "version": "corrected"
+        }
+      ]
     }
   ],
   "auditCommit": "97c16425d163b5d0414e6aede0b2677ac4ccb6c5"
