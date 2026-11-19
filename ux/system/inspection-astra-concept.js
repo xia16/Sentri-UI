@@ -469,13 +469,7 @@ function saveProductionTask(c){
   p.batchId='';p.stage='Off production';p.breedingStatus='Open';
  }
  addEvent(c,f.taskTitle||'Production task',[p.id],outcome+(f.taskNote?.trim()?' · '+f.taskNote.trim():''),'Production');
- returnToPigAfterProduction(c,p.id);return true;
-}
-function returnToPigAfterProduction(c,id){
- const trail=c.navTrail||[],idx=trail.findLastIndex(parent=>parent.view==='pig'&&parent.pigId===id);
- if(idx>=0){const parent=trail[idx];Object.assign(c,parent);c.restoreSheetScroll=parent.sheetScroll;trail.length=idx;}
- else {c.selected.clear();c.navTrail=[];}
- c.pigId=id;c.form={};c.view='pig';
+ c.pigId=p.id;c.selected.clear();c.navTrail=[];c.form={};c.view='pig';return true;
 }
 function pigCurrentTasks(c){
  const tasks=currentTasksForPig(c,pig(c,c.pigId));if(!tasks.length)return '';
@@ -1387,13 +1381,13 @@ function saveBatchMembership(c){
  if(target==='__none__')p.batchId='';
  else {const next=c.batches?.find(batch=>batch.id===target);if(!next)return false;next.pigIds=[...new Set([...next.pigIds,p.id])];p.batchId=next.id;p.stage=next.stage;}
  saveToast(c,'save.batch_updated',[p.id]);addEvent(c,'Batch membership changed',[p.id],(old?'Batch '+old.id:'No batch')+' → '+(target==='__none__'?'No batch':'Batch '+target)+(f.batchNote?.trim()?' · '+f.batchNote.trim():''),'Production');
- returnToPigAfterProduction(c,p.id);return true;
+ c.pigId=p.id;c.selected.clear();c.navTrail=[];c.form={};c.view='pig';return true;
 }
 function saveMiscarriage(c){
  const p=picked(c)[0],reason=String(c.lossReason||'').trim();if(!p||!reason)return false;
  const batch=c.batches?.find(batch=>batch.id===p.batchId);if(batch)batch.pigIds=batch.pigIds.filter(id=>id!==p.id);
  p.batchId='';p.stage='Off production';p.breedingStatus='Open';addEvent(c,'Abortion recorded',[p.id],reason,'Production');saveToast(c,'save.abortion_recorded',[p.id]);
- c.lossReason='';returnToPigAfterProduction(c,p.id);return true;
+ c.pigId=p.id;c.selected.clear();c.navTrail=[];c.lossReason='';c.form={};c.view='pig';return true;
 }
 function transferReady(c){const d=c.transferDraft||{},p=picked(c)[0],pe=p&&penOf(c,p.id);return !!d.unit&&!!d.pen&&c.transferDestinations?.some(u=>u.id===d.unit&&u.pens.includes(d.pen))&&!(d.unit===c.transferOrigin?.unit&&d.pen===pe?.id);}
 function transferPage(c){const p=picked(c)[0],d=c.transferDraft||{},units=c.transferDestinations||[],pens=units.find(u=>u.id===d.unit)?.pens||[];return sheet(c,'Transfer sow',p.id+' · '+penOf(c,p.id).id,`<div class="transfer-origin"><span>From</span><strong>${esc(c.transferOrigin?.name||'')} · ${esc(penOf(c,p.id).id)}</strong></div>${fieldSelect(c,'Destination unit','unit',[['','Choose unit'],...units.map(u=>[u.id,u.name])],d.unit||'','transfer')}${fieldSelect(c,'Destination pen','pen',[['','Choose pen'],...pens.filter(pen=>!(d.unit===c.transferOrigin?.unit&&pen===penOf(c,p.id).id)).map(pen=>[pen,pen])],d.pen||'','transfer',!d.unit)}`,footer(back(),button('save-transfer','Transfer sow','button primary','',!transferReady(c))));}
@@ -1511,7 +1505,7 @@ function installV2(){
  else if(a==='save-pen-note'&&valid(c)){pen(c,c.penId).note=c.form.note.trim();delete c.penDrafts?.['note:'+c.penId];pen(c,c.penId).noteBy='G. Hansen · today 09:41';pen(c,c.penId).noteDays=c.form.days||7;addEvent(c,'Pen note',[c.penId],c.form.note.trim());c.view=c.navTrail?.at(-1)?.view==='read-pen-note'?'read-pen-note':'pen-detail';}
  else if(a==='pig-profile'){c.pigId=v;c.profileTab='details';c.pigLogFilter='All';c.view='pig-profile';}
  else if(a==='tick-pen'){tickPen(c,v);}
- else if(a==='pig-actions'){c.actionsGridAll=false;selectActionPig(c,v);c.actionEntry=v;c.form={};c.view='actions';}
+ else if(a==='pig-actions'){c.actionsGridAll=false;selectActionPig(c,v);c.form={};c.view='actions';}
  else if(a==='measurements-menu'){c.view='measurements-menu';}
  else if(a==='health'){openBulkAction(c,'health',[...c.selected]);if(fromMeasurements)c.measurementsReturn=true;}
  else if(['health','body','individual-plan','resolve','triage','temperature','backfat','treatment'].includes(a)){const ids=[...c.selected];if((a==='individual-plan'||a==='temperature'||a==='backfat')&&ids.length!==1)return;c.form={subjects:ids,conditions:[],conditionKinds:{},customConditions:{...(c.customHealthCatalog||{})},kind:'Symptom',search:'',catalogSection:'',catalogGroup:'',triage:'None',issueStatus:'attention',band:'',start:'2026-09-12',end:'',verdicts:{}};c.view=a;if(fromMeasurements)c.measurementsReturn=true;}

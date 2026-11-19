@@ -13,7 +13,7 @@
     "Home Lookup stays in Home and opens the shared pig record",
     "Baseline: Find → Scan → single Actions loses one tick and Back skips Find",
     "Find and dock open the same full-screen Scan; Back restores the search or the walk",
-    "A pig record’s Actions save only for that pig and preserve the other walk ticks",
+    "Single-pig Actions preserves walk ticks on Back and saves only for that pig",
     "PenMap lands on C2; pen door opens faults, Pen log, and returns to that pen",
     "Report → marker and pen record → resolve → equipment entries in Pen log",
     "Existing equipment fault opened from its row or a duplicate report keeps one resolution draft",

@@ -19,7 +19,7 @@ No anchor. The walk has no lifecycle that changes what work is available. The he
 - Feed is guidance, not a completion checklist: nothing on the walk can be "done" for feed.
 - The stage on a row is days in the stage, never lifetime age; the walk date is fixed in the sample (12 Sep 2026).
 - Care is the only editable condition state; attention is derived from it (ASTRA-BULK-ACTIONS).
-- One Actions sheet for one pig or many, with applicable Production actions only for one pig. Opening Actions on a pig record uses that pig alone; returning restores the walk or scan selection.
+- One Actions sheet for one pig or many, with applicable Production actions only for one pig. Opening Actions on a pig record uses that pig alone; Back from the single-pig Actions restores the walk or scan selection. A save uses the action’s existing completion path.
 - The dock and Find open the same full-screen Scan. Back returns to the calling screen; if it was Find, its search text stays.
 
 ## Scope

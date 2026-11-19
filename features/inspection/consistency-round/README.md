@@ -19,4 +19,4 @@ node scripts/canvas.mjs features/inspection/consistency-round/review.src.html fe
 node scripts/canvas.mjs features/inspection/consistency-round/decisions.src.html features/inspection/consistency-round/decisions.html
 ```
 
-`capture.mjs --check` 只回放和断言，不覆盖已有图片。源文件和截图在这里，`.html` 成品内嵌图片，可以单独保存打开。
+`capture.mjs --check` 只回放和断言，不覆盖已有图片。源文件和截图在这里，`.html` 成品内嵌图片，可以单独保存打开。跨单元旧稿所在分支未合并；新克隆的仓库会保留已经提交的三张旧稿截图。

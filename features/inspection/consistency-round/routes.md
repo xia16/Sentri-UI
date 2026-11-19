@@ -19,7 +19,7 @@
 | 栏位 → 故障行 → **Resolve fault** → Pen log | `inspection.fault-resolve` → `inspection.fault-resolved` → `inspection.pen-log` | 可填处理经过；处理后回栏位，最后一条未解决故障消失，日志留原报告和处理记录。 | 实走且重新登记 Atlas。 |
 | 巡检底部 Search → 输耳号或栏号 → 点结果 | `inspection.search` → `inspection.find-pig` / `inspection.search-none` → `pig-profile.full` | 开始为空、无结果有提示；跨单元结果显示真实归属；回查找保留输入。 | 同一全屏 Lookup；异单元操作规则待定。 |
 | 巡检底部 **Scan** / 查找右侧扫码图标 | `inspection.scan` / `scan-no-reader` / `scan-list` / `scan-new` / `scan-ticked` / `scan-stopped` | 同一全屏；读一只勾一只、重复读不增加行、可手动取消。尚未选择时可停／恢复。没有读卡器时没有 Actions。返回分别回巡检、查找。 | 修复查找切扫码后跳级、暂停示例显示成已勾选。 |
-| 巡检、查找结果、扫码列表 → 点猪耳号 | `pig-profile.full` → **Actions** → `pig-profile.actions` | 看档案，再只对这一只做操作。回上一步保留原名单、勾选和搜索。 | 修复单猪 Actions 覆盖原勾选；验证备注只保存给这只猪。 |
+| 巡检、查找结果、扫码列表 → 点猪耳号 | `pig-profile.full` → **Actions** → `pig-profile.actions` | 看档案，再只对这一只做操作。未保存时用 Back 回上一步，保留原名单、勾选和搜索。表单提交仍走各自的保存去向。 | 修复单猪 Actions 覆盖原勾选；验证备注只保存给这只猪。 |
 | 列表勾选、栏位 **Tick all**、扫码勾选 → **Actions** | 单头 `pig-profile.actions`；多头 `inspection.actions` | 单头按猪只阶段出现生产操作；多头是日常操作。点击巡检底部已选数量还可先核对和取消某头。 | 多处用同一份 Actions；已选列表的阶段天数用巡检格式。 |
 | 巡检右上 History | `inspection.walk-log` | 看巡检已记录内容，返回同一列表。没有结束巡检和签到。 | 按 #314 更正需求和流程。 |
 | 分娩房间 → B1 栏位 `›` | `inspection.farrowing-pen*` | 备注／备注卡、饲喂指导、报障／故障记录、栏位日志，返回分娩房间。 | 仍是分娩自己的实现。入口和话题差异图见待复核。 |
@@ -55,4 +55,4 @@
 | Header、TaskDock | 巡检和其他任务都调用共享组件；History 仍在 Header，Scan/搜索/地图在 dock。 |
 | PenMap | 基线的组件支持 Whole room，但巡检宿主的动态布局和长图接线并未进 `main`。继续由已打开的 #317 负责。 |
 
-图中为样例、原型操作。没有变更 Android，也没有将登记或验证成功标成新的批准记录。
+图中为样例、原型操作。没有变更 Android，也没有将登记或验证成功标成新的批准记录。保存后要不要留在扫码／已选继续操作，见待复核第 6 项。
