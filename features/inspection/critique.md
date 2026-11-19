@@ -324,3 +324,9 @@ Scope: the words only. At `?lang=zh` these screens read in English where the Ins
 ## Attention budget
 
 Unchanged: each screen shows the same information in the same order as on main, in Chinese. Cut list: nothing is cut.
+
+## Entrance consistency (2026-11-19)
+
+- Reviewed the [old and new 390 px frames](consistency-round/review.html). Find returns to its typed results again; Scan keeps both selected rows after a detour into one pig’s Actions. The destination and the subjects are visible in the same place before the next action.
+- A scan and a walk still use the same Lookup/Row patterns. The fault indicator fits next to the note and pen code without changing the pen door; resolving the last fault clears only the indicator and keeps the log. The Atlas specimen uses the real Fault button and field picker.
+- The [decision board](consistency-round/decisions.html) shows the separate Farrowing pen tools, cross-unit scope, earlier count flow and handoffs. These need a product decision before the prototypes converge.

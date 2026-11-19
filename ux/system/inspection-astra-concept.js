@@ -233,6 +233,10 @@ function unitEquipment(c){
  const faults=c.pens.flatMap(pe=>openFaults(pe).map(f=>({pe,f})));
  return '<section class="unit-detail-section">'+stHeading({title:'Equipment faults',icon:icon('wrench'),meta:faults.length+' open',kind:'section',level:4})+(faults.length?'<div class="unit-fault-list">'+faults.map(({pe,f})=>'<article class="unit-fault-card"><div class="unit-fault-heading"><span>Pen '+esc(pe.id)+'</span><small>Open</small></div><h5>'+esc(f.name)+'</h5><p>'+esc(f.description)+'</p><small>Reported '+esc(f.time)+' · '+esc(f.who)+'</small>'+'</article>').join('')+'</div>':'<p class="unit-empty-state">'+icon('check')+'No open equipment faults</p>')+'</section>';
 }
+function openFaultRecord(c,penId,faultId){
+ c.penId=penId;c.faultId=faultId;
+ const drafts=c.penDrafts||={};c.form=drafts['resolve:'+penId+'|'+faultId]||={resolution:''};c.view='fault-record';
+}
 function returnFromFault(c){c.view=[...(c.navTrail||[])].reverse().find(p=>['unit-detail','equipment','pen-detail','pen-faults','actions'].includes(p.view))?.view||'pen-detail';}
 function environmentBody(c){
  const sensors=unitSensors(c);
@@ -282,18 +286,21 @@ function penFeedEntry(pe){
 const ROSTER_NAME={'Poor appetite':['Appetite','trend-down'],'Diarrhoea':['Scours']};
 // Urgency: act (Hospital pen, Treat in place) · watch (Monitor) · ongoing (no action).
 const rosterLevel=k=>k.triage==='Hospital pen'||k.triage==='Treat in place'?'act':k.triage==='Monitor'?'watch':'ongoing';
+const compactStage=metadata=>metadata.replace(/ (days|day)( old)?$/,'d');
 function pigRow(c,p,attrs={}){
  const metadata=stageSummary(p),cs=cases(p);
  const tags=rowConditionTags(cs);
  const accessible=[p.id,metadata,...cs.map(k=>({label:k.name,day:Number.isFinite(k.day)?(issueStatus(k)==='ongoing'?k.day+' days':'Day '+k.day):'',...careAppearance(k)})).map(tagDescription)].filter(Boolean).join('. ');
- return SentriUI.rowSelectDoor({code:p.id,description:metadata.replace(/ (days|day)( old)?$/,'d'),contextWidth:'112px',right:{kind:'tags',tags},className:'inspect-pig roster-pig'+(c.selected.has(p.id)?' selected':''),label:accessible,action:'',checked:c.selected.has(p.id),value:p.id,openAction:'pig',openValue:p.id,inputAttrs:{'data-pig-select':p.id,'aria-label':'Select pig '+p.id},attrs});
+ return SentriUI.rowSelectDoor({code:p.id,description:compactStage(metadata),contextWidth:'112px',right:{kind:'tags',tags},className:'inspect-pig roster-pig'+(c.selected.has(p.id)?' selected':''),label:accessible,action:'',checked:c.selected.has(p.id),value:p.id,openAction:'pig',openValue:p.id,inputAttrs:{'data-pig-select':p.id,'aria-label':'Select pig '+p.id},attrs});
 }
 function dockBulkDetails(root){root._detailsObserver?.disconnect();}
 /* Tagged pigs by ID number (owner, 2026-10-18); the No tags row always comes last. */
 function displayPigs(c,pe){const byId=(a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}),rows=visiblePigs(c,pe).slice();return rows.sort(byId);}
 function penEntry(pe){
- const signals=pe.note?'<span class="pen-notification" aria-hidden="true">'+icon('note')+'</span>':'';
- const total=pe.pigs.length+(pe.untagged?.count||0),label='Pen '+pe.id+', '+countLabel(total)+(pe.note?', note available':'')+'. View pen details';
+ const fault=openFaults(pe).length>0;
+ const signal=(symbol,cls='')=>'<span class="pen-notification'+cls+'" aria-hidden="true">'+icon(symbol)+'</span>';
+ const signals=(pe.note?signal('note'):'')+(fault?signal('wrench',' has-fault'):'');
+ const total=pe.pigs.length+(pe.untagged?.count||0),label='Pen '+pe.id+', '+countLabel(total)+(pe.note?', note available':'')+(fault?', open equipment fault':'')+'. View pen details';
  return button('pen-detail','<strong>'+esc(pe.id)+'</strong><small>· '+countLabel(total)+'</small>'+signals+icon('chevron'),'pen-name',pe.id).replace('<button','<button aria-label="'+esc(label)+'"');
 }
 function main(c){const n=c.selected.size+c.selectedPens.size+(c.selectedNoTags?.size||0),filtered=pigs(c).filter(p=>matches(c,p)),filterN=(c.batchFilter!=='All')+(c.stage!=='All')+(c.healthFilter!=='All')+c.manualOnly+(c.triageFilter!=='All')+(c.healthStatus!=='All');return `<div class="inspect-main"${c.view!=='list'?' inert':''}>${status()}${SentriUI.pageHeader({title:'Inspection',back:{action:'home',label:'Back to Today'},line:{text:[{text:unitName(c)+' · last record '},{text:c.events.length?'09:41':SentriUnitSnapshot.lastRecord.time,strong:true},{text:' · '+SentriUI.logStamp(null,c.events.length?'G. Hansen':SentriUnitSnapshot.lastRecord.who)}]},action:{icon:icon('history'),label:'This walk',action:'history'},level:2,ds:'Header'})}<div class="inspect-controls">${SentriUI.segment({variant:'two-line-lens',options:['Health','Feed','All'].map(v=>[v,v,{count:filtered.filter(p=>matchesLens(c,p,v)).length}]),active:c.lens,action:'lens',ariaLabel:'Inspection view'})}${stIconButton({action:'filters',icon:icon('filter'),label:'Filter pigs'+(filterN?', '+filterN+' applied':''),className:'room-filter-button',badge:filterN||''})}</div><div class="inspect-scroll" role="region" aria-label="${unitName(c)} inspection list" tabindex="-1">${filterN?`<div class="inspection-filter-summary"><span>${[c.batchFilter!=='All'?'Batch '+c.batchFilter:'',c.stage!=='All'?c.stage:'',c.healthFilter!=='All'?c.healthFilter:'',c.healthStatus!=='All'?(c.healthStatus==='ongoing'?'No action needed':'Needs attention'):'',c.manualOnly?'Manual feed':'',c.triageFilter!=='All'?careLabel(c.triageFilter):''].filter(Boolean).join(' · ')}</span>${button('reset-filters','Clear','text-button')}</div>`:''}<div class="inspect-list">${c.pens.map(pe=>{const matchesInPen=visiblePigs(c,pe),rows=displayPigs(c,pe);if(!matchesInPen.length&&!(c.reviewOnly&&c.selectedPens.has(pe.id)))return '';const num=rows.filter(p=>c.selected.has(p.id)).length;return `<section class="inspect-pen" data-pen="${pe.id}"><header class="inspect-pen-head">${penEntry(pe)}${penFeedEntry(pe)}</header>${pe.issue?`<div class="pen-attention">${icon('alert')}${esc(pe.issue)} · ${pe.issueTime}</div>`:''}${rows.map(p=>pigRow(c,p)).join('')}${noTagsRow(c,pe)}</section>`;}).join('')||`<div class="empty-inspect"><strong>No pigs match</strong>${button('reset-filters','Show all pigs','text-button')}</div>`}</div></div>${SentriUI.taskDock({label:'Inspection tools',className:'inspect-dock',content:n?`${button('review-sheet','<span>'+selectionLabel(c)+' selected</span>'+icon('chevron'),'selection-count').replace('<button','<button aria-label="'+selectionLabel(c)+' selected. Review the selection"')}${button('actions',icon('more')+'<span>Actions</span>','button primary selection-action')}`:'',place:{action:'grid',label:'Pen map'},primary:{action:'scan',label:'Scan',attrs:{'aria-label':'Scan ear tag',...(entryFor('scan',icon('scan')+'<span>Scan ear tag</span>')?{'data-entry':entryFor('scan',icon('scan')+'<span>Scan ear tag</span>')}:{})}}   /* "Scan": the docks read alike (TaskDock, 2026-10-22) */,tools:[{action:'search',icon:'search',label:'Search ear tag',className:'dock-search'}]})}</div>`;}
@@ -328,8 +335,12 @@ function pickerCommit(c,v){
  else if(entry.target==='feed')updateFeedInput(c,key,v);
  else if(entry.target==='log')handleRecordAction(c,'log-filter',entry.scope+'|'+v);
  else if(entry.target==='bulk'){c.form[key]=v;if(key==='dose')c.form.values={};}
- else {c.form[key]=v;
-  if(c.form.pickerReturn==='fault-form'&&key==='device'&&v!=='Other'){const x=pen(c,c.penId).faults.find(x=>x.open&&x.device===v);if(x){c.faultId=x.id;c.form={};c.view='fault-record';return true;}}
+ else {
+  if(c.form.pickerReturn==='fault-form'&&key==='device'&&v!=='Other'){
+   const existing=openFaults(pen(c,c.penId)).find(x=>x.device===v);
+   if(existing){delete c.form.pickerKey;delete c.form.pickerReturn;openFaultRecord(c,c.penId,existing.id);return true;}
+  }
+  c.form[key]=v;
  }
  return false;
 }
@@ -458,7 +469,13 @@ function saveProductionTask(c){
   p.batchId='';p.stage='Off production';p.breedingStatus='Open';
  }
  addEvent(c,f.taskTitle||'Production task',[p.id],outcome+(f.taskNote?.trim()?' · '+f.taskNote.trim():''),'Production');
- c.pigId=p.id;c.selected.clear();c.navTrail=[];c.form={};c.view='pig';return true;
+ returnToPigAfterProduction(c,p.id);return true;
+}
+function returnToPigAfterProduction(c,id){
+ const trail=c.navTrail||[],idx=trail.findLastIndex(parent=>parent.view==='pig'&&parent.pigId===id);
+ if(idx>=0){const parent=trail[idx];Object.assign(c,parent);c.restoreSheetScroll=parent.sheetScroll;trail.length=idx;}
+ else {c.selected.clear();c.navTrail=[];}
+ c.pigId=id;c.form={};c.view='pig';
 }
 function pigCurrentTasks(c){
  const tasks=currentTasksForPig(c,pig(c,c.pigId));if(!tasks.length)return '';
@@ -1370,13 +1387,13 @@ function saveBatchMembership(c){
  if(target==='__none__')p.batchId='';
  else {const next=c.batches?.find(batch=>batch.id===target);if(!next)return false;next.pigIds=[...new Set([...next.pigIds,p.id])];p.batchId=next.id;p.stage=next.stage;}
  saveToast(c,'save.batch_updated',[p.id]);addEvent(c,'Batch membership changed',[p.id],(old?'Batch '+old.id:'No batch')+' → '+(target==='__none__'?'No batch':'Batch '+target)+(f.batchNote?.trim()?' · '+f.batchNote.trim():''),'Production');
- c.pigId=p.id;c.selected.clear();c.navTrail=[];c.form={};c.view='pig';return true;
+ returnToPigAfterProduction(c,p.id);return true;
 }
 function saveMiscarriage(c){
  const p=picked(c)[0],reason=String(c.lossReason||'').trim();if(!p||!reason)return false;
  const batch=c.batches?.find(batch=>batch.id===p.batchId);if(batch)batch.pigIds=batch.pigIds.filter(id=>id!==p.id);
  p.batchId='';p.stage='Off production';p.breedingStatus='Open';addEvent(c,'Abortion recorded',[p.id],reason,'Production');saveToast(c,'save.abortion_recorded',[p.id]);
- c.pigId=p.id;c.selected.clear();c.navTrail=[];c.lossReason='';c.form={};c.view='pig';return true;
+ c.lossReason='';returnToPigAfterProduction(c,p.id);return true;
 }
 function transferReady(c){const d=c.transferDraft||{},p=picked(c)[0],pe=p&&penOf(c,p.id);return !!d.unit&&!!d.pen&&c.transferDestinations?.some(u=>u.id===d.unit&&u.pens.includes(d.pen))&&!(d.unit===c.transferOrigin?.unit&&d.pen===pe?.id);}
 function transferPage(c){const p=picked(c)[0],d=c.transferDraft||{},units=c.transferDestinations||[],pens=units.find(u=>u.id===d.unit)?.pens||[];return sheet(c,'Transfer sow',p.id+' · '+penOf(c,p.id).id,`<div class="transfer-origin"><span>From</span><strong>${esc(c.transferOrigin?.name||'')} · ${esc(penOf(c,p.id).id)}</strong></div>${fieldSelect(c,'Destination unit','unit',[['','Choose unit'],...units.map(u=>[u.id,u.name])],d.unit||'','transfer')}${fieldSelect(c,'Destination pen','pen',[['','Choose pen'],...pens.filter(pen=>!(d.unit===c.transferOrigin?.unit&&pen===penOf(c,p.id).id)).map(pen=>[pen,pen])],d.pen||'','transfer',!d.unit)}`,footer(back(),button('save-transfer','Transfer sow','button primary','',!transferReady(c))));}
@@ -1398,7 +1415,7 @@ function findHits(c){
 }
 function searchBody(c){
  // A result reads as the walk's row (her stage line, the pen being the card's header) and opens her record: Find ticks nothing.
- const q=c.query.trim().toLowerCase(),groups=penGroups(c,findHits(c),h=>SentriUI.findRow({code:h.p.id,place:stageSummary(h.p).replace(/ (days|day)( old)?$/,'d'),contextWidth:'112px',markPlace:false,query:q,right:{kind:'tags',tags:rowConditionTags(cases(h.p))},action:'search-pig',value:h.p.id}),q);
+ const q=c.query.trim().toLowerCase(),groups=penGroups(c,findHits(c),h=>SentriUI.findRow({code:h.p.id,place:compactStage(stageSummary(h.p)),contextWidth:'112px',markPlace:false,query:q,right:{kind:'tags',tags:rowConditionTags(cases(h.p))},action:'search-pig',value:h.p.id}),q);
  return SentriUI.findResults({query:c.query,groups,hint:'Type part of an ear tag or a pen, or scan a tag. Searches every unit.',none:'No pig matching “'+c.query.trim()+'” in any unit.'});
 }
 function findPage(c){
@@ -1409,7 +1426,7 @@ function scanSetup(c,type=''){
  c.scan={connected:type==='scan-none'?false:/^scan-/.test(type)?true:!scannerOff,listening:type!=='scan-stopped',items,seq:items.length,fresh:{},last:''};
  if(type==='scan-new')c.scan.fresh['000306']=Infinity;   // the held frame of the arrival tint: 000306, the newest scan, stays lit
  // Inspection is a multi-select task (owner, 2026-10-22): a read ticks her. Scan · ticked shows one pig the worker has unticked again.
- c.selected=new Set(type==='scan-ticked'?['000267','000254']:items);
+ c.selected=new Set(type==='scan-ticked'?['000267','000254']:type==='scan-stopped'?[]:items);
 }
 function scanAdd(c){
  const sc=c.scan;if(!sc.connected||!sc.listening)return false;
@@ -1437,7 +1454,7 @@ function overlay(c){if(c.view==='medicines')return medicinesPage(c);if(c.view===
  if(c.view==='pen-log')return sheet(c,'Pen log','Pen '+c.penId+' · '+unitName(c),categorizedLog(c,penLogEntries(c,c.penId),'pen'),footer(back(),''));
  if(c.view==='pen-faults'){const pe=pen(c,c.penId),faults=openFaults(pe);return sheet(c,'Equipment faults','Pen '+pe.id+' · '+faults.length+' open',faults.length?'<div class="compact-actions st-panel st-row-group st-action-list">'+faults.map(x=>action('fault-record','wrench',x.name,x.description,pe.id+'|'+x.id)).join('')+'</div>':'<p class="detail-empty">No open faults</p>',footer(back(),button('new-fault','Report fault','button primary',pe.id)));}
  if(c.view==='fault-form')return sheet(c,'Report fault','Pen '+c.penId,(fieldSelect(c,'Device','device',[['','Choose device'],['Feeding station','Feeding station'],['Drinking station','Drinking station'],['Other','Other equipment']],f.device))+(f.device==='Other'?(SentriUI.field({label:"Device name",control:"<input data-v2=\"name\" value=\""+(esc(f.name||''))+"\" placeholder=\"e.g. gate beside the aisle\">"})):'')+(SentriUI.field({label:"Description",control:"<textarea data-v2=\"description\" placeholder=\"What is broken or not working?\">"+(esc(f.description||''))+"</textarea>"})),footer(back(),button('save-fault','Report fault','button primary','',!valid(c))));
- if(c.view==='fault-record'){const pe=pen(c,c.penId),x=pe.faults.find(x=>x.id===c.faultId);return sheet(c,x.name,`Pen ${pe.id} · ${x.open?'Open fault':'Resolved'}`,`<div class="instruction-detail">${esc(x.description)}<small>Reported ${x.time} · ${x.who}</small></div>${x.open?optNote('Resolution note',SentriUI.field({label:'Resolution note',labelHidden:true,variant:'textarea',control:'<textarea data-v2="resolution" placeholder="What was done?"></textarea>'}),''):`<p class="quiet-note">Resolved 09:41 · G. Hansen${x.resolution?'<br>'+esc(x.resolution):''}</p>`}`,footer(back(),x.open?button('close-fault','Resolve fault','button primary'):''));}
+ if(c.view==='fault-record'){const pe=pen(c,c.penId),x=pe.faults.find(x=>x.id===c.faultId);return sheet(c,x.name,`Pen ${pe.id} · ${x.open?'Open fault':'Resolved'}`,`<div class="instruction-detail">${esc(x.description)}<small>Reported ${x.time} · ${x.who}</small></div>${x.open?optNote('Resolution note',SentriUI.field({label:'Resolution note',labelHidden:true,variant:'textarea',control:'<textarea data-v2="resolution" placeholder="What was done?">'+esc(f.resolution||'')+'</textarea>'}),f.resolution):`<p class="quiet-note">Resolved 09:41 · G. Hansen${x.resolution?'<br>'+esc(x.resolution):''}</p>`}`,footer(back(),x.open?button('close-fault','Resolve fault','button primary'):''));}
  if(c.view==='pen-observe')return sheet(c,'How the pen looks','Pen '+c.penId,SentriUI.choiceGroup(CC.penObservations.map(o=>SentriUI.choiceRow({label:o.en,mode:'multi',action:'pen-observe-toggle',value:o.id,selected:f.observations.includes(o.id)}))),footer(back(),button('save-pen-observe','Save','button primary')));
 if(c.view==='pen-note')return sheet(c,'Pen note','Pen '+c.penId,(SentriUI.field({label:"Note",control:"<textarea class=\"st-note-input\" data-v2=\"note\">"+(esc(f.note||''))+"</textarea>"}))+noteDaysField(f),footer(back(),button('save-pen-note','Save note','button primary','',!valid(c))));
  if(c.view==='resolve'){const rows=f.subjects.flatMap(id=>cases(pig(c,id)).map(k=>({id,k})));return sheet(c,'Resolve conditions',scope(c),rows.map(({id,k})=>{const key=id+'|'+k.name,entry=pickerEntry(c,key,{items:[['','Keep open'],['recover','Recovered'],['strike','Entered in error']],label:'Outcome for '+k.name+' on '+id,target:'verdict',value:f.verdicts[key]||''});return `<div class="resolve-case"><div><strong>${id}</strong><span>${esc(k.name)} · day ${k.day}</span>${k.feedLinked?'<small>Recovery ends this case’s feed adjustment</small>':''}</div>${pickerTriggerButton(entry,key,'','Outcome for '+k.name+' on '+id)}</div>`;}).join('')+`<p class="quiet-note">Recovery keeps the case in history. Entered in error marks it as a correction.</p>`,footer(back(),button('save-resolve','Save outcomes','button primary','',!Object.values(f.verdicts).some(Boolean))));}
@@ -1483,9 +1500,9 @@ function installV2(){
  else if(a==='unit-detail'||a==='equipment'){c.view=a;}
  else if(['pen-detail','pen-faults','pen-log'].includes(a)){c.penId=v;c.view=a;if(a==='pen-log'){c.penLogFilter='All';c.penLogDate={preset:'all'};}}
  else if(a==='new-fault'){c.penId=v;const d=(c.penDrafts||={});d['fault:'+v]||={device:'',name:'',description:''};c.form=d['fault:'+v];c.view='fault-form';}
- else if(a==='fault-record'){[c.penId,c.faultId]=v.split('|');c.form={resolution:''};c.view='fault-record';}
- else if(a==='save-fault'&&valid(c)){delete c.penDrafts?.['fault:'+c.penId];const pe=pen(c,c.penId),f=c.form,existing=pe.faults.find(x=>x.open&&x.device===f.device&&f.device!=='Other');if(existing){c.faultId=existing.id;c.view='fault-record';}else{const x={id:'fault-'+Date.now(),device:f.device,name:f.device==='Other'?f.name.trim():f.device,description:f.description.trim(),time:'09:41',who:'G. Hansen',open:true};pe.faults.push(x);addEvent(c,'Fault reported',[pe.id],x.name+' · '+x.description);returnFromFault(c);}}
- else if(a==='close-fault'){const pe=pen(c,c.penId),x=pe.faults.find(x=>x.id===c.faultId);x.open=false;x.resolution=c.form.resolution||'';addEvent(c,'Fault resolved',[pe.id],x.name+' · '+x.resolution);returnFromFault(c);}
+ else if(a==='fault-record'){openFaultRecord(c,...v.split('|'));}
+ else if(a==='save-fault'&&valid(c)){delete c.penDrafts?.['fault:'+c.penId];const pe=pen(c,c.penId),f=c.form,existing=pe.faults.find(x=>x.open&&x.device===f.device&&f.device!=='Other');if(existing){openFaultRecord(c,pe.id,existing.id);}else{const x={id:'fault-'+Date.now(),device:f.device,name:f.device==='Other'?f.name.trim():f.device,description:f.description.trim(),time:'09:41',who:'G. Hansen',open:true};pe.faults.push(x);addEvent(c,'Fault reported',[pe.id],x.name+' · '+x.description);returnFromFault(c);}}
+ else if(a==='close-fault'){const pe=pen(c,c.penId),x=pe.faults.find(x=>x.id===c.faultId);x.open=false;x.resolution=c.form.resolution||'';delete c.penDrafts?.['resolve:'+c.penId+'|'+c.faultId];addEvent(c,'Fault resolved',[pe.id],x.name+' · '+x.resolution);returnFromFault(c);}
  else if(a==='read-pen-note'){c.penId=v;c.view='read-pen-note';}
  else if(a==='close-pen-note'){closePenNote(c,c.penId);c.view='pen-detail';}
  
@@ -1494,7 +1511,7 @@ function installV2(){
  else if(a==='save-pen-note'&&valid(c)){pen(c,c.penId).note=c.form.note.trim();delete c.penDrafts?.['note:'+c.penId];pen(c,c.penId).noteBy='G. Hansen · today 09:41';pen(c,c.penId).noteDays=c.form.days||7;addEvent(c,'Pen note',[c.penId],c.form.note.trim());c.view=c.navTrail?.at(-1)?.view==='read-pen-note'?'read-pen-note':'pen-detail';}
  else if(a==='pig-profile'){c.pigId=v;c.profileTab='details';c.pigLogFilter='All';c.view='pig-profile';}
  else if(a==='tick-pen'){tickPen(c,v);}
- else if(a==='pig-actions'){c.actionsGridAll=false;c.selected=new Set([v]);c.selectedPens.clear();c.actionScope='pigs';c.form={};c.view='actions';}
+ else if(a==='pig-actions'){c.actionsGridAll=false;selectActionPig(c,v);c.actionEntry=v;c.form={};c.view='actions';}
  else if(a==='measurements-menu'){c.view='measurements-menu';}
  else if(a==='health'){openBulkAction(c,'health',[...c.selected]);if(fromMeasurements)c.measurementsReturn=true;}
  else if(['health','body','individual-plan','resolve','triage','temperature','backfat','treatment'].includes(a)){const ids=[...c.selected];if((a==='individual-plan'||a==='temperature'||a==='backfat')&&ids.length!==1)return;c.form={subjects:ids,conditions:[],conditionKinds:{},customConditions:{...(c.customHealthCatalog||{})},kind:'Symptom',search:'',catalogSection:'',catalogGroup:'',triage:'None',issueStatus:'attention',band:'',start:'2026-09-12',end:'',verdicts:{}};c.view=a;if(fromMeasurements)c.measurementsReturn=true;}
@@ -1957,8 +1974,24 @@ const examples=[{title:'Walk & select',initial:'walk',caption:'Individual checkb
 const atlasViews={list:'inspection.walk','pen-detail':'inspection.pen','pen-note':'inspection.pen-note','selected-pen-note':'inspection.pen-note','read-pen-note':'inspection.pen-note','pen-log':'inspection.pen-log',filters:'inspection.filters',grid:'inspection.go-to-pen',review:'inspection.review-selected',log:'inspection.walk-log',history:'inspection.walk-log','pig-origin':'pig-profile.origin','unit-detail':'inspection.unit-detail','batch-detail':'inspection.batch-detail','pen-faults':'inspection.pen-faults','fault-form':'inspection.fault-report','fault-record':'inspection.fault-resolve','feed-editor':'feed-plan.editor','feed-date':'feed-plan.end-date','pig-feed':'feed-plan.pig',pig:'pig-profile.full','pig-production':'pig-profile.production-batches','pig-production-batch':'pig-profile.batch-record','pig-log':'pig-profile.log','pig-profile':'pig-profile.origin','production-task':'pig-profile.production-task',miscarriage:'pig-profile.miscarriage','batch-membership':'pig-profile.batch-membership','measurements-menu':'pig-profile.measurements',weight:'pig-profile.measure',temperature:'pig-profile.measure',backfat:'pig-profile.measure',body:'pig-profile.body-condition',note:'pig-profile.note',finding:'health-record.finding','finding-edit':'health-record.edit-finding',resolve:'health-record.resolve-conditions','finding-close':'health-record.resolve-finding',triage:'health-record.care-instructions',health:'health-record.record-health','bulk-health-picker':'health-record.condition-picker','edit-conditions':'health-record.care-instructions',condition:'health-record.record-health',treatment:'treat.record'};
 function atlasScreen(c){
  if(c.view==='search')return !c.query.trim()?'inspection.search':findHits(c).length?'inspection.find-pig':'inspection.search-none';
- if(c.view==='scan'){const sc=c.scan;return !sc.connected?'inspection.scan-no-reader':!sc.items.length?'inspection.scan':c.selected.size?'inspection.scan-ticked':!sc.listening?'inspection.scan-stopped':'inspection.scan-list';}
- if(c.view==='actions')return c.actionScope==='pens'?'feed-plan.bulk':c.selected.size===1?'pig-profile.actions':'inspection.actions';
+ if(c.view==='scan'){
+  const sc=c.scan;
+  if(!sc.connected)return 'inspection.scan-no-reader';
+  if(!sc.listening)return 'inspection.scan-stopped';
+  if(!sc.items.length)return 'inspection.scan';
+  if(sc.items.some(id=>!c.selected.has(id)))return 'inspection.scan-ticked';
+  if(Object.values(sc.fresh).some(until=>until>Date.now()))return 'inspection.scan-new';
+  return 'inspection.scan-list';
+ }
+ if(c.view==='read-pen-note')return 'inspection.pen-read-note';
+ if(c.view==='pen-observe')return 'inspection.pen-observe';
+ if(c.view==='fault-form'&&c.form.device==='Other')return 'inspection.fault-report-other';
+ if(c.view==='pen-detail'){
+  if(openFaults(pen(c,c.penId)).length)return 'inspection.pen-faults';
+  if(c.events.some(e=>e.title==='Fault resolved'&&e.subjects.includes(c.penId)))return 'inspection.fault-resolved';
+ }
+ if(c.view==='list'&&c.pens.some(pe=>openFaults(pe).length&&c.events.some(e=>e.title==='Fault reported'&&e.subjects.includes(pe.id))))return 'inspection.fault-flag';
+ if(c.view==='actions')return c.actionScope==='pens'?'feed-plan.bulk':picked(c).length===1&&!c.selectedNoTags?.size?'pig-profile.actions':'inspection.actions';
  if(c.view==='feed')return pen(c,c.penId)?.mode==='adlib'?'feed-plan.adlib':'feed-plan.pen';
  if(c.view==='treatment'&&c.form?.bulk)return 'treat.record-batch';
  if(c.view==='medicine-picker'){const s=medState(c),q=(s.search||'').trim();return s.level==='add'?'treat.medicine-add':s.level==='add-category'?'treat.medicine-add-category':q?(medSearchRows(c,q)?'treat.medicine-search':'treat.medicine-search-none'):s.level==='category'?'treat.medicine-category':c.form.taskId==='vaccination'?'treat.vaccine-picker':medRecents(c).length?'treat.medicine-picker':'treat.medicine-picker-first';}
@@ -2071,7 +2104,7 @@ function selectionReviewGroup(label,items,titled=true){
 function endEmptyReview(c){if(c.view==='review'&&!c.selected.size&&!c.selectedPens.size&&!c.selectedNoTags?.size){c.reviewOnly=false;c.view='list';}}
 function selectionReview(c){
  const pens=[...c.selectedPens],covered=new Set(pens.flatMap(id=>displayPigs(c,pen(c,id)).map(p=>p.id))),pigsLeft=picked(c).filter(p=>!covered.has(p.id)),both=[pens.length,pigsLeft.length,c.selectedNoTags?.size].filter(Boolean).length>1;
- return selectionReviewGroup('Pens',pens.map(id=>({title:id,detail:countLabel(displayPigs(c,pen(c,id)).length+(c.selectedNoTags?.has(id)?noTagsCountOf(c,id):0)),value:id,pen:true,ariaLabel:'Pen '+id})),both)+selectionReviewGroup('Pigs',pigsLeft.map(p=>({title:p.id,detail:penOf(c,p.id).id+' · '+p.stage,value:p.id,ariaLabel:'Pig '+p.id})),both)+selectionReviewNoTags(c);
+ return selectionReviewGroup('Pens',pens.map(id=>({title:id,detail:countLabel(displayPigs(c,pen(c,id)).length+(c.selectedNoTags?.has(id)?noTagsCountOf(c,id):0)),value:id,pen:true,ariaLabel:'Pen '+id})),both)+selectionReviewGroup('Pigs',pigsLeft.map(p=>({title:p.id,detail:penOf(c,p.id).id+' · '+compactStage(stageSummary(p)),value:p.id,ariaLabel:'Pig '+p.id})),both)+selectionReviewNoTags(c);
 }
 function legacyOverlay(c){
  if(c.view==='list')return '';
@@ -2203,6 +2236,9 @@ function render(i,focus){if(states[i].actionEntry&&states[i].view==='list'&&stat
 function backTo(c){if(c.view==='pen-observe'){c.view='pen-detail';return;}if(c.view==='medicine-picker'){delete c.form.med;c.view='treatment';return;}if(c.view==='brand-picker'){delete c.form.brandPick;c.view='treatment';return;}if(c.view==='pig-doses'){delete c.form.doseSearch;c.view='treatment';return;}if(c.view==='medicine-sheet'){c.view='medicines';return;}if(c.view==='medicines'){const pg=medPage(c);if(pg.category)pg.category='';else c.view='list';return;}if(c.view==='bulk-health-picker'){leaveConditionPicker(c);return;}if(c.view==='record-optional'){c.view=c.form.optionalReturn;delete c.form.optionalDraft;return;}if(c.view==='picker'){c.view=c.form.pickerReturn||'list';delete c.form.pickerKey;delete c.form.pickerReturn;return;}if(c.navTrail?.length){const parent=c.navTrail.pop();Object.assign(c,parent);c.restoreSheetScroll=parent.sheetScroll;return;}if(['health','body','individual-plan','resolve','triage','temperature','backfat','treatment'].includes(c.view)){parkBulkDraft(c);c.form={};c.view='actions';return;}if(['fault-form','fault-record','pen-note'].includes(c.view)){c.view='pen-detail';return;}if(['condition','note','plan','weight'].includes(c.view)){parkBulkDraft(c);c.form={};c.view='actions';}else if(['report','exception'].includes(c.view)){c.form={};c.view='feed';}else if(c.view==='review')c.view=c.reviewBack||'actions';else c.view='list';}
 
 // Detail sheets return to the actual entry page; form values are discarded on Back.
+// The record's own Actions has one subject; keep the walk or scan ticks on its parent.
+function selectionContext(c){return {selected:c.selected,selectedPens:c.selectedPens,selectedNoTags:c.selectedNoTags,noTagsCount:c.noTagsCount,actionScope:c.actionScope,reviewOnly:c.reviewOnly,actionEntry:c.actionEntry};}
+function selectActionPig(c,id){c.selected=new Set([id]);c.selectedPens=new Set();c.selectedNoTags=new Set();c.noTagsCount={};c.actionScope='pigs';c.reviewOnly=false;}
 function detailLocation(c){return {view:c.view,productionRecordId:c.productionRecordId,penId:c.penId,pigId:c.pigId,batchId:c.batchId,faultId:c.faultId,findingName:c.findingName,profileTab:c.profileTab,feedTab:c.feedTab,form:JSON.parse(JSON.stringify(c.form||{}))};}
 function sameDetail(a,b){return a.view===b.view&&(!['pen-detail','pen-faults','pen-log','feed','fault-form','pen-note','read-pen-note'].includes(a.view)||a.penId===b.penId)&&(!['pig','pig-profile','pig-production','pig-origin','pig-log','pig-feed','pig-feed-curve','pig-feed-changes','finding','finding-edit','finding-close'].includes(a.view)||a.pigId===b.pigId)&&(!['finding','finding-edit','finding-close'].includes(a.view)||a.findingName===b.findingName)&&(a.view!=='pig-production-batch'||a.productionRecordId===b.productionRecordId)&&(a.view!=='batch-detail'||a.batchId===b.batchId)&&(a.view!=='fault-record'||a.faultId===b.faultId);}
 function settleDetailNavigation(c){
@@ -2219,7 +2255,7 @@ function settleDetailNavigation(c){
  }
 }
 function installDetailNavigation(){
- const links=new Set(['production-task','batch-membership','miscarriage','measurements-menu','feed-breakdown','pig-production-batch','feed-edit-pen','feed-edit-selected','finding','finding-edit','finding-close','finding-treat','pig-feed','pig-adjustment','pig-profile','pig-production','pig-origin','pig-log','pig-feed-curve','pig-feed-changes','actions','pig-actions','pen-detail','pen-faults','pen-log','read-pen-note','read-pig-note','feed','pig','search-pig','unit-detail','environment','batch-detail','equipment','history','new-fault','fault-record','pen-note','pen-observe','selected-fault','selected-pen-note','review-sheet','edit-conditions','health','body','individual-plan','resolve','triage','temperature','backfat','treatment','note','weight']);
+ const links=new Set(['production-task','batch-membership','miscarriage','measurements-menu','feed-breakdown','pig-production-batch','feed-edit-pen','feed-edit-selected','finding','finding-edit','finding-close','finding-treat','pig-feed','pig-adjustment','pig-profile','pig-production','pig-origin','pig-log','pig-feed-curve','pig-feed-changes','actions','pig-actions','pen-detail','pen-faults','pen-log','read-pen-note','read-pig-note','feed','pig','search-pig','search','scan','unit-detail','environment','batch-detail','equipment','history','new-fault','fault-record','pen-note','pen-observe','selected-fault','selected-pen-note','review-sheet','edit-conditions','health','body','individual-plan','resolve','triage','temperature','backfat','treatment','note','weight']);
  gallery.addEventListener('click',e=>{
   const el=e.target.closest('[data-action]');if(!el||el.disabled)return;
   const root=el.closest('[data-card]');if(!root)return;
@@ -2239,8 +2275,9 @@ function installDetailNavigation(){
   if((c.view==='feed-date'||c.view==='feed-note')&&(a==='back'||a==='dismiss')){e.stopImmediatePropagation();(c.form.optionalDrafts||={})[c.view==='feed-date'?'until':'reason']=c.form.optionalDraft;delete c.form.optionalDraft;c.view='feed-editor';render(i);return;}
   if(c.view==='pen-observe'&&a==='back'){e.stopImmediatePropagation();c.view='pen-detail';render(i);return;}
   if(a==='back'&&c.navTrail?.length){e.stopImmediatePropagation();parkBulkDraft(c);const parent=c.navTrail.pop();Object.assign(c,parent);c.restoreSheetScroll=parent.sheetScroll;render(i);return;}
+  if(a==='pig'&&c.view==='actions'&&c.navTrail?.at(-1)?.view==='pig'&&c.navTrail.at(-1).pigId===el.dataset.value){e.stopImmediatePropagation();backTo(c);render(i);return;}
   if(a==='dismiss'){c.navTrail=[];delete c.navOrigin;return;}
-  if(links.has(a)){c.navOrigin={...detailLocation(c),sheetScroll:root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0};}
+  if(links.has(a)){c.navOrigin={...detailLocation(c),...(a==='pig-actions'?selectionContext(c):{}),sheetScroll:root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0};}
  },true);
 }
 
@@ -2290,7 +2327,8 @@ gallery.addEventListener('click',e=>{const el=e.target.closest('[data-action]');
  else if(a==='find-clear')c.query='';
  else if(a==='transfer')notify(c,'Transfer is not designed yet');   // the entry point only: the Transfer feature (move) is not designed yet
  else if(a==='scan-toggle'&&c.scan.connected)c.scan.listening=!c.scan.listening;
- else if(['history','home','grid','search','scan'].includes(a)){c.query='';c.view=a;}
+ else if(a==='search'){c.query='';c.view='search';}
+ else if(['history','home','grid','scan'].includes(a)){c.view=a;}
  render(i,old===c.view?{a,v}:null);
 });
 gallery.addEventListener('change',e=>{const el=e.target,root=el.closest('[data-card]');if(!root)return;const i=+root.dataset.card,c=states[i];if(el.matches('.scenario')){clearTimeout(c.toastTimer);states[i]=makeExample(el.value);render(i);return;}if(el.dataset.pigSelect){c.actionScope='pigs';el.checked?c.selected.add(el.dataset.pigSelect):c.selected.delete(el.dataset.pigSelect);if(!c.selected.size)c.reviewOnly=false;endEmptyReview(c);render(i,{p:el.dataset.pigSelect});}else if(el.dataset.notagsSelect){const nt=(c.selectedNoTags||=new Set()),id=el.dataset.notagsSelect;c.noTagsCount||={};if(el.checked){nt.add(id);c.noTagsCount[id]=pen(c,id).untagged.count;}else{nt.delete(id);delete c.noTagsCount[id];}endEmptyReview(c);render(i);}else if(el.dataset.penSelect){el.checked?c.selectedPens.add(el.dataset.penSelect):c.selectedPens.delete(el.dataset.penSelect);{const pu=pen(c,el.dataset.penSelect),nt=(c.selectedNoTags||=new Set());if(pu?.untagged?.count){c.noTagsCount||={};if(el.checked){nt.add(pu.id);c.noTagsCount[pu.id]=pu.untagged.count;}else{nt.delete(pu.id);delete c.noTagsCount[pu.id];}}}c.actionScope='pigs';displayPigs(c,pen(c,el.dataset.penSelect)).forEach(p=>el.checked?c.selected.add(p.id):c.selected.delete(p.id));if(!c.selected.size)c.reviewOnly=false;endEmptyReview(c);render(i,{pe:el.dataset.penSelect});}else if(el.dataset.field&&el.type!=='textarea'&&el.type!=='number'){c.form[el.dataset.field]=el.value;render(i,{f:el.dataset.field,v:el.value});}});

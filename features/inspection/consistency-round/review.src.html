@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>巡检入口：已同步</title><style>
+:root{color-scheme:light;--paper:#fff;--tint:#f5f6f1;--ink:#1f2921;--muted:#505a50;--rule:#dce1d8;--green:#255843;--amber:#734714} *{box-sizing:border-box}
+body{margin:0;background:var(--tint);color:var(--ink);font:16px/1.65 system-ui,sans-serif} main{max-width:1200px;margin:auto;padding:28px 22px 72px} h1{font-size:clamp(30px,5vw,45px);line-height:1.2;margin:.25em 0} h2{font-size:25px;line-height:1.3;margin:.15em 0 .55em}
+p{margin:.55em 0} a{color:var(--green);text-underline-offset:.2em} .eyebrow{font:700 12px/1.7 system-ui,sans-serif;letter-spacing:.08em;color:var(--green)} .lede{max-width:750px;color:var(--muted)} nav{display:flex;gap:8px 18px;flex-wrap:wrap;margin:20px 0}
+section{border:1px solid var(--rule);border-radius:16px;background:var(--paper);padding:clamp(15px,3vw,28px);margin:18px 0;scroll-margin-top:16px} .route{font-weight:650;color:var(--green)} .ask{margin:14px 0 8px;padding:12px 14px;background:#fcf4e8;border-left:3px solid #ab7829} .pass{margin:14px 0 8px;padding:12px 14px;background:#edf5ef;border-left:3px solid #54826a}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr));gap:14px;margin-top:14px;align-items:start} figure{margin:0;max-width:390px} figure img{display:block;width:100%;height:auto;border:1px solid var(--rule);border-radius:10px;background:var(--tint)} figcaption{font-size:14px;color:var(--muted);padding:8px 0 14px;line-height:1.5} figcaption b{display:block;margin:3px 0 2px;color:var(--ink)} .tag{font:700 11px/1.2 system-ui,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--green);background:#edf5ef;border-radius:5px;display:inline-block;padding:4px 7px} .old{color:var(--amber);background:#fcf4e8} footer{color:var(--muted);font-size:14px;margin-top:22px}
+</style></head>
+<body><main><header><p class="eyebrow">SENTRI · INSPECTION · 2026-11-19</p><h1>巡检入口：已同步</h1><p class="lede">按现场点按顺序看入口、页面和返回。完成项沿用仓库现行组件和规则。</p><nav aria-label="章节"><a href="#home">从首页进巡检</a><a href="#lookup">查找和扫码</a><a href="#selection">勾选与 Actions</a><a href="#fault">设备报障</a><a href="#pen">地图、栏位与日志</a><a href="decisions.html">看待复核</a><a href="routes.md">入口与版本清单</a></nav></header>
+<section id="home"><h2>1. 首页入口</h2><p class="route">Home 单元卡 → Inspect unit；To treat / Monitoring → 点一行 → 对应单元 Health</p><p>普通入口从当前单元开始；关注入口直接进 Health，返回原列表。底部放大镜是首页自己的查找。</p>
+<div class="row">
+<figure><img src="screenshots/01-home.jpg" alt="首页 · Unit 7" loading="lazy"><figcaption><span class="tag now">now</span><b>首页 · Unit 7</b>Inspect unit 打开同一个单元。</figcaption></figure>
+<figure><img src="screenshots/46-home-treat.jpg" alt="待治疗猪只" loading="lazy"><figcaption><span class="tag now">now</span><b>待治疗猪只</b>点一行按该行所在单元进入。</figcaption></figure>
+<figure><img src="screenshots/46-home-monitor.jpg" alt="监测猪只" loading="lazy"><figcaption><span class="tag now">now</span><b>监测猪只</b>同样进入 Health，返回时回到 Monitoring。</figcaption></figure>
+<figure><img src="screenshots/02-home-lookup.jpg" alt="首页 Lookup" loading="lazy"><figcaption><span class="tag now">now</span><b>首页 Lookup</b>直接开猪档案；扫码在查找框位置切换。</figcaption></figure>
+</div>
+</section>
+<section id="lookup"><h2>2. 查找、扫码和返回</h2><p class="route">巡检 → Search → 输入 30 → 扫码图标 → Scan → 返回</p><p>底部 Scan 与查找里的扫码图标到同一个全屏页面。区别只在返回目的地：从列表进就回列表；从查找进就回查找。</p>
+<div class="row">
+<figure><img src="screenshots/03-find-results.jpg" alt="输入 30" loading="lazy"><figcaption><span class="tag now">now</span><b>输入 30</b>按单元和栏位找耳号；可以点猪查看档案。</figcaption></figure>
+<figure><img src="screenshots/07-old-find-back.jpg" alt="之前：返回整张巡检名单" loading="lazy"><figcaption><span class="tag old">old</span><b>之前：返回整张巡检名单</b>查找文字和结果被跳过。</figcaption></figure>
+<figure><img src="screenshots/11-new-find-back.jpg" alt="现在：回同一搜索" loading="lazy"><figcaption><span class="tag new">new</span><b>现在：回同一搜索</b>保留 30，也保留扫码期间选中的猪。</figcaption></figure>
+</div><div class="row">
+<figure><img src="screenshots/08-scan-stopped.jpg" alt="暂停" loading="lazy"><figcaption><span class="tag new">new</span><b>暂停</b>尚未选猪时可停止、恢复扫码。</figcaption></figure>
+<figure><img src="screenshots/12-no-reader.jpg" alt="没有读卡器" loading="lazy"><figcaption><span class="tag now">now</span><b>没有读卡器</b>显示连接说明，没有可提交的操作。</figcaption></figure>
+</div>
+</section>
+<section id="selection"><h2>3. 核对要操作哪几头猪</h2><p class="route">扫码两头 → 点其中一行 → 档案 → Actions → 返回两次</p><p>扫码下方的 Actions 针对已勾选多头；先点耳号进入档案，再点 Actions，只对当前这头。</p>
+<div class="row">
+<figure><img src="screenshots/04-scan-two.jpg" alt="扫码勾了两头" loading="lazy"><figcaption><span class="tag now">now</span><b>扫码勾了两头</b>000267 和 000306。</figcaption></figure>
+<figure><img src="screenshots/05-scan-pig-actions.jpg" alt="单头 Actions" loading="lazy"><figcaption><span class="tag now">now</span><b>单头 Actions</b>当前对象是 000306。</figcaption></figure>
+<figure><img src="screenshots/06-old-scan-one.jpg" alt="之前：另一头的勾选丢失" loading="lazy"><figcaption><span class="tag old">old</span><b>之前：另一头的勾选丢失</b>退回来只剩 000306。</figcaption></figure>
+<figure><img src="screenshots/09-new-scan-two.jpg" alt="现在：两头都还在" loading="lazy"><figcaption><span class="tag new">new</span><b>现在：两头都还在</b>再次打开批量 Actions 目标正确。</figcaption></figure>
+</div><div class="row">
+<figure><img src="screenshots/10-scan-bulk-actions.jpg" alt="扫码列表 → 两头 Actions" loading="lazy"><figcaption><span class="tag new">new</span><b>扫码列表 → 两头 Actions</b>可记录病症、治疗等日常操作。</figcaption></figure>
+<figure><img src="screenshots/13-new-selected.jpg" alt="巡检列表 → 已选" loading="lazy"><figcaption><span class="tag new">new</span><b>巡检列表 → 已选</b>阶段和天数与名单一致；可取消某一头。</figcaption></figure>
+<figure><img src="screenshots/14-selected-bulk-actions.jpg" alt="已选 → 两头 Actions" loading="lazy"><figcaption><span class="tag new">new</span><b>已选 → 两头 Actions</b>菜单和直接从扫码进入相同。</figcaption></figure>
+</div><p class="pass">已验证从名单打开单头 Actions 写备注，只改那头猪；保存后退回仍可看到原来的两头勾选。</p>
+</section>
+<section id="fault"><h2>4. 报障、解除、看日志</h2><p class="route">巡检 → 栏位 C1 → Fault → 报告 → 返回列表 → 扳手所在栏 → 故障记录 → Resolve fault</p><p>把 Atlas 从旧演示切到同一个可点的实际表单。填 Other 时才要填设备名称；报完回栏位，走回列表会看到扳手。</p>
+<div class="row">
+<figure><img src="screenshots/48-old-atlas-report.jpg" alt="Atlas 原来用早期演示" loading="lazy"><figcaption><span class="tag old">old</span><b>Atlas 原来用早期演示</b>栏位先勾选，表单包含旧照片区。</figcaption></figure>
+<figure><img src="screenshots/20-new-live-report.jpg" alt="Atlas 现在沿用实时表单" loading="lazy"><figcaption><span class="tag new">new</span><b>Atlas 现在沿用实时表单</b>从栏位页的 Fault 打开，按当前必填项目。</figcaption></figure>
+<figure><img src="screenshots/21-fault-other.jpg" alt="设备选 Other" loading="lazy"><figcaption><span class="tag new">new</span><b>设备选 Other</b>显示必填设备名称。</figcaption></figure>
+<figure><img src="screenshots/22-pen-fault.jpg" alt="栏位显示未解决故障" loading="lazy"><figcaption><span class="tag new">new</span><b>栏位显示未解决故障</b>点 Gate sensor 查看原记录。</figcaption></figure>
+</div><div class="row">
+<figure><img src="screenshots/18-old-walk-fault.jpg" alt="之前：列表没有故障提示" loading="lazy"><figcaption><span class="tag old">old</span><b>之前：列表没有故障提示</b>有故障的 C2 没有扳手。</figcaption></figure>
+<figure><img src="screenshots/23-new-walk-fault.jpg" alt="现在：列表显示扳手" loading="lazy"><figcaption><span class="tag new">new</span><b>现在：列表显示扳手</b>备注图标和故障图标可以同时出现。</figcaption></figure>
+<figure><img src="screenshots/24-fault-resolve.jpg" alt="只解除所点的那条" loading="lazy"><figcaption><span class="tag new">new</span><b>只解除所点的那条</b>可以留处理经过。</figcaption></figure>
+<figure><img src="screenshots/25-pen-log.jpg" alt="解除后看日志" loading="lazy"><figcaption><span class="tag new">new</span><b>解除后看日志</b>报障和解除均有记录，扳手随最后一条未解除故障消失。</figcaption></figure>
+</div>
+</section>
+<section id="pen"><h2>5. 从地图找栏、看栏况和记备注</h2><p class="route">巡检 → Pen map → 点栏定位 → 点栏名；或者直接点列表的栏名</p><p>地图定位到列表的栏，栏名打开同一栏位。巡检右上 History 看本次活动；栏位页内 Pen log 只看当前栏。</p>
+<div class="row">
+<figure><img src="screenshots/16-pen-map.jpg" alt="地图定位" loading="lazy"><figcaption><span class="tag now">now</span><b>地图定位</b>点 C2 后从列表打开 C2，不产生检查记录。</figcaption></figure>
+<figure><img src="screenshots/26-inspection-pen.jpg" alt="当前栏位页" loading="lazy"><figcaption><span class="tag now">now</span><b>当前栏位页</b>备注、饲喂、观察、报障、全选。</figcaption></figure>
+<figure><img src="screenshots/27-inspection-note.jpg" alt="查看备注" loading="lazy"><figcaption><span class="tag new">new</span><b>查看备注</b>作者、正文、到期日，铅笔编辑。</figcaption></figure>
+<figure><img src="screenshots/30-inspection-observe.jpg" alt="记录栏况" loading="lazy"><figcaption><span class="tag new">new</span><b>记录栏况</b>独立于猪只勾选和病症。</figcaption></figure>
+</div><div class="row">
+<figure><img src="screenshots/28-inspection-note-edit.jpg" alt="修改备注" loading="lazy"><figcaption><span class="tag now">now</span><b>修改备注</b>默认显示 7 天，走当前消息和步进器组件。</figcaption></figure>
+<figure><img src="screenshots/29-inspection-feed.jpg" alt="栏内 Feed" loading="lazy"><figcaption><span class="tag now">now</span><b>栏内 Feed</b>查看饲喂；调整另有入口。</figcaption></figure>
+<figure><img src="screenshots/15-filters.jpg" alt="巡检筛选" loading="lazy"><figcaption><span class="tag now">now</span><b>巡检筛选</b>筛的是名单和地图可见对象。</figcaption></figure>
+<figure><img src="screenshots/17-walk-history.jpg" alt="巡检 History" loading="lazy"><figcaption><span class="tag now">now</span><b>巡检 History</b>这里没有 End walk 或签到。</figcaption></figure>
+</div>
+</section>
+<footer>画面来自仓库原型的样例。版本基线：df82ba5d。除特别标注的早期稿外，截图为 390 × 844 像素。<a href="verification.json">浏览器回放记录</a></footer></main></body></html>
