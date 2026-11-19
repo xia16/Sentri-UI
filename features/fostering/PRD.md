@@ -2,6 +2,8 @@
 
 Draft — compiled from existing docs, not yet confirmed.
 
+**Version note, 2026-11-17:** Farrowing's later owner decision (2026-11-03) approved Foster piglets from a living sow's Actions and from selected piglets on a dead or finished sow's Piglets list; see [`features/farrowing/PRD.md`](../farrowing/PRD.md#owner-decisions-2026-11-03--her-piglets-and-fostering). The older "parked" rule quoted below no longer describes Farrowing. This Fostering feature remains a draft; ownership of a shared fostering flow across Farrowing and Piglet processing is still open.
+
 Section: Breeding · Platform: mobile · Prototype: `ux/tasks/piglet-processing/move.html?state=move` (the full Piglet processing task's Move piglets drawer). Sources: `ux/tasks/piglet-processing/dead-contract.md`, `parity.md` (13 · Move), `ux/research/farrowing/RULINGS.md` (After the lock; Round 2 Q12-Q14), Figma Inspection file 记录-寄养 (`node-id=60-408`).
 
 ## Problem
@@ -25,7 +27,7 @@ From RULINGS Round 2, quoted short:
 - Q13: "Move opens only on litters whose farrowing is locked"; before the lock the farrowing sheet owns the count.
 - Q14: what moved piglets owe follows the source's done / not done doses; when the source is partly done the Move asks per treatment.
 - The ledger: Alive = Born − Dead − Moved out + Moved in ± Unexplained − Weaned.
-- Fostering in farrowing is **parked** (RULINGS After the lock).
+- Fostering in farrowing is **parked** (RULINGS After the lock). **Superseded for Farrowing** by the 2026-11-03 owner decision linked above.
 
 ## Scope
 

@@ -2,12 +2,12 @@
 (()=>{
 'use strict';
 const types=['Stillborn','Mummified','Crushed','Scours','Starve-out','Put down','Other'];   // Put down (owner, 2026-11-03): a piglet that cannot recover, put down by trained staff
-const mortalityCauses=['Cause unknown','Crushed','Scours','Starve-out','Put down','Other'];
 const sum=a=>a.reduce((x,y)=>x+y,0), clone=o=>JSON.parse(JSON.stringify(o));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const assistanceLabel=value=>value===true?'Yes':value===false?'No':'Not recorded';
 const icon=k=>SentriIcons.icon(k);
 const taskSyncPreview=typeof location==='undefined'?null:new URLSearchParams(location.search).get('taskSync');
+const penMapShape=typeof location==='undefined'?null:new URLSearchParams(location.search).get('penmap');
 // The task's saved-work badge (owner, 2026-10-13 and 2026-10-18): an upload icon and this task's record count, as the page action of
 // every page in the task; nothing when this task has no records on this phone, even if other tasks do (Home holds the whole phone).
 // Red only when signed out. ?taskSync= offline | syncing | failed (read as uploading with some not accepted) | expired | other | done.
@@ -32,19 +32,19 @@ function placeTaskSyncBadge(root){
 // People are initials on every record stamp: "G. Hansen" is "G.H".
 const initials=n=>{const m=/^([A-Za-z])[.]? ([A-Za-z])/.exec(n||'');return m?m[1]+'.'+m[2]:(n||'');};
 function seed(preset='count'){
- const s={preset,view:'count',back:'count',finishAlive:9,due:'Due today · day 114',alive:9,dead:[1,1,2,0,0,0,1],anchor:10,pending:0,weak:1,deformed:1,weight:'',assisted:false,locked:false,ended:false,frozen:14,tag:'000418',pen:'B1',parity:3,deathDraft:[0,0,0,0,0,0,0],bornDraft:0,group:null,deathFrom:null,moved:0,handReared:null,mode:'piglets',sowCause:'',sowNote:'',photos:[],undone:null,expanded:false,popup:null,pointers:false,lens:'All',stamp:'08:41',finished:'Aug 27 · 08:12',markers:[{text:'Red line on left shoulder · monitor overnight',meta:'Today · 06:20 · G.H'}],markerDraft:null,pigletTab:'care',processingDirty:false,processingTasks:[{id:'dry',day:1,title:'Dry and warm',done:true,meta:'Aug 26 · 07:18 · G.H'},{id:'navel',day:1,title:'Disinfect navel',done:true,meta:'Aug 26 · 07:24 · G.H'},{id:'iron',day:3,title:'Iron supplement',done:false,meta:'Due today'},{id:'identity',day:3,title:'Ear tag, notch and weight',done:false,meta:'3 identified · 6 without identity'},{id:'health',day:5,title:'Health check',done:false,meta:'In 2 days'}],piglets:[{tag:'418001',notch:'36-38',sex:'Female',weight:'1.4',state:'Alive'},{tag:'418002',notch:'36-41',sex:'Male',weight:'1.5',state:'Alive'},{tag:'418003',notch:'',sex:'Female',weight:'',state:'Alive'}],unidentified:6,pigletQuery:'',pigletSelected:[],pigletDraft:null,pigletEditIndex:-1,fosterDraft:{direction:'out',target:'000392',count:1},mortalityDraft:{cause:'',unidentified:0,photos:[]},countDraft:9,countReason:'',events:[{text:'+3 born alive · 1 crushed',day:'Aug 26',time:'08:20',who:'L. Madsen',visit:{born:3,dead:[0,0,1,0,0,0,0]}},{text:'+4 born alive · 1 crushed · 1 other',day:'Aug 26',time:'08:12',who:'G. Hansen',visit:{born:4,dead:[0,0,1,0,0,0,1]}},{text:'+5 born alive',day:'Aug 26',time:'07:52',who:'G. Hansen',visit:{born:5,dead:[0,0,0,0,0,0,0]}},{text:'1 stillborn · 1 mummified',day:'Aug 26',time:'07:30',who:'G. Hansen',visit:{born:0,dead:[1,1,0,0,0,0,0]}}]};
+ const s={preset,view:'count',back:'count',finishAlive:9,due:'Due today · day 114',alive:9,dead:[1,1,2,0,0,0,1],anchor:10,pending:0,weak:1,deformed:1,weight:'',assisted:false,locked:false,ended:false,frozen:14,tag:'000418',pen:'B1',parity:3,deathDraft:[0,0,0,0,0,0,0],bornDraft:0,group:null,deathFrom:null,moved:0,handReared:null,mode:'piglets',sowCause:'',sowNote:'',photos:[],undone:null,expanded:false,popup:null,pointers:false,lens:'All',stamp:'08:41',finished:'Aug 27 · 08:12',markers:[{text:'Red line on left shoulder · monitor overnight',meta:'Today · 06:20 · G.H'}],markerDraft:null,piglets:[{tag:'418001',notch:'36-38',sex:'Female',weight:'1.4',state:'Alive'},{tag:'418002',notch:'36-41',sex:'Male',weight:'1.5',state:'Alive'},{tag:'418003',notch:'',sex:'Female',weight:'',state:'Alive'}],fosterDraft:{direction:'out',target:'000392',count:1},events:[{text:'+3 born alive · 1 crushed',day:'Aug 26',time:'08:20',who:'L. Madsen',visit:{born:3,dead:[0,0,1,0,0,0,0]}},{text:'+4 born alive · 1 crushed · 1 other',day:'Aug 26',time:'08:12',who:'G. Hansen',visit:{born:4,dead:[0,0,1,0,0,0,1]}},{text:'+5 born alive',day:'Aug 26',time:'07:52',who:'G. Hansen',visit:{born:5,dead:[0,0,0,0,0,0,0]}},{text:'1 stillborn · 1 mummified',day:'Aug 26',time:'07:30',who:'G. Hansen',visit:{born:0,dead:[1,1,0,0,0,0,0]}}]};
  if(preset==='room')s.view='room';
  if(/^search-/.test(preset))s.view='roomSearch';
  if(/^scan-/.test(preset)&&preset!=='scan-read')s.view=['scan-pig','scan-dead'].includes(preset)?'roomPig':'roomScan';   // scan-read: her drawer (the default view) over Scan
  if(preset.startsWith('task-'))s.view='roomEndTask';
  if(preset.startsWith('batch-'))s.view=preset==='batch-sheet'?'roomBatch':preset==='batch-form'?'roomBatchForm':preset==='batch-saved'?'room':'roomBatchPick';
- if(preset==='before'){Object.assign(s,{alive:0,dead:[0,0,0,0,0,0,0],anchor:0,pending:0,weak:0,deformed:0,tag:'000455',pen:'B4',events:[],stamp:'',parity:2});}
+ if(preset==='before'){Object.assign(s,{alive:0,dead:[0,0,0,0,0,0,0],anchor:0,pending:0,weak:0,deformed:0,tag:'000455',pen:'B4',events:[],stamp:'',parity:2,piglets:[]});}
  if(preset==='finish')s.view='finish';
  if(preset==='draft'){s.bornDraft=2;s.deathDraft[2]=1;s.group='died';s.deathFrom=[0,0,0,0,0,0,0];s.view='death';}
  if(preset==='visit'){s.bornDraft=3;s.deathDraft[0]=1;s.deathDraft[2]=1;}
  if(preset==='litter'){s.view='litter';s.litterBack='count';}
  if(['locked','history','ended','allocate','details','details-first'].includes(preset)){Object.assign(s,{locked:true,view:'locked',alive:8,dead:[1,1,3,0,0,0,1],pending:0,weight:'12.6',assisted:true,history:[{parity:1,bornAlive:13,weaned:12},{parity:2,bornAlive:12,weaned:11}]});s.events.unshift({text:'+1 crushed',day:'Aug 28',time:'14:02',who:'L. Madsen',visit:{born:0,dead:[0,0,1,0,0,0,0]},afterLock:true},{text:'Farrowing finished · born 14',day:'Aug 27',time:'08:12',who:'G. Hansen',kind:'milestone'});}
- if(preset==='ended'||preset==='allocate'){s.ended=true;s.deathStage='during';s.frozen=10;s.alive=7;s.dead=[2,0,1,0,0,0,0];s.sowCause='Prolapse';s.events=[{text:'Sow died · prolapse',day:'Aug 25',time:'06:20',who:'L. Madsen',kind:'danger'},{text:'7 alive · 3 dead',day:'Aug 25',time:'06:18',who:'L. Madsen'}];if(preset==='allocate'){Object.assign(s,{tag:'000399',pen:'B3',parity:4,view:'locked',back:'locked'});s.piglets=[...s.piglets,{notch:'36-44',sex:'Male',weight:'1.3',state:'Alive'},{notch:'36-45',sex:'Female',weight:'1.2',state:'Alive'},{notch:'',sex:'Male',weight:'1.1',state:'Alive'}].map((p,i)=>({...p,tag:'3990'+String(i+1).padStart(2,'0')}));s.unidentified=s.alive-s.piglets.length;}}
+ if(preset==='ended'||preset==='allocate'){s.ended=true;s.deathStage='during';s.frozen=10;s.alive=7;s.dead=[2,0,1,0,0,0,0];s.sowCause='Prolapse';s.events=[{text:'Sow died · prolapse',day:'Aug 25',time:'06:20',who:'L. Madsen',kind:'danger'},{text:'7 alive · 3 dead',day:'Aug 25',time:'06:18',who:'L. Madsen'}];if(preset==='allocate'){Object.assign(s,{tag:'000399',pen:'B3',parity:4,view:'locked',back:'locked'});s.piglets=[...s.piglets,{notch:'36-44',sex:'Male',weight:'1.3',state:'Alive'},{notch:'36-45',sex:'Female',weight:'1.2',state:'Alive'},{notch:'',sex:'Male',weight:'1.1',state:'Alive'}].map((p,i)=>({...p,tag:'3990'+String(i+1).padStart(2,'0')}));}}
  if(preset==='history'){s.view='history';s.back='locked';}
  if(preset==='details'||preset==='details-first'){s.view='litter';s.litterBack='locked';}
  if(preset==='details-first'){s.parity=1;s.history=[];}
@@ -68,6 +68,7 @@ function restoreDraft(s){try{const d=JSON.parse(sessionStorage.getItem(draftKey(
 const draftBornDead=s=>s.deathDraft[0]+s.deathDraft[1],draftDied=s=>sum(s.deathDraft.slice(2));
 const aliveNow=s=>s.alive+(s.bornDraft||0)-(s.locked?0:draftDied(s));
 const visitDraft=s=>!s.locked&&!s.ended&&((s.bornDraft||0)+sum(s.deathDraft))>0;
+const visitSaveAllowed=s=>visitDraft(s)&&draftDied(s)<=s.alive+(s.bornDraft||0);
 const hasDraft=s=>(s.bornDraft||0)>0||sum(s.deathDraft)>0||(!s.ended&&s.sowCause);
 // No Edit record (owner, 2026-11-02): what is saved is in. Undo is a stack (owner, 2026-11-03): Details shows her last action on top, and
 // anyone can take it back, only the top one, again and again down the stack; the counts go back and the log keeps it marked Withdrawn.
@@ -105,7 +106,7 @@ function act(s,a,v){
  if(a==='deathGroup'){if(v==='sow')s.mode='sow';else{s.mode='piglets';s.group=v;}}
  if(a==='close'){if(s.view==='count')fold(s);s.view=s.view==='roomEndTask'?'roomOverview':s.view==='roomTaskSows'?'roomEndTask':s.view==='roomTaskReceipt'?'roomHome':penParent(s.view);}
  if(a==='open')s.view=s.locked?'locked':'count';
- if(a==='back'){s.popup=null;s.view=s.view==='litter'?s.litterBack||'count':['history','profile','deathBreakdown'].includes(s.view)?s.pageBack||s.back||'count':s.back||'count';}
+ if(a==='back'){s.popup=null;s.view=s.view==='litter'?s.litterBack||'count':['history','profile'].includes(s.view)?s.pageBack||s.back||'count':s.back||'count';}
  if(a==='finish'){s.pointers=false;s.view='finish';}
  if(a==='death'){s.back=s.view==='finish'?'finish':s.locked?'locked':'count';if(s.ended)s.mode='piglets';if(!s.locked&&!s.ended){s.deathFrom=[...s.deathDraft];if(!s.group)s.group=draftBornDead(s)&&!draftDied(s)?'bornDead':'died';}s.view='death';}
  if(a==='mode')s.mode=v;
@@ -117,33 +118,24 @@ function act(s,a,v){
  if(a==='lock'){s.weight=normWeight(s.weight);if(hasDraft(s)||!born(s))return;fold(s);s.frozen=born(s);s.finishAlive=s.alive;s.locked=true;s.finished='Today · 09:41';event(s,`Farrowing finished · born ${s.frozen}`,'milestone');s.view='locked';}
  if(a==='sowActions'){s.pageBack=s.view;s.actionsEntry=true;s.view='profile';}
  if(a==='profile')s.actionsEntry=false;
- if(a==='history'||a==='profile'||a==='deathBreakdown'){s.pageBack=s.view;s.view=a;}
+ if(a==='history'||a==='profile'){s.pageBack=s.view;s.view=a;}
  if(a==='sowCause')s.sowCause=v;
  if(a==='cancelPopup')s.popup=null;
- if(a==='mortalityPhoto')s.photoOrigin={action:a,index:Number(v)};
- if(a==='mortalityPhoto')s.popup={kind:'photo',src:s.mortalityDraft.photos[Number(v)],index:Number(v),editable:true,mortality:true};
  if(a==='photo')s.photoOrigin={action:a,index:Number(v)};
  if(a==='photo')s.popup={kind:'photo',src:s.photos[Number(v)],index:Number(v),editable:true};
- if(a==='deletePhoto'){const list=s.popup.mortality?s.mortalityDraft.photos:s.photos;list.splice(s.popup.index,1);s.photoOrigin={action:'addPhoto',index:'photos'};s.popup=null;}
+ if(a==='deletePhoto'){s.photos.splice(s.popup.index,1);s.photoOrigin={action:'addPhoto',index:'photos'};s.popup=null;}
  if(a==='lens')s.lens=v;
- if(a==='marker'){if(s.markerDraft==null)s.markerDraft=s.markers[0]?.text||'';s.view='marker';} // Back keeps the draft (drawer law): reopening finds it
- if(a==='saveMarker'){const text=(s.markerDraft??s.markers[0]?.text??'').trim();if(!text)return;s.markers=[{text,meta:'Today · 09:41 · G.H'}];event(s,'Note updated · '+text,'milestone');s.markerDraft=null;if(s.scanReturn){s.scanReturn=false;s.actionsEntry=false;s.view=s.pageBack||'roomScan';}else{s.actionsEntry=true;s.view='profile';}}
- if(a==='piglets'){s.pigletSelected=[];s.view='pigletCare';}
- if(a==='pigletTab')s.pigletTab=v;
- if(a==='processingTask'){const task=s.processingTasks.find(x=>x.id===v);if(task){task.done=!task.done;task.meta=task.done?'This visit · G.H':task.id==='health'?'In 2 days':'Due today';s.processingDirty=true;}}
- if(a==='saveProcessing'){if(!s.processingDirty)return;const done=s.processingTasks.filter(x=>x.done).length;event(s,`Piglet processing updated · ${done} of ${s.processingTasks.length} items done`);s.processingDirty=false;s.actionsEntry=true;s.view='profile';}
- if(a==='togglePiglet'){s.pigletSelected=s.pigletSelected.includes(v)?s.pigletSelected.filter(x=>x!==v):[...s.pigletSelected,v];}
- if(a==='editPiglet'){const index=Number(v),p=s.piglets[index];if(!p)return;s.pigletEditIndex=index;s.pigletDraft={...p};s.view='pigletEdit';}
- if(a==='addPiglet'||a==='scanPiglet'||a==='notchPiglet'){s.pigletEditIndex=-1;s.pigletDraft={tag:a==='scanPiglet'?String(418001+s.piglets.length):'',notch:a==='notchPiglet'?'Choose notch':'',sex:'',weight:'',state:'Alive'};s.view='pigletEdit';}
- if(a==='savePiglet'){const p=s.pigletDraft;if(!p||![p.tag,p.notch,p.sex,p.weight].some(x=>String(x||'').trim()))return;const clean={tag:String(p.tag||'').trim(),notch:p.notch==='Choose notch'?'':String(p.notch||'').trim(),sex:p.sex||'',weight:String(p.weight||'').trim(),state:p.state||'Alive'};if(s.pigletEditIndex<0){s.piglets.push(clean);s.unidentified=Math.max(0,s.unidentified-1);}else s.piglets[s.pigletEditIndex]=clean;event(s,`${s.pigletEditIndex<0?'Piglet identity added':'Piglet identity updated'} · ${clean.tag||clean.notch||'identity pending'}`);s.pigletTab='records';s.view='pigletCare';}
- if(a==='foster'){s.featureReturn=s.view==='pigletCare'?'pigletCare':'profile';s.fosterDraft=fosterStart(s,1);s.view='foster';}
+ if(a==='marker'){if(s.markerDraft==null)s.markerDraft=s.markers[0]?.text||'';if(s.markerDaysDraft==null)s.markerDaysDraft=s.markers[0]?.days||7;s.view='marker';} // Back keeps both drafts
+ if(a==='markerDays')s.markerDaysDraft=Math.max(1,Math.min(60,(s.markerDaysDraft||7)+noteStep));
+ if(a==='saveMarker'){const text=(s.markerDraft??s.markers[0]?.text??'').trim();if(!text)return;const days=s.markerDaysDraft||7;s.markers=[{text,meta:'G. Hansen · today 09:41',days}];event(s,'Note updated · '+text+' · '+days+' days','milestone');s.markerDraft=null;s.markerDaysDraft=null;if(s.scanReturn){s.scanReturn=false;s.actionsEntry=false;s.view=s.pageBack||'roomScan';}else{s.actionsEntry=true;s.view='profile';}}
+ if(a==='foster'){s.featureReturn='profile';s.fosterDraft=fosterStart(s,1);s.view='foster';}
  // Allocate piglets (owner, 2026-11-02): a menu drawer of three verbs; each pushes its own page and Back returns to the drawer. Foster
  // is the Foster piglets page itself, foster off only (Foster on is there, disabled); each save comes back to it while piglets are left,
  // so 3 can go to one sow and 3 to another. Hand-rear and the rearing pen take what is left, from their pages.
  // Allocate piglets (owner, 2026-11-03): her litter's piglet list. Tick piglets (with an ID by tick, search or scan; without one by a
  // count), then Send to a sow or Move to a pen; each takes its piglets off the list. The ones left stay: Keep N in her crate hand-rears them.
  if(a==='pigletList'){s.fosterDraft=null;litterDraft(s);s.view='pigletList';}   // her piglets, from her record
- if(a==='litterAll'){const f=litterDraft(s),all=fosterIds(s).map(p=>p.tag),full=f.ids.length===all.length&&f.count===fosterNoId(s);f.ids=full?[]:all;f.count=full?0:fosterNoId(s);}
+ if(a==='litterAll'&&!unresolvedPigletIds(s)){const f=litterDraft(s),all=fosterIds(s).map(pigletKey),full=f.ids.length===all.length&&f.count===fosterNoId(s);f.ids=full?[]:all;f.count=full?0:fosterNoId(s);}
  if(a==='litterNoId'){const f=s.fosterDraft;f.count=f.count?0:fosterNoId(s);}   // the row ticks all of them; its count says how many
  if(a==='litterActions'&&litterPicked(s))s.view='litterActions';
  if(a==='allocToSow'&&litterPicked(s)){s.featureReturn='pigletList';Object.assign(s.fosterDraft,{q:'',scanning:false,direction:'out',target:''});s.view='foster';}
@@ -151,8 +143,8 @@ function act(s,a,v){
  if(a==='allocPenClear')s.fosterDraft.penQ='';
  if(a==='allocPenScan'){s.fosterDraft.penScan=roomContext(s).scan.connected?true:'waiting';s.fosterDraft.penQ='';}
  if(a==='allocPenScanStop')s.fosterDraft.penScan=false;
- if(a==='allocPen'){const f=s.fosterDraft,[unit,pen]=String(v).split('|'),c=roomContext(s),ids=f.ids.slice(),n=ids.length+f.count;if(!n)return;
-  s.piglets=s.piglets.filter(p=>!ids.includes(p.tag));s.alive-=n;s.moved=(s.moved||0)+n;s.unidentified=fosterNoId(s);s.anchor=born(s);
+ if(a==='allocPen'){const f=s.fosterDraft,[unit,pen]=String(v).split('|'),c=roomContext(s),ids=f.ids.slice(),n=ids.length+f.count;if(!n||n>s.alive||unresolvedPigletIds(s))return;
+  s.piglets=s.piglets.filter(p=>!ids.includes(pigletKey(p)));s.alive-=n;s.moved=(s.moved||0)+n;s.anchor=born(s);
   const where=`${rowText.pen(pen)} · ${farmUnit(c,unit).name}`;event(s,`${n} piglet${n===1?'':'s'} moved to ${where}${ids.length?' · ID '+ids.join(', '):''}`,'milestone');
   (s.allocSent||=[]).push({kind:'moved',where,n,ids});s.fosterDraft=null;litterDraft(s);s.view='pigletList';}
  if(a==='fosterFilter'){s.fosterDraft.filtering=true;s.fosterDraft.filterDraft=clone(s.fosterDraft.filter);}
@@ -175,23 +167,18 @@ function act(s,a,v){
  if(a==='fosterClear')s.fosterDraft.q='';
  if(a==='fosterCount'){const f=s.fosterDraft;f.count=Math.max(0,Math.min(fosterMax(s),f.count+Number(v)));}
  if(a==='saveFoster'){const f=s.fosterDraft,other=fosterSow(s,f.target);if(!other||f.count<0||f.count>fosterMax(s)||f.count+f.ids.length<1)return;const out=f.direction==='out',to=out?other:s,from=out?s:other,ids=f.ids.slice(),k=f.count,n=k+ids.length,word=`${n} piglet${n===1?'':'s'} fostered`,idText=ids.length?` · ID ${ids.join(', ')}`:'';
+  if(n>from.alive||unresolvedPigletIds(from))return;
   // the ticked piglets go with their records (ID, notch, sex, weight); the others go as a count and arrive without identity
-  ids.forEach(tag=>{const i=(from.piglets||[]).findIndex(p=>p.tag===tag);if(i>=0)(to.piglets||=[]).push(from.piglets.splice(i,1)[0]);});
-  from.alive-=n;from.moved=(from.moved||0)+n;to.alive+=n;to.moved=(to.moved||0)-n;from.unidentified=fosterNoId(from);to.unidentified=fosterNoId(to);[from,to].forEach(r=>{if(!r.locked)r.anchor=born(r);});
+  ids.forEach(id=>{const i=(from.piglets||[]).findIndex(p=>pigletKey(p)===id);if(i>=0)(to.piglets||=[]).push(from.piglets.splice(i,1)[0]);});
+  from.alive-=n;from.moved=(from.moved||0)+n;to.alive+=n;to.moved=(to.moved||0)-n;[from,to].forEach(r=>{if(!r.locked)r.anchor=born(r);});
   event(s,`${word} ${out?'to':'from'} ${other.tag}${idText}`,'milestone');event(other,`${word} ${out?'from':'to'} ${s.tag}${idText}`,'milestone');f.target='';f.ids=[];
   if(s.featureReturn==='pigletList')(s.allocSent||=[]).push({kind:'sent',tag:other.tag,pen:other.pen,n,ids});   // Allocate lists what has gone where
-  if(s.featureReturn==='pigletList'){s.fosterDraft=null;litterDraft(s);s.view='pigletList';}else if(s.featureReturn==='pigletCare'){s.pigletTab='records';s.view='pigletCare';}else{s.actionsEntry=true;s.view='profile';}}
- if(a==='openMortality'){if(!s.pigletSelected.length&&!s.unidentified)return;s.mortalityDraft={cause:'',unidentified:0,photos:[]};s.view='pigletDeath';}
- if(a==='mortalityCount'){const max=Math.min(s.unidentified,s.alive-s.pigletSelected.length);s.mortalityDraft.unidentified=Math.max(0,Math.min(max,s.mortalityDraft.unidentified+Number(v)));}
- if(a==='savePigletMortality'){const f=s.mortalityDraft,total=s.pigletSelected.length+f.unidentified;if(!f.cause||!total)return;const selected=new Set(s.pigletSelected);s.piglets.forEach(p=>{if(selected.has(p.tag))p.state='Dead';});s.unidentified=Math.max(0,s.unidentified-f.unidentified);s.alive=Math.max(0,s.alive-total);const typeIndex={Stillborn:0,Mummified:1,Crushed:2,Scours:3,'Starve-out':4,Other:5,'Cause unknown':5}[f.cause]??5;s.dead[typeIndex]+=total;s.frozen=Math.max(s.frozen,born(s));event(s,`${total} piglet${total===1?'':'s'} died · ${f.cause.toLowerCase()}`,'danger',f.photos);s.pigletSelected=[];s.pigletTab='records';s.view='pigletCare';}
- if(a==='countReconcile'){s.countDraft=s.alive;s.countReason='';s.view='countReconcile';}
- if(a==='countReconcileStep'){const identified=s.piglets.filter(p=>p.state==='Alive').length;s.countDraft=Math.max(identified,Math.min(30,s.countDraft+Number(v)));}
- if(a==='saveCountReconcile'){if(s.countDraft===s.alive||!s.countReason.trim())return;const before=s.alive,diff=s.countDraft-before;s.alive=s.countDraft;s.unidentified=Math.max(0,s.unidentified+diff);s.anchor=born(s);if(s.locked)s.frozen=Math.max(s.frozen,born(s));event(s,`Piglet count corrected · ${before} → ${s.alive} · ${s.countReason.trim()}`,'correction');s.actionsEntry=true;s.view='profile';}
+  if(s.featureReturn==='pigletList'){s.fosterDraft=null;litterDraft(s);s.view='pigletList';}else{s.actionsEntry=true;s.view='profile';}}
  if(a==='featureBack'&&s.view==='fosterSend'){s.fosterDraft.target='';s.view='foster';return;}   // back to the sows
  if(a==='featureBack'&&s.view==='allocConfirm'){s.fosterDraft.target='';s.view='foster';return;}   // back to the sows
  if(a==='featureBack'&&['allocPen','litterActions'].includes(s.view)){s.view='pigletList';return;}   // back to her piglets, nothing changed
  if(a==='featureBack'&&s.view==='pigletList'){s.fosterDraft=null;s.view=recordView(s);return;}   // back to her record
- if(a==='featureBack'){if(s.view==='foster'&&s.featureReturn==='pigletList'){s.view='pigletList';}else if(['pigletEdit','pigletDeath'].includes(s.view)||s.view==='foster'&&s.featureReturn==='pigletCare'){s.pigletTab='records';s.view='pigletCare';}else if(s.scanReturn){s.scanReturn=false;s.actionsEntry=false;s.view=s.pageBack||'roomScan';}else{s.actionsEntry=true;s.view='profile';}}   // opened from Scan's Actions: Back returns to the scan list
+ if(a==='featureBack'){if(s.view==='foster'&&s.featureReturn==='pigletList'){s.view='pigletList';}else if(s.scanReturn){s.scanReturn=false;s.actionsEntry=false;s.view=s.pageBack||'roomScan';}else{s.actionsEntry=true;s.view='profile';}}   // opened from Scan's Actions: Back returns to the scan list
 }
 // Merge every saved event in the pen, independent of the current list filters.
 // Resolve the prototype's relative date labels against one reference day.
@@ -218,14 +205,14 @@ function taskClosureReview(c){
  const totals={born:sum(completedLitters.map(x=>born(x.record))),alive:sum(completedLitters.map(x=>x.record.alive)),dead:sum(completedLitters.map(x=>sum(x.record.dead))),stillborn:sum(completedLitters.map(x=>x.record.dead[0])),mummified:sum(completedLitters.map(x=>x.record.dead[1]))};
  // Where the piglets born went, and two per-litter facts: deaths after birth by cause, assisted litters, the mean of recorded litter weights.
  const cause=i=>sum(completedLitters.map(x=>x.record.dead[i])),weights=completedLitters.map(x=>Number(x.record.weight)).filter(w=>w>0);
- const performance={...totals,litters:completedLitters.length,bornAlivePerLitter:completedLitters.length?(totals.born-totals.stillborn-totals.mummified)/completedLitters.length:null,stillbornRate:totals.born?100*totals.stillborn/totals.born:null,target:c.bornAliveTarget??null,causes:{crushed:cause(2),scours:cause(3),starveOut:cause(4),other:cause(5)},assisted:completedLitters.filter(x=>x.record.assisted===true).length,weight:weights.length?sum(weights)/weights.length:null};
+ const performance={...totals,litters:completedLitters.length,bornAlivePerLitter:completedLitters.length?(totals.born-totals.stillborn-totals.mummified)/completedLitters.length:null,stillbornRate:totals.born?100*totals.stillborn/totals.born:null,target:c.bornAliveTarget??null,causes:{crushed:cause(2),scours:cause(3),starveOut:cause(4),putDown:cause(5),other:cause(6)},assisted:completedLitters.filter(x=>x.record.assisted===true).length,weight:weights.length?sum(weights)/weights.length:null};
  return {rows,active,awaiting,finished,ended,abortions,left,notInPig,removed,performance,drafts,blocked:!!active.length};
 }
 function closeTask(c,at=new Date().toISOString()){
  if(c.completion)return false;
  const review=taskClosureReview(c);if(review.blocked)return false;
  // A task closure receipt, not a frozen copy of the animals' live records.
- c.completion={early:review.awaiting.length>0,at,who:'G. Hansen',total:review.rows.length,finished:review.finished.length,removed:review.awaiting.length+review.removed.length,ended:review.ended.length,abortions:review.abortions.length,notInPig:review.notInPig.length,performance:review.performance};
+ c.completion={early:review.awaiting.length>0,at,who:'G. Hansen',total:review.rows.length,finished:review.finished.length,awaiting:review.awaiting.length,removed:review.removed.length,ended:review.ended.length,abortions:review.abortions.length,notInPig:review.notInPig.length,performance:review.performance};
  review.awaiting.forEach(({record})=>{record.taskDisposition='removed-at-close';});
  review.finished.forEach(({record})=>{fold(record);record.taskDisposition='retained';});
  return true;
@@ -236,7 +223,7 @@ if(typeof document==='undefined')return;
 function atlasScreen(s,c){
  const v=s.view;
  if(!/^room/.test(v)&&c.returnToTaskReview==='roomScan')return 'farrowing.scan-read';   // a sow the reader opened, over Scan
- if(v==='room')return c.toast?.title?'farrowing.batch-saved':'farrowing.room';
+ if(v==='room')return c.toast?.title?'farrowing.batch-saved':penMapShape==='single'?'farrowing.room-single':'farrowing.room';
  if(s.popup?.kind==='undo')return 'farrowing.undo';
  if(v==='count')return visitDraft(s)?'farrowing.count-draft':lastSave(s)?.who===ME&&s.events[0]===lastSave(s)&&s.events[0].time==='09:41'?'farrowing.count-saved':born(s)?'farrowing.count':'farrowing.before';
  if(v==='death')return 'farrowing.death';
@@ -249,23 +236,28 @@ function atlasScreen(s,c){
  if(v==='allocConfirm')return 'farrowing.piglets-confirm';
  if(v==='litterActions')return 'farrowing.piglets-actions';
  if(v==='pigletList')return litterPicked(s)?'farrowing.piglets-ticked':'farrowing.piglets';
- if(v==='countReconcile')return 'farrowing.reconcile';
  if(v==='roomOverview')return 'farrowing.overview';
  if(v==='roomTaskReceipt')return 'farrowing.task-receipt';
- if(v==='roomEndTask'){const r=taskClosureReview(c);return r.blocked?'farrowing.task-blocked':r.awaiting.length?'farrowing.task-ready':r.abortions.length?'farrowing.task-outcomes':'farrowing.task-complete';}
+ if(v==='roomGrid'){
+  if(penMapShape==='mixed')return 'farrowing.pen-map-mixed';
+  if(penMapShape==='long')return document.querySelector('[data-card="0"] .st-pen-whole')?'farrowing.pen-map-whole':c.penMapGroupOpened?'farrowing.pen-map-group':'farrowing.pen-map-long';
+  return 'farrowing.pen-map';
+ }
+ if(v==='roomEndTask'){const r=taskClosureReview(c);return r.blocked?'farrowing.task-blocked':r.awaiting.length?'farrowing.task-ready':(r.abortions.length||r.removed.length||r.notInPig.length)?'farrowing.task-outcomes':'farrowing.task-complete';}
  if(v==='roomSearch'){const f=findHits(c);return !f?'farrowing.search':f.hits.length?'farrowing.search-results':'farrowing.search-none';}
  if(v==='roomScan'){const sc=c.scan;return !sc.connected?'farrowing.scan-no-reader':!sc.listening?'farrowing.scan-stopped':c.toast?.on==='roomScan'?'farrowing.scan-unknown':'farrowing.scan';}
- if(v==='roomPig')return farmPigs.find(p=>p.tag===c.pig)?.gone?'farrowing.pig-gone':'farrowing.pig-not-in-task';
+ if(v==='roomPig')return farmPigs.find(p=>p.tag===c.pig)?.gone||c.units.some(u=>u.records.some(r=>r.tag===c.pig&&r.ended))?'farrowing.pig-gone':'farrowing.pig-not-in-task';
  if(v==='roomBatch')return 'farrowing.batch';
  if(v==='roomBatchPick'){const b=c.batch||{};return b.filtering?'farrowing.batch-filter':b.missed?.length?'farrowing.batch-missed':b.scanning==='waiting'?'farrowing.batch-waiting':b.scanning?'farrowing.batch-scanning':b.q?'farrowing.batch-search':b.picked?.length?'farrowing.batch-pick':'farrowing.batch-pick-none';}
  if(v==='roomBatchForm')return 'farrowing.batch-form';
  if(v==='litter'&&s.locked&&!s.ended&&!s.productionOutcome)return pastLitters(s).length?'farrowing.details':'farrowing.details-first';
- const more={roomFilter:'filter',roomGrid:'pen-map',roomPenDetail:'pen',roomPenLog:'pen-log',roomPenNote:'pen-note',roomPenReadNote:'pen-read-note',roomPenFeed:'pen-feed',roomPenFault:'pen-fault',roomPenFaultRecord:'pen-fault-record',roomTaskSows:'task-sows',roomHome:'today',deathBreakdown:'death-breakdown',litter:'litter',marker:'note',pigletCare:'piglet-care',pigletEdit:'piglet-identity',pigletDeath:'piglet-death'};
+ const more={roomFilter:'filter',roomGrid:'pen-map',roomPenDetail:'pen',roomPenLog:'pen-log',roomPenNote:'pen-note',roomPenReadNote:'pen-read-note',roomPenFeed:'pen-feed',roomPenFault:'pen-fault',roomPenFaultRecord:'pen-fault-record',roomTaskSows:'task-sows',roomHome:'today',litter:'litter',marker:'note'};
  if(more[v])return 'farrowing.'+more[v];
+ if(v==='profile'&&sowDetailContexts.get(s)?.view==='batch-membership')return 'farrowing.batch-membership';
  if(v==='profile'&&s.actionsEntry)return 'farrowing.sow-actions';
  return null;
 }
-const presets=[['room','Room list'],['room-parity','Room · filter, parity 6+'],['count','Counting'],['visit','Counting · not saved yet'],['saved','Counting · just saved'],['undo','Undo the last save'],['litter','Details · while she farrows'],['details','Details · a finished sow'],['details-first','Details · no earlier litters'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['locked','Locked record'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · her piglets'],['piglets-dead','Piglets · a dead sow'],['piglets-ticked','Piglets · three ticked'],['piglets-actions','Piglets · Actions'],['piglets-sow','Piglets · foster to a sow'],['piglets-filter','Piglets · filter sows'],['piglets-confirm','Piglets · confirm the sow'],['piglets-after','Piglets · after a send'],['piglets-pen','Piglets · move to a pen'],['piglets-live','Piglets · a finished sow'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['foster-search','Foster · search a pen'],['foster-scanning','Foster · scanning'],['foster-send','Foster · send to a sow'],['foster-filter','Foster · filter sows'],['foster-receive','Foster · receive piglets'],['reconcile','Reconcile piglet count'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · listening'],['scan-read','Scan · her drawer opened'],['scan-pig','Scan · a pig not in Farrowing'],['scan-dead','Scan · a pig that died'],['scan-unknown','Scan · a tag with no pig'],['scan-stopped','Scan · stopped'],['batch-sheet','Actions · pigs in this unit'],['batch-none','Choose pigs · none yet'],['batch-pick','Choose pigs · 3 chosen'],['batch-search','Choose pigs · search'],['batch-filter','Choose pigs · filter'],['batch-scanning','Choose pigs · scanning'],['batch-waiting','Choose pigs · waiting for the reader'],['batch-missed','Choose pigs · reads that cannot join'],['batch-form','Actions · the form'],['batch-saved','Actions · saved']];
+const presets=[['room','Room list'],['room-parity','Room · filter, parity 6+'],['count','Counting'],['visit','Counting · not saved yet'],['saved','Counting · just saved'],['undo','Undo the last save'],['litter','Details · while she farrows'],['details','Details · a finished sow'],['details-first','Details · no earlier litters'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['locked','Locked record'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · her piglets'],['piglets-dead','Piglets · a dead sow'],['piglets-ticked','Piglets · three ticked'],['piglets-actions','Piglets · Actions'],['piglets-sow','Piglets · foster to a sow'],['piglets-filter','Piglets · filter sows'],['piglets-confirm','Piglets · confirm the sow'],['piglets-after','Piglets · after a send'],['piglets-pen','Piglets · move to a pen'],['piglets-live','Piglets · a finished sow'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['foster-search','Foster · search a pen'],['foster-scanning','Foster · scanning'],['foster-send','Foster · send to a sow'],['foster-filter','Foster · filter sows'],['foster-receive','Foster · receive piglets'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · listening'],['scan-read','Scan · her drawer opened'],['scan-pig','Scan · a pig not in Farrowing'],['scan-dead','Scan · a pig that died'],['scan-unknown','Scan · a tag with no pig'],['scan-stopped','Scan · stopped'],['batch-sheet','Actions · pigs in this unit'],['batch-none','Choose pigs · none yet'],['batch-pick','Choose pigs · 3 chosen'],['batch-search','Choose pigs · search'],['batch-filter','Choose pigs · filter'],['batch-scanning','Choose pigs · scanning'],['batch-waiting','Choose pigs · waiting for the reader'],['batch-missed','Choose pigs · reads that cannot join'],['batch-form','Actions · the form'],['batch-saved','Actions · saved']];
 const cards=[{title:'Find the next sow',caption:'<strong>The room, in context.</strong> Filter by state, jump to a pen, and open each sow’s live record.',initial:'room'},{title:'Finish with confidence',caption:'<strong>Two observations, then the lock.</strong> Clear rows, optional details and a deliberate final action.',initial:'finish'},{title:'Read the whole litter',caption:'<strong>Current facts, with their context.</strong> Finish details stay readable; the history opens on its own page.',initial:'locked'}];
 const states=cards.map(c=>{const r=seed(c.initial);restoreDraft(r);return r;});
 // Scenario gate hook (scripts/run-scenarios.mjs): read-only access to the live records for record assertions. Draws nothing.
@@ -365,6 +357,7 @@ function sampleUnit(id,awaiting,active,done,named={}){
  for(const [preset,n] of [['count',active],['before',awaiting],['locked',done]])for(let j=0;j<n;j++){
   const r=seed(preset),index=records.length;
   Object.assign(r,{tag:named[index]||String(Number(id)*100+index+1).padStart(6,'0'),pen:(id==='6'?'A':'C')+(Math.floor(index/2)+1),parity:2+index%5,lastBorn:10+index%4,view:'room'});
+  r.piglets=r.piglets.map((piglet,i)=>({...piglet,tag:r.tag.slice(-3)+String(i+1).padStart(3,'0')}));
   if(preset==='before')r.due=j===0?'Due today · day 114':j===1?'Due tomorrow · day 113':'Due in 2 days · day 112';
   records.push(r);
  }
@@ -383,16 +376,16 @@ function switchRoomUnit(c,id){
 function roomContext(s){
  const i=states.indexOf(s);if(roomContexts[i])return roomContexts[i];
  const fixtures=[['count','000418','B1',3,11,'Due today · day 114'],['before','000392','B2',5,11,'Due tomorrow · day 113'],['before','000455','B4',2,12,'Due today · day 114'],['before','000431','B4',6,9,'Overdue · 3 days · day 117'],['before','000467','B4',5,10,'Due in 2 days · day 112'],['locked','000406','B3',4,13,'Due yesterday · day 115'],['ended','000399','B3',4,10,'Due yesterday · day 115']];
- const records=fixtures.map(([p,tag,pen,parity,lastBorn,due])=>{if(s.tag===tag){s.lastBorn=lastBorn;return s;}const r=seed(p);Object.assign(r,{tag,pen,parity,lastBorn,due,view:'room'});if(tag==='000406'){r.alive=11;r.dead=[1,0,1,0,0,0,0];r.frozen=13;r.finished='Today · 05:58';r.events=[{text:'Farrowing finished · born 13',day:'Today',time:'05:58',who:'G. Hansen',kind:'milestone'}];}return r;});
+ const records=fixtures.map(([p,tag,pen,parity,lastBorn,due])=>{if(s.tag===tag){s.lastBorn=lastBorn;return s;}const r=seed(p);Object.assign(r,{tag,pen,parity,lastBorn,due,view:'room'});if(tag!=='000418')r.piglets=r.piglets.map((piglet,i)=>({...piglet,tag:tag.slice(-3)+String(i+1).padStart(3,'0')}));if(tag==='000406'){r.alive=11;r.dead=[1,0,1,0,0,0,0];r.frozen=13;r.finished='Today · 05:58';r.events=[{text:'Farrowing finished · born 13',day:'Today',time:'05:58',who:'G. Hansen',kind:'milestone'}];}return r;});
  if(!records.includes(s))records.unshift(s);
- const context=roomContexts[i]={unitId:'7',bornAliveTarget:12,units:[sampleUnit('6',3,1,4,{2:'004318',6:'000437'}),{id:'7',name:'Unit 7',records,livePerLitter:10},sampleUnit('8',2,0,2,{0:'000943'})],unitPositions:{},get unit(){return this.units.find(u=>u.id===this.unitId)},get records(){return this.unit.records},get listed(){return this.unit.records.filter(onList)},lens:'All',filter:defaultRoomFilter(),filterDraft:defaultRoomFilter(),currentPen:s.pen,scroll:0,query:'',jump:null};
+ const sampleRecords=penMapRoom.map?records:records.filter(r=>r.pen==='B4');
+ const context=roomContexts[i]={unitId:'7',bornAliveTarget:12,units:[sampleUnit('6',3,1,4,{2:'004318',6:'000437'}),{id:'7',name:'Unit 7',records:sampleRecords,livePerLitter:10},sampleUnit('8',2,0,2,{0:'000943'})],unitPositions:{},get unit(){return this.units.find(u=>u.id===this.unitId)},get records(){return this.unit.records},get listed(){return this.unit.records.filter(onList)},lens:'All',filter:defaultRoomFilter(),filterDraft:defaultRoomFilter(),currentPen:sampleRecords[0]?.pen||s.pen,scroll:0,query:'',jump:null};
  scanSetup(context,s.preset);
+ const outcomeRecord=s.preset==='task-outcomes'?context.units.flatMap(u=>u.records).find(r=>!r.locked&&!born(r)):null;
  if(['task-ready','task-complete','task-outcomes'].includes(s.preset))context.units.forEach(u=>u.records.forEach(r=>{
-  if(!r.locked&&(born(r)>0||s.preset==='task-complete'))Object.assign(r,{locked:true,frozen:born(r)||12,alive:born(r)?r.alive:12,pending:0,finished:'Today · 09:35'});
+  if(!r.locked&&(born(r)>0||s.preset!=='task-ready')){Object.assign(r,{locked:true,frozen:born(r)||12,alive:born(r)?r.alive:12,pending:0,finished:'Today · 09:35'});}
  }));
- if(s.preset==='task-outcomes'){
-  const record=context.units[0].records.find(r=>!r.locked);Object.assign(record,{productionOutcome:'abortion',locked:true,frozen:0,alive:0,pending:0,events:[{text:'Abortion recorded',day:'Today',time:'08:10',who:'G. Hansen'}]});
- }
+ if(outcomeRecord)Object.assign(outcomeRecord,{productionOutcome:'abortion',locked:true,frozen:0,alive:0,pending:0,events:[{text:'Abortion recorded',day:'Today',time:'08:10',who:'G. Hansen'}]});
  return context;
 }
 function dueDayOf(r){const d=r.due||'';return d.startsWith('Due today')?0:d.startsWith('Due tomorrow')?1:d.startsWith('Due yesterday')?-1:d.startsWith('Overdue')?-Number(d.match(/(\d+) days?/)?.[1]||1):d.startsWith('Due in')?Number(d.match(/(\d+) days?/)?.[1]):null;}
@@ -451,7 +444,7 @@ function room(s){
  if(!pens.includes(c.currentPen))c.currentPen=pens[0]||'';
  const latest=c.records.some(r=>r.stamp==='09:41')?'09:41':'08:41';
  if(s.view==='roomHome'||c.completion)return roomHome(c);
- return `${status()}${SentriTask.header({title:'Farrowing',back:{action:'room-home'},backLabel:'Back to Today',line:{text:[{text:'Last record '},{text:latest,strong:true},{text:' · G.H'}]}})}<div class="room-scroll" tabindex="-1" role="region" aria-label="${esc(c.unit.name)} farrowing sows"><div class="room-context-strip overview-host">${AstraTaskOverview.render({headingIcons:true,unit:{name:c.unit.name,value:avg,metric:'Live / litter',target:'Target 12',belowTarget:true},task:{value:allCounts.Done,total:allCounts.ProgressTotal,label:'Done',statuses:{farrowed:allCounts.Done,active:allCounts.Active,awaiting:allCounts.Awaiting}}})}</div><div class="room-controls"><div class="room-lensbar">${SentriUI.segment({variant:'two-line-lens',options:roomLenses.map(l=>[l,l,{count:counts[l]}]),active:c.lens,action:'room-lens',ariaLabel:'Farrowing state'})}${SentriUI.iconButton({action:'room-filter',icon:roomIcon('filter'),label:'Filter sows',className:'room-filter-button',badge:roomFilterCount(c.filter)||''})}</div>${roomFilterCount(c.filter)?`<div class="room-filter-summary"><span>${esc(roomFilterLabel(c.filter))}</span>${btn('room-clear-filter','Clear','text-button')}</div>`:''}</div><div class="room-list">${!visible.length?`<div class="room-empty"><strong>No ${c.lens==='All'?'matching':c.lens.toLowerCase()} sows</strong><p>${roomFilterCount(c.filter)?'Adjust the filters to see more task sows.':'Choose another status to see the other task sows in this unit.'}</p></div>`:''}${pens.map(p=>{const all=c.listed.filter(r=>r.pen===p),rows=visible.filter(r=>r.pen===p);return `<section class="st-panel pen-card" data-pen="${p}"><header class="pen-top">${btn('room-pen-detail',`<strong>${p}</strong><small>· ${all.length} ${all.length===1?'sow':'sows'}</small>${icon('chevron')}`,'room-pen-name',p).replace('<button',`<button aria-label="Pen ${p}, ${all.length} ${all.length===1?'sow':'sows'}, view details"`)}${rows.length!==all.length?`<span class="pen-visible-count">${rows.length} shown</span>`:''}</header>${rows.map(r=>sowRow(r)).join('')}</section>`;}).join('')}</div></div>${SentriUI.taskDock({label:'Farrowing tools',place:{action:'room-grid',label:penText.title},primary:{action:'room-scan',label:'Scan',attrs:{'aria-label':'Scan ear tag'}},tools:[{action:'room-search',icon:'search',label:'Search ear tag'},{action:'room-batch',icon:'more',label:'Actions'}]})}`;
+ return `${status()}${SentriTask.header({title:'Farrowing',back:{action:'room-home'},backLabel:'Back to Today',line:{text:[{text:'Last record '},{text:latest,strong:true},{text:' · G.H'}]}})}<div class="room-scroll" tabindex="-1" role="region" aria-label="${esc(c.unit.name)} farrowing sows"><div class="room-context-strip overview-host">${AstraTaskOverview.render({headingIcons:true,unit:{name:c.unit.name,value:avg,metric:'Live / litter',target:'Target 12',belowTarget:true},task:{value:allCounts.Done,total:allCounts.ProgressTotal,label:'Done',statuses:{farrowed:allCounts.Done,active:allCounts.Active,awaiting:allCounts.Awaiting}}})}</div><div class="room-controls"><div class="room-lensbar">${SentriUI.segment({variant:'two-line-lens',options:roomLenses.map(l=>[l,l,{count:counts[l]}]),active:c.lens,action:'room-lens',ariaLabel:'Farrowing state'})}${SentriUI.iconButton({action:'room-filter',icon:roomIcon('filter'),label:'Filter sows',className:'room-filter-button',badge:roomFilterCount(c.filter)||''})}</div>${roomFilterCount(c.filter)?`<div class="room-filter-summary"><span>${esc(roomFilterLabel(c.filter))}</span>${btn('room-clear-filter','Clear','text-button')}</div>`:''}</div><div class="room-list">${!visible.length?`<div class="room-empty"><strong>No ${c.lens==='All'?'matching':c.lens.toLowerCase()} sows</strong><p>${roomFilterCount(c.filter)?'Adjust the filters to see more task sows.':'Choose another status to see the other task sows in this unit.'}</p></div>`:''}${pens.map(p=>{const all=c.listed.filter(r=>r.pen===p),rows=visible.filter(r=>r.pen===p);return `<section class="st-panel pen-card" data-pen="${p}"><header class="pen-top">${btn('room-pen-detail',`<strong>${p}</strong><small>· ${all.length} ${all.length===1?'sow':'sows'}</small>${icon('chevron')}`,'room-pen-name',p).replace('<button',`<button aria-label="Pen ${p}, ${all.length} ${all.length===1?'sow':'sows'}, view details"`)}${rows.length!==all.length?`<span class="pen-visible-count">${rows.length} shown</span>`:''}</header>${rows.map(r=>sowRow(r)).join('')}</section>`;}).join('')}</div></div>${SentriUI.taskDock({label:'Farrowing tools',place:penMapRoom.map?{action:'room-grid',label:penText.title}:null,primary:{action:'room-scan',label:'Scan',attrs:{'aria-label':'Scan ear tag'}},tools:[{action:'room-search',icon:'search',label:'Search ear tag'},{action:'room-batch',icon:'more',label:'Actions'}]})}`;
 }
 function roomHome(c){if(c.completion)return `${status()}<div class="room-home"><p class="home-eyebrow">All units</p><h2>Today</h2><p class="home-intro">Ended tasks</p>${btn('room-task-receipt',`<span class="home-task-title">Farrowing ${icon('chevron')}</span><span class="home-task-states">Task ended · ${c.completion.finished} finished</span><span class="home-resume">View receipt</span>`,'home-task')}</div>`;const n=roomCounts(c.listed);return `${status()}<div class="room-home"><p class="home-eyebrow">${esc(c.unit.name)}</p><h2>Today</h2><p class="home-intro">Your work in this unit</p>${btn('room-return',`<span class="home-task-title">Farrowing ${icon('chevron')}</span><span class="home-task-states"><b>${n.Active} active</b> · ${n.Awaiting} awaiting · ${n.Done} done</span><span class="home-resume">Continue from pen ${c.currentPen}</span>`,'home-task')}</div>`;}
 function roomSheet(title,body,actions,cls='',surface='',line=null){
@@ -461,14 +454,14 @@ function roomSheet(title,body,actions,cls='',surface='',line=null){
 }
 // Pen map: one PenMap (design-system/components/PenMap). A pen takes the loudest level among the sows the room list shows in it, read from
 // sowFacts() like the animal row, so the map and the list say the same thing. A pen whose sows the tab or filter hides is "hidden", not empty.
-const penLanes=['A','B','C','D'],penDepth=6;
+const penMapRoom=SentriPenMapSampleRooms[new URLSearchParams(location.search).get('penmap')]||SentriPenMapSampleRooms.standard;
 const penText={title:ZH?'栏位图':'Pen map',back:ZH?'返回':'Back',entrance:ZH?'入口':'Entrance',need:ZH?'需处理':'need you',farrowing:rowText.farrowing.toLowerCase(),
- map:ZH?'栏位':'Pens',jump:ZH?'跳转栏位':'Jump to pens',pen:p=>rowText.pen(p),act:ZH?'需处理':'needs you',live:ZH?'分娩中':'farrowing',plain:ZH?'有母猪':'has sows',empty:ZH?'空栏':'empty',
+ map:ZH?'栏位':'Pens',whole:ZH?'整栋':'Whole room',byPen:ZH?'逐栏':'Pen by pen',pens:r=>ZH?`${r}栏`:`Pens ${r}`,pen:p=>rowText.pen(p),act:ZH?'需处理':'needs you',live:ZH?'分娩中':'farrowing',plain:ZH?'有母猪':'has sows',empty:ZH?'空栏':'empty',
  hidden:ZH?'没有符合条件的母猪':'no sows match',sows:n=>ZH?`${n}头母猪`:`${n} ${n===1?'sow':'sows'}`};
 function penLevels(c){
  const shown=visibleRoomRecords(c),pens={};
- for(const lane of penLanes)for(let n=1;n<=penDepth;n++){
-  const p=lane+n,levels=shown.filter(r=>r.pen===p).map(r=>sowFacts(r).level);
+ for(const p of new Set(c.listed.map(r=>r.pen))){
+  const levels=shown.filter(r=>r.pen===p).map(r=>sowFacts(r).level);
   if(levels.length)pens[p]=levels.includes('act')?'act':levels.includes('live')?'live':'plain';
   else if(c.listed.some(r=>r.pen===p))pens[p]='hidden';
  }
@@ -477,9 +470,9 @@ function penLevels(c){
 function penMapSheet(c,sheet){
  const shown=visibleRoomRecords(c);
  const peek=p=>{const rows=shown.filter(r=>r.pen===p);return SentriUI.penPeek({title:p,meta:penText.sows(rows.length),rows:rows.map(r=>{const f=sowFacts(r);return {code:r.tag,right:{kind:'state',figure:f.figure,word:f.word,level:f.level}};})});};
- const pens=penLevels(c),body=SentriUI.penMap({lanes:penLanes,depth:penDepth,pens,current:c.currentPen,action:'room-pen',key:'farrowing-pens-'+roomContexts.indexOf(c),entrance:penText.entrance,
-  labels:{map:penText.map,pen:penText.pen,act:penText.act,live:penText.live,plain:penText.plain,empty:penText.empty,hidden:penText.hidden},peek});
- return sheet(penText.title,body,SentriUI.penMapFooter({back:{action:'room-back',label:{text:penText.back,str:'act.back'}},depth:penDepth,label:penText.jump}),'picker-sheet','menu',{key:SentriUI.penMapKey({pens,words:{act:penText.need,live:penText.farrowing}})});
+ const pens=penLevels(c),body=SentriUI.penMap({...penMapRoom.props,pens,current:c.currentPen,action:'room-pen',key:'farrowing-pens-'+roomContexts.indexOf(c),entrance:penText.entrance,
+  labels:{map:penText.map,pen:penText.pen,pens:penText.pens,whole:penText.whole,byPen:penText.byPen,act:penText.act,live:penText.live,plain:penText.plain,empty:penText.empty,hidden:penText.hidden},peek});
+ return sheet(penText.title,body,SentriUI.penMapFooter({back:{action:'room-back',label:{text:penText.back,str:'act.back'}}}),'picker-sheet','menu',{key:SentriUI.penMapKey({pens,words:{act:penText.need,live:penText.farrowing}})});
 }
 /* ---- Find a sow and Scan ear tags (owner decisions 2026-10-12, amended 2026-10-22) ----
    Two full pages that replace the old search drawer and scan preview. Both look across every unit; neither switches unit by itself.
@@ -616,7 +609,13 @@ function batchFilterSheet(c){
  return SentriUI.filterSheet({title:'Filter pigs',sections,apply:{label:`Show ${n} ${n===1?'pig':'pigs'}`,action:'room-batch-filter-apply'},reset:batchFilterCount(d)?{label:'Reset',action:'room-batch-filter-reset'}:false,backAction:'room-batch-filter-back',className:'batch-filter-sheet',size:'medium'});
 }
 // The verb's own form: Inspection's, embedded as her pig record is, for every pig chosen. Saving returns to the room with the count.
-function batchFormPage(c){return `<iframe class="sow-detail-frame room-pig-frame batch-form-frame" data-room-pig title="${esc((batchVerbs.find(x=>x[0]===c.batch.verb)||[])[3]||'')}" src="inspection-astra-concept.html?layout=focus&embed=sow${ZH?'&lang=zh':''}"></iframe>`;}
+function batchFormPage(c){
+ if(c.batch.verb==='transfer'){
+  const selected=c.batch.picked.length;
+  const message=SentriUI.banner({tone:'notice',headline:'Batch transfer is not available in this preview'});
+  return roomSheet('Transfer',message,footer(SentriUI.backButton({action:'room-back'})),'','menu',{text:[{text:selected+' '+(selected===1?'pig':'pigs')+' selected'}]});
+ }
+ return `<iframe class="sow-detail-frame room-pig-frame batch-form-frame" data-room-pig title="${esc((batchVerbs.find(x=>x[0]===c.batch.verb)||[])[3]||'')}" src="inspection-astra-concept.html?layout=focus&embed=sow${ZH?'&lang=zh':''}"></iframe>`;}
 function connectBatchForm(root,c){
  const frame=root.querySelector('.batch-form-frame');if(!frame)return;
  const pigs=unitPigs(c).filter(p=>c.batch.picked.includes(p.tag)).map(p=>p.rec?{id:p.tag,pen:p.pen,unit:c.unit.name,stage:'Lactating',parity:p.rec.parity}:{id:p.tag,pen:p.pen,unit:c.unit.name,stage:p.pig.stage});
@@ -705,7 +704,7 @@ const NOTE_DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],NOTE_MONTHS=['Jan','
 function noteEnd(n){const d=new Date(NOTE_DAY+'T12:00:00');d.setDate(d.getDate()+n);return d;}
 function noteUntil(n=7){const d=noteEnd(n);return 'Until '+NOTE_DAYS[d.getDay()]+' '+d.getDate()+' '+NOTE_MONTHS[d.getMonth()];}
 function noteMeta(pe){return pe.noteBy+' · until '+NOTE_DAYS[noteEnd(pe.noteDays||7).getDay()];}
-function noteDaysField(d){const n=d.days||7;return '<div class="st-panel st-note-days">'+SentriUI.stepper({label:'Show for',description:n+(n===1?' day':' days')+' · '+noteUntil(n),value:n,min:1,max:60,action:'room-pen-note-days',key:'days',variant:'row'})+'</div>';}
+function noteDaysField(d,action='room-pen-note-days'){const n=d.days||7;return '<div class="st-panel st-note-days">'+SentriUI.stepper({label:'Show for',description:n+(n===1?' day':' days')+' · '+noteUntil(n),value:n,min:1,max:60,action,key:'days',variant:'row'})+'</div>';}
 /* A note read in full: who and when on top, the note at reading size, how long it shows at the foot; the pencil edits it. */
 function noteCard(text,by,foot,footIcon,editAction){const [name,...when]=String(by||'').split(' · ');return '<div class="st-panel st-note"><div class="st-note-head"><p class="st-note-by"><b>'+esc(name)+'</b>'+(when.length?' · '+esc(when.join(' · ')):'')+'</p>'+(editAction?SentriUI.iconButton({variant:'plain',icon:icon('edit'),label:'Edit note',action:editAction}):'')+'</div><p class="st-note-text">'+esc(text)+'</p><p class="st-note-foot">'+icon(footIcon)+esc(foot)+'</p></div>';}
 function validPenFault(draft){return !!draft.device&&!!draft.description?.trim()&&(draft.device!=='Other'||!!draft.name?.trim());}
@@ -734,7 +733,7 @@ function taskPerformance(p){
  const below=p.target!=null&&p.bornAlivePerLitter!=null&&p.bornAlivePerLitter<p.target;
  const verdict=p.target==null?'<small>No target set</small>':p.bornAlivePerLitter==null?`<small>Target ${p.target}</small>`:`<small class="task-perf-verdict"${below?' data-below=""':''}>${below?'! Below target '+p.target:icon('check')+'On target · '+p.target}</small>`;
  const causes=p.causes||{},afterBirth=sum(Object.values(causes)),bornDead=p.stillborn+p.mummified;
- const said=[['crushed',causes.crushed],['scours',causes.scours],['starve-out',causes.starveOut],['other',causes.other]].filter(([,n])=>n).sort((a,b)=>b[1]-a[1]).map(([k,n])=>n+' '+k).join(' · ');
+ const said=[['crushed',causes.crushed],['scours',causes.scours],['starve-out',causes.starveOut],['put down',causes.putDown],['other',causes.other]].filter(([,n])=>n).sort((a,b)=>b[1]-a[1]).map(([k,n])=>n+' '+k).join(' · ');
  const part=(name,n,why='')=>`<li><i aria-hidden="true"></i><span class="task-perf-name">${name}</span><span class="task-perf-n">${n}</span><span class="task-perf-share">${share(n)}</span>${why?`<span class="task-perf-why">${why}</span>`:''}</li>`;
  const split=p.litters?`<div class="task-perf-split"><div class="task-perf-split-head"><span><b>${p.born}</b>piglets born</span><span><b>${one(p.born/p.litters)}</b>/ litter</span></div><div class="task-perf-bar" role="img" aria-label="${p.alive} alive now, ${afterBirth} died after birth, ${bornDead} born dead"><i style="flex:${p.alive}"></i><i style="flex:${afterBirth}"></i><i style="flex:${bornDead}"></i></div><ul class="task-perf-parts">${part('Alive now',p.alive)}${part('Died after birth',afterBirth,said)}${part('Born dead',bornDead,`${p.stillborn} stillborn · ${p.mummified} mummified`)}</ul></div><dl class="task-perf-facts"><div><dt>Alive / litter</dt><dd>${one(p.alive/p.litters)}</dd></div><div><dt>Assisted</dt><dd>${p.assisted??0}<small>of ${p.litters}</small></dd></div><div><dt>Weight / litter</dt><dd>${p.weight==null?'—':one(p.weight)+'<small>kg</small>'}</dd></div></dl>`:'';
  return `<section class="task-performance">${SentriUI.heading({title:'Performance metrics',icon:icon('chart'),meta:`${p.litters} finished ${p.litters===1?'litter':'litters'}`,kind:'section',level:4})}<div class="task-perf-card st-panel"><div class="task-perf-kpis"><div><span>Born alive / litter</span><strong>${one(p.bornAlivePerLitter)}</strong>${verdict}</div><div><span>Stillborn rate</span><strong>${one(p.stillbornRate)}${p.stillbornRate==null?'':'<small>%</small>'}</strong><small>${p.born?'Mummified '+one(100*p.mummified/p.born)+'%':'No litters finished'}</small></div></div>${split}</div></section>`;
@@ -776,7 +775,7 @@ function taskEndSheet(s,c){
   const end=c.completion;if(!end)return '';
   const at=new Date(end.at),when=at.toLocaleString('en-US',{month:'short'})+' '+at.getDate()+' · '+at.toLocaleString('en-GB',{hour:'2-digit',minute:'2-digit'});
   // Who closed the task and when is the receipt's own fact: the first line of its body (never the header).
-  return sheet(end.early?'Task ended early':'Task ended',`${bodyLead(`Farrowing · ${when} · ${initials(end.who)}`)}${taskPerformance(end.performance)}${taskOutcomeSummary({...end,awaiting:end.removed})}`,false,'task-end-expanded task-receipt-sheet');
+  return sheet(end.early?'Task ended early':'Task ended',`${bodyLead(`Farrowing · ${when} · ${initials(end.who)}`)}${taskPerformance(end.performance)}${taskOutcomeSummary(end)}`,false,'task-end-expanded task-receipt-sheet');
  }
  const r=taskClosureReview(c);
  if(s.view==='roomTaskSows'){
@@ -810,7 +809,7 @@ function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls
 }
 function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states[i],c=roomContext(s);if(a!=='room-pen'&&atlasStill())c.highlightUntil=0;const list=document.querySelector(`[data-card="${i}"] .room-scroll`);if(list)c.scroll=list.scrollTop;const intro=list?list.querySelector('.room-context-strip').offsetHeight+10:0;const nextScroll=c.scroll>=intro?intro:0;
   if(a==='room-sow'){const hit=findSow(c,v),r=hit?.record;if(r){const from=s.view;if(from==='roomScan'||from==='roomSearch')c.returnToTaskReview=from;states[i]=r;r.view=recordView(r);if(r.view==='history')r.pageBack='room';if(hit.unit.id===c.unitId)c.currentPen=r.pen;if(from!=='roomSearch')c.query='';}}   // Back returns to the list she was opened from; Find a sow keeps what was typed   // Farrowing is one task across its units: a sow in another unit opens the same drawer
- if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;if(from==='roomFilter')c.filterKeep=clone(c.filterDraft);if(from==='roomPenNote'||from==='roomPenFault'||from==='roomPenFaultRecord')(c.penKeeps=c.penKeeps||{})[from+'|'+c.detailPen+(from==='roomPenFaultRecord'?'|'+c.penFaultId:'')]=clone(c.penDraft||{});if(from==='roomPenDetail'&&c.penKeeps)for(const k of Object.keys(c.penKeeps))if(k.endsWith('|'+c.detailPen))delete c.penKeeps[k];s.view=from==='roomBatchPick'?'roomBatch':from==='roomScanActions'?'roomScan':from==='roomScan'&&c.scanFrom?c.scanFrom:from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
+ if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;if(from==='roomFilter')c.filterKeep=clone(c.filterDraft);if(from==='roomPenNote'||from==='roomPenFault'||from==='roomPenFaultRecord')(c.penKeeps=c.penKeeps||{})[from+'|'+c.detailPen+(from==='roomPenFaultRecord'?'|'+c.penFaultId:'')]=clone(c.penDraft||{});if(from==='roomPenDetail'&&c.penKeeps)for(const k of Object.keys(c.penKeeps))if(k.endsWith('|'+c.detailPen))delete c.penKeeps[k];s.view=from==='roomBatchForm'?'roomBatchPick':from==='roomBatchPick'?'roomBatch':from==='roomScanActions'?'roomScan':from==='roomScan'&&c.scanFrom?c.scanFrom:from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
  handlePenAction(s,c,a,v);
  if(a==='room-pen-log')s.view='roomPenLog';
  if(a==='room-pen-detail'&&c.records.some(r=>r.pen===v)){c.detailPen=v;c.currentPen=v;s.view='roomPenDetail';}
@@ -820,7 +819,7 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
  if(a==='room-reset-filter')c.filterDraft=defaultRoomFilter();
  if(a==='room-apply-filter'){c.filterKeep=null;c.filter=clone(c.filterDraft);c.scroll=nextScroll;c.tailSpace=0;s.view='room';}
  if(a==='room-clear-filter'){c.filterKeep=null;c.filter=defaultRoomFilter();c.scroll=nextScroll;c.tailSpace=0;}
- if(a==='room-grid')s.view='roomGrid';
+ if(a==='room-grid'){c.penMapGroupOpened=false;s.view='roomGrid';}
  if(a==='room-pen'){const L=landMs();c.currentPen=v;c.jump=v;c.highlightUntil=Date.now()+L.hold+L.fade;c.highlightPen=v;c.highlightLevel=penLevels(c)[v]||'plain';s.view='room';}
 
  if(a==='room-search'||a==='room-scan'){c.scanFrom=a==='room-scan'&&s.view==='roomSearch'?'roomSearch':'';if(!c.scanFrom)c.query='';s.view=a==='room-search'?'roomSearch':'roomScan';}   // Scan opened from Find a sow goes back to it, with what was typed
@@ -903,8 +902,10 @@ function count(s){
  // One row of keys under the card (owner, 2026-11-02): − takes back a + not yet saved, + Born alive, Death opens Report death.
  const n=s.bornDraft||0;
  const keys=`<div class="count-keys" role="group" aria-label="Count this visit"><button type="button" class="count-key" data-action="bornAlive" data-value="-1" aria-label="Take back one born alive"${n?'':' aria-disabled="true"'}>${icon('minus')}</button><button type="button" class="count-key" data-tone="plus" data-action="bornAlive" data-value="1">${icon('plus')}<span>Born alive</span></button><button type="button" class="count-key" data-tone="death" data-action="death" aria-label="Report death">${icon('death')}<span>Death</span></button></div>`;
- const body=aliveCard(s)+keys;
- return {cls:'count-body',body,corner:dr?cornerClear('clearVisit'):null,footer:dr?footer(back,SentriUI.button({label:'Save',register:'primary',action:'saveVisit'}),'execution-completion'):footer(back,SentriUI.button({label:'Finish farrowing',register:'primary',action:'finish',disabled:!born(s)})+SentriUI.iconButton({action:'sowActions',icon:icon('more'),label:'Actions for sow '+s.tag}),'execution-completion count-footer')};
+ const primary=dr?SentriUI.button({label:'Save',register:'primary',action:'saveVisit',disabled:!visitSaveAllowed(s)})
+  :SentriUI.button({label:'Finish farrowing',register:'primary',action:'finish',disabled:!born(s)});
+ const actions=SentriUI.iconButton({action:'sowActions',icon:icon('more'),label:'Actions for sow '+s.tag});
+ return {cls:'count-body',body:aliveCard(s)+keys,corner:dr?cornerClear('clearVisit'):null,footer:footer(back,primary+actions,'execution-completion count-footer')};
 }
 function finish(s){
  const rows=row('Weak',s.weak,'classify','weak,',s.weak===0,s.weak+s.deformed>=s.alive)+row('Deformed',s.deformed,'classify','deformed,',s.deformed===0,s.weak+s.deformed>=s.alive)+finishDetails(s);
@@ -926,13 +927,13 @@ const pigletWord=n=>`${n} piglet${n===1?'':'s'}`;
 // A sow still farrowing keeps her counting drawer; Foster is in her Actions.
 function litterDoor(s){
  if(!s.alive)return '';
- return `<div class="litter-door">${SentriUI.rowGroup(SentriUI.row({variant:'navigation',icon:icon('pig'),title:'Piglets',description:s.ended?'Foster or move':'',trail:'chevron',action:'pigletList'}))}</div>`;
+ return `<div class="litter-door">${SentriUI.rowGroup(SentriUI.row({variant:'navigation',icon:icon('pig'),title:'Piglets',description:s.ended||s.productionOutcome==='abortion'?'Foster or move':'',trail:'chevron',action:'pigletList'}))}</div>`;
 }
 function litterRows(s){
  const f=litterDraft(s),noId=fosterNoId(s),q=(f.idQ||'').trim().toLowerCase();
- const shown=fosterIds(s).filter(p=>!q||p.tag.toLowerCase().includes(q));
+ const shown=fosterIds(s).filter(p=>!q||p.tag.toLowerCase().includes(q)||p.notch.toLowerCase().includes(q));
  if(q&&!shown.length)return `<p class="st-find-hint">No piglet ID matching “${esc(f.idQ.trim())}”.</p>`;
- const tagged=shown.map(p=>{const html=SentriUI.rowSelect({code:p.tag,description:p.notch?'Notch '+p.notch:'',right:{kind:'state',figure:'',word:'',level:'settled'},checked:f.ids.includes(p.tag),action:'fosterId',value:p.tag,className:'roster-pig',inputAttrs:{'data-value':p.tag,'aria-label':'Select '+p.tag}});return p.tag===f.idRead?html.replace(/class="/,'data-read class="'):html;}).join('');
+ const tagged=shown.map(p=>{const key=pigletKey(p),label=pigletLabel(p),html=SentriUI.rowSelect({code:label,description:p.tag&&p.notch?'Notch '+p.notch:'',right:{kind:'state',figure:'',word:'',level:'settled'},checked:f.ids.includes(key),action:'fosterId',value:key,className:'roster-pig',inputAttrs:{'data-value':key,'aria-label':'Select '+label}});return key===f.idRead?html.replace(/class="/,'data-read class="'):html;}).join('');
  const group=noId&&!q?SentriUI.rowSelectDoor({code:pigletWord(noId),lead:'tag-off',contextWidth:'112px',right:{kind:'tags',tags:[]},className:'roster-pig',label:pigletWord(noId)+' without ID',action:'litterNoId',checked:f.count>0,value:'no-id',openAction:'litterNoId',inputAttrs:{'aria-label':'Select the piglets without ID'},count:{value:f.count||noId,idle:!f.count,attrs:{'data-litter-count':'','aria-label':`How many of the ${noId} without ID`}}}):'';
  return SentriUI.rowGroup(tagged+group);
 }
@@ -940,7 +941,7 @@ function litterPage(s){
  const f=litterDraft(s),k=litterPicked(s),n=s.alive,all=f.ids.length===fosterIds(s).length&&f.count===fosterNoId(s);
  const bar=f.idScan?SentriUI.scanBar({state:f.idScan==='waiting'?'waiting':'scanning',device:'Reader 1',text:f.idScan==='waiting'?'':'Scan piglet tags',stop:{action:'fosterIdScanStop'}})
   :SentriUI.choiceSearch({label:'Search piglet ID',placeholder:'Piglet ID',value:f.idQ,attrs:{'data-litter-search':''},clear:{action:'fosterIdClear'},scan:{action:'fosterIdScan',label:'Scan piglet tags'}});
- const list=n?`<section class="litter-list"><div class="litter-head">${SentriUI.heading({title:`${n} alive`,kind:'section',level:4})}${SentriUI.button({label:all?'Clear':'Tick all',register:'text',action:'litterAll'})}</div><div class="litter-bar">${bar}</div><div class="litter-rows">${litterRows(s)}</div></section>`:`<p class="st-find-hint">No piglets left with her.</p>`;
+ const list=n&&unresolvedPigletIds(s)?pigletIdNotice(s):n?`<section class="litter-list"><div class="litter-head">${SentriUI.heading({title:`${n} alive`,kind:'section',level:4})}${SentriUI.button({label:all?'Clear':'Tick all',register:'text',action:'litterAll'})}</div><div class="litter-bar">${bar}</div><div class="litter-rows">${litterRows(s)}</div></section>`:`<p class="st-find-hint">No piglets left with her.</p>`;
  const foot=footer(SentriUI.backButton({action:'featureBack'}),k?btn('litterActions',`${icon('more')}<span>Actions · ${k}</span>`,'button primary'):'');
  const page=SentriUI.sheet({variant:'page',title:'Piglets',line:`${s.ended?'Sow died':'Sow'} · ${s.tag} · ${sowPlace(s)}`,back:{action:'featureBack'},body:list+allocSentList(s),bodyClass:'litter-body',footer:foot,className:'feature-page litter-page',label:'Piglets',bar:status()});
  if(s.view==='allocConfirm')return '<div class="page-background" inert aria-hidden="true">'+fosterPage(s)+'</div>'+allocConfirm(s);   // over the sows
@@ -1024,7 +1025,7 @@ function locked(s){
  const e=s.events[0];
  const ab=s.productionOutcome==='abortion'?s.events.find(e=>e.text.startsWith('Abortion')):null;
  if(!ab)return {cls:'completed-record-body finished-record-body',body:finishedCard(s)+litterDoor(s),footer:footer(SentriUI.backButton({action:'close'}),btn('sowActions',`${icon('more')}<span>Actions</span>`,'button primary').replace('<button',`<button aria-label="Actions for sow ${s.tag}"`)+btn('death',`${icon('death')}<span>Record dead</span>`,'button secondary'),'execution-completion finished-footer')};
- const body=ab?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Aborted',ab.text.replace(/^Abortion · ?/,''),[ab.day,ab.time].filter(Boolean).join(' '),initials(ab.who)].filter(Boolean).join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:s.ended?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Sow died',s.sowCause.toLowerCase(),...diedStamp(s)].join(' · ')})}${litterDoor(s)}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:'';
+ const body=ab?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Aborted',ab.text.replace(/^Abortion · ?/,''),[ab.day,ab.time].filter(Boolean).join(' '),initials(ab.who)].filter(Boolean).join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>${litterDoor(s)}`:s.ended?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Sow died',s.sowCause.toLowerCase(),...diedStamp(s)].join(' · ')})}${litterDoor(s)}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:'';
  return {cls:'completed-record-body',body:`${body}${recordActions(s)}`,footer:recordNavigation()};
 }
 // Report death while she farrows (owner, 2026-10-23): a level of the drawer. What died is one choice (Born dead, Died after birth, or the
@@ -1061,20 +1062,15 @@ return '';
 }
 // Details (owner, 2026-11-03): one page while she farrows and after Finish; the old Litter details grid is gone.
 function litter(s){return finishedDetails(s);}
-function deathBreakdown(s){return detailSheet(s,'Death breakdown',SentriUI.facts([...s.dead.map((n,i)=>n?{label:types[i],value:n}:null).filter(Boolean),{label:'Total dead',value:sum(s.dead)}]),'compact');}
 function profile(s){return `<iframe class="sow-detail-frame" title="Sow details · ${esc(s.tag)}" src="inspection-astra-concept.html?layout=focus&embed=sow&v=stage-actions-15${ZH?'&lang=zh':''}"></iframe>`;}
 const sowDetailContexts=new WeakMap();
-function sowActionCatalogue(s){return [
- {id:'miscarriage',title:'Record abortion',group:'production',icon:'pregnancy',scope:'farrowing',sub:'Record a pregnancy loss',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':s.locked?'Farrowing is already finished.':''},
- {id:'piglets',title:'Piglet processing',group:'production',scope:'piglet-processing',sub:`Care and identity · ${s.piglets.filter(p=>p.state==='Alive').length} identified · ${s.unidentified} without identity`,icon:'pig',reason:!born(s)?'Record the litter first.':''},
- {id:'death',inDrawer:true,title:'Record piglet deaths',group:'production',scope:'piglet-processing',sub:'Record stillbirths and deaths in this litter',icon:'death',reason:s.productionOutcome?'A production outcome is already recorded.':!born(s)?'Record the litter first.':''},
- {id:'countReconcile',title:'Reconcile piglet count',group:'production',scope:'piglet-processing',sub:`System count ${s.alive} · explain a mismatch`,icon:'count',reason:!born(s)?'Record the litter first.':''},
- {id:'sow-death',inDrawer:true,title:'Record sow death',icon:'death',group:'health',sub:'Record the death of this sow',reason:s.ended?'Sow death is already recorded.':''},
- {id:'foster',title:'Foster piglets',group:'production',scope:'piglet-processing',sub:'Send or receive piglets between litters',icon:'pig',reason:!s.alive?'No live piglets recorded.':''},
- {id:'remove-batch',title:'Remove from batch',group:'production',scope:'other',sub:'Remove this sow without recording a litter',icon:'close',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':''},
- {id:'not-in-pig',title:'Mark not in pig',group:'production',scope:'farrowing',sub:'Record the outcome and return to rebreed watch',icon:'pregnancy',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':''},
- {id:'move-batch',title:'Move to another farrowing batch',group:'production',scope:'other',sub:'Keep the sow in the production plan',icon:'batch',reason:'No destination farrowing batches are connected in this preview.'},
- {id:'marker',title:s.markers.length?'Edit note':'Add note',content:s.markers.length>0,group:'routine',sub:s.markers[0]?.text||'Leave a note or describe a visible marker',icon:'note',reason:s.ended?'This sow has died.':''},
+function sowActionCatalogue(s){
+ const draftReason=visitDraft(s)?(ZH?'请先保存或清空本次记录。':'Save or clear this visit first.'):'';
+ return [
+ {id:'miscarriage',title:'Record abortion',group:'production',icon:'pregnancy',scope:'farrowing',sub:'Record a pregnancy loss',livePiglets:s.alive,reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':s.locked?'Farrowing is already finished.':draftReason},
+ ...(born(s)>0?[{id:'foster',title:'Foster piglets',group:'production',scope:'farrowing',sub:'Send or receive piglets between litters',icon:'pig',reason:s.ended?'This sow has died.':!s.alive?'No live piglets recorded.':draftReason}]:[]),
+ {id:'remove-batch',title:'Remove from batch',group:'production',scope:'other',sub:'Remove this sow without recording a litter',icon:'close',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':draftReason},
+ {id:'marker',title:s.markers.length?'Edit note':'Add note',content:s.markers.length>0,group:'routine',sub:s.markers[0]?.text||'Leave a note or describe a visible marker',icon:'note',reason:''},
  {id:'transfer',title:'Transfer sow',group:'routine',sub:'Move this sow to another unit or pen',icon:'transfer',reason:s.ended?'This sow has died.':''}
 ];}
 // Scan's Actions: the embedded actions page opens for the first ticked sow, and the row the worker chose is opened in it.
@@ -1084,61 +1080,41 @@ function connectSowDetail(root,s){
  const frame=root.querySelector('.sow-detail-frame:not([data-room-pig])');if(!frame)return;
  frame.addEventListener('load',()=>{
   const events=s.pending?[{text:(s.pending>0?'+':'')+s.pending+' alive · this visit',day:'Today',time:s.stamp,who:'G. Hansen'},...s.events]:s.events;
-  const tasks=!s.productionOutcome&&!s.ended?[{id:'farrowing',title:'Farrowing',type:'Production',status:s.locked?'Finished':born(s)?'In progress':'Awaiting',summary:born(s)?s.alive+' alive · '+sum(s.dead)+' dead':'Record this sow’s litter'},...(born(s)?[{id:'piglet-processing',title:'Piglet processing',type:'Production',status:s.processingTasks.some(t=>!t.done)?'Due today':'Up to date',summary:s.processingTasks.filter(t=>t.done).length+' of '+s.processingTasks.length+' care steps done'}]:[]),...(s.tag==='000418'?[{id:'vaccination',title:'Vaccination',type:'Health',status:'Due today',summary:'Scheduled vaccination'},{id:'treatment-task',title:'Treatment',type:'Health',status:'Due today',summary:'Scheduled treatment'}]:[])]:[];
+  const tasks=!s.productionOutcome&&!s.ended?[{id:'farrowing',title:'Farrowing',type:'Production',status:s.locked?'Finished':born(s)?'In progress':'Awaiting',summary:born(s)?s.alive+' alive · '+sum(s.dead)+' dead':'Record this sow’s litter'},...(s.tag==='000418'?[{id:'vaccination',title:'Vaccination',type:'Health',status:'Due today',summary:'Scheduled vaccination'},{id:'treatment-task',title:'Treatment',type:'Health',status:'Due today',summary:'Scheduled treatment'}]:[])]:[];
   if(s.deepLink){const key=s.deepLink;s.deepLink='';deepLinkInto(frame,key);}
-  frame.contentWindow.postMessage({type:'open-sow-detail',record:{id:s.tag,pen:s.pen,unit:(roomContext(s).units.find(u=>u.records.includes(s))||roomContext(s).unit).name,parity:s.parity,batch:'28',breed:'Landrace × Large White',serviceDate:'2026-05-21',expectedFarrowing:'2026-09-12',stage:s.ended?'Sow died':s.locked?'Lactating':born(s)?'Farrowing':'Gestating',events},tasks,destinations:roomContext(s).units.map(u=>({id:u.id,name:u.name,pens:[...new Set(u.records.map(r=>r.pen))]})),context:sowDetailContexts.get(s),entry:s.actionsEntry?'actions':'pig',actions:sowActionCatalogue(s).filter(x=>!x.inDrawer)},location.origin);
+  frame.contentWindow.postMessage({type:'open-sow-detail',record:{id:s.tag,pen:s.pen,unit:(roomContext(s).units.find(u=>u.records.includes(s))||roomContext(s).unit).name,parity:s.parity,batch:s.productionOutcome?'':'28',breed:'Landrace × Large White',serviceDate:'2026-05-21',expectedFarrowing:'2026-09-12',stage:s.ended?'Sow died':s.locked?'Lactating':born(s)?'Farrowing':'Gestating',events},tasks,destinations:roomContext(s).units.map(u=>({id:u.id,name:u.name,pens:[...new Set(u.records.map(r=>r.pen))]})),context:sowDetailContexts.get(s),entry:s.actionsEntry?'actions':'pig',actions:sowActionCatalogue(s)},location.origin);
  },{once:true});
 }
 window.addEventListener('message',e=>{
  if(e.origin!==location.origin||!['sow-detail-state','sow-detail-close','sow-action'].includes(e.data?.type))return;
  const i=states.findIndex((s,i)=>s.view==='profile'&&document.querySelector(`[data-card="${i}"] .sow-detail-frame`)?.contentWindow===e.source);
  if(i<0)return;const s=states[i];sowDetailContexts.set(s,e.data.context);
+ if(i===0&&e.data.type==='sow-detail-state'&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(s,roomContext(s)));
  // Scan's Actions opened one of her flows directly: leaving that flow goes back to the scan list in one Back, not via her Actions sheet.
  if(e.data.type==='sow-detail-state'&&s.scanDeep){const v=e.data.context?.view;if(v&&v!=='actions')s.scanDeep='in';else if(s.scanDeep==='in'&&v==='actions'){s.scanDeep=false;s.actionsEntry=false;act(s,'back');render(i);return;}}
  const viaScan=!!s.scanDeep;if(e.data.type!=='sow-detail-state')s.scanDeep=false;
  if(e.data.type==='sow-action'){
-  const a=e.data.action;if(a==='current-task'&&!s.productionOutcome&&!s.ended){s.actionReturn=false;s.actionsEntry=false;s.view=e.data.taskId==='piglet-processing'&&born(s)?'pigletCare':s.locked?'locked':'count';render(i);return;}const actionId={'save-miscarriage':'miscarriage','save-transfer':'transfer','save-batch-removal':'remove-batch','save-not-in-pig':'not-in-pig'}[a]||a,entry=sowActionCatalogue(s).find(x=>x.id===actionId&&!x.reason);if(!entry)return;
+  const a=e.data.action;if(a==='current-task'&&e.data.taskId==='farrowing'&&!s.productionOutcome&&!s.ended){s.actionReturn=false;s.actionsEntry=false;s.view=s.locked?'locked':'count';render(i);return;}const actionId={'save-miscarriage':'miscarriage','save-transfer':'transfer','save-batch-removal':'remove-batch'}[a]||a,entry=sowActionCatalogue(s).find(x=>x.id===actionId&&!x.reason);if(!entry)return;
   if(a==='save-transfer'){const c=roomContext(s),from=c.units.find(u=>u.records.includes(s)),to=c.units.find(u=>u.id===e.data.unit),pen=String(e.data.pen||'');if(!from||!to||!to.records.some(r=>r.pen===pen)||(from===to&&s.pen===pen))return;const origin=from.name+' · '+s.pen;if(from!==to){from.records.splice(from.records.indexOf(s),1);to.records.push(s);}s.pen=pen;switchRoomUnit(c,to.id);c.currentPen=pen;event(s,'Transferred · '+origin+' → '+to.name+' · '+pen,'milestone');s.actionsEntry=true;s.view='profile';}
   else if(a==='save-miscarriage'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.frozen=born(s);s.productionOutcome='abortion';s.locked=true;event(s,'Abortion · '+reason,'danger');s.actionsEntry=false;s.view='history';s.pageBack='room';}
-  else if(a==='save-batch-removal'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.productionOutcome='removed';s.locked=true;s.frozen=0;s.alive=0;s.pending=0;event(s,'Removed from farrowing batch · '+reason+(e.data.note?' · '+String(e.data.note).trim():''),'milestone');s.actionsEntry=false;s.view='history';s.pageBack='room';}
-  else if(a==='save-not-in-pig'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.productionOutcome='not-in-pig';s.locked=true;s.frozen=0;s.alive=0;s.pending=0;event(s,'Not in pig · '+reason+(e.data.note?' · '+String(e.data.note).trim():''),'milestone');s.actionsEntry=false;s.view='history';s.pageBack='room';}
-  else {s.actionReturn=true;s.scanReturn=viaScan;s.view=s.locked?'locked':'count';if(a==='sow-death'){act(s,'death');s.mode='sow';}else act(s,a);}
+  else if(a==='save-batch-removal'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.productionOutcome='removed';s.locked=true;s.frozen=0;event(s,'Removed from farrowing batch · '+reason+(e.data.note?' · '+String(e.data.note).trim():''),'milestone');s.actionsEntry=false;s.view='history';s.pageBack='room';}
+  else {s.actionReturn=true;s.scanReturn=viaScan;s.view=s.locked?'locked':'count';act(s,a);}
   render(i);return;
  }
  if(e.data.type==='sow-detail-close'){s.actionsEntry=false;act(s,'back');render(i);document.querySelector(`[data-card="${i}"] [data-action="profile"]`)?.focus({preventScroll:true,focusVisible:false});}
 });
 
 // Actions launched from the sow's record (More actions): pages with the page header and no line; More actions (her chip) is one Back away.
-// Piglet processing is the page the piglet identity, mortality and foster pages come back to, so it carries the route (her chip,
-// her pen): every surface about her shows her on screen or one Back away.
 function featurePage(s,title,body,primary='',cls='',line=null){
  return SentriUI.sheet({variant:'page',title,line,back:{action:'featureBack'},body,footer:pageFooter(primary),className:('feature-page '+cls).trim(),label:title,bar:status()});
 }
 function markerPage(s){
  const existing=s.markers[0];
- const body=`${existing?SentriUI.panel(`<span>Current note</span><strong>${esc(existing.text)}</strong><small>${esc(existing.meta)}</small>`,{className:'feature-summary',tag:'section'}):''}${SentriUI.field({label:'Note',control:`<textarea data-marker-draft rows="5" placeholder="For example: red line on left shoulder · monitor overnight">${esc(s.markerDraft??existing?.text??'')}</textarea>`,className:'feature-field'})}<p class="feature-hint">Use this for handover information or a visible marker on the sow. The update stays in her history.</p>`;
+ const body=`${existing?noteCard(existing.text,existing.meta,noteUntil(existing.days||7).replace('Until','Shows until'),'clock',null):''}${SentriUI.field({label:'Note',control:`<textarea class="st-note-input" data-marker-draft rows="5" placeholder="For example: red line on left shoulder · monitor overnight">${esc(s.markerDraft??existing?.text??'')}</textarea>`,className:'feature-field'})}${noteDaysField({days:s.markerDaysDraft||existing?.days||7},'markerDays')}<p class="feature-hint">Use this for handover information or a visible marker on the sow. The update stays in her history.</p>`;
  return featurePage(s,existing?'Edit note':'Add note',body,btn('saveMarker','Save note','button primary','',!(s.markerDraft??existing?.text??'').trim()),'marker-page');
 }
-function processingCare(s){
- const days=[...new Set(s.processingTasks.map(t=>t.day))];
- return SentriUI.panel(`<strong>${s.processingTasks.filter(t=>t.done).length} of ${s.processingTasks.length} care items done</strong><span>Due items stay visible until this litter is saved.</span>`,{className:'feature-callout'})+`<div class="processing-days">${days.map(day=>`<section class="processing-day"><div class="processing-day-head"><strong>Day ${day}</strong><span>${day===3?'Due today':day<3?'Recorded':`In ${day-3} days`}</span></div>${s.processingTasks.filter(t=>t.day===day).map(t=>btn('processingTask',`${t.done?icon('check'):'<span class="task-dot"></span>'}<span><strong>${esc(t.title)}</strong><small>${esc(t.meta)}</small></span>`,'processing-task'+(t.done?' is-done':''),t.id)).join('')}</section>`).join('')}</div>`;
-}
-function processingRecords(s){
- const q=s.pigletQuery.trim().toLowerCase(),rows=s.piglets.map((p,index)=>({p,index})).filter(({p})=>!q||p.tag.toLowerCase().includes(q)||p.notch.toLowerCase().includes(q));
- const alive=s.piglets.filter(p=>p.state==='Alive').length;
- return SentriUI.facts([{label:'Alive litter',value:s.alive},{label:'Identified',value:alive},{label:'Without identity',value:s.unidentified}],{columns:3})+`${s.unidentified?`<div class="feature-warning">${icon('alert')}<span><strong>${s.unidentified} piglets do not have identity details</strong><small>The litter count remains valid. Add identity only when it is known.</small></span></div>`:''}<label class="piglet-search">${icon('search')}<input type="search" data-piglet-search value="${esc(s.pigletQuery)}" placeholder="Search ear tag or notch"></label><div class="identity-tools">${btn('scanPiglet',`${icon('scan')}<span>Scan tag</span>`,'feature-tool')}${btn('notchPiglet',`${icon('tag')}<span>Ear notch</span>`,'feature-tool')}${btn('addPiglet',`${icon('plus')}<span>Add piglet</span>`,'feature-tool')}</div><div class="piglet-roster">${rows.map(({p,index})=>`<article class="piglet-row${p.state==='Dead'?' is-dead':''}"><label class="piglet-select"><input type="checkbox" data-action="togglePiglet" data-value="${esc(p.tag)}"${s.pigletSelected.includes(p.tag)?' checked':''}${p.state==='Dead'?' disabled':''}><span class="visually-hidden">Select ${esc(p.tag)}</span></label><button data-action="editPiglet" data-value="${index}" class="piglet-row-main"><strong>${esc(p.tag||'Identity pending')}</strong><span>${esc([p.notch&&'notch '+p.notch,p.sex,p.weight&&p.weight+' kg'].filter(Boolean).join(' · ')||'Add identity details')}</span><small>${esc(p.state)}</small>${icon('chevron')}</button></article>`).join('')||'<p class="detail-empty">No piglets match this search.</p>'}</div>${SentriUI.panel(SentriUI.row({action:'foster',icon:icon('pig'),title:'Foster piglets',description:'Send or receive piglets between litters'}),{className:'st-row-group'})}`;
-}
-function pigletCarePage(s){
- const care=s.pigletTab==='care';
- const tabs=SentriUI.segment({variant:'view-switch',options:[['care','Care'],['records','Piglet records']],active:s.pigletTab,action:'pigletTab',className:'feature-tabs',ariaLabel:'Piglet processing sections'});
- const primary=care?btn('saveProcessing','Save care updates','button primary','',!s.processingDirty):btn('openMortality',`Report mortality${s.pigletSelected.length?' · '+s.pigletSelected.length:''}`,'button primary','',!s.pigletSelected.length&&!s.unidentified);
- return featurePage(s,'Piglet processing',tabs+(care?processingCare(s):processingRecords(s)),primary,'piglet-care-page',{chip:{id:s.tag,action:'profile',label:'View sow '+s.tag+' details'},facts:[sowPlace(s)]});
-}
-function pigletEditPage(s){
- const p=s.pigletDraft||{tag:'',notch:'',sex:'',weight:''},valid=[p.tag,p.notch,p.sex,p.weight].some(x=>String(x||'').trim()&&x!=='Choose notch');
- const body=SentriUI.panel(`<strong>${s.pigletEditIndex<0?'New identity':'Edit identity'}</strong><span>Enter what is known. Empty fields remain visibly incomplete.</span>`,{className:'feature-callout'})+`<div class="piglet-edit-grid">${SentriUI.field({label:'Ear tag',control:`<input data-piglet-field="tag" value="${esc(p.tag)}" inputmode="numeric" placeholder="Scan or enter tag">`,className:'feature-field'})}${SentriUI.field({label:'Ear notch',control:`<input data-piglet-field="notch" value="${esc(p.notch==='Choose notch'?'':p.notch)}" placeholder="Choose or enter notch">`,className:'feature-field'})}${SentriUI.pickerField({label:'Sex',value:p.sex||'',placeholder:'Select',key:'piglet:sex',className:'feature-field'})}${SentriUI.field({label:'Weight <span>kg</span>',control:`<input data-piglet-field="weight" value="${esc(p.weight)}" inputmode="decimal" type="number" min="0" step="0.1" placeholder="—">`,className:'feature-field'})}</div>`;
- return featurePage(s,s.pigletEditIndex<0?'Add piglet identity':'Piglet identity',body,btn('savePiglet','Save identity','button primary','',!valid),'piglet-edit-page');
-}
+const pigletKey=p=>p.id||p.tag||'notch:'+p.notch;
+const pigletLabel=p=>p.tag||'Notch '+p.notch;
 /* ---- Foster piglets (owner, 2026-11-02) ----
    "We might not have room to show all pigs here: it should be a list users can search by pen id, or scan." The other sow is found the house's
    way, as Choose pigs finds pigs: the search field with scan inside it pinned over the list, and the list under it, scrolling, grouped by unit
@@ -1151,10 +1127,12 @@ const fosterStart=(s,count)=>({...fosterDraft(count),filter:fosterFilterDefault(
 const fosterDraft=count=>({direction:'out',target:'',count,ids:[],idQ:'',idScan:false,idRead:'',start:count,q:'',scanning:false,seq:0});
 // A litter's piglets with an ID (alive) and how many have none: the count is what the record says is alive, so no ID = alive - IDs.
 const fosterIds=r=>(r.piglets||[]).filter(p=>p.state==='Alive');
+const unresolvedPigletIds=r=>r&&fosterIds(r).length>r.alive;
+const pigletIdNotice=s=>SentriUI.banner({tone:'notice',headline:s.alive+' alive',consequence:'Check piglet IDs before sending or moving this litter.'});
 const fosterNoId=r=>Math.max(0,(r.alive||0)-fosterIds(r).length);
 const fosterFrom=s=>s.fosterDraft.direction==='out'?s:fosterSow(s,s.fosterDraft.target);   // the litter the piglets leave
 // The start of a count: all of them when Allocate moves the whole litter (start covers it), else one piglet without ID (or none, if all have one).
-const fosterOpen=(s)=>{const f=s.fosterDraft,src=fosterFrom(s);if(!src)return;const all=f.start>=src.alive;f.ids=all?fosterIds(src).map(p=>p.tag):[];f.count=all?fosterNoId(src):Math.min(1,fosterNoId(src));f.idQ='';f.idScan=false;f.idRead='';};
+const fosterOpen=(s)=>{const f=s.fosterDraft,src=fosterFrom(s);if(!src)return;const all=f.start>=src.alive;f.ids=all?fosterIds(src).map(pigletKey):[];f.count=all?fosterNoId(src):Math.min(1,fosterNoId(src));f.idQ='';f.idScan=false;f.idRead='';};
 function fosterPreset(i,p){
  const s=states[i];act(s,'foster');
  if(p==='foster-search')s.fosterDraft.q='B3';
@@ -1180,7 +1158,7 @@ function fosterCandidates(s){const c=roomContext(s);return c.units.flatMap(unit=
 const nurseSows=[{tag:'000377',unit:'3',pen:'A4',stage:'Weaned'},{tag:'000352',unit:'6',pen:'A3',stage:'Weaned'}];
 const fosterSow=(s,tag)=>fosterCandidates(s).find(x=>x.r.tag===tag)?.r||(p=>p&&fosterFarmSow(roomContext(s),p))(nurseSows.find(p=>p.tag===tag));
 // A nurse sow found by search or scan: a light record of her own, kept with the room, so a send lands.
-const fosterFarmSow=(c,p)=>(c.fosterFarm||={})[p.tag]||=({tag:p.tag,pen:p.pen,stage:p.stage,unit:p.unit,farm:true,locked:true,alive:0,moved:0,unidentified:0,dead:[0,0,0,0,0,0,0],events:[]});
+const fosterFarmSow=(c,p)=>(c.fosterFarm||={})[p.tag]||=({tag:p.tag,pen:p.pen,stage:p.stage,unit:p.unit,farm:true,locked:true,alive:0,moved:0,dead:[0,0,0,0,0,0,0],events:[]});
 const homeUnit=s=>{const c=roomContext(s);return c.units.find(u=>u.records.includes(s))||c.unit;};
 // Fostering's filter is its own (owner, 2026-11-03): only sows that have farrowed can take piglets (the list holds no others), so it asks
 // what makes a nurse sow: her unit, how long ago she farrowed (piglets of a like age) and how many she has alive (room on the teats).
@@ -1255,9 +1233,9 @@ const fosterShown=(s,g)=>fosterCandidates(s).filter(({r,unit})=>fosterMatch(g,r,
 // the ID over its notch; no weight or sex (owner, 2026-11-03: a tagged piglet's sex is on record; the weight is not what is chosen on). Past three whole rows they scroll inside the box, a whole row
 // always at its top; a fade at the bottom says there are more.
 function fosterIdRows(list,f){
- const q=f.idQ.trim().toLowerCase(),shown=list.filter(p=>!q||p.tag.toLowerCase().includes(q));
+ const q=f.idQ.trim().toLowerCase(),shown=list.filter(p=>!q||p.tag.toLowerCase().includes(q)||p.notch.toLowerCase().includes(q));
  if(!shown.length)return `<p class="st-find-hint foster-id-none">No piglet ID matching “${esc(f.idQ.trim())}”.</p>`;
- return shown.map(p=>{const html=SentriUI.rowSelect({code:p.tag,description:p.notch?'Notch '+p.notch:'',right:{kind:'state',figure:'',word:'',level:'settled'},checked:f.ids.includes(p.tag),fill:false,action:'fosterId',value:p.tag,inputAttrs:{'data-value':p.tag,'aria-label':'Move '+p.tag}});return p.tag===f.idRead?html.replace(/class="/,'data-read class="'):html;}).join('');
+ return shown.map(p=>{const key=pigletKey(p),label=pigletLabel(p),html=SentriUI.rowSelect({code:label,description:p.tag&&p.notch?'Notch '+p.notch:'',right:{kind:'state',figure:'',word:'',level:'settled'},checked:f.ids.includes(key),fill:false,action:'fosterId',value:key,inputAttrs:{'data-value':key,'aria-label':'Move '+label}});return key===f.idRead?html.replace(/class="/,'data-read class="'):html;}).join('');
 }
 // The box fades its bottom edge while rows sit below it.
 const fosterIdMore=sc=>sc.toggleAttribute('data-more',sc.scrollTop+sc.clientHeight<sc.scrollHeight-1);
@@ -1274,35 +1252,39 @@ function fosterSendPage(s){
  const f=s.fosterDraft,other=fosterSow(s,f.target);if(!other)return '';
  const out=f.direction==='out',max=fosterMax(s),src=out?s:other,withId=fosterIds(src),n=f.count+f.ids.length,word=out?'Send':'Receive';
  const line={text:[{text:out?'To ':'From '},{text:other.tag,strong:true},{text:` · ${rowText.pen(other.pen)}${other.farm?' · '+other.stage:''}`}]};
- const body=`${fosterIdList(withId,f)}${max||!withId.length?`<section class="feature-section">${farmStepper({variant:'well',label:withId.length?'Without ID':'Number of piglets',value:f.count,min:withId.length?0:1,max,action:'fosterCount',reserveHint:false})}</section>`:''}`;
- const commit=btn('saveFoster',`${word} ${n} piglet${n===1?'':'s'}`,'button primary','',n<1||f.count>max);
+ const blocked=unresolvedPigletIds(src);
+ const body=blocked?pigletIdNotice(src):`${fosterIdList(withId,f)}${max||!withId.length?`<section class="feature-section">${farmStepper({variant:'well',label:withId.length?'Without ID':'Number of piglets',value:f.count,min:withId.length?0:1,max,action:'fosterCount',reserveHint:false})}</section>`:''}`;
+ const commit=btn('saveFoster',`${word} ${n} piglet${n===1?'':'s'}`,'button primary','',blocked||n<1||n>src.alive||f.count>max);
  return SentriUI.sheet({variant:'page',title:out?'Send piglets':'Receive piglets',line,back:{action:'featureBack'},body,footer:footer(SentriUI.backButton({action:'featureBack'}),commit),className:'feature-page foster-send-page',label:out?'Send piglets':'Receive piglets',bar:status()});
 }
-function pigletDeathPage(s){
- const f=s.mortalityDraft,total=s.pigletSelected.length+f.unidentified;
- const body=SentriUI.panel(`<strong>${s.pigletSelected.length} identified selected</strong><span>${s.pigletSelected.join(' · ')||'No identified piglets selected'}</span>`,{className:'feature-callout'})+`${s.unidentified?`<section class="feature-section">${farmStepper({variant:'well',label:'Unidentified piglets',value:f.unidentified,max:Math.min(s.unidentified,s.alive-s.pigletSelected.length),action:'mortalityCount',reserveHint:false})}</section>`:''}${SentriUI.pickerField({label:'Cause',value:f.cause,placeholder:'Select',key:'mortality:cause',className:'feature-field'})}<div class="photo-field">${SentriUI.photos({items:f.photos.map((src,i)=>({id:String(i),src})),action:'addPhoto',viewAction:'mortalityPhoto'})}<input type="file" data-piglet-photo accept="image/*" capture="environment" multiple class="visually-hidden" tabindex="-1"></div><p class="feature-hint">One cause is applied to this save. Use another pass when the causes differ.</p>`;
- return featurePage(s,'Record piglet deaths',body,btn('savePigletMortality',`Save mortality${total?' · '+total:''}`,'button primary','',!f.cause||!total),'piglet-death-page');
-}
-function countReconcilePage(s){
- const identified=s.piglets.filter(p=>p.state==='Alive').length,changed=s.countDraft!==s.alive;
- const body=`${SentriUI.panel(`<span>System count</span><strong>${s.alive}</strong>`,{className:'count-compare',tag:'section'})}<section class="feature-section">${farmStepper({variant:'well',label:'Count the piglets in this litter',value:s.countDraft,min:identified,max:30,action:'countReconcileStep',reserveHint:false})}<p class="feature-hint">The count cannot be lower than the ${identified} identified piglets still recorded alive.</p></section>${changed?`<div class="feature-warning">${icon('alert')}<span><strong>Your count will replace ${s.alive}</strong><small>${s.countDraft>s.alive?s.countDraft-s.alive+' piglets will be added without identity.':s.alive-s.countDraft+' piglets without identity will be removed.'}</small></span></div>`:''}${SentriUI.field({label:'Reason for mismatch',control:`<textarea rows="3" data-count-reason placeholder="What explains the difference?">${esc(s.countReason)}</textarea>`,className:'feature-field'})}`;
- return featurePage(s,'Correct piglet count',body,btn('saveCountReconcile','Save corrected count','button primary','',!changed||!s.countReason.trim()),'count-reconcile-page');
-}
-function capabilitySurface(s){return s.view==='fosterSend'?fosterSendPage(s):['pigletList','litterActions','allocPen','allocConfirm'].includes(s.view)?litterPage(s):s.view==='marker'?markerPage(s):s.view==='pigletCare'?pigletCarePage(s):s.view==='pigletEdit'?pigletEditPage(s):s.view==='foster'?fosterPage(s):s.view==='pigletDeath'?pigletDeathPage(s):s.view==='countReconcile'?countReconcilePage(s):'';}
+function capabilitySurface(s){return s.view==='fosterSend'?fosterSendPage(s):['pigletList','litterActions','allocPen','allocConfirm'].includes(s.view)?litterPage(s):s.view==='marker'?markerPage(s):s.view==='foster'?fosterPage(s):'';}
 
 function farrowingRecordSurface(s){const surface=({count,finish,locked,death})[s.view];if(!surface)return '';const v=surface(s),h=identity(s),page=AstraSurfaces.isPage('farrowing',s.view);
  const label={count:'Count alive',finish:'Finish farrowing',locked:'Locked litter',death:'Record dead'}[s.view];
  return SentriUI.sheet(Object.assign({variant:page?'page':'drawer',body:v.body,bodyClass:v.cls,corner:v.corner||null,footer:v.footer,size:['death','finish'].includes(s.view)||s.view==='locked'&&lastSave(s)?.afterLock?'long':'medium',sizing:['death'].includes(s.view)?'full':'content',view:s.view,label,scrim:{action:'dismiss',label:'Dismiss sheet'},bar:page?status():''},h));}
 function farrowingBackground(s){
- if(s.view==='roomPicker'){const c=roomContext(s),back=c.picker?.returnView||'';const behind=['roomPenReadNote','roomPenNote','roomPenFault','roomPenFaultRecord'].includes(back)?penSubpage({...s,view:back},c):['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile'].includes(back)?capabilitySurface({...s,view:back}):'';return behind?'<div class="page-background" inert aria-hidden="true">'+behind+'</div>':'';}
+ if(s.view==='roomPicker'){const c=roomContext(s),back=c.picker?.returnView||'';const behind=['roomPenReadNote','roomPenNote','roomPenFault','roomPenFaultRecord'].includes(back)?penSubpage({...s,view:back},c):['marker','foster'].includes(back)?capabilitySurface({...s,view:back}):'';return behind?'<div class="page-background" inert aria-hidden="true">'+behind+'</div>':'';}
  if(['roomPenReadNote','roomPenNote','roomPenFault','roomPenFaultRecord'].includes(s.view))return '<div class="page-background" inert aria-hidden="true">'+penDetails(roomContext(s))+'</div>';
- if(!['death','deathBreakdown','profile','litter'].includes(s.view))return '';
- const parent=s.view==='profile'||s.view==='deathBreakdown'?s.pageBack:s.view==='litter'?s.litterBack:s.back;
+ if(!['death','profile','litter'].includes(s.view))return '';
+ const parent=s.view==='profile'?s.pageBack:s.view==='litter'?s.litterBack:s.back;
  if(!['count','finish'].includes(parent))return '';
  return '<div class="page-background" inert aria-hidden="true">'+farrowingRecordSurface({...s,view:parent})+'</div>';
 }
 function render(i,focusKey){const fosterTop=document.querySelector(`[data-card="${i}"] .foster-pick .sheet-body`)?.scrollTop||0;renderCard(i,focusKey);const list=document.querySelector(`[data-card="${i}"] .foster-pick .sheet-body`);if(list)list.scrollTop=fosterTop;}   // the list keeps its place under the count drawer
-function renderCard(i,focusKey){const s=states[i],context=roomContext(s);persistDraft(s);if(s.view==='profile'&&s.actionsEntry)s.actionReturn=false; /* back at the actions drawer: the pending return is spent, or the drawer's own Back would reopen it */if(s.actionReturn&&['count','locked'].includes(s.view)){s.actionReturn=false;if(!s.ended){s.view='profile';s.actionsEntry=true;}}if(s.view==='room'&&context.returnToTaskReview){s.view=context.returnToTaskReview;context.returnToTaskReview=false;}const root=document.querySelector(`[data-card="${i}"]`);clearTimeout(reminderTimers[i]);if(s.view!=='count')s.pointers=false;if(s.pointers)reminderTimers[i]=setTimeout(()=>{if(states[i]!==s||s.view!=='count')return;s.pointers=false;const status=root.querySelector('.receipt');if(status)status.innerHTML=receipt(s);},4000);const active=root.contains(document.activeElement)?document.activeElement:null,field=active?.dataset?.field,fieldValue=active?.value;if(root.dataset.view==='roomOverview')context.overviewScroll=root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0;const previousPopup=root.dataset.popup||'';const popupChanged=previousPopup!==(s.popup?.kind||'');root.dataset.popup=s.popup?.kind||'';const sameView=root.dataset.view===s.view;const scroll=sameView?root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0:0;root.dataset.view=s.view;root.querySelector('.phone').innerHTML=`<div class="room-surface"${!['room','roomHome','roomSearch','roomScan'].includes(s.view)?' inert':''}>${room(s)}</div>`+farrowingBackground(s)+farrowingRecordSurface(s)+roomOverlay(s)+capabilitySurface(s)+(s.view==='history'?history(s):s.view==='profile'?profile(s):s.view==='deathBreakdown'?deathBreakdown(s):s.view==='litter'?litter(s):'')+popup(s);placeTaskSyncBadge(root);connectSowDetail(root,s);root.querySelectorAll('.st-filter-chips-track').forEach(tr=>{const b=tr.querySelector('[aria-checked="true"]');if(b&&b.offsetLeft+b.offsetWidth>tr.clientWidth)tr.scrollLeft=b.offsetLeft+b.offsetWidth-tr.clientWidth+parseFloat(getComputedStyle(tr).paddingRight);});   /* the ticked chip in view (the track scrolls sideways) */root.querySelectorAll('.foster-id-scroll [data-read]').forEach(r=>{const sc=r.parentElement;sc.scrollTop+=r.getBoundingClientRect().top-sc.getBoundingClientRect().top;});   /* a read piglet at the top of the box */root.querySelectorAll('.foster-id-scroll').forEach(fosterIdMore);if(root.querySelector('.phone > .sheet > .sheet-body'))root.querySelector('.phone > .sheet > .sheet-body').scrollTop=s.view==='roomOverview'?(context.overviewScroll||0):scroll;if(s.popup&&s.popup.kind!=='born'){root.querySelectorAll('.phone > :not(.dialog-backdrop)').forEach(e=>e.setAttribute('inert',''));root.querySelector('.record-page')?.setAttribute('inert','');}if(!sameView){root.querySelector('.phone > .sheet,.phone > .record-page')?.focus({preventScroll:true,focusVisible:false});}if(popupChanged&&s.popup)root.querySelector('.dialog input,.dialog button')?.focus({preventScroll:true,focusVisible:false});else if(popupChanged&&previousPopup==='undo')root.querySelector('[data-action="undoAsk"]')?.focus({preventScroll:true,focusVisible:false});if(field){[...root.querySelectorAll('.phone > .sheet [data-field]')].find(x=>x.dataset.field===field&&(x.type!=='radio'||x.value===fieldValue))?.focus({preventScroll:true,focusVisible:false});}if(focusKey){const target=Array.from(root.querySelectorAll('.phone > .sheet [data-action]')).find(e=>e.dataset.action===focusKey.a&&e.dataset.value===focusKey.v);const focusTarget=target&&!target.disabled?target:target?.closest('.st-stepper')?.querySelector('button:not(:disabled)')||root.querySelector('.phone > .sheet,.phone > .record-page');focusTarget?.focus({preventScroll:true,focusVisible:false});}SentriUI.liveFill(root,{delay:0});if(popupChanged&&previousPopup==='photo'&&!s.popup){const origin=s.photoOrigin;root.querySelector(`[data-action="${origin?.action||'addPhoto'}"][data-value="${origin?.index??'photos'}"]`)?.focus();}roomAfterRender(i);if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(s,context)); }
+function revealCheckedFilterChips(root){
+ const checked=root.querySelectorAll('.st-filter-chips-track [aria-checked="true"]');
+ if(!checked.length)return;
+ // Wait for fonts before measuring the checked chip within its scroll track.
+ document.fonts.ready.then(()=>{
+  for(const chip of checked){
+   if(!chip.isConnected)continue;
+   const track=chip.parentElement;
+   const overflow=chip.getBoundingClientRect().right-track.getBoundingClientRect().right;
+   if(overflow>0)track.scrollLeft+=Math.ceil(overflow+parseFloat(getComputedStyle(track).paddingRight));
+  }
+ });
+}
+function renderCard(i,focusKey){const s=states[i],context=roomContext(s);persistDraft(s);if(s.view==='profile'&&s.actionsEntry)s.actionReturn=false; /* back at the actions drawer: the pending return is spent, or the drawer's own Back would reopen it */if(s.actionReturn&&['count','locked'].includes(s.view)){s.actionReturn=false;if(!s.ended){s.view='profile';s.actionsEntry=true;}}if(s.view==='room'&&context.returnToTaskReview){s.view=context.returnToTaskReview;context.returnToTaskReview=false;}const root=document.querySelector(`[data-card="${i}"]`);clearTimeout(reminderTimers[i]);if(s.view!=='count')s.pointers=false;if(s.pointers)reminderTimers[i]=setTimeout(()=>{if(states[i]!==s||s.view!=='count')return;s.pointers=false;const status=root.querySelector('.receipt');if(status)status.innerHTML=receipt(s);},4000);const active=root.contains(document.activeElement)?document.activeElement:null,field=active?.dataset?.field,fieldValue=active?.value;if(root.dataset.view==='roomOverview')context.overviewScroll=root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0;const previousPopup=root.dataset.popup||'';const popupChanged=previousPopup!==(s.popup?.kind||'');root.dataset.popup=s.popup?.kind||'';const sameView=root.dataset.view===s.view;const scroll=sameView?root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0:0;root.dataset.view=s.view;root.querySelector('.phone').innerHTML=`<div class="room-surface"${!['room','roomHome','roomSearch','roomScan'].includes(s.view)?' inert':''}>${room(s)}</div>`+farrowingBackground(s)+farrowingRecordSurface(s)+roomOverlay(s)+capabilitySurface(s)+(s.view==='history'?history(s):s.view==='profile'?profile(s):s.view==='litter'?litter(s):'')+popup(s);placeTaskSyncBadge(root);connectSowDetail(root,s);revealCheckedFilterChips(root);root.querySelectorAll('.foster-id-scroll [data-read]').forEach(r=>{const sc=r.parentElement;sc.scrollTop+=r.getBoundingClientRect().top-sc.getBoundingClientRect().top;});   /* a read piglet at the top of the box */root.querySelectorAll('.foster-id-scroll').forEach(fosterIdMore);if(root.querySelector('.phone > .sheet > .sheet-body'))root.querySelector('.phone > .sheet > .sheet-body').scrollTop=s.view==='roomOverview'?(context.overviewScroll||0):scroll;if(s.popup&&s.popup.kind!=='born'){root.querySelectorAll('.phone > :not(.dialog-backdrop)').forEach(e=>e.setAttribute('inert',''));root.querySelector('.record-page')?.setAttribute('inert','');}if(!sameView){root.querySelector('.phone > .sheet,.phone > .record-page')?.focus({preventScroll:true,focusVisible:false});}if(popupChanged&&s.popup)root.querySelector('.dialog input,.dialog button')?.focus({preventScroll:true,focusVisible:false});else if(popupChanged&&previousPopup==='undo')root.querySelector('[data-action="undoAsk"]')?.focus({preventScroll:true,focusVisible:false});if(field){[...root.querySelectorAll('.phone > .sheet [data-field]')].find(x=>x.dataset.field===field&&(x.type!=='radio'||x.value===fieldValue))?.focus({preventScroll:true,focusVisible:false});}if(focusKey){const target=Array.from(root.querySelectorAll('.phone > .sheet [data-action]')).find(e=>e.dataset.action===focusKey.a&&e.dataset.value===focusKey.v);const focusTarget=target&&!target.disabled?target:target?.closest('.st-stepper')?.querySelector('button:not(:disabled)')||root.querySelector('.phone > .sheet,.phone > .record-page');focusTarget?.focus({preventScroll:true,focusVisible:false});}SentriUI.liveFill(root,{delay:0});if(popupChanged&&previousPopup==='photo'&&!s.popup){const origin=s.photoOrigin;root.querySelector(`[data-action="${origin?.action||'addPhoto'}"][data-value="${origin?.index??'photos'}"]`)?.focus();}roomAfterRender(i);if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(s,context)); }
 // Pointer taps keep keyboard focus position without drawing a keyboard-only ring.
 document.addEventListener('pointerdown',()=>document.documentElement.dataset.inputMode='pointer',true);
 document.addEventListener('keydown',()=>delete document.documentElement.dataset.inputMode,true);
@@ -1321,7 +1303,7 @@ gallery.addEventListener('input',e=>{if(!e.target.matches('[data-room-search]'))
 document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const i=+b.closest('[data-card]').dataset.card,s=states[i],c=roomContext(s);
  // Foster, scanning: a read opens the count for the sow read (single-action), as tapping her does; the reader connecting starts it.
  if(s.view==='allocPen'&&s.fosterDraft?.penScan){const f=s.fosterDraft;if(f.penScan==='waiting'){c.scan.connected=true;f.penScan=true;render(i);return;}const o=allocPenOptions(s).find(o=>!o[4]);if(o)act(s,'allocPen',o[0]);render(i);return;}   // a plate read moves them there
- if(['fosterSend','pigletList'].includes(s.view)&&s.fosterDraft?.idScan){const f=s.fosterDraft;if(f.idScan==='waiting'){c.scan.connected=true;f.idScan=true;render(i);return;}const next=fosterIds(fosterFrom(s)).find(p=>!f.ids.includes(p.tag));if(next){f.ids.push(next.tag);f.idRead=next.tag;}render(i);return;}   // a read ticks that piglet
+ if(['fosterSend','pigletList'].includes(s.view)&&s.fosterDraft?.idScan&&!unresolvedPigletIds(fosterFrom(s))){const f=s.fosterDraft;if(f.idScan==='waiting'){c.scan.connected=true;f.idScan=true;render(i);return;}const next=fosterIds(fosterFrom(s)).find(p=>!f.ids.includes(pigletKey(p)));if(next){f.ids.push(pigletKey(next));f.idRead=pigletKey(next);}render(i);return;}   // a read ticks that piglet
  if(fosterPicking(s)&&s.fosterDraft.scanning&&!s.fosterDraft.target){const f=s.fosterDraft;if(f.scanning==='waiting'){c.scan.connected=true;f.scanning=true;render(i);return;}if(!f.seq++){act(s,'fosterRead',farmPigs.find(p=>p.stage==='Gestating')?.tag);render(i);return;}const list=fosterCandidates(s),x=list[(f.seq-2)%list.length];if(x)act(s,'fosterRead',x.r.tag);render(i);return;}   // the first read is a pregnant sow
  // Choosing pigs, scanning: a read ticks her and marks her row (a repeat read keeps her ticked); a pig from another unit isn't added (a toast says where she is).
  if(s.view==='roomBatchPick'&&c.batch.scanning){const b=c.batch,tag=b.scanning==='waiting'?'':batchScans[b.seq++%batchScans.length],p=unitPigs(c).find(x=>x.tag===tag);if(b.scanning==='waiting'){c.scan.connected=true;b.scanning=true;render(i);return;}   // the reader connects: scanning starts
@@ -1338,19 +1320,20 @@ gallery.addEventListener('scroll',e=>{if(!e.target.matches('.room-scroll'))retur
 let grabStart=null;
 SentriUI.holdBind(gallery,{onCommit(el){const i=+el.closest('[data-card]').dataset.card,record=states[i];if(!roomAction(i,el.dataset.action,el.dataset.value))act(record,el.dataset.action);render(i);}});
 gallery.addEventListener('pointerdown',e=>{if(e.button!==0)return;if(e.target.closest('.grab'))grabStart={y:e.clientY,i:+e.target.closest('[data-card]').dataset.card};});
-gallery.addEventListener('pointerup',e=>{if(grabStart){if(e.clientY-grabStart.y>100||Math.abs(e.clientY-grabStart.y)<8){const s=states[grabStart.i];if(['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile'].includes(s.view))act(s,'featureBack');else if(['death','history','profile','deathBreakdown','litter'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else if(s.view.startsWith('room'))roomAction(grabStart.i,'room-back');else act(s,'close');render(grabStart.i);}grabStart=null;}});
+gallery.addEventListener('pointerup',e=>{if(grabStart){if(e.clientY-grabStart.y>100||Math.abs(e.clientY-grabStart.y)<8){const s=states[grabStart.i];if(['marker','foster'].includes(s.view))act(s,'featureBack');else if(['death','history','profile','litter'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else if(s.view.startsWith('room'))roomAction(grabStart.i,'room-back');else act(s,'close');render(grabStart.i);}grabStart=null;}});
 gallery.addEventListener('pointercancel',()=>{grabStart=null});
-gallery.addEventListener('keydown',e=>{const pi=e.target.closest?.('[data-card]')?+e.target.closest('[data-card]').dataset.card:-1;if(e.key==='Tab'&&e.target.closest('.dialog,.sheet')){const items=[...e.target.closest('.dialog,.sheet').querySelectorAll('button:not(:disabled),input:not(:disabled):not([tabindex="-1"]),select,textarea')],first=items[0],last=items[items.length-1];if(e.shiftKey&&e.target===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&e.target===last){e.preventDefault();first?.focus();}}if(e.key==='Escape'){const i=+e.target.closest('[data-card]').dataset.card,s=states[i];if(s.popup)s.popup=null;else if(['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile'].includes(s.view))act(s,'featureBack');else if(['death','history','profile','deathBreakdown','litter'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else if(s.view.startsWith('room'))roomAction(i,'room-back');else act(s,'close');render(i);}});
+gallery.addEventListener('keydown',e=>{const pi=e.target.closest?.('[data-card]')?+e.target.closest('[data-card]').dataset.card:-1;if(e.key==='Tab'&&e.target.closest('.dialog,.sheet')){const items=[...e.target.closest('.dialog,.sheet').querySelectorAll('button:not(:disabled),input:not(:disabled):not([tabindex="-1"]),select,textarea')],first=items[0],last=items[items.length-1];if(e.shiftKey&&e.target===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&e.target===last){e.preventDefault();first?.focus();}}if(e.key==='Escape'){const i=+e.target.closest('[data-card]').dataset.card,s=states[i];if(s.popup)s.popup=null;else if(['marker','foster'].includes(s.view))act(s,'featureBack');else if(['death','history','profile','litter'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else if(s.view.startsWith('room'))roomAction(i,'room-back');else act(s,'close');render(i);}});
 // Record dead: opening the sow's Details grows the body; keep the danger banner whole above the footer (crit round 2).
 gallery.addEventListener('click',e=>{const row=e.target.closest('.sheet[data-view=death] [data-st-optional]');if(row)requestAnimationFrame(()=>row.closest('.sheet-body')?.querySelector(':scope > .st-banner')?.scrollIntoView({block:'nearest'}));});
 let noteStep=0;gallery.addEventListener('click',e=>{noteStep=+(e.target.closest('[data-step]')?.dataset.step||0);},true);
-gallery.addEventListener('click',e=>{const el=e.target.closest('[data-action]');if(!el||el.disabled||el.classList.contains('st-hold'))return;
+window.addEventListener('click',e=>{const group=e.target.closest('.st-pen-group'),toggle=e.target.closest('.st-pen-whole-toggle');if(!group&&!toggle)return;const card=e.target.closest('[data-card]');if(card)roomContext(states[+card.dataset.card]).penMapGroupOpened=!!group;},true);
+gallery.addEventListener('click',e=>{if(e.target.closest('.st-pen-whole-toggle,.st-pen-group'))return;const el=e.target.closest('[data-action]');if(!el||el.disabled||el.classList.contains('st-hold'))return;
  // Finish waits while a draft is open; the tap brings the worker to Record dead, where the draft is said ("1 unsaved") and can be saved.
  if(el.dataset.action==='finish'&&el.getAttribute('aria-disabled')==='true'){const k=+el.closest('[data-card]').dataset.card,w=states[k];if(hasDraft(w)){act(w,'death');render(k);}return;}
  if(el.dataset.action==='open-task-sync'){if(!SentriUI.guard(el))openTaskSync();return;}
  // A waiting camera (floor-gray) answers in its hint line, shown only for the answer: long enough to read, and in view.
  if(el.dataset.action==='addPhoto'&&el.getAttribute('aria-disabled')==='true'){SentriUI.guard(el,{flash:4000});document.getElementById(el.getAttribute('aria-describedby'))?.scrollIntoView({block:'nearest'});return;}
- if(SentriUI.guard(el))return;const i=+el.closest('[data-card]').dataset.card,s=states[i];let a=el.dataset.action,v=el.dataset.value;const before=s.view,beforePopup=s.popup?.kind;if(a==='room-pen'&&s.view==='roomGrid'&&settleOnPen(i,v))return;if(roomAction(i,a,v)){render(i,s.view===before?{a,v}:null);return;}if(a==='addPhoto'){el.closest('.photo-field').querySelector('input[type=file]').click();return;}if(a==='savedPhoto'){s.popup={kind:'photo',src:v,editable:false};render(i);return;}if(a==='otherSow'){states[i]=seed('before');states[i].pen='B2';states[i].tag='000392';states[i].parity=5;states[i].due='Due tomorrow · day 113';render(i);return;}if(a==='open-picker'){const c=roomContext(s),key=el.dataset.pickerKey,configs={'pen:device':{label:'Device',options:['Feeding station','Drinking station','Other'].map(d=>[d,d]),selected:c.penDraft?.device||'',returnView:'roomPenFault'},'piglet:sex':{label:'Sex',options:[['Female','Female'],['Male','Male']],selected:s.pigletDraft?.sex||'',returnView:'pigletEdit'},'mortality:cause':{label:'Cause',options:mortalityCauses.map(x=>[x,x]),selected:s.mortalityDraft?.cause||'',returnView:'pigletDeath'}},config=configs[key];if(!config)return;c.picker={key,...config};s.view='roomPicker';render(i);return;}if(a==='picker-select'){const c=roomContext(s),p=c.picker;if(!p)return;if(p.key==='pen:device')(c.penDraft=c.penDraft||{}).device=v;else if(p.key==='piglet:sex')s.pigletDraft.sex=v;else if(p.key==='mortality:cause')s.mortalityDraft.cause=v;s.view=p.returnView;c.picker=null;render(i);return;}if(a==='returnCount'){s.view='count';}else if(a==='dismiss'){if(['death','history','profile','deathBreakdown'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else act(s,'close');}else act(s,a,v);render(i,s.view===before&&s.popup?.kind===beforePopup?{a,v}:null);if(s.view!==before){const body=el.closest('.spec')?.querySelector('.sheet-body');if(body)body.scrollTop=0;} });
+ if(SentriUI.guard(el))return;const i=+el.closest('[data-card]').dataset.card,s=states[i];let a=el.dataset.action,v=el.dataset.value;const before=s.view,beforePopup=s.popup?.kind;if(a==='room-pen'&&s.view==='roomGrid'&&settleOnPen(i,v))return;if(roomAction(i,a,v)){render(i,s.view===before?{a,v}:null);return;}if(a==='addPhoto'){el.closest('.photo-field').querySelector('input[type=file]').click();return;}if(a==='savedPhoto'){s.popup={kind:'photo',src:v,editable:false};render(i);return;}if(a==='otherSow'){states[i]=seed('before');states[i].pen='B2';states[i].tag='000392';states[i].parity=5;states[i].due='Due tomorrow · day 113';render(i);return;}if(a==='open-picker'){const c=roomContext(s),key=el.dataset.pickerKey,configs={'pen:device':{label:'Device',options:['Feeding station','Drinking station','Other'].map(d=>[d,d]),selected:c.penDraft?.device||'',returnView:'roomPenFault'}},config=configs[key];if(!config)return;c.picker={key,...config};s.view='roomPicker';render(i);return;}if(a==='picker-select'){const c=roomContext(s),p=c.picker;if(!p)return;if(p.key==='pen:device')(c.penDraft=c.penDraft||{}).device=v;s.view=p.returnView;c.picker=null;render(i);return;}if(a==='returnCount'){s.view='count';}else if(a==='dismiss'){if(['death','history','profile','deathBreakdown'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else act(s,'close');}else act(s,a,v);render(i,s.view===before&&s.popup?.kind===beforePopup?{a,v}:null);if(s.view!==before){const body=el.closest('.spec')?.querySelector('.sheet-body');if(body)body.scrollTop=0;} });
 gallery.addEventListener('input',e=>{
  const field=e.target.dataset.penField;if(!field)return;
  const i=+e.target.closest('[data-card]').dataset.card,c=roomContext(states[i]);c.penDraft[field]=e.target.value;
@@ -1360,16 +1343,8 @@ gallery.addEventListener('input',e=>{
 gallery.addEventListener('input',e=>{
  const root=e.target.closest('[data-card]');if(!root)return;const i=+root.dataset.card,s=states[i];
  if(e.target.hasAttribute('data-marker-draft')){s.markerDraft=e.target.value;root.querySelector('[data-action="saveMarker"]').disabled=!s.markerDraft.trim();return;}
- if(e.target.hasAttribute('data-count-reason')){s.countReason=e.target.value;root.querySelector('[data-action="saveCountReconcile"]').disabled=s.countDraft===s.alive||!s.countReason.trim();return;}
- if(e.target.hasAttribute('data-piglet-field')){s.pigletDraft[e.target.dataset.pigletField]=e.target.value;const valid=[s.pigletDraft.tag,s.pigletDraft.notch,s.pigletDraft.sex,s.pigletDraft.weight].some(x=>String(x||'').trim()&&x!=='Choose notch');root.querySelector('[data-action="savePiglet"]').disabled=!valid;return;}
- if(e.target.hasAttribute('data-piglet-search')){s.pigletQuery=e.target.value;render(i);root.querySelector('[data-piglet-search]')?.focus({preventScroll:true,focusVisible:false});}
 });
 SentriUI.radioBind(gallery,{onChange:(field,value)=>{if(!['bornMode','sowCause','assistance','editAssistance'].includes(field))return;const i=+document.activeElement.closest('[data-card]').dataset.card;act(states[i],field,value);render(i);}});
-gallery.addEventListener('change',e=>{
- const root=e.target.closest('[data-card]');if(!root)return;const i=+root.dataset.card,s=states[i];
- if(e.target.hasAttribute('data-piglet-field')){s.pigletDraft[e.target.dataset.pigletField]=e.target.value;render(i);return;}
- if(e.target.hasAttribute('data-piglet-photo')){for(const file of e.target.files){if(s.mortalityDraft.photos.length>=12)break;s.mortalityDraft.photos.push(URL.createObjectURL(file));};render(i);}
-});
 function updateTextField(el,i){
  const s=states[i],target=s,f=el.dataset.field;
  if(f==='weight'){const c=cleanWeight(el.value);if(c!==el.value)el.value=c;}
@@ -1379,7 +1354,7 @@ function updateTextField(el,i){
 gallery.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.field==='weight'){e.preventDefault();e.target.blur();}});
 gallery.addEventListener('change',e=>{if(e.target.dataset?.field!=='weight')return;render(+e.target.closest('[data-card]').dataset.card);});
 gallery.addEventListener('input',e=>{if(['weight','sowNote'].includes(e.target.dataset.field))updateTextField(e.target,+e.target.closest('[data-card]').dataset.card);});
-gallery.addEventListener('change',e=>{const el=e.target,card=el.closest('[data-card]');if(!card)return;const i=+card.dataset.card,s=states[i];if(el.matches('.scenario')){roomContexts[i]=null;states[i]=seed(el.value);restoreDraft(states[i]);if(/^foster/.test(el.value))fosterPreset(i,el.value);if(/^piglets-/.test(el.value))allocPreset(i,el.value);if(el.value==='reconcile')act(states[i],'countReconcile');if(el.value==='room-parity'){states[i]=seed('room');states[i].preset='room-parity';roomAction(i,'room-filter');roomContext(states[i]).filterDraft.pmin=6;} /* the room's filter, parity at 6+ (a tap cannot drag a range) */render(i);return;}const f=el.dataset.field;if(!f)return;if(f==='sowNote'){updateTextField(el,i);return;}if(f==='photo'){for(const file of el.files){if(s.photos.length>=12)break;s.photos.push(URL.createObjectURL(file));}}else{const target=s;target[f]=f==='assisted'?el.value==='true':el.type==='checkbox'?el.checked:el.value;}render(i,f==='photo'?{a:'addPhoto',v:'photos'}:undefined);});
+gallery.addEventListener('change',e=>{const el=e.target,card=el.closest('[data-card]');if(!card)return;const i=+card.dataset.card,s=states[i];if(el.matches('.scenario')){roomContexts[i]=null;states[i]=seed(el.value);restoreDraft(states[i]);if(/^foster/.test(el.value))fosterPreset(i,el.value);if(/^piglets-/.test(el.value))allocPreset(i,el.value);if(el.value==='room-parity'){states[i]=seed('room');states[i].preset='room-parity';roomAction(i,'room-filter');roomContext(states[i]).filterDraft.pmin=6;} /* the room's filter, parity at 6+ (a tap cannot drag a range) */render(i);return;}const f=el.dataset.field;if(!f)return;if(f==='sowNote'){updateTextField(el,i);return;}if(f==='photo'){for(const file of el.files){if(s.photos.length>=12)break;s.photos.push(URL.createObjectURL(file));}}else{const target=s;target[f]=f==='assisted'?el.value==='true':el.type==='checkbox'?el.checked:el.value;}render(i,f==='photo'?{a:'addPhoto',v:'photos'}:undefined);});
 document.getElementById('reset-all').onclick=()=>{states.forEach((s,i)=>{roomContexts[i]=null;try{sessionStorage.removeItem(draftKey(s));}catch(e){}states[i]=seed(cards[i].initial);document.querySelector(`[data-card="${i}"] .scenario`).value=cards[i].initial;render(i);});};
 document.querySelectorAll('[data-layout]').forEach(b=>b.onclick=()=>{const focus=b.dataset.layout==='focus';gallery.classList.toggle('focus',focus);document.querySelectorAll('[data-layout]').forEach(x=>x.setAttribute('aria-pressed',x===b));const u=new URL(location.href);u.searchParams.set('layout',focus?'focus':'overview');window.history.replaceState(null,'',u);});
 if(new URLSearchParams(location.search).get('layout')==='focus')document.querySelector('[data-layout="focus"]').click();

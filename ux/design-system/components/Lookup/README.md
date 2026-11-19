@@ -45,7 +45,7 @@ Classification: **component**. It was lifted from Farrowing's Find a sow and Sca
 
 - [Find](variants/find.html): empty, results in two units, no match, a 12-digit tag, no reader (no scan icon), and Chinese.
 - [Scan](variants/scan.html): nothing scanned, no reader, condition-tag rows, a single-action task's opening page, stopped, and Chinese. A row's ticked and Just scanned faces are [Row · select + door](../Row/variants/select-door.html)'s own states; the page with rows ticked as they were read is on the live screens (Inspection's and Home's Scan · scanned). A multi-select task's own actions in the footer (`actions: [...]`) are a shape for the heat check, which isn't designed yet.
-- [Scan bar](variants/scan-bar.html): scanning, waiting for the reader, waiting with no reader name, and Chinese. A row's ticked and Just scanned faces are [Row · select + door](../Row/variants/select-door.html)'s own states; the page with rows ticked is on the live screens (Farrowing's and Inspection's Scan · ticked).
+- [Scan bar](variants/scan-bar.html): scanning, waiting for the reader, waiting with no reader name, and Chinese. A row's ticked and Just scanned faces are [Row](../Row/README.md)'s selection states; the page with rows ticked is on the live screens (Farrowing's Actions → Choose pigs and Inspection's Scan · ticked).
 
 ## States
 
@@ -87,7 +87,7 @@ The field's accessible name is its placeholder ("Ear tag or pen"). The results a
 
 ## Native
 
-Find maps to a search screen with a pinned search bar (iOS `UISearchController` in a full-screen presentation, Android `SearchView` in its own screen). Scan maps to a full-screen list fed by the Bluetooth reader, with a short haptic tick on each read.
+Find maps to a search screen with a pinned search bar (iOS `UISearchController` in a full-screen presentation, Android `SearchView` in its own screen). Scan maps to a full-screen reader state fed by the Bluetooth reader, with a list only in multi-select contexts and a short haptic tick on each read.
 
 ## Related components
 

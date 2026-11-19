@@ -8,13 +8,13 @@
   "kind": "decision",
   "severity": "medium",
   "title": "Fostering is drawn three times: which one is the feature?",
-  "detail": "(1) farrowing.foster: a Foster piglets page in the farrowing concept (one stepper, send or receive). RULINGS 'After the lock' says fostering is parked and farrowing ships no foster doors, yet the concept still draws it. (2) fostering.* (this feature): Move piglets in the full piglet-processing task (move.html), a drawer with direction, other crate, which piglets, owed doses; RULINGS Round 2 Q13 says Move opens only after farrowing is locked and 'Farrowing's own foster door stays parked'. (3) piglet-processing.move-piglets: the simple prototype's Move, within the batch. The old UI has one fostering flow (Inspection 记录-寄养, 4 screens). Which one is the fostering feature, and does farrowing.foster stay, become an alias, or go?",
+  "detail": "The owner approved fostering in Farrowing on 2026-11-03: Foster piglets from a living sow's Actions (Send / Receive) and Foster from selected piglets on a finished or dead sow's Piglets list (Send). The older RULINGS park and the 2026-10-10 sow-death-only scope are superseded for Farrowing. This fostering.* feature is still a draft based on the old Inspection UI and piglet-processing/move.html; Piglet processing's Move is another version. The remaining decision is which feature owns a shared cross-task fostering flow and how the three entrances reach it.",
   "options": [
-   "Keep fostering as its own feature on move.html; mark farrowing.foster as parked/earlier",
-   "Keep fostering.* as aliases of piglet-processing.move-piglets once the simple prototype is chosen",
-   "Keep both: farrowing.foster before the lock, Move after (needs the owner to reopen the farrowing park)"
+   "Keep the approved Farrowing entrances; this draft remains a historical placeholder",
+   "Make fostering.* the shared flow reached from Farrowing and Piglet processing",
+   "Make Piglet processing's Move the shared flow reached from Farrowing"
   ],
-  "recommendation": "Follow the rulings: Move after the lock is the feature. Owner decision 2026-10-10 reopens the park for one case only: when a sow dies, farrowing.foster (the move page, sending out of her litter) is how her piglets go to other sows. Elsewhere it stays parked.",
-  "source": "populate-piglet"
+  "recommendation": "Use the approved Farrowing entrances for Farrowing. Keep fostering.* at its draft maturity until cross-feature ownership is decided on a canvas; do not point Farrowing back to the older parked flow.",
+  "source": "populate-piglet; features/farrowing/PRD.md owner decision 2026-11-03; features/farrowing/consistency-round/audit.md"
  }
 ]

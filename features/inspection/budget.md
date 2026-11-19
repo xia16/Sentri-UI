@@ -102,9 +102,9 @@ The walk's Go to pen moves onto the design system's PenMap, as Farrowing's Pen m
 ## Inventory
 
 - Header: the title, `Pen map`, and the colour key as its one line: the pens that need the worker, with the amber swatch.
-- The Entrance band, the column letters and row numbers, one tile per pen with its code; the tile's colour is its status.
+- The Entrance band and one tile per pen with its code and status colour. The room shape follows the [pen-map contract](../../ux/model/pen-map-contract.md): uniform lanes keep column letters and row numbers; mixed sizes change tile heights and omit the row-number column; rows across the room appear where the worker meets them, and lane A can be on either side.
 - Peek (hold a tile): the pen code and its pig count, then the pen's rows as the walk draws them: ID over the stage line, condition tags; the group of pigs without tags after the struck tag.
-- Footer: Back.
+- Footer: Back; Whole room appears beside it when the map is more than two screens tall. It groups neighbouring pens of one run into shared tiles with a status mark per pen; a tap returns to pen by pen at that group. A room with one pen or no pens has no Pen map entry.
 - Could have shown and does not: the old fact line in every cell (`2 health`, `3 pigs`, `Not in unit`, `No matches`); the intro `Tap a pen to go to its pigs. Hold to peek.`; the note `Pen layout · only pens matching this view can be opened.`; the unit name under the title; the ring on the current pen; the current pen on the dock button (`C1 / Go to pen`); the peek's feed line, `Formula change due`, the manual-feed count, `Pen note available` and the open fault; a checked mark per pen; a blue level.
 
 ## Questions
@@ -125,7 +125,8 @@ The walk's Go to pen moves onto the design system's PenMap, as Farrowing's Pen m
 | White tile with a line | **Settled** | Which pens have pigs shown under the current lens and filter. |
 | Quiet tile (disabled) | **Settled** | Which pens have nothing to go to, or nothing this lens or filter shows. |
 | Pen code (`C2`) | **Settled** | Which pen is this? The tile's only text. |
-| `Entrance` band, letters and numbers | **Settled** | Which end is the door, which lane, which row. |
+| `Entrance` band, letters and row numbers when sizes align | **Settled** | Which end is the door, which lane and row. In a mixed-size room the pen codes carry the numbers and the row-number column goes. |
+| Whole room / Pen by pen | **Watch** | Where are the pens in a room more than two screens tall? One zoom out, then back to individual pens. |
 | Peek: pen code and pig count (`D4 · 16 pigs`) | **Settled** | Which pen, how many pigs. |
 | Peek: the rows (`000306 · Gestation`, `! Fever`, `Appetite`) | the roster's own levels | Who is in it and does anyone need me: the same ID, stage line and tags as the walk, most urgent first. |
 | Peek: `+3 more` | **Settled** | Are there more pigs than the card shows? Only past four rows (a pen of 30). |

@@ -18,7 +18,7 @@ No anchor. The record is the same for a pig at any stage; what changes is which 
 - The blocks follow the animal type (Sow cycle, Gilt breeding, Boar breeding, Piglet growth, Growth).
 - An empty production-average section is absent; facts missing from the registry show a dash.
 - The Actions sheet has three groups, Production, Health and General. Production is for one pig only and holds only the rows that fit her stage and tasks; an action she can't take stays in its place, greyed (a tile, or a Production row with its reason as line 2; owner, 2026-11-06), and there is no Unavailable actions page.
-- Farrowing opens the shared health and measurement flows rather than copying them; it adds its own Production rows when embedded (piglet processing, piglet deaths, count reconciliation, fostering, litter edit, remove from batch, not in pig, transfer).
+- Farrowing opens the shared health and measurement flows and supplies Record abortion, Foster piglets, Transfer sow and removal through Batch membership. Eligibility follows the Farrowing record state.
 - Not in pig, abortion and batch removal take a sow out of her batch and return her to rebreed watch; saved records are kept.
 - Weight, temperature and backfat take one value per pig.
 - A dead sow offers a note only.
@@ -29,7 +29,7 @@ In: the record (full, partial, empty, with tasks), Production stats and a batch 
 
 Entry points: Inspection (a pig row, search or scan), Tasks (a sow in the Farrowing room list), Pigs (the pig list; that feature is a placeholder written elsewhere, so this entry has no source screen yet).
 
-Out: health forms and findings (health-record), feed editing and the pig's feed plan (feed-plan), the unit walk (inspection). Transfer sow, Mark not in pig and Remove from batch render only inside Farrowing's drawer. Mark not in pig is shown as a screen, opened through Farrowing's sow sheet. Remove from batch has a built page but no control opens it (Batch membership's Remove option replaced it); it is not shown.
+Out: health forms and findings (health-record), feed editing and the pig’s feed plan (feed-plan), the unit walk (inspection). Farrowing supplies its own Batch membership context and transfer destinations for embedded records.
 
 ## Decisions
 
@@ -43,4 +43,4 @@ Open (recorded on the screens as issues):
 - Age is in days for a sow.
 - Saving a reading or a note returns to the walk list, not to the pig record; the task, abortion and batch forms return to the record.
 - The pig's lifetime figures (litters, born total, rates) are in the data but not shown.
-- Mark-not-in-pig, remove-from-batch and transfer cannot be reviewed outside Farrowing.
+- Farrowing’s batch removal and transfer can be reviewed from the Farrowing record.

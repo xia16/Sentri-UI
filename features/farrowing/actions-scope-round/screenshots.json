@@ -1,0 +1,402 @@
+{
+  "date": "2026-11-18",
+  "main": "df82ba5dbaf690fab32cfd4437c66457c4e17b9e",
+  "type": "corrected prototype and verified operation chains",
+  "groups": [
+    {
+      "id": "a",
+      "title": "分娩中：送出仔猪",
+      "path": "分娩中母猪记录 → Actions → Foster piglets → Send piglets → 选接收母猪 → 选仔猪 → Send → 回记录",
+      "note": "Foster piglets 显示在 Production，分娩中送出后活仔 9 → 6。",
+      "screenshots": [
+        {
+          "file": "screenshots/a01-active-record.jpg",
+          "title": "起点：分娩中母猪记录",
+          "caption": "当前有 9 只活仔，从记录底部的 Actions 进入。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/a02-active-sow-actions-current.jpg",
+          "title": "母猪 Actions：通用操作区",
+          "caption": "这是单头母猪的操作，和单元底部 Actions 是两个入口。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/a03-active-actions-production-current.jpg",
+          "title": "分娩中的 Production 区",
+          "caption": "流产可点，Foster piglets 可点。Batch membership 是共享猪档案入口。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/a04-active-foster-send-direction.jpg",
+          "title": "先选 Send，再选接收母猪",
+          "caption": "有 Send / Receive 切换；搜索、扫描和筛选用于找另一头母猪。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/a05-active-send-select-three.jpg",
+          "title": "再选送出的仔猪",
+          "caption": "已勾 2 只有编号的仔猪，并选 1 只无编号，共 3 只；未创建或修改身份。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/a06-active-after-send.jpg",
+          "title": "送出后回看分娩记录",
+          "caption": "保存后回 Actions，再 Back 到记录；当前活仔由 9 变成 6。",
+          "version": "corrected"
+        }
+      ]
+    },
+    {
+      "id": "b",
+      "title": "分娩中：接收仔猪",
+      "path": "同一个母猪 Actions → Foster piglets → Receive piglets → 选来源母猪 → 选仔猪 / 数量 → Receive",
+      "note": "同一个 Foster piglets 入口也支持接收。独立样例从 9 只活仔开始，接收后变成 11。",
+      "screenshots": [
+        {
+          "file": "screenshots/b01-active-receive-direction.jpg",
+          "title": "切换到 Receive",
+          "caption": "选择仔猪来自哪头母猪。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/b02-active-receive-select-two.jpg",
+          "title": "选来源母猪的 2 只无编号仔猪",
+          "caption": "页头写 From 000406，按钮写 Receive 2 piglets。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/b03-active-after-receive.jpg",
+          "title": "接收后回看记录",
+          "caption": "保存后当前活仔由 9 变成 11；与 A 组独立，不累计。",
+          "version": "corrected"
+        }
+      ]
+    },
+    {
+      "id": "c",
+      "title": "结束分娩后：从 Piglets 寄养送出",
+      "path": "已结束母猪记录 → Piglets → 先选仔猪 → Actions · N → Foster → 选接收母猪 → 确认 → Send",
+      "note": "先选好要送出的仔猪，所以寄养页面直接进入选接收母猪。",
+      "screenshots": [
+        {
+          "file": "screenshots/c01-finished-record.jpg",
+          "title": "起点：已结束分娩记录",
+          "caption": "当前 8 只活仔；卡片下有 Piglets，底部另有母猪 Actions 和 Record dead。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/c02-finished-piglets.jpg",
+          "title": "打开现有仔猪列表",
+          "caption": "逐头已有编号 + 5 只无编号；搜索 / 扫描用于选中已有仔猪。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/c03-finished-selected-actions.jpg",
+          "title": "选中 3 只后的 Actions",
+          "caption": "只有 Foster 和 Move，没有 Care、编辑身份或数量核对。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/c04-finished-foster-sow-picker.jpg",
+          "title": "选择接收母猪",
+          "caption": "页面标题直接是 Send piglets；没有方向切换。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/c05-finished-foster-confirm.jpg",
+          "title": "确认送给谁、送哪 3 只",
+          "caption": "确认页展示接收母猪、栏位和已选择的仔猪编号。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/c06-finished-after-foster.jpg",
+          "title": "保存后回到 Piglets",
+          "caption": "剩 5 只；Sent and moved 中保留送出 3 只的去向和编号。",
+          "version": "corrected"
+        }
+      ]
+    },
+    {
+      "id": "d",
+      "title": "结束分娩后：仔猪移栏",
+      "path": "已结束记录 → Piglets → 选 2 只 → Actions → Move → 选目标栏",
+      "note": "独立样例从 8 只活仔开始。Move 处理选中的仔猪，移栏后剩 6 只。",
+      "screenshots": [
+        {
+          "file": "screenshots/d01-finished-move-pen-picker.jpg",
+          "title": "选择目标栏",
+          "caption": "原栏 B1 禁用，可搜索栏位或扫描栏牌；本样例选 B2。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/d02-finished-after-move.jpg",
+          "title": "移栏后回到 Piglets",
+          "caption": "剩 6 只；Sent and moved 中记录 2 只移到 Unit 7 的 B2。",
+          "version": "corrected"
+        }
+      ]
+    },
+    {
+      "id": "e",
+      "title": "母猪死亡后：剩余仔猪寄养",
+      "path": "母猪死亡记录 → Piglets · Foster or move → 选仔猪 → Actions → Foster / Move",
+      "note": "母猪的 Production 操作置灰，备注仍可用。剩余仔猪在 Piglets 里寄养或移栏。",
+      "screenshots": [
+        {
+          "file": "screenshots/e01-sow-died-record.jpg",
+          "title": "起点：Sow died 记录",
+          "caption": "本组死亡样例有 7 只活仔，Piglets 带 Foster or move 说明。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/e02-sow-died-piglets-actions.jpg",
+          "title": "选仔猪后的 Actions",
+          "caption": "仍然只有 Foster / Move；本例选了 2 只有编号的仔猪。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/e03-sow-died-foster-picker.jpg",
+          "title": "选择接收母猪",
+          "caption": "只送出，不向死亡母猪接收仔猪。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/e04-sow-died-send-confirm.jpg",
+          "title": "确认寄养 2 只",
+          "caption": "确认目标与已有编号。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/e05-sow-died-after-send.jpg",
+          "title": "保存后仍留 5 只",
+          "caption": "送出 2 只，其余留着；不额外要求 Keep 或 Allocate。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/e06-sow-died-actions-greyed.jpg",
+          "title": "母猪自己的 Actions",
+          "caption": "流产、寄养和共享批次管理均置灰。仔猪从记录里的 Piglets 进入。",
+          "version": "corrected"
+        }
+      ]
+    },
+    {
+      "id": "f",
+      "title": "结束分娩后的活母猪：仍可接收",
+      "path": "已结束母猪记录 → 母猪 Actions → Foster piglets → Receive piglets",
+      "note": "结束分娩后仍能从母猪 Actions 接收仔猪。若这窝有出生记录但活仔已归零，原菜单的 Foster piglets 置灰。",
+      "screenshots": [
+        {
+          "file": "screenshots/f01-finished-sow-actions-current.jpg",
+          "title": "已结束，有活仔",
+          "caption": "流产置灰。Foster piglets 和共享 Batch membership 可点。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/f02-finished-receive-direction.jpg",
+          "title": "选择接收方向",
+          "caption": "选来源母猪，再选已有编号或填写无编号仔猪只数。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/f03-finished-after-receive.jpg",
+          "title": "接收 1 只后",
+          "caption": "活仔由 8 变成 9，历史出生数保持 14。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/f04-finished-zero-live-actions.jpg",
+          "title": "已结束，活仔为 0",
+          "caption": "流产、Foster 均置灰。共享 Batch membership 可点。",
+          "version": "corrected"
+        }
+      ]
+    },
+    {
+      "id": "g",
+      "title": "死亡登记按活仔数校验",
+      "path": "已结束记录 → Record dead → 新增 6 只死亡 → 保存 → 查看 Piglets",
+      "note": "死亡数量按当前活仔数校验。样例有 8 只活仔和 3 个已有编号，死亡保存后剩 2 只，编号须核对后才能寄养或移栏。",
+      "screenshots": [
+        {
+          "file": "screenshots/g01-finished-record-dead.jpg",
+          "title": "直接从分娩记录登记死亡",
+          "caption": "分娩自己的 Record dead 入口。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/g02-death-six-of-eight.jpg",
+          "title": "可登记 6 只死亡",
+          "caption": "原来第 6 只会被无编号数量挡住。现在可以保存 6 只。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/g03-death-saved-two-alive.jpg",
+          "title": "保存后活仔剩 2",
+          "caption": "死亡统计更新，出生总数仍是 14。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/g04-piglet-ids-need-check.jpg",
+          "title": "剩余活仔与已有编号对不上",
+          "caption": "先核对仔猪编号再寄养或移栏，避免把静态样例中的任一编号标成死亡。",
+          "version": "corrected"
+        }
+      ]
+    },
+    {
+      "id": "h",
+      "title": "流产后有活仔：从 Piglets 寄养或移栏",
+      "path": "记录流产 → 保存 → 从 Room 打开流产记录 → Piglets → Foster / Move",
+      "note": "有活仔时记录留在产房，Piglets 提供送出和移栏。母猪自己的 Actions 保留共享 Batch membership。",
+      "screenshots": [
+        {
+          "file": "screenshots/h01-abortion-with-live-confirm.jpg",
+          "title": "记录流产",
+          "caption": "有活仔时确认页说明分娩结束，但记录暂留在 Farrowing。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/h02-aborted-with-live-piglets.jpg",
+          "title": "流产记录出现 Piglets",
+          "caption": "有 9 只活仔时可以打开仔猪列表。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/h03-aborted-actions.jpg",
+          "title": "流产母猪的 Actions",
+          "caption": "Production 只剩共享 Batch membership。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/h04-aborted-piglets-actions.jpg",
+          "title": "选中仔猪后打开 Actions",
+          "caption": "选中的仔猪可以 Foster 或 Move。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/h05-aborted-foster-picker.jpg",
+          "title": "寻找接收母猪",
+          "caption": "这里是送出链路。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/h06-aborted-foster-confirm.jpg",
+          "title": "确认送出 1 只",
+          "caption": "确认接收母猪和仔猪编号。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/h07-aborted-after-send.jpg",
+          "title": "完成并返回 Piglets",
+          "caption": "送出 1 只后，记录显示还有 8 只活仔。",
+          "version": "corrected"
+        }
+      ]
+    },
+    {
+      "id": "i",
+      "title": "单元 Actions：7 项通用操作",
+      "path": "Room 底部 Actions → Condition → Choose pigs → Next → 共享表单",
+      "note": "单元 Actions 保留 7 项通用操作。饲喂按已有计划判断可用性，批量 Transfer 显示占位。",
+      "screenshots": [
+        {
+          "file": "screenshots/i01-unit-generic-actions.jpg",
+          "title": "单元通用菜单",
+          "caption": "Condition / Treat / Care / Note / Measure / Feed / Transfer；没有生产任务操作。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/i02-unit-choose-pigs.jpg",
+          "title": "选择本单元的猪",
+          "caption": "本例勾选 000418；也可以选择本单元不在分娩任务中的活猪。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/i03-unit-condition-form.jpg",
+          "title": "进入共享健康表单",
+          "caption": "从通用 Condition 进入；本组停在表单，没有提交健康记录。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/i04-unit-adjust-feed-no-plan.jpg",
+          "title": "Feed 打开 Adjust feed",
+          "caption": "样例无饲喂计划，显示不可调整。Back 返回已选猪只。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/i05-unit-transfer-placeholder.jpg",
+          "title": "Transfer 显示占位",
+          "caption": "页面显示选中只数和批量转移暂不可用。Back 返回已选猪只。",
+          "version": "corrected"
+        }
+      ]
+    },
+    {
+      "id": "j",
+      "title": "待产母猪：从批次管理移除",
+      "path": "待产母猪 → Actions → Batch membership → 选择原因 → Remove from batch → Production log",
+      "note": "待产且未记录产仔的母猪可以从批次移除。移除原因保存在日志，母猪在任务里计为已移出批次。",
+      "screenshots": [
+        {
+          "file": "screenshots/j01-awaiting-record.jpg",
+          "title": "待产母猪记录",
+          "caption": "活仔 0；可以开始 + Born alive、报告死亡，Finish 暂不可用。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/j02-awaiting-sow-actions.jpg",
+          "title": "待产母猪 Actions",
+          "caption": "Production 显示 Record abortion 和 Batch membership。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/j03-awaiting-batch-membership.jpg",
+          "title": "查看当前批次",
+          "caption": "页面显示 Batch 28。选择原因后才能移出。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/j04-awaiting-removal-reason.jpg",
+          "title": "选择原因",
+          "caption": "示例选择误入批次，确认后结束该猪在本批次的分娩任务。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/j05-removal-production-log.jpg",
+          "title": "保存后查看生产日志",
+          "caption": "日志记录移出操作及原因。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/j06-removed-sow-in-done.jpg",
+          "title": "已移出的母猪出现在 Done",
+          "caption": "母猪从 Awaiting 移出，Done 可以查看结果。",
+          "version": "corrected"
+        },
+        {
+          "file": "screenshots/j07-overview-removal-count.jpg",
+          "title": "任务总览显示移出计数",
+          "caption": "可从 Removed from batch 找到对应母猪和日志。",
+          "version": "corrected"
+        }
+      ]
+    },
+    {
+      "id": "record-footer",
+      "title": "分娩记录底部按钮对齐",
+      "path": "Find a sow → 点开分娩中母猪 → Born alive → Save",
+      "note": "2026-11-19，同步 Android 的三列对齐。",
+      "screenshots": [
+        {
+          "file": "screenshots/k01-find-active-draft.jpg",
+          "title": "录数后等待保存",
+          "caption": "Finish farrowing 换成 Save，Back 和 Actions 保持原位。",
+          "version": "corrected"
+        }
+      ]
+    }
+  ],
+  "auditCommit": "97c16425d163b5d0414e6aede0b2677ac4ccb6c5"
+}

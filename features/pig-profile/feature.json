@@ -31,8 +31,7 @@
         "pig-profile.actions",
         "pig-profile.production-task",
         "pig-profile.miscarriage",
-        "pig-profile.batch-membership",
-        "pig-profile.not-in-pig"
+        "pig-profile.batch-membership"
       ]
     ],
     [
@@ -170,11 +169,6 @@
       "pig-profile.actions",
       "pig-profile.unavailable-actions",
       "a pig with something she cannot take: the same sheet, greyed in place"
-    ],
-    [
-      "pig-profile.actions",
-      "pig-profile.not-in-pig",
-      "tap Mark not in pig (sows only)"
     ]
   ],
   "screens": [
@@ -717,7 +711,7 @@
       "notes": {
         "purpose": "Everything a worker can do to one pig, in a menu drawer over her record: the everyday verbs (Health, Routine) as one grid of icon tiles, then Production as described rows. The same drawer opens for several pigs (inspection.actions).",
         "states": [
-          "Opened from Farrowing (embedded): rows added by Farrowing are mixed in (piglet processing, piglet deaths, reconcile count, foster, edit litter, sow death, remove from batch, mark not in pig, transfer)."
+          "Opened from Farrowing (embedded): the host adds Record abortion, Foster piglets, Transfer sow and a Batch membership form for the current farrowing batch."
         ],
         "elements": [
           {
@@ -773,7 +767,7 @@
                 "shows": "No Production rows"
               }
             ],
-            "logic": "Production exists only for one pig. Mark not in pig, Remove from batch and Transfer sow render only inside Farrowing's sow drawer. Farrowing's versions of batch moves are hidden when this sheet's own Batch membership row exists.",
+            "logic": "Production exists only for one pig. Farrowing uses the shared Batch membership entrance with a task-specific removal form. Pregnancy results are recorded in the Pregnancy check outcome form.",
             "at": "Record abortion"
           },
           {
@@ -922,9 +916,7 @@
         "edge": [
           "Not offered once another outcome is recorded in Farrowing; this sheet does not check for an existing outcome."
         ],
-        "issues": [
-          "Reason is free text; the production-task outcome \"Not in pig\" lists evidence choices: two forms for a similar loss."
-        ],
+        "issues": [],
         "rules": [
           "The screen's wording is Abortion (same event, one word; Owner decision 2026-10-10). Its id keeps the old name so links and leaves survive."
         ]
@@ -1237,30 +1229,6 @@
         "copy": [],
         "issues": []
       }
-    },
-    {
-      "id": "pig-profile.not-in-pig",
-      "name": "Mark not in pig",
-      "zh": "标记未孕",
-      "status": "in-design",
-      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "figma": "",
-      "notes": {
-        "purpose": "A sow with no litter is marked not in pig: choose the evidence and save. Opened from a Farrowing sow's Actions (the Actions sheet is inspection's, embedded in Farrowing).",
-        "rules": [
-          "Available only before a litter is recorded and while no production outcome is recorded.",
-          "The sow returns to rebreed watch."
-        ],
-        "issues": [
-          "Changes batch and stage with no confirmation or undo (see the backlog item on pig-profile.production-task)."
-        ]
-      },
-      "preset": "room",
-      "steps": [
-        "[data-action=\"room-sow\"][data-value=\"000392\"]",
-        "Actions",
-        "[data-action=\"sow-host-action\"][data-value=\"not-in-pig\"]"
-      ]
     }
   ]
 }
