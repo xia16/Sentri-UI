@@ -562,7 +562,6 @@
 
 .inspection-phone .pen-notification{display:inline-flex;align-items:center;gap:2px;margin-left:3px;color:#536847}
 .inspection-phone .pen-notification svg{width:15px;height:15px}
-.inspection-phone .pen-notification.has-fault,.inspection-phone .pen-notification.has-fault small{color:var(--amber)}
 
 .inspection-phone .pen-note-meta{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .inspection-phone .pen-note-meta .quiet-note{margin:0}

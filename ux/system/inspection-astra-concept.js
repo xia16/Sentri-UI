@@ -298,8 +298,8 @@ function dockBulkDetails(root){root._detailsObserver?.disconnect();}
 function displayPigs(c,pe){const byId=(a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}),rows=visiblePigs(c,pe).slice();return rows.sort(byId);}
 function penEntry(pe){
  const fault=openFaults(pe).length>0;
- const signal=(symbol,cls='')=>'<span class="pen-notification'+cls+'" aria-hidden="true">'+icon(symbol)+'</span>';
- const signals=(pe.note?signal('note'):'')+(fault?signal('wrench',' has-fault'):'');
+ const signals=(pe.note?`<span class="pen-notification" aria-hidden="true">${icon('note')}</span>`:'')
+  +(fault?`<span class="pen-notification has-fault" aria-hidden="true"><span class="st-part" data-tone="amber">${icon('wrench')}</span></span>`:'');
  const total=pe.pigs.length+(pe.untagged?.count||0),label='Pen '+pe.id+', '+countLabel(total)+(pe.note?', note available':'')+(fault?', open equipment fault':'')+'. View pen details';
  return button('pen-detail','<strong>'+esc(pe.id)+'</strong><small>· '+countLabel(total)+'</small>'+signals+icon('chevron'),'pen-name',pe.id).replace('<button','<button aria-label="'+esc(label)+'"');
 }
