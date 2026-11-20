@@ -93,6 +93,20 @@
       "from": "pig-list.list",
       "control": "A pig row in the list",
       "lands": "pig-profile.full"
+    },
+    {
+      "section": "Home",
+      "label": "From To treat",
+      "control": "Pig row",
+      "lands": "pig-profile.full",
+      "from": "workbench.to-treat"
+    },
+    {
+      "section": "Home",
+      "label": "From Monitoring",
+      "control": "Pig row",
+      "lands": "pig-profile.full",
+      "from": "workbench.monitoring"
     }
   ],
   "flow": [

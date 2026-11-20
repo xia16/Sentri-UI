@@ -1,5 +1,7 @@
 # 巡检入口核对 · 2026-11-19
 
+这是初次核对的存档。已确认的六项决定及当前原型截图见 [操作链路](../decision-round/canvas.html)。
+
 - [已同步：点按链路与修正前后截图](review.html)
 - [待复核：现有状态、差异和建议](decisions.html)
 - [逐页版本和入口清单](routes.md)
@@ -9,7 +11,7 @@
 
 ## 复现
 
-从仓库根目录启动预览。独立 worktree 若没安装 Playwright，把 `SENTRI_PLAYWRIGHT` 指向其已安装路径。
+在提交 `af640dd3` 的巡检基线中，从仓库根目录启动预览。独立 worktree 若没安装 Playwright，把 `SENTRI_PLAYWRIGHT` 指向其已安装路径。
 
 ```sh
 node scripts/serve-ux.cjs 4319

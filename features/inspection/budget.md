@@ -154,3 +154,14 @@ Decision: a pen the walk has been through and one it has not take the same face.
 ## Cut list
 
 The fact line in every cell and its second vocabulary (`N health`, which also counted ongoing conditions); `Not in unit` and `No matches` (the quiet tile says both); the intro and layout notes; the unit name under the title (the walk's header has it); the current-pen ring and the pen number on the dock button; the peek's feed, formula, manual-feed, note and fault lines (the pen page has them, one tap away); a checked mark.
+
+## Scan scope, transfer decision and destination
+
+| Where | First question | Information and controls |
+| --- | --- | --- |
+| Scan / Find | Which pig did I read, and where is it recorded? | One row under its recorded unit and pen. Outside the scope, replace the selection box with a door and a short location cue. |
+| Outside pig sheet | Can I see the record, move it, or also select it? | Ear tag, recorded location; View pig record, Move only, Move and select. No duplicate action beside the result. |
+| Destination | Which registered pen will receive it? | Current unit and one pinned search over a scrolling catalogue. No transfer action on selecting a line. |
+| Confirm / result | Is this where the pig belongs, and did it move? | Ear tag and source → destination on confirmation; destination and selection outcome on the receipt. A pen scan skips the catalogue. |
+
+Cut: the repeated Move into this … text below each result, a long stack of radio rows in a drawer, and numbers that restate the list's row count. A rejected or uncertain move retains the selection and does not announce a completed transfer.

@@ -1,6 +1,6 @@
 {
-  "status": "canvas only",
-  "base": "af640dd3",
+  "source": "implemented prototype",
+  "transfer": "simulated receipts",
   "checks": [
     "Unit scan groups local pigs in their own pens; outside tag has no tick; unknown and repeated reads do not add pigs",
     "Move-only and move-and-select change the location; only the second adds a tick",
@@ -13,9 +13,11 @@
     "No connected reader offers no scan actions",
     "Farrowing pen keeps Note, Feed and Fault; returns to the room",
     "Current tasks and Actions both open the matching Farrowing record and return to their entry",
+    "Entering and leaving the sow sheet preserves the Inspection selection and a Farrowing draft",
     "Home to-treat opens exactly the row's pig and goes back to the same search",
     "Home monitoring opens exactly the row's pig and goes back to the same search",
     "After saving from the scan batch, continue on the same selection",
+    "Batch treatment returns to Scan and retains the selected pigs, online and offline",
     "After saving from Selected, continue on the same selection",
     "From a pig record, save only for that pig and preserve the parent selection"
   ]

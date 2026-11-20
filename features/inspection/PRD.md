@@ -19,8 +19,11 @@ No anchor. The walk has no lifecycle that changes what work is available. The he
 - Feed is guidance, not a completion checklist: nothing on the walk can be "done" for feed.
 - The stage on a row is days in the stage, never lifetime age; the walk date is fixed in the sample (12 Sep 2026).
 - Care is the only editable condition state; attention is derived from it (ASTRA-BULK-ACTIONS).
-- One Actions sheet for one pig or many, with applicable Production actions only for one pig. Opening Actions on a pig record uses that pig alone; Back from the single-pig Actions restores the walk or scan selection. A save uses the action’s existing completion path.
-- The dock and Find open the same full-screen Scan. Back returns to the calling screen; if it was Find, its search text stays.
+- One Actions sheet for one pig or many, with applicable Production actions only for one pig. Opening Actions on a pig record uses that pig alone; Back from the single-pig Actions restores the walk or scan selection. A successful everyday record returns to the source (walk, Scan, Selected, or the pig record), restoring the original selection; treatment started on a finding still returns to that finding.
+- The dock and Find open the same full-screen unit Scan. A pen page also opens Scan for that one pen only. Back returns to the calling page and preserves its context.
+- Search and scan show pigs under the unit and pen where they are recorded. A scan ticks an active pig only inside its explicit scope. A pig outside that scope has one result row: tap for her record or to move her. On a unit scan or Find, choose a registered pen on a searchable full-screen page; on a pen scan, the destination is already the current pen. Confirm the move after reviewing both locations. Only a confirmed transfer updates placement; **Move and select** also ticks her. Offline, denied, failed and unconfirmed moves leave the selection unchanged. The prototype uses sample receipts, not a transfer API.
+- Home To treat and Monitoring open the selected pig record with her marked condition. Back preserves the search, filters and scroll. Home Inspect unit still opens the unit walk.
+- Open Farrowing from a pig record or its single-pig Actions opens the matching sow’s Farrowing record for that task, matching the unit and ear tag. Back returns to the originating screen. A missing match does not open another animal.
 
 ## Scope
 
@@ -30,7 +33,7 @@ Out (owned by other features): the pig record and its actions (pig-profile), fee
 
 ## Decisions
 
-- Owner, 2026-10-22: the pen page and its tools are Inspection's. Farrowing's pen header `›` opens the pen page; Farrowing's own drawing of it (Note, Feed, Fault, Needs attention, Now, Pen log) is listed under "Pen in Farrowing" until the two prototypes share one page.
+- Owner, 2026-10-22: the pen page and its tools are Inspection's. Farrowing's pen header `›` opens the pen page; Farrowing offers Note, read-only Feed guidance, Fault and Pen log. It shares the note and fault form renderers and validation with Inspection. Each host supplies its own pen facts and history, and returns to its own task. Observe and Tick all remain Inspection-only.
 
 Taken from the research notes and the code:
 
@@ -38,15 +41,15 @@ Taken from the research notes and the code:
 - The tag line is one line only. Tags are added in priority order until the line is full, then "+N" says how many are left; the urgent tag is never the hidden one.
 - There is no feed tag on a pig row. A trough pen can't feed one pig, so feed is read and changed at the pen (the pen header keeps its feed summary).
 - The row is the design system's Row · animal (select + door), with the compact ConditionTag.
-- Home opens this page through the "Inspect unit" card with the unit kept in the link. A row in To treat or Monitoring opens the row’s unit with the Health lens. Back restores the Home unit or the originating attention list. Home’s magnifier runs its own Lookup and can open a pig record without entering a walk.
+- Home opens this page through the "Inspect unit" card with the unit kept in the link. Back from the walk restores the Home unit. Home’s magnifier runs its own Lookup and can open a pig record without entering a walk.
 - Pen map is the design system's PenMap, as Farrowing's (2026-10-22): the framed Pen map button in the dock, tiles coloured by the walk's row levels (amber for a pig at act now, never blue), the peek with the walk's rows, and the colour-carries-over landing. A pen the walk has been through and one it has not look the same: there is no per-pen check (budget.md, Pen map).
 - A pen with an open equipment fault shows a wrench in its walk header. Tap the pen name for the fault under Needs attention; resolving the last open fault removes the mark and retains the record in Pen log.
 
 Open (recorded on the screens as issues):
 
 - The unit summary card (pig and pen counts, faults, sensors, batch tracker) is not placed on the walk. Home already has Environment & devices.
-- Pen count in the earlier workflow deck is not a live Web entry. The Android Pigs fact can open a count preview; scope and count rules need review before mapping it here.
-- Cross-unit Actions and transfer, shared pen tools across tasks, and the destination for Home attention and Farrowing handoffs are listed with affected states in the [consistency review](consistency-round/README.md).
+- Pen head count stays out of this round. The Web Pigs fact is read-only. The earlier Set count deck and Android preview are references for the separate Count design.
+- The six entrance decisions and screenshots are in the [operation flows](decision-round/canvas.html). Native transfer still needs a service receipt that can identify and safely look up the exact submitted operation before enabling real writes.
 - "Health" and "Feed" lens counts do not say what they count.
 - The care level shows on a row only by the tag's look (red wash with "!", outlined, plain); the care word and the day are on the record.
 - Fixed author "G. Hansen" and times 06:40 and 09:41 stand in for the signed-in worker and real times.

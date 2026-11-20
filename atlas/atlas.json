@@ -2589,11 +2589,17 @@
            {
             "name": "Marked pigs, one card per unit",
             "shows": "A plain \"Unit 7\" section heading over one card of its pigs in walking order (the same unit heading as Farrowing's Find a sow and Scan ear tags): tag over \"Pen B2 · Hospital · 1d\", the condition as a plain tag on the right",
-            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A pig opens its unit's walk on the Health lens; Back from there reopens this list.",
+            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A row opens that pig’s record; Back keeps this list’s search and filters.",
             "source": "markedPage()"
            }
           ],
-          "controls": [],
+          "controls": [
+           {
+            "control": "Pig row",
+            "does": "Open the record of this ear tag and show its marked health finding; Back retains query, filters and scroll.",
+            "goesTo": "pig-profile.full"
+           }
+          ],
           "copy": [
            "(raw)"
           ],
@@ -2623,11 +2629,17 @@
            {
             "name": "Marked pigs, one card per unit",
             "shows": "A plain \"Unit 7\" section heading over one card of its pigs in walking order (the same unit heading as Farrowing's Find a sow and Scan ear tags): tag over \"Pen B2 · Hospital · 1d\", the condition as a plain tag on the right",
-            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A pig opens its unit's walk on the Health lens; Back from there reopens this list.",
+            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A row opens that pig’s record; Back keeps this list’s search and filters.",
             "source": "markedPage()"
            }
           ],
-          "controls": [],
+          "controls": [
+           {
+            "control": "Pig row",
+            "does": "Open the record of this ear tag and show its marked health finding; Back retains query, filters and scroll.",
+            "goesTo": "pig-profile.full"
+           }
+          ],
           "copy": [
            "(raw)"
           ],
@@ -2721,7 +2733,13 @@
             "source": "markedPage()"
            }
           ],
-          "controls": [],
+          "controls": [
+           {
+            "control": "Pig row",
+            "does": "Open the record of this ear tag and show its marked health finding; Back retains query, filters and scroll.",
+            "goesTo": "pig-profile.full"
+           }
+          ],
           "copy": [
            "(raw)"
           ],
@@ -2789,7 +2807,13 @@
             "source": "markedPage()"
            }
           ],
-          "controls": [],
+          "controls": [
+           {
+            "control": "Pig row",
+            "does": "Open the record of this ear tag and show its marked health finding; Back retains query, filters and scroll.",
+            "goesTo": "pig-profile.full"
+           }
+          ],
           "copy": [
            "(raw)"
           ],
@@ -2799,7 +2823,7 @@
          }
         }
        ],
-       "prd": "# Workbench 工作台\n\n## Problem\n\nA worker opens the app to see the active work in the chosen area, not how the farm is doing. Home must show which tasks are in progress, scheduled, or assigned, let the worker work either by task across units or by place inside one unit, and show what is saved on the phone when there is no signal. The old Figma (首页 › 工作台) says the same: a workbench, not a data page.\n\n## Who\n\nDaily floor workers in a section (Breeding, Gestation, Farrowing, Nursery): gloved, one-handed, often offline. A supervisor can open the same task cards; task completion remains in the owning task flow.\n\n## Anchor\n\nNone. Home has no lifecycle of its own; each card inherits the lifecycle of its task. Screens are grouped by scope: section Overview, unit, drawers, task preview, settings.\n\n## Rules\n\n- The Overview is three sections: Production, Health, Other (see \"Overview and Schedule · 2026-10-19\" below). The unit page is \"Today's work\": one card per task instance in the unit, until its own redesign. On the unit page an authoritative in-progress task stays in the main list even when its next action is later; rank confirmed exceptions, explicit overdue work, today's work, previously scheduled but unstarted work, assigned undated work, and other in-progress tasks. Equal ranks keep a stable order.\n- Home placement follows the authoritative task status. Records and a full progress bar inform the card content but never create a separate \"ready to complete\" state or closure call to action. Only an authoritative completed or ended-early task enters Closed. Task closure belongs to the owning task detail.\n- A unit card has identity (task, batch, context), timing (\"Day N of N\", contextual, never a completion measure), one task-specific headline fact, at most one supporting line and an optional named progress bar when its denominator is reliable. The Overview uses the four-slot tile instead. Eligible-now counts are never guessed as total minus done.\n- Counts are unique animals or litters in the selected scope. A unit narrows the counts, never the batch time.\n- Task-specific rules: Farrowing = underway, past expected date, due today, next expected; Piglet processing = litters with care due, next care, waiting; Pregnancy = open windows, then next check; Heat and Return-heat show no completion bar for observation.\n- Unit scope: inspection, attention, environment and devices entrances sit at the unit; Inspection owns the pen walk.\n- Offline: the app header shows the upload icon alone on Home and other non-task pages, and each task card with records still on the phone carries \"↑ N\" in its footer (that task's records). The icon turns to a red \"!\" only when a person must act: signed out, or work stuck on the phone. A usable connection starts upload automatically; nothing pops up as records upload. Task pages show the icon with that task's own count. The record lifecycle, Saved work and the rules belong to [Data sync](../data-sync/PRD.md) (owner, 2026-10-18 to 2026-10-20).\n- Closed tasks never revive due counts.\n- Tapping the section name in the Home header opens the section chooser with a 260 ms horizontal slide and fade: the chooser enters from the right by about one third of the page width while Home exits left by about one sixth. Back or choosing a section reverses the motion. The bottom navigation stays fixed; reduced-motion preference removes the animation.\n\n### Home list contract · 2026-10-14\n\n- A task instance is identified by farm, source type and task ID; keep the batch and any genuinely separate check instance in its identity. Do not merge different batches or split one cross-unit task into several Overview cards. An authoritative in-progress task belongs in Today's work regardless of whether an action is due now. A scheduled task that has not started belongs there from its start day; an assigned, executable undated task also belongs there. Drafts, unscheduled work and permanent tool entrances do not generate task cards.\n- Use farm-local dates. Only an explicit deadline makes a task overdue; passing its start date alone does not. A future, unstarted task is not on Home: it is on the Schedule. An unknown backend state is read-only “Status to confirm”; it produces no due count, overdue marker or end action.\n- The unit page sorts confirmed actionable exceptions, explicitly overdue tasks, today's scheduled/action tasks, previously scheduled unstarted tasks, assigned executable undated tasks, then other in-progress tasks. Ties use explicit action time, start time and stable task ID. The Overview orders Production by stage instead (below).\n- Every open task instance is listed; neither the Overview nor the unit page folds the list behind \"See all\". Counts in the section chooser are **distinct open task instances in that section** across Production, Health and Other; the unit picker counts the unit's production task instances until the unit page carries health and other work. Waiting tasks count; task types and unfinished animal rows don't. Complete sorting and counts before pagination; the first fetched page cannot establish the total.\n- Closed contains only authoritative completed and ended-early tasks that ended today in the farm timezone. It is collapsed by default, newest first; older receipts live in Records. A full progress bar or all currently due records do not move an open task to Closed. Home has no inferred Ready-to-complete state or completion button.\n- A task may have no reliable headline number or denominator. Show an accurate status/next-time line and omit an invented bar. Distinguish loading, empty, no permission and read failure. The detailed local-record/upload-failure/offline-snapshot behavior belongs to Data sync and the Android implementation contract, outside this design handoff.\n\n### Overview and Schedule · 2026-10-19\n\nOwner decisions from the redesign (record: [overview-redesign.md](overview-redesign.md)).\n\n- **Overview = Production, Health, Other**, in that order, with no strip of headline numbers. Each section heading may carry \"Schedule ›\" (Production, Health), which opens the Schedule filtered to that section.\n- **Production** is a 2-column grid of tiles, one per open task instance, every one listed. Order: the sow's cycle (Heat check, Breeding, Return heat, Pregnancy check, Farrowing, Piglet processing, Weaning), then oldest batch first. Overdue is a mark on the tile, never a re-sort.\n- **The tile has four fixed slots**, each with one kind of message, at the same height in every tile: (1) the task, one line, a short name of at most about 15 characters (\"Return heat\", \"Processing\"); (2) the batch; (3) to-do: one line that says it all, with no second line under it (owner, 2026-10-19): the count due now with a short word (\"10 to watch\"); an overdue part follows on the same line and only it is red (\"5 now · 2 overdue\"); when nothing is due yet, the next count in grey (\"8 tomorrow\") or \"None now\". Timers and later windows (\"4 more from Sat\") are in the task and on the Schedule, not the tile; (4) the run: one segment per day of the plan and \"Day N of N\". There is no done state: a multi-day task stays a tile until the task closes. A task past its planned end says how many are overdue (\"6 overdue\"), its run grows one red segment per day over and reads \"1 day overdue\". **One coloured signal per tile at most** (owner, 2026-10-19): the overdue part or the days over, never a red edge or red words beside them. **Ready to close** (owner, 2026-10-19, reversing the 2026-10-12 decision below): when everything the task asks for is recorded and the task is still open, the tile's count line reads \"Ready to close\" with a quiet tick; it is a reminder, and closing stays inside the task (Home has no close button). A closed task leaves the grid for one quiet, muted \"N closed today\" line across the content width, ending in a chevron like \"Schedule ›\" so it reads as a tap (owner, 2026-10-19); it opens a drawer listing them.\n- **Health** is reactive first: one card with **To treat** (pigs marked Treat in place or Hospital pen and not yet treated or moved; \"N waiting since yesterday\", plain, else its units; \"Nothing marked\" at 0) and **Monitoring** (pigs marked Monitor, with units). Each opens a list page of those pigs across the section's units, unit by unit (owner, 2026-10-19), built to hold about 100 (owner, 2026-10-20): a search at the top (ear tag or pen, Scan ear tag inside it) with the filter beside it (unit, care, condition), then the rows: the tag over its pen, how it is treated (\"Hospital\", \"In place\") and \"1d\" when waiting since yesterday, the condition as a plain tag; no row is coloured, since the title already says what to do. A pig opens its unit's walk on the Health lens. Planned health work (vaccination plans, treatment orders) are tasks, shown as tiles under the card. Walk coverage, withdrawal and deaths are not on Home.\n- **Other** is one flat list with no category headers: type icon, what the work is and where (\"Move to Farrowing, Unit 6\" · \"From Units 7, 8\"), pigs or pens due on the right. Order numbers stay on the task page. Withdrawal shows in red on the outbound or transfer row it blocks.\n- **Schedule** (the week board): full screen; ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label, ⓘ \"How to read the board\" top right. Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\"). A segment filters All, Production, Health, Other; All is one card with a band per section: a rule, the section icon and its name (no fill: a surface inside the board breaks the no-nested-cards law).\n- **Rows and cells:** every row is one line (owner, 2026-10-19: no second row kind): a 36px gutter under the task type written once holds the shortest label that tells the row from its siblings, about 4 characters at most: the batch (\"B31\"), a pickup time (\"14:00\"), a transfer's batch when it moves one (\"B29\"), otherwise \"Mixed\" (owner, 2026-10-19: no destination codes, unit counts or order numbers), a sample or product (\"PRRS\", \"Amox\"). The full name heads the drawer the row opens. A whole row is the tap target and opens that task's week, count first (\"11 done\" over \"Wednesday 7 Jul\"). A task type carries a note only when it explains the cells (\"estimated returns\"); no count of the rows under it. Each cell holds that day's count: done (past days, can be 0), today, planned (exact), estimate (\"~6\", dashed: heat, returns, farrowing), waiting on today (\"–\"), nothing due (\"·\"), past its plan (a red edge on the cell; nothing else red). There is no \"late\" state and no grace period: unfinished work carries on. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". No daily total.\n\n## Scope\n\nIn: section chooser, Overview (Production tiles, Health, Other), the Schedule (week board), unit picker, unit hub, status-driven task cards (in progress, scheduled, closed), the app-header Saved work badge (details belong to Data sync), Toolbox and Records, the unit attention states, task preview, end-early confirmation, closed-task receipt.\n\nOut: Assistant (its own feature), Scan and Find a pig (Find a pig), the Data sync page; task detail pages (their own features); Environment & devices (its own feature). Language and Log out exist in the old design and are not built here (placeholder).\n\nThe Assistant, Scan and Toolbox controls are visible prototype navigation to separate sample pages, not part of the Home delivery. A Home-only native preview may open an explicit \"UI preview · not connected\" explanation for these controls; it must not imply that an agent, camera, search or record action ran. Production navigation waits for the owning feature's design and implementation.\n\n## Decisions\n\n- Decided: one Overview plus unit scope; Assistant has no badge on Home; the last section is remembered; the unit picker has no search (about 15 units at most); completion stays inside the task.\n- Superseded 2026-10-19 (owner): the Overview tile shows a tick and \"Ready to close\" when everything is recorded and the task is open; closure still belongs to the task. The Android Home PRD needs the same change.\n- Decided (2026-10-12; aligned 2026-10-14): remove Home's inferred \"ready to complete\" state. An in-progress task remains in Today's work regardless of record progress. The [Android Home PRD](../../../Sentri-Android-App/docs/home-prd.md) defines the target card fields and source-data fallback. The Workbench state map and current interactive prototypes now omit the old Ready state; historical review snapshots do not override this decision.\n- Open: where language and log out live; what the real \"Not designed yet\" page shows per task; how the real queue feeds the app-header badge; what \"Day N of N\" means for tasks with no batch window.\n- Open (data): the Home card uses Piglet processing Batch 27 (8 pens, 2 units), while its linked piglet-processing prototype uses Batch 40 (12 pens). These are independent design fixtures; the click-through demonstrates the intended destination, not continuity of one task instance. Align the fixtures before using this flow for connected-data acceptance.\n- Open (date): `Sample · Thu, 8 Jul` is a fixed prototype date, not the device clock or a real work schedule. The connected Home date source and formatting still need definition.\n\n### Owner decisions, 2026-11-02 · Status colours\n\n- The status colour convention (owner, 2026-11-02; canvas https://claude.ai/artifact/BTzQ8Y3zBiv41WL3wshJyq): one hue per status, the shape's size picks the shade (README › Colour).\n- **A tile's run of days:** days done `done-mark`, today `progress-mark`, days past the plan `late-mark`, days to come the empty well. A task past its plan is late, not overdue: the line reads \"1 day late\" in `amber`. Red stays for the overdue part (animals) only.\n- **The Schedule's cells hold a number**, so each takes its status's light fill with the number in the same hue's dark ink: done `done-fill`, today `progress-fill` (today's date ringed in `progress`), past its plan `amber-fill`. Planned, estimate and waiting keep their outlines; the key matches.\n- Home's progress bars use the same marks: in progress `progress-mark`, complete `done-mark`, on the `handle` track.\n",
+       "prd": "# Workbench 工作台\n\n## Problem\n\nA worker opens the app to see the active work in the chosen area, not how the farm is doing. Home must show which tasks are in progress, scheduled, or assigned, let the worker work either by task across units or by place inside one unit, and show what is saved on the phone when there is no signal. The old Figma (首页 › 工作台) says the same: a workbench, not a data page.\n\n## Who\n\nDaily floor workers in a section (Breeding, Gestation, Farrowing, Nursery): gloved, one-handed, often offline. A supervisor can open the same task cards; task completion remains in the owning task flow.\n\n## Anchor\n\nNone. Home has no lifecycle of its own; each card inherits the lifecycle of its task. Screens are grouped by scope: section Overview, unit, drawers, task preview, settings.\n\n## Rules\n\n- The Overview is three sections: Production, Health, Other (see \"Overview and Schedule · 2026-10-19\" below). The unit page is \"Today's work\": one card per task instance in the unit, until its own redesign. On the unit page an authoritative in-progress task stays in the main list even when its next action is later; rank confirmed exceptions, explicit overdue work, today's work, previously scheduled but unstarted work, assigned undated work, and other in-progress tasks. Equal ranks keep a stable order.\n- Home placement follows the authoritative task status. Records and a full progress bar inform the card content but never create a separate \"ready to complete\" state or closure call to action. Only an authoritative completed or ended-early task enters Closed. Task closure belongs to the owning task detail.\n- A unit card has identity (task, batch, context), timing (\"Day N of N\", contextual, never a completion measure), one task-specific headline fact, at most one supporting line and an optional named progress bar when its denominator is reliable. The Overview uses the four-slot tile instead. Eligible-now counts are never guessed as total minus done.\n- Counts are unique animals or litters in the selected scope. A unit narrows the counts, never the batch time.\n- Task-specific rules: Farrowing = underway, past expected date, due today, next expected; Piglet processing = litters with care due, next care, waiting; Pregnancy = open windows, then next check; Heat and Return-heat show no completion bar for observation.\n- Unit scope: inspection, attention, environment and devices entrances sit at the unit; Inspection owns the pen walk.\n- Offline: the app header shows the upload icon alone on Home and other non-task pages, and each task card with records still on the phone carries \"↑ N\" in its footer (that task's records). The icon turns to a red \"!\" only when a person must act: signed out, or work stuck on the phone. A usable connection starts upload automatically; nothing pops up as records upload. Task pages show the icon with that task's own count. The record lifecycle, Saved work and the rules belong to [Data sync](../data-sync/PRD.md) (owner, 2026-10-18 to 2026-10-20).\n- Closed tasks never revive due counts.\n- Tapping the section name in the Home header opens the section chooser with a 260 ms horizontal slide and fade: the chooser enters from the right by about one third of the page width while Home exits left by about one sixth. Back or choosing a section reverses the motion. The bottom navigation stays fixed; reduced-motion preference removes the animation.\n\n### Home list contract · 2026-10-14\n\n- A task instance is identified by farm, source type and task ID; keep the batch and any genuinely separate check instance in its identity. Do not merge different batches or split one cross-unit task into several Overview cards. An authoritative in-progress task belongs in Today's work regardless of whether an action is due now. A scheduled task that has not started belongs there from its start day; an assigned, executable undated task also belongs there. Drafts, unscheduled work and permanent tool entrances do not generate task cards.\n- Use farm-local dates. Only an explicit deadline makes a task overdue; passing its start date alone does not. A future, unstarted task is not on Home: it is on the Schedule. An unknown backend state is read-only “Status to confirm”; it produces no due count, overdue marker or end action.\n- The unit page sorts confirmed actionable exceptions, explicitly overdue tasks, today's scheduled/action tasks, previously scheduled unstarted tasks, assigned executable undated tasks, then other in-progress tasks. Ties use explicit action time, start time and stable task ID. The Overview orders Production by stage instead (below).\n- Every open task instance is listed; neither the Overview nor the unit page folds the list behind \"See all\". Counts in the section chooser are **distinct open task instances in that section** across Production, Health and Other; the unit picker counts the unit's production task instances until the unit page carries health and other work. Waiting tasks count; task types and unfinished animal rows don't. Complete sorting and counts before pagination; the first fetched page cannot establish the total.\n- Closed contains only authoritative completed and ended-early tasks that ended today in the farm timezone. It is collapsed by default, newest first; older receipts live in Records. A full progress bar or all currently due records do not move an open task to Closed. Home has no inferred Ready-to-complete state or completion button.\n- A task may have no reliable headline number or denominator. Show an accurate status/next-time line and omit an invented bar. Distinguish loading, empty, no permission and read failure. The detailed local-record/upload-failure/offline-snapshot behavior belongs to Data sync and the Android implementation contract, outside this design handoff.\n\n### Overview and Schedule · 2026-10-19\n\nOwner decisions from the redesign (record: [overview-redesign.md](overview-redesign.md)).\n\n- **Overview = Production, Health, Other**, in that order, with no strip of headline numbers. Each section heading may carry \"Schedule ›\" (Production, Health), which opens the Schedule filtered to that section.\n- **Production** is a 2-column grid of tiles, one per open task instance, every one listed. Order: the sow's cycle (Heat check, Breeding, Return heat, Pregnancy check, Farrowing, Piglet processing, Weaning), then oldest batch first. Overdue is a mark on the tile, never a re-sort.\n- **The tile has four fixed slots**, each with one kind of message, at the same height in every tile: (1) the task, one line, a short name of at most about 15 characters (\"Return heat\", \"Processing\"); (2) the batch; (3) to-do: one line that says it all, with no second line under it (owner, 2026-10-19): the count due now with a short word (\"10 to watch\"); an overdue part follows on the same line and only it is red (\"5 now · 2 overdue\"); when nothing is due yet, the next count in grey (\"8 tomorrow\") or \"None now\". Timers and later windows (\"4 more from Sat\") are in the task and on the Schedule, not the tile; (4) the run: one segment per day of the plan and \"Day N of N\". There is no done state: a multi-day task stays a tile until the task closes. A task past its planned end says how many are overdue (\"6 overdue\"), its run grows one red segment per day over and reads \"1 day overdue\". **One coloured signal per tile at most** (owner, 2026-10-19): the overdue part or the days over, never a red edge or red words beside them. **Ready to close** (owner, 2026-10-19, reversing the 2026-10-12 decision below): when everything the task asks for is recorded and the task is still open, the tile's count line reads \"Ready to close\" with a quiet tick; it is a reminder, and closing stays inside the task (Home has no close button). A closed task leaves the grid for one quiet, muted \"N closed today\" line across the content width, ending in a chevron like \"Schedule ›\" so it reads as a tap (owner, 2026-10-19); it opens a drawer listing them.\n- **Health** is reactive first: one card with **To treat** (pigs marked Treat in place or Hospital pen and not yet treated or moved; \"N waiting since yesterday\", plain, else its units; \"Nothing marked\" at 0) and **Monitoring** (pigs marked Monitor, with units). Each opens a list page of those pigs across the section's units, unit by unit (owner, 2026-10-19), built to hold about 100 (owner, 2026-10-20): a search at the top (ear tag or pen, Scan ear tag inside it) with the filter beside it (unit, care, condition), then the rows: the tag over its pen, how it is treated (\"Hospital\", \"In place\") and \"1d\" when waiting since yesterday, the condition as a plain tag; no row is coloured, since the title already says what to do. A row opens that pig’s record and its marked condition. Back returns to the same list, search and filters. Inspect unit opens the whole unit walk. Planned health work (vaccination plans, treatment orders) are tasks, shown as tiles under the card. Walk coverage, withdrawal and deaths are not on Home.\n- **Other** is one flat list with no category headers: type icon, what the work is and where (\"Move to Farrowing, Unit 6\" · \"From Units 7, 8\"), pigs or pens due on the right. Order numbers stay on the task page. Withdrawal shows in red on the outbound or transfer row it blocks.\n- **Schedule** (the week board): full screen; ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label, ⓘ \"How to read the board\" top right. Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\"). A segment filters All, Production, Health, Other; All is one card with a band per section: a rule, the section icon and its name (no fill: a surface inside the board breaks the no-nested-cards law).\n- **Rows and cells:** every row is one line (owner, 2026-10-19: no second row kind): a 36px gutter under the task type written once holds the shortest label that tells the row from its siblings, about 4 characters at most: the batch (\"B31\"), a pickup time (\"14:00\"), a transfer's batch when it moves one (\"B29\"), otherwise \"Mixed\" (owner, 2026-10-19: no destination codes, unit counts or order numbers), a sample or product (\"PRRS\", \"Amox\"). The full name heads the drawer the row opens. A whole row is the tap target and opens that task's week, count first (\"11 done\" over \"Wednesday 7 Jul\"). A task type carries a note only when it explains the cells (\"estimated returns\"); no count of the rows under it. Each cell holds that day's count: done (past days, can be 0), today, planned (exact), estimate (\"~6\", dashed: heat, returns, farrowing), waiting on today (\"–\"), nothing due (\"·\"), past its plan (a red edge on the cell; nothing else red). There is no \"late\" state and no grace period: unfinished work carries on. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". No daily total.\n\n## Scope\n\nIn: section chooser, Overview (Production tiles, Health, Other), the Schedule (week board), unit picker, unit hub, status-driven task cards (in progress, scheduled, closed), the app-header Saved work badge (details belong to Data sync), Toolbox and Records, the unit attention states, task preview, end-early confirmation, closed-task receipt.\n\nOut: Assistant (its own feature), Scan and Find a pig (Find a pig), the Data sync page; task detail pages (their own features); Environment & devices (its own feature). Language and Log out exist in the old design and are not built here (placeholder).\n\nThe Assistant, Scan and Toolbox controls are visible prototype navigation to separate sample pages, not part of the Home delivery. A Home-only native preview may open an explicit \"UI preview · not connected\" explanation for these controls; it must not imply that an agent, camera, search or record action ran. Production navigation waits for the owning feature's design and implementation.\n\n## Decisions\n\n- Decided: one Overview plus unit scope; Assistant has no badge on Home; the last section is remembered; the unit picker has no search (about 15 units at most); completion stays inside the task.\n- Superseded 2026-10-19 (owner): the Overview tile shows a tick and \"Ready to close\" when everything is recorded and the task is open; closure still belongs to the task. The Android Home PRD needs the same change.\n- Decided (2026-10-12; aligned 2026-10-14): remove Home's inferred \"ready to complete\" state. An in-progress task remains in Today's work regardless of record progress. The [Android Home PRD](../../../Sentri-Android-App/docs/home-prd.md) defines the target card fields and source-data fallback. The Workbench state map and current interactive prototypes now omit the old Ready state; historical review snapshots do not override this decision.\n- Open: where language and log out live; what the real \"Not designed yet\" page shows per task; how the real queue feeds the app-header badge; what \"Day N of N\" means for tasks with no batch window.\n- Open (data): the Home card uses Piglet processing Batch 27 (8 pens, 2 units), while its linked piglet-processing prototype uses Batch 40 (12 pens). These are independent design fixtures; the click-through demonstrates the intended destination, not continuity of one task instance. Align the fixtures before using this flow for connected-data acceptance.\n- Open (date): `Sample · Thu, 8 Jul` is a fixed prototype date, not the device clock or a real work schedule. The connected Home date source and formatting still need definition.\n\n### Owner decisions, 2026-11-02 · Status colours\n\n- The status colour convention (owner, 2026-11-02; canvas https://claude.ai/artifact/BTzQ8Y3zBiv41WL3wshJyq): one hue per status, the shape's size picks the shade (README › Colour).\n- **A tile's run of days:** days done `done-mark`, today `progress-mark`, days past the plan `late-mark`, days to come the empty well. A task past its plan is late, not overdue: the line reads \"1 day late\" in `amber`. Red stays for the overdue part (animals) only.\n- **The Schedule's cells hold a number**, so each takes its status's light fill with the number in the same hue's dark ink: done `done-fill`, today `progress-fill` (today's date ringed in `progress`), past its plan `amber-fill`. Planned, estimate and waiting keep their outlines; the key matches.\n- Home's progress bars use the same marks: in progress `progress-mark`, complete `done-mark`, on the `handle` track.\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,
@@ -15596,7 +15620,8 @@
           "inspection.no-batches",
           "inspection.one-batch",
           "inspection.many-batches",
-          "inspection.batch-detail"
+          "inspection.batch-detail",
+          "inspection.farrowing-record"
          ]
         ],
         [
@@ -15642,7 +15667,13 @@
           "inspection.scan-list",
           "inspection.scan-new",
           "inspection.scan-ticked",
-          "inspection.scan-stopped"
+          "inspection.scan-stopped",
+          "inspection.scan-pen",
+          "inspection.lookup-outside",
+          "inspection.lookup-move",
+          "inspection.lookup-move-pens",
+          "inspection.lookup-move-confirm",
+          "inspection.lookup-move-result"
          ]
         ]
        ],
@@ -15652,20 +15683,6 @@
          "label": "from a unit on Home",
          "from": "workbench.unit",
          "control": "Inspect unit",
-         "lands": "inspection.walk"
-        },
-        {
-         "section": "Home",
-         "label": "from To treat",
-         "from": "workbench.to-treat",
-         "control": "Pig row",
-         "lands": "inspection.walk"
-        },
-        {
-         "section": "Home",
-         "label": "from Monitoring",
-         "from": "workbench.monitoring",
-         "control": "Pig row",
          "lands": "inspection.walk"
         },
         {
@@ -15695,6 +15712,27 @@
          "from": "farrowing.room",
          "control": "B1",
          "lands": "inspection.farrowing-pen"
+        },
+        {
+         "section": "Inspection",
+         "label": "Scan from a pen",
+         "control": "Scan this pen",
+         "lands": "inspection.scan-pen",
+         "from": "inspection.pen"
+        },
+        {
+         "section": "Pig record",
+         "label": "From Current tasks",
+         "control": "Open Farrowing",
+         "lands": "inspection.farrowing-record",
+         "from": "pig-profile.full"
+        },
+        {
+         "section": "Pig record",
+         "label": "From Actions",
+         "control": "Open Farrowing",
+         "lands": "inspection.farrowing-record",
+         "from": "pig-profile.actions"
         }
        ],
        "flow": [
@@ -15912,6 +15950,36 @@
          "inspection.pen",
          "inspection.walk",
          "Tick all returns with the pen’s pigs ticked"
+        ],
+        [
+         "inspection.pen",
+         "inspection.scan-pen",
+         "Scan this pen"
+        ],
+        [
+         "inspection.scan",
+         "inspection.lookup-outside",
+         "read a pig from another unit"
+        ],
+        [
+         "inspection.lookup-outside",
+         "inspection.lookup-move",
+         "tap the outside pig"
+        ],
+        [
+         "inspection.lookup-move",
+         "inspection.lookup-move-pens",
+         "Move only or Move and select"
+        ],
+        [
+         "inspection.lookup-move-pens",
+         "inspection.lookup-move-confirm",
+         "search and choose a destination"
+        ],
+        [
+         "inspection.lookup-move-confirm",
+         "inspection.lookup-move-result",
+         "confirm and wait for the receipt"
         ]
        ],
        "screens": [
@@ -16626,7 +16694,8 @@
            "(raw) Unit 7 · Unit 6 · Pen C2"
           ],
           "rules": [
-           "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and a result opens that animal in the current context. One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20)."
+           "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and a result opens that animal in the current context. One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20).",
+           "Other-unit results open the same exception sheet as Scan; View pig record uses her real recorded place without selecting."
           ]
          },
          "approval": {
@@ -16789,7 +16858,7 @@
           "purpose": "Show the pigs scanned in this walk, newest first, each ticked as she was read; untick one to leave it out, or open one.",
           "states": [
            "Pigs in this unit: one card under \"Unit 7\"",
-           "A pig from another unit: her own card under her unit"
+           "A pig from another unit: under the recorded unit and pen, without a tick box; opens the transfer decision sheet"
           ],
           "elements": [
            {
@@ -16806,7 +16875,8 @@
           "rules": [
            "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20).",
            "The rows are Inspection's condition-tag rows (Animal row ruling, 2026-10-11), the same as the walk's.",
-           "Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig)."
+           "Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig).",
+           "The automatic tick is only for a pig in the active scan scope (the current unit, or the explicit pen)."
           ]
          }
         },
@@ -16925,7 +16995,8 @@
          "notes": {
           "purpose": "Actions for multiple pigs selected on the walk, in Selected, or on Scan.",
           "rules": [
-           "The same Health and Routine menu is used for the same subjects. A single locally selected pig opens her own Actions with applicable production entries."
+           "The same Health and Routine menu is used for the same subjects. A single locally selected pig opens her own Actions with applicable production entries.",
+           "Successful everyday records return to the source walk, scan, Selected or pig record; the original selection stays available for the next action."
           ],
           "edge": [
            "Opening a pig record from Scan then opening its own Actions temporarily targets that pig; Back restores the scan ticks."
@@ -17882,9 +17953,149 @@
           ],
           "issues": []
          }
+        },
+        {
+         "id": "inspection.scan-pen",
+         "name": "Scan this pen",
+         "zh": "扫本栏耳标",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "walk",
+         "steps": [
+          "[data-action=\"pen-detail\"][data-value=\"C1\"]",
+          "[data-action=\"scan-pen\"][data-value=\"C1\"]"
+         ],
+         "notes": {
+          "purpose": "Scan for one explicit pen.",
+          "rules": [
+           "Only the target pen is eligible for immediate selection. Outside results keep their recorded pen and unit. Back returns to this pen."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "inspection.lookup-outside",
+         "name": "Scan · pig outside the unit",
+         "zh": "扫码 · 异单元猪只",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "lookup-outside",
+         "steps": [],
+         "notes": {
+          "purpose": "Identify an outside animal without adding it to the current selection.",
+          "rules": [
+           "One row opens the decision sheet; there is no second button or checkbox."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "inspection.lookup-move",
+         "name": "Pig in another unit",
+         "zh": "猪只在其他单元",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "lookup-outside",
+         "steps": [
+          "[data-action=\"lookup-exception\"][data-value=\"000430\"]"
+         ],
+         "notes": {
+          "purpose": "Check the ear tag and its recorded place; view the record or choose how to move it.",
+          "rules": [
+           "Move only preserves the selection. Move and select waits for a confirmed receipt."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "inspection.lookup-move-pens",
+         "name": "Destination pen",
+         "zh": "选择目标栏",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "lookup-outside",
+         "steps": [
+          "[data-action=\"lookup-exception\"][data-value=\"000430\"]",
+          "[data-action=\"lookup-move-mode\"][data-value=\"select\"]"
+         ],
+         "notes": {
+          "purpose": "Find a registered destination in the inspected unit.",
+          "rules": [
+           "The full-screen list remains searchable when it contains many pens. A scan from a pen skips this step. Selecting a pen does not commit a move."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "inspection.lookup-move-confirm",
+         "name": "Move and select · review",
+         "zh": "移入并选中 · 核对",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "lookup-outside",
+         "steps": [
+          "[data-action=\"lookup-exception\"][data-value=\"000430\"]",
+          "[data-action=\"lookup-move-mode\"][data-value=\"select\"]",
+          {
+           "fill": "[data-move-pen-search]",
+           "text": "C12"
+          },
+          "[data-action=\"lookup-move-pen\"][data-value=\"C12\"]"
+         ],
+         "notes": {
+          "purpose": "Review the pig and the source and destination before submitting.",
+          "rules": [
+           "Back preserves the selected destination and search."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "inspection.lookup-move-result",
+         "name": "Move confirmed",
+         "zh": "转舍已确认",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "lookup-outside",
+         "steps": [
+          "[data-action=\"lookup-exception\"][data-value=\"000430\"]",
+          "[data-action=\"lookup-move-mode\"][data-value=\"select\"]",
+          {
+           "fill": "[data-move-pen-search]",
+           "text": "C12"
+          },
+          "[data-action=\"lookup-move-pen\"][data-value=\"C12\"]",
+          "[data-action=\"lookup-move-confirm\"]"
+         ],
+         "notes": {
+          "purpose": "Show the prototype receipt and what happened to this selection.",
+          "rules": [
+           "Only a confirmed receipt updates the location and, in the select mode, the selection. Offline, failure, denial and uncertain are simulated alternatives."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "inspection.farrowing-record",
+         "name": "Farrowing record from Inspection",
+         "zh": "从巡检打开分娩记录",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "batch-farrowing",
+         "steps": [
+          "[data-action=\"pig\"][data-value=\"000281\"]",
+          "[data-action=\"open-farrowing\"]"
+         ],
+         "notes": {
+          "purpose": "Open the matching sow’s record from her current tasks or Actions.",
+          "rules": [
+           "Validate batch, unit and ear tag. The sheet returns to its Inspection entry. No eligible matching record gives an unavailable state."
+          ],
+          "issues": []
+         }
         }
        ],
-       "prd": "# Inspection 巡检\n\n## Problem\n\nA worker walks one unit and has to see every pig, spot the ones that need care or feed attention, and record what they find without leaving the place they are standing. Today's old UI spreads this over many screens in the Inspection Figma file. The current prototype (`ux/system/inspection-astra-concept.html`) puts the walk in a single list with a dock. A pen header opens its pen tools; a pig row opens that pig’s record. Unit summary, sensors and the batch tracker have no live walk entrance.\n\n## Who\n\nThe barn worker doing the morning or evening walk, often wearing gloves, one hand free. The supervisor uses History to see what was recorded. The unit is the scope: there is no cohort.\n\n## Anchor\n\nNo anchor. The walk has no lifecycle that changes what work is available. The header shows the last record and opens History; End walk and check-in were removed by the owner on 2026-11-03 (#314).\n\n## Rules\n\n- Selection is not an inspection result. The pen header opens the pen page. Tick all on that page selects the pen’s pigs shown in the walk, including its untagged group when present. A pig checkbox selects that pig only.\n- A pen note is scoped to one pen, and belongs to its own log when closed. Pig notes are a separate action on the pig record.\n- Feed is guidance, not a completion checklist: nothing on the walk can be \"done\" for feed.\n- The stage on a row is days in the stage, never lifetime age; the walk date is fixed in the sample (12 Sep 2026).\n- Care is the only editable condition state; attention is derived from it (ASTRA-BULK-ACTIONS).\n- One Actions sheet for one pig or many, with applicable Production actions only for one pig. Opening Actions on a pig record uses that pig alone; Back from the single-pig Actions restores the walk or scan selection. A save uses the action’s existing completion path.\n- The dock and Find open the same full-screen Scan. Back returns to the calling screen; if it was Find, its search text stays.\n\n## Scope\n\nIn: the unit walk list (lens All / Health / Feed, filter, pen map, find and scan), the pen page and its tools (note, feed, fault, log) wherever a task opens it, Farrowing's room included (owner, 2026-10-22: the screens Farrowing's prototype draws are mapped here, \"Pen in Farrowing\"), the selection and Actions sheet, the walk history, equipment faults for one pen, and the unit batches that change the stage text.\n\nOut (owned by other features): the pig record and its actions (pig-profile), feed reading and editing (feed-plan), conditions, care and treatment (health-record). The Farrowing task is opened from here but belongs to Tasks.\n\n## Decisions\n\n- Owner, 2026-10-22: the pen page and its tools are Inspection's. Farrowing's pen header `›` opens the pen page; Farrowing's own drawing of it (Note, Feed, Fault, Needs attention, Now, Pen log) is listed under \"Pen in Farrowing\" until the two prototypes share one page.\n\nTaken from the research notes and the code:\n\n- The roster shows every pig (the earlier \"quiet pigs collapsed\" idea was dropped). Owner-approved 2026-10-12: a pig is a two-line row. Left, a fixed 112px column: the pig ID over the stage line (\"Gestation · 42d\"; \"d\" is the one allowed abbreviation; no stage date, the stage alone; the stage ends in an ellipsis rather than widening the column). Right, one line of compact condition tags that fills the space up to the chevron: the name only (no day, no care word; Poor appetite is the trend-down icon and \"Appetite\", Diarrhoea is \"Scours\"), ordered by urgency then day (Treat in place and Hospital pen, then Monitor, then ongoing). Act now is a red wash with the \"!\" icon and bold red text; monitor is white with a thin border; ongoing is muted text with no box.\n- The tag line is one line only. Tags are added in priority order until the line is full, then \"+N\" says how many are left; the urgent tag is never the hidden one.\n- There is no feed tag on a pig row. A trough pen can't feed one pig, so feed is read and changed at the pen (the pen header keeps its feed summary).\n- The row is the design system's Row · animal (select + door), with the compact ConditionTag.\n- Home opens this page through the \"Inspect unit\" card with the unit kept in the link. A row in To treat or Monitoring opens the row’s unit with the Health lens. Back restores the Home unit or the originating attention list. Home’s magnifier runs its own Lookup and can open a pig record without entering a walk.\n- Pen map is the design system's PenMap, as Farrowing's (2026-10-22): the framed Pen map button in the dock, tiles coloured by the walk's row levels (amber for a pig at act now, never blue), the peek with the walk's rows, and the colour-carries-over landing. A pen the walk has been through and one it has not look the same: there is no per-pen check (budget.md, Pen map).\n- A pen with an open equipment fault shows a wrench in its walk header. Tap the pen name for the fault under Needs attention; resolving the last open fault removes the mark and retains the record in Pen log.\n\nOpen (recorded on the screens as issues):\n\n- The unit summary card (pig and pen counts, faults, sensors, batch tracker) is not placed on the walk. Home already has Environment & devices.\n- Pen count in the earlier workflow deck is not a live Web entry. The Android Pigs fact can open a count preview; scope and count rules need review before mapping it here.\n- Cross-unit Actions and transfer, shared pen tools across tasks, and the destination for Home attention and Farrowing handoffs are listed with affected states in the [consistency review](consistency-round/README.md).\n- \"Health\" and \"Feed\" lens counts do not say what they count.\n- The care level shows on a row only by the tag's look (red wash with \"!\", outlined, plain); the care word and the day are on the record.\n- Fixed author \"G. Hansen\" and times 06:40 and 09:41 stand in for the signed-in worker and real times.\n",
+       "prd": "# Inspection 巡检\n\n## Problem\n\nA worker walks one unit and has to see every pig, spot the ones that need care or feed attention, and record what they find without leaving the place they are standing. Today's old UI spreads this over many screens in the Inspection Figma file. The current prototype (`ux/system/inspection-astra-concept.html`) puts the walk in a single list with a dock. A pen header opens its pen tools; a pig row opens that pig’s record. Unit summary, sensors and the batch tracker have no live walk entrance.\n\n## Who\n\nThe barn worker doing the morning or evening walk, often wearing gloves, one hand free. The supervisor uses History to see what was recorded. The unit is the scope: there is no cohort.\n\n## Anchor\n\nNo anchor. The walk has no lifecycle that changes what work is available. The header shows the last record and opens History; End walk and check-in were removed by the owner on 2026-11-03 (#314).\n\n## Rules\n\n- Selection is not an inspection result. The pen header opens the pen page. Tick all on that page selects the pen’s pigs shown in the walk, including its untagged group when present. A pig checkbox selects that pig only.\n- A pen note is scoped to one pen, and belongs to its own log when closed. Pig notes are a separate action on the pig record.\n- Feed is guidance, not a completion checklist: nothing on the walk can be \"done\" for feed.\n- The stage on a row is days in the stage, never lifetime age; the walk date is fixed in the sample (12 Sep 2026).\n- Care is the only editable condition state; attention is derived from it (ASTRA-BULK-ACTIONS).\n- One Actions sheet for one pig or many, with applicable Production actions only for one pig. Opening Actions on a pig record uses that pig alone; Back from the single-pig Actions restores the walk or scan selection. A successful everyday record returns to the source (walk, Scan, Selected, or the pig record), restoring the original selection; treatment started on a finding still returns to that finding.\n- The dock and Find open the same full-screen unit Scan. A pen page also opens Scan for that one pen only. Back returns to the calling page and preserves its context.\n- Search and scan show pigs under the unit and pen where they are recorded. A scan ticks an active pig only inside its explicit scope. A pig outside that scope has one result row: tap for her record or to move her. On a unit scan or Find, choose a registered pen on a searchable full-screen page; on a pen scan, the destination is already the current pen. Confirm the move after reviewing both locations. Only a confirmed transfer updates placement; **Move and select** also ticks her. Offline, denied, failed and unconfirmed moves leave the selection unchanged. The prototype uses sample receipts, not a transfer API.\n- Home To treat and Monitoring open the selected pig record with her marked condition. Back preserves the search, filters and scroll. Home Inspect unit still opens the unit walk.\n- Open Farrowing from a pig record or its single-pig Actions opens the matching sow’s Farrowing record for that task, matching the unit and ear tag. Back returns to the originating screen. A missing match does not open another animal.\n\n## Scope\n\nIn: the unit walk list (lens All / Health / Feed, filter, pen map, find and scan), the pen page and its tools (note, feed, fault, log) wherever a task opens it, Farrowing's room included (owner, 2026-10-22: the screens Farrowing's prototype draws are mapped here, \"Pen in Farrowing\"), the selection and Actions sheet, the walk history, equipment faults for one pen, and the unit batches that change the stage text.\n\nOut (owned by other features): the pig record and its actions (pig-profile), feed reading and editing (feed-plan), conditions, care and treatment (health-record). The Farrowing task is opened from here but belongs to Tasks.\n\n## Decisions\n\n- Owner, 2026-10-22: the pen page and its tools are Inspection's. Farrowing's pen header `›` opens the pen page; Farrowing offers Note, read-only Feed guidance, Fault and Pen log. It shares the note and fault form renderers and validation with Inspection. Each host supplies its own pen facts and history, and returns to its own task. Observe and Tick all remain Inspection-only.\n\nTaken from the research notes and the code:\n\n- The roster shows every pig (the earlier \"quiet pigs collapsed\" idea was dropped). Owner-approved 2026-10-12: a pig is a two-line row. Left, a fixed 112px column: the pig ID over the stage line (\"Gestation · 42d\"; \"d\" is the one allowed abbreviation; no stage date, the stage alone; the stage ends in an ellipsis rather than widening the column). Right, one line of compact condition tags that fills the space up to the chevron: the name only (no day, no care word; Poor appetite is the trend-down icon and \"Appetite\", Diarrhoea is \"Scours\"), ordered by urgency then day (Treat in place and Hospital pen, then Monitor, then ongoing). Act now is a red wash with the \"!\" icon and bold red text; monitor is white with a thin border; ongoing is muted text with no box.\n- The tag line is one line only. Tags are added in priority order until the line is full, then \"+N\" says how many are left; the urgent tag is never the hidden one.\n- There is no feed tag on a pig row. A trough pen can't feed one pig, so feed is read and changed at the pen (the pen header keeps its feed summary).\n- The row is the design system's Row · animal (select + door), with the compact ConditionTag.\n- Home opens this page through the \"Inspect unit\" card with the unit kept in the link. Back from the walk restores the Home unit. Home’s magnifier runs its own Lookup and can open a pig record without entering a walk.\n- Pen map is the design system's PenMap, as Farrowing's (2026-10-22): the framed Pen map button in the dock, tiles coloured by the walk's row levels (amber for a pig at act now, never blue), the peek with the walk's rows, and the colour-carries-over landing. A pen the walk has been through and one it has not look the same: there is no per-pen check (budget.md, Pen map).\n- A pen with an open equipment fault shows a wrench in its walk header. Tap the pen name for the fault under Needs attention; resolving the last open fault removes the mark and retains the record in Pen log.\n\nOpen (recorded on the screens as issues):\n\n- The unit summary card (pig and pen counts, faults, sensors, batch tracker) is not placed on the walk. Home already has Environment & devices.\n- Pen head count stays out of this round. The Web Pigs fact is read-only. The earlier Set count deck and Android preview are references for the separate Count design.\n- The six entrance decisions and screenshots are in the [operation flows](decision-round/canvas.html). Native transfer still needs a service receipt that can identify and safely look up the exact submitted operation before enabling real writes.\n- \"Health\" and \"Feed\" lens counts do not say what they count.\n- The care level shows on a row only by the tag's look (red wash with \"!\", outlined, plain); the care word and the day are on the record.\n- Fixed author \"G. Hansen\" and times 06:40 and 09:41 stand in for the signed-in worker and real times.\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,
@@ -18355,7 +18566,7 @@
          }
         }
        ],
-       "prd": "# Search and scan 搜索与扫描\n\nDraft, in design (owner reviews, 2026-10-22). It grew out of Home's Find a pig, which stays its first host. The feature id stays `find-pig`.\n\n## Problem\n\nA worker reaches pigs by ear tag in every part of the app: one pig to look at, or several to act on, from Home, inside a task, or while choosing pigs for an action. Each place used to decide for itself what a search or a scan does. Search and scan are one feature set. Each task or feature adds only its own display logic on top.\n\n## Who\n\nFloor workers, gloved and one-handed, with a tag in front of them or a reader in their hand.\n\n## Anchor\n\nThe design system's [Lookup](../../ux/design-system/components/Lookup/README.md): Find (`findPage`), Scan (`scanPage`), and the scan bar for scanning on a list (`scanBar`). Every host draws these parts. No host copies them.\n\n## Rules (every host)\n\n- **Search and scan are different jobs** (owner, 2026-10-12). Find: type, tap one, act. Scan: hands-free reads.\n- **What a scan does depends on the host's job** (owner, 2026-10-22):\n  - **Opens.** A single-action task (Farrowing) opens the pig on each read; there's no list. Its Scan page only listens. While she is open, the reader waits.\n  - **Ticks.** A multi-select place (Home, Inspection's walk, Choose pigs, the heat check when it's designed) ticks each pig as she is read. The bar becomes the actions for the ticked pigs: the count and Actions, or the task's own actions directly. A repeat read keeps her ticked and lights her row.\n  - **Scans on a list.** A page that chooses pigs from a list (Choose pigs) scans in place, with no Scan page. The scan button turns the search bar into the scan bar.\n  - **Home searches and scans on one page** (owner, 2026-10-22). The bottom bar's middle button opens it. The button is a magnifier with no word, since the icon says it. The field searches, and its scan icon turns it into the scan bar, as on Choose pigs. Each read ticks the pig. A result can be ticked too. The ticks stay through searching, Stop and leaving the page. Home has no separate Scan page, and Toolbox no longer has Find a pig or pen.\n- **Task membership:** \"in the task\" means on the task's own list, not just in the same unit. A pig on the list shows the task's row; any other pig shows the generic row (her tag over her pen, her condition tags). The host passes the row's right side.\n- **Where a pig opens:** a task opens her in the task's context (Farrowing: her farrowing drawer, in any unit). A pig outside the task, or anywhere outside a task, opens her pig record. Back returns to the page she was opened from, with the text, the ticks and the scanning kept.\n- **Pens stay the grouping** inside a unit, as the header of each card. Units are plain section headings (\"Unit 7\"), the worker's unit first. The list and the results read like Inspection's unit list (owner, 2026-10-22). The pen card's header has the pen code and how many pigs are listed. Each row shows the tag over her stage line, with her condition at its urgency. Home and Inspection (Find and Scan) draw it this way. Farrowing's Find a sow still uses one card per unit with the pen in the row.\n- **Unchanged display:** a host's change of behaviour never changes its rows. Home's scan ticks now, but draws its rows exactly as before.\n\n## What a read can find, and what each host does\n\n| The tag's record says | Opens (Farrowing Scan) | Ticks (Home, Inspection) | Choose pigs (this unit only) | Find (typed) |\n|---|---|---|---|---|\n| On the task's list | Her task drawer | Ticked | Ticked, the task's row | The task's row |\n| In the unit, not on the list | Her record · \"Not in Farrowing · Unit 7 · D2\" | Ticked | Ticked, the generic row | The generic row |\n| Another unit | On the list: her drawer. Otherwise her record · \"Not in Farrowing · Unit 3 · A2\" | Ticked, under her unit | Not added: \"Pig in another unit · 000434 · Unit 3\" | Under her unit |\n| No longer on the farm (died, sold, culled, moved to another farm) | Her record · \"Died 14 Oct · …\" | Not added (proposed) | Not added: \"Pig not on the farm · 000512 · Died 14 Oct\" | Open question 2 |\n| No pig has this tag (a new, empty tag, or not synced to this phone yet) | A toast on Scan: \"No pig with this tag · 000999 · New tag, or not synced yet\" | Not added (proposed) | Not added: the same toast | \"No pig matching\" |\n| Read again | — (the reader waits while she is open) | Stays ticked, row lights | Stays ticked, row lights | — |\n| Reader not connected, or it drops | Scan page · \"Scanner not connected\" | Inspection: the same. Home: the bar · \"Waiting for reader · Make sure Reader 1 is on\" | The bar · \"Waiting for reader · Make sure Reader 1 is on\" | — |\n\n**Not added** is one toast at the bottom. It shows a category, then her tag and the reason. It stays, with a ✕ at its left, until the worker closes it or leaves; tapping the rest opens her record (a tag with no pig opens nothing). Reads that miss while it shows pile into it (\"2 pigs not added\", their tags). Tapping it then lists them, each with its reason. The ticks and the count always show what was added.\n\n## What a host supplies\n\n1. Its list (who is \"in the task\") and its row for those pigs.\n2. Its job: opens or ticks.\n3. Its actions for ticked pigs: its own, plus the general ones (Transfer, Condition, Treat, Note).\n4. Where a pig opens in its context.\n\nEverything else (the pages, the bar, the reader states, the not-added toast and list) is Lookup's.\n\n## Scope\n\nIn: Find, Scan (opens and ticks), scanning on a list, the reader states, the not-added messages, opening a pig, the general Actions for ticked pigs from Home.\n\nOut: ear-notch search, untagged groups, the pig record itself (Pig profile), each action's own pages, the real reader and pairing.\n\n## Not supported\n\n- Searching by anything other than tag or pen (batch, stage, condition): use a list's filter.\n- Several readers paired to one phone.\n- Registering a new pig from a scan of an empty tag (it belongs to tagging, which isn't designed). Here an empty tag only says so.\n\n## Open questions (owner)\n\n1. **An empty tag:** when tagging, workers scan a new tag first to add the pig. Should a read of an unknown tag offer \"Add a pig with this tag\" once tagging exists? Should \"not synced yet\" stay one message with it?\n2. **Dead and sold pigs in Find:** list them last, under \"Not on the farm\", grey, opening her record (recommended), or hide them?\n3. **A pig in transit** (move saved, not yet arrived): follow the record, so she belongs to the new unit (recommended)?\n4. **Home and Inspection scan:** use the same not-added toast for pigs that died, were sold, or have no record (proposed, not built).\n\n## Decisions\n\n- Decided (ASTRA-HOME-DIRECTION): Home keeps Home / Scan / Toolbox. Amended by the owner on 2026-10-22: the middle button is now Search and scan, a magnifier with no word.\n- Decided (owner, 2026-10-12): search and scan are separate pages with one pattern across features.\n- Decided (owner, 2026-10-20): a pig from Home opens her pig record, not a task.\n- Decided (owner, 2026-10-22): scan opens in single-action tasks and ticks in multi-select places, Home included; search rows follow task membership; search and scan is one feature set across every task.\n- Decided (owner, 2026-10-22, later): Home searches and scans on one page. The field's scan icon turns it into the scan bar. The bottom bar's middle button opens the page and shows only a magnifier.\n\n## Sources\n\n- ux/research/home/ASTRA-HOME-DIRECTION.md\n- ux/research/home/SENTRI-DRAWER-INVENTORY.md\n- ux/research/home/UI-AUDIT-HOME-TASKS.md\n- Prototype: ux/system/home-astra-prototype.html, ux/system/farrowing-astra-concept.html\n",
+       "prd": "# Search and scan 搜索与扫描\n\nDraft, in design (owner reviews, 2026-10-22). It grew out of Home's Find a pig, which stays its first host. The feature id stays `find-pig`.\n\n## Problem\n\nA worker reaches pigs by ear tag in every part of the app: one pig to look at, or several to act on, from Home, inside a task, or while choosing pigs for an action. Each place used to decide for itself what a search or a scan does. Search and scan are one feature set. Each task or feature adds only its own display logic on top.\n\n## Who\n\nFloor workers, gloved and one-handed, with a tag in front of them or a reader in their hand.\n\n## Anchor\n\nThe design system's [Lookup](../../ux/design-system/components/Lookup/README.md): Find (`findPage`), Scan (`scanPage`), and the scan bar for scanning on a list (`scanBar`). Every host draws these parts. No host copies them.\n\n## Rules (every host)\n\n- **Search and scan are different jobs** (owner, 2026-10-12). Find: type, tap one, act. Scan: hands-free reads.\n- **What a scan does depends on the host's job** (owner, 2026-10-22):\n  - **Opens.** A single-action task (Farrowing) opens the pig on each read; there's no list. Its Scan page only listens. While she is open, the reader waits.\n  - **Ticks.** A multi-select place (Home, Inspection's walk, Choose pigs, the heat check when it's designed) ticks each pig as she is read. The bar becomes the actions for the ticked pigs: the count and Actions, or the task's own actions directly. A repeat read keeps her ticked and lights her row.\n  - **Scans on a list.** A page that chooses pigs from a list (Choose pigs) scans in place, with no Scan page. The scan button turns the search bar into the scan bar.\n  - **Home searches and scans on one page** (owner, 2026-10-22). The bottom bar's middle button opens it. The button is a magnifier with no word, since the icon says it. The field searches, and its scan icon turns it into the scan bar, as on Choose pigs. Each read ticks the pig. A result can be ticked too. The ticks stay through searching, Stop and leaving the page. Home has no separate Scan page, and Toolbox no longer has Find a pig or pen.\n- **Task membership:** \"in the task\" means on the task's own list, not just in the same unit. A pig on the list shows the task's row; any other pig shows the generic row (her tag over her pen, her condition tags). The host passes the row's right side.\n- **Where a pig opens:** a task opens her in the task's context (Farrowing: her farrowing drawer, in any unit). A pig outside the task, or anywhere outside a task, opens her pig record. Back returns to the page she was opened from, with the text, the ticks and the scanning kept.\n- **Pens stay the grouping** inside a unit, as the header of each card. Units are plain section headings (\"Unit 7\"), the worker's unit first. The list and the results read like Inspection's unit list (owner, 2026-10-22). The pen card's header has the pen code and how many pigs are listed. Each row shows the tag over her stage line, with her condition at its urgency. Home and Inspection (Find and Scan) draw it this way. Farrowing's Find a sow still uses one card per unit with the pen in the row.\n- **Unchanged display:** a host's change of behaviour never changes its rows. Home's scan ticks now, but draws its rows exactly as before.\n\n## What a read can find, and what each host does\n\n| The tag's record says | Opens (Farrowing Scan) | Ticks (Home, Inspection) | Choose pigs (this unit only) | Find (typed) |\n|---|---|---|---|---|\n| On the task's list | Her task drawer | Ticked | Ticked, the task's row | The task's row |\n| In the unit, not on the list | Her record · \"Not in Farrowing · Unit 7 · D2\" | Ticked | Ticked, the generic row | The generic row |\n| Another unit | On the list: her drawer. Otherwise her record · \"Not in Farrowing · Unit 3 · A2\" | Home: ticked under her unit. Inspection: not selected; tap for her record or to move her into the active scan scope. | Not added: \"Pig in another unit · 000434 · Unit 3\" | Under her unit |\n| No longer on the farm (died, sold, culled, moved to another farm) | Her record · \"Died 14 Oct · …\" | Not added (proposed) | Not added: \"Pig not on the farm · 000512 · Died 14 Oct\" | Open question 2 |\n| No pig has this tag (a new, empty tag, or not synced to this phone yet) | A toast on Scan: \"No pig with this tag · 000999 · New tag, or not synced yet\" | Not added (proposed) | Not added: the same toast | \"No pig matching\" |\n| Read again | — (the reader waits while she is open) | Stays ticked, row lights | Stays ticked, row lights | — |\n| Reader not connected, or it drops | Scan page · \"Scanner not connected\" | Inspection: the same. Home: the bar · \"Waiting for reader · Make sure Reader 1 is on\" | The bar · \"Waiting for reader · Make sure Reader 1 is on\" | — |\n\nInspection’s scope is explicit: the unit dock and Find use unit scan, the pen page scans only that pen. A known pig outside this scope remains a row with its recorded location; see [Inspection](../inspection/PRD.md#rules).\n\n**Not added** is one toast at the bottom. It shows a category, then her tag and the reason. It stays, with a ✕ at its left, until the worker closes it or leaves; tapping the rest opens her record (a tag with no pig opens nothing). Reads that miss while it shows pile into it (\"2 pigs not added\", their tags). Tapping it then lists them, each with its reason. The ticks and the count always show what was added.\n\n## What a host supplies\n\n1. Its list (who is \"in the task\") and its row for those pigs.\n2. Its job: opens or ticks.\n3. Its actions for ticked pigs: its own, plus the general ones (Transfer, Condition, Treat, Note).\n4. Where a pig opens in its context.\n\nEverything else (the pages, the bar, the reader states, the not-added toast and list) is Lookup's.\n\n## Scope\n\nIn: Find, Scan (opens and ticks), scanning on a list, the reader states, the not-added messages, opening a pig, the general Actions for ticked pigs from Home.\n\nOut: ear-notch search, untagged groups, the pig record itself (Pig profile), each action's own pages, the real reader and pairing.\n\n## Not supported\n\n- Searching by anything other than tag or pen (batch, stage, condition): use a list's filter.\n- Several readers paired to one phone.\n- Registering a new pig from a scan of an empty tag (it belongs to tagging, which isn't designed). Here an empty tag only says so.\n\n## Open questions (owner)\n\n1. **An empty tag:** when tagging, workers scan a new tag first to add the pig. Should a read of an unknown tag offer \"Add a pig with this tag\" once tagging exists? Should \"not synced yet\" stay one message with it?\n2. **Dead and sold pigs in Find:** list them last, under \"Not on the farm\", grey, opening her record (recommended), or hide them?\n3. **A pig in transit** (move saved, not yet arrived): follow the record, so she belongs to the new unit (recommended)?\n4. **Home and Inspection scan:** use the same not-added toast for pigs that died, were sold, or have no record (proposed, not built).\n\n## Decisions\n\n- Decided (ASTRA-HOME-DIRECTION): Home keeps Home / Scan / Toolbox. Amended by the owner on 2026-10-22: the middle button is now Search and scan, a magnifier with no word.\n- Decided (owner, 2026-10-12): search and scan are separate pages with one pattern across features.\n- Decided (owner, 2026-10-20): a pig from Home opens her pig record, not a task.\n- Decided (owner, 2026-10-22): scan opens in single-action tasks and ticks in multi-select places, Home included; search rows follow task membership; search and scan is one feature set across every task.\n- Decided (owner, 2026-10-22, later): Home searches and scans on one page. The field's scan icon turns it into the scan bar. The bottom bar's middle button opens the page and shows only a magnifier.\n\n## Sources\n\n- ux/research/home/ASTRA-HOME-DIRECTION.md\n- ux/research/home/SENTRI-DRAWER-INVENTORY.md\n- ux/research/home/UI-AUDIT-HOME-TASKS.md\n- Prototype: ux/system/home-astra-prototype.html, ux/system/farrowing-astra-concept.html\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,
@@ -18696,6 +18907,20 @@
          "from": "pig-list.list",
          "control": "A pig row in the list",
          "lands": "pig-profile.full"
+        },
+        {
+         "section": "Home",
+         "label": "From To treat",
+         "control": "Pig row",
+         "lands": "pig-profile.full",
+         "from": "workbench.to-treat"
+        },
+        {
+         "section": "Home",
+         "label": "From Monitoring",
+         "control": "Pig row",
+         "lands": "pig-profile.full",
+         "from": "workbench.monitoring"
         }
        ],
        "flow": [
@@ -19866,7 +20091,7 @@
          ]
         }
        ],
-       "prd": "# Pig profile 猪只详情\n\n## Problem\n\nWhen a worker taps a pig they need, in this order: what needs attention, what to do next, who she is, how she is fed, where to read more, and the actions they can take. The old Figma draws pig detail twice: inside Inspection and in the pig list (猪只列表) file. The built version (inside the Inspection prototype) is one sheet with six blocks and many repeated facts.\n\n## Who\n\nA worker on the walk or in a task who reaches a single pig; the same sheet opens inside Farrowing's sow drawer. A supervisor reading history uses Production stats, Origin and Log.\n\n## Anchor\n\nNo anchor. The record is the same for a pig at any stage; what changes is which blocks and which actions apply. Screens are grouped as The record, Read more, Actions - Production, Actions - General and Actions - Greyed in place.\n\n## Rules\n\n- Human-entered records lead; derived plans and stable facts sit in reading sections.\n- The blocks follow the animal type (Sow cycle, Gilt breeding, Boar breeding, Piglet growth, Growth).\n- An empty production-average section is absent; facts missing from the registry show a dash.\n- The Actions sheet has three groups, Production, Health and General. Production is for one pig only and holds only the rows that fit her stage and tasks; an action she can't take stays in its place, greyed (a tile, or a Production row with its reason as line 2; owner, 2026-11-06), and there is no Unavailable actions page.\n- Farrowing opens the shared health and measurement flows rather than copying them; it adds its own Production rows when embedded (piglet processing, piglet deaths, count reconciliation, fostering, litter edit, remove from batch, not in pig, transfer).\n- Not in pig, abortion and batch removal take a sow out of her batch and return her to rebreed watch; saved records are kept.\n- Weight, temperature and backfat take one value per pig.\n- A dead sow offers a note only.\n\n## Scope\n\nIn: the record (full, partial, empty, with tasks), Production stats and a batch record, Origin, the pig Log, the Actions sheet for one pig, the task outcome form, abortion, batch membership, the measurement menu and forms, body condition, notes and the greyed-in-place states.\n\nEntry points: Inspection (a pig row, search or scan), Tasks (a sow in the Farrowing room list), Pigs (the pig list; that feature is a placeholder written elsewhere, so this entry has no source screen yet).\n\nOut: health forms and findings (health-record), feed editing and the pig's feed plan (feed-plan), the unit walk (inspection). Transfer sow, Mark not in pig and Remove from batch render only inside Farrowing's drawer. Mark not in pig is shown as a screen, opened through Farrowing's sow sheet. Remove from batch has a built page but no control opens it (Batch membership's Remove option replaced it); it is not shown.\n\n## Decisions\n\n- One Actions sheet for one pig or twenty; the Production group appears only for one.\n- Tasks are shown as cards on the record and as rows in Actions; Farrowing and Piglet processing open the Farrowing task.\n- Body condition is recorded from Measurements & condition and creates a health finding with Monitor care.\n\nOpen (recorded on the screens as issues):\n\n- Next task and Batch are repeated in the task card, the grid and the type block; stage and days appear in the header, the grid and the type block.\n- Age is in days for a sow.\n- Saving a reading or a note returns to the walk list, not to the pig record; the task, abortion and batch forms return to the record.\n- The pig's lifetime figures (litters, born total, rates) are in the data but not shown.\n- Mark-not-in-pig, remove-from-batch and transfer cannot be reviewed outside Farrowing.\n",
+       "prd": "# Pig profile 猪只详情\n\n## Problem\n\nWhen a worker taps a pig they need, in this order: what needs attention, what to do next, who she is, how she is fed, where to read more, and the actions they can take. The old Figma draws pig detail twice: inside Inspection and in the pig list (猪只列表) file. The built version (inside the Inspection prototype) is one sheet with six blocks and many repeated facts.\n\n## Who\n\nA worker on the walk or in a task who reaches a single pig; the same sheet opens inside Farrowing's sow drawer. A supervisor reading history uses Production stats, Origin and Log.\n\n## Anchor\n\nNo anchor. The record is the same for a pig at any stage; what changes is which blocks and which actions apply. Screens are grouped as The record, Read more, Actions - Production, Actions - General and Actions - Greyed in place.\n\n## Rules\n\n- Human-entered records lead; derived plans and stable facts sit in reading sections.\n- The blocks follow the animal type (Sow cycle, Gilt breeding, Boar breeding, Piglet growth, Growth).\n- An empty production-average section is absent; facts missing from the registry show a dash.\n- The Actions sheet has three groups, Production, Health and General. Production is for one pig only and holds only the rows that fit her stage and tasks; an action she can't take stays in its place, greyed (a tile, or a Production row with its reason as line 2; owner, 2026-11-06), and there is no Unavailable actions page.\n- Farrowing opens the shared health and measurement flows rather than copying them; it adds its own Production rows when embedded (piglet processing, piglet deaths, count reconciliation, fostering, litter edit, remove from batch, not in pig, transfer).\n- Not in pig, abortion and batch removal take a sow out of her batch and return her to rebreed watch; saved records are kept.\n- Weight, temperature and backfat take one value per pig.\n- A dead sow offers a note only.\n\n## Scope\n\nIn: the record (full, partial, empty, with tasks), Production stats and a batch record, Origin, the pig Log, the Actions sheet for one pig, the task outcome form, abortion, batch membership, the measurement menu and forms, body condition, notes and the greyed-in-place states.\n\nEntry points: Home (To treat, Monitoring and Lookup), Inspection (a pig row, search or scan), Tasks (a sow in the Farrowing room list), Pigs (the pig list; that feature is a placeholder written elsewhere, so this entry has no source screen yet).\n\nOut: health forms and findings (health-record), feed editing and the pig's feed plan (feed-plan), the unit walk (inspection). Transfer sow, Mark not in pig and Remove from batch render only inside Farrowing's drawer. Mark not in pig is shown as a screen, opened through Farrowing's sow sheet. Remove from batch has a built page but no control opens it (Batch membership's Remove option replaced it); it is not shown.\n\n## Decisions\n\n- One Actions sheet for one pig or twenty; the Production group appears only for one.\n- Tasks are shown as cards on the record and as rows in Actions; Farrowing and Piglet processing open the Farrowing task.\n- Body condition is recorded from Measurements & condition and creates a health finding with Monitor care.\n\nOpen (recorded on the screens as issues):\n\n- Next task and Batch are repeated in the task card, the grid and the type block; stage and days appear in the header, the grid and the type block.\n- Age is in days for a sow.\n- Saving a reading or note from this record returns here; saves from a list return to that list and retain its selection. The task, abortion and batch forms also return to the record.\n- The pig's lifetime figures (litters, born total, rates) are in the data but not shown.\n- Mark-not-in-pig, remove-from-batch and transfer cannot be reviewed outside Farrowing.\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,
@@ -19948,7 +20173,8 @@
          "notes": {
           "purpose": "Actions for multiple pigs selected on the walk, in Selected, or on Scan.",
           "rules": [
-           "The same Health and Routine menu is used for the same subjects. A single locally selected pig opens her own Actions with applicable production entries."
+           "The same Health and Routine menu is used for the same subjects. A single locally selected pig opens her own Actions with applicable production entries.",
+           "Successful everyday records return to the source walk, scan, Selected or pig record; the original selection stays available for the next action."
           ],
           "edge": [
            "Opening a pig record from Scan then opening its own Actions temporarily targets that pig; Back restores the scan ticks."
@@ -22399,7 +22625,7 @@
          ],
          "figma": "",
          "notes": {
-          "purpose": "Saving a treatment closes the form onto the walk list, where the record is not visible, so a Toast says what was saved and for whom (design law: Feedback after saving). Held so the gate can see it.",
+          "purpose": "Saving from a pig record returns there with a Toast for the recorded treatment. Saving from a walk, Scan or Selected returns to that source with its selection. Held so the gate can see it.",
           "elements": [
            {
             "name": "Toast",

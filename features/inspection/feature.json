@@ -61,7 +61,8 @@
         "inspection.no-batches",
         "inspection.one-batch",
         "inspection.many-batches",
-        "inspection.batch-detail"
+        "inspection.batch-detail",
+        "inspection.farrowing-record"
       ]
     ],
     [
@@ -107,7 +108,13 @@
         "inspection.scan-list",
         "inspection.scan-new",
         "inspection.scan-ticked",
-        "inspection.scan-stopped"
+        "inspection.scan-stopped",
+        "inspection.scan-pen",
+        "inspection.lookup-outside",
+        "inspection.lookup-move",
+        "inspection.lookup-move-pens",
+        "inspection.lookup-move-confirm",
+        "inspection.lookup-move-result"
       ]
     ]
   ],
@@ -117,20 +124,6 @@
       "label": "from a unit on Home",
       "from": "workbench.unit",
       "control": "Inspect unit",
-      "lands": "inspection.walk"
-    },
-    {
-      "section": "Home",
-      "label": "from To treat",
-      "from": "workbench.to-treat",
-      "control": "Pig row",
-      "lands": "inspection.walk"
-    },
-    {
-      "section": "Home",
-      "label": "from Monitoring",
-      "from": "workbench.monitoring",
-      "control": "Pig row",
       "lands": "inspection.walk"
     },
     {
@@ -160,6 +153,27 @@
       "from": "farrowing.room",
       "control": "B1",
       "lands": "inspection.farrowing-pen"
+    },
+    {
+      "section": "Inspection",
+      "label": "Scan from a pen",
+      "control": "Scan this pen",
+      "lands": "inspection.scan-pen",
+      "from": "inspection.pen"
+    },
+    {
+      "section": "Pig record",
+      "label": "From Current tasks",
+      "control": "Open Farrowing",
+      "lands": "inspection.farrowing-record",
+      "from": "pig-profile.full"
+    },
+    {
+      "section": "Pig record",
+      "label": "From Actions",
+      "control": "Open Farrowing",
+      "lands": "inspection.farrowing-record",
+      "from": "pig-profile.actions"
     }
   ],
   "flow": [
@@ -377,6 +391,36 @@
       "inspection.pen",
       "inspection.walk",
       "Tick all returns with the pen’s pigs ticked"
+    ],
+    [
+      "inspection.pen",
+      "inspection.scan-pen",
+      "Scan this pen"
+    ],
+    [
+      "inspection.scan",
+      "inspection.lookup-outside",
+      "read a pig from another unit"
+    ],
+    [
+      "inspection.lookup-outside",
+      "inspection.lookup-move",
+      "tap the outside pig"
+    ],
+    [
+      "inspection.lookup-move",
+      "inspection.lookup-move-pens",
+      "Move only or Move and select"
+    ],
+    [
+      "inspection.lookup-move-pens",
+      "inspection.lookup-move-confirm",
+      "search and choose a destination"
+    ],
+    [
+      "inspection.lookup-move-confirm",
+      "inspection.lookup-move-result",
+      "confirm and wait for the receipt"
     ]
   ],
   "screens": [
@@ -1080,7 +1124,8 @@
           "(raw) Unit 7 · Unit 6 · Pen C2"
         ],
         "rules": [
-          "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and a result opens that animal in the current context. One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20)."
+          "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and a result opens that animal in the current context. One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20).",
+          "Other-unit results open the same exception sheet as Scan; View pig record uses her real recorded place without selecting."
         ]
       }
     },
@@ -1232,7 +1277,7 @@
         "purpose": "Show the pigs scanned in this walk, newest first, each ticked as she was read; untick one to leave it out, or open one.",
         "states": [
           "Pigs in this unit: one card under \"Unit 7\"",
-          "A pig from another unit: her own card under her unit"
+          "A pig from another unit: under the recorded unit and pen, without a tick box; opens the transfer decision sheet"
         ],
         "elements": [
           {
@@ -1249,7 +1294,8 @@
         "rules": [
           "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20).",
           "The rows are Inspection's condition-tag rows (Animal row ruling, 2026-10-11), the same as the walk's.",
-          "Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig)."
+          "Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig).",
+          "The automatic tick is only for a pig in the active scan scope (the current unit, or the explicit pen)."
         ]
       }
     },
@@ -1368,7 +1414,8 @@
       "notes": {
         "purpose": "Actions for multiple pigs selected on the walk, in Selected, or on Scan.",
         "rules": [
-          "The same Health and Routine menu is used for the same subjects. A single locally selected pig opens her own Actions with applicable production entries."
+          "The same Health and Routine menu is used for the same subjects. A single locally selected pig opens her own Actions with applicable production entries.",
+          "Successful everyday records return to the source walk, scan, Selected or pig record; the original selection stays available for the next action."
         ],
         "edge": [
           "Opening a pig record from Scan then opening its own Actions temporarily targets that pig; Back restores the scan ticks."
@@ -2322,6 +2369,146 @@
         "edge": [
           "The Resolved state is built but no door reaches it: a resolved fault leaves the pen page, and pen log entries are not links.",
           "A typed resolution note is kept for that fault through Back, until Resolve fault."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.scan-pen",
+      "name": "Scan this pen",
+      "zh": "扫本栏耳标",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"C1\"]",
+        "[data-action=\"scan-pen\"][data-value=\"C1\"]"
+      ],
+      "notes": {
+        "purpose": "Scan for one explicit pen.",
+        "rules": [
+          "Only the target pen is eligible for immediate selection. Outside results keep their recorded pen and unit. Back returns to this pen."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.lookup-outside",
+      "name": "Scan · pig outside the unit",
+      "zh": "扫码 · 异单元猪只",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "lookup-outside",
+      "steps": [],
+      "notes": {
+        "purpose": "Identify an outside animal without adding it to the current selection.",
+        "rules": [
+          "One row opens the decision sheet; there is no second button or checkbox."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.lookup-move",
+      "name": "Pig in another unit",
+      "zh": "猪只在其他单元",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "lookup-outside",
+      "steps": [
+        "[data-action=\"lookup-exception\"][data-value=\"000430\"]"
+      ],
+      "notes": {
+        "purpose": "Check the ear tag and its recorded place; view the record or choose how to move it.",
+        "rules": [
+          "Move only preserves the selection. Move and select waits for a confirmed receipt."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.lookup-move-pens",
+      "name": "Destination pen",
+      "zh": "选择目标栏",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "lookup-outside",
+      "steps": [
+        "[data-action=\"lookup-exception\"][data-value=\"000430\"]",
+        "[data-action=\"lookup-move-mode\"][data-value=\"select\"]"
+      ],
+      "notes": {
+        "purpose": "Find a registered destination in the inspected unit.",
+        "rules": [
+          "The full-screen list remains searchable when it contains many pens. A scan from a pen skips this step. Selecting a pen does not commit a move."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.lookup-move-confirm",
+      "name": "Move and select · review",
+      "zh": "移入并选中 · 核对",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "lookup-outside",
+      "steps": [
+        "[data-action=\"lookup-exception\"][data-value=\"000430\"]",
+        "[data-action=\"lookup-move-mode\"][data-value=\"select\"]",
+        {
+          "fill": "[data-move-pen-search]",
+          "text": "C12"
+        },
+        "[data-action=\"lookup-move-pen\"][data-value=\"C12\"]"
+      ],
+      "notes": {
+        "purpose": "Review the pig and the source and destination before submitting.",
+        "rules": [
+          "Back preserves the selected destination and search."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.lookup-move-result",
+      "name": "Move confirmed",
+      "zh": "转舍已确认",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "lookup-outside",
+      "steps": [
+        "[data-action=\"lookup-exception\"][data-value=\"000430\"]",
+        "[data-action=\"lookup-move-mode\"][data-value=\"select\"]",
+        {
+          "fill": "[data-move-pen-search]",
+          "text": "C12"
+        },
+        "[data-action=\"lookup-move-pen\"][data-value=\"C12\"]",
+        "[data-action=\"lookup-move-confirm\"]"
+      ],
+      "notes": {
+        "purpose": "Show the prototype receipt and what happened to this selection.",
+        "rules": [
+          "Only a confirmed receipt updates the location and, in the select mode, the selection. Offline, failure, denial and uncertain are simulated alternatives."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.farrowing-record",
+      "name": "Farrowing record from Inspection",
+      "zh": "从巡检打开分娩记录",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "batch-farrowing",
+      "steps": [
+        "[data-action=\"pig\"][data-value=\"000281\"]",
+        "[data-action=\"open-farrowing\"]"
+      ],
+      "notes": {
+        "purpose": "Open the matching sow’s record from her current tasks or Actions.",
+        "rules": [
+          "Validate batch, unit and ear tag. The sheet returns to its Inspection entry. No eligible matching record gives an unavailable state."
         ],
         "issues": []
       }

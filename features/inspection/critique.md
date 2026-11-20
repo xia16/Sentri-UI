@@ -330,3 +330,7 @@ Unchanged: each screen shows the same information in the same order as on main, 
 - Reviewed the [old and new 390 px frames](consistency-round/review.html). Find returns to its typed results again; Scan keeps both selected rows after a detour into one pig’s Actions. The destination and the subjects are visible in the same place before the next action.
 - A scan and a walk still use the same Lookup/Row patterns. The fault indicator fits next to the note and pen code without changing the pen door; resolving the last fault clears only the indicator and keeps the log. The Atlas specimen uses the real Fault button and field picker.
 - The [decision board](consistency-round/decisions.html) shows the separate Farrowing pen tools, cross-unit scope, earlier count flow and handoffs. These need a product decision before the prototypes converge.
+
+## Applying the 2026-11-20 decisions
+
+The review proposal repeated a move button below every outside pig, making one result look like two rows. The destination sheet put the full catalogue and submit action in the same space. Keep the physical unit/pen grouping; use one tappable row, a short choice of intent and a full-page searchable catalogue. In the 48-pen example, C12 is reachable without scrolling; selecting it opens a separate review. The before/after captures and the exception paths are in [操作链路](decision-round/canvas.html).
