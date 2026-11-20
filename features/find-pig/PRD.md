@@ -39,7 +39,7 @@ The design system's [Lookup](../../ux/design-system/components/Lookup/README.md)
 | Read again | — (the reader waits while she is open) | Stays ticked, row lights | Stays ticked, row lights | — |
 | Reader not connected, or it drops | Scan page · "Scanner not connected" | Inspection: the same. Home: the bar · "Waiting for reader · Make sure Reader 1 is on" | The bar · "Waiting for reader · Make sure Reader 1 is on" | — |
 
-Inspection’s scope is explicit: the unit dock and Find use unit scan, the pen page scans only that pen. A known pig outside this scope remains a row with its recorded location; see [Inspection](../inspection/PRD.md#rules).
+The Inspection dock and Find both open the same unit scan. A known pig from another unit remains a row with its recorded location; see [Inspection](../inspection/PRD.md#rules).
 
 **Not added** is one toast at the bottom. It shows a category, then her tag and the reason. It stays, with a ✕ at its left, until the worker closes it or leaves; tapping the rest opens her record (a tag with no pig opens nothing). Reads that miss while it shows pile into it ("2 pigs not added", their tags). Tapping it then lists them, each with its reason. The ticks and the count always show what was added.
 

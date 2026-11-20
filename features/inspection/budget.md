@@ -162,6 +162,6 @@ The fact line in every cell and its second vocabulary (`N health`, which also co
 | Scan / Find | Which pig did I read, and where is it recorded? | One row under its recorded unit and pen. Outside the scope, replace the selection box with a door and a short location cue. |
 | Outside pig sheet | Can I see the record, move it, or also select it? | Ear tag, recorded location; View pig record, Move only, Move and select. No duplicate action beside the result. |
 | Destination | Which registered pen will receive it? | Current unit and one pinned search over a scrolling catalogue. No transfer action on selecting a line. |
-| Confirm / result | Is this where the pig belongs, and did it move? | Ear tag and source → destination on confirmation; destination and selection outcome on the receipt. A pen scan skips the catalogue. |
+| Confirm / result | Is this where the pig belongs, and did it move? | Ear tag and source → destination on confirmation; destination and selection outcome on the receipt. |
 
 Cut: the repeated Move into this … text below each result, a long stack of radio rows in a drawer, and numbers that restate the list's row count. A rejected or uncertain move retains the selection and does not announce a completed transfer.

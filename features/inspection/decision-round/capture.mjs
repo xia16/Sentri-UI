@@ -65,13 +65,10 @@ try{
   await tap('lookup-move-confirm');await tap('back');assert.equal(await live('[data-find-input]').inputValue(),'000430');await shot('10-find-return');
   await tap('back');assert.deepEqual(await ticks(),['000430']);
  });
- await check('Pen scan only ticks the target pen; another pen uses the fixed destination',async()=>{
-  await walk();await tap('pen-detail','C1');await shot('11-scan-entry-pen');await tap('scan-pen','C1');await read();await read();await read();
-  assert.deepEqual(await ticks(),['000267']);await shot('12-pen-scan');
-  await tap('lookup-exception','000306');await shot('13-other-pen');await tap('lookup-move-mode','select');
-  assert.equal(await live(action('lookup-move-pen')).count(),0);await shot('14-fixed-pen');
-  await tap('lookup-move-confirm');await tap('back');assert.deepEqual(await ticks(),['000267','000306']);await shot('15-fixed-pen-return');
-  await tap('back');await view('pen-detail');
+ await check('Pen page has no scan entry; the walk dock still scans the whole unit',async()=>{
+  await walk();await tap('pen-detail','C1');assert.equal(await live(':is([data-action="scan"], [data-action="scan-pen"])').count(),0);await shot('11-inspection-pen');
+  await tap('back');await tap('scan');await read();await read();
+  assert.deepEqual(await ticks(),['000267','000306']);
  });
  for(const outcome of ['offline','denied','failed','uncertain']){
   await check(`A move that is ${outcome} does not change the selection`,async()=>{

@@ -109,7 +109,6 @@
         "inspection.scan-new",
         "inspection.scan-ticked",
         "inspection.scan-stopped",
-        "inspection.scan-pen",
         "inspection.lookup-outside",
         "inspection.lookup-move",
         "inspection.lookup-move-pens",
@@ -153,13 +152,6 @@
       "from": "farrowing.room",
       "control": "B1",
       "lands": "inspection.farrowing-pen"
-    },
-    {
-      "section": "Inspection",
-      "label": "Scan from a pen",
-      "control": "Scan this pen",
-      "lands": "inspection.scan-pen",
-      "from": "inspection.pen"
     },
     {
       "section": "Pig record",
@@ -391,11 +383,6 @@
       "inspection.pen",
       "inspection.walk",
       "Tick all returns with the pen’s pigs ticked"
-    ],
-    [
-      "inspection.pen",
-      "inspection.scan-pen",
-      "Scan this pen"
     ],
     [
       "inspection.scan",
@@ -1295,7 +1282,7 @@
           "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20).",
           "The rows are Inspection's condition-tag rows (Animal row ruling, 2026-10-11), the same as the walk's.",
           "Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig).",
-          "The automatic tick is only for a pig in the active scan scope (the current unit, or the explicit pen)."
+          "The automatic tick is only for a pig in the current unit."
         ]
       }
     },
@@ -2374,25 +2361,6 @@
       }
     },
     {
-      "id": "inspection.scan-pen",
-      "name": "Scan this pen",
-      "zh": "扫本栏耳标",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "walk",
-      "steps": [
-        "[data-action=\"pen-detail\"][data-value=\"C1\"]",
-        "[data-action=\"scan-pen\"][data-value=\"C1\"]"
-      ],
-      "notes": {
-        "purpose": "Scan for one explicit pen.",
-        "rules": [
-          "Only the target pen is eligible for immediate selection. Outside results keep their recorded pen and unit. Back returns to this pen."
-        ],
-        "issues": []
-      }
-    },
-    {
       "id": "inspection.lookup-outside",
       "name": "Scan · pig outside the unit",
       "zh": "扫码 · 异单元猪只",
@@ -2440,7 +2408,7 @@
       "notes": {
         "purpose": "Find a registered destination in the inspected unit.",
         "rules": [
-          "The full-screen list remains searchable when it contains many pens. A scan from a pen skips this step. Selecting a pen does not commit a move."
+          "The full-screen list remains searchable when it contains many pens. Selecting a pen does not commit a move."
         ],
         "issues": []
       }

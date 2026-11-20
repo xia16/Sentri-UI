@@ -5,7 +5,7 @@
     "Unit scan groups local pigs in their own pens; outside tag has no tick; unknown and repeated reads do not add pigs",
     "Move-only and move-and-select change the location; only the second adds a tick",
     "Search offers the same transfer choices and preserves the original text on return",
-    "Pen scan only ticks the target pen; another pen uses the fixed destination",
+    "Pen page has no scan entry; the walk dock still scans the whole unit",
     "A move that is offline does not change the selection",
     "A move that is denied does not change the selection",
     "A move that is failed does not change the selection",

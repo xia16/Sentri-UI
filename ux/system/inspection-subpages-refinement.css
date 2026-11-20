@@ -85,7 +85,7 @@
 }
 
 /* Keep compact controls reachable on touch screens without changing desktop study chrome. */
-.inspection-phone :is(.catalog-search input,.stage-legend button,.record-tabs button,.inspection-filter-summary .text-button,.unit-summary-heading .text-button,.profile-details-link,.dock-selection-summary .selection-review,.feed-percent-control input[type="number"],.feed-range-labels .text-button,.feed-amount-fields input[type="range"],.log-results .text-button,.instruction-detail .text-button,.bulk-reading input){min-height:var(--tap-min);}
+.inspection-phone :is(.catalog-search input,.stage-legend button,.record-tabs button,.inspection-filter-summary .text-button,.unit-summary-heading .text-button,.dock-selection-summary .selection-review,.feed-percent-control input[type="number"],.feed-range-labels .text-button,.feed-amount-fields input[type="range"],.log-results .text-button,.instruction-detail .text-button,.bulk-reading input){min-height:var(--tap-min);}
 .inspection-phone .bulk-controls :is(input,select,textarea){min-height:var(--tap-min);}
 
 /* Bulk action page: the selected pigs on top, the details held on the bottom edge above the footer.

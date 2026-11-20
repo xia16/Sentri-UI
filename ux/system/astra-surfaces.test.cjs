@@ -304,10 +304,10 @@ test('the pen page leads with its verbs, then what needs someone, then how the p
   pe.note='Close the aisle gate after passing.';pe.noteBy='G. Hansen · today · 06:40';
   pe.faults=[{id:'f1',name:'Drinking station',description:'Leaking valve at the east end.',open:true}];
   const html=model.overlay(c);
-  const grid=html.match(/<div class="st-panel st-row-grid[^"]*"[^>]*aria-label="Pen actions"[^>]*>([\s\S]*?)data-action="scan-pen" data-value="C1"/);
-  assert.ok(grid,'pen verbs as a tile grid followed by the C1 scanner entry');
+  const grid=html.match(/<div class="st-panel st-row-grid[^"]*"[^>]*aria-label="Pen actions"[^>]*>([\s\S]*?)<\/div><\/section>/);
+  assert.ok(grid,'pen verbs as a tile grid');
   assert.deepEqual([...grid[1].matchAll(/data-action="([^"]+)"/g)].map(m=>m[1]),['pen-note','feed','pen-observe','new-fault','tick-pen']);
-  assert.equal((html.match(/data-action="scan-pen"/g)||[]).length,1,'one scanner scoped to this pen');
+  assert.doesNotMatch(html,/data-action="(?:scan|scan-pen)"/,'the pen page does not open Scan');
   const order=['Pen actions','Needs attention','>Now<','Pen log'].map(k=>html.indexOf(k));
   assert.ok(order.every((x,i)=>x>0&&(i===0||x>order[i-1])),'verbs, needs attention, now, log: '+order);
   assert.match(html,/data-action="fault-record" data-value="C1\|f1"/);
