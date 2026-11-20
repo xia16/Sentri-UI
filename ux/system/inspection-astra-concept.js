@@ -425,7 +425,7 @@ function pigRecordCards(p){
  const ongoing=cases(p).filter(k=>!needsHealthAttention(k));
  const rows=ongoing.length?SentriUI.rowGroup(ongoing.map(k=>SentriUI.row({title:k.name,description:[Number.isFinite(k.day)?k.day+' days':'', 'No action needed'].filter(Boolean).join(' · '),action:'finding',value:p.id+'|'+k.name,trail:'chevron'})).join(''),{className:'ongoing-findings'}):'';
  const t=p.treatment;
- const latest=t?SentriUI.statusLine(['Last treatment',t.medicine,t.dose+' '+t.unit,t.method],{sep:'dot',className:'recent-treatment'}):'';
+ const latest=t?SentriUI.statusLine([`Last treatment: ${t.medicine} · ${t.dose} ${t.unit} · ${t.method}`],{className:'recent-treatment'}):'';
  return attentionOverview(p)+rows+latest;
 }
 function currentTasksForPig(c,p){
