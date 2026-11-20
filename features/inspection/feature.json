@@ -27,6 +27,8 @@
       [
         "inspection.pen",
         "inspection.pen-note",
+        "inspection.pen-read-note",
+        "inspection.pen-observe",
         "inspection.pen-log",
         "inspection.pen-signals"
       ]
@@ -59,7 +61,8 @@
         "inspection.no-batches",
         "inspection.one-batch",
         "inspection.many-batches",
-        "inspection.batch-detail"
+        "inspection.batch-detail",
+        "inspection.farrowing-record"
       ]
     ],
     [
@@ -72,7 +75,6 @@
     [
       "Equipment faults",
       [
-        "inspection.pen-actions",
         "inspection.fault-report",
         "inspection.fault-report-other",
         "inspection.fault-flag",
@@ -82,8 +84,9 @@
       ]
     ],
     [
-      "Pen head count",
+      "Earlier pen count and pen selection",
       [
+        "inspection.pen-actions",
         "inspection.set-count",
         "inspection.set-count-batches",
         "inspection.set-count-fewer",
@@ -105,7 +108,12 @@
         "inspection.scan-list",
         "inspection.scan-new",
         "inspection.scan-ticked",
-        "inspection.scan-stopped"
+        "inspection.scan-stopped",
+        "inspection.lookup-outside",
+        "inspection.lookup-move",
+        "inspection.lookup-move-pens",
+        "inspection.lookup-move-confirm",
+        "inspection.lookup-move-result"
       ]
     ]
   ],
@@ -132,11 +140,32 @@
       "lands": "inspection.scan"
     },
     {
+      "section": "Inspection",
+      "label": "Scan from Find",
+      "from": "inspection.search",
+      "control": "Scan ear tag",
+      "lands": "inspection.scan"
+    },
+    {
       "section": "Farrowing",
       "label": "from a pen in the room",
       "from": "farrowing.room",
       "control": "B1",
       "lands": "inspection.farrowing-pen"
+    },
+    {
+      "section": "Pig record",
+      "label": "From Current tasks",
+      "control": "Open Farrowing",
+      "lands": "inspection.farrowing-record",
+      "from": "pig-profile.full"
+    },
+    {
+      "section": "Pig record",
+      "label": "From Actions",
+      "control": "Open Farrowing",
+      "lands": "inspection.farrowing-record",
+      "from": "pig-profile.actions"
     }
   ],
   "flow": [
@@ -183,7 +212,7 @@
     [
       "inspection.scan-list",
       "inspection.scan-ticked",
-      "tick a pig"
+      "untick one scanned pig"
     ],
     [
       "inspection.scan-ticked",
@@ -198,7 +227,7 @@
     [
       "inspection.pen",
       "inspection.pen-note",
-      "tap the note card or Add / Edit pen note"
+      "tap Note"
     ],
     [
       "inspection.pen",
@@ -208,7 +237,7 @@
     [
       "inspection.walk",
       "inspection.actions",
-      "tick pigs or pens, tap Actions"
+      "tick multiple pigs, then Actions"
     ],
     [
       "inspection.walk",
@@ -223,32 +252,12 @@
     [
       "inspection.walk",
       "inspection.walk-log",
-      "tap Log"
-    ],
-    [
-      "inspection.sensors",
-      "inspection.unit-detail",
-      "tap the unit name (not drawn today)"
+      "tap the History icon"
     ],
     [
       "inspection.pen-faults",
       "inspection.fault-report",
       "tap Report fault"
-    ],
-    [
-      "inspection.pen-faults",
-      "inspection.fault-resolve",
-      "tap a fault"
-    ],
-    [
-      "inspection.walk",
-      "inspection.pen-actions",
-      "tick a pen, tap Actions"
-    ],
-    [
-      "inspection.pen-actions",
-      "inspection.fault-report",
-      "tap Fault"
     ],
     [
       "inspection.fault-report",
@@ -258,47 +267,17 @@
     [
       "inspection.fault-report",
       "inspection.fault-flag",
-      "tap Report fault"
+      "Report fault, then Back to the walk"
     ],
     [
       "inspection.fault-flag",
       "inspection.pen-faults",
-      "open the pen, tap its FAULTS row"
-    ],
-    [
-      "inspection.pen-faults",
-      "inspection.fault-resolve",
-      "tap the fault"
+      "open the pen with the wrench mark"
     ],
     [
       "inspection.fault-resolve",
       "inspection.fault-resolved",
       "tap Resolve"
-    ],
-    [
-      "inspection.pen-actions",
-      "inspection.set-count",
-      "tap Count"
-    ],
-    [
-      "inspection.set-count",
-      "inspection.set-count-batches",
-      "tap Add batch"
-    ],
-    [
-      "inspection.set-count",
-      "inspection.set-count-fewer",
-      "lower the total"
-    ],
-    [
-      "inspection.set-count",
-      "inspection.set-count-more",
-      "raise the total"
-    ],
-    [
-      "inspection.set-count",
-      "inspection.count-recorded",
-      "close the sheet"
     ],
     [
       "inspection.farrowing-pen",
@@ -344,6 +323,91 @@
       "inspection.farrowing-pen-fault",
       "inspection.farrowing-pen",
       "Report fault or Back"
+    ],
+    [
+      "inspection.pen-landed",
+      "inspection.pen-faults",
+      "tap the C2 pen header"
+    ],
+    [
+      "inspection.search",
+      "inspection.search-none",
+      "type an unmatched ear tag"
+    ],
+    [
+      "inspection.scan",
+      "inspection.scan-stopped",
+      "Stop scanning with nothing selected"
+    ],
+    [
+      "inspection.scan",
+      "inspection.search",
+      "Back if opened from Find"
+    ],
+    [
+      "inspection.scan",
+      "inspection.walk",
+      "Back if opened from the dock"
+    ],
+    [
+      "inspection.pen",
+      "inspection.pen-read-note",
+      "tap the note card"
+    ],
+    [
+      "inspection.pen-read-note",
+      "inspection.pen-note",
+      "tap the pencil"
+    ],
+    [
+      "inspection.pen",
+      "inspection.pen-observe",
+      "tap Observe"
+    ],
+    [
+      "inspection.pen",
+      "inspection.fault-report",
+      "tap Fault"
+    ],
+    [
+      "inspection.fault-report",
+      "inspection.pen-faults",
+      "tap Report fault"
+    ],
+    [
+      "inspection.fault-resolved",
+      "inspection.pen-log",
+      "tap Pen log to read the resolution"
+    ],
+    [
+      "inspection.pen",
+      "inspection.walk",
+      "Tick all returns with the pen’s pigs ticked"
+    ],
+    [
+      "inspection.scan",
+      "inspection.lookup-outside",
+      "read a pig from another unit"
+    ],
+    [
+      "inspection.lookup-outside",
+      "inspection.lookup-move",
+      "tap the outside pig"
+    ],
+    [
+      "inspection.lookup-move",
+      "inspection.lookup-move-pens",
+      "Move only or Move and select"
+    ],
+    [
+      "inspection.lookup-move-pens",
+      "inspection.lookup-move-confirm",
+      "search and choose a destination"
+    ],
+    [
+      "inspection.lookup-move-confirm",
+      "inspection.lookup-move-result",
+      "confirm and wait for the receipt"
     ]
   ],
   "screens": [
@@ -356,7 +420,7 @@
       "preset": "walk",
       "figma": "",
       "notes": {
-        "purpose": "The worker walks one unit pen by pen, sees every pig with its stage, health tags and feed change, selects pigs or pens, and records on the spot.",
+        "purpose": "The worker walks one unit pen by pen, sees every pig with its stage, health tags and feed change, and records on the spot. Select pigs on their rows; pen tools live on the pen page.",
         "states": [
           "Opened from Home: the back arrow returns to Home with the unit kept. Opened alone: it opens a one-row Today sheet.",
           "Filters on and no pig matches: \"No pigs match\" with Show all pigs."
@@ -619,21 +683,12 @@
       "preset": "pen-signals",
       "figma": "",
       "notes": {
-        "purpose": "Intended to show a pen carrying both a note and an open equipment fault.",
-        "elements": [
-          {
-            "name": "Pen header · fault mark",
-            "shows": "Nothing",
-            "logic": "No fault mark is drawn on the list: penEntry() only knows the note. The fault appears only in the pen log after it is reported.",
-            "source": "penEntry()",
-            "at": "· 3 pigs"
-          }
+        "purpose": "Show the existing note and open fault side by side on the C1 header.",
+        "rules": [
+          "The note glyph says a note exists; the amber wrench says there is an open equipment fault. The pen name still opens one pen page. A resolved fault leaves the header and remains in Pen log."
         ],
-        "controls": [],
-        "issues": [
-          "Looks identical to the walk: an open fault has no sign on the list and no row in the pen sheet.",
-          "No control opens this (fault sheets, Report fault, Resolve fault)."
-        ]
+        "edge": [],
+        "issues": []
       }
     },
     {
@@ -735,6 +790,48 @@
         "issues": [
           "Close note and Edit note overlap (edit replaces, close archives); two notes cannot coexist."
         ]
+      }
+    },
+    {
+      "id": "inspection.pen-read-note",
+      "name": "Read pen note",
+      "zh": "查看栏位备注",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"C1\"]",
+        "[data-action=\"read-pen-note\"][data-value=\"C1\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Read the pen note as a message, with author, time and the date it stops showing.",
+        "rules": [
+          "Pencil opens the same editor as Note on the pen page. Save from the editor returns here; closing the note archives it in Pen log and returns to the pen."
+        ],
+        "edge": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.pen-observe",
+      "name": "How the pen looks",
+      "zh": "观察栏况",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"C1\"]",
+        "[data-action=\"pen-observe\"][data-value=\"C1\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Record observations for the pen.",
+        "rules": [
+          "Back returns to the pen. Saving records an observation, without selecting pigs."
+        ],
+        "edge": [],
+        "issues": []
       }
     },
     {
@@ -974,7 +1071,8 @@
         "rules": [
           "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and a result opens that animal in the current context. One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20).",
           "Drawn by the design system's Lookup (components/Lookup), the same page as Farrowing's.",
-          "Replaces the old Find a pig drawer, which listed every pig of the walk's unit before anything was typed and searched this unit only."
+          "Replaces the old Find a pig drawer, which listed every pig of the walk's unit before anything was typed and searched this unit only.",
+          "The scan icon opens the same full-screen Scan as the dock. Back from Scan restores this page and the query."
         ]
       }
     },
@@ -1013,7 +1111,8 @@
           "(raw) Unit 7 · Unit 6 · Pen C2"
         ],
         "rules": [
-          "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and a result opens that animal in the current context. One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20)."
+          "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and a result opens that animal in the current context. One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20).",
+          "Other-unit results open the same exception sheet as Scan; View pig record uses her real recorded place without selecting."
         ]
       }
     },
@@ -1103,7 +1202,8 @@
           "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20).",
           "Drawn by the design system's Lookup (components/Lookup), the same page as Farrowing's.",
           "Replaces the old Scan ear tag drawer (\"Camera scanning is not connected\", \"Try sample tag 000306\").",
-          "Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig)."
+          "Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig).",
+          "Scan fills the phone from both the dock and Find. Back returns to the entry (the walk, or Find with its search text)."
         ]
       }
     },
@@ -1164,7 +1264,7 @@
         "purpose": "Show the pigs scanned in this walk, newest first, each ticked as she was read; untick one to leave it out, or open one.",
         "states": [
           "Pigs in this unit: one card under \"Unit 7\"",
-          "A pig from another unit: her own card under her unit"
+          "A pig from another unit: under the recorded unit and pen, without a tick box; opens the transfer decision sheet"
         ],
         "elements": [
           {
@@ -1181,7 +1281,8 @@
         "rules": [
           "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20).",
           "The rows are Inspection's condition-tag rows (Animal row ruling, 2026-10-11), the same as the walk's.",
-          "Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig)."
+          "Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig).",
+          "The automatic tick is only for a pig in the current unit."
         ]
       }
     },
@@ -1236,7 +1337,7 @@
         "issues": [],
         "purpose": "One pig unticked by hand: the count and Actions follow the ticks.",
         "states": [
-          "One or more ticked: the ticked rows take the selected tint, and the footer becomes \"N pigs selected\" and Actions"
+          "The ticked row stays white and has a green checkbox with a white tick (Row · select + door). The footer count and Actions follow the ticks."
         ],
         "elements": [
           {
@@ -1270,7 +1371,7 @@
         "issues": [],
         "purpose": "Show that scanning is paused, with the list kept, and how to resume.",
         "states": [
-          "Stopped, nothing ticked: the footer's primary is \"Resume scanning\""
+          "Nothing selected: Stop pauses the reader and Resume restarts it. Previously scanned rows stay on the page."
         ],
         "elements": [
           {
@@ -1295,111 +1396,24 @@
       "zh": "操作（多选）",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "selected",
+      "preset": "walk",
       "figma": "",
       "notes": {
-        "purpose": "One menu drawer of actions for the ticked pigs or pens: the everyday verbs as a grid of icon tiles, over the list it acts on. Here two pigs are selected.",
-        "elements": [
-          {
-            "name": "Verb grid",
-            "at": "Condition",
-            "shows": "Health then Routine verbs as one card of icon tiles, one word each from the strings registry (Condition, Treat, Edit, Resolve, Care, Note, Transfer, Measure, Feed)",
-            "states": [
-              {
-                "state": "Rows",
-                "when": "Two or more verbs",
-                "shows": "One row up to five; from six, two rows split evenly: 6 = 3+3, 7 = 4+3, 8 = 4+4, 9 = 5+4, 10 = 5+5"
-              },
-              {
-                "state": "More",
-                "when": "More than ten verbs",
-                "shows": "Nine tiles and More just before Death (Death never folds); More opens every tile in even rows of at most five, the one case of a third row"
-              },
-              {
-                "state": "Death",
-                "when": "Record sow death is offered",
-                "shows": "The last tile, in red ink"
-              }
-            ],
-            "rule": "The word under the icon is the short verb; the accessible name always contains it: the full action name when that holds the word as a whole word (Add a note), else the word, then the full name (Condition, Disease or symptom). A verb whose line is content (an existing sow note) keeps its described row under the grid."
-          },
-          {
-            "name": "Action row availability",
-            "shows": "Rows in Health and General groups",
-            "states": [
-              {
-                "state": "Record a health finding / treatment",
-                "when": "At least one selected pig is alive",
-                "shows": "Shown"
-              },
-              {
-                "state": "Edit conditions",
-                "when": "Two or more selected AND one has a condition",
-                "shows": "Shown; bulk only"
-              },
-              {
-                "state": "Resolve conditions · Care instructions",
-                "when": "A selected pig has a condition",
-                "shows": "Live; otherwise greyed in place (\"No open conditions to resolve.\" / \"Record a health finding first.\")"
-              },
-              {
-                "state": "Adjust feed",
-                "when": "At least one pig can be fed (not ad-lib, not dead, has a plan)",
-                "shows": "Live; otherwise greyed in place with the reason"
-              },
-              {
-                "state": "Add a note",
-                "when": "Live pigs",
-                "shows": "Always shown"
-              },
-              {
-                "state": "Production group",
-                "when": "Exactly one pig",
-                "shows": "Hidden for several pigs or pens so a group never gets a single-sow workflow"
-              },
-              {
-                "state": "Adjust feed unavailable",
-                "when": "No selected pig can be fed",
-                "shows": "Feed greyed in place; its accessible name carries the first selected pig's reason (This pig has died / Ad-lib feeding has no fixed daily allowance / No feeding plan recorded)"
-              },
-              {
-                "state": "Health greyed",
-                "when": "No selected pig is alive",
-                "shows": "Every health tile greyed in its place"
-              }
-            ],
-            "logic": "Greyed in place (owner, 2026-11-06: \"when a sow died, the actions should just be grey\"): every action keeps its place in a live pig's order; one that does not apply is a disabled tile (its reason in the accessible name only, no reason line) or, in Production, a disabled row with the reason as line 2. No \"Unavailable actions\" link or page. A dead sow keeps the whole set greyed; only Add a note is live.",
-            "source": "ASTRA-BULK-ACTIONS",
-            "at": "Edit conditions"
-          },
-          {
-            "name": "Measurements & condition menu",
-            "shows": "Body condition, weight, backfat, temperature",
-            "logic": "Weight takes a separate value per pig. Backfat for sows and gilts only. Temperature is offered for one pig only.",
-            "rule": "Batch save applies only to included, changed rows; an invalid entered value blocks the whole save.",
-            "at": "Measurements & condition"
-          },
-          {
-            "name": "Footer tabs",
-            "shows": "Health · General",
-            "logic": "Jump to a group; the active tab follows the scroll.",
-            "at": "General"
-          }
+        "purpose": "Actions for multiple pigs selected on the walk, in Selected, or on Scan.",
+        "rules": [
+          "The same Health and Routine menu is used for the same subjects. A single locally selected pig opens her own Actions with applicable production entries.",
+          "Successful everyday records return to the source walk, scan, Selected or pig record; the original selection stays available for the next action."
         ],
-        "controls": [],
-        "copy": [
-          "Actions (raw)",
-          "Disease or symptom (raw)",
-          "Record treatment (raw)",
-          "Adjust feed (raw)"
+        "edge": [
+          "Opening a pig record from Scan then opening its own Actions temporarily targets that pig; Back restores the scan ticks."
         ],
-        "issues": [
-          "Health and General groups sit in one long scroll with tabs at the foot; two small groups do not need tabs.",
-          "Edit conditions, Resolve conditions and Care instructions all edit a finding: three doors for one record.",
-          "Measurements & condition puts body condition (a health record) next to weight and backfat.",
-          "The sheet header says only \"2 pigs\"; it does not name them."
-        ]
-      }
+        "issues": []
+      },
+      "steps": [
+        "[data-pig-select=\"000254\"]",
+        "[data-pig-select=\"000267\"]",
+        "[data-action=\"actions\"]"
+      ]
     },
     {
       "id": "inspection.review-selected",
@@ -1410,6 +1424,7 @@
       "preset": "walk",
       "steps": [
         "[data-pig-select=\"000254\"]",
+        "[data-pig-select=\"000267\"]",
         "[data-action=\"review-sheet\"]"
       ],
       "figma": "",
@@ -1431,18 +1446,22 @@
                 "shows": "The sheet closes and the selection clears"
               }
             ],
-            "logic": "Pig row shows the raw stage name (\"Gestating\"), not the list's stage-and-days text.",
+            "logic": "Pig rows use the same stage and compact elapsed days as the walk.",
             "at": "Selected"
           }
         ],
-        "controls": [],
+        "controls": [
+          {
+            "control": "Actions",
+            "does": "opens Actions for the same ticked pigs; Back returns to this review",
+            "goesTo": "inspection.actions"
+          }
+        ],
         "copy": [
           "Selected (raw)",
           "Clear (raw)"
         ],
-        "issues": [
-          "Stage shown as \"Gestating\" while the list shows \"Gestation\"."
-        ]
+        "issues": []
       }
     },
     {
@@ -1786,17 +1805,20 @@
       "status": "in-design",
       "figma": "",
       "notes": {
-        "purpose": "The pen record: its FAULTS row quotes the open fault; the fault line opens the fault's own record.",
+        "purpose": "Open the pen page when it has an open device fault. The fault row is under Needs attention.",
         "rules": [
-          "The page reads, the record acts: Resolve is not on the verb sheet.",
-          "Three doors reach a fault record: this row, the unit sheet's Equipment row, and the report picker's redirect on an already-faulted device."
+          "A fault row opens that fault. Fault in the pen tools opens the report form."
         ],
-        "issues": [
-          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it.",
-          "The Astra prototype's own pen-faults view is built but no control opens it."
-        ]
+        "edge": [
+          "The unit summary and a standalone fault list have no live entry."
+        ],
+        "issues": []
       },
-      "url": "/ux/archive/workflows.html?sec=wf-resolve-fault&slide=1"
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"C2\"]"
+      ]
     },
     {
       "id": "inspection.fault-report",
@@ -1805,19 +1827,23 @@
       "status": "in-design",
       "figma": "",
       "notes": {
-        "purpose": "Report a device fault in one pen: device, description, photos.",
+        "purpose": "Report equipment that is not working in this pen.",
         "rules": [
-          "Choosing a device that already has a fault opens its existing fault record instead of an error.",
-          "Severity, category, assignee and due date are left out on purpose; photos are new."
+          "Choose a device and write a description. On save the fault is listed on the pen and in Pen log. Back retains the draft."
         ],
         "edge": [
-          "Description is required for every device type."
+          "Choosing an already open registered device opens its existing fault record, with any resolution draft kept."
         ],
         "issues": [
-          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+          "Photos and the device registry in the earlier deck are not part of this prototype."
         ]
       },
-      "url": "/ux/archive/workflows.html?sec=wf-fault&slide=2"
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"C1\"]",
+        "[data-action=\"new-fault\"][data-value=\"C1\"]"
+      ]
     },
     {
       "id": "inspection.fault-resolve",
@@ -1826,26 +1852,27 @@
       "status": "in-design",
       "figma": "",
       "notes": {
-        "purpose": "Read one fault and resolve it with an optional note.",
+        "purpose": "Read one open fault and resolve it with an optional note.",
         "rules": [
-          "Resolved-by and resolved-at stamp automatically; nothing else is asked.",
-          "One record at a time: typed devices hold at most one open fault, and \"Other\" records name different objects."
+          "Resolve returns to the pen. Pen log keeps the report and resolution."
         ],
         "edge": [
-          "Same-device bulk resolve is unprovable until a device registry exists (OQ3 in the deck)."
+          "There is no bulk resolve control."
         ],
-        "issues": [
-          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it.",
-          "The Astra prototype's own fault-resolve view is built but no control opens it."
-        ]
+        "issues": []
       },
-      "url": "/ux/archive/workflows.html?sec=wf-resolve-fault&slide=2"
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"C2\"]",
+        "[data-action=\"fault-record\"]"
+      ]
     },
     {
       "id": "inspection.pen-actions",
       "name": "Pen actions",
       "zh": "点选栏位操作",
-      "status": "in-design",
+      "status": "earlier",
       "url": "/ux/archive/workflows.html?sec=wf-fault&slide=1",
       "figma": "",
       "notes": {
@@ -1855,7 +1882,7 @@
           "Feed is not a verb here; a feed change is the consequence of a case."
         ],
         "issues": [
-          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+          "Earlier deck: pen and pig actions shared one menu. The current pen header opens the pen tools and only pigs are selected for Actions."
         ]
       }
     },
@@ -1864,62 +1891,80 @@
       "name": "Report fault · other device",
       "zh": "上报故障 · 其他设备",
       "status": "in-design",
-      "url": "/ux/archive/workflows.html?sec=wf-fault&slide=3",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "Report a fault on a device that is not in the list: a Device name field appears under the trigger.",
+        "purpose": "Report a fault when the device is not one of the listed choices.",
         "rules": [
-          "Description stays required."
+          "Other equipment adds a required Device name; the description is still required. Back retains both fields."
         ],
-        "edge": [
-          "Free-text names can repeat-report the same device; promoting recurring names to registered devices is console scope (OQ3 in the deck)."
-        ],
-        "issues": [
-          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
-        ]
-      }
+        "edge": [],
+        "issues": []
+      },
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"C1\"]",
+        "[data-action=\"new-fault\"][data-value=\"C1\"]",
+        "[data-picker-key=\"device\"]",
+        "[data-action=\"picker-select\"][data-value=\"Other\"]"
+      ]
     },
     {
       "id": "inspection.fault-flag",
       "name": "Unit list · fault marked",
       "zh": "单元列表 · 故障标记",
       "status": "in-design",
-      "url": "/ux/archive/workflows.html?sec=wf-fault&slide=4",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "The unit list after reporting: the pen row carries a fault mark.",
+        "purpose": "Return to the walk after reporting. The pen band shows the open equipment fault beside any note signal.",
         "rules": [
-          "No toast: the mark and the row are the feedback; the walk returns to the same scroll position with the selection cleared.",
-          "Device name, reporter and time live on the pen record, whose history gains \"Fault · reported\"."
+          "The same pen door opens its fault under Needs attention. The mark leaves when there are no open faults."
         ],
-        "issues": [
-          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
-        ]
-      }
+        "edge": [],
+        "issues": []
+      },
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"C1\"]",
+        "[data-action=\"new-fault\"][data-value=\"C1\"]",
+        "[data-picker-key=\"device\"]",
+        "[data-action=\"picker-select\"][data-value=\"Feeding station\"]",
+        {
+          "fill": "[data-v2=\"description\"]",
+          "text": "Feeder jams when the gate opens."
+        },
+        "[data-action=\"save-fault\"]",
+        "[data-action=\"back\"]"
+      ]
     },
     {
       "id": "inspection.fault-resolved",
       "name": "Pen record · fault resolved",
       "zh": "栏位记录 · 故障已解决",
       "status": "in-design",
-      "url": "/ux/archive/workflows.html?sec=wf-resolve-fault&slide=3",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "figma": "",
       "notes": {
-        "purpose": "The pen record after Resolve: the Faults section prints \"none open\"; history holds both ends of the fault.",
+        "purpose": "Read the pen after its last fault has been resolved.",
         "rules": [
-          "The empty section prints \"— none open\" instead of vanishing; the mark leaves the pen card the moment Resolve commits.",
-          "No toast, no banner: the record updates where it sat."
+          "The resolved row and its header indicator are gone; Pen log retains the fault history."
         ],
-        "issues": [
-          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
-        ]
-      }
+        "edge": [],
+        "issues": []
+      },
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"C2\"]",
+        "[data-action=\"fault-record\"]",
+        "[data-action=\"close-fault\"]"
+      ]
     },
     {
       "id": "inspection.set-count",
       "name": "Set count",
       "zh": "设置头数",
-      "status": "in-design",
+      "status": "earlier",
       "url": "/ux/archive/workflows.html?sec=wf-count&slide=1",
       "figma": "",
       "notes": {
@@ -1933,7 +1978,7 @@
           "A fully tagged pen derives its count from placements, so the verb sits in the not-available line."
         ],
         "issues": [
-          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+          "Earlier deck: there is no current Set count entry in Sentri-UI Inspection."
         ]
       }
     },
@@ -1941,7 +1986,7 @@
       "id": "inspection.set-count-batches",
       "name": "Set count · several batches",
       "zh": "设置头数 · 多个批次",
-      "status": "in-design",
+      "status": "earlier",
       "url": "/ux/archive/workflows.html?sec=wf-count&slide=2",
       "figma": "",
       "notes": {
@@ -1952,7 +1997,7 @@
           "A row's remove control appears only at 0, and a 0-row drops on close."
         ],
         "issues": [
-          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+          "Earlier deck: assigning a pen count to production batches is not a live Inspection route."
         ]
       }
     },
@@ -1960,7 +2005,7 @@
       "id": "inspection.set-count-fewer",
       "name": "Set count · why fewer",
       "zh": "设置头数 · 减少原因",
-      "status": "in-design",
+      "status": "earlier",
       "url": "/ux/archive/workflows.html?sec=wf-count&slide=3",
       "figma": "",
       "notes": {
@@ -1971,7 +2016,7 @@
           "Closing records one event with the old to new pair and the reason."
         ],
         "issues": [
-          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+          "Earlier deck: a lower pen count is not a live Inspection route."
         ]
       }
     },
@@ -1979,7 +2024,7 @@
       "id": "inspection.set-count-more",
       "name": "Set count · why more",
       "zh": "设置头数 · 增加原因",
-      "status": "in-design",
+      "status": "earlier",
       "url": "/ux/archive/workflows.html?sec=wf-count&slide=4",
       "figma": "",
       "notes": {
@@ -1991,7 +2036,7 @@
           "A pen with no tagged head prints no floor line; a mixed pen edits only its untagged remainder."
         ],
         "issues": [
-          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+          "Earlier deck: a higher pen count is not a live Inspection route."
         ]
       }
     },
@@ -1999,7 +2044,7 @@
       "id": "inspection.count-recorded",
       "name": "Pen record · count set",
       "zh": "栏位记录 · 头数已设",
-      "status": "in-design",
+      "status": "earlier",
       "url": "/ux/archive/workflows.html?sec=wf-count&slide=5",
       "figma": "",
       "notes": {
@@ -2008,7 +2053,7 @@
           "No banner, no discrepancy state: the history line carries who set it and the old to new pair."
         ],
         "issues": [
-          "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
+          "Earlier deck: the confirmation is not a live Inspection route."
         ]
       }
     },
@@ -2311,6 +2356,127 @@
         "edge": [
           "The Resolved state is built but no door reaches it: a resolved fault leaves the pen page, and pen log entries are not links.",
           "A typed resolution note is kept for that fault through Back, until Resolve fault."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.lookup-outside",
+      "name": "Scan · pig outside the unit",
+      "zh": "扫码 · 异单元猪只",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "lookup-outside",
+      "steps": [],
+      "notes": {
+        "purpose": "Identify an outside animal without adding it to the current selection.",
+        "rules": [
+          "One row opens the decision sheet; there is no second button or checkbox."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.lookup-move",
+      "name": "Pig in another unit",
+      "zh": "猪只在其他单元",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "lookup-outside",
+      "steps": [
+        "[data-action=\"lookup-exception\"][data-value=\"000430\"]"
+      ],
+      "notes": {
+        "purpose": "Check the ear tag and its recorded place; view the record or choose how to move it.",
+        "rules": [
+          "Move only preserves the selection. Move and select waits for a confirmed receipt."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.lookup-move-pens",
+      "name": "Destination pen",
+      "zh": "选择目标栏",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "lookup-outside",
+      "steps": [
+        "[data-action=\"lookup-exception\"][data-value=\"000430\"]",
+        "[data-action=\"lookup-move-mode\"][data-value=\"select\"]"
+      ],
+      "notes": {
+        "purpose": "Find a registered destination in the inspected unit.",
+        "rules": [
+          "The full-screen list remains searchable when it contains many pens. Selecting a pen does not commit a move."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.lookup-move-confirm",
+      "name": "Move and select · review",
+      "zh": "移入并选中 · 核对",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "lookup-outside",
+      "steps": [
+        "[data-action=\"lookup-exception\"][data-value=\"000430\"]",
+        "[data-action=\"lookup-move-mode\"][data-value=\"select\"]",
+        {
+          "fill": "[data-move-pen-search]",
+          "text": "C12"
+        },
+        "[data-action=\"lookup-move-pen\"][data-value=\"C12\"]"
+      ],
+      "notes": {
+        "purpose": "Review the pig and the source and destination before submitting.",
+        "rules": [
+          "Back preserves the selected destination and search."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.lookup-move-result",
+      "name": "Move confirmed",
+      "zh": "转舍已确认",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "lookup-outside",
+      "steps": [
+        "[data-action=\"lookup-exception\"][data-value=\"000430\"]",
+        "[data-action=\"lookup-move-mode\"][data-value=\"select\"]",
+        {
+          "fill": "[data-move-pen-search]",
+          "text": "C12"
+        },
+        "[data-action=\"lookup-move-pen\"][data-value=\"C12\"]",
+        "[data-action=\"lookup-move-confirm\"]"
+      ],
+      "notes": {
+        "purpose": "Show the prototype receipt and what happened to this selection.",
+        "rules": [
+          "Only a confirmed receipt updates the location and, in the select mode, the selection. Offline, failure, denial and uncertain are simulated alternatives."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "inspection.farrowing-record",
+      "name": "Farrowing record from Inspection",
+      "zh": "从巡检打开分娩记录",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "batch-farrowing",
+      "steps": [
+        "[data-action=\"pig\"][data-value=\"000281\"]",
+        "[data-action=\"open-farrowing\"]"
+      ],
+      "notes": {
+        "purpose": "Open the matching sow’s record from her current tasks or Actions.",
+        "rules": [
+          "Validate batch, unit and ear tag. The sheet returns to its Inspection entry. No eligible matching record gives an unavailable state."
         ],
         "issues": []
       }

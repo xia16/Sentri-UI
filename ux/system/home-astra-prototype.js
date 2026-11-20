@@ -437,7 +437,7 @@
 
   // Today's closed tasks (completed or ended early in farm time): each opens its receipt. Older receipts live in Records.
   // To treat / Monitoring: the marked pigs across units, one card per unit under its section heading (as Farrowing's scan and search; Row · Animal: tag over pen and care, the condition tag right).
-  // A pig opens its unit's walk on the Health lens, where it is treated or its mark changed.
+  // A pig opens that tag's record, with the finding shown on this row.
   // To treat / Monitoring is a list page (owner, 2026-10-20: "what if we have 100 pigs?… everything goes inside the filter, search
   // bar at top, flat list"): the search at the top with the filter beside it, then today's list, one card per unit, pigs in walking order.
   const careShort={'Hospital pen':'Hospital','Treat in place':'In place'};
@@ -454,7 +454,7 @@
     if(!shown.length)return `<div class="mk-empty">${SentriUI.choiceEmpty(state.marked.q?(markedFilterCount(state.marked.filter)?'The filter may be hiding it.':'Check the ear tag, or scan it.'):'No pig matches the filter.',{title:'No pigs found',icon:'search'})}${markedFilterCount(state.marked.filter)?SentriUI.button({register:'text',label:'Show all pigs',action:'marked-reset'}):''}</div>`;
     return [...new Set(shown.map(p=>p.unit))].map(u=>SentriUI.heading({title:'Unit '+u,kind:'section',level:3})+SentriUI.rowGroup(shown.filter(p=>p.unit===u).map(p=>
       // Plain tags: the title says what to do, so no row is coloured; "1d" marks a pig waiting since yesterday.
-      SentriUI.row({variant:'animal',code:p.tag,description:['Pen '+p.pen,careShort[p.care]||'',p.wait?p.wait+'d':''].filter(Boolean).join(' · '),right:{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]},action:'marked-pig',value:String(p.unit)})).join(''))).join('');
+      SentriUI.row({variant:'animal',code:p.tag,description:['Pen '+p.pen,careShort[p.care]||'',p.wait?p.wait+'d':''].filter(Boolean).join(' · '),right:{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]},action:'marked-pig',value:p.tag,attrs:{'data-entry':'pig-profile'}})).join(''))).join('');
   }
   function markedPage(){
     const m=state.marked,n=markedFilterCount(m.filter),title=m.kind==='treat'?'To treat':'Monitoring';
@@ -640,7 +640,7 @@
      A pig opens her pig record (the owner, 2026-10-20). */
   // A marked condition keeps the urgency Inspection's walk gives it: to treat acts now, monitoring is watched.
   const lookupPigs=()=>{const seen=new Map(),m=markedPigs[state.section]||{};
-    [['treat','act'],['monitor','watch']].forEach(([k,level])=>(m[k]||[]).forEach(p=>seen.set(p.tag,{tag:p.tag,pen:p.pen,unit:p.unit,cond:p.cond,level})));
+    [['treat','act'],['monitor','watch']].forEach(([k,level])=>(m[k]||[]).forEach(p=>seen.set(p.tag,{...p,level})));
     tasks.filter(t=>t.section===state.section).forEach(t=>Object.keys(t.counts).forEach(u=>taskRecords(t,+u).forEach(r=>{if(!seen.has(r.id))seen.set(r.id,{tag:r.id,pen:r.pen,unit:+u,cond:''});})));
     return [...seen.values()];};
   // A plain "Unit 7" heading per unit, the unit the worker is in first; under it one card per pen in walking order, the pen code and how
@@ -678,9 +678,10 @@
   function scanActions(){const n=lookup.scan.picked.length;drawer('Actions',SentriUI.rowGrid([['transfer','Transfer'],['condition','Condition'],['treat','Treat'],['note','Note']].map(([k,label])=>({label,title:label+' · '+n+' '+(n===1?'pig':'pigs'),icon:icon(k),action:'scan-act',value:label,attrs:k==='transfer'?{'data-entry':'move'}:{}})),{label:'Actions for the ticked pigs'}),{surface:'menu'});overlay.querySelector('.sheet')?.classList.add('scan-actions-sheet');}
   /* A pig's record: the Inspection pig record, embedded as Farrowing embeds it. Its own Back returns here. */
   function pigPage(){return '<iframe class="home-pig-frame" frameborder="0" title="Pig record · '+esc(state.pig)+'" src="inspection-astra-concept.html?layout=focus&embed=sow'+(params.get('lang')==='zh'?'&lang=zh':'')+'"></iframe>';}
-  function connectPig(){const frame=app.querySelector('.home-pig-frame');if(!frame)return;const p=lookupPigs().find(x=>x.tag===state.pig);if(!p)return;
-    frame.addEventListener('load',()=>frame.contentWindow.postMessage({type:'open-sow-detail',record:{id:p.tag,pen:p.pen,unit:'Unit '+p.unit,stage:({gestation:'Gestating',breeding:'Open',farrowing:'Lactating',nursery:'Nursery'})[state.section]||'',events:[]},tasks:[],destinations:section().units.map(u=>({id:u,name:'Unit '+u,pens:[]})),entry:'pig',actions:[]},location.origin),{once:true});}
-  window.addEventListener('message',e=>{if(e.origin!==location.origin||state.page!=='pig'||e.data?.type!=='sow-detail-close')return;back();});
+  function connectPig(){const frame=app.querySelector('.home-pig-frame');if(!frame)return;const p=(navStack.at(-1)?.page==='marked'?markedAll().find(x=>x.tag===state.pig):null)||lookupPigs().find(x=>x.tag===state.pig);if(!p)return;
+    const findings=p.cond?[{name:p.cond,kind:'Symptom',triage:p.care||(p.level==='act'?'Treat in place':'Monitor'),issueStatus:'attention',day:Math.max(p.wait||0,1)}]:[];
+    frame.addEventListener('load',()=>frame.contentWindow.postMessage({type:'open-sow-detail',record:{id:p.tag,pen:p.pen,unit:'Unit '+p.unit,stage:({gestation:'Gestating',breeding:'Open',farrowing:'Lactating',nursery:'Nursery'})[state.section]||'',events:[],findings},tasks:[],destinations:section().units.map(u=>({id:u,name:'Unit '+u,pens:[]})),entry:'pig',actions:[]},location.origin),{once:true});}
+  window.addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==app.querySelector('.home-pig-frame')?.contentWindow||state.page!=='pig'||e.data?.type!=='sow-detail-close')return;back();});
   function chat(question){state.assistantTab='chat';state.chat.push({who:'user',text:question},{who:'assistant',text:'This is a preview of the conversation entrance. In the connected app, I would use your current '+(state.workUnit?'Unit '+state.workUnit:section().name)+' context to investigate this request and ask for any missing details. No analysis or farm action has been performed.'});render();const scroller=app.querySelector('.app-scroll');scroller.scrollTop=scroller.scrollHeight;}
   SentriUI.holdBind(document.body,{onCommit(el){if(el.dataset.action==='confirm-end-task'){task().terminatedAt='Today · just now';closeDrawer();goHome();}}});
   document.addEventListener('click',e=>{
@@ -696,7 +697,7 @@
     if(a==='schedule-row'){scheduleRow(v);return;}
     if(a==='closed-task'){closeDrawer();openTask(v);return;}
     if(a==='closed-today'){closedToday();return;}
-    // Marked pigs: one list across units; a pig opens its unit's walk on the Health lens.
+    // Marked pigs: the row opens that animal, while Inspect unit opens the unit.
     if(a==='to-treat'||a==='monitoring'){openMarked(a==='to-treat'?'treat':'monitor');return;}
     if(a==='marked-filter'){state.marked.draft={...state.marked.filter};state.marked.picking=false;returnFocus=null;markedFilter();return;}
     // Scanner preview: a scan fills the search with the tag read, so the list shows that pig.
@@ -709,8 +710,7 @@
     if(a==='mk-reset'){state.marked.draft=markedDefaults();markedFilter();return;}
     if(a==='mk-apply'){state.marked.filter={...state.marked.draft};closeDrawer();render();return;}
     if(a==='marked-reset'){state.marked.filter=markedDefaults();state.marked.q='';render();return;}
-    // Back from the pig's walk reopens this list (openDesigned's returnSheet).
-    if(a==='marked-pig'){openDesigned('inspection-astra-concept.html',+v,'unit','Health','',state.marked.kind);return;}
+    if(a==='marked-pig'){if(markedAll().some(p=>p.tag===v))push('pig',{pig:v});return;}
     if(a==='toggle-tasks'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;state.expandedTasks=!state.expandedTasks;render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
     if(a==='toggle-upcoming'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;state.expandedUpcoming=!state.expandedUpcoming;render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
     if(a==='end-task-early'){dialog('End task early?','Unfinished work will remain incomplete. Existing records are kept.',{label:'End task early',action:'confirm-end-task'});return;}

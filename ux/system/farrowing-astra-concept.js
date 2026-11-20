@@ -232,6 +232,12 @@ function closeTask(c,at=new Date().toISOString()){
 }
 globalThis.FarrowingStudy={seed,act,cleanWeight,normWeight,born,floor,canUndo,lastSave,hasDraft,penLogEvents,taskClosureReview,closeTask,sowActionCatalogue,leftTask};
 if(typeof document==='undefined')return;
+const handoffParams=new URLSearchParams(location.search);
+const inspectionHandoff=window.parent!==window&&handoffParams.get('embed')==='inspection';
+if(inspectionHandoff){
+ document.documentElement.classList.add('inspection-embedded');
+ document.documentElement.setAttribute('data-atlas-pending','');
+}
 // The atlas follows the demo (?screen=): which of the feature's screens this state is. Null when no screen is that state.
 function atlasScreen(s,c){
  const v=s.view;
@@ -383,7 +389,11 @@ function switchRoomUnit(c,id){
 function roomContext(s){
  const i=states.indexOf(s);if(roomContexts[i])return roomContexts[i];
  const fixtures=[['count','000418','B1',3,11,'Due today · day 114'],['before','000392','B2',5,11,'Due tomorrow · day 113'],['before','000455','B4',2,12,'Due today · day 114'],['before','000431','B4',6,9,'Overdue · 3 days · day 117'],['before','000467','B4',5,10,'Due in 2 days · day 112'],['locked','000406','B3',4,13,'Due yesterday · day 115'],['ended','000399','B3',4,10,'Due yesterday · day 115']];
- const records=fixtures.map(([p,tag,pen,parity,lastBorn,due])=>{if(s.tag===tag){s.lastBorn=lastBorn;return s;}const r=seed(p);Object.assign(r,{tag,pen,parity,lastBorn,due,view:'room'});if(tag==='000406'){r.alive=11;r.dead=[1,0,1,0,0,0,0];r.frozen=13;r.finished='Today · 05:58';r.events=[{text:'Farrowing finished · born 13',day:'Today',time:'05:58',who:'G. Hansen',kind:'milestone'}];}return r;});
+ // The Inspection batch-20 showcase and this room share these sample active records only in the handoff host.
+ if(i===0&&inspectionHandoff){
+  fixtures.push(['count','000281','C1',4,11,'Due today · day 114'],['count','000306','C2',5,11,'Due today · day 114'],['before','000312','C2',2,12,'Due tomorrow · day 113']);
+ }
+ const records=fixtures.map(([p,tag,pen,parity,lastBorn,due])=>{if(s.tag===tag){s.lastBorn=lastBorn;return s;}const r=seed(p);Object.assign(r,{tag,pen,parity,lastBorn,due,view:'room'});if(inspectionHandoff&&['000281','000306','000312'].includes(tag))restoreDraft(r);if(tag==='000406'){r.alive=11;r.dead=[1,0,1,0,0,0,0];r.frozen=13;r.finished='Today · 05:58';r.events=[{text:'Farrowing finished · born 13',day:'Today',time:'05:58',who:'G. Hansen',kind:'milestone'}];}return r;});
  if(!records.includes(s))records.unshift(s);
  const context=roomContexts[i]={unitId:'7',bornAliveTarget:12,units:[sampleUnit('6',3,1,4,{2:'004318',6:'000437'}),{id:'7',name:'Unit 7',records,livePerLitter:10},sampleUnit('8',2,0,2,{0:'000943'})],unitPositions:{},get unit(){return this.units.find(u=>u.id===this.unitId)},get records(){return this.unit.records},get listed(){return this.unit.records.filter(onList)},lens:'All',filter:defaultRoomFilter(),filterDraft:defaultRoomFilter(),currentPen:s.pen,scroll:0,query:'',jump:null};
  scanSetup(context,s.preset);
@@ -690,32 +700,32 @@ function penSubpage(s,c){
  const sheet=(title,body,action='')=>roomSheet(title,body,feedPage?pageFooter(action):footer(SentriUI.backButton({action:'room-back'}),action),feedPage?'pen-feed-page':['roomPenNote','roomPenReadNote'].includes(s.view)?'pen-form-sheet pen-note-sheet':'pen-form-sheet');
  if(s.view==='roomPenFeed')return sheet('Feed guidance',pe.feed?`<section class="pen-detail-section">${SentriUI.heading({title:'Feeding',icon:icon('feed'),kind:'section',level:4})}${SentriUI.facts([{label:'Formula',value:pe.feed.formula},{label:'Method',value:pe.feed.mode}])}${pe.feed.guidance?SentriUI.panel(`<p class="pen-detail-copy">${esc(pe.feed.guidance)}</p>`):''}</section>`:'<p class="detail-empty">No feed guidance recorded for this pen.</p>');
  if(s.view==='roomPenReadNote')return sheet('Pen note',noteCard(pe.note,pe.noteBy,noteUntil(pe.noteDays).replace('Until','Shows until'),'clock','room-pen-note'),btn('room-pen-close-note','Close note','button primary'));
- if(s.view==='roomPenNote')return sheet('Pen note',SentriUI.field({label:'Note',control:`<textarea class="st-note-input" data-pen-field="note">${esc(draft.note||'')}</textarea>`,className:'pen-field'})+noteDaysField(draft),btn('room-pen-save-note','Save note','button primary','',!draft.note?.trim()));
- if(s.view==='roomPenFault')return sheet('Report fault',`${SentriUI.pickerField({label:'Device',value:draft.device||'',placeholder:'Select',key:'pen:device',className:'pen-field'})}${draft.device==='Other'?SentriUI.field({label:'Device name',control:`<input data-pen-field="name" value="${esc(draft.name||'')}">`,className:'pen-field'}):''}${SentriUI.field({label:'Description',control:`<textarea data-pen-field="description" placeholder="What is broken or not working?">${esc(draft.description||'')}</textarea>`,className:'pen-field'})}`,btn('room-pen-save-fault','Report fault','button primary','',!validPenFault(draft)));
+ if(s.view==='roomPenNote')return sheet('Pen note',SentriPenTools.noteField(draft,'data-pen-field','pen-field')+noteDaysField(draft),btn('room-pen-save-note','Save note','button primary','',!draft.note?.trim()));
+ if(s.view==='roomPenFault'){
+  const picker=SentriUI.pickerField({label:'Device',value:draft.device||'',placeholder:'Select',key:'pen:device',className:'pen-field'});
+  return sheet('Report fault',SentriPenTools.faultFields(draft,picker,'data-pen-field','pen-field'),btn('room-pen-save-fault','Report fault','button primary','',!validPenFault(draft)));
+ }
  if(s.view==='roomPenFaultRecord'){
   const f=pe.faults.find(x=>x.id===c.penFaultId);if(!f)return sheet('Equipment fault','<p class="detail-empty">No fault found.</p>');
-  return sheet(f.device,`<div class="st-panel"><p class="pen-detail-copy">${esc(f.description)}</p><p class="pen-detail-meta">${f.open?'Open':'Resolved'} · Reported ${f.time} · ${esc(initials(f.who))}</p>${!f.open&&f.resolution?`<p class="pen-detail-copy">${esc(f.resolution)}</p>`:''}</div>${f.open?SentriUI.optionalRow({label:'Resolution note',value:draft.resolution||'',open:!!draft.resolution?.trim(),inline:SentriUI.field({label:'Resolution note',labelHidden:true,control:`<textarea data-pen-field="resolution">${esc(draft.resolution||'')}</textarea>`,className:'pen-field'})}):''}`,f.open?btn('room-pen-resolve-fault','Resolve fault','button primary'):'');
+  return sheet(f.device,SentriPenTools.faultReportCard(f)+`${f.open?SentriUI.optionalRow({label:'Resolution note',value:draft.resolution||'',open:!!draft.resolution?.trim(),inline:SentriUI.field({label:'Resolution note',labelHidden:true,control:`<textarea data-pen-field="resolution">${esc(draft.resolution||'')}</textarea>`,className:'pen-field'})}):''}`,f.open?btn('room-pen-resolve-fault','Resolve fault','button primary'):'');
  }
  return null;
 }
 /* Pen note life (proposal, 2026-11-03), as Inspection's pen page: a note shows for a chosen time, 1 week unless the writer picks
    another, then leaves the pen page and stays in the pen log. The study's day is Inspection's walk day, so the dates stay put. */
 const NOTE_DAY='2026-09-12';   // the study's day is Inspection's walk day, so the dates stay put
-const NOTE_DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],NOTE_MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-function noteEnd(n){const d=new Date(NOTE_DAY+'T12:00:00');d.setDate(d.getDate()+n);return d;}
-function noteUntil(n=7){const d=noteEnd(n);return 'Until '+NOTE_DAYS[d.getDay()]+' '+d.getDate()+' '+NOTE_MONTHS[d.getMonth()];}
-function noteMeta(pe){return pe.noteBy+' · until '+NOTE_DAYS[noteEnd(pe.noteDays||7).getDay()];}
-function noteDaysField(d){const n=d.days||7;return '<div class="st-panel st-note-days">'+SentriUI.stepper({label:'Show for',description:n+(n===1?' day':' days')+' · '+noteUntil(n),value:n,min:1,max:60,action:'room-pen-note-days',key:'days',variant:'row'})+'</div>';}
-/* A note read in full: who and when on top, the note at reading size, how long it shows at the foot; the pencil edits it. */
-function noteCard(text,by,foot,footIcon,editAction){const [name,...when]=String(by||'').split(' · ');return '<div class="st-panel st-note"><div class="st-note-head"><p class="st-note-by"><b>'+esc(name)+'</b>'+(when.length?' · '+esc(when.join(' · ')):'')+'</p>'+(editAction?SentriUI.iconButton({variant:'plain',icon:icon('edit'),label:'Edit note',action:editAction}):'')+'</div><p class="st-note-text">'+esc(text)+'</p><p class="st-note-foot">'+icon(footIcon)+esc(foot)+'</p></div>';}
-function validPenFault(draft){return !!draft.device&&!!draft.description?.trim()&&(draft.device!=='Other'||!!draft.name?.trim());}
+const noteUntil=(n=7)=>'Until '+SentriPenTools.dateText(NOTE_DAY,n);
+const noteMeta=pe=>SentriPenTools.noteMeta(NOTE_DAY,pe);
+const noteDaysField=d=>SentriPenTools.noteDaysField(NOTE_DAY,d,'room-pen-note-days');
+const noteCard=(...args)=>SentriPenTools.noteCard(...args);
+const validPenFault=draft=>SentriPenTools.faultReady(draft);
 function handlePenAction(s,c,a,v){
  const destinations={'room-pen-feed':'roomPenFeed','room-pen-read-note':'roomPenReadNote','room-pen-note':'roomPenNote','room-pen-fault':'roomPenFault','room-pen-fault-record':'roomPenFaultRecord'};
- if(destinations[a]){const keep=(c.penKeeps||{})[destinations[a]+'|'+c.detailPen+(a==='room-pen-fault-record'?'|'+v:'')];c.penDraft=keep?clone(keep):a==='room-pen-note'?{note:penInfo(c).note,days:penInfo(c).noteDays||7}:{};if(a==='room-pen-fault-record')c.penFaultId=v;s.view=destinations[a];return;}
- if(a==='room-pen-save-note'&&c.penDraft?.note?.trim()){const pe=penInfo(c),note=c.penDraft.note.trim();penEvent(c,pe.note?'Pen note updated':'Pen note added',note);pe.note=note;pe.noteBy='G. Hansen · today 09:41';pe.noteDays=c.penDraft.days||7;delete c.penKeeps?.['roomPenNote|'+c.detailPen];s.view='roomPenDetail';}
+ if(destinations[a]){if(a==='room-pen-note')c.noteReturn=s.view;const keep=(c.penKeeps||{})[destinations[a]+'|'+c.detailPen+(a==='room-pen-fault-record'?'|'+v:'')];c.penDraft=keep?clone(keep):a==='room-pen-note'?{note:penInfo(c).note,days:penInfo(c).noteDays||7}:{};if(a==='room-pen-fault-record')c.penFaultId=v;s.view=destinations[a];return;}
+ if(a==='room-pen-save-note'&&c.penDraft?.note?.trim()){const pe=penInfo(c),note=c.penDraft.note.trim();penEvent(c,pe.note?'Pen note updated':'Pen note added',note);pe.note=note;pe.noteBy='G. Hansen · today 09:41';pe.noteDays=c.penDraft.days||7;delete c.penKeeps?.['roomPenNote|'+c.detailPen];s.view=c.noteReturn==='roomPenReadNote'?'roomPenReadNote':'roomPenDetail';}
  if(a==='room-pen-note-days'&&c.penDraft){c.penDraft.days=Math.max(1,Math.min(60,(c.penDraft.days||7)+(noteStep||0)));}
  if(a==='room-pen-close-note'){const pe=penInfo(c);if(pe.note){penEvent(c,'Pen note closed',pe.note);pe.note='';pe.noteBy='';}s.view='roomPenDetail';}
- if(a==='room-pen-save-fault'&&validPenFault(c.penDraft)){const d=c.penDraft,pe=penInfo(c),fault={id:String(pe.faults.length+1),device:d.device==='Other'?d.name.trim():d.device,description:d.description.trim(),time:'09:41',who:'G. Hansen',open:true};pe.faults.push(fault);penEvent(c,'Equipment fault reported',fault.device+' · '+fault.description);delete c.penKeeps?.['roomPenFault|'+c.detailPen];s.view='roomPenDetail';}
+ if(a==='room-pen-save-fault'&&validPenFault(c.penDraft)){const d=c.penDraft,pe=penInfo(c),fault={id:String(pe.faults.length+1),deviceId:d.device,device:d.device==='Other'?d.name.trim():d.device,description:d.description.trim(),time:'09:41',who:'G. Hansen',open:true};pe.faults.push(fault);penEvent(c,'Equipment fault reported',fault.device+' · '+fault.description);delete c.penKeeps?.['roomPenFault|'+c.detailPen];s.view='roomPenDetail';}
  if(a==='room-pen-resolve-fault'){const f=penInfo(c).faults.find(x=>x.id===c.penFaultId);if(f?.open){f.open=false;f.resolution=c.penDraft.resolution?.trim()||'';penEvent(c,'Equipment fault resolved',f.device+(f.resolution?' · '+f.resolution:''));delete c.penKeeps?.['roomPenFaultRecord|'+c.detailPen+'|'+f.id];s.view='roomPenDetail';}}
 }
 /* A log group is a day: Today, Yesterday, a weekday, or a date ("Aug 27"). "N days ago" is turned into one of those. */
@@ -810,7 +820,7 @@ function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls
 }
 function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states[i],c=roomContext(s);if(a!=='room-pen'&&atlasStill())c.highlightUntil=0;const list=document.querySelector(`[data-card="${i}"] .room-scroll`);if(list)c.scroll=list.scrollTop;const intro=list?list.querySelector('.room-context-strip').offsetHeight+10:0;const nextScroll=c.scroll>=intro?intro:0;
   if(a==='room-sow'){const hit=findSow(c,v),r=hit?.record;if(r){const from=s.view;if(from==='roomScan'||from==='roomSearch')c.returnToTaskReview=from;states[i]=r;r.view=recordView(r);if(r.view==='history')r.pageBack='room';if(hit.unit.id===c.unitId)c.currentPen=r.pen;if(from!=='roomSearch')c.query='';}}   // Back returns to the list she was opened from; Find a sow keeps what was typed   // Farrowing is one task across its units: a sow in another unit opens the same drawer
- if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;if(from==='roomFilter')c.filterKeep=clone(c.filterDraft);if(from==='roomPenNote'||from==='roomPenFault'||from==='roomPenFaultRecord')(c.penKeeps=c.penKeeps||{})[from+'|'+c.detailPen+(from==='roomPenFaultRecord'?'|'+c.penFaultId:'')]=clone(c.penDraft||{});if(from==='roomPenDetail'&&c.penKeeps)for(const k of Object.keys(c.penKeeps))if(k.endsWith('|'+c.detailPen))delete c.penKeeps[k];s.view=from==='roomBatchPick'?'roomBatch':from==='roomScanActions'?'roomScan':from==='roomScan'&&c.scanFrom?c.scanFrom:from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
+ if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;if(from==='roomFilter')c.filterKeep=clone(c.filterDraft);if(from==='roomPenNote'||from==='roomPenFault'||from==='roomPenFaultRecord')(c.penKeeps=c.penKeeps||{})[from+'|'+c.detailPen+(from==='roomPenFaultRecord'?'|'+c.penFaultId:'')]=clone(c.penDraft||{});if(from==='roomPenDetail'&&c.penKeeps)for(const k of Object.keys(c.penKeeps))if(k.endsWith('|'+c.detailPen))delete c.penKeeps[k];s.view=from==='roomBatchPick'?'roomBatch':from==='roomScanActions'?'roomScan':from==='roomScan'&&c.scanFrom?c.scanFrom:from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPenNote'&&c.noteReturn==='roomPenReadNote')s.view='roomPenReadNote';if(from==='roomPicker')c.picker=null;}
  handlePenAction(s,c,a,v);
  if(a==='room-pen-log')s.view='roomPenLog';
  if(a==='room-pen-detail'&&c.records.some(r=>r.pen===v)){c.detailPen=v;c.currentPen=v;s.view='roomPenDetail';}
@@ -1350,7 +1360,11 @@ gallery.addEventListener('click',e=>{const el=e.target.closest('[data-action]');
  if(el.dataset.action==='open-task-sync'){if(!SentriUI.guard(el))openTaskSync();return;}
  // A waiting camera (floor-gray) answers in its hint line, shown only for the answer: long enough to read, and in view.
  if(el.dataset.action==='addPhoto'&&el.getAttribute('aria-disabled')==='true'){SentriUI.guard(el,{flash:4000});document.getElementById(el.getAttribute('aria-describedby'))?.scrollIntoView({block:'nearest'});return;}
- if(SentriUI.guard(el))return;const i=+el.closest('[data-card]').dataset.card,s=states[i];let a=el.dataset.action,v=el.dataset.value;const before=s.view,beforePopup=s.popup?.kind;if(a==='room-pen'&&s.view==='roomGrid'&&settleOnPen(i,v))return;if(roomAction(i,a,v)){render(i,s.view===before?{a,v}:null);return;}if(a==='addPhoto'){el.closest('.photo-field').querySelector('input[type=file]').click();return;}if(a==='savedPhoto'){s.popup={kind:'photo',src:v,editable:false};render(i);return;}if(a==='otherSow'){states[i]=seed('before');states[i].pen='B2';states[i].tag='000392';states[i].parity=5;states[i].due='Due tomorrow · day 113';render(i);return;}if(a==='open-picker'){const c=roomContext(s),key=el.dataset.pickerKey,configs={'pen:device':{label:'Device',options:['Feeding station','Drinking station','Other'].map(d=>[d,d]),selected:c.penDraft?.device||'',returnView:'roomPenFault'},'piglet:sex':{label:'Sex',options:[['Female','Female'],['Male','Male']],selected:s.pigletDraft?.sex||'',returnView:'pigletEdit'},'mortality:cause':{label:'Cause',options:mortalityCauses.map(x=>[x,x]),selected:s.mortalityDraft?.cause||'',returnView:'pigletDeath'}},config=configs[key];if(!config)return;c.picker={key,...config};s.view='roomPicker';render(i);return;}if(a==='picker-select'){const c=roomContext(s),p=c.picker;if(!p)return;if(p.key==='pen:device')(c.penDraft=c.penDraft||{}).device=v;else if(p.key==='piglet:sex')s.pigletDraft.sex=v;else if(p.key==='mortality:cause')s.mortalityDraft.cause=v;s.view=p.returnView;c.picker=null;render(i);return;}if(a==='returnCount'){s.view='count';}else if(a==='dismiss'){if(['death','history','profile','deathBreakdown'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else act(s,'close');}else act(s,a,v);render(i,s.view===before&&s.popup?.kind===beforePopup?{a,v}:null);if(s.view!==before){const body=el.closest('.spec')?.querySelector('.sheet-body');if(body)body.scrollTop=0;} });
+ if(SentriUI.guard(el))return;const i=+el.closest('[data-card]').dataset.card,s=states[i];let a=el.dataset.action,v=el.dataset.value;const before=s.view,beforePopup=s.popup?.kind;if(a==='room-pen'&&s.view==='roomGrid'&&settleOnPen(i,v))return;if(roomAction(i,a,v)){render(i,s.view===before?{a,v}:null);return;}if(a==='addPhoto'){el.closest('.photo-field').querySelector('input[type=file]').click();return;}if(a==='savedPhoto'){s.popup={kind:'photo',src:v,editable:false};render(i);return;}if(a==='otherSow'){states[i]=seed('before');states[i].pen='B2';states[i].tag='000392';states[i].parity=5;states[i].due='Due tomorrow · day 113';render(i);return;}if(a==='open-picker'){const c=roomContext(s),key=el.dataset.pickerKey,configs={'pen:device':{label:'Device',options:SentriPenTools.devices.map(d=>[d,d==='Other'?'Other equipment':d]),selected:c.penDraft?.device||'',returnView:'roomPenFault'},'piglet:sex':{label:'Sex',options:[['Female','Female'],['Male','Male']],selected:s.pigletDraft?.sex||'',returnView:'pigletEdit'},'mortality:cause':{label:'Cause',options:mortalityCauses.map(x=>[x,x]),selected:s.mortalityDraft?.cause||'',returnView:'pigletDeath'}},config=configs[key];if(!config)return;c.picker={key,...config};s.view='roomPicker';render(i);return;}if(a==='picker-select'){const c=roomContext(s),p=c.picker;if(!p)return;if(p.key==='pen:device'){
+ const existing=SentriPenTools.openFaultForDevice(penInfo(c),v);
+ if(existing){c.penKeeps||={};c.penKeeps['roomPenFault|'+c.detailPen]=clone(c.penDraft||{});handlePenAction(s,c,'room-pen-fault-record',existing.id);c.picker=null;render(i);return;}
+ (c.penDraft=c.penDraft||{}).device=v;
+ }else if(p.key==='piglet:sex')s.pigletDraft.sex=v;else if(p.key==='mortality:cause')s.mortalityDraft.cause=v;s.view=p.returnView;c.picker=null;render(i);return;}if(a==='returnCount'){s.view='count';}else if(a==='dismiss'){if(['death','history','profile','deathBreakdown'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else act(s,'close');}else act(s,a,v);render(i,s.view===before&&s.popup?.kind===beforePopup?{a,v}:null);if(s.view!==before){const body=el.closest('.spec')?.querySelector('.sheet-body');if(body)body.scrollTop=0;} });
 gallery.addEventListener('input',e=>{
  const field=e.target.dataset.penField;if(!field)return;
  const i=+e.target.closest('[data-card]').dataset.card,c=roomContext(states[i]);c.penDraft[field]=e.target.value;
@@ -1384,7 +1398,42 @@ document.getElementById('reset-all').onclick=()=>{states.forEach((s,i)=>{roomCon
 document.querySelectorAll('[data-layout]').forEach(b=>b.onclick=()=>{const focus=b.dataset.layout==='focus';gallery.classList.toggle('focus',focus);document.querySelectorAll('[data-layout]').forEach(x=>x.setAttribute('aria-pressed',x===b));const u=new URL(location.href);u.searchParams.set('layout',focus?'focus':'overview');window.history.replaceState(null,'',u);});
 if(new URLSearchParams(location.search).get('layout')==='focus')document.querySelector('[data-layout="focus"]').click();
 // Home opens the existing whole-task overview or the selected unit directly.
-if(window.SentriHomeLink){
+if(inspectionHandoff){
+ const c=roomContext(states[0]),tag=handoffParams.get('tag'),unit=handoffParams.get('unit'),batch=handoffParams.get('batch');
+ const hit=batch==='20'&&unit==='7'&&['000281','000306','000312'].includes(tag)?findSow(c,tag):null;
+ const draftKey='inspection-farrowing:'+batch+':'+unit+':'+tag;
+ if(hit&&hit.unit.id===unit){
+  try{
+   const previous=JSON.parse(sessionStorage.getItem(draftKey)||'null');
+   if(previous?.tag===tag&&previous.pen===hit.record.pen)Object.assign(hit.record,previous);
+  }catch{/* The fixture can still open if session storage is unavailable. */}
+  switchRoomUnit(c,unit);states[0]=hit.record;hit.record.view=recordView(hit.record);render(0);
+ }else{
+  const title=ZH?'分娩记录不可用':'Farrowing record unavailable';
+  gallery.querySelector('[data-card="0"] .phone').innerHTML=SentriUI.sheet({variant:'page',title,back:{action:'room-home'},bar:status(),footer:false,
+   body:SentriUI.choiceEmpty(ZH?'返回巡检，核对母猪耳号和当前任务。':'Return to Inspection and check the ear tag and current task.',{icon:'search'})});
+ }
+ document.documentElement.classList.add('inspection-embedded-ready');
+ document.documentElement.removeAttribute('data-atlas-pending');
+ const leave=()=>{
+  if(hit?.record.view==='count')fold(hit.record);
+  if(hit){
+   persistDraft(hit.record);
+   try{sessionStorage.setItem(draftKey,JSON.stringify(hit.record));}catch{/* This prototype can still return to its source. */}
+  }
+  window.parent.postMessage({type:'inspection-farrowing-back',tag,finished:!!hit?.record.locked},location.origin);
+ };
+ document.addEventListener('click',e=>{
+  const a=e.target.closest('[data-action]')?.dataset.action;
+  if(a==='room-home'||(['close','dismiss'].includes(a)&&hit&&!hit.record.popup&&['count','locked'].includes(hit.record.view))){
+   e.stopImmediatePropagation();leave();
+  }
+ },true);
+ document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&(!hit||['count','locked','room'].includes(hit.record.view))){e.preventDefault();e.stopImmediatePropagation();leave();}
+ },true);
+}
+if(window.SentriHomeLink&&!inspectionHandoff){
  const link=window.SentriHomeLink,c=roomContext(states[0]);
  if(link.unit){const record=switchRoomUnit(c,link.unit);if(record)states[0]=record;}
  let homeOverview=false;

@@ -27,7 +27,7 @@ No anchor. The record is the same for a pig at any stage; what changes is which 
 
 In: the record (full, partial, empty, with tasks), Production stats and a batch record, Origin, the pig Log, the Actions sheet for one pig, the task outcome form, abortion, batch membership, the measurement menu and forms, body condition, notes and the greyed-in-place states.
 
-Entry points: Inspection (a pig row, search or scan), Tasks (a sow in the Farrowing room list), Pigs (the pig list; that feature is a placeholder written elsewhere, so this entry has no source screen yet).
+Entry points: Home (To treat, Monitoring and Lookup), Inspection (a pig row, search or scan), Tasks (a sow in the Farrowing room list), Pigs (the pig list; that feature is a placeholder written elsewhere, so this entry has no source screen yet).
 
 Out: health forms and findings (health-record), feed editing and the pig's feed plan (feed-plan), the unit walk (inspection). Transfer sow, Mark not in pig and Remove from batch render only inside Farrowing's drawer. Mark not in pig is shown as a screen, opened through Farrowing's sow sheet. Remove from batch has a built page but no control opens it (Batch membership's Remove option replaced it); it is not shown.
 
@@ -41,6 +41,6 @@ Open (recorded on the screens as issues):
 
 - Next task and Batch are repeated in the task card, the grid and the type block; stage and days appear in the header, the grid and the type block.
 - Age is in days for a sow.
-- Saving a reading or a note returns to the walk list, not to the pig record; the task, abortion and batch forms return to the record.
+- Saving a reading or note from this record returns here; saves from a list return to that list and retain its selection. The task, abortion and batch forms also return to the record.
 - The pig's lifetime figures (litters, born total, rates) are in the data but not shown.
 - Mark-not-in-pig, remove-from-batch and transfer cannot be reviewed outside Farrowing.

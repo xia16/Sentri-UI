@@ -307,6 +307,7 @@ test('the pen page leads with its verbs, then what needs someone, then how the p
   const grid=html.match(/<div class="st-panel st-row-grid[^"]*"[^>]*aria-label="Pen actions"[^>]*>([\s\S]*?)<\/div><\/section>/);
   assert.ok(grid,'pen verbs as a tile grid');
   assert.deepEqual([...grid[1].matchAll(/data-action="([^"]+)"/g)].map(m=>m[1]),['pen-note','feed','pen-observe','new-fault','tick-pen']);
+  assert.doesNotMatch(html,/data-action="(?:scan|scan-pen)"/,'the pen page does not open Scan');
   const order=['Pen actions','Needs attention','>Now<','Pen log'].map(k=>html.indexOf(k));
   assert.ok(order.every((x,i)=>x>0&&(i===0||x>order[i-1])),'verbs, needs attention, now, log: '+order);
   assert.match(html,/data-action="fault-record" data-value="C1\|f1"/);
