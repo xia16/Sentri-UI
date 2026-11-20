@@ -10,7 +10,14 @@ const root=new URL('../../../',here);
 const browser=await playwright().chromium.launch();
 const lang=process.env.SENTRI_REVIEW_LANG||'en';
 const checkOnly=process.argv.includes('--check');
-const ctx=await browser.newContext({viewport:{width:Number(process.env.SENTRI_REVIEW_WIDTH)||390,height:844},reducedMotion:'reduce'});
+const width=Number(process.env.SENTRI_REVIEW_WIDTH)||390;
+const ctx=await browser.newContext({viewport:{width,height:844},reducedMotion:'reduce'});
+if(width!==390)await ctx.addInitScript(w=>{
+ document.addEventListener('DOMContentLoaded',()=>{
+  const layout=document.createElement('style');layout.textContent=`html.atlas-bare,html.atlas-bare body,html.atlas-bare .atlas-phone{width:${w}px!important}`;
+  document.head.append(layout);
+ },{once:true});
+},width);
 await routeFonts(ctx,fileURLToPath(root));
 const page=await ctx.newPage(),checks=[],errors=[];
 page.on('pageerror',e=>errors.push(e.message));
@@ -37,6 +44,9 @@ try{
   await read();assert.equal(await live('[data-scan-tag="000306"]').count(),1);assert.deepEqual(await ticks(),['000267','000306']);
   await tap('lookup-exception','000430');await shot('04-outside-choices');await tap('lookup-move-mode','select');
   assert.equal(await live(action('lookup-move-pen')).count(),48);await shot('05-choose-destination');
+  const search=live('[data-move-pen-search]'),before=await search.boundingBox();
+  await live('.destination-pen-picker .sheet-body').evaluate(el=>{el.scrollTop=el.scrollHeight;});
+  assert.equal((await search.boundingBox()).y,before.y,'filter remains above the long scrolling list');
   await live('[data-move-pen-search]').fill('XYZ');assert.equal(await live(action('lookup-move-pen')).count(),0);await shot('05a-no-matching-pens');
   await tap('lookup-move-clear');await live('[data-move-pen-search]').fill('C12');assert.equal(await live(action('lookup-move-pen')).count(),1);await shot('05b-search-C12');
   await tap('lookup-move-pen','C12');await view('lookup-move-confirm');await tap('lookup-move-change');

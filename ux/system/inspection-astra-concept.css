@@ -585,13 +585,13 @@
 .inspection-phone .reading-section>.pig-fact-grid{padding:0}
 .inspection-phone .reading-section>.compact-actions{margin:0}
 
-.inspection-phone .attention-row{display:flex;align-items:center;gap:9px;width:100%;min-height:48px;margin:0 0 6px;padding:8px 10px;border-radius:9px;background:#fcf4e5;text-align:left;color:#283225}
+.inspection-phone .attention-row{display:flex;align-items:center;gap:9px;width:100%;min-height:48px;margin:0 0 6px;padding:8px 10px;border-radius:9px;background:#fcf4e5;text-align:left}
 .inspection-phone .attention-type{flex:0 0 39px;font-size:var(--type-meta-size);color:#866029}
 .inspection-phone .attention-copy{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 .inspection-phone .attention-copy strong{font-size:var(--type-row-title-size);font-weight:600;line-height:1.4}
 .inspection-phone .attention-copy small{font-size:var(--type-meta-size);line-height:1.4;color:var(--muted)}
 .inspection-phone .attention-row>svg{width:12px;height:12px;flex-shrink:0;color:#68745d}
-.inspection-phone .recent-treatment{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px;font-size:var(--type-meta-size);color:#68745d}
+.inspection-phone .recent-treatment.recent-treatment{margin-bottom:var(--space-section)}
 
 .inspection-phone .attention-overview{margin:0 0 24px}
 .inspection-phone .attention-list>.attention-row:last-child{margin-bottom:0}
@@ -795,4 +795,4 @@
 .inspection-phone>.st-find{position:absolute;inset:0;z-index:5}
 
 /* Keep the pen search in the page gutter and outside the scrolling list. */
-.destination-pen-picker > .st-choice-search{margin:0 var(--space-gutter) var(--space-12)}
+.destination-pen-picker > [data-destination-search]{padding:0 var(--space-gutter) var(--space-12)}

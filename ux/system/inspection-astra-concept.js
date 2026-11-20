@@ -424,7 +424,9 @@ function recordCard({kind,title,meta='',badge='',copy='',qualification='',tone='
 function pigRecordCards(p){
  const ongoing=cases(p).filter(k=>!needsHealthAttention(k));
  const rows=ongoing.length?SentriUI.rowGroup(ongoing.map(k=>SentriUI.row({title:k.name,description:[Number.isFinite(k.day)?k.day+' days':'', 'No action needed'].filter(Boolean).join(' · '),action:'finding',value:p.id+'|'+k.name,trail:'chevron'})).join(''),{className:'ongoing-findings'}):'';
- return attentionOverview(p)+rows+(p.treatment?'<div class="recent-treatment"><span>Last treatment</span><strong>'+esc(p.treatment.medicine)+'</strong><small>'+esc(p.treatment.dose+' '+p.treatment.unit+' · '+p.treatment.method)+'</small></div>':'');
+ const t=p.treatment;
+ const latest=t?SentriUI.statusLine(['Last treatment',t.medicine,t.dose+' '+t.unit,t.method],{sep:'dot',className:'recent-treatment'}):'';
+ return attentionOverview(p)+rows+latest;
 }
 function currentTasksForPig(c,p){
  if(!p)return [];
@@ -1405,7 +1407,6 @@ function transferPage(c){const p=picked(c)[0],d=c.transferDraft||{},units=c.tran
 const scanSequence=['000306','000267','000430','999999','000306','003012','000254','000801','000281','000312','000802'];   // what "Simulate scan" reads, in turn
 // Inspection lookup has two explicit scopes: a unit, or a pen opened from that pen's page.
 const moveText=(en,zh)=>language==='zh'?zh:en;
-const penLabel=id=>moveText('Pen '+id,id+' 栏');
 function lookupPlacement(c,id){
  const local=c.pens.find(pe=>pe.pigs.some(p=>p.id===id));
  const unit=local?null:(c.otherUnits||[]).find(u=>u.pens.some(pe=>pe.pigs.some(p=>p.id===id)));
@@ -1431,7 +1432,7 @@ function lookupMoveLayer(c){
  const titleForMode=m.mode==='select'?moveText('Move and select','移入并选中'):moveText('Move only','只移入');
  if(c.view==='lookup-move-pens'){
   return SentriUI.sheet({variant:'page',className:'destination-pen-picker',title:moveText('Destination pen','选择目标栏'),line:{text:unitName(c)},back:{action:'back'},bar:status(),
-   above:SentriUI.choiceSearch({label:moveText('Search pen code','搜索栏号'),placeholder:moveText('e.g. C12','例如 C12'),value:m.query,clear:{action:'lookup-move-clear'},attrs:{'data-move-pen-search':''}}),
+   above:'<div data-destination-search>'+SentriUI.choiceSearch({label:moveText('Search pen code','搜索栏号'),placeholder:moveText('e.g. C12','例如 C12'),value:m.query,clear:{action:'lookup-move-clear'},attrs:{'data-move-pen-search':''}})+'</div>',
    body:'<div data-move-pen-results>'+movePenResults(c)+'</div>',footer:false});
  }
  if(c.view==='lookup-move'){
@@ -1454,7 +1455,7 @@ function lookupMoveLayer(c){
    (m.result==='ok'?SentriUI.statusLine([detail]):SentriUI.banner({tone:'correction',headline:moveText('Selection unchanged','勾选未变'),consequence:detail})),footer(back(),''),'menu');
  }
  const facts=SentriUI.facts([{label:moveText('From','从'),value:place},{label:moveText('To','到'),value:target}],{columns:2});
- const change=m.fixed?'':SentriUI.rowGroup(SentriUI.row({title:penLabel(destination),description:moveText('Change destination','更换目标栏'),action:'lookup-move-change',variant:'navigation'}));
+ const change=m.fixed?'':SentriUI.button({label:moveText('Change destination','更换目标栏'),register:'text',icon:icon('edit'),action:'lookup-move-change'});
  return sheet(c,titleForMode,'',facts+change,footer(back(),button('lookup-move-confirm',moveText('Confirm move','确认移入'),'button primary','',!destination||!origin)),'menu',{text:[{text:m.id,mono:true}]});
 }
 function leavePenScan(c){
