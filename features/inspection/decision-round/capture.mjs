@@ -115,9 +115,12 @@ try{
   assert.equal(await live(action('move-count-open')).count(),1);
   const count=live('.move-form [role="spinbutton"]');
   assert.equal(await count.getAttribute('aria-valuemax'),'14');await shot('61-move-pick');
-  await tap('move-count-open','D4');await tap('move-number-all');
+  await tap('move-count-open','D4');
   await live('[data-action="move-number"][data-key="5"]').click();await shot('62-move-count');
   await tap('move-number-done');assert.equal(await count.getAttribute('aria-valuenow'),'5');
+  await tap('move-count-open','D4');await tap('move-number-all');
+  assert.match(await live('.st-measure-value').innerText(),/14/);
+  await tap('back');assert.equal(await count.getAttribute('aria-valuenow'),'5');
   await tap('move-next');await view('move-to');await tap('back');
   assert.equal(await count.getAttribute('aria-valuenow'),'5');
  });

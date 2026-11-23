@@ -1668,7 +1668,7 @@ function moveCountPage(c,m){
  const d=m.number,max=moveCountMax(c,m);
  const bar=status(),n=Number(d.value);
  const pad=SentriUI.numpad({compact:true,label:moveText('How many?','转几头？'),value:d.value,unit:moveText('of '+max,'最多 '+max+' 头'),
-  suggested:d.suggested,maxLength:4,action:'move-number',actions:[{label:moveText('All '+max,'全部 '+max+' 头'),action:'move-number-all'}]});
+  maxLength:4,action:'move-number',actions:[{label:moveText('All '+max,'全部 '+max+' 头'),action:'move-number-all'}]});
  return MovePicker.page({title:moveText('Pigs without ID','无身份猪只'),bar,body:pad,
   primary:{label:moveText('Done','完成'),action:'move-number-done',waiting:d.value===''||n>max}});
 }
@@ -1693,7 +1693,7 @@ function handleInspectionMove(c,el,a,v){
  if(a==='move-read'&&c.view==='move-pigs'){m.scanning=true;m.pigQuery='';return true;}
  if(a==='move-read-stop'&&c.view==='move-pigs'){m.scanning=false;return true;}
  if(a==='move-count-open'&&c.view==='move-pigs'){
-  m.number={value:String(m.counts[m.sourcePen]||0),suggested:true};c.view='move-number';
+  m.number={value:String(m.counts[m.sourcePen]||'')};c.view='move-number';
   return true;
  }
  if(a==='move-count-step'&&c.view==='move-pigs'){
@@ -1705,7 +1705,7 @@ function handleInspectionMove(c,el,a,v){
   const d=m.number;
   if(a==='move-number'){Object.assign(d,SentriUI.numpadInput(d,el.dataset.key,{maxLength:4}));return true;}
   const max=moveCountMax(c,m);
-  if(a==='move-number-all'){d.value=String(max);d.suggested=true;return true;}
+  if(a==='move-number-all'){d.value=String(max);return true;}
   const count=Number(d.value);
   if(d.value===''||count>max)return true;
   m.counts[m.sourcePen]=count;
