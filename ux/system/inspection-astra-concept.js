@@ -1601,7 +1601,7 @@ function inspectionMovePage(c){
  if(c.view==='move-counts'){
   const rows=m.sources.filter(s=>s.count).map(s=>SentriUI.heading({title:s.code+' · '+moveCountLabel(s.count),kind:'section',level:3})+
    s.batches.map((b,i)=>moveBatchControl(s.code+'|'+i,b,b.move)).join(''));
-  return MovePicker.page({title:moveText('How many from each batch?','各批次转几头'),bar,body:'<div class="move-form">'+rows.join('')+'</div>',
+  return MovePicker.page({title:moveText('Pigs per batch','各批次转几头'),bar,body:'<div class="move-form">'+rows.join('')+'</div>',
    primary:{label:moveText('Choose pen','选择目标栏'),action:'move-next',waiting:!m.sources.every(countSettled)}});
  }
  if(c.view==='move-rooms'){
