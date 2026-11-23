@@ -840,6 +840,8 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
    label above it on the tint like a heading. The skeleton context (tasks not designed yet) keeps the well. */
 :is([data-st-context="page"],[data-st-context="drawer"],[data-st-context="menu"]) .st-stepper[data-variant="well"] .st-stepper-keys{background:var(--st-panel-bg);border:var(--border-width) solid var(--st-line);border-radius:var(--radius-panel)}
 .st-stepper[data-variant="well"] .st-stepper-value{font-size:var(--type-figure-well-size);letter-spacing:0}
+.st-stepper button.st-stepper-value{align-self:stretch;border:0;border-radius:var(--radius-control);background:transparent;padding:0;color:var(--ink)}
+.st-stepper button.st-stepper-value:active{background:var(--st-press)}
 .st-stepper[data-variant="well"] .st-stepper-copy{align-items:flex-start;text-align:left}
 .st-stepper[data-variant="count"]{padding:var(--space-panel);background:var(--well);border-radius:var(--radius-count)}
 .st-stepper-value{display:grid;place-items:center;min-width:var(--control-height);min-height:var(--control-height)}

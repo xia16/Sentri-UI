@@ -244,6 +244,8 @@ export interface StepperProps {
   key?: string;
   /** Default "step". */
   action?: string;
+  /** Let the value open a numeric keypad dialog. The action receives the field key. */
+  valueAction?: { action: string; label?: string };
   /** row: inline record (default) · count: primary screen count · well: foster/reconcile. hero is a compatibility alias for count. */
   variant?: 'row' | 'count' | 'well' | 'hero';
   disabled?: boolean; reason?: string; error?: string; loading?: boolean; pressed?: boolean; status?: string; hintHtml?: string;
@@ -629,7 +631,7 @@ export interface SentriUI {
   radioBind(root: Element, options?: { onChange?: (field: string, value: string) => void }): { destroy(): void };
   rowSelect(props: RowSelectProps): string;
   /** Select + door: a checkbox and an opening door as sibling targets. */
-  rowSelectDoor(props: RowCopyProps & { checked?: boolean; action?: string; value: string; openAction?: string; openValue?: string; label?: string; doorClass?: string; inputAttrs?: SafeAttrs; contentHtml?: string; right?: AnimalRight; contextWidth?: string; /** Group form: a registry glyph before the name. */ lead?: IconName; /** Group form: a count field after the door (idle: not ticked, quieter). */ count?: { value: number | string; idle?: boolean; attrs?: SafeAttrs } }): string;
+  rowSelectDoor(props: RowCopyProps & { checked?: boolean; action?: string; value: string; openAction?: string; openValue?: string; label?: string; doorClass?: string; inputAttrs?: SafeAttrs; contentHtml?: string; right?: AnimalRight; contextWidth?: string; /** Group form: a registry glyph before the name. */ lead?: IconName; /** Group form: a count field after the door. With an openAction it opens a keypad instead. */ count?: { value: number | string; idle?: boolean; openAction?: string; attrs?: SafeAttrs } }): string;
   rowAction(props: RowActionProps): string;
   /** From a 'change' event on a rowSelect: { value, checked, action }, or null. */
   rowSelectChange(event: Event | { target: unknown }): { value: string; checked: boolean; action: string } | null;

@@ -136,7 +136,7 @@ try{
   await walk('penmap=long&moveFixture=batches');
   await live('[data-pig-select="000254"]').check();
   const number=live('[data-notags-field="D4"]');
-  assert.equal(await number.innerText(),'14');await shot('60-list-count');
+  assert.equal(await number.innerText(),'14');await number.scrollIntoViewIfNeeded();await shot('60-list-count');
   await number.click();await view('notags-count');
   assert.ok(await live('.sheet[role="dialog"] [data-ds="Numpad"]').isVisible());
   await live('[data-action="notags-pad"][data-key="5"]').click();await shot('60a-list-count-sheet');

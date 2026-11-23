@@ -1642,7 +1642,7 @@ function inspectionMovePage(c){
 }
 function movePigRows(c,m){
  const q=m.pigQuery.trim().toLowerCase(),pigs=pen(c,m.sourcePen).pigs.filter(p=>transferable(p)&&(!q||[p.id,p.earNotch].some(id=>id?.toLowerCase().includes(q))));
- return pigs.length?SentriUI.rowGroup(pigs.map(p=>SentriUI.rowSelect({title:[{text:identifiedLabel(p),mono:true}],description:compactStage(stageSummary(p)),
+ return pigs.length?SentriUI.rowGroup(pigs.map(p=>SentriUI.rowSelect({code:identifiedLabel(p),description:compactStage(stageSummary(p)),right:{kind:'tags',tags:[]},
   action:'move-pig',value:p.id,checked:m.ids.includes(p.id),inputAttrs:{'aria-label':moveText('Select ','选择 ')+identifiedLabel(p)}})).join('')):
   SentriUI.choiceEmpty(moveText('No matching pigs','没有匹配的猪只'),{icon:'search'});
 }
@@ -1650,12 +1650,12 @@ const moveCountMax=(c,m)=>pen(c,m.sourcePen)?.untagged?.count||0;
 function moveCountControl(c,m){
  const max=moveCountMax(c,m);
  const label=moveText('Pigs without ID','无身份猪只');
- const heading=SentriUI.heading({title:label,kind:'section',level:3});
+ const heading=SentriUI.heading({title:label,meta:moveText(max+' available','可转 '+max+' 头'),kind:'section',level:3});
  const count=SentriUI.stepper({label,key:m.sourcePen,value:m.counts[m.sourcePen]||0,max,variant:'well',className:'move-head-count',
   action:'move-count-step',valueAction:{action:'move-count-open',label:moveText('Edit head count','修改头数')},reserveHint:false});
  const hint=pen(c,m.sourcePen).untagged.cases?.length?
-  '<p class="move-count-hint">'+moveText('Moving clears this pen’s group conditions.','转舍会清空本栏无身份猪的病症。')+'</p>':'';
- return '<section><div class="move-count-heading">'+heading+'<span>'+moveText(max+' available','可转 '+max+' 头')+'</span></div>'+count+hint+'</section>';
+  '<p class="st-find-hint move-count-hint">'+moveText('Moving clears this pen’s group conditions.','转舍会清空本栏无身份猪的病症。')+'</p>':'';
+ return '<section>'+heading+count+hint+'</section>';
 }
 function inspectionMoveRoomResults(c,m){
  return MovePicker.roomResults(moveDestinationRooms(c,m),m.host?String(c.transferOrigin?.unit||''):'home',m.room,'move-room',m.roomQuery);
