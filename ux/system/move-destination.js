@@ -38,7 +38,7 @@ function layoutFor(room,pens){
 function picker({room,selected='',current='',blocked={},bar,back='back',key,roomAction='',action,reviewAction}){
  const pens=room.pens.filter(p=>p.registered!==false);
  const disabled=Object.fromEntries(pens.map(p=>[p.id,blocked[p.id]||unavailable(p)]).filter(([,reason])=>reason));
- const body=pens.length?SentriUI.penMap({...layoutFor(room,pens),pens:Object.fromEntries(pens.map(p=>[p.id,'plain'])),
+ const body=pens.length?SentriUI.penMap({lanes:[],...layoutFor(room,pens),pens:Object.fromEntries(pens.map(p=>[p.id,'plain'])),
   disabled,selected,current:selected||current,action,key,entrance:t('Entrance','入口'),
   labels:{pen:code=>code,plain:'',map:t('Pens','栏位'),whole:t('Whole room','整栋'),byPen:t('Pen by pen','逐栏'),pens:range=>t('Pens '+range,range+' 栏')}}):
   SentriUI.choiceEmpty(t('No registered pens','没有登记的栏位'),{icon:'grid'});

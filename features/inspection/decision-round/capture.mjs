@@ -183,6 +183,10 @@ try{
   await view('move-to');
   assert.equal(await live('.st-pen-tile[data-pen="C1"]').isDisabled(),true);
   await tap('back');await view('pen-detail');
+  await walk('penmap=single','walk-single');await tap('search');await live('[data-find-input]').fill('000430');
+  await tap('lookup-exception','000430');await tap('lookup-move-mode','move');
+  assert.deepEqual(await live('.st-pen-tile').evaluateAll(tiles=>tiles.map(t=>t.dataset.pen)),['C1']);
+  assert.equal(await live('.st-pen-whole-toggle').count(),0);
  });
  await check('Scan selection and Selected review open the same embedded destination map',async()=>{
   await walk('penmap=standard');await outsideRead();
