@@ -1,42 +1,31 @@
-# Move 转移
-
-> Draft — compiled from existing docs, not yet confirmed.
-
-## Problem
-
-Production moved pigs through a tree page, a two-wheel drawer and a confirmation dialog, and a separate full page for groups with uncounted head.
-
-## Who
-
-The stockperson moving pigs between pens or units; the supervisor reading pen counts.
-
-## Anchor
-
-Anchor: The placement of a pig or a counted group.
-
-## Rules
-
-- An identified pig's records live on the animal: cases, treatments and marks travel with her silently, so the whole event is one Picker.
-- The sheet is the confirmation: the subject header restates scope, view > filters the list to the selection, and the primary commits. Production's confirmation dialog is cut.
-- The destination tree survives as labels only. The current unit is pinned first and the source cell dimmed; cross-unit groups carry their full path; search reaches any pen and the scan reads a pen plate. Tap commits and closes. An empty pen prints dashed.
-- Mixed selection: tagged pigs move as placement events, un-identified head move as a count. Each open group record on the source pen gets a verdict (Stays, Goes, Both; default stays) and the checklist folds to a footnote when the whole population leaves.
-- A pen's un-identified count is fully partitioned by (line, batch), so a multi-batch move must say which batches shrink (steppers, sum = n). A single-batch group rides silently.
-- No toast: counts are the feedback. The source card re-derives down and the destination up (derived for tagged pigs, set by count for head).
+# Move 转舍
 
 ## Scope
 
-In: Transfer · tagged pigs; Destination picker; Transfer · tagged and head; After · the cards are the receipt; Transfer sow · from a sow record.
+A worker moves pigs to another pen during a walk. The phone calls this **Move**. Planned Transfer tasks are issued from the console.
 
-Out: see the neighbouring features of the same section for what the same sheet does elsewhere; nothing outside the screens above is designed here.
+| Entrance | Where it opens |
+| --- | --- |
+| Inspection → pen → Move | Choose pigs in that pen. A pen holding one movable identified pig opens the destination directly. |
+| Inspection or Scan → selected pigs → Actions → Move | The selection supplies identified pigs and the total number of unidentified pigs per source pen. Move opens the destination picker. |
+| Pig record → Actions → Move | This pig opens directly on the destination. |
+| Farrowing record → Actions → Move | This sow opens the same destination picker using Farrowing's rooms. |
+| Finished or ended Farrowing record → Piglets → Actions → Move | The chosen piglets open the same destination picker. The movement goes in their litter and pen logs. |
+| Inspection Scan or Find → pig from another unit | Choose Move only or Move and select. A PenMap Sheet opens over the results, fixed to the inspected unit. Tapping a destination opens the review. |
 
-## Decisions
+## Meaning of a selection
 
-Open questions and items to confirm:
+- Ear tag and ear notch identify individual pigs. The pen roster supports search and the reader. For pigs without either identity, enter one total head count per source pen, up to the number available. In Move, minus and plus surround the count. Tap the number to edit it in the keypad drawer. In the Inspection list, tap the group row's number for the same keypad. Done applies the count. In the Inspection list, submitting zero clears that group's selection.
+- The client sends the source pen and total head count for its unidentified pigs. The server may randomly draw from the source pen's batch balances when deducting that count. The total deducted equals the submitted count.
+- For a regular move, choose a room, then tap a registered pen on the embedded PenMap. Source pens and known unavailable destinations are disabled. The chosen pen is outlined. Tap Review move to check the selection before submitting. Both the page and the sheet offer Whole room in long rooms. Tapping a range returns to that part of the detailed map.
+- Review identifies the source pens and their pigs or counts, and names the destination room and pen. Tap the destination row to change it. Back from that change restores the previous destination.
+- Tagged or ear-notched animals keep their individual records. Once any unidentified pigs leave a pen, clear that source pen's **current diseases and symptoms for all its unidentified pigs**, even when some remain. The picker lists affected source pens. The destination's existing animals retain their records and the movement history stays available.
+- Formal batch membership for unidentified pigs is handled internally. For individually identified pigs, any applicable default batch assignment is shown in the review.
 
-- Whether Transfer on a sow's record is the same design as this page (the sow transfer in Farrowing and in the Pig profile uses a unit and pen pair of fields; see the screen).
-- The deck flags this as the worst-case container for a drawer.
+## Record and return
 
-Sources:
+- Confirm move submits the review. A confirmed move adjusts the source and destination and records both sides. The pen entrance returns to its source. The pig record and selection entrances return to the originating record or list. A finished litter returns to Piglets with the move listed in Sent and moved.
+- Inspection's prototype models a success, an API error message or a quiet queue on connection loss. An API error uses the same notice toast as Scan and leaves the review available for editing. Placement, group conditions and selection update on confirmation.
+- Android and the live operation require a service contract for placement, eligibility, capacity, conflicts and a retrievable receipt. A live cross-pen transaction is outside this prototype round.
 
-- The event workflow deck: `ux/system/workflows/place.html` (all decks render in `ux/archive/workflows.html`).
-- The ops requirements: `ux/research/ops/place-identity.md` and `ux/research/ops/SYNTHESIS.md`.
+[巡检转舍图文](../../ux/review/farrowing-inspection/move.html)

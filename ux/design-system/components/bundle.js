@@ -227,15 +227,18 @@
   }
   /* rowSelectDoor: a list that both selects (a bulk act) and opens. Two sibling targets, none nested: the checkbox (48px hit area,
      the same box as rowSelect) toggles; the door (copy + ›) opens. contentHtml: trusted markup in place of the title/description copy. */
-  function rowSelectDoor({title='',description='',code='',mono=false,wrap=false,tight=false,checked=false,action='select',value='',openAction='open',openValue='',label='',id='',className='',doorClass='',attrs={},strs,args,inputAttrs={},contentHtml='',right=null,contextWidth='',lead='',count=null}={}){
+  function rowSelectDoor({title='',description='',code='',mono=false,wrap=false,tight=false,checked=false,selectDisabled=false,action='select',value='',openAction='open',openValue='',label='',id='',className='',doorClass='',attrs={},strs,args,inputAttrs={},contentHtml='',right=null,contextWidth='',lead='',count=null}={}){
     const o={strs,args},c=rowCopy({title,description,code,mono,tight,o});
     const an=right?animalBody({code,description,right,contextWidth,tight,o}):null;
     /* Group (an Animal row for animals without an ID, owner 2026-10-18): a lead glyph before the name, the tags on the line under it,
        and a count field after the door, always there, so the row keeps the Animal row's height ticked or not. */
     if(an&&lead)an.html=an.html.replace('<strong class="st-animal-id">','<strong class="st-animal-id">'+(root.SentriIcons?root.SentriIcons.icon(lead):''));
-    const countHtml=count?`<label class="st-row-count"${count.idle?' data-idle=""':''}><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" value="${esc(String(count.value??''))}"${safeAttr(count.attrs||{})}></label>`:'';
+    const countValue=count?esc(String(count.value??'')):'';
+    const countHtml=count?`<span class="st-row-count"${count.idle?' data-idle=""':''}>${count.openAction
+      ?`<button type="button" data-action="${esc(count.openAction)}" data-value="${esc(openValue)}"${safeAttr(count.attrs||{})}>${countValue}</button>`
+      :`<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" value="${countValue}"${safeAttr(count.attrs||{})}>`}</span>`:'';
     const copy=contentHtml||(an?an.html:'')||`${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>`;
-    return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door"${an?` data-animal="${an.kind}"`:''}${count?' data-group=""':''} data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><label class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${safeAttr(inputAttrs)}></label><button type="button" class="st-row-door ${esc(doorClass)}" data-action="${esc(openAction)}" data-value="${esc(openValue)}"${label?` aria-label="${esc(label)}"`:''}>${copy}<span class="st-row-chevron">${arrow}</span></button>${countHtml}</div>`;
+    return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door"${an?` data-animal="${an.kind}"`:''}${count?' data-group=""':''} data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><label class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${selectDisabled?' disabled':''}${safeAttr(inputAttrs)}></label><button type="button" class="st-row-door ${esc(doorClass)}" data-action="${esc(openAction)}" data-value="${esc(openValue)}"${label?` aria-label="${esc(label)}"`:''}>${copy}<span class="st-row-chevron">${arrow}</span></button>${countHtml}</div>`;
   }
   function rowSelectChange(ev){
     const t=ev&&ev.target;
@@ -520,7 +523,7 @@
   /* Stepper: `− n +`, the one counting shape. variant 'row' (a 60px sheet row) or 'hero' (the count sheet's one number).
      A key emits a requested delta; the host posts it (immediate host) or adds it to a draft (staged host).
      pointers: text actions shown in the status region at the floor. */
-  function stepper({label='',prefix='',description='',value=0,min=0,max=null,step=1,action='step',key='',variant='row',changed=false,draft=false,tone='',hint='',pointers=[],reserveHint,id='',className='',disabled=false,reason='',error='',loading=false,pressed=false,status='',hintHtml='',strs,args}={}){
+  function stepper({label='',prefix='',description='',value=0,min=0,max=null,step=1,action='step',key='',variant='row',changed=false,draft=false,tone='',hint='',pointers=[],reserveHint,id='',className='',disabled=false,reason='',error='',loading=false,pressed=false,status='',hintHtml='',valueAction=null,strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{};
     const n=Number(value)||0,hero=variant!=='row',lid=id||fieldId('st-stepper'),hid=lid+'-hint',d=Math.abs(Number(step)||1);
     variant=variant==='hero'?'count':variant;
@@ -532,7 +535,10 @@
     const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}" aria-describedby="${esc(hid)}${inline?' '+esc(nid):''}"${pressed&&dir>0?' data-preview="pressed"':''}${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
     const copy=`<span class="st-stepper-copy"><span class="st-stepper-label" id="${esc(lid)}">${tx(label,o,'label')}</span>${inline?`<span class="st-stepper-note" id="${esc(nid)}" role="status" aria-live="polite">${stateWord}</span>`:''}${description||has(o,'description')?`<small class="st-stepper-description">${tx(description,o,'description')}</small>`:''}</span>`;
     const vargs=a.value||(s.value?{n:String(n)}:null);
-    const val=`<span class="st-stepper-value" role="spinbutton" tabindex="0" data-st-spin${disabled||loading?' aria-disabled="true"':''}${error?' aria-invalid="true"':''} aria-labelledby="${esc(lid)}" aria-describedby="${esc(hid)}${inline?' '+esc(nid):''}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${esc(prefix)}${esc(n)}</span>`;
+    const valueText=esc(prefix)+esc(n);
+    const val=valueAction
+      ?`<button type="button" class="st-stepper-value" data-st-spin data-action="${esc(valueAction.action)}" data-value="${esc(key)}" aria-haspopup="dialog" aria-label="${esc(valueAction.label||label)}: ${valueText}"${disabled||loading?' disabled':''}>${valueText}</button>`
+      :`<span class="st-stepper-value" role="spinbutton" tabindex="0" data-st-spin${disabled||loading?' aria-disabled="true"':''}${error?' aria-invalid="true"':''} aria-labelledby="${esc(lid)}" aria-describedby="${esc(hid)}${inline?' '+esc(nid):''}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${valueText}</span>`;
     const canPoint=pointers.length>0;
     const reserve=reserveHint!=null?(reserveHint?(canPoint?'action':'text'):''):'';
     const messages=[hint||has(o,'hint')?tx(hint,o,'hint'):'',error?esc(error):'',disabled?esc(reason||'This record cannot be edited.'):'',loading?tx('Saving…',{strs:{status:'ds.stepper.saving'}},'status'):'',''].filter(Boolean);
@@ -1362,12 +1368,14 @@
     const lo=Math.min(...s),r=Math.max(...s)/lo,p=r>PEN_CAP?Math.log(PEN_CAP)/Math.log(r):1;
     return v=>v>0?Math.round(PEN_TILE*Math.pow(v/lo,p)):PEN_TILE;
   }
-  function penMap({lanes=['A','B','C','D'],depth=6,rows=[],apart=[],aSide='left',entranceAt='middle',backDoor=null,pens={},current='',action='pen',key='pen-map',entrance='Entrance',labels={},peek=null,className=''}={}){
+  function penMap({lanes=['A','B','C','D'],depth=6,rows=[],apart=[],aSide='left',entranceAt='middle',backDoor=null,pens={},current='',selected='',disabled={},action='pen',key='pen-map',entrance='Entrance',labels={},peek=null,className=''}={}){
     const L=penLabels(labels);
     if(typeof peek==='function')penPeeks.set(key,peek);else penPeeks.delete(key);
-    const level=c=>PEN_LEVELS.includes(pens[c])?pens[c]:'empty';
-    const tile=(c,at='')=>{const l=level(c),off=l==='empty'||l==='hidden';
-      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${at}${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc(L.pen(c)+', '+L[l])}">${esc(c)}</button>`;};
+    const available=c=>!Object.hasOwn(disabled,c);
+    const level=c=>available(c)&&PEN_LEVELS.includes(pens[c])?pens[c]:'empty';
+    const tile=(c,at='')=>{const l=level(c),off=l==='empty'||l==='hidden',word=available(c)?L[l]:disabled[c];
+      const picked=selected===c&&!off?' data-selected aria-pressed="true"':'';
+      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${at}${picked}${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc([L.pen(c),word].filter(Boolean).join(', '))}">${esc(c)}</button>`;};;
     const band=(cls,text,at,extra='')=>`<div class="${cls}"${at==='left'||at==='right'?` data-at="${at}"`:''}${extra}>${sGlyph('arrow-down')}<span>${esc(text)}</span></div>`;
     const letterOf=i=>String.fromCharCode(65+i),runsOf=l=>typeof l==='string'?[]:l.runs||[];
     const sizeOf=penSizes([...lanes.flatMap(l=>runsOf(l).map(r=>r.size)),...rows.flatMap(w=>(w.runs||[]).map(r=>r.size))]);
@@ -1484,6 +1492,7 @@
      it opens centred on its current pen; a map more than two screens tall adds Whole room to the sheet's footer; a hold
      shows the peek (350ms; a move of more than 12px, a scroll or a release hides it), and the tap after a peek only closes it. */
   const penHead=map=>map.querySelector('.st-pen-col'),penSheet=el=>el.closest('.sheet,.phone')||document.body;
+  const penControls=m=>penSheet(m).querySelector('.sheet-footer');
   function penMount(scope){
     const maps=!scope||!scope.querySelectorAll?[]:scope.matches&&scope.matches('.st-pen-map')?[scope]:[...scope.querySelectorAll('.st-pen-map')];
     for(const m of maps){
@@ -1498,15 +1507,17 @@
         map.scrollTop+=snap(at.top-(head.bottom+PEN_GAP),at.height+PEN_GAP);
         if(map.scrollWidth>map.clientWidth+1)map.scrollLeft+=snap(at.left-(side+PEN_GAP),at.width+PEN_GAP);
       }
-      const room=penRooms.get(m.dataset.key),foot=penSheet(m).querySelector('.sheet-footer');
-      if(room&&foot&&map.clientHeight>0&&map.scrollHeight>2*map.clientHeight&&!foot.querySelector('.st-pen-whole-toggle'))
-        foot.insertAdjacentHTML('beforeend',button({label:room.L.whole,className:'st-pen-whole-toggle',attrs:{'aria-pressed':'false','data-key':m.dataset.key}}));
+      const room=penRooms.get(m.dataset.key),foot=penControls(m);
+      if(room&&foot&&map.clientHeight>0&&map.scrollHeight>2*map.clientHeight&&!foot.querySelector('.st-pen-whole-toggle')){
+        const toggle=button({label:room.L.whole,className:'st-pen-whole-toggle',attrs:{'aria-pressed':'false','data-key':m.dataset.key}});
+        foot.insertAdjacentHTML(penSheet(m).dataset.presentation==='page'?'afterbegin':'beforeend',toggle);
+      }
     }
   }
   /* Whole room on, at the fewest pens to a tile that fit the map's height; off, back to the pens where they were */
   function penWholeSet(m,on,from){
     const map=m.querySelector('.st-pen-scroll'),pens=map.querySelector('.st-pen-grid:not(.st-pen-whole)'),room=penRooms.get(m.dataset.key);
-    const btn=penSheet(m).querySelector(`.st-pen-whole-toggle[data-key="${CSS.escape(m.dataset.key)}"]`);
+    const btn=penControls(m)?.querySelector(`.st-pen-whole-toggle[data-key="${CSS.escape(m.dataset.key)}"]`);
     let whole=map.querySelector('.st-pen-whole');
     if(on){
       m.dataset.pensTop=map.scrollTop;penStop();
@@ -1690,10 +1701,10 @@
   /* An animal just scanned keeps Row's Just scanned state for a moment (data-arrival="on", the progress wash), so the eye finds her row after
      looking up from the pig; "off" then fades it back and the attribute goes. The row just read is brought into view (smoothly); the rest of
      the list keeps its place. scan = { fresh:{ tag: until (ms, or Infinity for the held frame) }, last }. Rows carry data-scan-tag. */
-  function scanArrive(root,sc){
+  function scanArrive(root,sc,{highlight=()=>true}={}){
     if(!root||!sc)return;const now=Date.now();sc.fresh=sc.fresh||{};
     for(const [tag,until] of Object.entries(sc.fresh)){
-      if(until<=now){delete sc.fresh[tag];continue;}
+      if(until<=now||!highlight(tag)){delete sc.fresh[tag];continue;}
       const r=root.querySelector(`[data-scan-tag="${tag}"]`);if(!r)continue;
       r.dataset.arrival='on';
       if(until!==Infinity)setTimeout(()=>{r.dataset.arrival='off';setTimeout(()=>r.removeAttribute('data-arrival'),900);},until-now);

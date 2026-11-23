@@ -1,0 +1,10 @@
+.move-page .move-picker-tools{display:flex;flex-direction:column;gap:var(--space-16);padding:0 var(--space-gutter) var(--space-16)}
+.move-page .move-picker-tools .st-choice-search.st-choice-search{margin:0}
+.move-page .move-form{display:flex;flex-direction:column;gap:var(--space-12)}
+.move-page .move-head-count .st-stepper-copy{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.move-page .move-head-count .st-stepper-keys{padding:var(--space-12)}
+.move-page .move-count-hint{margin:var(--space-8) 0 0;text-align:center}
+.move-page .sheet-footer>.st-pen-whole-toggle{flex:0 1 auto}
+.move-page .move-review{display:flex;flex-direction:column;gap:var(--space-section)}
+.move-page .move-picker-tools:has([data-move-room-search]){padding-bottom:0}
+.move-page [data-move-room-results]{display:flex;flex-direction:column;gap:var(--space-16);padding-top:var(--space-24)}

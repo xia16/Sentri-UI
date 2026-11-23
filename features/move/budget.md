@@ -49,3 +49,14 @@ Scope: the facts a disabled or waiting control displays. The change adds and cut
 - **Settled**: the label, the current option and the picker value, in ink (or `ink-2` on a floor key), at the control's own size and weight.
 - **Watch**: unavailability, quiet: the flat disabled surface and the 1px dashed `control-border` rim. No colour, no icon added.
 - **Cut**: faded text as the signal (opacity, `disabled-ink` text).
+
+## Inspection entry and destination · 2026-11-20
+
+| Question in walking order | Attention | Place |
+| --- | --- | --- |
+| Which pigs are moving? | Primary | Pen entry selects individual IDs and one total count of unidentified pigs for that pen. Review shows the source pens, IDs and counts. |
+| Where are they going? | Primary | Choose a room and select the destination on the embedded PenMap. A long room offers Whole room. The review shows the exact destination as an editable row. |
+| Which records will change? | Secondary, only when relevant | One consequence for the source pens whose untagged group conditions are cleared. A change to the default batch uses the destination's line. |
+| Did it go through? | Primary after commit | Source and target counts, both pen logs and the confirmed result. A locally queued move closes the view. A rejected or uncertain move keeps placement and health facts intact. |
+
+Cut: row-wide selected colour, repeated selection messages, connectivity copy and dedicated API-error screens. Confirm move lives on the review with the source and destination.

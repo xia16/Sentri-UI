@@ -1707,11 +1707,17 @@
           {
             "name": "Marked pigs, one card per unit",
             "shows": "A plain \"Unit 7\" section heading over one card of its pigs in walking order (the same unit heading as Farrowing's Find a sow and Scan ear tags): tag over \"Pen B2 · Hospital · 1d\", the condition as a plain tag on the right",
-            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A pig opens its unit's walk on the Health lens; Back from there reopens this list.",
+            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A row opens that pig’s record; Back keeps this list’s search and filters.",
             "source": "markedPage()"
           }
         ],
-        "controls": [],
+        "controls": [
+          {
+            "control": "Pig row",
+            "does": "Open the record of this ear tag and show its marked health finding; Back retains query, filters and scroll.",
+            "goesTo": "pig-profile.full"
+          }
+        ],
         "copy": [
           "(raw)"
         ],
@@ -1741,11 +1747,17 @@
           {
             "name": "Marked pigs, one card per unit",
             "shows": "A plain \"Unit 7\" section heading over one card of its pigs in walking order (the same unit heading as Farrowing's Find a sow and Scan ear tags): tag over \"Pen B2 · Hospital · 1d\", the condition as a plain tag on the right",
-            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A pig opens its unit's walk on the Health lens; Back from there reopens this list.",
+            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A row opens that pig’s record; Back keeps this list’s search and filters.",
             "source": "markedPage()"
           }
         ],
-        "controls": [],
+        "controls": [
+          {
+            "control": "Pig row",
+            "does": "Open the record of this ear tag and show its marked health finding; Back retains query, filters and scroll.",
+            "goesTo": "pig-profile.full"
+          }
+        ],
         "copy": [
           "(raw)"
         ],
@@ -1839,7 +1851,13 @@
             "source": "markedPage()"
           }
         ],
-        "controls": [],
+        "controls": [
+          {
+            "control": "Pig row",
+            "does": "Open the record of this ear tag and show its marked health finding; Back retains query, filters and scroll.",
+            "goesTo": "pig-profile.full"
+          }
+        ],
         "copy": [
           "(raw)"
         ],
@@ -1907,7 +1925,13 @@
             "source": "markedPage()"
           }
         ],
-        "controls": [],
+        "controls": [
+          {
+            "control": "Pig row",
+            "does": "Open the record of this ear tag and show its marked health finding; Back retains query, filters and scroll.",
+            "goesTo": "pig-profile.full"
+          }
+        ],
         "copy": [
           "(raw)"
         ],

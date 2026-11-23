@@ -36,7 +36,7 @@ Label; optional description; decrease key; spinbutton value; increase key; persi
 ## Behaviour
 Keys emit data-action, data-value (field key), and data-step (requested delta). The host owns bounds, persistence and receipts; the component never commits. ArrowUp / ArrowDown on the spinbutton request the same delta as the visible keys. Floor and ceiling keys remain focusable and aria-disabled: the host answers refused taps in the status line. Loading and disabled hosts must reject deltas. Draft and corrected receipts include words. Pass localized status with the actual draft delta (for example +1 unsaved); the fallback says Unsaved. Keep roots and status regions mounted when patching.
 
-Show at most seven row steppers in a drawer (six death causes plus one live-count correction); use a page for more, and keep the body scrollable. One count or well per sheet. Reserve hint space once per sheet with reserveHint:true on the row that can show pointers; all other rows use reserveHint:false. No selection state: these are counting actions.
+Show at most seven row steppers in a drawer (Farrowing's seven current death causes, including Put down); use a page for more, and keep the body scrollable. The former live-count correction door was retired on 2026-11-02. One count or well per sheet. Reserve hint space once per sheet with reserveHint:true on the row that can show pointers; all other rows use reserveHint:false. No selection state: these are counting actions.
 
 ## Content rules
 Sentence case, labels normally ≤14 English characters or 8 Chinese characters. Longer labels wrap without truncation; descriptions ≤60 characters. Status lines state a single consequence; never repeat the label or count in a receipt. A pointer is a verb plus destination.

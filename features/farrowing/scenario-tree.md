@@ -99,7 +99,7 @@ States: F0 the record with a visit waiting (from D1) · F1 *retired* (Finish wit
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
-| F-1 | F0 | look at the bar | → Back · Save: Finish farrowing is not offered until the visit is saved or cleared | S — RUL Starting and ending ("Finish with a draft waiting"); owner decisions 2026-10-23 (Counting) | `fa-f1-finish-blocked-by-death-draft` |
+| F-1 | F0 | look at the bar | → Back · Save · Actions: Finish farrowing is not offered until the visit is saved or cleared | S — RUL Starting and ending ("Finish with a draft waiting"); owner decisions 2026-10-23 (Counting) | `fa-f1-finish-blocked-by-death-draft` |
 | F-2 | F0 | look at the bar | → nothing can lock; the draft is still there | S — RUL Starting and ending ("A draft never crosses the lock") | `fa-f2-draft-never-crosses-lock` |
 | F-3 | F0 | Save, Finish farrowing | → F2: the lock is live | S — RUL ("a guard on the lock, not a gate on recording") | `fa-f3-resolved-finish-unblocked` |
 | F-4 | F2 (after F-3) | hold Finish farrowing | → locked; Born frozen = alive + dead (14); the record face | S — RUL Model; RUL Surfaces | `fa-f4-lock-gives-locked-record` |

@@ -101,7 +101,7 @@ Wheels (`UIPickerView`, `NumberPicker`) are for long ordered values only (dates,
 
 2026-10-16 (owner ruling B): a drawer with levels has no "‹ Parent": the title names the level, the footer's Back goes up one level, a ✕ at the top left closes the whole drawer. The multi variant's specimens (a level of a cascade) carry the ✕ and a Back that goes up.
 
-2026-10-15 (Finish farrowing): the inline key face (`face: 'key'`), variant `inline-key`, used by Finish farrowing's Assisted (No preselected, no Clear) and Edit finish details.
+2026-10-15 (Finish farrowing): the inline key face (`face: 'key'`), variant `inline-key`, used by Finish farrowing's Assisted (No preselected, no Clear). Edit finish details was a former caller; the Edit door was retired on 2026-11-02.
 
 2026-10-10 (multi-choice family): single-choice sheets have Back alone and sit on the bottom edge; specimens drawn in the phone; Native mapping.
 

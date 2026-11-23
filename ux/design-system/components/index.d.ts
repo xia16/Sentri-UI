@@ -244,6 +244,8 @@ export interface StepperProps {
   key?: string;
   /** Default "step". */
   action?: string;
+  /** Let the value open a numeric keypad dialog. The action receives the field key. */
+  valueAction?: { action: string; label?: string };
   /** row: inline record (default) · count: primary screen count · well: foster/reconcile. hero is a compatibility alias for count. */
   variant?: 'row' | 'count' | 'well' | 'hero';
   disabled?: boolean; reason?: string; error?: string; loading?: boolean; pressed?: boolean; status?: string; hintHtml?: string;
@@ -629,7 +631,7 @@ export interface SentriUI {
   radioBind(root: Element, options?: { onChange?: (field: string, value: string) => void }): { destroy(): void };
   rowSelect(props: RowSelectProps): string;
   /** Select + door: a checkbox and an opening door as sibling targets. */
-  rowSelectDoor(props: RowCopyProps & { checked?: boolean; action?: string; value: string; openAction?: string; openValue?: string; label?: string; doorClass?: string; inputAttrs?: SafeAttrs; contentHtml?: string; right?: AnimalRight; contextWidth?: string; /** Group form: a registry glyph before the name. */ lead?: IconName; /** Group form: a count field after the door (idle: not ticked, quieter). */ count?: { value: number | string; idle?: boolean; attrs?: SafeAttrs } }): string;
+  rowSelectDoor(props: RowCopyProps & { checked?: boolean; action?: string; value: string; openAction?: string; openValue?: string; label?: string; doorClass?: string; inputAttrs?: SafeAttrs; contentHtml?: string; right?: AnimalRight; contextWidth?: string; /** Group form: a registry glyph before the name. */ lead?: IconName; /** Group form: a count field after the door. With an openAction it opens a keypad instead. */ count?: { value: number | string; idle?: boolean; openAction?: string; attrs?: SafeAttrs } }): string;
   rowAction(props: RowActionProps): string;
   /** From a 'change' event on a rowSelect: { value, checked, action }, or null. */
   rowSelectChange(event: Event | { target: unknown }): { value: string; checked: boolean; action: string } | null;
@@ -828,6 +830,11 @@ export interface PenMapProps {
   pens?: Record<string, PenLevel>;
   /** The pen the map opens centred on. */
   current?: string;
+  /** The chosen tile in a destination picker. */
+  selected?: string;
+  /** Pen code to accessible reason for a tile that cannot be chosen. */
+  disabled?: Record<string, string>;
+  /** A destination picker can put the view toggle beside Entrance. */
   /** The data-action of every tile that can be opened; its data-value is the pen code. */
   action?: string;
   /** Names this map for the peek registry; give each map on a page its own. */
@@ -902,7 +909,7 @@ export interface SentriUI {
   /** Scanning on a list: the host's search bar becomes this one status while the reader is on. 'waiting' until it connects. */
   scanBar(props?: { state?: 'scanning' | 'waiting'; title?: string; text?: string; device?: string; stop?: { action: string; label?: string } }): string;
   /** Lights the rows in scan.fresh until their time is up and brings scan.last into view. */
-  scanArrive(root: ParentNode, scan: ScanState): void;
+  scanArrive(root: ParentNode, scan: ScanState, options?: { highlight?: (tag: string) => boolean }): void;
   /** Measures the scan list before a render, for scanGlide after it. */
   scanPlaces(root: ParentNode): Map<string, number>;
   scanGlide(root: ParentNode, before: Map<string, number>): void;

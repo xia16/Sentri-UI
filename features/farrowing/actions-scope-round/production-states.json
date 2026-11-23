@@ -1,0 +1,74 @@
+{
+  "Farrowing": [
+    {
+      "title": "Batch membership",
+      "disabled": false
+    },
+    {
+      "title": "Record abortion",
+      "disabled": false
+    },
+    {
+      "title": "Foster piglets",
+      "disabled": false
+    }
+  ],
+  "Sow died": [
+    {
+      "title": "Batch membership",
+      "disabled": true
+    },
+    {
+      "title": "Record abortion",
+      "disabled": true
+    },
+    {
+      "title": "Foster piglets",
+      "disabled": true
+    }
+  ],
+  "Finished": [
+    {
+      "title": "Batch membership",
+      "disabled": false
+    },
+    {
+      "title": "Record abortion",
+      "disabled": true
+    },
+    {
+      "title": "Foster piglets",
+      "disabled": false
+    }
+  ],
+  "Aborted with live piglets": [
+    {
+      "title": "Batch membership",
+      "disabled": false
+    }
+  ],
+  "Awaiting": [
+    {
+      "title": "Batch membership",
+      "disabled": false
+    },
+    {
+      "title": "Record abortion",
+      "disabled": false
+    }
+  ],
+  "Finished with no live piglets": [
+    {
+      "title": "Batch membership",
+      "disabled": false
+    },
+    {
+      "title": "Record abortion",
+      "disabled": true
+    },
+    {
+      "title": "Foster piglets",
+      "disabled": true
+    }
+  ]
+}

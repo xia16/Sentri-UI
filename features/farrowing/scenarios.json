@@ -1173,7 +1173,7 @@
            "gwt": {
             "given": "Sow 000418 is Farrowing and a death draft of 1 is waiting on the device.",
             "when": "The worker looks at the bar after Done.",
-            "then": "The bar is Back · Save: Finish farrowing is not offered until the visit is saved or cleared, so nothing can lock with a draft."
+            "then": "The bar is Back · Save · Actions: Finish farrowing is not offered until the visit is saved or cleared, so nothing can lock with a draft."
            },
            "authority": [
             {
@@ -1206,6 +1206,12 @@
              "hard": "dead-end"
             },
             {
+             "el": ".count-footer [data-action='sowActions']",
+             "is": "enabled",
+             "says": "The Actions button stays in the right column",
+             "hard": "dead-end"
+            },
+            {
              "el": "[data-action='lock']",
              "is": "absent",
              "says": "no lock to hold while the visit waits",
@@ -1219,6 +1225,11 @@
             }
            ],
            "record": [
+            {
+             "expr": "(() => { const keys = [...document.querySelectorAll('.count-keys > button')]; const footer = [...document.querySelectorAll('.count-footer > button')]; return keys.length === 3 && footer.length === 3 && keys.every((key, i) => { const top = key.getBoundingClientRect(), bottom = footer[i].getBoundingClientRect(); return top.left === bottom.left && top.width === bottom.width; }); })()",
+             "says": "Each counting key aligns with its footer control",
+             "hard": "broken-ruling"
+            },
             {
              "expr": "s.locked === false",
              "says": "not locked",
@@ -3038,11 +3049,13 @@
         {
          "type": "action",
          "id": "sow-death.piglets.tick3.move",
-         "label": "Actions, Move, tap Pen B1",
+         "label": "Actions, Move, choose and confirm Pen B1",
          "taps": [
           "[data-action='litterActions']",
           "[data-action='allocToPen']",
-          "[data-action='allocPen'][data-value='7|B1']"
+          "[data-action='allocPenPick'][data-value='B1']",
+          "[data-action='allocPenNext']",
+          "[data-action='allocPenSave']"
          ],
          "children": [
           {
@@ -3052,7 +3065,7 @@
            "label": "Moved: the three leave her list for Pen B1",
            "gwt": {
             "given": "Three piglets are ticked on a dead sow's list.",
-            "when": "The worker chooses Move and taps Pen B1.",
+            "when": "The worker chooses Move, selects Pen B1 and confirms.",
             "then": "Her list shows 4 alive and Sent and moved lists To Pen B1 · Unit 7 with 3."
            },
            "authority": [
@@ -3412,12 +3425,14 @@
       {
        "type": "action",
        "id": "sow-death.piglets.move-all",
-       "label": "Tick all, Actions, Move, Pen B1",
+       "label": "Tick all, Actions, Move, choose and confirm Pen B1",
        "taps": [
         "[data-action='litterAll']",
         "[data-action='litterActions']",
         "[data-action='allocToPen']",
-        "[data-action='allocPen'][data-value='7|B1']"
+        "[data-action='allocPenPick'][data-value='B1']",
+        "[data-action='allocPenNext']",
+        "[data-action='allocPenSave']"
        ],
        "children": [
         {

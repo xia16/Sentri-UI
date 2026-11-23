@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>巡检转舍 · 选栏方案对照</title>
+  <style>
+    :root { color-scheme: light; --bg: #f5f5ef; --paper: #fff; --ink: #222b21; --muted: #52634e; --line: #d7ded0; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.65 system-ui, sans-serif; color: var(--ink); background: var(--bg); }
+    main { max-width: 1350px; margin: auto; padding: clamp(18px, 4vw, 48px); }
+    header { border-bottom: 1px solid var(--line); padding: 0 0 20px; }
+    h1 { font-size: clamp(28px, 4vw, 46px); line-height: 1.2; margin: 0 0 14px; }
+    h2 { line-height: 1.25; margin: 0 0 12px; }
+    p { max-width: 76ch; margin: 0 0 14px; }
+    nav { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+    a { color: #235236; text-underline-offset: 3px; }
+    section { margin: 34px 0; scroll-margin-top: 18px; }
+    .route { color: var(--muted); font-weight: 650; }
+    .screens { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(255px, 100%), 1fr)); gap: 16px; align-items: start; }
+    figure { margin: 0; padding: 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); }
+    figure img { display: block; width: 100%; max-width: 390px; height: auto; margin: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); }
+    figcaption { padding-top: 10px; font-size: 14px; }
+    figcaption strong { display: block; font-size: 16px; }
+    .old { color: var(--muted); }
+    .note { padding: 18px 20px 4px; background: #e9ede3; border-radius: 12px; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>巡检转舍 · 选栏方案</h1>
+    <p>同一例用两种方式选 Unit 7 的 C12。样例共转 6 头猪，C1 一头有耳号，D4 转 5 头无身份猪。D4 只填本次要转的总头数。两套方案都用组件库的 PenMap Sheet，长房间在底部点「整栋」。</p>
+    <nav aria-label="查看方案">
+      <a href="#a">A · 核对页打开栏位图</a>
+      <a href="#b">B · 先按栏号找，再核对</a>
+      <a href="#outside">异单元移入与接口提示</a>
+      <a href="#integration">PR 接入核对</a>
+    </nav>
+  </header>
+
+  <section id="a">
+    <h2>A · 核对页打开栏位图</h2>
+    <p class="route">Move → 核对对象 → 选房间或打开栏位图 → 点目标栏 → 确认转舍</p>
+    <p>适合按现场位置找栏。已在目标房间时，直接点「选择目标栏」。知道栏号时，也能从核对页打开搜索。目标确定后回同一页，可以点目标栏再改。</p>
+    <div class="screens">
+      <figure><img src="screenshots/a-start.jpg" alt="核对页还没有选目标栏" width="390" height="844"><figcaption><strong>新 · 先看准备转哪几头</strong>默认显示本房间，也能点房间行切换。</figcaption></figure>
+      <figure><img src="screenshots/a-whole.jpg" alt="标准 PenMap Sheet 的整栋视图" width="390" height="844"><figcaption><strong>新 · 整栋看 200 个栏</strong>底部用 PenMap 的「返回」和「逐栏」，例如点 C11–20。</figcaption></figure>
+      <figure><img src="screenshots/a-pens.jpg" alt="逐栏模式定位到 C12" width="390" height="844"><figcaption><strong>新 · 在区间内点 C12</strong>点区间只回到逐栏，点具体栏才填进草稿。</figcaption></figure>
+      <figure><img src="screenshots/a-review.jpg" alt="核对页已填入目标栏 C12" width="390" height="844"><figcaption><strong>新 · 回原页核对再提交</strong>点 C12 可以改栏。底部确认才提交。</figcaption></figure>
+    </div>
+  </section>
+
+  <section id="b">
+    <h2>B · 先按栏号找，再核对</h2>
+    <p class="route">Move → 选择房间和栏 → 核对对象与目的地 → 确认转舍</p>
+    <p>适合栏很多、工作人员已经知道栏号的情况。输入 C12 后点结果。只知道大概位置时，也可以从同一页打开标准栏位图。两条路径都回同一张核对页。</p>
+    <div class="screens">
+      <figure><img src="screenshots/b-search.jpg" alt="输入 C12，显示本房间的匹配栏位" width="390" height="844"><figcaption><strong>新 · 先搜栏号</strong>结果随所选房间改变，地图入口也在这一页。</figcaption></figure>
+      <figure><img src="screenshots/b-map.jpg" alt="通过选择目标栏页打开标准 PenMap" width="390" height="844"><figcaption><strong>新 · 也可以打开同一张 PenMap</strong>返回时还在原搜索，点具体栏直接去核对。</figcaption></figure>
+      <figure><img src="screenshots/b-review.jpg" alt="从搜索或地图选中 C12 后进入核对" width="390" height="844"><figcaption><strong>新 · 点目标位置整行可以改</strong>更换房间或栏位都从这里进。</figcaption></figure>
+    </div>
+    <p class="note"><strong>建议 B。</strong> 知道栏号时可以直接搜，需要看栏位相对位置时再打开整栋图。如果现场多数是对着栏位找位置，A 从核对页开图更顺。</p>
+  </section>
+
+  <section id="outside">
+    <h2>异单元移入的核对和报错</h2>
+    <p class="route">扫描或查找 → 点 000430 → 只移入／移入并选中 → 选本单元目标栏 → 核对</p>
+    <p>核对里直接点目标栏这一整行修改。目的地限定在当前 Unit 7。接口返回错误时，在核对页短暂显示服务端消息，耳号、目标栏和已有勾选都保留，可改栏再提交。图中的「目标栏已满」是提示样例。</p>
+    <div class="screens">
+      <figure><img src="screenshots/outside-before.jpg" alt="旧原型中单独的 Change destination 按钮" width="390" height="844"><figcaption class="old"><strong>旧版 · 单独的 Change destination</strong>目标值和修改入口分在两处。</figcaption></figure>
+      <figure><img src="screenshots/outside-review.jpg" alt="目标栏参与核对，右侧箭头可重新选栏" width="390" height="844"><figcaption><strong>新 · 点 Unit 7 · C12 改栏</strong>来源栏 A2 只供核对，目标栏的箭头代表可以修改。</figcaption></figure>
+      <figure><img src="screenshots/outside-error.jpg" alt="核对页以底部提示显示接口报错" width="390" height="844"><figcaption><strong>新 · 接口错误用底部提示</strong>沿用扫描「No pig with this tag」的 Toast。删除 Move unavailable、Move failed、Move not confirmed 三个专用状态。</figcaption></figure>
+    </div>
+  </section>
+
+  <section id="integration">
+    <h2>PR 接入核对</h2>
+    <p><a href="https://github.com/xia16/Sentri-UI/pull/317">PR #317</a> 已把巡检和分娩的常规栏位图接入标准 Sheet，补齐布局样例、整栋和区间跳转。<a href="https://github.com/xia16/Sentri-UI/pull/318">PR #318</a> 的栏位 Move、名单 Move、单猪 Move、异单元移入、分娩母猪和仔猪 Move 要用同一套 Sheet。进入地图前由各入口提供房间和可选栏，点栏只更新转舍草稿。</p>
+    <p>栏位图读取房间布局。单栏房间通过列表点选，可选的空栏仍可作为目标，来源栏和已知不可用栏不可点。地图负责选栏，核对页负责提交。</p>
+    <p>两边的巡检与分娩入口、页面登记和生成的 Atlas 有文件冲突。建议以 #317 的常规栏位图为基准，把 Move 的选择行为接上，重新生成 Atlas，并回放两边的入口。</p>
+  </section>
+</main>
+</body>
+</html>

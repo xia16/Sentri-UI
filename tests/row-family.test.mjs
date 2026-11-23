@@ -24,6 +24,12 @@ test('unavailable rows explain why and legacy trailing values cannot inject HTML
  assert.match(html,/disabled aria-disabled="true"/);assert.match(html,/Unit closed/);
  assert.match(html,/&lt;img/);assert.doesNotMatch(html,/<img/);
 });
+test('a dead piglet can open its identity while its select box stays disabled',()=>{
+ const html=UI.rowSelectDoor({code:'418001',value:'418001',selectDisabled:true,action:'select-piglet',openAction:'open-piglet',openValue:'418001'});
+ assert.match(html,/<input type="checkbox" data-action="select-piglet" value="418001" disabled>/);
+ assert.match(html,/<button type="button" class="st-row-door " data-action="open-piglet" data-value="418001"/);
+ assert.doesNotMatch(html,/<button[^>]+disabled/);
+});
 test('TaskDay ticks: due shows a ring, ticked a disc and no Done chip; only saved items say Done',()=>{
  const html=K.day({title:'Day 3',items:[{title:'Iron',id:'a',mark:'due',action:'item',value:'a'},{title:'Tail',id:'b',mark:'ticked',action:'item',value:'b'},{title:'Teeth',id:'c',mark:'done',action:'noop'}]});
  assert.match(html,/data-mark="due"/);assert.match(html,/data-mark="ticked"/);

@@ -12,7 +12,7 @@ Scope: the headers only (the shared Headers change). Bodies keep their own budge
 
 ## Levels
 
-- Header line: the unit, the walk's subject (settled). The last record is the body's first row, with Log as a quiet text action (End walk and check-in removed: owner, 2026-11-03): the activity row the walk already had, now holding its two walk actions, with no second dark fill. Counts, pens and the unit are cut from every drawer: the selection bar and the list say them.
+- Header line: the unit and last record (time and author). The History button opens This walk. End walk and check-in were removed on 2026-11-03 (#314). Counts, pens and the unit are cut from every drawer: the selection bar and the list say them.
 
 ## Headers (2026-10-13)
 
@@ -20,8 +20,7 @@ The header line of every surface of this feature, decided by the Headers law (`u
 
 | Surface | Hub or action | Header line | The worker's question it answers there | Back test |
 |---|---|---|---|---|
-| Walk (task page) | hub | fact: `Unit 7`, the walk's subject | Which unit am I walking? (the first question; the unit card is not on this page) | Back reaches Today, which spans units |
-| Walk, the row under the header | body | `Last record 06:40 · G.H`, then Log as a quiet text action (End walk removed 2026-11-03) | Can I trust this list (who last worked here)? Where do I read this walk? | |
+| Walk (task page) | hub | `Unit 7 · last record 06:40 · G.H`; History at right | Which unit am I walking? Who last worked here? | Back reaches the originating Home unit or attention list |
 | Pen sheet (title `Pen C1`), Pen log, Pen note, Filter pigs, Go to pen, Find or scan, Selected, This walk | action | none | | Back reaches the walk, or the pen sheet that names the pen |
 | More actions for one pig, and the pig's surfaces | see `features/pig-profile/budget.md` | route on the hubs her forms come back to | | walked on the real chain (crit round 1) |
 
@@ -29,7 +28,7 @@ Crit round 2: the first design (unit as a grey label beside Log and a dark End w
 
 Chains walked on the real Back path after this change (crit round 1): no surface here writes to or is about one animal without showing it on screen or one Back away; no line changed.
 
-## Check in again (2026-10-14)
+## Earlier check-in design (2026-10-14, superseded by #314)
 
 | Fact | Level | Question it answers | Change |
 |---|---|---|---|
@@ -102,9 +101,9 @@ The walk's Go to pen moves onto the design system's PenMap, as Farrowing's Pen m
 ## Inventory
 
 - Header: the title, `Pen map`, and the colour key as its one line: the pens that need the worker, with the amber swatch.
-- The Entrance band, the column letters and row numbers, one tile per pen with its code; the tile's colour is its status.
+- The Entrance band and one tile per pen with its code and status colour. The room shape follows the [pen-map contract](../../ux/model/pen-map-contract.md): uniform lanes keep column letters and row numbers; mixed sizes change tile heights and omit the row-number column; rows across the room appear where the worker meets them, and lane A can be on either side.
 - Peek (hold a tile): the pen code and its pig count, then the pen's rows as the walk draws them: ID over the stage line, condition tags; the group of pigs without tags after the struck tag.
-- Footer: Back.
+- Footer: Back; Whole room appears beside it when the map is more than two screens tall. It groups neighbouring pens of one run into shared tiles with a status mark per pen; a tap returns to pen by pen at that group. A room with one pen or no pens has no Pen map entry.
 - Could have shown and does not: the old fact line in every cell (`2 health`, `3 pigs`, `Not in unit`, `No matches`); the intro `Tap a pen to go to its pigs. Hold to peek.`; the note `Pen layout · only pens matching this view can be opened.`; the unit name under the title; the ring on the current pen; the current pen on the dock button (`C1 / Go to pen`); the peek's feed line, `Formula change due`, the manual-feed count, `Pen note available` and the open fault; a checked mark per pen; a blue level.
 
 ## Questions
@@ -125,7 +124,8 @@ The walk's Go to pen moves onto the design system's PenMap, as Farrowing's Pen m
 | White tile with a line | **Settled** | Which pens have pigs shown under the current lens and filter. |
 | Quiet tile (disabled) | **Settled** | Which pens have nothing to go to, or nothing this lens or filter shows. |
 | Pen code (`C2`) | **Settled** | Which pen is this? The tile's only text. |
-| `Entrance` band, letters and numbers | **Settled** | Which end is the door, which lane, which row. |
+| `Entrance` band, letters and row numbers when sizes align | **Settled** | Which end is the door, which lane and row. In a mixed-size room the pen codes carry the numbers and the row-number column goes. |
+| Whole room / Pen by pen | **Watch** | Where are the pens in a room more than two screens tall? One zoom out, then back to individual pens. |
 | Peek: pen code and pig count (`D4 · 16 pigs`) | **Settled** | Which pen, how many pigs. |
 | Peek: the rows (`000306 · Gestation`, `! Fever`, `Appetite`) | the roster's own levels | Who is in it and does anyone need me: the same ID, stage line and tags as the walk, most urgent first. |
 | Peek: `+3 more` | **Settled** | Are there more pigs than the card shows? Only past four rows (a pen of 30). |
@@ -147,7 +147,7 @@ Pen facts that are not animals (feed, formula due, a note, an open fault) do not
 
 Decision: a pen the walk has been through and one it has not take the same face. The map draws no checked state.
 
-- What the walk can know. A pen leaves a trace only when something is recorded on it or its pigs. A pen the worker looked at and found fine leaves none. The walk is checked in as a unit (End walk, `Check in to Unit 7`), and finishing a walk does not mark pigs healthy (PRD, Rules). There is no per-pen check to show.
+- What the walk can know. A pen leaves a trace only when something is recorded on it or its pigs. A pen the worker looked at and found fine leaves none. History records the work done. There is no End walk, unit check-in or per-pen check to show.
 - Why not mark recorded pens. A tick or a dimmed face from records would call every healthy pen the worker did look at "not checked": the wrong answer on exactly the pens with nothing wrong, pushing a second walk. It would also be a second channel in a tile that the colour rule keeps to one (one pen, one colour; a tile says its code only).
 - Why not blue. Blue is In progress; nothing on the walk is in progress.
 - Where "where was I" is answered. The walk list is in walking order and the map opens centred on the pen at the top of the list, so the pen the worker stopped at is in view and the pens still ahead follow it. What was recorded this walk is in the walk's Log.
@@ -155,3 +155,14 @@ Decision: a pen the walk has been through and one it has not take the same face.
 ## Cut list
 
 The fact line in every cell and its second vocabulary (`N health`, which also counted ongoing conditions); `Not in unit` and `No matches` (the quiet tile says both); the intro and layout notes; the unit name under the title (the walk's header has it); the current-pen ring and the pen number on the dock button; the peek's feed, formula, manual-feed, note and fault lines (the pen page has them, one tap away); a checked mark.
+
+## Scan scope, transfer decision and destination
+
+| Where | First question | Information and controls |
+| --- | --- | --- |
+| Scan / Find | Which pig did I read, and where is it recorded? | One row under its recorded unit and pen. Outside the scope, replace the selection box with a door and a short location cue. |
+| Outside pig sheet | Can I see the record, move it, or also select it? | Ear tag, recorded location; View pig record, Move only, Move and select. No duplicate action beside the result. |
+| Destination | Which registered pen will receive it? | Current unit and one pinned search over a scrolling catalogue. No transfer action on selecting a line. |
+| Confirm / result | Is this where the pig belongs, and did it move? | Ear tag and source → destination on confirmation; destination and selection outcome on the receipt. |
+
+Cut: the repeated Move into this … text below each result, a long stack of radio rows in a drawer, and numbers that restate the list's row count. A rejected or uncertain move retains the selection and does not announce a completed transfer.

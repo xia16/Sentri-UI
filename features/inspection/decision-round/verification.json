@@ -1,0 +1,31 @@
+{
+  "source": "implemented prototype",
+  "transfer": "simulated receipts",
+  "checks": [
+    "Unit scan groups local pigs in their own pens; outside tag has no tick; unknown and repeated reads do not add pigs",
+    "The outside-unit PenMap Sheet offers Whole room and returns to the move choices",
+    "Move-only and move-and-select change the location; only the second adds a tick",
+    "Search offers the same transfer choices and preserves the original text on return",
+    "Pen page has no scan entry; the walk dock still scans the whole unit",
+    "The API error uses a notice toast and keeps the review and selection",
+    "Selected scan rows keep their background and a queued move returns silently",
+    "From a pen, choose identities or scan and count; a tagged-only move keeps the pen’s group conditions",
+    "From a pen, enter one total for all pigs without ID in the source pen",
+    "A walk selection goes straight to the destination and moves the correct quantities across any source batches",
+    "From one pig’s record, Move takes that pig only and returns to its record with the new location",
+    "A single movable pig in a pen opens the map directly",
+    "Scan selection and Selected review open the same embedded destination map",
+    "Ear notch stays individually selectable and cancel leaves the source untouched",
+    "Farrowing sow and piglet Move reuse the pen picker",
+    "No connected reader offers no scan actions",
+    "Farrowing pen keeps Note, Feed and Fault; returns to the room",
+    "Current tasks and Actions both open the matching Farrowing record and return to their entry",
+    "Entering and leaving the sow sheet preserves the Inspection selection and a Farrowing draft",
+    "Home to-treat opens exactly the row's pig and goes back to the same search",
+    "Home monitoring opens exactly the row's pig and goes back to the same search",
+    "After saving from the scan batch, continue on the same selection",
+    "Batch treatment returns to Scan and retains the selected pigs, online and offline",
+    "After saving from Selected, continue on the same selection",
+    "From a pig record, save only for that pig and preserve the parent selection"
+  ]
+}

@@ -40,7 +40,11 @@ test('Record health is a full page like Record treatment (owner, 2026-10-17)', (
 test('treatment and transfer use full pages with completion controls', () => {
   const c = context('pig'); c.selected.add(c.pigId); model.openBulkAction(c, 'treatment');
   checkPage(model.overlay(c)); assert.match(model.overlay(c), /data-action="bulk-save"/);
-  c.view = 'sow-transfer'; c.transferDraft = {}; checkPage(model.overlay(c));
+  c.view = 'actions'; c.transferOrigin={unit:'7',name:'Unit 7'};
+  c.transferDestinations=[{id:'7',name:'Unit 7',pens:['C1','C2','C3']}];
+  assert.equal(model.openInspectionMove(c,'',true),true);checkPage(model.overlay(c));
+  assert.match(model.overlay(c), /data-action="move-pen"/);
+  c.move.to='C2';c.view='move-review';checkPage(model.overlay(c));
   assert.match(model.overlay(c), /data-action="save-transfer"/);
 });
 test('medicine picker preserves the treatment page and entered dose behind it', () => {
@@ -121,13 +125,13 @@ test('a sow\'s existing note keeps its row under the grid; only bare verbs becom
   assert.ok(html.indexOf('data-action-group="everyday"')<html.indexOf('data-action-group="content"'));
 });
 
-test('a group of pigs without ear tags alone is offered Condition only: no verb that cannot act on it', () => {
+test('a group without identity can record a condition or move', () => {
   const c=context('actions');c.selected.clear();
   const penWithGroup=c.pens.find(p=>p.untagged?.count);
   if(!penWithGroup)return; // seed without untagged groups
   c.selectedNoTags=new Set([penWithGroup.id]);c.noTagsCount={[penWithGroup.id]:penWithGroup.untagged.count};
   const actions=model.actionCatalogue(c).groups.flatMap(g=>g.items).map(x=>x.a);
-  assert.deepEqual(actions,['health']);
+  assert.deepEqual(actions,['health','transfer']);
 });
 
 test('pen Actions is a menu drawer too', () => {
@@ -135,11 +139,11 @@ test('pen Actions is a menu drawer too', () => {
   checkMenuDrawer(model.overlay(c));
 });
 
-test('the verb words come from the strings registry, and Transfer is not the registered verb Move', () => {
+test('the Move tile comes from the shared strings registry', () => {
   const c=context('actions');c.selected.add(c.pigId);
   c.hostActions=farrowing.sowActionCatalogue(farrowing.seed('count'));
   const labels=[...model.overlay(c).matchAll(/<span class="st-row-tile-label">([^<]+)<\/span>/g)].map(m=>m[1]);
-  assert.ok(labels.includes('Transfer'));assert.ok(!labels.includes('Move'));
+  assert.ok(labels.includes('Move'));
   const registry=require('../laws/strings.json').strings;
   for(const label of labels)assert.ok(Object.entries(registry).some(([id,s])=>id.startsWith('actions.tile.')&&s.en===label&&s.zh),label);
 });
@@ -196,44 +200,37 @@ test('batch membership is one production entrance for add, move and remove', () 
 test('farrowing operations stay together inside Production', () => {
   const s = farrowing.seed('count');
   const actions = farrowing.sowActionCatalogue(s);
-  for (const id of ['miscarriage', 'not-in-pig']) {
+  for (const id of ['miscarriage', 'foster']) {
     const entry = actions.find(action => action.id === id);
     assert.equal(entry.group, 'production', id);
     assert.equal(entry.scope, 'farrowing', id);
   }
-  for (const id of ['piglets', 'death', 'countReconcile', 'foster']) {
-    const entry = actions.find(action => action.id === id);
-    assert.equal(entry.group, 'production', id);
-    assert.equal(entry.scope, 'piglet-processing', id);
-  }
-  actions.find(action => action.id === 'remove-batch').reason = '';
-  const c = context('actions'); c.selected.add(c.pigId); c.hostActions = actions;
-  c.hostTasks = [
-    { id: 'farrowing', title: 'Farrowing', type: 'Production', status: 'In progress' },
-    { id: 'piglet-processing', title: 'Piglet processing', type: 'Production', status: 'Due today' }
-  ];
+  const c = context('actions');
+  c.selected.add(c.pigId);
+  c.hostActions = actions;
+  c.hostTasks = [{ id: 'farrowing', title: 'Farrowing', type: 'Production', status: 'In progress' }];
   const html = model.overlay(c);
   assert.match(html, /aria-label="Farrowing actions"/);
-  assert.match(html, /aria-label="Piglet processing actions"/);
-  assert.match(html, /aria-label="Farrowing actions">[\s\S]*?<h5[^>]*><span>Farrowing<\/span><\/h5>/);
-  assert.match(html, /aria-label="Piglet processing actions">[\s\S]*?<h5[^>]*><span>Piglet processing<\/span><\/h5>/);
-  assert.doesNotMatch(html, /Current task ·/);
-  assert.match(html, /Record abortion/);
-  assert.doesNotMatch(html, /Edit litter record/, 'no Edit record (owner, 2026-11-02)');
-  assert.ok(html.indexOf('aria-label="Farrowing actions"') < html.indexOf('aria-label="Piglet processing actions"'));
-  assert.ok(html.indexOf('aria-label="Piglet processing actions"') < html.indexOf('aria-label="Shared actions"'));
-  assert.doesNotMatch(html, /Other production actions|aria-label="Other actions"/);
-  c.hostActions = actions.map(({ scope, ...action }) => action);
-  const legacyHtml = model.overlay(c);
-  assert.match(legacyHtml, /aria-label="Farrowing actions"/);
-  assert.match(legacyHtml, /aria-label="Piglet processing actions"/);
+  assert.match(html, /Foster piglets/);
+  assert.doesNotMatch(html, /Piglet processing|Reconcile piglet count|Edit litter record|Mark not in pig/);
+  assert.ok(html.indexOf('aria-label="Farrowing actions"') < html.indexOf('aria-label="Shared actions"'));
+  assert.equal(farrowing.sowActionCatalogue(farrowing.seed('before')).some(action => action.id === 'foster'), false);
+  assert.ok(farrowing.sowActionCatalogue(farrowing.seed('ended')).find(action => action.id === 'foster').reason);
   for (const id of ['remove-batch']) {
     const entry = actions.find(action => action.id === id);
     assert.equal(entry.group, 'production', id);
     assert.equal(entry.scope, 'other', id);
   }
-  assert.equal(actions.find(action => action.id === 'not-in-pig').scope, 'farrowing');
-  assert.ok(actions.find(action => action.id === 'move-batch').reason);
+  assert.ok(actions.find(action => action.id === 'remove-batch').reason);
+});
+test('farrowing receipt counts earlier removals separately from removals at close', () => {
+  const awaiting = farrowing.seed('before');
+  const removed = { ...farrowing.seed('before'), locked: true, frozen: 0, productionOutcome: 'removed' };
+  const room = { units: [{ id: '7', records: [awaiting, removed] }] };
+  assert.equal(farrowing.closeTask(room), true);
+  assert.equal(room.completion.awaiting, 1);
+  assert.equal(room.completion.removed, 1);
+  assert.equal(room.completion.total, 2);
 });
 test('Farrowing actions use one note, one measurements entrance and no Feed category', () => {
   const s = farrowing.seed('count');
@@ -288,7 +285,7 @@ test('Production hides actions from conflicting stages and shares only batch mem
   assert.equal(growerProduction.filter(item => item.a === 'batch-membership').length, 1);
 });
 test('farrowing surface policy includes substantial pages but preserves review drawers', () => {
-  for (const view of ['history', 'roomOverview', 'roomEndTask', 'roomTaskReceipt', 'roomTaskSows', 'roomPenDetail', 'roomPenFeed', 'roomPenLog', 'marker', 'pigletCare', 'pigletEdit', 'foster', 'pigletDeath', 'countReconcile']) assert.equal(surfaces.isPage('farrowing', view), true, view);
+  for (const view of ['history', 'roomOverview', 'roomEndTask', 'roomTaskReceipt', 'roomTaskSows', 'roomPenDetail', 'roomPenFeed', 'roomPenLog', 'marker', 'pigletList', 'fosterSend', 'foster']) assert.equal(surfaces.isPage('farrowing', view), true, view);
   for (const view of ['count', 'finish', 'locked', 'death', 'edit', 'editFinish', 'deathBreakdown']) assert.equal(surfaces.isPage('farrowing', view), false, view);
 });
 
@@ -306,7 +303,8 @@ test('the pen page leads with its verbs, then what needs someone, then how the p
   const html=model.overlay(c);
   const grid=html.match(/<div class="st-panel st-row-grid[^"]*"[^>]*aria-label="Pen actions"[^>]*>([\s\S]*?)<\/div><\/section>/);
   assert.ok(grid,'pen verbs as a tile grid');
-  assert.deepEqual([...grid[1].matchAll(/data-action="([^"]+)"/g)].map(m=>m[1]),['pen-note','feed','pen-observe','new-fault','tick-pen']);
+  assert.deepEqual([...grid[1].matchAll(/data-action="([^"]+)"/g)].map(m=>m[1]),['pen-note','feed','pen-observe','new-fault','pen-move','tick-pen']);
+  assert.doesNotMatch(html,/data-action="(?:scan|scan-pen)"/,'the pen page does not open Scan');
   const order=['Pen actions','Needs attention','>Now<','Pen log'].map(k=>html.indexOf(k));
   assert.ok(order.every((x,i)=>x>0&&(i===0||x>order[i-1])),'verbs, needs attention, now, log: '+order);
   assert.match(html,/data-action="fault-record" data-value="C1\|f1"/);

@@ -1,0 +1,25 @@
+{
+  "baseline": "df82ba5dbaf690fab32cfd4437c66457c4e17b9e",
+  "crossUnitStudy": "baa057e5624bcfb54c8bf24c344bb58ed36756e9",
+  "viewport": [
+    390,
+    844
+  ],
+  "language": "en",
+  "checks": [
+    "Home Unit 7 → Inspect unit → same Home unit",
+    "Home to-treat → the pig’s unit in Health → original Home list",
+    "Home monitoring → the pig’s unit in Health → original Home list",
+    "Home Lookup stays in Home and opens the shared pig record",
+    "Baseline: Find → Scan → single Actions loses one tick and Back skips Find",
+    "Find and dock open the same full-screen Scan; Back restores the search or the walk",
+    "Single-pig Actions preserves walk ticks on Back and saves only for that pig",
+    "PenMap lands on C2; pen door opens faults, Pen log, and returns to that pen",
+    "Report → marker and pen record → resolve → equipment entries in Pen log",
+    "Existing equipment fault opened from its row or a duplicate report keeps one resolution draft",
+    "Inspection pen → read / edit / close note; Feed, Observe and Tick all",
+    "Farrowing has its own pen page and pen tools",
+    "Cross-unit lookup: real Unit 6 record, no selection into the walk; earlier Move proposal stays disabled",
+    "Production card and single Actions both enter Farrowing; completed sow has no active task"
+  ]
+}

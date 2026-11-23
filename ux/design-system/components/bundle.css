@@ -840,6 +840,8 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
    label above it on the tint like a heading. The skeleton context (tasks not designed yet) keeps the well. */
 :is([data-st-context="page"],[data-st-context="drawer"],[data-st-context="menu"]) .st-stepper[data-variant="well"] .st-stepper-keys{background:var(--st-panel-bg);border:var(--border-width) solid var(--st-line);border-radius:var(--radius-panel)}
 .st-stepper[data-variant="well"] .st-stepper-value{font-size:var(--type-figure-well-size);letter-spacing:0}
+.st-stepper button.st-stepper-value{align-self:stretch;border:0;border-radius:var(--radius-control);background:transparent;padding:0;color:var(--ink)}
+.st-stepper button.st-stepper-value:active{background:var(--st-press)}
 .st-stepper[data-variant="well"] .st-stepper-copy{align-items:flex-start;text-align:left}
 .st-stepper[data-variant="count"]{padding:var(--space-panel);background:var(--well);border-radius:var(--radius-count)}
 .st-stepper-value{display:grid;place-items:center;min-width:var(--control-height);min-height:var(--control-height)}
@@ -1219,6 +1221,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-pen-row{position:sticky;left:0;z-index:2;box-shadow:var(--pm-gap) 0 0 0 var(--st-context-bg,var(--app-background))}
 .st-pen-col.st-pen-row{z-index:4;box-shadow:var(--pm-gap) 0 0 0 var(--st-context-bg,var(--app-background)),0 var(--pm-gap) 0 0 var(--st-context-bg,var(--app-background)),var(--pm-gap) var(--pm-gap) 0 0 var(--st-context-bg,var(--app-background))}
 .st-pen-tile{scroll-snap-align:start;display:grid;place-items:center;width:100%;min-width:var(--pm-tile);min-height:var(--pm-tile);margin:0;padding:0;border:var(--border-width) solid var(--line);border-radius:var(--radius-control);background:var(--st-panel-bg);color:var(--ink);font:var(--type-weight-semibold) var(--size-15)/1 var(--font-mono);touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.st-pen-tile[data-selected]{border-color:var(--ink);box-shadow:inset 0 0 0 calc(var(--ring-width) - 1px) var(--ink)}
 .st-pen-tile[data-level=act]{border-color:transparent;background:var(--amber-fill);color:var(--amber-fill-ink)}
 .st-pen-tile[data-level=live]{border-color:transparent;background:var(--progress-fill);color:var(--progress-fill-ink)}
 .st-pen-tile:is([data-level=empty],[data-level=hidden]){border-color:transparent;background:var(--well);color:var(--muted);font-weight:var(--type-weight-medium)}
@@ -1405,8 +1408,9 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-row[data-group] .st-row-chevron{display:none}
 .st-row[data-variant="select-door"][data-group] .st-row-door.st-row-door{padding-top:8px;padding-bottom:8px}
 .st-row-count{flex:none;display:flex;align-items:center;padding-right:6px}
-.st-row-count input{width:52px;height:48px;box-sizing:border-box;margin:0;padding:0;border:1px solid var(--control-border,var(--line));border-radius:var(--radius-10);background:var(--paper,#fff);color:var(--ink);font:600 17px/1 var(--font-sans);text-align:center}
-.st-row-count[data-idle] input{color:var(--ink-2);font-weight:500}
+.st-row-count :is(input,button){width:52px;height:48px;box-sizing:border-box;margin:0;padding:0;border:1px solid var(--control-border,var(--line));border-radius:var(--radius-10);background:var(--paper,#fff);color:var(--ink);font:600 17px/1 var(--font-sans);text-align:center}
+.st-row-count[data-idle] :is(input,button){color:var(--ink-2);font-weight:500}
+.st-row-count button:active{background:var(--st-press)}
 /* Lookup: Find and Scan, the two ways to reach an animal by its ear tag (components/Lookup/README.md). Find is an input page on the tint with the
    field pinned at the top and its unit cards white; Scan is a Sheet page on the tint, its list carrying the page gutter itself. Unit cards sit under plain section headings. */
 .st-find{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--st-canvas)}
@@ -1537,7 +1541,20 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .alive-card .alive-chip[data-tone="sub"]{background:#f6e1dc;color:#8a2a1c}
 .alive-card .alive-quiet{display:flex;align-items:center;gap:5px;font:400 13px var(--font-sans);color:var(--muted)}
 .alive-card .alive-quiet svg{width:14px;height:14px;color:#2f6b3a}
-.farrowing-phone .count-keys{display:grid;grid-template-columns:64px 1fr 80px;gap:8px}
+.farrowing-phone .sheet[data-view="count"] :is(.count-keys,.sheet-footer.count-footer){
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.4fr) minmax(0,1fr);gap:var(--space-8)
+}
+.farrowing-phone .sheet[data-view="count"] .count-footer{padding-inline:var(--space-gutter)}
+.farrowing-phone .count-footer>.button.surface-back{
+  container:farrowing-back / inline-size;
+  position:relative;gap:var(--space-8);width:100%;min-width:0;font-size:13px;white-space:nowrap
+}
+@container farrowing-back (width < 55px){
+  .farrowing-phone .count-footer>.surface-back>span{
+    position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)
+  }
+}
+.farrowing-phone .sheet-footer.count-footer>.button.primary{padding-inline:var(--space-10);white-space:nowrap}
 .farrowing-phone .count-key{display:flex;align-items:center;justify-content:center;gap:8px;height:72px;padding:0;border:1px solid #c3d6c7;border-radius:15px;background:var(--paper);color:#345841;font:600 15px var(--font-sans);cursor:pointer}
 .farrowing-phone .count-key svg{width:22px;height:22px}
 .farrowing-phone .count-key[data-tone="plus"]{background:var(--count-key);border-color:var(--count-key);color:var(--paper);box-shadow:0 3px 8px #225d3520}
@@ -1545,7 +1562,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .farrowing-phone .count-key[data-tone="death"] svg{color:#8a2a1c}
 .farrowing-phone .count-key[aria-disabled="true"]{background:var(--disabled-surface);border-color:var(--control-border);border-style:dashed;color:var(--ink-2);cursor:default}
 .farrowing-phone .count-key:not([aria-disabled="true"]):active{filter:brightness(.94)}
-.farrowing-phone .count-footer .icon-button{flex:none;width:56px;height:56px}
+.farrowing-phone .count-footer>.icon-button{width:100%;min-width:0;height:var(--footer-height)}
 .farrowing-phone .sheet[data-view="death"] .death-causes{margin-top:16px}
 .farrowing-phone .sheet[data-view="death"] .death-causes:first-child{margin-top:0}   /* a sow that died: no switch above, the card leads the body */
 .farrowing-phone .sheet[data-view="death"] .tk-choice+.photo-field,.farrowing-phone .sheet[data-view="death"] .death-causes+.photo-field{margin-top:16px}
