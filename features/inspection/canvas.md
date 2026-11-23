@@ -1,10 +1,11 @@
 # Canvas
 
+- [PenMap propagation · Farrowing and Inspection](../farrowing/penmap-sync-round/canvas.html) (2026-11-16, offline canvas): Inspection's current 4 × 6 map beside a long room and Whole room, including the host click fix. Rendered from the live prototype by `../farrowing/penmap-sync-round/mock.mjs`; owner agreed on 2026-11-16. Claude Design was unavailable because claude.ai showed Sign in.
 - [Multi-select box: green on white](https://claude.ai/artifact/3gGpWh4tEuA2qdLq4Vr1gq) (2026-11-03): before and after of the ticked multi-select box, now `select-mark` green with a white tick on a white row (owner pick B, 2026-11-03), on Choose pigs, the Inspection walk, Choose conditions and Home's scan list; the ticked task item (Row · Task item) is left as it is until Piglet processing is designed (owner, 2026-11-03: still a skeleton). Sources: `features/farrowing/select-box-round/` (mock.mjs renders them from the live pages).
 - [Colour in the health and treatment pickers](https://claude.ai/artifact/CaAFZ7wmNkGcNDUkdfTYTH) (2026-11-03): the owner found Conditions, Treatment and Medicines grey and dull. Four levers on the live pages: A white rows (a picker as a menu drawer), B the selection in green, C the withdrawal as the consequence, D a hue per body area and drug class. Sources: `features/inspection/picker-colour-round/` (mock.mjs). On hold: the owner first wants one surface convention (2026-11-03).
 - [Inspection entrance consistency](consistency-round/review.html) and [pending decisions](consistency-round/decisions.html) (2026-11-19, offline canvas). 390 × 844 old, current and corrected states from `consistency-round/capture.mjs`. Built with the prototype’s own parts before promotion. The owner authorized direct fixes where the intended behavior was clear; the decisions board records the cases left for review. Claude Design was unavailable in this session.
-- [巡检六项决定与操作链路](decision-round/canvas.html)（2026-11-20，离线画布）：单元扫码、移入与回执、分娩栏位工具、盘点暂缓、直开母猪分娩记录、首页直开猪档案及保存返回。基于 `af640dd3`，从真实原型的样例回放，已在会话确认。实现时按要求收起列表内的重复移入入口，目标栏改用可搜索的全屏页。旧版本见提交 `21dd7636`。按后续指示移除栏位页的本栏扫码，猪只档案的饲喂标题与查看计划对齐，图文已更新。
+- [巡检六项决定与操作链路](../../ux/review/farrowing-inspection/inspection.html)（2026-11-20，离线画布）：单元扫码、移入与回执、分娩栏位工具、盘点暂缓、直开母猪分娩记录、首页直开猪档案及保存返回。基于 `af640dd3`，从真实原型的样例回放，已在会话确认。实现时按要求收起列表内的重复移入入口，目标栏改用可搜索的全屏页。旧版本见提交 `21dd7636`。按后续指示移除栏位页的本栏扫码，猪只档案的饲喂标题与查看计划对齐，图文已更新。
 
-- [巡检转舍与选栏](decision-round/canvas.html#move)（2026-11-21，离线画布）。会话确认的勾选样式、精简回执、无身份群组病症清理与 PenMap Whole room。截图由原型回放生成。
+- [巡检转舍与选栏](../../ux/review/farrowing-inspection/move.html)（2026-11-21，离线画布）。会话确认的勾选样式、精简回执、无身份群组病症清理与 PenMap Whole room。截图由原型回放生成。
 
-- [巡检转舍选栏方案](move-picker-round/canvas.html)（2026-11-23，离线画布）。核对页开图与先搜栏号两套方案、异单元移入的目标栏修改与接口提示，以及 PR #317 的接入范围。待选方案。
+- [巡检转舍选栏方案](move-picker-round/canvas.html)（2026-11-23，离线画布）。核对页开图与先搜栏号两套方案、异单元移入的目标栏修改与接口提示，以及 PR #317 的接入范围。负责人于 2026-11-23 确认 B。

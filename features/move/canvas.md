@@ -1,3 +1,5 @@
 # Move canvas
 
-- [巡检转舍与选栏](../inspection/decision-round/canvas.html#move)（2026-11-21，离线画布）。沿用会话中的《Move pigs.html》和确认后的来源栏病症规则。包含栏位、勾选名单、单猪档案和分娩入口。
+- [巡检转舍与选栏](../../ux/review/farrowing-inspection/move.html)（2026-11-21，离线画布）。沿用会话中的《Move pigs.html》和确认后的来源栏病症规则。包含栏位、勾选名单、单猪档案和分娩入口。
+
+- [选栏方案](../inspection/move-picker-round/canvas.html)（2026-11-23）。负责人确认 B · 先按栏号找，再核对，复用 PenMap Sheet。

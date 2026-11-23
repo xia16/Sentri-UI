@@ -1,0 +1,750 @@
+[
+  {
+    "id": "farrowing.room",
+    "name": "Room list",
+    "preset": "room",
+    "steps": [],
+    "current": "farrowing.room",
+    "view": "room",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.count",
+    "name": "Counting",
+    "preset": "count",
+    "steps": [],
+    "current": "farrowing.count",
+    "view": "count",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.count-draft",
+    "name": "Counting · not saved yet",
+    "preset": "visit",
+    "steps": [],
+    "current": "farrowing.count-draft",
+    "view": "count",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.count-saved",
+    "name": "Counting · just saved",
+    "preset": "saved",
+    "steps": [],
+    "current": "farrowing.count-saved",
+    "view": "count",
+    "text": "9:41 Farrowing Last record 09:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 just now · G.H 12 ",
+    "errors": []
+  },
+  {
+    "id": "farrowing.undo",
+    "name": "Undo the last save",
+    "preset": "undo",
+    "steps": [],
+    "current": "farrowing.undo",
+    "view": "history",
+    "text": "9:41 Farrowing Last record 09:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 just now · G.H 12 ",
+    "errors": []
+  },
+  {
+    "id": "farrowing.before",
+    "name": "Before first count",
+    "preset": "before",
+    "steps": [],
+    "current": "farrowing.before",
+    "view": "count",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.death",
+    "name": "Report death",
+    "preset": "draft",
+    "steps": [],
+    "current": "farrowing.death",
+    "view": "death",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.death-selected",
+    "name": "Record dead · selected piglets",
+    "preset": "count",
+    "steps": [
+      "[data-action=\"sowActions\"]",
+      "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
+      "Piglet records",
+      "[data-action=\"togglePiglet\"][data-value=\"418001\"]",
+      "[data-action=\"openMortality\"]"
+    ],
+    "current": "farrowing.death-selected",
+    "view": "death",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.litter",
+    "name": "Details · while she farrows",
+    "preset": "litter",
+    "steps": [],
+    "current": "farrowing.litter",
+    "view": "litter",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.finish",
+    "name": "Finish",
+    "preset": "finish",
+    "steps": [],
+    "current": "farrowing.finish",
+    "view": "finish",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.locked",
+    "name": "Locked record",
+    "preset": "locked",
+    "steps": [],
+    "current": "farrowing.locked",
+    "view": "locked",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 9 / 19 Done · all units Awaiting 4 Active 0 Done 3 All 7 B1 · 1 sow 000418 08:12 · G.H 8 aliv",
+    "errors": []
+  },
+  {
+    "id": "farrowing.details",
+    "name": "Details · a finished sow",
+    "preset": "details",
+    "steps": [],
+    "current": "farrowing.details",
+    "view": "litter",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 9 / 19 Done · all units Awaiting 4 Active 0 Done 3 All 7 B1 · 1 sow 000418 08:12 · G.H 8 aliv",
+    "errors": []
+  },
+  {
+    "id": "farrowing.details-first",
+    "name": "Details · no earlier litters",
+    "preset": "details-first",
+    "steps": [],
+    "current": "farrowing.details-first",
+    "view": "litter",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 9 / 19 Done · all units Awaiting 4 Active 0 Done 3 All 7 B1 · 1 sow 000418 08:12 · G.H 8 aliv",
+    "errors": []
+  },
+  {
+    "id": "farrowing.history",
+    "name": "Farrowing log",
+    "preset": "history",
+    "steps": [],
+    "current": "farrowing.history",
+    "view": "history",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 9 / 19 Done · all units Awaiting 4 Active 0 Done 3 All 7 B1 · 1 sow 000418 08:12 · G.H 8 aliv",
+    "errors": []
+  },
+  {
+    "id": "farrowing.piglets",
+    "name": "Piglets · a dead sow's litter",
+    "preset": "piglets-dead",
+    "steps": [],
+    "current": "farrowing.piglets",
+    "view": "pigletList",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.piglets-ticked",
+    "name": "Piglets · three ticked",
+    "preset": "piglets-ticked",
+    "steps": [],
+    "current": "farrowing.piglets-ticked",
+    "view": "pigletList",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.piglets-actions",
+    "name": "Piglets · Actions",
+    "preset": "piglets-actions",
+    "steps": [],
+    "current": "farrowing.piglets-actions",
+    "view": "litterActions",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.piglets-sow",
+    "name": "Piglets · foster to a sow",
+    "preset": "piglets-sow",
+    "steps": [],
+    "current": "farrowing.piglets-sow",
+    "view": "foster",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.piglets-filter",
+    "name": "Piglets · filter sows",
+    "preset": "piglets-filter",
+    "steps": [],
+    "current": "farrowing.piglets-filter",
+    "view": "foster",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.piglets-confirm",
+    "name": "Piglets · confirm the sow",
+    "preset": "piglets-confirm",
+    "steps": [],
+    "current": "farrowing.piglets-confirm",
+    "view": "allocConfirm",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.piglets-pen",
+    "name": "Piglets · move to a pen",
+    "preset": "piglets-pen",
+    "steps": [],
+    "current": "farrowing.piglets-pen",
+    "view": "allocPen",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.ended",
+    "name": "Sow died",
+    "preset": "ended",
+    "steps": [],
+    "current": "farrowing.ended",
+    "view": "locked",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 9 / 19 Done · all units Awaiting 4 Active 0 Done 3 All 7 B1 · 1 sow 000418 yesterday · L.M 7 ",
+    "errors": []
+  },
+  {
+    "id": "farrowing.task-blocked",
+    "name": "End task · active sows",
+    "preset": "task-blocked",
+    "steps": [],
+    "current": "farrowing.task-blocked",
+    "view": "roomEndTask",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.task-ready",
+    "name": "End task · awaiting sows",
+    "preset": "task-ready",
+    "steps": [],
+    "current": "farrowing.task-ready",
+    "view": "roomEndTask",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 10 / 19 Done · all units Awaiting 4 Active 0 Done 3 All 7 B1 · 1 sow 000418 09:35 · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.task-complete",
+    "name": "End task · all finished",
+    "preset": "task-complete",
+    "steps": [],
+    "current": "farrowing.task-complete",
+    "view": "roomEndTask",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 19 / 19 Done · all units Awaiting 0 Active 0 Done 7 All 7 B1 · 1 sow 000418 09:35 · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.task-outcomes",
+    "name": "End task · production outcomes",
+    "preset": "task-outcomes",
+    "steps": [],
+    "current": "farrowing.task-outcomes",
+    "view": "roomEndTask",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 18 / 18 Done · all units Awaiting 0 Active 0 Done 7 All 7 B1 · 1 sow 000418 09:35 · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.overview",
+    "name": "Task overview",
+    "preset": "room",
+    "steps": [
+      "Task overview"
+    ],
+    "current": "farrowing.overview",
+    "view": "roomOverview",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.task-receipt",
+    "name": "Task receipt",
+    "preset": "task-complete",
+    "steps": [
+      {
+        "tap": ".st-hold",
+        "hold": 1000
+      }
+    ],
+    "current": "farrowing.task-receipt",
+    "view": "roomTaskReceipt",
+    "text": "9:41 All units Today Ended tasks Farrowing Task ended · 18 finished View receipt 9:41 Task ended Farrowing · Nov 17 · 18:34 · G.H Performance metrics 18 finished litters Born alive",
+    "errors": []
+  },
+  {
+    "id": "farrowing.foster",
+    "name": "Foster piglets",
+    "preset": "foster",
+    "steps": [],
+    "current": "farrowing.foster",
+    "view": "foster",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.foster-search",
+    "name": "Foster piglets · typed",
+    "preset": "foster-search",
+    "steps": [],
+    "current": "farrowing.foster-search",
+    "view": "foster",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.foster-scanning",
+    "name": "Foster piglets · scanning",
+    "preset": "foster-scanning",
+    "steps": [],
+    "current": "farrowing.foster-scanning",
+    "view": "foster",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.foster-send",
+    "name": "Foster piglets · send to a sow",
+    "preset": "foster-send",
+    "steps": [],
+    "current": "farrowing.foster-send",
+    "view": "fosterSend",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.foster-filter",
+    "name": "Foster piglets · filter sows",
+    "preset": "foster-filter",
+    "steps": [],
+    "current": "farrowing.foster-filter",
+    "view": "foster",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.filter",
+    "name": "Filter sows",
+    "preset": "room",
+    "steps": [
+      "Filter sows"
+    ],
+    "current": "farrowing.filter",
+    "view": "roomFilter",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pen-map",
+    "name": "Pen map",
+    "preset": "room",
+    "steps": [
+      ".dock-map"
+    ],
+    "current": "farrowing.pen-map",
+    "view": "roomGrid",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pen-map-long",
+    "name": "Pen map · long room",
+    "preset": "room",
+    "steps": [
+      ".dock-map"
+    ],
+    "current": "farrowing.pen-map-long",
+    "view": "roomGrid",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pen-map-whole",
+    "name": "Pen map · Whole room",
+    "preset": "room",
+    "steps": [
+      ".dock-map",
+      ".st-pen-whole-toggle"
+    ],
+    "current": "farrowing.pen-map-whole",
+    "view": "roomGrid",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pen-map-group",
+    "name": "Pen map · shared tile opened",
+    "preset": "room",
+    "steps": [
+      ".dock-map",
+      ".st-pen-whole-toggle",
+      ".st-pen-group[data-from=\"B1\"]"
+    ],
+    "current": "farrowing.pen-map-group",
+    "view": "roomGrid",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pen-map-mixed",
+    "name": "Pen map · mixed pens",
+    "preset": "room",
+    "steps": [
+      ".dock-map"
+    ],
+    "current": "farrowing.pen-map-mixed",
+    "view": "roomGrid",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.room-single",
+    "name": "Room list · one pen",
+    "preset": "room",
+    "steps": [],
+    "current": "farrowing.room-single",
+    "view": "room",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 6 / 15 Done · all units Awaiting 3 Active 0 Done 0 All 3 B4 · 3 sows 000455 Parity 2 Today Du",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pen-landed",
+    "name": "Landed on a pen · needs you",
+    "preset": "room",
+    "steps": [
+      ".dock-map",
+      "[data-ds=\"PenMap\"] button[data-value=\"B4\"]"
+    ],
+    "current": "farrowing.room",
+    "view": "room",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pen-landed-live",
+    "name": "Landed on a pen · farrowing",
+    "preset": "room",
+    "steps": [
+      ".dock-map",
+      "[data-ds=\"PenMap\"] button[data-value=\"B1\"]"
+    ],
+    "current": "farrowing.room",
+    "view": "room",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pen-landed-plain",
+    "name": "Landed on a pen · has sows",
+    "preset": "room",
+    "steps": [
+      ".dock-map",
+      "[data-ds=\"PenMap\"] button[data-value=\"B2\"]"
+    ],
+    "current": "farrowing.room",
+    "view": "room",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.search",
+    "name": "Find a sow",
+    "preset": "room",
+    "steps": [
+      "Search ear tag"
+    ],
+    "current": "farrowing.search",
+    "view": "roomSearch",
+    "text": "9:41 Cancel Type part of an ear tag or a pen, or scan a tag. Searches every unit.",
+    "errors": []
+  },
+  {
+    "id": "farrowing.search-results",
+    "name": "Find a sow · results",
+    "preset": "search-results",
+    "steps": [],
+    "current": "farrowing.search-results",
+    "view": "roomSearch",
+    "text": "9:41 Cancel Unit 7 000431 Pen B4 3 days Overdue 004305 Pen D2 Lameness · No action needed Unit 3 000434 Pen A2 Thin · No action needed 004329 Pen A4 Unit 6 000437 Pen A4 8 alive · ",
+    "errors": []
+  },
+  {
+    "id": "farrowing.search-none",
+    "name": "Find a sow · no match",
+    "preset": "search-none",
+    "steps": [],
+    "current": "farrowing.search-none",
+    "view": "roomSearch",
+    "text": "9:41 Cancel No sow matching “909” in any unit.",
+    "errors": []
+  },
+  {
+    "id": "farrowing.scan",
+    "name": "Scan ear tags",
+    "preset": "room",
+    "steps": [
+      "Scan ear tag"
+    ],
+    "current": "farrowing.scan",
+    "view": "roomScan",
+    "text": "9:41 Scan ear tags Hold the reader to an ear tag Each sow opens as soon as her tag is read. Stop scanning",
+    "errors": []
+  },
+  {
+    "id": "farrowing.scan-no-reader",
+    "name": "Scan · reader not connected",
+    "preset": "scan-none",
+    "steps": [],
+    "current": "farrowing.scan-no-reader",
+    "view": "roomScan",
+    "text": "9:41 Scan ear tags Scanner not connected Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects.",
+    "errors": []
+  },
+  {
+    "id": "farrowing.scan-read",
+    "name": "Scan · her drawer opened",
+    "preset": "scan-read",
+    "steps": [],
+    "current": "farrowing.scan-read",
+    "view": "count",
+    "text": "9:41 Scan ear tags Hold the reader to an ear tag Each sow opens as soon as her tag is read. Stop scanning Farrowing record #000418 B1·Parity 3 Alive Details 9 Born alive Death Back",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pig-not-in-task",
+    "name": "A pig not in Farrowing",
+    "preset": "scan-pig",
+    "steps": [],
+    "current": "farrowing.pig-not-in-task",
+    "view": "roomPig",
+    "text": "9:41 Scan ear tags Hold the reader to an ear tag Each sow opens as soon as her tag is read. Stop scanning",
+    "errors": []
+  },
+  {
+    "id": "farrowing.pig-gone",
+    "name": "A pig no longer on the farm",
+    "preset": "scan-dead",
+    "steps": [],
+    "current": "farrowing.pig-gone",
+    "view": "roomPig",
+    "text": "9:41 Scan ear tags Hold the reader to an ear tag Each sow opens as soon as her tag is read. Stop scanning",
+    "errors": []
+  },
+  {
+    "id": "farrowing.scan-unknown",
+    "name": "Scan · a tag with no pig",
+    "preset": "scan-unknown",
+    "steps": [],
+    "current": "farrowing.scan-unknown",
+    "view": "roomScan",
+    "text": "9:41 Scan ear tags Hold the reader to an ear tag Each sow opens as soon as her tag is read. Stop scanning No pig with this tag 000999 · New tag, or not synced yet",
+    "errors": []
+  },
+  {
+    "id": "farrowing.scan-stopped",
+    "name": "Scan · stopped",
+    "preset": "scan-stopped",
+    "steps": [],
+    "current": "farrowing.scan-stopped",
+    "view": "roomScan",
+    "text": "9:41 Scan ear tags Scanning is stopped Resume scanning to open the next sow. Resume scanning",
+    "errors": []
+  },
+  {
+    "id": "farrowing.batch",
+    "name": "Actions · pigs in this unit",
+    "preset": "batch-sheet",
+    "steps": [],
+    "current": "farrowing.batch",
+    "view": "roomBatch",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.batch-pick-none",
+    "name": "Choose pigs",
+    "preset": "batch-none",
+    "steps": [],
+    "current": "farrowing.batch-pick-none",
+    "view": "roomBatchPick",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.batch-pick",
+    "name": "Choose pigs · 3 chosen",
+    "preset": "batch-pick",
+    "steps": [],
+    "current": "farrowing.batch-pick",
+    "view": "roomBatchPick",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.batch-search",
+    "name": "Choose pigs · search",
+    "preset": "batch-search",
+    "steps": [],
+    "current": "farrowing.batch-search",
+    "view": "roomBatchPick",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.batch-filter",
+    "name": "Choose pigs · filter",
+    "preset": "batch-filter",
+    "steps": [],
+    "current": "farrowing.batch-filter",
+    "view": "roomBatchPick",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.batch-waiting",
+    "name": "Choose pigs · waiting for the reader",
+    "preset": "batch-waiting",
+    "steps": [],
+    "current": "farrowing.batch-waiting",
+    "view": "roomBatchPick",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.batch-scanning",
+    "name": "Choose pigs · scanning",
+    "preset": "batch-scanning",
+    "steps": [],
+    "current": "farrowing.batch-scanning",
+    "view": "roomBatchPick",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.batch-missed",
+    "name": "Choose pigs · reads that can't join",
+    "preset": "batch-missed",
+    "steps": [],
+    "current": "farrowing.batch-missed",
+    "view": "roomBatchPick",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.batch-form",
+    "name": "Actions · the form",
+    "preset": "batch-form",
+    "steps": [],
+    "current": "farrowing.batch-form",
+    "view": "roomBatchForm",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.batch-saved",
+    "name": "Actions · saved",
+    "preset": "batch-saved",
+    "steps": [],
+    "current": "farrowing.batch-saved",
+    "view": "room",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.task-sows",
+    "name": "Task sows list",
+    "preset": "task-blocked",
+    "steps": [
+      "Still farrowing"
+    ],
+    "current": "farrowing.task-sows",
+    "view": "roomTaskSows",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.today",
+    "name": "Today",
+    "preset": "room",
+    "steps": [
+      "Back to Today"
+    ],
+    "current": "farrowing.today",
+    "view": "roomHome",
+    "text": "9:41 Unit 7 Today Your work in this unit Farrowing 1 active · 4 awaiting · 2 done Continue from pen B1",
+    "errors": []
+  },
+  {
+    "id": "farrowing.sow-actions",
+    "name": "Actions",
+    "preset": "count",
+    "steps": [
+      "[data-action=\"sowActions\"]"
+    ],
+    "current": "farrowing.sow-actions",
+    "view": "profile",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.note",
+    "name": "Sow note",
+    "preset": "count",
+    "steps": [
+      "[data-action=\"sowActions\"]",
+      "[data-action=\"sow-host-action\"][data-value=\"marker\"]"
+    ],
+    "current": "farrowing.note",
+    "view": "marker",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.piglet-care",
+    "name": "Piglet processing",
+    "preset": "count",
+    "steps": [
+      "[data-action=\"sowActions\"]",
+      "[data-action=\"sow-host-action\"][data-value=\"piglets\"]"
+    ],
+    "current": "farrowing.piglet-care",
+    "view": "pigletCare",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  },
+  {
+    "id": "farrowing.piglet-identity",
+    "name": "Piglet identity",
+    "preset": "count",
+    "steps": [
+      "[data-action=\"sowActions\"]",
+      "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
+      "Piglet records",
+      "Add piglet"
+    ],
+    "current": "farrowing.piglet-identity",
+    "view": "pigletEdit",
+    "text": "9:41 Farrowing Last record 08:41 · G.H Unit 7 10 Live / litter Target 12 Task overview 8 / 19 Done · all units Awaiting 4 Active 1 Done 2 All 7 B1 · 1 sow 000418 1h ago · G.H 9 ali",
+    "errors": []
+  }
+]

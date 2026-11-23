@@ -227,7 +227,7 @@
   }
   /* rowSelectDoor: a list that both selects (a bulk act) and opens. Two sibling targets, none nested: the checkbox (48px hit area,
      the same box as rowSelect) toggles; the door (copy + ›) opens. contentHtml: trusted markup in place of the title/description copy. */
-  function rowSelectDoor({title='',description='',code='',mono=false,wrap=false,tight=false,checked=false,action='select',value='',openAction='open',openValue='',label='',id='',className='',doorClass='',attrs={},strs,args,inputAttrs={},contentHtml='',right=null,contextWidth='',lead='',count=null}={}){
+  function rowSelectDoor({title='',description='',code='',mono=false,wrap=false,tight=false,checked=false,selectDisabled=false,action='select',value='',openAction='open',openValue='',label='',id='',className='',doorClass='',attrs={},strs,args,inputAttrs={},contentHtml='',right=null,contextWidth='',lead='',count=null}={}){
     const o={strs,args},c=rowCopy({title,description,code,mono,tight,o});
     const an=right?animalBody({code,description,right,contextWidth,tight,o}):null;
     /* Group (an Animal row for animals without an ID, owner 2026-10-18): a lead glyph before the name, the tags on the line under it,
@@ -235,7 +235,7 @@
     if(an&&lead)an.html=an.html.replace('<strong class="st-animal-id">','<strong class="st-animal-id">'+(root.SentriIcons?root.SentriIcons.icon(lead):''));
     const countHtml=count?`<label class="st-row-count"${count.idle?' data-idle=""':''}><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" value="${esc(String(count.value??''))}"${safeAttr(count.attrs||{})}></label>`:'';
     const copy=contentHtml||(an?an.html:'')||`${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>`;
-    return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door"${an?` data-animal="${an.kind}"`:''}${count?' data-group=""':''} data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><label class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${safeAttr(inputAttrs)}></label><button type="button" class="st-row-door ${esc(doorClass)}" data-action="${esc(openAction)}" data-value="${esc(openValue)}"${label?` aria-label="${esc(label)}"`:''}>${copy}<span class="st-row-chevron">${arrow}</span></button>${countHtml}</div>`;
+    return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door"${an?` data-animal="${an.kind}"`:''}${count?' data-group=""':''} data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><label class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${selectDisabled?' disabled':''}${safeAttr(inputAttrs)}></label><button type="button" class="st-row-door ${esc(doorClass)}" data-action="${esc(openAction)}" data-value="${esc(openValue)}"${label?` aria-label="${esc(label)}"`:''}>${copy}<span class="st-row-chevron">${arrow}</span></button>${countHtml}</div>`;
   }
   function rowSelectChange(ev){
     const t=ev&&ev.target;
@@ -1362,7 +1362,7 @@
     const lo=Math.min(...s),r=Math.max(...s)/lo,p=r>PEN_CAP?Math.log(PEN_CAP)/Math.log(r):1;
     return v=>v>0?Math.round(PEN_TILE*Math.pow(v/lo,p)):PEN_TILE;
   }
-  function penMap({lanes=['A','B','C','D'],depth=6,rows=[],apart=[],aSide='left',entranceAt='middle',backDoor=null,pens={},current='',selected='',disabled={},action='pen',key='pen-map',entrance='Entrance',labels={},peek=null,className='',wholeControl='footer'}={}){
+  function penMap({lanes=['A','B','C','D'],depth=6,rows=[],apart=[],aSide='left',entranceAt='middle',backDoor=null,pens={},current='',selected='',disabled={},action='pen',key='pen-map',entrance='Entrance',labels={},peek=null,className=''}={}){
     const L=penLabels(labels);
     if(typeof peek==='function')penPeeks.set(key,peek);else penPeeks.delete(key);
     const available=c=>!Object.hasOwn(disabled,c);
@@ -1381,7 +1381,7 @@
       const rows=Array.from({length:Math.max(1,depth|0)},(_,i)=>i+1);tall=rows.length>99;
       grid=`<div class="st-pen-grid" style="--pm-lanes:${lanes.length}"><span class="st-pen-col st-pen-row" aria-hidden="true"></span>${lanes.map(c=>`<span class="st-pen-col" aria-hidden="true">${esc(c)}</span>`).join('')}${rows.map(n=>`<span class="st-pen-row" data-row="${n}" aria-hidden="true">${n}</span>${lanes.map(c=>tile(c+n)).join('')}`).join('')}</div>`;
     }else({tall,html:grid}=penPlaced({ls,rs,apart,aSide,backDoor,tile,band}));
-    return `<div class="st-pen-map${className?' '+esc(className):''}" data-ds="PenMap" data-key="${esc(key)}"${current?` data-current="${esc(current)}"`:''}${tall?' data-wide':''}>${wholeControl==='map'?`<div class="st-pen-controls">${band('st-pen-entrance',entrance,entranceAt)}</div>`:band('st-pen-entrance',entrance,entranceAt)}<div class="st-pen-field"><div class="st-pen-scroll" role="group" aria-label="${esc(L.map)}">${grid}</div><div class="st-pen-peek" hidden></div></div></div>`;
+    return `<div class="st-pen-map${className?' '+esc(className):''}" data-ds="PenMap" data-key="${esc(key)}"${current?` data-current="${esc(current)}"`:''}${tall?' data-wide':''}>${band('st-pen-entrance',entrance,entranceAt)}<div class="st-pen-field"><div class="st-pen-scroll" role="group" aria-label="${esc(L.map)}">${grid}</div><div class="st-pen-peek" hidden></div></div></div>`;
   }
   const penH=h=>h!==PEN_TILE?`min-height:${h}px`:'';
   const penStyle=(...parts)=>{const s=parts.filter(Boolean).join(';');return s?` style="${s}"`:'';};
@@ -1486,7 +1486,7 @@
      it opens centred on its current pen; a map more than two screens tall adds Whole room to the sheet's footer; a hold
      shows the peek (350ms; a move of more than 12px, a scroll or a release hides it), and the tap after a peek only closes it. */
   const penHead=map=>map.querySelector('.st-pen-col'),penSheet=el=>el.closest('.sheet,.phone')||document.body;
-  const penControls=m=>m.querySelector('.st-pen-controls')||penSheet(m).querySelector('.sheet-footer');
+  const penControls=m=>penSheet(m).querySelector('.sheet-footer');
   function penMount(scope){
     const maps=!scope||!scope.querySelectorAll?[]:scope.matches&&scope.matches('.st-pen-map')?[scope]:[...scope.querySelectorAll('.st-pen-map')];
     for(const m of maps){

@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-23",
+  "prototype": "Combined Farrowing and Inspection preview",
+  "screenshots": 57,
+  "screenshotSize": [
+    390,
+    844
+  ],
+  "brokenImages": 0,
+  "registeredScreens": 69,
+  "verifiedProductionStates": 6,
+  "routes": {
+    "activeSend": "9 → 6",
+    "activeReceive": "9 → 11",
+    "finishedSend": "8 → 5",
+    "finishedMove": "8 → 6",
+    "deadSowSend": "7 → 5",
+    "finishedReceive": "8 → 9",
+    "abortedSowSend": "9 → 8",
+    "finishedRecordDead": "8 → 2; +6 recorded; Born 14",
+    "awaitingBatchRemoval": "Batch 28 · required reason → Production log → Done and Task overview"
+  },
+  "unitActions": {
+    "feed": "shared editor; no plan in sample; Back keeps selection",
+    "transfer": "placeholder; Back keeps selection"
+  },
+  "footerAlignment": {
+    "date": "2026-11-19",
+    "matches": "three aligned columns, 1 : 2.4 : 1 with 8px gaps",
+    "verifiedRoutesAndPresets": 13,
+    "phoneWidths": [
+      320,
+      360,
+      390,
+      430
+    ],
+    "languages": [
+      "en",
+      "zh"
+    ],
+    "draft": "Save keeps the center column. Actions returns to the intact draft. Abortion, fostering and removal wait for Save or Clear."
+  },
+  "checks": {
+    "englishScenarios": {
+      "passed": 136,
+      "failed": 0
+    },
+    "chineseScenarioFailures": {
+      "count": 6,
+      "reproducedBeforeChange": 6
+    },
+    "actionsSurfaceTests": {
+      "passed": 45
+    },
+    "batchMembershipAtlasReplay": "pass"
+  }
+}

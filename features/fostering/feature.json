@@ -5,7 +5,7 @@
   "platform": "mobile",
   "section": "breeding",
   "newFeature": false,
-  "duplicates": "Built inside Inspection in the old UI. The same move is also drawn in Farrowing as 'Foster piglets' (farrowing.foster, a one-stepper sheet); Piglet processing's Move piglets (piglet-processing.move-piglets, simple prototype) is a third version.",
+  "duplicates": "This draft maps the old Inspection fostering flow. Farrowing's later owner-approved 2026-11-03 flow has Foster from a living sow's Actions and from selected piglets on a finished or dead sow's Piglets list; Piglet processing's Move is another version. Shared ownership remains open.",
   "groups": [
     [
       "Old UI",

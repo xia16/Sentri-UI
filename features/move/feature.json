@@ -84,7 +84,7 @@
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
         "rules": [
-          "An identified pig keeps her records. Destination uses the shared PenMap; source pens are disabled. Search can find a registered destination."
+          "The pig’s record supplies the source. Choose a pen by code or from the standard PenMap Sheet when the room has a layout."
         ]
       }
     },
@@ -107,8 +107,7 @@
       "figma": "",
       "notes": {
         "rules": [
-          "Review the sources by pen and batch. Moving any unidentified heads clears current diseases and symptoms for the whole unidentified group at each affected source pen.",
-          "Existing conditions of identified pigs and existing groups at the destination are kept."
+          "Choose a room, then find the pen by code or open the standard PenMap Sheet. The source pens are disabled. Selecting a pen opens Review move."
         ]
       }
     },
@@ -138,7 +137,7 @@
     },
     {
       "id": "move.whole-room",
-      "name": "Destination · Whole room",
+      "name": "PenMap Sheet · Whole room",
       "zh": "整栋选栏",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus&penmap=long",
@@ -151,6 +150,7 @@
         "[data-action=\"move-number\"][data-key=\"5\"]",
         "[data-action=\"move-number-done\"]",
         "[data-action=\"move-next\"]",
+        "[data-action=\"move-open-map\"]",
         ".st-pen-whole-toggle"
       ],
       "figma": "",
@@ -162,8 +162,8 @@
     },
     {
       "id": "move.picker",
-      "name": "Destination · pen picked",
-      "zh": "已选目标栏",
+      "name": "Review move",
+      "zh": "核对转舍",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "walk",
@@ -180,7 +180,8 @@
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
         "rules": [
-          "A dark ring marks the chosen pen. The primary button names the unit and pen and commits the move."
+          "The source pigs and counts and the selected destination are shown before submission. Tap the destination row to change it. Back cancels the change and keeps the previous target.",
+          "A server error is shown using the ordinary notice toast while the move stays on the review page."
         ]
       }
     },
@@ -249,7 +250,7 @@
     [
       "move.mixed",
       "move.whole-room",
-      "tap Whole room in a long room"
+      "open the PenMap Sheet and tap Whole room in a long room"
     ],
     [
       "move.mixed",

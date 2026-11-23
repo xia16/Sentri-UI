@@ -85,7 +85,6 @@
     "ds.penmap.plain": {"en": "has sows", "zh": "有母猪", "kind": "status"},
     "ds.penmap.empty": {"en": "empty", "zh": "空栏", "kind": "status"},
     "ds.penmap.hidden": {"en": "no sows match", "zh": "没有符合条件的母猪", "kind": "status"},
-    "ds.penmap.jump": {"en": "Jump to pens", "zh": "跳转栏位", "kind": "label"},
     "fr.penmap.title": {"en": "Pen map", "zh": "栏位图", "kind": "title"},
     "fr.penmap.dock": {"en": "Pen map", "zh": "栏位图", "kind": "label"},
     "fr.penmap.peek_one": {"en": "{n} sow", "zh": "{n}头母猪", "kind": "body"},

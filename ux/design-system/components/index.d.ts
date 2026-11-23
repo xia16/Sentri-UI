@@ -833,7 +833,6 @@ export interface PenMapProps {
   /** Pen code to accessible reason for a tile that cannot be chosen. */
   disabled?: Record<string, string>;
   /** A destination picker can put the view toggle beside Entrance. */
-  wholeControl?: 'footer' | 'map';
   /** The data-action of every tile that can be opened; its data-value is the pen code. */
   action?: string;
   /** Names this map for the peek registry; give each map on a page its own. */

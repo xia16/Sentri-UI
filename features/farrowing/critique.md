@@ -952,3 +952,29 @@ Inspection's pen list and its No tags row (Row · select-door with a count), the
 - The count without ID is typed on the phone's keypad; on the web prototype that is a text field with a numeric keyboard.
 - Record dead does not take ticked piglets yet: a piglet that is put down is recorded through Record dead with its cause, by count.
 - Nurse sows are sample data (two weaned sows); the farm's real weaned sows come from production records.
+
+# PenMap propagation to Farrowing (2026-11-16)
+
+## Keep
+
+- The current 4 × 6 room, colour key, tile colours, peek, and landing cue answer the room-list questions and remain the baseline.
+- PenMap owns tile layout and the Whole room transition; the host only supplies room geometry, sow levels and navigation.
+
+## Problems
+
+- **Major:** the host fixes every sample room to four lanes and six rows, so the current PenMap's long and mixed room rules cannot be seen on a Farrowing screen. The shared component and `pen-map-contract.md` already define the room props.
+- **Major:** on a long room, the generic host click handler redraws the sheet when Whole room is tapped, resetting the component's view. The approved canvas shows the current failure beside the corrected state.
+- **Minor:** `feature.json` and the information budget retained the retired range-button rule and incomplete room-shape notes.
+
+## Parts
+
+| Part | Drawn by | Call |
+|---|---|---|
+| Header key, Entrance, tiles, peek, Whole room | Shared PenMap and Sheet | Keep; pass the sampled room's PenMap props. |
+| Footer Back | Shared PenMapFooter | Keep; remove obsolete range parameters. |
+| Dock Pen map entry | TaskDock | Keep for a room with more than one pen; omit for a one-pen room. |
+| Tap to pen and landing cue | Host plus shared PenMap | Keep; leave Whole room and shared-tile taps to PenMap. |
+
+## Self-crit
+
+After the owner agreed to the offline canvas on 2026-11-16, the built 4 × 6 map was byte-identical to its canvas baseline at 390 EN. The long room exposes Whole room, its shared B1–10 tile returns to B1, and the mixed room gives group pens taller tiles and row C after the lanes. The one-pen room has no Pen map entry. The host interaction test checks that Whole room survives the host click handler and that a pen tap still lands in the list. Forty atlas shots across the two features at 390/360, EN/ZH rendered successfully; Farrowing's colour key and sow levels stayed with the room data.

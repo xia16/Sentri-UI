@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Farrowing · 入口与组件版本对齐</title>
+<style>
+  :root { color-scheme: light; --bg:#f3f5f0; --paper:#fff; --ink:#202820; --muted:#5e695e; --line:#dce3d9; --green:#24683d; --amber:#8b5e18; font-family:"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); }
+  main { max-width:1320px; margin:auto; padding:32px 24px 80px; }
+  header { max-width:880px; margin-bottom:40px; }
+  .eyebrow { font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--green); font-weight:700; }
+  h1 { font-size:32px; line-height:1.2; margin:8px 0 12px; }
+  h2 { font-size:22px; margin:0 0 6px; }
+  p { margin:0; line-height:1.55; }
+  header p { color:var(--muted); font-size:16px; }
+  .flow { display:grid; gap:36px; }
+  .step { border-top:2px solid var(--line); padding-top:20px; }
+  .step-head { margin-bottom:16px; }
+  .step-head p { color:var(--muted); }
+  .row { display:flex; align-items:start; gap:22px; overflow-x:auto; padding-bottom:4px; }
+  figure { margin:0; flex:0 0 390px; }
+  .artboard { display:block; width:390px; height:844px; border:1px solid var(--line); border-radius:12px; box-shadow:0 5px 18px #1f2a1f12; background:white; }
+  figure h3 { display:flex; align-items:center; gap:9px; margin:0 0 10px; font-size:15px; }
+  figure h3 span { display:inline-block; min-width:46px; text-align:center; border-radius:7px; padding:4px 7px; background:#e7eae4; color:#3e483e; font:700 12px/1.2 ui-monospace,monospace; text-transform:uppercase; }
+  figure h3 span.new { background:#dceede; color:#1b6033; }
+  figure h3 span.now { background:#e1e9f1; color:#285079; }
+  figcaption { font-size:14px; line-height:1.45; color:var(--muted); margin-top:9px; }
+  aside { flex:0 0 310px; background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:18px; margin-top:32px; line-height:1.5; }
+  aside strong { display:block; margin-bottom:7px; font-size:14px; }
+  aside p + p { margin-top:12px; }
+  aside .choice { color:var(--green); font-weight:650; }
+  code { font: .9em ui-monospace,monospace; overflow-wrap:anywhere; }
+  a { color:var(--green); }
+  .end { margin-top:42px; padding:20px 22px; border:1px solid var(--line); border-radius:12px; background:var(--paper); max-width:900px; }
+  .end h2 { font-size:18px; }
+  .end ul { line-height:1.6; padding-left:20px; margin:8px 0 0; }
+  .end li + li { margin-top:5px; }
+</style>
+<main>
+  <header>
+    <div class="eyebrow">Farrowing · consistency canvas · 17 Nov 2026</div>
+    <h1>同一功能，从每个入口进入都应是同一版</h1>
+    <p>每张手机画面均为 390 × 844，来自当时主线的真实原型及其组件；“new” 是同意前在本画布脚本中用 SentriUI 部件拼出的提案。负责人于 2026-11-17 同意本轮同步，并选择保留“母猪记录 → Actions → Piglet processing”的 Care 和身份录入。下方保留同意前的差异与建议，最终实现与入口复核见页面矩阵。</p>
+  </header>
+
+  <div class="flow">
+    <section class="step">
+      <div class="step-head"><h2>1 · Actions 的入口指向了两个对象</h2><p>Atlas 中 5 个 screen 的 “Actions” 先点中房间底栏；母猪记录中的 Actions 才是这些 screen 描述的入口。</p></div>
+      <div class="row">
+        <figure><h3><span>old</span> Atlas 的 screen 重放</h3><img class="artboard" src="actions-atlas-now.png" alt="Atlas 错误重放：Pigs in Unit 7 的房间 Actions"><figcaption>打开“Pigs in Unit 7”批量动作，母猪的 Note / Piglet processing 不在这里。</figcaption></figure>
+        <figure><h3><span class="now">now</span> 真实母猪入口</h3><img class="artboard" src="actions-sow-now.png" alt="母猪 000418 的 Actions"><figcaption>母猪 000418 的 Actions，已使用 PR 315 的原位灰显 Row · Tile。</figcaption></figure>
+        <aside><strong>建议 · 绑定修复</strong><p>将 <code>farrowing.sow-actions</code>、<code>.note</code>、<code>.piglet-care</code>、<code>.piglet-identity</code>、<code>.piglet-death</code> 的起始步骤改为母猪记录上的 <code>sowActions</code>，再重放各自的动作。</p><p class="choice">不改这张 Actions 的已批准外观。</p></aside>
+      </div>
+    </section>
+
+    <section class="step">
+      <div class="step-head"><h2>2 · 母猪 Note 没有跟上新版组件</h2><p>同一原型的 pen note 与 Inspection 的 pig note 已有 7 天 Show for；母猪 Note 仍是旧表单。</p></div>
+      <div class="row">
+        <figure><h3><span>old</span> 母猪 Note</h3><img class="artboard" src="note-sow-now.png" alt="旧母猪备注：普通卡片与输入，没有显示时长"><figcaption>旧版 Current note 卡片 + 文本框；没有显示多久。</figcaption></figure>
+        <figure><h3><span class="new">new</span> 套用 Panel · Note</h3><img class="artboard" src="note-sow-proposed.png" alt="建议母猪备注：消息式当前备注、输入和 Show for 7 天"><figcaption>同一母猪、同一文字；消息式备注与白卡片中的 Show for 7 天。</figcaption></figure>
+        <aside><strong>待确认 · 备注时效</strong><p>新版 Note 默认显示 7 天（可调 1–60 天）。母猪 Note 目前没有到期规则。死亡母猪的 Actions 已经用 Inspection 的新版 Note；活母猪的 Edit note 却走左侧旧表单。</p><p class="choice">建议各状态使用同一规则；保留 Back 草稿与历史记录。</p></aside>
+      </div>
+    </section>
+
+    <section class="step">
+      <div class="step-head"><h2>3 · 同一窝仔猪有两张不同的列表</h2><p>从死亡或完成母猪的记录进入 Piglets，是 11 月 3 日批准的 Row 选择面；从 Actions → Piglet processing 进入的 Piglet records 仍是旧页面。</p></div>
+      <div class="row">
+        <figure><h3><span class="now">now</span> 记录 → Piglets</h3><img class="artboard" src="piglets-now.png" alt="新版 Piglets 列表，共享 Row 选择框"><figcaption>共享 Row 的选择框；勾选后是绿色白勾。每行只给这一步需要的身份。</figcaption></figure>
+        <figure><h3><span>old</span> Actions → Piglet records</h3><img class="artboard" src="piglet-records-old.png" alt="旧 Piglet records，独立 checkbox 与局部列表"><figcaption>本地 `.piglet-row`、原生 checkbox、不同的信息密度；同一只仔猪看起来像另一版。</figcaption></figure>
+        <aside><strong>待确认 · 页面归属</strong><p>旧页面还混有 Care、身份录入和 Report mortality；<code>features/piglet-processing</code> 又有自己的原型。身份表单可在无耳标/耳缺、仅填性别或重量时 Save。</p><p class="choice">建议 Piglets 行/选择统一用新版 Row；身份必须有耳标或耳缺。Care 和身份是留在母猪 Actions，还是转到独立 Piglet processing，需要在这里定。</p></aside>
+      </div>
+    </section>
+
+    <section class="step">
+      <div class="step-head"><h2>4 · 仔猪死亡有两套记录方式</h2><p>母猪记录的 Record dead 已有七个原因；旧 Piglet records 的 Report mortality 另有原因选择，且保存映射会把 Other/未知原因算成 Put down。</p></div>
+      <div class="row">
+        <figure><h3><span>old</span> Piglet records → Report mortality</h3><img class="artboard" src="mortality-old.png" alt="旧死亡页，单原因 picker 和未识别仔猪计数"><figcaption>一次选择一个死因，带已识别仔猪选择与未识别数量；与 Record dead 分叉。</figcaption></figure>
+        <figure><h3><span class="now">now</span> 母猪记录 → Record dead</h3><img class="artboard" src="record-dead-now.png" alt="新版 Record dead，七个原因的白卡片"><figcaption>七个原因，Put down 与 Other 分开；Steppers 在白卡片上。</figcaption></figure>
+        <aside><strong>待确认 · 一张死亡表单</strong><p>现有两张表单承担的信息不同：一张知道具体仔猪 ID，另一张按原因计数。</p><p class="choice">建议以 Record dead 的七原因与白卡片为统一基础，并在同一流程保留 ID 与无 ID 数量。先修正旧表单的错误原因映射，不让 Other 写成 Put down。</p></aside>
+      </div>
+    </section>
+
+    <section class="step">
+      <div class="step-head"><h2>5 · 锁定后仍有旧的“Correct piglet count”</h2><p>11 月 3 日的规则让 Born 在 Finish 后冻结、Undo 只在 Farrowing log；Actions 里的 Reconcile 仍能直接保存一个新 Alive 数。</p></div>
+      <div class="row">
+        <figure><h3><span>old</span> Reconcile piglet count</h3><img class="artboard" src="reconcile-old.png" alt="旧 Correct piglet count 页，可以直接保存修改"><figcaption><code>saveCountReconcile()</code> 在锁定后还可能增加 <code>frozen</code> Born。</figcaption></figure>
+        <figure><h3><span class="now">now</span> Farrowing log</h3><img class="artboard" src="undo-log-now.png" alt="当前 Farrowing log，顶层记录有 Undo"><figcaption>当前批准的撤销入口；Finish 是 Undo 的边界。</figcaption></figure>
+        <aside><strong>待确认 · 重数的入口</strong><p>PRD 指向独立 Count 功能，但这个功能没有已批准的屏幕；旧 Edit-record round 只有草案。</p><p class="choice">建议 Reconcile 在 Actions 保留原位灰显，说明需等 Count 功能；当前页不再改变锁定的 Born。Count 的完整入口另开画布决定。</p></aside>
+      </div>
+    </section>
+
+    <section class="step">
+      <div class="step-head"><h2>6 · End task 的 outcome screen 重放成 Ready</h2><p><code>farrowing.task-outcomes</code> 的当前 preset 仍有 8 头 Awaiting 母猪，所以实际运行态是 <code>task-ready</code>；这是 71 页逐页重放发现的错配。</p></div>
+      <div class="row">
+        <figure><h3><span>old</span> 当前 outcomes 重放</h3><img class="artboard" src="task-outcomes-replay.png" alt="当前 task-outcomes 实际为 Ready to end early，8 头待产母猪将离开"><figcaption>画面含 1 头流产，但仍有 8 头 Leave the batch；运行态归入 task-ready。</figcaption></figure>
+        <figure><h3><span class="new">new</span> 独立 outcome 状态</h3><img class="artboard" src="task-outcomes-proposed.png" alt="建议的 outcome 示例，所有母猪已完成，Done 行写 1 sow died 1 aborted"><figcaption>同一现行组件；没有 Awaiting，Done 行明确包含死亡与流产，运行态才是 task-outcomes。</figcaption></figure>
+        <aside><strong>建议 · 一页一态</strong><p>如果保留独立 <code>task-outcomes</code> screen，preset 应真的落在此态；若它与 <code>task-complete</code> 无独立用途，可删掉重复 screen。</p><p class="choice">绩效卡同时要把 Put down 和 Other 分开计入；当前统计把第 6 槽当成 Other。</p></aside>
+      </div>
+    </section>
+
+    <section class="step">
+      <div class="step-head"><h2>7 · Death breakdown 已没有入口</h2><p>Atlas 的 <code>farrowing.death-breakdown</code> 仍尝试点 “Death causes”，但完成记录已无该控件；新版 Details 直接写出各死因。</p></div>
+      <div class="row">
+        <figure><h3><span>old</span> Death breakdown 重放</h3><img class="artboard" src="death-breakdown-replay.png" alt="旧 Death breakdown 重放实际停在已完成母猪的记录卡"><figcaption>步骤找不到，停在 Locked record；该 screen 在 flow 中也无入边。</figcaption></figure>
+        <figure><h3><span class="now">now</span> 已批准的 Details</h3><img class="artboard" src="details-now.png" alt="Details 页 This litter 中直接列出死因"><figcaption>This litter 已把 Died after birth、Born dead 和死因列出。</figcaption></figure>
+        <aside><strong>建议 · 清理旧门</strong><p>按 11 月 3 日的一页 Details 版本，移除旧 Death breakdown screen 和失效重放；补上 <code>details-first</code> 的真实入路。</p><p class="choice">Finished / Sow died 的详情仍用同一套现行内容。</p></aside>
+      </div>
+    </section>
+  </div>
+
+  <div class="end"><h2>与画面同步的文字和组件记录</h2><ul>
+    <li>Undo：PRD 旧轮次、<code>feature.json</code> 的 Counting control、场景 authority 改为 11 月 3 日的堆栈规则；保留历史与 leaf ID。</li>
+    <li>Foster：<code>farrowing.foster-count</code> 是不存在的目标，改为 <code>.foster-send</code>；独立 Fostering 占位功能标明 11 月 3 日批准的 Farrowing 版本，成熟度仍保持占位/待设计。</li>
+    <li>Pig profile 的嵌入 Actions 交接还列有已删除的 Edit litter record；同步其说明，保留 Pig profile 自身的设计状态。</li>
+    <li>组件卡片：Row 的 “to allocate”、Stepper 的旧死因个数与 correction、ChoiceList 的 Edit finish details 文字按当前使用者更新；不改变共享组件视觉。</li>
+    <li>Scan 一头死亡且没有活仔猪的母猪会打开正确的 gone-pig 内容，但运行态仍报 <code>pig-not-in-task</code>；同步 screen 绑定后应报 <code>pig-gone</code>。</li>
+    <li>71 个页面、134 条内部 flow、两条 Home 入口的逐页对照见<a href="page-entry-matrix.md">页面 × 入口矩阵</a>；59 条真实入口见<a href="route-matrix.md">入口 → 页面矩阵</a>；差异与受影响状态见<a href="audit.md">差异审计</a>。已同意的 <a href="../penmap-sync-round/canvas.html">PenMap 画布</a> 已在同一分支同步；本画布提出的其他原型、Atlas 和 screen metadata 修改等负责人决定。</li>
+  </ul></div>
+</main>
+</html>

@@ -45,8 +45,10 @@ try{
   await tap('lookup-exception','000430');await shot('04-outside-choices');await tap('lookup-move-mode','select');
   assert.equal(await live(action('lookup-move-pen')).count(),48);await shot('05-choose-destination');
   const search=live('[data-move-pen-search]'),before=await search.boundingBox();
-  await live('.move-page .st-pen-scroll').evaluate(el=>{el.scrollTop=el.scrollHeight;});
+  await live('.move-page .sheet-body').evaluate(el=>{el.scrollTop=el.scrollHeight;});
   assert.equal((await search.boundingBox()).y,before.y,'filter remains above the long scrolling list');
+  await tap('lookup-move-map');assert.ok(await live('.sheet[role="dialog"] .st-pen-map').isVisible());
+  await shot('05-map');await tap('back');
   await live('[data-move-pen-search]').fill('XYZ');assert.equal(await live(action('lookup-move-pen')).count(),0);await shot('05a-no-matching-pens');
   await live('[data-search-clear]').click();await live('[data-move-pen-search]').fill('C12');assert.equal(await live(action('lookup-move-pen')).count(),1);await shot('05b-search-C12');
   await tap('lookup-move-pen','C12');await view('lookup-move-confirm');await tap('lookup-move-change');
@@ -72,14 +74,14 @@ try{
   await tap('back');await tap('scan');await read();await read();
   assert.deepEqual(await ticks(),['000267','000306']);
  });
- for(const outcome of ['denied','failed','uncertain']){
-  await check(`A move that is ${outcome} does not change the selection`,async()=>{
-   await walk('moveResult='+outcome);await outsideRead();await choose('select');await tap('lookup-move-confirm');await shot('16-'+outcome);
-   await tap('back');if(outcome==='failed'){await tap('back');await tap('back');await tap('back');}
-   assert.deepEqual(await ticks(),['000267','000306']);assert.equal(await live(action('lookup-exception','000430')).count(),1);
-   if(outcome==='uncertain'){await tap('lookup-exception','000430');assert.equal(await live(action('lookup-move-confirm')).count(),0);}
-  });
- }
+ await check('The API error uses a notice toast and keeps the review and selection',async()=>{
+  await walk('moveResult=error');await outsideRead();await choose('select');await tap('lookup-move-confirm');
+  await view('lookup-move-confirm');assert.match(await live('.st-toast').innerText(),/Destination pen is full|目标栏已满/);
+  assert.match(await live(action('lookup-move-change')).innerText(),/C1/);await shot('16-error');
+  await tap('lookup-move-change');await tap('back');await view('lookup-move-confirm');
+  await tap('back');await tap('back');await tap('back');
+  assert.deepEqual(await ticks(),['000267','000306']);assert.equal(await live(action('lookup-exception','000430')).count(),1);
+ });
  await check('Selected scan rows keep their background and a queued move returns silently',async()=>{
   await walk('moveResult=offline');await outsideRead();
   await live('[data-scan-tag="000306"]').waitFor();
@@ -103,7 +105,9 @@ try{
   await tap('move-read');await read();
   assert.equal(await live('input[data-action="move-pig"][value="000801"]').isChecked(),true);
   await tap('move-read-stop');await tap('move-next');await view('move-to');
+  await tap('move-open-map');
   assert.equal(await live('.st-pen-tile[data-pen="D4"]').isDisabled(),true);
+  await tap('back');
   await tap('move-pen','C4');await tap('move-save');await view('pen-detail');await tap('back');
   assert.match(await live('[data-pen="D4"]').first().innerText(),/Coughing|咳嗽/);
  });
@@ -117,13 +121,15 @@ try{
    await tap('move-count-open',batch);await live('[data-action="move-number"][data-key="'+count+'"]').click();
    await tap('move-number-done');
   }
-  await tap('move-next');await view('move-to');
+  await tap('move-next');await view('move-to');await tap('move-open-map');
   for(const pen of ['C1','D4','C5','C6'])assert.equal(await live('.st-pen-tile[data-pen="'+pen+'"]').isDisabled(),true);
-  await live('.move-sources summary').click();assert.match(await live('.move-sources').innerText(),/000254/);
-  await shot('63-move-review');await live('.move-sources summary').click();
   await live('.st-pen-whole-toggle').click();await shot('64-move-whole-room');
-  await live('.st-pen-group[data-from="C26"]').click();await tap('move-pen','C30');
-  assert.match(await live(action('move-save')).innerText(),/C30/);
+  await live('.st-pen-group[data-from="C21"]').click();await tap('move-pen','C30');
+  assert.match(await live('.move-review').innerText(),/000254/);
+  assert.match(await live(action('move-change')).innerText(),/C30/);await shot('63-move-review');
+  await tap('move-change');await tap('move-choose-room');await tap('move-room','8');
+  await tap('back');assert.match(await live(action('move-change')).innerText(),/(?:Unit 7|7\s*单元) · C30/);
+  await tap('move-change');
   await live('[data-move-pen-search]').fill('C4');await tap('move-pen','C4');await shot('65-move-target');
   await tap('move-save');await view('list');await shot('66-move-after');
   const list=await live('.inspect-list').innerText();
@@ -146,8 +152,8 @@ try{
   await walk('moveFixture=batches');await tap('pen-detail','D4');await tap('pen-move','D4');
   await live('[data-move-pig-search]').fill('2-5');
   await live('input[data-action="move-pig"][value="sample-notch"]').check();
-  await tap('move-next');assert.match(await live('.sheet').last().innerText(),/2-5/);
-  await tap('back');await tap('back');await tap('back');await view('list');
+  await tap('move-next');await tap('move-pen','C4');assert.match(await live('.move-review').innerText(),/2-5/);
+  await tap('back');await tap('back');await tap('back');await tap('back');await view('list');
   assert.match(await live('[data-pen="D4"]').first().innerText(),/Coughing|咳嗽/);
  });
  await check('Farrowing sow and piglet Move reuse the pen picker',async()=>{
@@ -156,11 +162,14 @@ try{
   const frame=page.frameLocator('[data-card="0"] .sow-detail-frame').locator('[data-card="0"] .phone');
   const frameTap=(a,v)=>frame.locator(action(a,v)+':not([inert] *)').last().click();
   await frameTap('sow-host-action','transfer');
+  await frameTap('move-open-map');
   await frame.locator('.st-pen-whole-toggle').click();await shot('71-move-sow');
+  await frameTap('back');
   await frame.locator('[data-move-pen-search]').fill('B4');await frameTap('move-pen','B4');await frameTap('save-transfer');
   await frame.locator(':scope > .sheet').filter({hasText:'B4'}).waitFor();
   await open('farrowing-astra-concept','screen=farrowing.piglets-pen&lang=en&penmap=long');
-  await view('allocPen');await live('.st-pen-whole-toggle').click();await shot('72-move-piglets');
+  await view('allocPen');await tap('allocPenMap');await live('.st-pen-whole-toggle').click();await shot('72-move-piglets');
+  await tap('featureBack');
   await tap('allocRooms');await tap('allocRoom','8');await live(action('allocPenPick')).first().click();
   await tap('allocPenSave');await view('pigletList');await shot('73-move-piglets-after');
  });

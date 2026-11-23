@@ -32,7 +32,7 @@
 const UI=window.SentriUI;
 const L=n=>[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].slice(0,n);
 const EN={entrance:'Entrance',legend:{act:'need you',live:'farrowing'},labels:{}};
-const ZH={entrance:'入口',legend:{act:'需处理',live:'分娩中'},labels:{map:'栏位',pen:c=>c+'栏',act:'需处理',live:'分娩中',plain:'有母猪',empty:'空栏',hidden:'没有符合条件的母猪'}};
+const ZH={entrance:'入口',legend:{act:'需处理',live:'分娩中'},labels:{map:'栏位',pen:c=>c+'栏',pens:r=>r+'栏',whole:'整栋',byPen:'逐栏',act:'需处理',live:'分娩中',plain:'有母猪',empty:'空栏',hidden:'没有符合条件的母猪'}};
 const BARNS={
  unit7:{lanes:L(4),depth:6,pens:{B1:'live',B2:'plain',B3:'act',B4:'act',C5:'live',D3:'plain',A4:'plain',C2:'plain'},current:'B2'},
  filtered:{lanes:L(4),depth:6,pens:{B1:'hidden',B2:'hidden',B3:'act',B4:'act',C5:'hidden',D3:'plain',A4:'hidden',C2:'plain'},current:'B3'},
@@ -63,7 +63,7 @@ const open=(name,lang,o)=>{
  const b=BARNS[name],t=lang==='zh'?ZH:EN;
  const peek=code=>UI.penPeek({title:code,meta:lang==='zh'?'2头母猪':'2 sows',rows:peekRows});
  const body=UI.penMap(Object.assign({},b,{action:'pick',key:'pm-'+name+lang,entrance:t.entrance,labels:t.labels,peek},o||{}));
- return UI.sheet({surface:'menu',size:'long',title:lang==='zh'?'栏位图':'Pen map',label:'Pen map',line:{key:UI.penMapKey({pens:b.pens,words:lang==='zh'?t.legend:b.words||t.legend})},body,footer:UI.penMapFooter({back:{action:'back',label:lang==='zh'?'返回':'Back'},depth:b.depth,label:lang==='zh'?'跳转栏位':'Jump to pens'})});
+ return UI.sheet({surface:'menu',size:'long',title:lang==='zh'?'栏位图':'Pen map',label:'Pen map',line:{key:UI.penMapKey({pens:b.pens,words:lang==='zh'?t.legend:b.words||t.legend})},body,footer:UI.penMapFooter({back:{action:'back',label:lang==='zh'?'返回':'Back'}})});
 };
 const R={
  unit7:()=>open('unit7','en'),

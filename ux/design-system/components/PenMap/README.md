@@ -60,7 +60,7 @@ Size tells small, medium or large at a glance; two types close in size (crates a
 
 ## Choose a destination
 
-The Move hosts pass eligible pen levels as `plain`, including registered empty pens. The options `selected` and `disabled` mark a chosen tile with the ink ring and make source or unavailable pens unavailable with an accessible reason. `wholeControl: 'map'` places Whole room beside Entrance so the page keeps its primary commit in the footer. The ordinary navigation map keeps its footer control.
+The Move hosts pass eligible pen levels as `plain`, including registered empty pens. The options `selected` and `disabled` mark a chosen tile with the ink ring and make source or unavailable pens unavailable with an accessible reason. The destination picker opens the standard PenMap Sheet with Back and Whole room in its footer. Tapping a pen opens Review move, where the worker confirms the transfer.
 
 ## Whole room
 

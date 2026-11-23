@@ -43,14 +43,14 @@ Taken from the research notes and the code:
 - There is no feed tag on a pig row. A trough pen can't feed one pig, so feed is read and changed at the pen (the pen header keeps its feed summary).
 - The row is the design system's Row · animal (select + door), with the compact ConditionTag.
 - Home opens this page through the "Inspect unit" card with the unit kept in the link. Back from the walk restores the Home unit. Home’s magnifier runs its own Lookup and can open a pig record without entering a walk.
-- Pen map is the design system's PenMap, as Farrowing's (2026-10-22): the framed Pen map button in the dock, tiles coloured by the walk's row levels (amber for a pig at act now, never blue), the peek with the walk's rows, and the colour-carries-over landing. A pen the walk has been through and one it has not look the same: there is no per-pen check (budget.md, Pen map).
+- Pen map is the design system's PenMap, as Farrowing's (2026-10-22): the framed Pen map button in the dock, tiles coloured by the walk's row levels (amber for a pig at act now, never blue), the peek with the walk's rows, and the colour-carries-over landing. Its shape comes from the saved room layout through the [pen-map contract](../../ux/model/pen-map-contract.md); a room with one pen or none has no map entry, and a map more than two screens tall offers Whole room before returning to individual pens. The current 4 × 6 prototype is sample layout data. A pen the walk has been through and one it has not look the same: there is no per-pen check (budget.md, Pen map).
 - A pen with an open equipment fault shows a wrench in its walk header. Tap the pen name for the fault under Needs attention; resolving the last open fault removes the mark and retains the record in Pen log.
 
 Open (recorded on the screens as issues):
 
 - The unit summary card (pig and pen counts, faults, sensors, batch tracker) is not placed on the walk. Home already has Environment & devices.
 - Pen head count stays out of this round. The Web Pigs fact is read-only. The earlier Set count deck and Android preview are references for the separate Count design.
-- The six entrance decisions and screenshots are in the [operation flows](decision-round/canvas.html). Native transfer still needs a service receipt that can identify and safely look up the exact submitted operation before enabling real writes.
+- The six entrance decisions and screenshots are in the [operation flows](../../ux/review/farrowing-inspection/inspection.html) and the [Move walkthrough](../../ux/review/farrowing-inspection/move.html). Native transfer still needs a service receipt that can identify and safely look up the exact submitted operation before enabling real writes.
 - "Health" and "Feed" lens counts do not say what they count.
 - The care level shows on a row only by the tag's look (red wash with "!", outlined, plain); the care word and the day are on the record.
 - Fixed author "G. Hansen" and times 06:40 and 09:41 stand in for the signed-in worker and real times.
