@@ -5,7 +5,7 @@
 .move-page .move-form{display:flex;flex-direction:column;gap:var(--space-12)}
 .move-page [data-move-room-results]>.st-heading:not(:first-child){margin-top:var(--space-16)}
 .move-page .move-sources .st-row-group{max-height:calc(2 * var(--row-min) + 2 * var(--space-16));overflow:auto}
-.move-page .move-sources summary{min-height:var(--tap-min);display:flex;align-items:center;gap:var(--space-6);font-size:var(--type-description-size)}
+.move-page .move-sources summary{min-height:var(--tap-min);display:flex;align-items:center;gap:var(--space-6)}
 .move-page .move-sources summary::-webkit-details-marker{display:none}
 .move-page .move-sources summary svg{width:var(--size-16);height:var(--size-16)}
 .move-page .move-sources[open] summary svg{transform:rotate(90deg)}
