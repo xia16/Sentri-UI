@@ -737,7 +737,7 @@
           {
             "name": "Verb grid",
             "at": "Condition",
-            "shows": "Health then Routine verbs as one card of icon tiles, one word each from the strings registry (Condition, Treat, Edit, Resolve, Care, Note, Transfer, Measure, Feed)",
+            "shows": "Health then Routine verbs as one card of icon tiles, one word each from the strings registry (Condition, Treat, Edit, Resolve, Care, Note, Move, Measure, Feed)",
             "states": [
               {
                 "state": "Rows",
@@ -787,7 +787,7 @@
                 "shows": "No Production rows"
               }
             ],
-            "logic": "Production exists only for one pig. Mark not in pig, Remove from batch and Transfer sow render only inside Farrowing's sow drawer. Farrowing's versions of batch moves are hidden when this sheet's own Batch membership row exists.",
+            "logic": "Production exists only for one pig. Move opens the shared destination picker. Farrowing supplies its own source and destination rooms. Farrowing's versions of batch moves are hidden when this sheet's own Batch membership row exists.",
             "at": "Record abortion"
           },
           {

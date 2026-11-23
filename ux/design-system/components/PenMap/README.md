@@ -58,6 +58,10 @@ A pen's size says what it is: on the floor a stall is a narrow slot and a group 
 
 Size tells small, medium or large at a glance; two types close in size (crates and sick pens) look alike, and the exact type is in the peek and on the pen's page. A map of one size keeps its row numbers; a map of mixed sizes stacks each lane on its own (rows would no longer line up), and the codes carry the numbers.
 
+## Choose a destination
+
+The Move hosts pass eligible pen levels as `plain`, including registered empty pens. The options `selected` and `disabled` mark a chosen tile with the ink ring and make source or unavailable pens unavailable with an accessible reason. `wholeControl: 'map'` places Whole room beside Entrance so the page keeps its primary commit in the footer. The ordinary navigation map keeps its footer control.
+
 ## Whole room
 
 A room longer than two screens is hard to take in by scrolling, and a tile can never shrink under the glove floor. So such a map gets one more button, Whole room, which shows the room on one screen with neighbouring pens sharing a tile (owner, 2026-11-03: one zoom out; no slider, no pinch). It replaces the range control.

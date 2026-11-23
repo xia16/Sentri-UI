@@ -61,7 +61,8 @@
           "farrowing.piglets-sow",
           "farrowing.piglets-filter",
           "farrowing.piglets-confirm",
-          "farrowing.piglets-pen"
+          "farrowing.piglets-pen",
+          "farrowing.piglets-room"
         ]
       }
     ],
@@ -817,6 +818,16 @@
       "farrowing.history",
       "farrowing.details",
       "Back (opened from Details)"
+    ],
+    [
+      "farrowing.piglets-pen",
+      "farrowing.piglets-room",
+      "choose a room"
+    ],
+    [
+      "farrowing.piglets-room",
+      "farrowing.piglets-pen",
+      "tap a room"
     ]
   ],
   "screens": [
@@ -2227,23 +2238,28 @@
         "states": [],
         "elements": [
           {
-            "name": "Move to a pen",
-            "at": "Pen",
-            "shows": "A drawer: \"Move to a pen\", line \"From <ID>\"; search a pen with scan inside (a plate read moves them there); pens by unit, her unit first, her own crate dimmed (\"Her crate\"); Back.",
-            "logic": "A tap moves them and returns to her list: they leave her litter, her record logs \"3 piglets moved to Pen B1 · Unit 7 · ID …\", and Sent and moved gains the row.",
-            "source": "farrowing-astra-concept.js allocPenPage(), act allocPen"
+            "name": "Choose a destination",
+            "at": "Pen map",
+            "shows": "Full page with room, search and the shared PenMap. The sow’s source crate is disabled.",
+            "logic": "Select a pen, then commit using the footer named for that pen. The piglets leave her litter and the Sent and moved list records the destination.",
+            "source": "farrowing-astra-concept.js allocPenPage(), act allocPenSave"
           }
         ],
         "controls": [
           {
-            "control": "a pen",
-            "does": "moves the ticked piglets there; back to her piglets",
+            "control": "Move to the selected pen",
+            "does": "Moves the ticked piglets and returns to the litter",
             "goesTo": "farrowing.piglets"
           },
           {
+            "control": "Choose room",
+            "does": "Shows the farm’s destination rooms",
+            "goesTo": "farrowing.piglets-room"
+          },
+          {
             "control": "Back",
-            "does": "back to her piglets; nothing moved",
-            "goesTo": "farrowing.piglets-ticked"
+            "does": "Returns to the litter Actions",
+            "goesTo": "farrowing.piglets-actions"
           }
         ],
         "copy": [
@@ -2257,6 +2273,24 @@
           "Owner, 2026-11-03: no Allocate step; a sow's record leads to her piglets, Inspection's pen list for one litter. Tick some, then Actions: Foster or Move; piglets nobody moves stay with her."
         ]
       }
+    },
+    {
+      "id": "farrowing.piglets-room",
+      "name": "Piglets · choose a destination room",
+      "zh": "仔猪转舍 · 选择房间",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "piglets-pen",
+      "figma": "",
+      "notes": {
+        "purpose": "Switch the destination room without losing the litter selection.",
+        "rules": [
+          "The sow’s room comes first. A room opens its PenMap and keeps the selected piglets."
+        ]
+      },
+      "steps": [
+        "[data-action=\"allocRooms\"]"
+      ]
     },
     {
       "id": "farrowing.ended",

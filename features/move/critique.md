@@ -134,3 +134,7 @@ Scope: the words only. At `?lang=zh` these screens read in English where the Ins
 ## Attention budget
 
 Unchanged: each screen shows the same information in the same order as on main, in Chinese. Cut list: nothing is cut.
+
+## Inspection integration · 2026-11-20
+
+The Scan specimen puts an arrival wash on checked rows. The move receipt repeats the outcome in its footer area. The draft Move board has a 24-pen map and its source condition rule retains the old symptom count after a partial move. The local review uses checked markers on the ordinary row ground, a concise receipt, a neutral shared PenMap with its Whole room control, and a source-pen consequence for any untagged heads moved.

@@ -2936,6 +2936,7 @@
     "actions.tile.resolve": {"en": "Resolve", "zh": "解除", "kind": "action"},
     "actions.tile.care": {"en": "Care", "zh": "护理", "kind": "action"},
     "actions.tile.note": {"en": "Note", "zh": "备注", "kind": "action"},
+    "actions.tile.move": {"en": "Move", "zh": "转舍", "kind": "action"},
     "actions.tile.transfer": {"en": "Transfer", "zh": "转栏", "kind": "action"},
     "actions.tile.measure": {"en": "Measure", "zh": "测量", "kind": "action"},
     "actions.tile.feed": {"en": "Feed", "zh": "饲喂", "kind": "action"},

@@ -149,6 +149,7 @@ From the Edit record product round ([edit-record-round.md](edit-record-round.md)
 
 ### Owner decision, 2026-10-22 · The pen tools are Inspection's
 
+- A sow’s Move and a selected litter’s Move both open the [shared destination picker](../move/PRD.md). Select the destination, then use the button naming the room and pen. A litter move returns to its Piglets list and records the destination in Sent and moved.
 - The pen page and everything on it (Note, Feed, Fault, the pen log) live in **Inspection**, where pens are walked and looked after. Farrowing keeps the room, Pen map and the pen header's `›` that opens the pen page; its map no longer lists the pen screens.
 - **Find a sow and Scan ear tags** stay in Farrowing's scope and are their own band on its map ("Find and scan"), apart from the room.
 

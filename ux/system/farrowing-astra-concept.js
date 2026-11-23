@@ -147,14 +147,25 @@ function act(s,a,v){
  if(a==='litterNoId'){const f=s.fosterDraft;f.count=f.count?0:fosterNoId(s);}   // the row ticks all of them; its count says how many
  if(a==='litterActions'&&litterPicked(s))s.view='litterActions';
  if(a==='allocToSow'&&litterPicked(s)){s.featureReturn='pigletList';Object.assign(s.fosterDraft,{q:'',scanning:false,direction:'out',target:''});s.view='foster';}
- if(a==='allocToPen'&&litterPicked(s)){Object.assign(s.fosterDraft,{penQ:'',penScan:false});s.view='allocPen';}
- if(a==='allocPenClear')s.fosterDraft.penQ='';
- if(a==='allocPenScan'){s.fosterDraft.penScan=roomContext(s).scan.connected?true:'waiting';s.fosterDraft.penQ='';}
- if(a==='allocPenScanStop')s.fosterDraft.penScan=false;
- if(a==='allocPen'){const f=s.fosterDraft,[unit,pen]=String(v).split('|'),c=roomContext(s),ids=f.ids.slice(),n=ids.length+f.count;if(!n)return;
+ if(a==='allocToPen'&&litterPicked(s)){
+  Object.assign(s.fosterDraft,{toRoom:homeUnit(s).id,toPen:'',penQ:'',roomQ:''});s.view='allocPen';
+ }
+ if(a==='allocRooms'&&s.view==='allocPen'){s.fosterDraft.roomQ='';s.view='allocRooms';}
+ if(a==='allocRoom'&&s.view==='allocRooms'){
+  const f=s.fosterDraft;if(v!==f.toRoom){f.toRoom=v;f.toPen='';f.penQ='';}s.view='allocPen';
+ }
+ if(a==='allocPenPick'&&s.view==='allocPen')s.fosterDraft.toPen=v;
+ if(a==='allocPenSave'&&s.view==='allocPen'){
+  const f=s.fosterDraft,c=roomContext(s),home=homeUnit(s),room=allocRoom(s),ids=f.ids.slice(),n=ids.length+f.count;
+  if(!n||!room.pens.some(p=>p.id===f.toPen&&!SentriMovePicker.unavailable(p))||(room.id===home.id&&f.toPen===s.pen))return;
   s.piglets=s.piglets.filter(p=>!ids.includes(p.tag));s.alive-=n;s.moved=(s.moved||0)+n;s.unidentified=fosterNoId(s);s.anchor=born(s);
-  const where=`${rowText.pen(pen)} · ${farmUnit(c,unit).name}`;event(s,`${n} piglet${n===1?'':'s'} moved to ${where}${ids.length?' · ID '+ids.join(', '):''}`,'milestone');
-  (s.allocSent||=[]).push({kind:'moved',where,n,ids});s.fosterDraft=null;litterDraft(s);s.view='pigletList';}
+  const target=farmUnit(c,room.id),where=`${rowText.pen(f.toPen)} · ${target.name}`;
+  event(s,`${n} piglet${n===1?'':'s'} moved to ${where}${ids.length?' · ID '+ids.join(', '):''}`,'milestone');
+  const subject=pigletWord(n),from=sowPlace(s);
+  logPenMove(home,s.pen,SentriMovePicker.t('Moved out · '+subject,'移出 '+n+' 头仔猪'),from+' → '+where);
+  logPenMove(target,f.toPen,SentriMovePicker.t('Moved in · '+subject,'移入 '+n+' 头仔猪'),from+' → '+where);
+  (s.allocSent||=[]).push({kind:'moved',where,n,ids});s.fosterDraft=null;litterDraft(s);s.view='pigletList';
+ }
  if(a==='fosterFilter'){s.fosterDraft.filtering=true;s.fosterDraft.filterDraft=clone(s.fosterDraft.filter);}
  if(a==='fosterUnit')s.fosterDraft.filterDraft.unit=v;
  if(a==='fosterFilterReset')s.fosterDraft.filterDraft=fosterFilterDefault(s);
@@ -189,7 +200,9 @@ function act(s,a,v){
  if(a==='saveCountReconcile'){if(s.countDraft===s.alive||!s.countReason.trim())return;const before=s.alive,diff=s.countDraft-before;s.alive=s.countDraft;s.unidentified=Math.max(0,s.unidentified+diff);s.anchor=born(s);if(s.locked)s.frozen=Math.max(s.frozen,born(s));event(s,`Piglet count corrected · ${before} → ${s.alive} · ${s.countReason.trim()}`,'correction');s.actionsEntry=true;s.view='profile';}
  if(a==='featureBack'&&s.view==='fosterSend'){s.fosterDraft.target='';s.view='foster';return;}   // back to the sows
  if(a==='featureBack'&&s.view==='allocConfirm'){s.fosterDraft.target='';s.view='foster';return;}   // back to the sows
- if(a==='featureBack'&&['allocPen','litterActions'].includes(s.view)){s.view='pigletList';return;}   // back to her piglets, nothing changed
+ if(a==='featureBack'&&s.view==='allocRooms'){s.view='allocPen';return;}
+ if(a==='featureBack'&&s.view==='allocPen'){s.view='litterActions';return;}
+ if(a==='featureBack'&&s.view==='litterActions'){s.view='pigletList';return;}   // back to her piglets, nothing changed
  if(a==='featureBack'&&s.view==='pigletList'){s.fosterDraft=null;s.view=recordView(s);return;}   // back to her record
  if(a==='featureBack'){if(s.view==='foster'&&s.featureReturn==='pigletList'){s.view='pigletList';}else if(['pigletEdit','pigletDeath'].includes(s.view)||s.view==='foster'&&s.featureReturn==='pigletCare'){s.pigletTab='records';s.view='pigletCare';}else if(s.scanReturn){s.scanReturn=false;s.actionsEntry=false;s.view=s.pageBack||'roomScan';}else{s.actionsEntry=true;s.view='profile';}}   // opened from Scan's Actions: Back returns to the scan list
 }
@@ -252,6 +265,7 @@ function atlasScreen(s,c){
  if(v==='foster'){const f=s.fosterDraft;if(s.featureReturn==='pigletList')return f.filtering?'farrowing.piglets-filter':'farrowing.piglets-sow';return f.filtering?'farrowing.foster-filter':f.scanning?'farrowing.foster-scanning':f.q.trim()?'farrowing.foster-search':'farrowing.foster';}
  if(v==='fosterSend')return 'farrowing.foster-send';
  if(v==='allocPen')return 'farrowing.piglets-pen';
+ if(v==='allocRooms')return 'farrowing.piglets-room';
  if(v==='allocConfirm')return 'farrowing.piglets-confirm';
  if(v==='litterActions')return 'farrowing.piglets-actions';
  if(v==='pigletList')return litterPicked(s)?'farrowing.piglets-ticked':'farrowing.piglets';
@@ -655,7 +669,11 @@ function connectPig(root,c){
  frame.addEventListener('load',()=>frame.contentWindow.postMessage({type:'open-sow-detail',record:{id:p.tag,pen:p.pen,unit:p.unit,stage:p.stage,events:[]},tasks:[],destinations:c.units.map(u=>({id:u.id,name:u.name,pens:[...new Set(u.records.map(r=>r.pen))]})),entry:'pig',actions:[],note},location.origin),{once:true});
 }
 // Pen context is shared by its drawers within the unit; task rows stay sow-focused.
-function penInfo(c){const pens=c.unit.penDetails||(c.unit.penDetails={});return pens[c.detailPen]||(pens[c.detailPen]={note:'',noteBy:'',faults:[],events:[],feed:null});}
+function penInfo(c){return penDetailsAt(c.unit,c.detailPen);}
+function penDetailsAt(unit,code){
+ const pens=unit.penDetails||={};return pens[code]||={note:'',noteBy:'',faults:[],events:[],feed:null};
+}
+function logPenMove(unit,code,text,note){penDetailsAt(unit,code).events.unshift({text,note,day:'Today',time:'09:41',who:'G. Hansen'});}
 function penEvent(c,text,note=''){penInfo(c).events.unshift({text,note,day:'Today',time:'09:41',who:'G. Hansen'});}
 function penActionRow(action,symbol,title,sub,value=''){return SentriUI.row({action,icon:icon(symbol),title,description:sub,value});}
 /* The pen page (owner, 2026-10-19; the sibling of Inspection's, PR #229): the pen is a door, not a tick. Everything done to the pen as a whole
@@ -862,7 +880,7 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
  return true;
 }
 function pageAfterRender(i,s,c,root){
- const demo=root.querySelector('[data-demo-scan]');if(demo){demo.hidden=s.view==='allocPen'?!s.fosterDraft?.penScan:['fosterSend','pigletList'].includes(s.view)?!s.fosterDraft?.idScan:fosterPicking(s)?!s.fosterDraft.scanning:s.view==='roomBatchPick'?!c.batch?.scanning:s.view!=='roomScan'||!c.scan.connected;demo.disabled=s.view==='roomScan'&&!c.scan.listening;demo.textContent=s.view==='roomBatchPick'&&c.batch?.scanning==='waiting'||(['fosterSend','pigletList'].includes(s.view)?s.fosterDraft?.idScan:s.view==='allocPen'?s.fosterDraft?.penScan:fosterPicking(s)&&s.fosterDraft.scanning)==='waiting'?'Simulate reader on':'Simulate scan';}
+ const demo=root.querySelector('[data-demo-scan]');if(demo){demo.hidden=['fosterSend','pigletList'].includes(s.view)?!s.fosterDraft?.idScan:fosterPicking(s)?!s.fosterDraft.scanning:s.view==='roomBatchPick'?!c.batch?.scanning:s.view!=='roomScan'||!c.scan.connected;demo.disabled=s.view==='roomScan'&&!c.scan.listening;demo.textContent=s.view==='roomBatchPick'&&c.batch?.scanning==='waiting'||(['fosterSend','pigletList'].includes(s.view)?s.fosterDraft?.idScan:s.view==='allocPen'?s.fosterDraft?.penScan:fosterPicking(s)&&s.fosterDraft.scanning)==='waiting'?'Simulate reader on':'Simulate scan';}
  if(s.view==='roomPig')connectPig(root,c);
  if(s.view==='roomBatchForm')connectBatchForm(root,c);
  // The pig just read is brought into view where she is, and her row keeps Row's Just scanned state for a moment.
@@ -954,7 +972,9 @@ function litterPage(s){
  const foot=footer(SentriUI.backButton({action:'featureBack'}),k?btn('litterActions',`${icon('more')}<span>Actions · ${k}</span>`,'button primary'):'');
  const page=SentriUI.sheet({variant:'page',title:'Piglets',line:`${s.ended?'Sow died':'Sow'} · ${s.tag} · ${sowPlace(s)}`,back:{action:'featureBack'},body:list+allocSentList(s),bodyClass:'litter-body',footer:foot,className:'feature-page litter-page',label:'Piglets',bar:status()});
  if(s.view==='allocConfirm')return '<div class="page-background" inert aria-hidden="true">'+fosterPage(s)+'</div>'+allocConfirm(s);   // over the sows
- const layer=s.view==='allocPen'?allocPenPage(s):s.view==='litterActions'?litterActionsSheet(s):'';
+ if(s.view==='allocPen')return allocPenPage(s);
+ if(s.view==='allocRooms')return allocRoomsPage(s);
+ const layer=s.view==='litterActions'?litterActionsSheet(s):'';
  return layer?'<div class="page-background" inert aria-hidden="true">'+page+'</div>'+layer:page;
 }
 // Actions on the ticked piglets: what a litter's piglets can do from the floor.
@@ -975,18 +995,37 @@ function allocSentList(s){
  const row=x=>SentriUI.row({variant:'navigation',icon:icon(x.kind==='moved'?'transfer':'pig'),title:x.kind==='moved'?`To ${x.where}`:`To ${x.tag} · ${rowText.pen(x.pen)}`,description:x.ids.length?'ID '+x.ids.join(', '):'Without ID',trailing:{text:String(x.n)}});
  return `<section class="allocate-sent">${SentriUI.heading({title:'Sent and moved',kind:'group',level:4})}${SentriUI.rowGroup(s.allocSent.map(row).join(''))}</section>`;
 }
-// Move to a pen is Move's destination picker (features/move: her unit pinned first, her own crate dimmed, search reaches any pen and the
-// scan reads a pen's plate, a tap moves the ticked piglets and closes).
-function allocPenOptions(s){
- const c=roomContext(s),home=homeUnit(s),q=(s.fosterDraft?.penQ||'').trim().toLowerCase();
- return [home,...c.units.filter(u=>u!==home)].flatMap(u=>[...new Set(u.records.map(r=>r.pen))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).filter(p=>!q||p.toLowerCase().includes(q)).map(p=>{const own=u===home&&p===s.pen;return [u.id+'|'+p,rowText.pen(p),'',u.name,own?{disabled:true,reason:'Her crate'}:undefined];}));
+// Move shares the same picker with Inspection. The recorded litter belongs to the sow until the pen move is committed.
+function farrowingMoveRooms(c){
+ const sample=globalThis.SentriPenMapSampleRooms,shape=sample[new URLSearchParams(location.search).get('penmap')];
+ return c.units.map(u=>{
+  const layout=u.id==='7'?(shape||sample.standard).props:null;
+  const codes=[...new Set([...(layout?SentriMovePicker.codesFor(layout):[]),...u.records.map(r=>r.pen)])];
+  return {id:u.id,name:u.name,section:SentriMovePicker.t('Farrowing','分娩舍'),layout,pens:codes.map(id=>({id}))};
+ });
 }
-const allocPenList=s=>{const o=allocPenOptions(s);return o.length?SentriUI.pickerOptions({options:o,action:'allocPen'}):`<p class="st-find-hint">No pen matching “${esc((s.fosterDraft?.penQ||'').trim())}”.</p>`;};
+function allocRoom(s){
+ const f=s.fosterDraft,rooms=farrowingMoveRooms(roomContext(s));
+ return rooms.find(r=>r.id===f.toRoom)||rooms.find(r=>r.id===homeUnit(s).id);
+}
+function allocMoveMap(s){
+ const f=s.fosterDraft,room=allocRoom(s),home=room.id===homeUnit(s).id;
+ return SentriMovePicker.results({room,query:f.penQ,selected:f.toPen,current:f.toPen||(home?s.pen:''),action:'allocPenPick',
+  key:'piglet-move-'+states.indexOf(s),blocked:home?{[s.pen]:SentriMovePicker.t('Source pen','来源栏')}:{}});
+}
 function allocPenPage(s){
- const f=s.fosterDraft,k=litterPicked(s);
- const bar=f.penScan?SentriUI.scanBar({state:f.penScan==='waiting'?'waiting':'scanning',device:'Reader 1',text:f.penScan==='waiting'?'':'Scan the pen plate',stop:{action:'allocPenScanStop'}})
-  :SentriUI.choiceSearch({label:'Search pen',placeholder:'Pen',value:f.penQ||'',attrs:{'data-alloc-pen-search':''},clear:{action:'allocPenClear'},scan:{action:'allocPenScan',label:'Scan pen plate'}});
- return SentriUI.sheet({variant:'drawer',surface:'menu',title:'Move to a pen',line:{text:[{text:'From '},{text:s.tag,strong:true}]},body:`<div class="hand-pen-bar">${bar}</div><div class="hand-pen-list">${allocPenList(s)}</div>`,bodyClass:'alloc-done-body',footer:footer(SentriUI.backButton({action:'featureBack'})),size:'long',sizing:'content',label:'Move to a pen',scrim:{action:'featureBack',label:'Back to her piglets'}});
+ const f=s.fosterDraft,n=litterPicked(s),room=allocRoom(s),t=SentriMovePicker.t;
+ return SentriMovePicker.page({title:t('Move '+pigletWord(n),'转舍 '+n+' 头仔猪'),line:{text:t('From ','来源 ')+sowPlace(s)},bar:status(),back:'featureBack',
+  above:SentriMovePicker.roomRow(room,'allocRooms')+SentriMovePicker.search('pen',f.penQ),
+  body:'<div data-move-pen-results>'+allocMoveMap(s)+'</div>',primary:{action:'allocPenSave',waiting:!f.toPen,
+   label:f.toPen?t('Move to '+room.name+' · '+f.toPen,'移到 '+room.name+' · '+f.toPen):t('Choose a pen','选择一个栏位')}});
+}
+function allocRoomResults(s){
+ return SentriMovePicker.roomResults(farrowingMoveRooms(roomContext(s)),homeUnit(s).id,s.fosterDraft.toRoom,'allocRoom',s.fosterDraft.roomQ);
+}
+function allocRoomsPage(s){
+ return SentriMovePicker.page({title:SentriMovePicker.t('Choose room','选择房间'),bar:status(),back:'featureBack',
+  above:SentriMovePicker.search('room',s.fosterDraft.roomQ),body:'<div data-move-room-results>'+allocRoomResults(s)+'</div>'});
 }
 // The finished sow (owner, 2026-11-02): her drawer says only what happened this time, one ring of where the litter went in a card that
 // opens Details (a tappable card in a white drawer: white body, tinted head band); her actions sit in the bar, nothing stacked in the body.
@@ -1085,7 +1124,7 @@ function sowActionCatalogue(s){return [
  {id:'not-in-pig',title:'Mark not in pig',group:'production',scope:'farrowing',sub:'Record the outcome and return to rebreed watch',icon:'pregnancy',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':''},
  {id:'move-batch',title:'Move to another farrowing batch',group:'production',scope:'other',sub:'Keep the sow in the production plan',icon:'batch',reason:'No destination farrowing batches are connected in this preview.'},
  {id:'marker',title:s.markers.length?'Edit note':'Add note',content:s.markers.length>0,group:'routine',sub:s.markers[0]?.text||'Leave a note or describe a visible marker',icon:'note',reason:s.ended?'This sow has died.':''},
- {id:'transfer',title:'Transfer sow',group:'routine',sub:'Move this sow to another unit or pen',icon:'transfer',reason:s.ended?'This sow has died.':''}
+ {id:'transfer',title:'Move sow',group:'routine',sub:'Move this sow to another unit or pen',icon:'transfer',reason:s.ended?'This sow has died.':''}
 ];}
 // Scan's Actions: the embedded actions page opens for the first ticked sow, and the row the worker chose is opened in it.
 const deepSelectors={transfer:'[data-action="sow-host-action"][data-value="transfer"]',marker:'[data-action="sow-host-action"][data-value="marker"]',health:'[data-action="health"]',treatment:'[data-action="treatment"]'};
@@ -1096,7 +1135,7 @@ function connectSowDetail(root,s){
   const events=s.pending?[{text:(s.pending>0?'+':'')+s.pending+' alive · this visit',day:'Today',time:s.stamp,who:'G. Hansen'},...s.events]:s.events;
   const tasks=!s.productionOutcome&&!s.ended?[{id:'farrowing',title:'Farrowing',type:'Production',status:s.locked?'Finished':born(s)?'In progress':'Awaiting',summary:born(s)?s.alive+' alive · '+sum(s.dead)+' dead':'Record this sow’s litter'},...(born(s)?[{id:'piglet-processing',title:'Piglet processing',type:'Production',status:s.processingTasks.some(t=>!t.done)?'Due today':'Up to date',summary:s.processingTasks.filter(t=>t.done).length+' of '+s.processingTasks.length+' care steps done'}]:[]),...(s.tag==='000418'?[{id:'vaccination',title:'Vaccination',type:'Health',status:'Due today',summary:'Scheduled vaccination'},{id:'treatment-task',title:'Treatment',type:'Health',status:'Due today',summary:'Scheduled treatment'}]:[])]:[];
   if(s.deepLink){const key=s.deepLink;s.deepLink='';deepLinkInto(frame,key);}
-  frame.contentWindow.postMessage({type:'open-sow-detail',record:{id:s.tag,pen:s.pen,unit:(roomContext(s).units.find(u=>u.records.includes(s))||roomContext(s).unit).name,parity:s.parity,batch:'28',breed:'Landrace × Large White',serviceDate:'2026-05-21',expectedFarrowing:'2026-09-12',stage:s.ended?'Sow died':s.locked?'Lactating':born(s)?'Farrowing':'Gestating',events},tasks,destinations:roomContext(s).units.map(u=>({id:u.id,name:u.name,pens:[...new Set(u.records.map(r=>r.pen))]})),context:sowDetailContexts.get(s),entry:s.actionsEntry?'actions':'pig',actions:sowActionCatalogue(s).filter(x=>!x.inDrawer)},location.origin);
+  frame.contentWindow.postMessage({type:'open-sow-detail',record:{id:s.tag,pen:s.pen,unit:(roomContext(s).units.find(u=>u.records.includes(s))||roomContext(s).unit).name,parity:s.parity,batch:'28',breed:'Landrace × Large White',serviceDate:'2026-05-21',expectedFarrowing:'2026-09-12',stage:s.ended?'Sow died':s.locked?'Lactating':born(s)?'Farrowing':'Gestating',events},tasks,destinations:farrowingMoveRooms(roomContext(s)),context:sowDetailContexts.get(s),entry:s.actionsEntry?'actions':'pig',actions:sowActionCatalogue(s).filter(x=>!x.inDrawer)},location.origin);
  },{once:true});
 }
 window.addEventListener('message',e=>{
@@ -1108,7 +1147,16 @@ window.addEventListener('message',e=>{
  const viaScan=!!s.scanDeep;if(e.data.type!=='sow-detail-state')s.scanDeep=false;
  if(e.data.type==='sow-action'){
   const a=e.data.action;if(a==='current-task'&&!s.productionOutcome&&!s.ended){s.actionReturn=false;s.actionsEntry=false;s.view=e.data.taskId==='piglet-processing'&&born(s)?'pigletCare':s.locked?'locked':'count';render(i);return;}const actionId={'save-miscarriage':'miscarriage','save-transfer':'transfer','save-batch-removal':'remove-batch','save-not-in-pig':'not-in-pig'}[a]||a,entry=sowActionCatalogue(s).find(x=>x.id===actionId&&!x.reason);if(!entry)return;
-  if(a==='save-transfer'){const c=roomContext(s),from=c.units.find(u=>u.records.includes(s)),to=c.units.find(u=>u.id===e.data.unit),pen=String(e.data.pen||'');if(!from||!to||!to.records.some(r=>r.pen===pen)||(from===to&&s.pen===pen))return;const origin=from.name+' · '+s.pen;if(from!==to){from.records.splice(from.records.indexOf(s),1);to.records.push(s);}s.pen=pen;switchRoomUnit(c,to.id);c.currentPen=pen;event(s,'Transferred · '+origin+' → '+to.name+' · '+pen,'milestone');s.actionsEntry=true;s.view='profile';}
+  if(a==='save-transfer'){
+   const c=roomContext(s),from=c.units.find(u=>u.records.includes(s)),to=c.units.find(u=>u.id===e.data.unit),pen=String(e.data.pen||'');
+   const room=farrowingMoveRooms(c).find(r=>r.id===to?.id);
+   if(!from||!to||!room?.pens.some(p=>p.id===pen&&!SentriMovePicker.unavailable(p))||(from===to&&s.pen===pen))return;
+   const origin=from.name+' · '+s.pen,destination=to.name+' · '+pen,t=SentriMovePicker.t;
+   logPenMove(from,s.pen,t('Moved out · '+s.tag,'移出 · '+s.tag),origin+' → '+destination);
+   logPenMove(to,pen,t('Moved in · '+s.tag,'移入 · '+s.tag),origin+' → '+destination);
+   if(from!==to){from.records.splice(from.records.indexOf(s),1);to.records.push(s);}
+   s.pen=pen;switchRoomUnit(c,to.id);c.currentPen=pen;event(s,'Moved · '+origin+' → '+destination,'milestone');s.actionsEntry=false;s.view='profile';
+  }
   else if(a==='save-miscarriage'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.frozen=born(s);s.productionOutcome='abortion';s.locked=true;event(s,'Abortion · '+reason,'danger');s.actionsEntry=false;s.view='history';s.pageBack='room';}
   else if(a==='save-batch-removal'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.productionOutcome='removed';s.locked=true;s.frozen=0;s.alive=0;s.pending=0;event(s,'Removed from farrowing batch · '+reason+(e.data.note?' · '+String(e.data.note).trim():''),'milestone');s.actionsEntry=false;s.view='history';s.pageBack='room';}
   else if(a==='save-not-in-pig'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.productionOutcome='not-in-pig';s.locked=true;s.frozen=0;s.alive=0;s.pending=0;event(s,'Not in pig · '+reason+(e.data.note?' · '+String(e.data.note).trim():''),'milestone');s.actionsEntry=false;s.view='history';s.pageBack='room';}
@@ -1298,7 +1346,7 @@ function countReconcilePage(s){
  const body=`${SentriUI.panel(`<span>System count</span><strong>${s.alive}</strong>`,{className:'count-compare',tag:'section'})}<section class="feature-section">${farmStepper({variant:'well',label:'Count the piglets in this litter',value:s.countDraft,min:identified,max:30,action:'countReconcileStep',reserveHint:false})}<p class="feature-hint">The count cannot be lower than the ${identified} identified piglets still recorded alive.</p></section>${changed?`<div class="feature-warning">${icon('alert')}<span><strong>Your count will replace ${s.alive}</strong><small>${s.countDraft>s.alive?s.countDraft-s.alive+' piglets will be added without identity.':s.alive-s.countDraft+' piglets without identity will be removed.'}</small></span></div>`:''}${SentriUI.field({label:'Reason for mismatch',control:`<textarea rows="3" data-count-reason placeholder="What explains the difference?">${esc(s.countReason)}</textarea>`,className:'feature-field'})}`;
  return featurePage(s,'Correct piglet count',body,btn('saveCountReconcile','Save corrected count','button primary','',!changed||!s.countReason.trim()),'count-reconcile-page');
 }
-function capabilitySurface(s){return s.view==='fosterSend'?fosterSendPage(s):['pigletList','litterActions','allocPen','allocConfirm'].includes(s.view)?litterPage(s):s.view==='marker'?markerPage(s):s.view==='pigletCare'?pigletCarePage(s):s.view==='pigletEdit'?pigletEditPage(s):s.view==='foster'?fosterPage(s):s.view==='pigletDeath'?pigletDeathPage(s):s.view==='countReconcile'?countReconcilePage(s):'';}
+function capabilitySurface(s){return s.view==='fosterSend'?fosterSendPage(s):['pigletList','litterActions','allocPen','allocRooms','allocConfirm'].includes(s.view)?litterPage(s):s.view==='marker'?markerPage(s):s.view==='pigletCare'?pigletCarePage(s):s.view==='pigletEdit'?pigletEditPage(s):s.view==='foster'?fosterPage(s):s.view==='pigletDeath'?pigletDeathPage(s):s.view==='countReconcile'?countReconcilePage(s):'';}
 
 function farrowingRecordSurface(s){const surface=({count,finish,locked,death})[s.view];if(!surface)return '';const v=surface(s),h=identity(s),page=AstraSurfaces.isPage('farrowing',s.view);
  const label={count:'Count alive',finish:'Finish farrowing',locked:'Locked litter',death:'Record dead'}[s.view];
@@ -1322,7 +1370,15 @@ gallery.addEventListener('sentri-range-change',e=>{const root=e.target.closest('
 // Choose pigs: typing narrows the list where it is, so the field keeps focus; Clear shows only while something is typed.
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-litter-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,s=states[i],sec=e.target.closest('.litter-list');s.fosterDraft.idQ=e.target.value;sec.querySelector('.litter-rows').innerHTML=litterRows(s);sec.querySelector('[data-action="fosterIdClear"]')?.toggleAttribute('hidden',!s.fosterDraft.idQ);});   // typing filters her piglets
 gallery.addEventListener('change',e=>{if(!e.target.matches('[data-litter-count]'))return;const i=+e.target.closest('[data-card]').dataset.card,s=states[i];s.fosterDraft.count=Math.max(0,Math.min(fosterNoId(s),Number(e.target.value)||0));render(i);});   // typed into the row
-gallery.addEventListener('input',e=>{if(!e.target.matches('[data-alloc-pen-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,s=states[i],sh=e.target.closest('.sheet');s.fosterDraft.penQ=e.target.value;sh.querySelector('.hand-pen-list').innerHTML=allocPenList(s);sh.querySelector('[data-action="allocPenClear"]')?.toggleAttribute('hidden',!s.fosterDraft.penQ);});
+gallery.addEventListener('input',e=>{
+ const el=e.target;
+ if(!el.matches('[data-move-pen-search],[data-move-room-search]'))return;
+ const s=states[+el.closest('[data-card]').dataset.card],surface=el.closest('.sheet');
+ if(s.view==='allocPen'){s.fosterDraft.penQ=el.value;surface.querySelector('[data-move-pen-results]').innerHTML=allocMoveMap(s);}
+ if(s.view==='allocRooms'){s.fosterDraft.roomQ=el.value;surface.querySelector('[data-move-room-results]').innerHTML=allocRoomResults(s);}
+ surface.querySelector('.sheet-body').scrollTop=0;
+});
+
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-foster-id-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,s=states[i],box=e.target.closest('.foster-ids');s.fosterDraft.idQ=e.target.value;box.querySelector('.foster-id-scroll').innerHTML=fosterIdRows(fosterIds(fosterFrom(s)),s.fosterDraft);fosterIdMore(box.querySelector('.foster-id-scroll'));box.querySelector('[data-action="fosterIdClear"]')?.toggleAttribute('hidden',!s.fosterDraft.idQ);});
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-foster-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,s=states[i],page=e.target.closest('.foster-pick');s.fosterDraft.q=e.target.value;page.querySelector('.foster-list').innerHTML=fosterPickList(s);page.querySelector('[data-action="fosterClear"]')?.toggleAttribute('hidden',!s.fosterDraft.q);if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(s,roomContext(s)));});
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-batch-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,c=roomContext(states[i]),page=e.target.closest('.batch-pick');c.batch.q=e.target.value;page.querySelector('.batch-list').innerHTML=batchRows(c);page.querySelector('[data-action="room-batch-clear"]')?.toggleAttribute('hidden',!c.batch.q);});
@@ -1330,7 +1386,7 @@ gallery.addEventListener('input',e=>{if(!e.target.matches('[data-room-search]'))
 // The demo's own control, outside the phone: the reader reads the next sample sow.
 document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const i=+b.closest('[data-card]').dataset.card,s=states[i],c=roomContext(s);
  // Foster, scanning: a read opens the count for the sow read (single-action), as tapping her does; the reader connecting starts it.
- if(s.view==='allocPen'&&s.fosterDraft?.penScan){const f=s.fosterDraft;if(f.penScan==='waiting'){c.scan.connected=true;f.penScan=true;render(i);return;}const o=allocPenOptions(s).find(o=>!o[4]);if(o)act(s,'allocPen',o[0]);render(i);return;}   // a plate read moves them there
+
  if(['fosterSend','pigletList'].includes(s.view)&&s.fosterDraft?.idScan){const f=s.fosterDraft;if(f.idScan==='waiting'){c.scan.connected=true;f.idScan=true;render(i);return;}const next=fosterIds(fosterFrom(s)).find(p=>!f.ids.includes(p.tag));if(next){f.ids.push(next.tag);f.idRead=next.tag;}render(i);return;}   // a read ticks that piglet
  if(fosterPicking(s)&&s.fosterDraft.scanning&&!s.fosterDraft.target){const f=s.fosterDraft;if(f.scanning==='waiting'){c.scan.connected=true;f.scanning=true;render(i);return;}if(!f.seq++){act(s,'fosterRead',farmPigs.find(p=>p.stage==='Gestating')?.tag);render(i);return;}const list=fosterCandidates(s),x=list[(f.seq-2)%list.length];if(x)act(s,'fosterRead',x.r.tag);render(i);return;}   // the first read is a pregnant sow
  // Choosing pigs, scanning: a read ticks her and marks her row (a repeat read keeps her ticked); a pig from another unit isn't added (a toast says where she is).
@@ -1348,13 +1404,14 @@ gallery.addEventListener('scroll',e=>{if(!e.target.matches('.room-scroll'))retur
 let grabStart=null;
 SentriUI.holdBind(gallery,{onCommit(el){const i=+el.closest('[data-card]').dataset.card,record=states[i];if(!roomAction(i,el.dataset.action,el.dataset.value))act(record,el.dataset.action);render(i);}});
 gallery.addEventListener('pointerdown',e=>{if(e.button!==0)return;if(e.target.closest('.grab'))grabStart={y:e.clientY,i:+e.target.closest('[data-card]').dataset.card};});
-gallery.addEventListener('pointerup',e=>{if(grabStart){if(e.clientY-grabStart.y>100||Math.abs(e.clientY-grabStart.y)<8){const s=states[grabStart.i];if(['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile'].includes(s.view))act(s,'featureBack');else if(['death','history','profile','deathBreakdown','litter'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else if(s.view.startsWith('room'))roomAction(grabStart.i,'room-back');else act(s,'close');render(grabStart.i);}grabStart=null;}});
+gallery.addEventListener('pointerup',e=>{if(grabStart){if(e.clientY-grabStart.y>100||Math.abs(e.clientY-grabStart.y)<8){const s=states[grabStart.i];if(['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile','allocPen','allocRooms'].includes(s.view))act(s,'featureBack');else if(['death','history','profile','deathBreakdown','litter'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else if(s.view.startsWith('room'))roomAction(grabStart.i,'room-back');else act(s,'close');render(grabStart.i);}grabStart=null;}});
 gallery.addEventListener('pointercancel',()=>{grabStart=null});
-gallery.addEventListener('keydown',e=>{const pi=e.target.closest?.('[data-card]')?+e.target.closest('[data-card]').dataset.card:-1;if(e.key==='Tab'&&e.target.closest('.dialog,.sheet')){const items=[...e.target.closest('.dialog,.sheet').querySelectorAll('button:not(:disabled),input:not(:disabled):not([tabindex="-1"]),select,textarea')],first=items[0],last=items[items.length-1];if(e.shiftKey&&e.target===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&e.target===last){e.preventDefault();first?.focus();}}if(e.key==='Escape'){const i=+e.target.closest('[data-card]').dataset.card,s=states[i];if(s.popup)s.popup=null;else if(['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile'].includes(s.view))act(s,'featureBack');else if(['death','history','profile','deathBreakdown','litter'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else if(s.view.startsWith('room'))roomAction(i,'room-back');else act(s,'close');render(i);}});
+gallery.addEventListener('keydown',e=>{const pi=e.target.closest?.('[data-card]')?+e.target.closest('[data-card]').dataset.card:-1;if(e.key==='Tab'&&e.target.closest('.dialog,.sheet')){const items=[...e.target.closest('.dialog,.sheet').querySelectorAll('button:not(:disabled),input:not(:disabled):not([tabindex="-1"]),select,textarea')],first=items[0],last=items[items.length-1];if(e.shiftKey&&e.target===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&e.target===last){e.preventDefault();first?.focus();}}if(e.key==='Escape'){const i=+e.target.closest('[data-card]').dataset.card,s=states[i];if(s.popup)s.popup=null;else if(['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile','allocPen','allocRooms'].includes(s.view))act(s,'featureBack');else if(['death','history','profile','deathBreakdown','litter'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else if(s.view.startsWith('room'))roomAction(i,'room-back');else act(s,'close');render(i);}});
 // Record dead: opening the sow's Details grows the body; keep the danger banner whole above the footer (crit round 2).
 gallery.addEventListener('click',e=>{const row=e.target.closest('.sheet[data-view=death] [data-st-optional]');if(row)requestAnimationFrame(()=>row.closest('.sheet-body')?.querySelector(':scope > .st-banner')?.scrollIntoView({block:'nearest'}));});
 let noteStep=0;gallery.addEventListener('click',e=>{noteStep=+(e.target.closest('[data-step]')?.dataset.step||0);},true);
-gallery.addEventListener('click',e=>{const el=e.target.closest('[data-action]');if(!el||el.disabled||el.classList.contains('st-hold'))return;
+gallery.addEventListener('click',e=>{if(e.target.closest('.st-pen-whole-toggle,.st-pen-group'))return;
+ const el=e.target.closest('[data-action]');if(!el||el.disabled||el.classList.contains('st-hold'))return;
  // Finish waits while a draft is open; the tap brings the worker to Record dead, where the draft is said ("1 unsaved") and can be saved.
  if(el.dataset.action==='finish'&&el.getAttribute('aria-disabled')==='true'){const k=+el.closest('[data-card]').dataset.card,w=states[k];if(hasDraft(w)){act(w,'death');render(k);}return;}
  if(el.dataset.action==='open-task-sync'){if(!SentriUI.guard(el))openTaskSync();return;}

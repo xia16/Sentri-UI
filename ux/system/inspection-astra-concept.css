@@ -126,7 +126,6 @@
 .inspection-phone .pen-note-indicator span{font-size:var(--type-meta-size)}
 .inspection-phone .pen-note-body{margin:0;font-size:var(--type-row-title-size);line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
 @media(max-width:370px){.inspection-phone .roster-pig .check-target{width:var(--tap-min);min-width:var(--tap-min)}}
-/* The walk roster row is Row · animal via rowSelectDoor (select + door, tags on the right); the screen only adds the selected tint. */
 /* Match farrowing's default tools; keep selection context in the bottom bar. */
 .inspection-phone .inspect-dock{gap:9px}
 .inspection-phone .inspect-dock .dock-scan{flex:1;min-width:0}
@@ -791,6 +790,3 @@
 .inspection-phone .sheet-body > .review-list + .st-heading.st-heading { margin-top: var(--space-section); }
 /* Find a pig: the design system's Lookup find page (components/Lookup) fills the phone over the walk, as a page does. */
 .inspection-phone>.st-find{position:absolute;inset:0;z-index:5}
-
-/* Keep the pen search in the page gutter and outside the scrolling list. */
-.destination-pen-picker > [data-destination-search]{padding:0 var(--space-gutter) var(--space-12)}

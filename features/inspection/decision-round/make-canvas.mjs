@@ -8,32 +8,53 @@ const sections=[
    pic('02-outside-record','打开 000430 档案','档案仍显示 Unit 6 / A2。看档案不会移动猪或替它打勾。'),
    pic('03-unknown','读到系统找不到的耳标','显示没找到。原来已选的两头不受影响。再次读到同一耳标不会新增一行。'),
    pic('17-no-reader','没有连接读卡器','先连接设备，也可以回查找手输耳号。')]],
-  ['发现外单元猪：先看两种移入方式','扫码结果 → 点这头猪 → 只移入／移入并选中 → 选目标栏','如果现场确认这头猪要放到本单元，先选只移入，或移入后马上加入本轮操作；目标栏用独立的全屏选择页，列表可滚动，搜索始终在上方。选完再检查耳号、来源和目的栏。选错可以返回改，本轮其他猪的勾选都保留。',[
+  ['发现外单元猪：先看两种移入方式','扫码结果 → 点这头猪 → 只移入／移入并选中 → 选目标栏','如果现场确认这头猪要放到本单元，先选只移入，或移入后马上加入本轮操作；目标栏用全屏 PenMap，也可以在上方直接搜栏号。选完再检查耳号、来源和目的栏。选错可以返回改，本轮其他猪的勾选都保留。',[
    pic('39-old-cross-unit-scan','旧分支的异单元扫码','读到异单元猪时，显示真实归属且不勾选。',true),
    pic('04-outside-choices','选择移入方式','在转舍之前，两个入口都不会把它加入批量操作。'),
-   pic('05-choose-destination','48 个栏也可以翻','搜索固定在上方，下面只滚动栏位。'),
+   pic('05-choose-destination','48 栏的栏位图','照入口方向找栏，也可以直接在上方搜栏号。'),
    pic('05b-search-C12','输入 C12，只显示 C12','点中后回到移入确认；这一步不会转舍。'),
    pic('05a-no-matching-pens','栏号搜不到时可清空重搜','不会让没有登记的栏成为目的栏。'),
    pic('06-confirm-select','提交前再核对','例如从 Unit 6 / A2 到 Unit 7 / C1。')]],
   ['只移入：猪到了新栏，原名单不变','Move only → 选 C1 → Confirm move → Back','适合只是把位置登记正确。收到成功回执后，它出现在 Unit 7 / C1，但不替你勾上。',[
    pic('06-confirm-move','确认只移入','目标是登记新栏。'),
-   pic('07-receipt-move','转舍确认成功','样例回执明确这头猪没有加进名单。'),
+   pic('07-receipt-move','转舍确认成功','回执只写耳号和目标栏。'),
    pic('08-returns-move','返回扫码','000430 在 C1，已选仍是两头。')]],
   ['移入并选中：成功后才加进批量','Move and select → 选 C1 → Confirm move → Back','适合猪确实到了新栏，而且你接下来还要对它记录治疗、备注等。回来先看已选数量和耳号。',[
-   pic('07-receipt-select','确认移入并勾选','样例回执明确这头猪已加入。'),
+   pic('07-receipt-select','转舍确认成功','返回扫码即可看到勾选结果。'),
    pic('08-returns-select','返回后已选三头','原来两头还在，新加入 000430。')]],
   ['从查找进入：同样可看档案或移入','巡检 → Search → 输入 000430 → 点结果 → 看档案或移入','输入耳号找到结果不会勾选。选了移入并选中，确认成功后回到同一个搜索词；此时结果在新栏，退回巡检就能看到加入的勾选。从查找点右侧扫码，则走上面的全单元扫码，Back 恢复原搜索。',[
    pic('09-find-outside','输耳号，仍显示原栏','点结果打开同一个选择弹窗。'),
    pic('10-find-return','移入后回原搜索','搜索内容不丢，结果改为真实的新栏位。')]],
-  ['没有成功回执：不要当作已经转好','选择目的栏 → 点确认 → 按实际结果提示','下面是样例回执。等待确认时不改位置或勾选；失败、无权或离线保持这批猪不变。结果不明时先查询这一次提交，不自动重发。真实 App 启用前需要服务端能分辨是哪一次转舍、复查结果并防止重复写入。',[
-   pic('16-offline','离线：还没提交','联网后重新核对位置，再提交。'),
+  ['提交后按回执更新','选择目的栏 → 点确认 → 回到扫码或处理失败','断网时直接回到扫码，后台收到确认后更新位置和勾选。失败和无权时显示原因，结果不明时先核对原来那笔。下列截图用样例回执演示。',[
+   pic('16-queued','断网后回扫码','页面继续照常使用，异单元猪暂时按原位置显示。'),
+   pic('16-synced','后台确认后更新','这头猪移到 C12，并按此前选择加进已选名单。'),
    pic('16-denied','没有权限','不移动、不勾选；有权限的人处理。'),
    pic('16-failed','提交被拒绝','刷新实际位置和目标栏，再决定是否重试。'),
    pic('16-uncertain','提交结果不明','不把这头猪加入批量，也不能直接再提交一次。')]],
  ]},
+ {id:'move',title:'通用转舍怎么点',intro:'要把猪从原栏移到另一个栏，点 Move。已经选好猪就直接看目标栏。先从栏位进入时，选择对象后再选栏。',rows:[
+  ['从栏位进去，挑要转走的猪','巡检 → 点栏名 → Move → 选择猪只','耳标和耳缺都可以按头选。两者都没有的猪按数量选。选好后点 Choose pen。只有一头可识别猪时，直接选栏。',[
+   pic('61-move-pick','从 D4 挑猪','用耳标或耳缺查找，也可输入无身份猪数量。'),
+   pic('65-move-target','确认目标栏','只有点底部写着目标位置的按钮才会提交。')]],
+  ['已经在巡检名单上勾选，核对两边位置','勾选 000254 + D4 的 5 头 → Actions → Move','样例共 6 头。D4 的 5 头来自两批，先分配为批次 18 的 3 头和批次 19 的 2 头。展开核对可以看到原栏、耳号和批次头数。',[
+   pic('62-move-batches','5 头分到两批','分批头数合计要等于选中的 5 头。'),
+   pic('63-move-review','核对来源','C1 一头，D4 五头。只要成功转出无身份猪，D4 所有无身份猪的当前疾病和症状全部清空，包括仍留在 D4 的。'),
+   pic('64-move-whole-room','整栋看 200 栏','点 Whole room，再点 C26–50 即可跳到这一段。也可直接搜栏号。'),
+   pic('66-move-after','移完回巡检','两栏头数随之更新。到新栏的动物按新的位置显示。')]],
+  ['转完去哪查','来源栏 D4 或目标栏 C4 → Pen log','来源栏记移出，目标栏记移入。原有病症提示按新规则在来源栏清理，两边的转舍记录可查。',[
+   pic('67-move-out-log','D4 记录移出','写明本次从哪个栏移到哪里。'),
+   pic('68-move-in-log','C4 记录移入','可以回看猪只和来源。')]],
+  ['只转档案里这一头','猪只档案 → Actions → Move → 选房间和栏','可以换房间，再从地图或搜索挑栏。完成后回这头猪的档案看新位置。',[
+   pic('69-move-single','直接来到选栏','用档案里的耳号确定动的是哪一头。'),
+   pic('70-move-room','搜索房间','按房间名查找，再打开它的栏位图。')]],
+  ['分娩也用同一套选栏','母猪 Actions → Move，或 Piglets → 勾选 → Actions → Move','移动母猪时完成后回母猪档案。已选仔猪移动完成后回仔猪名单，在 Sent and moved 看到目标栏和头数。',[
+   pic('71-move-sow','母猪的整栋选栏','直接选目标栏。'),
+   pic('72-move-piglets','已勾选仔猪的整栋选栏','沿用刚才的选择，选好栏后再提交。'),
+   pic('73-move-piglets-after','回仔猪名单','能查本次移走几头、移到哪一个栏。')]],
+ ]},
  {id:'pen',title:'2. 分娩和巡检的栏位工具怎么用',intro:'栏位备注、报障、解除以及栏位日志采用同一套操作规则；进来时是谁的页面，最后就回谁。巡检仍能观察、全选；分娩栏位没有 Observe 或 Tick all，Feed 只看该栏的饲喂指导。',rows:[
   ['从哪进，就回到哪','巡检 → C1 栏名；或分娩房间 → B1 栏名','备注可读、可编辑、默认显示七天，关闭后能在日志查。报障选设备，选 Other 时另填名称；已有同设备故障就去原记录处理。解除可写处理经过，最后一条解除后故障提示消失。',[
-   pic('11-inspection-pen','巡检栏位页','保留观察和全选；扫码从巡检底部进入。'),
+   pic('11-inspection-pen','巡检栏位页','可以从这里发起转舍。观察和全选仍在栏位操作里。'),
    pic('21-farrowing-pen','分娩栏位页','只给 Note、Feed、Fault；本栏记录在下方。'),
    pic('22-farrowing-note','写本栏的备注','保存后可在栏位和本栏日志查看。'),
    pic('22a-farrowing-note-read','读备注与修改','点铅笔修改；从阅读进编辑，保存回阅读。'),
@@ -86,7 +107,7 @@ const esc=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&q
 const html=`<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>巡检入口 · 决定后的操作链路</title>
 <style>
 :root{font:16px/1.65 system-ui,sans-serif;color:#253328;background:#f5f7f1}*{box-sizing:border-box}body{margin:0}main{max-width:1280px;margin:auto;padding:24px}header,section,footer{padding:clamp(18px,4vw,35px);margin-bottom:20px;background:#fff;border:1px solid #dbe2d6;border-radius:16px}h1,h2,h3{line-height:1.25;margin:0 0 .7em}p{max-width:78ch;margin:.5em 0 1em}nav{display:flex;flex-wrap:wrap;gap:.6em;margin-top:1.3em}a{color:#286149}nav a{padding:.35em .7em;border:1px solid #cdd9cc;border-radius:8px}.kicker{font-size:.75em;letter-spacing:.12em;color:#4c6452}.route{font-weight:650;color:#29523d}.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(215px,100%),1fr));gap:15px;margin-bottom:16px}.flow{border-top:1px solid #e2e7dd;padding-top:1em;margin-top:1em}figure{margin:0;background:#f5f7f1;padding:9px;border:1px solid #e0e6da;border-radius:12px}img{display:block;width:100%;max-width:390px;height:auto;margin:auto;border-radius:10px}figcaption{font-size:.91em;padding:.6em}figcaption strong{display:block}.label{font-size:.75em;font-weight:650;color:#356149}.old{color:#6b5e48}li{max-width:85ch}
-</style><body><main><header><p class="kicker">SENTRI · INSPECTION · 2026-11-20</p><h1>巡检入口：决定后的操作链路</h1><p>六项决定的操作档案。截图从已更新的 Sentri-UI 原型直接回放；转舍成功、被拒绝和回执不明是模拟结果，不会提交真实记录。</p><nav aria-label="章节">${sections.map(s=>`<a href="#${s.id}">${esc(s.title)}</a>`).join('')}</nav></header>
+</style><body><main><header><p class="kicker">SENTRI · INSPECTION · 2026-11-21</p><h1>巡检入口：决定后的操作链路</h1><p>截图从 Sentri-UI 原型直接回放。转舍和队列使用样例回执。</p><nav aria-label="章节">${sections.map(s=>`<a href="#${s.id}">${esc(s.title)}</a>`).join('')}</nav></header>
 ${sections.map(({id,title,intro,rows})=>`<section id="${id}"><h2>${esc(title)}</h2><p>${esc(intro)}</p>${rows.map(([title,route,desc,pics])=>`<article class="flow"><h3>${esc(title)}</h3><p class="route">${esc(route)}</p><p>${esc(desc)}</p><div class="row">${pics.map(([id,t,c,earlier])=>`<figure><img loading="lazy" src="${earlier?base:'screenshots/'}${id}.jpg" alt="${esc(t)}"><figcaption><span class="label${earlier?' old':''}">${id==='55-pig-feeding-old'?'调整前':earlier?'旧稿／未变更':'当前原型'}</span><strong>${esc(t)}</strong>${esc(c)}</figcaption></figure>`).join('')}</div></article>`).join('')}</section>`).join('')}
 <footer><h2>流程依据</h2><ul>
 <li>mobile_webapp @ 6a81b23e0：普通巡检把读到的耳号填入搜索；旧出栏流程进一步区分异单元和异栏。本巡检借鉴单元入口选目标栏，以及转舍成功后才按选择意图勾选的顺序（useOutboundScanException、OutboundFieldDetailPopup、useOutboundPigLocate）。旧出栏的已出栏撤回是独立操作，不带进巡检。</li>

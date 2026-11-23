@@ -11,9 +11,11 @@
 | Sentri-UI `codex/inspection-cross-unit-scan@baa057e5` · `features/inspection/PRD.md` 与原型 | 保留真实归属、看档案、只移入／移入并选择。旧稿禁用真正提交。 |
 | Sentri-Android-App · `docs/home-inspection-health-delivery.md`、`docs/status.md` | 盘点现有预览及转舍写入边界。原型回执采用模拟结果；实际发布需确认服务端操作身份、权限和回执查询。 |
 
-现在的原型支持这些入口。列表的移入动作合在异常猪的单行里；选目的栏使用单独的全屏可搜索列表，大单元的样例有 48 个登记栏。可用 `?movePens=large` 看相同大单元，`?moveResult=offline|denied|failed|uncertain` 选择模拟回执，默认是成功。转舍结果不明时保留选择，并拦住同一次再次提交。
+扫码或查找时照实际位置显示异单元猪。选择移入方式后，可用 PenMap 或按栏号搜索当前单元，再核对来源和目标。用 `?moveResult=offline|denied|failed|uncertain` 切换模拟回执。离线提交直接回原入口，联网事件触发样例队列。结果不明时会拦住同一次提交。
 
-不接真实转舍、部署或 Android 改动。上线前需核对后端能否识别本次操作、验证源位置/目标及权限、查询结果并阻止重复提交。
+通用 Move 从栏位、已选名单、单猪档案进入。用 `?penmap=long` 查看 200 栏 Whole room 样例，用 `?moveFixture=batches` 看耳缺、两批头数和不可用栏。来源栏只要成功转出无身份猪，该栏无身份猪的当前疾病和症状全部清空。分娩母猪和已选仔猪共用目标栏选择页。详见 [Move 规则](../../move/PRD.md)。
+
+回执、队列和位置更新均为原型样例。
 
 ## 复现
 

@@ -1,3 +1,4 @@
+import './move-destination.js';
 import {localizeFeed,str,language} from './feed-locale.js';
 import medicineCatalogue from './medicines-catalogue.json' with {type:'json'};
 import './unit-snapshot.js';
@@ -61,7 +62,7 @@ const pigUnit=(c,id)=>(c.otherUnits||[]).find(u=>u.pens.some(pe=>pe.pigs.some(x=
 const pig=(c,id)=>pigs(c).find(p=>p.id===id)||otherPens(c).flatMap(pe=>pe.pigs).find(p=>p.id===id);
 const penOf=(c,id)=>c.pens.find(p=>p.pigs.some(x=>x.id===id))||otherPens(c).find(p=>p.pigs.some(x=>x.id===id));
 const pen=(c,id)=>c.pens.find(p=>p.id===id);
-const picked=c=>pigs(c).filter(p=>c.selected.has(p.id));
+const picked=c=>pigs(c).concat(otherPens(c).flatMap(pe=>pe.pigs)).filter(p=>c.selected.has(p.id));
 const baseAllocation=pe=>pe.pigs.reduce((s,p)=>s+p.base*p.factor,0);
 function pigAllocation(p,pe){
  if(p.noFeed)return 0;
@@ -82,8 +83,11 @@ function addEvent(c,title,subjects,note='',category){
  const penSubjects=c.pens.map(pe=>({id:pe.id,subjects:subjects.filter(id=>id===pe.id||pe.pigs.some(p=>p.id===id))})).filter(pe=>pe.subjects.length);
  c.events.unshift({title,category:category||eventCategory({title}),subjects:[...subjects],penSubjects,note,time:'09:41',recordedAt:walkDate+'T09:41',who:'G. Hansen'});
 }
-function penLogEntries(c,id){
- return c.events.filter(e=>e.penSubjects?.some(pe=>pe.id===id)).map(e=>({...e,time:'Today · '+e.time,note:[e.penSubjects.find(pe=>pe.id===id).subjects.filter(x=>x!==id).join(', '),e.note].filter(Boolean).join(' · ')})).concat(c.penHistory?.[id]||[]);
+function penLogEntries(c,id,unit='home'){
+ const matches=pe=>pe.id===id&&(pe.unit||'home')===unit;
+ return c.events.filter(e=>e.penSubjects?.some(matches)).map(e=>({...e,time:'Today · '+e.time,note:[
+  e.penSubjects.find(matches).subjects.filter(x=>x!==id).join(', '),e.note].filter(Boolean).join(' · ')}))
+  .concat(unit==='home'?c.penHistory?.[id]||[]:[]);
 }
 /* Pen note life (proposal, 2026-11-03): a note shows for a chosen time, 1 week unless the writer picks another; then it leaves the pen
    page and stays in the pen log. "Until closed" keeps it until someone closes it. */
@@ -289,7 +293,7 @@ function pigRow(c,p,attrs={}){
  const metadata=stageSummary(p),cs=cases(p);
  const tags=rowConditionTags(cs);
  const accessible=[p.id,metadata,...cs.map(k=>({label:k.name,day:Number.isFinite(k.day)?(issueStatus(k)==='ongoing'?k.day+' days':'Day '+k.day):'',...careAppearance(k)})).map(tagDescription)].filter(Boolean).join('. ');
- return SentriUI.rowSelectDoor({code:p.id,description:compactStage(metadata),contextWidth:'112px',right:{kind:'tags',tags},className:'inspect-pig roster-pig'+(c.selected.has(p.id)?' selected':''),label:accessible,action:'',checked:c.selected.has(p.id),value:p.id,openAction:'pig',openValue:p.id,inputAttrs:{'data-pig-select':p.id,'aria-label':'Select pig '+p.id},attrs});
+ return SentriUI.rowSelectDoor({code:p.id,description:compactStage(metadata),contextWidth:'112px',right:{kind:'tags',tags},className:'inspect-pig roster-pig',label:accessible,action:'',checked:c.selected.has(p.id),value:p.id,openAction:'pig',openValue:p.id,inputAttrs:{'data-pig-select':p.id,'aria-label':'Select pig '+p.id},attrs});
 }
 function dockBulkDetails(root){root._detailsObserver?.disconnect();}
 /* Tagged pigs by ID number (owner, 2026-10-18); the No tags row always comes last. */
@@ -544,6 +548,7 @@ function penOverview(c){
   {label:str('actions.tile.feed'),title:str('pen.title.feed'),icon:icon('feed'),action:'feed',value:pe.id},
   {label:str('actions.tile.observe'),title:str('pen.title.observe'),icon:icon('monitor'),action:'pen-observe',value:pe.id},
   {label:str('actions.tile.fault'),title:str('pen.title.fault'),icon:icon('wrench'),action:'new-fault',value:pe.id},
+  {label:str('actions.tile.move'),title:moveText('Move pigs from this pen','从此栏转舍'),icon:icon('transfer'),action:'pen-move',value:pe.id,disabled:!pe.pigs.some(transferable)&&!untagged},
   {label:str('actions.tile.tick_all'),title:str('pen.title.tick_all',{n:shown.length+untagged,code:pe.id}),icon:icon('check'),action:'tick-pen',value:pe.id}
  ],{label:str('pen.actions')});
  const faultRows=faults.map(x=>SentriUI.row({variant:'navigation',action:'fault-record',value:pe.id+'|'+x.id,icon:icon('wrench'),title:x.name,description:x.description,wrap:true,className:'action-item'}));
@@ -1148,7 +1153,7 @@ function rowConditionTags(cs,withCount=false){const out=[];for(const k of condit
 function noTagsRow(c,pe){
  if(!pe.untagged?.count)return '';
  const on=!!c.selectedNoTags?.has(pe.id),max=pe.untagged.count,n=on?noTagsCountOf(c,pe.id):max;
- return SentriUI.rowSelectDoor({code:countLabel(max),lead:'tag-off',contextWidth:'112px',right:{kind:'tags',tags:rowConditionTags(pe.untagged.cases,true)},className:'inspect-pig roster-pig'+(on?' selected':''),label:countLabel(max)+' without ear tags, pen '+pe.id,action:'',checked:on,value:'notags-'+pe.id,openAction:'notags-count-open',openValue:pe.id,inputAttrs:{'data-notags-select':pe.id,'aria-label':'Select the pigs without ear tags in pen '+pe.id},count:{value:n,idle:!on,attrs:{'data-notags-field':pe.id,'aria-label':'How many of the '+max+' pigs without ear tags in '+pe.id}}});
+ return SentriUI.rowSelectDoor({code:countLabel(max),lead:'tag-off',contextWidth:'112px',right:{kind:'tags',tags:rowConditionTags(pe.untagged.cases,true)},className:'inspect-pig roster-pig',label:countLabel(max)+' without ear tags, pen '+pe.id,action:'',checked:on,value:'notags-'+pe.id,openAction:'notags-count-open',openValue:pe.id,inputAttrs:{'data-notags-select':pe.id,'aria-label':'Select the pigs without ear tags in pen '+pe.id},count:{value:n,idle:!on,attrs:{'data-notags-field':pe.id,'aria-label':'How many of the '+max+' pigs without ear tags in '+pe.id}}});
 }
 /* Record health: the No tags group sits in the Pigs list with How many? (the only count anywhere). */
 /* The No tags count (owner, 2026-10-17): ticking the row selects all its untagged pigs; the count shows on the row and
@@ -1324,9 +1329,8 @@ function actionCatalogue(c){
  const measurements=rows.length?[item('measurements-menu','measure','Measurements & condition',single?'Weight, condition, backfat':'Body condition and measurements','','',died)]:[];
  const feedReason=rows.length&&!rows.some(p=>!feedUnavailableReason(p,penOf(c,p.id)))?feedUnavailableReason(rows[0],penOf(c,rows[0].id))+'.':'';
  const adjustFeed=rows.length?[item('feed-edit-selected','feed','Adjust feed','Review the current daily allowance','','',died||feedReason)]:[];
- /* Transfer: one of the general actions (owner, 2026-10-12), an entry point to the Transfer feature, which is not designed yet (owner, 2026-10-20).
-    A host that brings its own Transfer (Farrowing's sow record) keeps it. */
- const transfer=rows.length&&!host.some(x=>x.id==='transfer')?[item('transfer','transfer','Transfer',single?'Move this pig to another pen':'Move these pigs to another pen','','',died)]:[];
+ const transfer=(rows.length||c.selectedNoTags?.size)&&!host.some(x=>x.id==='transfer')?
+  [item('transfer','transfer','Move',single?'Move this pig to another pen':'Move these pigs to another pen','','',rows.some(p=>!transferable(p))?died||'Select only pigs that can move.':'')]:[];
  add('routine','Routine',[...transfer,...hostGeneral,...(!hasNote&&note?[note]:[]),...hostRecords,...measurements,...adjustFeed]);
  const order=['health','routine','production'];groups.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
  return {groups};
@@ -1346,7 +1350,7 @@ function productionActionGroups(c,items){
 function actionSections(c,groups,flat=false){return groups.map(g=>{const categoryIcon=icon(g.id==='production'?'production':g.id==='health'?'health':g.id==='feed'?'feed':'note');const heading=stHeading({title:g.label,icon:categoryIcon,kind:'section',level:4,className:'section-title st-category-heading'});return `<section class="sow-action-group st-action-section" data-action-group="${g.id}" aria-label="${g.label}">${heading}${g.id==='production'&&g.items.length&&!flat?productionActionGroups(c,g.items):'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(g.items)+'</div>'}${g.empty?'<p class="action-category-empty">'+esc(g.empty)+'</p>':''}</section>`;}).join('');}
 /* More actions is a menu drawer (owner, 2026-10-19): the everyday verbs (Health, then Routine) are one grid of an icon and one word;
    Production keeps described rows, because its verbs are stage-bound and need their line; up to three rows share one card, more are grouped by task. */
-const verbShort={transfer:'transfer',health:'condition',treatment:'treat','edit-conditions':'edit',resolve:'resolve',triage:'care',note:'note','measurements-menu':'measure','feed-edit-selected':'feed'},hostVerbShort={marker:'note',transfer:'transfer','sow-death':'death'},dangerVerbs=new Set(['sow-death']);
+const verbShort={transfer:'move',health:'condition',treatment:'treat','edit-conditions':'edit',resolve:'resolve',triage:'care',note:'note','measurements-menu':'measure','feed-edit-selected':'feed'},hostVerbShort={marker:'note',transfer:'move','sow-death':'death'},dangerVerbs=new Set(['sow-death']);
 const verbLabel=x=>{const k=x.a==='sow-host-action'?hostVerbShort[x.value]:verbShort[x.a];return k?str('actions.tile.'+k):x.title;};
 /* The grid and its two-row rule are the design system's (Row tile, SentriUI.rowGrid). Death is the danger tile, always last. */
 function verbGrid(c,items){
@@ -1398,8 +1402,6 @@ function saveMiscarriage(c){
  p.batchId='';p.stage='Off production';p.breedingStatus='Open';addEvent(c,'Abortion recorded',[p.id],reason,'Production');saveToast(c,'save.abortion_recorded',[p.id]);
  c.pigId=p.id;c.selected.clear();c.navTrail=[];c.lossReason='';c.form={};c.view='pig';return true;
 }
-function transferReady(c){const d=c.transferDraft||{},p=picked(c)[0],pe=p&&penOf(c,p.id);return !!d.unit&&!!d.pen&&c.transferDestinations?.some(u=>u.id===d.unit&&u.pens.includes(d.pen))&&!(d.unit===c.transferOrigin?.unit&&d.pen===pe?.id);}
-function transferPage(c){const p=picked(c)[0],d=c.transferDraft||{},units=c.transferDestinations||[],pens=units.find(u=>u.id===d.unit)?.pens||[];return sheet(c,'Transfer sow',p.id+' · '+penOf(c,p.id).id,`<div class="transfer-origin"><span>From</span><strong>${esc(c.transferOrigin?.name||'')} · ${esc(penOf(c,p.id).id)}</strong></div>${fieldSelect(c,'Destination unit','unit',[['','Choose unit'],...units.map(u=>[u.id,u.name])],d.unit||'','transfer')}${fieldSelect(c,'Destination pen','pen',[['','Choose pen'],...pens.filter(pen=>!(d.unit===c.transferOrigin?.unit&&pen===penOf(c,p.id).id)).map(pen=>[pen,pen])],d.pen||'','transfer',!d.unit)}`,footer(back(),button('save-transfer','Transfer sow','button primary','',!transferReady(c))));}
 /* ---- Find a pig and Scan ear tags: the design system's Lookup pages (components/Lookup; owner decisions 2026-10-12 and 2026-10-20) ----
    Find is global: nothing is listed before typing, then one card per unit, this unit first; a result opens that pig's record here.
    Scan collects the pigs the reader reads, newest first, as the walk's own roster rows (condition tags on the right). A tick is the walk's
@@ -1407,6 +1409,7 @@ function transferPage(c){const p=picked(c)[0],d=c.transferDraft||{},units=c.tran
 const scanSequence=['000306','000267','000430','999999','000306','003012','000254','000801','000281','000312','000802'];   // what "Simulate scan" reads, in turn
 // Inspection lookup scans the whole unit; pigs from other units stay under their recorded locations.
 const moveText=(en,zh)=>language==='zh'?zh:en;
+const MovePicker=globalThis.SentriMovePicker;
 function lookupPlacement(c,id){
  const local=c.pens.find(pe=>pe.pigs.some(p=>p.id===id));
  const unit=local?null:(c.otherUnits||[]).find(u=>u.pens.some(pe=>pe.pigs.some(p=>p.id===id)));
@@ -1418,41 +1421,364 @@ function lookupExceptionRow(c,h,scan){
  const title=!canMoveFromLookup(h.p)?moveText('Not on the farm','猪只不在场'):moveText('Outside this unit','不在本单元');
  return SentriUI.row({variant:'animal',code:h.p.id,description:title,action:canMoveFromLookup(h.p)?'lookup-exception':scan?'pig':'search-pig',value:h.p.id,trail:'chevron',attrs:scan?{'data-scan-tag':h.p.id}:{}});
 }
+const emptyMovePen=id=>({id,pigs:[],faults:[],note:'',issue:'',mode:'unknown',formula:''});
+const moveCountLabel=n=>moveText(n+(n===1?' pig':' pigs'),n+' 头猪');
+const moveConfig=()=>new URLSearchParams(globalThis.location?.search||'');
+function registeredMovePens(actual,codes=[]){
+ return [...new Set([...codes,...actual.map(pe=>pe.id)])].sort(MovePicker.sortCodes).map(id=>actual.find(pe=>pe.id===id)||emptyMovePen(id));
+}
+function inspectionMoveRooms(c){
+ const home={id:'home',name:unitName(c),section:moveText('Gestation','妊娠舍'),layout:c.penMapRoom?.props,
+  pens:registeredMovePens(c.pens,MovePicker.codesFor(c.penMapRoom?.props||{lanes:['A','B','C','D']})),actual:c.pens,defaultBatchId:c.defaultBatchId};
+ return [home,...(c.otherUnits||[]).map(u=>({...u,id:String(u.id),actual:u.pens,pens:registeredMovePens(u.pens,u.penCodes)}))];
+}
+const moveRoom=(c,id)=>inspectionMoveRooms(c).find(room=>room.id===id);
+const identifiedLabel=p=>p?.earNotch?moveText('Notch '+p.earNotch,'耳缺 '+p.earNotch):p?.id||'';
+const transferable=p=>canMoveFromLookup(p)&&p.stage!=='Sow died';
+const moveBatches=pe=>pe?.untagged?.batches||[{id:'',count:pe?.untagged?.count||0}];
+const batchLabel=id=>id?moveText('Batch '+id,'批次 '+id):moveText('No batch','无批次');
+function moveSources(c,ids,counts){
+ const sources=new Map(),get=(room,code)=>{
+  const key=room+'|'+code;
+  if(!sources.has(key))sources.set(key,{room,code,ids:[],count:0,batches:[]});
+  return sources.get(key);
+ };
+ for(const id of ids){
+  const hit=lookupPlacement(c,id);
+  if(hit)get(hit.unit?String(hit.unit.id):'home',hit.pe.id).ids.push(id);
+ }
+ for(const [code,count] of Object.entries(counts)){
+  if(!count)continue;
+  const source=get('home',code),batches=moveBatches(pen(c,code));
+  source.count=count;source.sourceTotal=pen(c,code).untagged.count;
+  source.batches=batches.filter(b=>b.count>0).map(b=>({...b,move:count===pen(c,code).untagged.count||batches.length===1?Math.min(b.count,count):0}));
+ }
+ return [...sources.values()];
+}
+const moveTotal=sources=>sources.reduce((n,s)=>n+s.count+s.ids.length,0);
+const countSettled=s=>s.batches.reduce((n,b)=>n+b.move,0)===s.count;
+function validateMove(c,sources,roomId,code){
+ const room=moveRoom(c,roomId),target=room?.pens.find(p=>p.id===code);
+ if(!target||MovePicker.unavailable(target)||!moveTotal(sources))return false;
+ return sources.every(s=>{
+  const from=moveRoom(c,s.room)?.actual.find(p=>p.id===s.code);
+  return from&&!(s.room===roomId&&s.code===code)&&s.ids.every(id=>from.pigs.some(p=>p.id===id&&transferable(p)))&&
+   (!s.count||(countSettled(s)&&from.untagged?.count===s.sourceTotal&&s.sourceTotal>=s.count&&s.batches.every(b=>b.move<=(moveBatches(from).find(x=>x.id===b.id)?.count||0))));
+ });
+}
+function recordMove(c,sources,roomId,code){
+ if(!validateMove(c,sources,roomId,code))return false;
+ const room=moveRoom(c,roomId),target=room.actual.find(pe=>pe.id===code)||emptyMovePen(code);
+ if(!room.actual.includes(target)){room.actual.push(target);room.actual.sort((a,b)=>MovePicker.sortCodes(a.id,b.id));}
+ const where=MovePicker.place(room,code),stamp={time:'09:41',recordedAt:walkDate+'T09:41',who:'G. Hansen',category:'Movement'};
+ for(const s of sources){
+  const fromRoom=moveRoom(c,s.room),from=fromRoom.actual.find(p=>p.id===s.code);
+  const moving=from.pigs.filter(p=>s.ids.includes(p.id));
+  from.pigs=from.pigs.filter(p=>!s.ids.includes(p.id));
+  for(const p of moving){
+   if(room.defaultBatchId&&(!p.batchId||p.batchId===fromRoom.defaultBatchId))p.batchId=room.defaultBatchId;
+   target.pigs.push(p);
+  }
+  if(s.count){
+   const kept=moveBatches(from).map(b=>({...b,count:b.count-(s.batches.find(x=>x.id===b.id)?.move||0)})).filter(b=>b.count>0);
+   const destBatches=new Map(moveBatches(target).map(b=>[b.id,b.count]));
+   for(const b of s.batches.filter(b=>b.move)){
+    const id=(!b.id||b.id===fromRoom.defaultBatchId)&&room.defaultBatchId?room.defaultBatchId:b.id;
+    destBatches.set(id,(destBatches.get(id)||0)+b.move);
+   }
+   // A completed move clears current diseases and symptoms for the source's whole unidentified group.
+   from.untagged={...from.untagged,count:from.untagged.count-s.count,batches:kept,cases:[]};
+   target.untagged={cases:[],...target.untagged,count:(target.untagged?.count||0)+s.count,
+    batches:[...destBatches].filter(([,n])=>n>0).map(([id,count])=>({id,count}))};
+  }
+  const origin=MovePicker.place(fromRoom,s.code),note=origin+' → '+where,n=s.ids.length+s.count;
+  c.events.unshift({...stamp,title:moveText('Moved out · '+moveCountLabel(n),'移出 · '+moveCountLabel(n)),subjects:s.ids,
+   penSubjects:[{unit:s.room,id:s.code,subjects:s.ids}],note});
+ }
+ c.events.unshift({...stamp,title:moveText('Moved in · '+moveCountLabel(moveTotal(sources)),'移入 · '+moveCountLabel(moveTotal(sources))),subjects:[],
+  penSubjects:[{unit:roomId,id:code,subjects:sources.flatMap(s=>s.ids)}],note:sources.map(s=>MovePicker.place(moveRoom(c,s.room),s.code)).join(', ')+' → '+where});
+ return true;
+}
+function moveEntryResult(){
+ const result=moveConfig().get('moveResult');
+ if(offlineNow()||globalThis.navigator?.onLine===false||result==='offline')return 'queued';
+ return ['denied','failed','uncertain'].includes(result)?result:'ok';
+}
+function moveSourcesOverlap(a,b){
+ return a.some(x=>b.some(y=>(x.room===y.room&&x.code===y.code&&x.count&&y.count)||x.ids.some(id=>y.ids.includes(id))));
+}
+function submitPreviewMove(c,sources,room,code,select=null){
+ if(!validateMove(c,sources,room,code))return 'failed';
+ const entries=c.pendingMoves||=[];
+ const previous=entries.find(p=>moveSourcesOverlap(sources,p.sources));
+ if(previous)return previous.result;
+ const result=moveEntryResult();
+ if(result==='queued'||result==='uncertain')entries.push({sources:structuredClone(sources),room,code,select,result});
+ if(result==='ok')completePreviewMove(c,sources,room,code,select);
+ return result;
+}
+function completePreviewMove(c,sources,room,code,select){
+ if(!recordMove(c,sources,room,code))return false;
+ for(const context of [c,...(c.navTrail||[])]){
+  for(const s of sources){
+   for(const id of s.ids)context.selected?.delete(id);
+   if(s.count){
+    context.selectedNoTags?.delete(s.code);
+    if(context.noTagsCount)delete context.noTagsCount[s.code];
+   }
+   if(room!=='home'||s.count)context.selectedPens?.delete(s.code);
+  }
+  if(!context.selected?.size&&!context.selectedNoTags?.size&&!context.selectedPens?.size&&Object.hasOwn(context,'reviewOnly'))context.reviewOnly=false;
+ }
+ if(select)c.selected.add(select);
+ return true;
+}
+function moveReply(result){
+ if(result==='denied')return [moveText('Move unavailable','无法转舍'),moveText('You don’t have permission to move these pigs.','你没有权限转舍这些猪。')];
+ if(result==='uncertain')return [moveText('Move not confirmed','转舍结果待核对'),moveText('Check the move record before submitting again.','请先核对本次转舍记录。')];
+ return [moveText('Move failed','转舍失败'),moveText('Check the pigs’ current location and the destination.','请核对猪只现在的位置和目标栏。')];
+}
+function openInspectionMove(c,sourcePen='',host=false){
+ const m={from:c.view,sourcePen,host,room:host?String(c.transferOrigin?.unit||''):'home',to:'',query:'',roomQuery:'',pigQuery:'',ids:[],counts:{},sources:[]};
+ if(sourcePen){
+  const pe=pen(c,sourcePen);
+  if(!pe)return false;
+  const pigs=pe.pigs.filter(transferable),n=pe.untagged?.count||0;
+  if(!pigs.length&&!n)return false;
+  if(pigs.length!==1||n){c.move=m;c.view='move-pigs';return true;}
+  m.ids=[pigs[0].id];
+ }else{
+  m.ids=[...c.selected];
+  m.counts=Object.fromEntries([...(c.selectedNoTags||[])].map(id=>[id,noTagsCountOf(c,id)]));
+ }
+ if(m.ids.some(id=>!transferable(pig(c,id)))||!m.ids.length&&!Object.keys(m.counts).length)return false;
+ m.sources=moveSources(c,m.ids,m.counts);
+ if(!host&&m.sources.length===1)m.room=m.sources[0].room;
+ c.move=m;
+ c.view=host?'sow-transfer':m.sources.every(countSettled)?'move-to':'move-counts';
+ return true;
+}
+function moveSubjectLine(c,m){
+ const one=m.sources.length===1?m.sources[0]:null;
+ const place=one?MovePicker.place(moveRoom(c,one.room),one.code):moveText(m.sources.length+' source pens','来自 '+m.sources.length+' 个栏');
+ return {text:one?moveText('From ','来源 ')+place:place};
+}
+function moveSourcesDisclosure(c,m){
+ if(m.sources.length===1&&moveTotal(m.sources)===1&&m.sources[0].ids.length===1)return '';
+ const labels=m.sources.map(s=>{
+  const details=[...s.ids.map(id=>identifiedLabel(pig(c,id))),...s.batches.filter(b=>b.move).map(b=>batchLabel(b.id)+' · '+moveCountLabel(b.move))];
+  return SentriUI.row({variant:'plain',title:MovePicker.place(moveRoom(c,s.room),s.code),description:details.join(' · '),wrap:true});
+ });
+ return '<details class="move-sources"'+(m.showSources?' open':'')+'><summary>'+icon('chevron')+
+  moveText('Review the pigs to move','核对要移动的猪')+'</summary>'+SentriUI.rowGroup(labels.join(''))+'</details>';
+}
+function moveDestinationRooms(c,m){
+ if(!m.host)return inspectionMoveRooms(c);
+ return (c.transferDestinations||[]).map(room=>({...room,id:String(room.id),pens:room.pens.map(code=>typeof code==='string'?{id:code}:code)}));
+}
+function moveDestinationRoom(c,m){
+ const rooms=moveDestinationRooms(c,m);
+ return rooms.find(r=>r.id===m.room)||rooms[0]||{id:'',name:unitName(c),pens:[]};
+}
+function inspectionMoveMap(c,m){
+ const room=moveDestinationRoom(c,m);
+ const blocked=Object.fromEntries(m.sources.filter(s=>(m.host?String(c.transferOrigin?.unit||''):s.room)===room.id).map(s=>[s.code,moveText('Source pen','来源栏')]));
+ return MovePicker.results({room,query:m.query,selected:m.to,current:m.to||Object.keys(blocked)[0],action:'move-pen',key:'move-'+c.moveKey,blocked});
+}
+function inspectionMovePage(c){
+ const m=c.move,bar=status();
+ if(c.view==='move-pigs'){
+  const pe=pen(c,m.sourcePen);
+  const identified=pe.pigs.some(transferable)?SentriUI.heading({title:moveText('With ID','可识别猪只'),kind:'section',level:3})+
+   '<div data-move-pig-results>'+movePigRows(c,m)+'</div>':'';
+  const counts=pe.untagged?.count?moveCountRows(c,m,pe):'';
+  const above=!identified?'':m.scanning?SentriUI.scanBar({state:c.scan.connected?'scanning':'waiting',device:'Reader 1',
+   text:c.scan.connected?moveText('Scan pig tags','扫描耳标'):'',stop:{action:'move-read-stop'}}):
+   SentriUI.choiceSearch({label:moveText('Search pig ID','搜索耳标或耳缺'),placeholder:moveText('Ear tag or notch','耳标或耳缺'),value:m.pigQuery,
+    attrs:{'data-move-pig-search':''},scan:{action:'move-read',label:moveText('Scan pig tags','扫描耳标')}});
+  return MovePicker.page({title:moveText('Which pigs?','选择要转舍的猪'),line:{text:unitName(c)+' · '+pe.id},bar,above,
+   body:'<div class="move-form">'+identified+counts+'</div>',primary:{label:moveText('Choose pen','选择目标栏'),action:'move-next',waiting:!m.ids.length&&!m.counts[pe.id]}});
+ }
+ if(c.view==='move-counts'){
+  const rows=m.sources.filter(s=>s.count).map(s=>SentriUI.heading({title:s.code+' · '+moveCountLabel(s.count),kind:'section',level:3})+
+   s.batches.map((b,i)=>moveBatchControl(s.code+'|'+i,b,b.move)).join(''));
+  return MovePicker.page({title:moveText('How many from each batch?','各批次转几头'),bar,body:'<div class="move-form">'+rows.join('')+'</div>',
+   primary:{label:moveText('Choose pen','选择目标栏'),action:'move-next',waiting:!m.sources.every(countSettled)}});
+ }
+ if(c.view==='move-rooms'){
+  return MovePicker.page({title:moveText('Choose room','选择房间'),bar,above:MovePicker.search('room',m.roomQuery),
+   body:'<div data-move-room-results>'+inspectionMoveRoomResults(c,m)+'</div>'});
+ }
+ const room=moveDestinationRoom(c,m),n=moveTotal(m.sources),one=n===1&&m.ids.length===1?pig(c,m.ids[0]):null;
+ const title=one?moveText('Move '+identifiedLabel(one),'转舍 · '+identifiedLabel(one)):moveText('Move '+moveCountLabel(n),'转舍 '+moveCountLabel(n));
+ const clear=m.sources.filter(s=>s.count&&pen(c,s.code)?.untagged?.cases?.length).map(s=>s.code);
+ const notice=clear.length?SentriUI.banner({tone:'notice',headline:moveText('Clear group conditions','清空群组病症'),
+  consequence:moveText('Covers all pigs without ID in '+clear.join(', ')+'.','涉及 '+clear.join('、')+' 栏的全部无身份猪。')}):'';
+ const outcome=m.result?moveReply(m.result):null;
+ const changingCount=room.defaultBatchId&&m.to?m.sources.reduce((n,s)=>{
+  const from=moveRoom(c,s.room),changes=id=>id!==room.defaultBatchId&&(!id||id===from.defaultBatchId);
+  return n+s.ids.filter(id=>changes(pig(c,id)?.batchId)).length+s.batches.filter(b=>changes(b.id)).reduce((total,b)=>total+b.move,0);
+ },0):0;
+ const batch=changingCount?SentriUI.statusLine([moveText(moveCountLabel(changingCount)+' join the destination’s default batch',moveCountLabel(changingCount)+'会加入目标生产线的默认批次')]):'';
+ const tools=MovePicker.roomRow(room,'move-choose-room')+MovePicker.search('pen',m.query)+(!m.host?moveSourcesDisclosure(c,m):'')+notice+batch+
+  (outcome?SentriUI.banner({tone:'correction',headline:outcome[0],consequence:outcome[1]}):'');
+ const target=m.to?room.name+' · '+m.to:'';
+ return MovePicker.page({title,line:m.sources.length?moveSubjectLine(c,m):{text:unitName(c)},bar,above:tools,
+  body:'<div data-move-pen-results>'+inspectionMoveMap(c,m)+'</div>',primary:{action:m.host?'save-transfer':'move-save',
+   label:target?moveText('Move to '+target,'移到 '+target):moveText('Choose a pen','选择一个栏位'),
+   waiting:!m.to||m.result==='uncertain'}});
+}
+function movePigRows(c,m){
+ const q=m.pigQuery.trim().toLowerCase(),pigs=pen(c,m.sourcePen).pigs.filter(p=>transferable(p)&&(!q||[p.id,p.earNotch].some(id=>id?.toLowerCase().includes(q))));
+ return pigs.length?SentriUI.rowGroup(pigs.map(p=>SentriUI.rowSelect({code:identifiedLabel(p),description:compactStage(stageSummary(p)),
+  action:'move-pig',value:p.id,checked:m.ids.includes(p.id),inputAttrs:{'aria-label':moveText('Select ','选择 ')+identifiedLabel(p)}})).join('')):
+  SentriUI.choiceEmpty(moveText('No matching pigs','没有匹配的猪只'),{icon:'search'});
+}
+function moveBatchControl(key,b,value){
+ return SentriUI.stepper({label:batchLabel(b.id),description:moveText(b.count+' available','可移 '+b.count+' 头'),key,value,max:b.count,action:'move-count-step',reserveHint:false})
+  +SentriUI.button({register:'text',label:moveText('Enter count','输入头数'),action:'move-count-open',value:key});
+}
+function moveCountRows(c,m,pe){
+ const batches=moveBatches(pe);
+ return SentriUI.heading({title:moveText('Without ID','无身份猪只'),kind:'section',level:3})+
+  batches.map((b,i)=>moveBatchControl(pe.id+'|'+i,b,m.penCounts?.[i]||0)).join('');
+}
+function inspectionMoveRoomResults(c,m){
+ return MovePicker.roomResults(moveDestinationRooms(c,m),m.host?String(c.transferOrigin?.unit||''):'home',m.room,'move-room',m.roomQuery);
+}
+function leaveInspectionMove(c,m,committed){
+ if(!committed){c.view=m.from;c.restoreSheetScroll=c.actionMenuScroll||0;}
+ else if(m.sourcePen){c.view='pen-detail';c.penId=m.sourcePen;}
+ else{
+  const parent=c.navTrail?.pop();
+  c.view='list';
+  if(parent){Object.assign(c,parent);c.restoreSheetScroll=parent.sheetScroll;}
+  endEmptyReview(c);
+ }
+ delete c.move;
+}
+function moveBatchDraft(c,m,key,view=c.view){
+ const [code,index]=key.split('|'),i=Number(index);
+ if(view==='move-counts'){
+  const source=m.sources.find(s=>s.code===code),batch=source?.batches[i];
+  if(!batch)return null;
+  return {count:batch.move,max:Math.min(batch.count,source.count-source.batches.reduce((n,b)=>n+b.move,0)+batch.move),apply:n=>batch.move=n};
+ }
+ const batch=moveBatches(pen(c,m.sourcePen))[i];
+ if(!batch)return null;
+ m.penCounts||={};
+ return {count:m.penCounts[i]||0,max:batch.count,apply:n=>{
+  m.penCounts[i]=n;
+  m.counts[code]=Object.values(m.penCounts).reduce((a,b)=>a+b,0);
+ }};
+}
+function moveCountPage(c,m){
+ const d=m.number,batch=moveBatchDraft(c,m,d.key,d.back);
+ const bar=status(),n=Number(d.value);
+ const pad=SentriUI.numpad({compact:true,label:moveText('How many?','转几头？'),value:d.value,unit:moveText('of '+batch.max,'最多 '+batch.max+' 头'),
+  suggested:d.suggested,maxLength:4,action:'move-number',actions:[{label:moveText('All '+batch.max,'全部 '+batch.max+' 头'),action:'move-number-all'}]});
+ return MovePicker.page({title:moveText('Pigs without ID','无身份猪只'),bar,body:pad,
+  primary:{label:moveText('Done','完成'),action:'move-number-done',waiting:d.value===''||n>batch.max}});
+}
+function handleInspectionMove(c,el,a,v){
+ if(a==='pen-move'&&c.view==='pen-detail')return openInspectionMove(c,v);
+ if(a==='transfer'&&c.view==='actions')return openInspectionMove(c);
+ const m=c.move;
+ if(!m)return false;
+ if(a==='back'||a==='dismiss'){
+  if(c.view==='move-number'){c.view=m.number.back;delete m.number;}
+  else if(c.view==='move-rooms')c.view=m.host?'sow-transfer':'move-to';
+  else if(c.view==='move-counts'&&m.sourcePen)c.view='move-pigs';
+  else if(c.view==='move-to'&&m.backToCounts)c.view='move-counts';
+  else if(c.view==='move-to'&&m.sourcePen&&m.penCounts)c.view='move-pigs';
+  else leaveInspectionMove(c,m,false);
+  return true;
+ }
+ if(a==='move-read'&&c.view==='move-pigs'){m.scanning=true;m.pigQuery='';return true;}
+ if(a==='move-read-stop'&&c.view==='move-pigs'){m.scanning=false;return true;}
+ if(a==='move-count-open'){
+  const batch=moveBatchDraft(c,m,v);
+  if(batch){m.number={key:v,value:String(batch.count),suggested:true,back:c.view};c.view='move-number';}
+  return true;
+ }
+ if(a==='move-count-step'){
+  const batch=moveBatchDraft(c,m,v);
+  if(batch)batch.apply(Math.min(batch.max,Math.max(0,batch.count+Number(el.dataset.step))));
+  return true;
+ }
+ if(c.view==='move-number'&&a.startsWith('move-number')){
+  const d=m.number;
+  if(a==='move-number'){Object.assign(d,SentriUI.numpadInput(d,el.dataset.key,{maxLength:4}));return true;}
+  c.view=d.back;
+  const batch=moveBatchDraft(c,m,d.key);
+  if(a==='move-number-all'){d.value=String(batch.max);d.suggested=true;c.view='move-number';return true;}
+  if(d.value!==''&&Number(d.value)<=batch.max)batch.apply(Number(d.value));
+  delete m.number;
+  return true;
+ }
+ if(a==='move-next'){
+  if(c.view==='move-counts'){
+   if(m.sources.every(countSettled)){c.view='move-to';m.backToCounts=true;}
+  }else if(m.ids.length||m.counts[m.sourcePen]){
+   m.sources=moveSources(c,m.ids,m.counts);
+   if(m.counts[m.sourcePen]){
+    const source=m.sources.find(s=>s.code===m.sourcePen);
+    source.batches.forEach((b,i)=>b.move=m.penCounts[i]||0);
+   }
+   m.penCounts||={};c.view='move-to';
+  }
+  return true;
+ }
+ if(a==='move-choose-room'){c.view='move-rooms';m.roomQuery='';return true;}
+ if(a==='move-room'){
+  if(m.room!==v){m.room=v;m.to='';m.query='';}
+  c.view=m.host?'sow-transfer':'move-to';
+  return true;
+ }
+ if(a==='move-pen'){
+  m.to=v;
+  if(m.result!=='uncertain')delete m.result;
+  return true;
+ }
+ if(a==='move-save'){
+  if(!m.to||m.result==='uncertain')return true;
+  const reply=submitPreviewMove(c,m.sources,m.room,m.to);
+  if(reply==='ok'||reply==='queued'){
+   leaveInspectionMove(c,m,true);
+   if(reply==='ok'&&m.sourcePen)c.moveReceipt=m.sourcePen;
+   if(reply==='ok')notify(c,{title:moveText('Moved '+moveCountLabel(moveTotal(m.sources)),'已转舍 '+moveCountLabel(moveTotal(m.sources))),
+    detail:MovePicker.place(moveRoom(c,m.room),m.to),tone:'done'});
+  }else m.result=reply;
+  return true;
+ }
+ return false;
+}
+
 function movePenResults(c){
- const m=c.lookupMove,q=m.query.trim().toLocaleLowerCase().replace(/\s+/g,'');
- const options=c.pens.filter(pe=>pe.registered!==false&&pe.available!==false&&!(m.fromPen===pe.id&&m.fromUnit===unitName(c)));
- const rows=options.filter(pe=>pe.id.toLocaleLowerCase().replace(/\s+/g,'').includes(q)).sort((a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}));
- return rows.length?SentriUI.chooserList(rows.map(pe=>SentriUI.choiceRow({label:pe.id,mono:true,mode:'single',action:'lookup-move-pen',value:pe.id,selected:m.destination===pe.id})).join('')):
-  SentriUI.choiceEmpty(q?moveText('Try another pen code.','试试其他栏号。'):moveText('No registered pen can receive this pig.','本单元没有可选的目标栏。'),{title:q?moveText('No matching pens','没有匹配的栏位'):moveText('No destination pens','没有可选栏位'),icon:'search'});
+ const m=c.lookupMove,room=moveRoom(c,'home');
+ return MovePicker.results({room,query:m.query,selected:m.destination,action:'lookup-move-pen',key:'lookup-move-'+c.moveKey});
 }
 function lookupMoveLayer(c){
  const m=c.lookupMove,subject=pig(c,m.id),origin=lookupPlacement(c,m.id);
  const place=m.fromUnit+' · '+m.fromPen,destination=m.destination;
  const line={text:[{text:m.id,mono:true},{sep:true},{text:place}]};
- const titleForMode=m.mode==='select'?moveText('Move and select','移入并选中'):moveText('Move only','只移入');
+ const titleForMode=moveText('Review move','核对转舍');
  if(c.view==='lookup-move-pens'){
-  return SentriUI.sheet({variant:'page',className:'destination-pen-picker',title:moveText('Destination pen','选择目标栏'),line:{text:unitName(c)},back:{action:'back'},bar:status(),
-   above:'<div data-destination-search>'+SentriUI.choiceSearch({label:moveText('Search pen code','搜索栏号'),placeholder:moveText('e.g. C12','例如 C12'),value:m.query,clear:{action:'lookup-move-clear'},attrs:{'data-move-pen-search':''}})+'</div>',
-   body:'<div data-move-pen-results>'+movePenResults(c)+'</div>',footer:false});
+  return MovePicker.page({title:moveText('Destination pen','选择目标栏'),line:{text:unitName(c)},bar:status(),
+   above:MovePicker.search('pen',m.query),body:'<div data-move-pen-results>'+movePenResults(c)+'</div>'});
  }
  if(c.view==='lookup-move'){
   const rows=[{title:moveText('View pig record','查看猪只档案'),icon:icon('profile'),action:'lookup-exception-record'}];
   if(canMoveFromLookup(subject))rows.push(
-   {title:moveText('Move only','只移入'),description:moveText('Keep your selection as it is','保留当前勾选'),action:'lookup-move-mode',value:'move',icon:icon('transfer')},
-   {title:moveText('Move and select','移入并选中'),description:moveText('Select after the move is confirmed','转舍确认后再勾选'),action:'lookup-move-mode',value:'select',icon:icon('check')});
+   {title:moveText('Move only','只移入'),action:'lookup-move-mode',value:'move',icon:icon('transfer')},
+   {title:moveText('Move and select','移入并选中'),action:'lookup-move-mode',value:'select',icon:icon('check')});
   return sheet(c,moveText('Pig in another unit','猪只在其他单元'),'',SentriUI.rowGroup(rows.map(r=>SentriUI.row({...r,variant:'navigation',wrap:true})).join('')),footer(back(),''),'menu',line);
  }
- const target=destination?unitName(c)+' · '+destination:unitName(c);
+ const target=destination?MovePicker.place(moveRoom(c,'home'),destination):unitName(c);
  if(c.view==='lookup-move-result'){
-  const replies={
-   ok:[moveText('Move confirmed','转舍已确认'),m.mode==='select'?moveText('Moved and selected.','已移入并选中。'):moveText('Moved. Selection unchanged.','已移入，勾选不变。')],
-   offline:[moveText('You’re offline','当前离线'),moveText('Reconnect before submitting the move.','联网后再提交转舍。')],
-   denied:[moveText('Move unavailable','无法转舍'),moveText('You don’t have permission to move this pig.','你没有权限转舍这头猪。')],
-   uncertain:[moveText('Move not confirmed','转舍结果待核对'),moveText('Check the transfer before trying again. This pig hasn’t been selected.','先核对本次转舍记录，避免重复提交。这头猪还未选中。')],
-   failed:[moveText('Move failed','转舍失败'),moveText('Refresh the pig’s location and destination before trying again.','重新核对猪只位置和目标栏后再试。')],
-  },[title,detail]=replies[m.result];
+  const [title,detail]=m.result==='ok'?[moveText('Move confirmed','转舍已确认'),'']:moveReply(m.result);
   return sheet(c,title,'',SentriUI.facts([{label:moveText('Ear tag','耳号'),value:m.id,mono:true},{label:moveText('Destination','目标栏'),value:target}],{columns:2})+
-   (m.result==='ok'?SentriUI.statusLine([detail]):SentriUI.banner({tone:'correction',headline:moveText('Selection unchanged','勾选未变'),consequence:detail})),footer(back(),''),'menu');
+   (detail?SentriUI.statusLine([detail]):''),footer(back(),''),'menu');
  }
  const facts=SentriUI.facts([{label:moveText('From','从'),value:place},{label:moveText('To','到'),value:target}],{columns:2});
  const change=SentriUI.button({label:moveText('Change destination','更换目标栏'),register:'text',icon:icon('edit'),action:'lookup-move-change'});
@@ -1462,8 +1788,8 @@ function lookupMoveAction(c,a,v){
  if(a==='lookup-exception'){
   const hit=lookupPlacement(c,v);
   if(!hit?.unit)return false;
-  const pending=c.lookupPending?.[v];
-  c.lookupMove={id:v,from:c.view,fromUnit:hit.unitLabel,fromPen:hit.pe.id,query:'',listening:c.scan.listening,...(pending||{})};
+  const pending=c.pendingMoves?.find(p=>p.result==='uncertain'&&p.sources.some(source=>source.ids.includes(v)));
+  c.lookupMove={id:v,from:c.view,fromUnit:hit.unitLabel,fromPen:hit.pe.id,query:'',listening:c.scan.listening,...(pending?{destination:pending.code,result:pending.result}:{})};
   c.scan.listening=false;c.view=pending?'lookup-move-result':'lookup-move';return true;
  }
  const m=c.lookupMove;
@@ -1471,7 +1797,7 @@ function lookupMoveAction(c,a,v){
  if(a==='back'||a==='dismiss'){
   if(c.view==='lookup-move-pens'){c.view=m.pickerBack||'lookup-move';return true;}
   if(c.view==='lookup-move-confirm'){m.pickerBack='lookup-move';c.view='lookup-move-pens';return true;}
-  if(c.view==='lookup-move-result'&&['failed','offline'].includes(m.result)){c.view='lookup-move-confirm';return true;}
+  if(c.view==='lookup-move-result'&&m.result==='failed'){c.view='lookup-move-confirm';return true;}
   c.view=m.from;c.scan.listening=m.listening;delete c.lookupMove;return true;
  }
  if(a==='lookup-exception-record'&&c.view==='lookup-move'){
@@ -1484,20 +1810,16 @@ function lookupMoveAction(c,a,v){
  if(a==='lookup-move-change'&&c.view==='lookup-move-confirm'){m.pickerBack='lookup-move-confirm';c.view='lookup-move-pens';return true;}
  if(a==='lookup-move-clear'&&c.view==='lookup-move-pens'){m.query='';return true;}
  if(a==='lookup-move-pen'&&c.view==='lookup-move-pens'){
-  if(c.pens.some(pe=>pe.id===v&&pe.registered!==false&&pe.available!==false&&!(m.fromPen===pe.id&&m.fromUnit===unitName(c)))){m.destination=v;c.view='lookup-move-confirm';}
+  if(moveRoom(c,'home').pens.some(pe=>pe.id===v&&!MovePicker.unavailable(pe))){m.destination=v;c.view='lookup-move-confirm';}
   return true;
  }
  if(a==='lookup-move-confirm'&&c.view==='lookup-move-confirm'){
-  const source=lookupPlacement(c,m.id),p=pig(c,m.id),target=pen(c,m.destination);
-  // Prototype only: a sample receipt stands in for the transfer service. Nothing is written while its result is unknown.
-  const simulated=new URLSearchParams(location.search).get('moveResult');
-  m.result=offlineNow()?'offline':['offline','denied','failed','uncertain'].includes(simulated)?simulated:'ok';
-  if(!source||source.unitLabel!==m.fromUnit||source.pe.id!==m.fromPen||!canMoveFromLookup(p)||!target||target===source.pe||target.available===false||target.registered===false)m.result='failed';
-  if(m.result==='uncertain')(c.lookupPending||=Object.create(null))[m.id]={result:m.result,mode:m.mode,destination:target.id};
-  if(m.result==='ok'){
-   source.pe.pigs=source.pe.pigs.filter(x=>x!==p);target.pigs.push(p);
-   addEvent(c,'Pig moved',[m.id,...(source.unit?[]:[source.pe.id]),target.id],m.fromUnit+' · '+m.fromPen+' → '+unitName(c)+' · '+target.id,'Movement');
-   if(m.mode==='select')c.selected.add(m.id);else c.selected.delete(m.id);
+  const hit=lookupPlacement(c,m.id),sources=moveSources(c,[m.id],{});
+  m.result=hit?.unitLabel===m.fromUnit&&hit.pe.id===m.fromPen?
+   submitPreviewMove(c,sources,'home',m.destination,m.mode==='select'?m.id:null):'failed';
+  if(m.result==='queued'){
+   c.view=m.from;c.scan.listening=m.listening;delete c.lookupMove;
+   return true;
   }
   c.view='lookup-move-result';return true;
  }
@@ -1526,12 +1848,12 @@ function findPage(c){
 function scanSetup(c,type=''){
  const scanned=['scan-list','scan-ticked','scan-stopped','scan-new'].includes(type),items=scanned?['000306','000267','000254']:[];   // newest first
  c.scan={connected:type==='scan-none'?false:/^scan-/.test(type)?true:!scannerOff,listening:type!=='scan-stopped',items,seq:items.length,fresh:{},last:''};
- if(type==='scan-new')c.scan.fresh['000306']=Infinity;   // the held frame of the arrival tint: 000306, the newest scan, stays lit
+ if(type==='scan-new')c.scan.newExample=true;
  // Inspection is a multi-select task (owner, 2026-10-22): a read ticks her. Scan · ticked shows one pig the worker has unticked again.
  c.selected=new Set(type==='scan-ticked'?['000267','000254']:type==='scan-stopped'?[]:items);
 }
 function scanAdd(c){
- const sc=c.scan;if(!sc.connected||!sc.listening)return false;
+ const sc=c.scan;if(!sc.connected||!sc.listening)return false;delete sc.newExample;
  const tag=scanSequence[sc.seq++%scanSequence.length];
  const place=lookupPlacement(c,tag);
  if(!place){notify(c,{title:moveText('No pig with this tag','未找到这个耳标'),detail:tag,tone:'notice'});return true;}
@@ -1552,6 +1874,8 @@ function farrowingRecordFrame(c){
  return `<iframe class="sheet" data-presentation="page" data-farrowing-record title="${esc(moveText('Farrowing record','分娩记录')+' · '+f.id)}" width="100%" height="100%" frameborder="0" src="farrowing-astra-concept.html?${esc(q)}"></iframe>`;
 }
 function overlay(c){
+ if(c.view==='move-number')return moveCountPage(c,c.move);
+ if(c.view==='sow-transfer'||c.view.startsWith('move-'))return inspectionMovePage(c);
  if(c.view==='farrowing-record')return farrowingRecordFrame(c);
  if(c.view.startsWith('lookup-move')){
   const layer=lookupMoveLayer(c);
@@ -1559,7 +1883,7 @@ function overlay(c){
   const under=c.lookupMove.from==='search'?findPage(c):scanPage(c);
   return '<div class="page-background" inert aria-hidden="true">'+under+'</div>'+layer;
  }
- if(c.view==='medicines')return medicinesPage(c);if(c.view==='medicine-sheet'&&!c.isDrawerBackground)return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+medicinesPage(c).replace(/ aria-modal="true"/g,'')+'</div>'+medicineSheet(c);if(c.view==='medicine-sheet')return medicineSheet(c);if(c.logDatePicker)return '<div class="drawer-background" inert aria-hidden="true">'+overlay({...c,logDatePicker:false})+'</div>'+logDatePicker(c);if(['record-optional','feed-date','feed-note','medicine-picker','brand-picker','bulk-health-picker','picker'].includes(c.view)&&!c.isDrawerBackground){const parent={...c,view:c.view==='picker'?c.form.pickerReturn:c.view==='record-optional'?c.form.optionalReturn:['medicine-picker','brand-picker'].includes(c.view)?'treatment':c.view==='bulk-health-picker'?'health':'feed-editor',isDrawerBackground:true};if(!AstraSurfaces.isPage('inspection',parent.view,parent))return overlay({...c,isDrawerBackground:true});return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+overlay(parent).replace(/ aria-modal="true"/g,'')+'</div>'+overlay({...c,isDrawerBackground:true});}if(c.view==='medicine-picker')return medicinePicker(c);if(c.view==='brand-picker')return brandPicker(c);if(c.view==='pig-doses')return customDosesPage(c);if(c.view==='picker')return pickerPage(c);if(c.view==='record-optional')return recordOptionalEditor(c);if(c.form?.recordEditor&&bulkActionKinds.includes(c.view))return bulkActionPage(c);if(c.view==='bulk-health-picker')return bulkHealthPicker(c);if(c.view==='sow-transfer')return transferPage(c);if(c.view==='measurements-menu')return measurementsMenu(c);if(c.view==='miscarriage')return miscarriagePage(c);if(c.view==='production-task')return productionTaskPage(c);if(c.view==='batch-membership')return batchMembershipPage(c);if(['batch-removal','not-in-pig'].includes(c.view))return productionDispositionPage(c);if(c.view==='feed-date'||c.view==='feed-note')return feedOptionalEditor(c);if(c.view==='feed-breakdown')return feedBreakdown(c);if(c.view==='pig-production-batch')return productionBatchPage(c);if(c.view==='feed-editor')return feedEditor(c);const recordView=recordFlowOverlay(c);if(recordView!==null)return recordView;const revised=round3Overlay(c);if(revised!==null)return revised;const f=c.form;
+ if(c.view==='medicines')return medicinesPage(c);if(c.view==='medicine-sheet'&&!c.isDrawerBackground)return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+medicinesPage(c).replace(/ aria-modal="true"/g,'')+'</div>'+medicineSheet(c);if(c.view==='medicine-sheet')return medicineSheet(c);if(c.logDatePicker)return '<div class="drawer-background" inert aria-hidden="true">'+overlay({...c,logDatePicker:false})+'</div>'+logDatePicker(c);if(['record-optional','feed-date','feed-note','medicine-picker','brand-picker','bulk-health-picker','picker'].includes(c.view)&&!c.isDrawerBackground){const parent={...c,view:c.view==='picker'?c.form.pickerReturn:c.view==='record-optional'?c.form.optionalReturn:['medicine-picker','brand-picker'].includes(c.view)?'treatment':c.view==='bulk-health-picker'?'health':'feed-editor',isDrawerBackground:true};if(!AstraSurfaces.isPage('inspection',parent.view,parent))return overlay({...c,isDrawerBackground:true});return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+overlay(parent).replace(/ aria-modal="true"/g,'')+'</div>'+overlay({...c,isDrawerBackground:true});}if(c.view==='medicine-picker')return medicinePicker(c);if(c.view==='brand-picker')return brandPicker(c);if(c.view==='pig-doses')return customDosesPage(c);if(c.view==='picker')return pickerPage(c);if(c.view==='record-optional')return recordOptionalEditor(c);if(c.form?.recordEditor&&bulkActionKinds.includes(c.view))return bulkActionPage(c);if(c.view==='bulk-health-picker')return bulkHealthPicker(c);if(c.view==='measurements-menu')return measurementsMenu(c);if(c.view==='miscarriage')return miscarriagePage(c);if(c.view==='production-task')return productionTaskPage(c);if(c.view==='batch-membership')return batchMembershipPage(c);if(['batch-removal','not-in-pig'].includes(c.view))return productionDispositionPage(c);if(c.view==='feed-date'||c.view==='feed-note')return feedOptionalEditor(c);if(c.view==='feed-breakdown')return feedBreakdown(c);if(c.view==='pig-production-batch')return productionBatchPage(c);if(c.view==='feed-editor')return feedEditor(c);const recordView=recordFlowOverlay(c);if(recordView!==null)return recordView;const revised=round3Overlay(c);if(revised!==null)return revised;const f=c.form;
  if(c.view==='actions')return actionsPage(c);
  if(c.view==='treatment')return sheet(c,f.taskId==='vaccination'?'Record vaccination':'Record treatment',f.returnFinding?c.pigId+' · '+f.returnFinding:scope(c),(SentriUI.field({label:(f.taskId==='vaccination'?'Vaccine':'Medicine'),control:"<input data-v2=\"medicine\" value=\""+(esc(f.medicine||''))+"\" placeholder=\""+(f.taskId==='vaccination'?'Vaccine administered':'Medicine administered')+"\">"}))+(fieldSelect(c,'Method','method',[['','Choose method'],['Injection','Injection'],['Oral','Oral'],['Topical','Topical'],['In feed','In feed'],['In water','In water']],f.method||''))+(fieldSelect(c,'Unit','doseUnit',[['','Choose unit'],['mL','mL'],['mg','mg'],['g','g']],f.doseUnit||''))+(SentriUI.field({label:'Dose per pig',unit:f.doseUnit||'',variant:'number',control:`<input type="number" inputmode="decimal" min="0" step="any" data-v2="dose" value="${esc(f.dose||'')}">`}))+(f.taskId==='vaccination'?'':f.returnFinding?'<div class="detail-line"><span>For this finding</span><strong>'+esc(f.returnFinding)+'</strong></div>':optionalSelect(c,'Condition','target',[['','No linked condition'],...[...new Set(f.subjects.flatMap(id=>cases(pig(c,id)).map(k=>k.name)))].map(n=>[n,n])],f.target||''))+"<p class=\"quiet-note\">"+(f.taskId==='vaccination'?'Record the vaccination administered for this task.':'Records the treatment already administered to these pigs. A target links only to pigs carrying that condition.')+"</p>",footer(back(),button('save-treatment',f.taskId?'Save':`Record · ${countLabel(f.subjects.length)}`,'button primary','',!valid(c))));
  if(c.view==='health')return healthForm(c);
@@ -1600,7 +1924,7 @@ function installV2(){
  root.querySelector('[data-bulk-rows]').innerHTML=feedPigPreview(c);setCommitWaiting(root.querySelector('[data-action="feed-edit-save"]'),!feedEditorValid(c));
  const hint=root.querySelector('[data-feed-input-hint]');hint.textContent=c.form.mode==='adjust'&&(!Number.isFinite(+c.form.percent)||+c.form.percent < -50.000001||+c.form.percent > 50.000001)?'Choose −50% to +50%.':c.form.mode==='stop'?'No feed · 0.0 kg/day':feedEditorHeld(c)?'Daily amounts stay fixed':'Replaces existing adjustments';localizeFeed(root.querySelector('.phone'));
  },true);
- gallery.addEventListener('click',e=>{const el=e.target.closest('[data-action]');if(!el||el.disabled)return;const i=+el.closest('[data-card]').dataset.card,c=states[i],a=el.dataset.action,v=el.dataset.value??(el.type==='checkbox'?el.value:undefined),fromMeasurements=c.view==='measurements-menu';let handled=true;
+ gallery.addEventListener('click',e=>{if(e.target.closest('.st-pen-whole-toggle,.st-pen-group'))return;const el=e.target.closest('[data-action]');if(!el||el.disabled)return;const i=+el.closest('[data-card]').dataset.card,c=states[i],a=el.dataset.action,v=el.dataset.value??(el.type==='checkbox'?el.value:undefined),fromMeasurements=c.view==='measurements-menu';let handled=true;
  if(handleRecordAction(c,a,v)){if(fromMeasurements)c.measurementsReturn=true;}
  else if(a==='open-picker'){c.form.pickerKey=el.dataset.pickerKey;c.form.pickerReturn=c.view;c.view='picker';}
  else if(a==='picker-select'){if(!pickerCommit(c,v))c.view=c.form.pickerReturn||'list';delete c.form.pickerKey;delete c.form.pickerReturn;}
@@ -1621,7 +1945,7 @@ function installV2(){
  else if(a==='filter-reset'){c.filterDraft={stage:'All',healthFilter:'All',healthStatus:'All',manualOnly:false,triageFilter:'All'};}
  else if(a==='filter-apply'){c.filterKeep=false;Object.assign(c,c.filterDraft);c.reviewOnly=false;c.view='list';c.scroll=0;}
  else if(a==='unit-detail'||a==='equipment'){c.view=a;}
- else if(['pen-detail','pen-faults','pen-log'].includes(a)){c.penId=v;c.view=a;if(a==='pen-log'){c.penLogFilter='All';c.penLogDate={preset:'all'};}}
+ else if(['pen-detail','pen-faults','pen-log'].includes(a)){delete c.moveReceipt;c.penId=v;c.view=a;if(a==='pen-log'){c.penLogFilter='All';c.penLogDate={preset:'all'};}}
  else if(a==='new-fault'){c.penId=v;const d=(c.penDrafts||={});d['fault:'+v]||={device:'',name:'',description:''};c.form=d['fault:'+v];c.view='fault-form';}
  else if(a==='fault-record'){openFaultRecord(c,...v.split('|'));}
  else if(a==='save-fault'&&valid(c)){delete c.penDrafts?.['fault:'+c.penId];const pe=pen(c,c.penId),f=c.form,existing=SentriPenTools.openFaultForDevice(pe,f.device);if(existing){openFaultRecord(c,pe.id,existing.id);}else{const x={id:'fault-'+Date.now(),device:f.device,name:f.device==='Other'?f.name.trim():f.device,description:f.description.trim(),time:'09:41',who:'G. Hansen',open:true};pe.faults.push(x);addEvent(c,'Fault reported',[pe.id],x.name+' · '+x.description);returnFromFault(c);}}
@@ -1883,7 +2207,7 @@ function handleRecordAction(c,a,v){
  if(bulkActionKinds.includes(a)&&(picked(c).length||a==='health'&&c.selectedNoTags?.size)){openBulkAction(c,a);return true;}
  if(a==='notags-count-open'){const base=noTagsCountOf(c,v),keep=(c.countKeeps||={})[v];c.countDraft=keep&&keep.base===base?keep:(c.countKeeps[v]={pen:v,value:String(base),suggested:true,base}); /* Back keeps the typed count until Done */c.countReturn=c.view;c.view='notags-count';return true;}
  if(a==='notags-all'){const d=c.countDraft;d.value=String(pen(c,d.pen).untagged.count);d.suggested=true;return true;}
- if(a==='notags-count-done'){const d=c.countDraft,max=pen(c,d.pen).untagged.count,n=Number(d.value||0);if(!n||n>max)return true;(c.noTagsCount||={})[d.pen]=n;delete c.countKeeps?.[d.pen];c.view=c.countReturn||'list';delete c.countDraft;return true;}
+ if(a==='notags-count-done'){const d=c.countDraft,max=pen(c,d.pen).untagged.count,n=Number(d.value||0);if(!n||n>max)return true;(c.noTagsCount||={})[d.pen]=n;(c.selectedNoTags||=new Set()).add(d.pen);c.actionScope='pigs';delete c.countKeeps?.[d.pen];c.view=c.countReturn||'list';delete c.countDraft;return true;}
  if(a==='notags-count-back'){c.view=c.countReturn||'list';delete c.countDraft;return true;}
  if(a==='health-catalog-section'){c.form.catalogSection=v;c.form.catalogGroup='';return true;}
  if(a==='health-catalog-group'){if(c.form.kind==='Symptom'&&!c.form.catalogSection)c.form.catalogSection=healthCatalogue(c.form).find(item=>item.kind==='Symptom'&&item.group===v)?.section||'';c.form.catalogGroup=v;return true;}
@@ -2077,7 +2401,7 @@ function sowDetailContext(record,previous){
  c.selected.clear();c.selectedPens.clear();return c;
 }
 // Model exports permit small, isolated checks without starting the UI.
-globalThis.InspectionStudy={catalog,verbGrid,tickPen,penOverview,main,rowCheckAfterRender,medFarm,medRecents,medicinePickerBody,brandPickerBody,medicinesPage,medicineSheet,pickMedicine,atlasScreen:c=>atlasScreen(c),healthList,conditionDefinition,batchTaskForPig,batchTrackerRows,unitOverview,overlay,inspectionSurface,drawerSize,actionCatalogue,productionActionsForPig,sowTaskCard,pigCurrentTasks,currentTasksForPig,openProductionTask,saveProductionTask,saveBatchMembership,saveMiscarriage,openBulkAction,parkBulkDraft,bulkChanges,bulkActionValid,saveBulkAction,bulkActionPage,sowDetailContext,seed,animalType,typeDetails,productionOverview,productionAverages,productionRecords,feedBasis,feedTotals,updateFeedInput,openFeedEditor,feedEditorTargets,proposedPigAllocation,feedEditorValid,saveFeedEditor,pigAllocation,feedPreview,stageSummary,penFeedEntry,penFeedStatus,baseAllocation,feedBody,careAppearance,pigFeedTags,pigRow,overviewDetails,measurementAge,daysFromWalk,attentionOverview,validIndependentAdjustment,issueStatus,needsHealthAttention,closePenNote,eventCategory,filterLogEntries,logEntryDate,logDateBounds,visibleLogEntries,logDateDraftError,logFilterBar,categorizedLog,addEvent,penLogEntries,pigs,pig,penOf,picked,allocation,visiblePigs,applyRecord,saveHealth,saveBody,cases,matches,displayPigs,saveFinding,closeFinding,handleRecordAction};
+globalThis.InspectionStudy={openInspectionMove,catalog,verbGrid,tickPen,penOverview,main,rowCheckAfterRender,medFarm,medRecents,medicinePickerBody,brandPickerBody,medicinesPage,medicineSheet,pickMedicine,atlasScreen:c=>atlasScreen(c),healthList,conditionDefinition,batchTaskForPig,batchTrackerRows,unitOverview,overlay,inspectionSurface,drawerSize,actionCatalogue,productionActionsForPig,sowTaskCard,pigCurrentTasks,currentTasksForPig,openProductionTask,saveProductionTask,saveBatchMembership,saveMiscarriage,openBulkAction,parkBulkDraft,bulkChanges,bulkActionValid,saveBulkAction,bulkActionPage,sowDetailContext,seed,animalType,typeDetails,productionOverview,productionAverages,productionRecords,feedBasis,feedTotals,updateFeedInput,openFeedEditor,feedEditorTargets,proposedPigAllocation,feedEditorValid,saveFeedEditor,pigAllocation,feedPreview,stageSummary,penFeedEntry,penFeedStatus,baseAllocation,feedBody,careAppearance,pigFeedTags,pigRow,overviewDetails,measurementAge,daysFromWalk,attentionOverview,validIndependentAdjustment,issueStatus,needsHealthAttention,closePenNote,eventCategory,filterLogEntries,logEntryDate,logDateBounds,visibleLogEntries,logDateDraftError,logFilterBar,categorizedLog,addEvent,penLogEntries,pigs,pig,penOf,picked,allocation,visiblePigs,applyRecord,saveHealth,saveBody,cases,matches,displayPigs,saveFinding,closeFinding,handleRecordAction};
 if(typeof document==='undefined')return;
 const embeddedSow=window.parent!==window&&new URLSearchParams(location.search).get('embed')==='sow';
 let embeddedSowReady=false;
@@ -2087,13 +2411,24 @@ function sendSowDetail(type,c){const t=c.batchHost&&type==='sow-detail-close'&&c
 
 /* Unit 6, for Find: the walk is one unit, but Find searches every unit. */
 function lookupSeed(c,type){
- if(/^lookup-/.test(type)||new URLSearchParams(location.search).get('movePens')==='large'){
-  // This room has 48 registered pens, including empty pens; the picker reads the same model as the walk.
-  for(const lane of ['A','B','C','D'])for(let i=1;i<=12;i++){
-   const id=lane+i;if(!pen(c,id))c.pens.push({id,pigs:[],faults:[],note:'',mode:'unknown',formula:''});
-  }
+ const params=moveConfig(),sample=globalThis.SentriPenMapSampleRooms;
+ c.penMapRoom=sample[params.get('penmap')]||
+  (/^lookup-/.test(type)||params.get('movePens')==='large'?{map:true,props:{lanes:['A','B','C','D'],depth:12}}:sample.standard);
+ c.otherUnits=[{id:6,name:'Unit 6',section:moveText('Gestation','妊娠舍'),penCodes:MovePicker.codesFor({lanes:['A','B','C','D'],depth:4}),pens:[
+  {...emptyMovePen('A2'),mode:'trough',formula:'Gestation 1',pigs:[{id:'000430',stage:'Gestating',parity:3,base:2.5,factor:1}]},
+  {...emptyMovePen('A4'),mode:'trough',formula:'Gestation 1',pigs:[{id:'003012',stage:'Gestating',parity:1,base:2.4,factor:1}]}]},
+  {id:8,name:'Unit 8',section:moveText('Nursery','保育舍'),defaultBatchId:'nursery-default',penCodes:MovePicker.codesFor({lanes:['A','B','C'],depth:5}),pens:[]},
+  {id:'hospital',name:moveText('Hospital','病猪舍'),section:moveText('Hospital','病猪舍'),penCodes:MovePicker.codesFor({lanes:['H'],depth:4}),pens:[]}];
+ if(params.get('moveFixture')==='batches'){
+  const pe=pen(c,'D4');
+  pe.untagged.batches=[{id:'18',count:8},{id:'19',count:6}];
+  pe.untagged.cases.push({name:'Diarrhoea',kind:'Disease',day:1,triage:'Monitor',count:2});
+  pe.pigs.push({id:'sample-notch',earNotch:'2-5',stage:'Grower',base:0,factor:1,cases:[]});
+  c.pens.push({...emptyMovePen('C5'),full:true},{...emptyMovePen('C6'),available:false});
+  const dest=emptyMovePen('C4');
+  dest.untagged={cases:[{name:'Poor appetite',kind:'Symptom',count:1,triage:'Monitor'}],count:2};
+  c.pens.push(dest);
  }
- c.otherUnits=[{id:6,name:'Unit 6',pens:[{id:'A2',mode:'trough',formula:'Gestation 1',faults:[],note:'',issue:'',pigs:[{id:'000430',stage:'Gestating',parity:3,base:2.5,factor:1}]},{id:'A4',mode:'trough',formula:'Gestation 1',faults:[],note:'',issue:'',pigs:[{id:'003012',stage:'Gestating',parity:1,base:2.4,factor:1}]}]}];
  c.otherUnits.forEach(u=>u.pens.forEach(pe=>pe.pigs.forEach(p=>Object.assign(p,{batchId:'',cases:[],band:'standard',initialRecords:[],registry:{type:'Sow',onFarm:true}}))));
  scanSetup(c,type);
  if(/^search-/.test(type)){c.query=type==='search-results'?'30':type==='search-none'?'909':'';c.view='search';}
@@ -2104,7 +2439,13 @@ const examples=[{title:'Walk & select',initial:'walk',caption:'Individual checkb
 const atlasViews={list:'inspection.walk','pen-detail':'inspection.pen','pen-note':'inspection.pen-note','selected-pen-note':'inspection.pen-note','read-pen-note':'inspection.pen-note','pen-log':'inspection.pen-log',filters:'inspection.filters',grid:'inspection.go-to-pen',review:'inspection.review-selected',log:'inspection.walk-log',history:'inspection.walk-log','pig-origin':'pig-profile.origin','unit-detail':'inspection.unit-detail','batch-detail':'inspection.batch-detail','pen-faults':'inspection.pen-faults','fault-form':'inspection.fault-report','fault-record':'inspection.fault-resolve','feed-editor':'feed-plan.editor','feed-date':'feed-plan.end-date','pig-feed':'feed-plan.pig',pig:'pig-profile.full','pig-production':'pig-profile.production-batches','pig-production-batch':'pig-profile.batch-record','pig-log':'pig-profile.log','pig-profile':'pig-profile.origin','production-task':'pig-profile.production-task',miscarriage:'pig-profile.miscarriage','batch-membership':'pig-profile.batch-membership','measurements-menu':'pig-profile.measurements',weight:'pig-profile.measure',temperature:'pig-profile.measure',backfat:'pig-profile.measure',body:'pig-profile.body-condition',note:'pig-profile.note',finding:'health-record.finding','finding-edit':'health-record.edit-finding',resolve:'health-record.resolve-conditions','finding-close':'health-record.resolve-finding',triage:'health-record.care-instructions',health:'health-record.record-health','bulk-health-picker':'health-record.condition-picker','edit-conditions':'health-record.care-instructions',condition:'health-record.record-health',treatment:'treat.record'};
 function atlasScreen(c){
  if(c.view.startsWith('lookup-move'))return 'inspection.'+c.view;
+ if(c.view==='sow-transfer')return 'move.transfer-sow';
+ if(c.view==='move-pigs')return 'move.which-pigs';
+ if(c.view==='move-counts')return 'move.counts';
+ if(c.view==='move-rooms')return 'move.rooms';
+ if(c.view==='move-to')return c.move.to?'move.picker':c.move.sources.some(source=>source.count)?'move.mixed':'move.tagged';
  if(c.view==='farrowing-record')return 'inspection.farrowing-record';
+ if(c.view==='scan'&&c.scan.newExample)return 'inspection.scan-new';
  if(c.view==='scan'&&c.scan.items.some(id=>lookupPlacement(c,id)?.unit))return 'inspection.lookup-outside';
  if(c.view==='search')return !c.query.trim()?'inspection.search':findHits(c).length?'inspection.find-pig':'inspection.search-none';
  if(c.view==='scan'){
@@ -2120,6 +2461,7 @@ function atlasScreen(c){
  if(c.view==='pen-observe')return 'inspection.pen-observe';
  if(c.view==='fault-form'&&c.form.device==='Other')return 'inspection.fault-report-other';
  if(c.view==='pen-detail'){
+  if(c.moveReceipt===c.penId)return 'move.after';
   if(openFaults(pen(c,c.penId)).length)return 'inspection.pen-faults';
   if(c.events.some(e=>e.title==='Fault resolved'&&e.subjects.includes(c.penId)))return 'inspection.fault-resolved';
  }
@@ -2263,7 +2605,7 @@ if(c.view==='review')return sheet(c,'Selected','',selectionReview(c),footer(back
    white when it has shown pigs; filtered out when the lens or the filter hides them all. Inspection has no in-progress state, so
    the map is never blue, and a pen is never "checked": the walk is checked in as a unit, so a pen the walk has been through and
    one it hasn't take the same face. */
-const PEN_LANES=['A','B','C','D'],PEN_DEPTH=6;
+
 const rowRank=tags=>tags.length?LEVEL_RANK[tags[0].level]:3;
 function penLevels(c){
  const out={};
@@ -2289,8 +2631,8 @@ function penPeek(c,id){
 }
 function penMapSheet(c){
  const pens=penLevels(c),act=Object.values(pens).filter(l=>l==='act').length;
- const body=SentriUI.penMap({lanes:PEN_LANES,depth:PEN_DEPTH,pens,current:c.currentPen,action:'jump',key:'inspection-pens-'+states.indexOf(c),labels:{plain:'has pigs',hidden:'no pigs match'},peek:id=>penPeek(c,id)});
- return sheet(c,'Pen map','',body,SentriUI.penMapFooter({back:{action:'back'},depth:PEN_DEPTH}),'menu',{key:SentriUI.penMapKey({pens,words:{act:act===1?'needs you':'need you'}})});
+ const body=SentriUI.penMap({...c.penMapRoom?.props,pens,current:c.currentPen,action:'jump',key:'inspection-pens-'+states.indexOf(c),entrance:moveText('Entrance','入口'),labels:{plain:moveText('has pigs','有猪'),hidden:moveText('no pigs match','没有符合条件的猪'),whole:moveText('Whole room','整栋'),byPen:moveText('Pen by pen','逐栏'),pens:r=>moveText('Pens '+r,r+' 栏')},peek:id=>penPeek(c,id)});
+ return sheet(c,'Pen map','',body,SentriUI.penMapFooter({back:{action:'back'}}),'menu',{key:SentriUI.penMapKey({pens,words:{act:act===1?'needs you':'need you'}})});
 }
 function legacyValid(c){const f=c.form;if(c.view==='condition'||c.view==='report')return !!f.choice&&(f.choice!=='Other'||!!f.note?.trim());if(c.view==='note')return !!f.note?.trim();if(c.view==='weight')return !!f.weight&&Number.isFinite(+f.weight)&&+f.weight>0;if(c.view==='plan')return !!f.preset;if(c.view==='exception')return !!f.choice&&(pen(c,c.penId).mode==='station'||f.actual!==''&&f.actual!=null&&Number.isFinite(+f.actual)&&+f.actual>=0);return true;}
 /* Which saves confirm with a toast (owner, 2026-10-18): one pig only when the walk list's row doesn't show the result (its ear tag,
@@ -2380,8 +2722,11 @@ function finishFarrowingHandoff(c,result){
  }
  c.view=f.from;c.restoreSheetScroll=f.scroll;delete c.farrowingRecord;
 }
-function render(i,focus){if(states[i].actionEntry&&states[i].view==='list'&&states[i].returnAfterActionSave){states[i].selected=new Set([states[i].actionEntry]);states[i].actionScope='pigs';states[i].view='actions';states[i].restoreSheetScroll=states[i].actionMenuScroll||0;}delete states[i].returnAfterActionSave;settleDetailNavigation(states[i]);if(embeddedSow&&embeddedSowReady&&i===0){sendSowDetail(states[i].view==='list'?'sow-detail-close':'sow-detail-state',states[i]);if(states[i].view==='list')return;}const c=states[i],root=gallery.querySelector(`[data-card="${i}"]`),previous=root.dataset.view;const active=document.activeElement;const focusKey=active&&root.contains(active)?['data-v2','data-condition','data-verdict','data-log-category','data-log-date-field','data-feed-edit'].find(k=>active.hasAttribute(k)):null;const focusValue=focusKey?active.getAttribute(focusKey):null;const catalogScroll=root.querySelector('.health-catalog')?.scrollTop||0;const sheetScroll=previous===c.view?root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0:0;root.dataset.view=c.view;if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(c));if(c.toast){if(c.toastView==null)c.toastView=c.view;else if(c.toastView!==c.view){c.toast='';c.toastView=null;clearTimeout(c.toastTimer);}}root.querySelector('.phone').innerHTML=main(c)+inspectionSurface(c)+(c.toast&&Date.now()<c.toastUntil?(typeof c.toast==='string'?SentriUI.toast(c.toast):SentriUI.toast(c.toast.title,{detail:c.toast.detail,tone:c.toast.tone})):'');localizeFeed(root.querySelector('.phone'));SentriUI.rowFitTags(root);dockBulkDetails(root);if(previous!==c.view)root.querySelector('.phone > .sheet')?.classList.add('drawer-enter');const parentList=root.querySelector('.bulk-pig-list,.feed-pig-rows');if(parentList&&c.form?.parentListScroll!=null)parentList.scrollTop=c.form.parentListScroll;const pigTaskRail=root.querySelector('.pig-current-task-list');if(pigTaskRail)pigTaskRail.scrollLeft=c.pigTaskRailScroll?.[c.pigId]||0;const taskRail=root.querySelector('.sow-task-rail');if(taskRail){taskRail.scrollLeft=c.taskRailScroll||0;}root.querySelector('.inspect-list').style.paddingBottom=(c.tailSpace||18)+'px';root.querySelector('.inspect-scroll').scrollTop=c.scroll;const carousel=root.querySelector('.batch-carousel');if(carousel)carousel.scrollLeft=c.batchScroll||0;root.querySelectorAll('[data-mixed]').forEach(x=>x.indeterminate=x.dataset.mixed==='true');if(root.querySelector('.phone > .sheet > .sheet-body'))root.querySelector('.phone > .sheet > .sheet-body').scrollTop=c.restoreSheetScroll??sheetScroll;delete c.restoreSheetScroll;if(previous!==c.view)root.querySelector(c.view==='list'?'.inspect-scroll':'.phone > .sheet')?.focus({preventScroll:true});if(focus){const el=[...root.querySelectorAll('[data-action],[data-pig-select],[data-pen-select],[data-field]')].find(e=>focus.a?e.dataset.action===focus.a&&e.dataset.value===focus.v:focus.p?e.dataset.pigSelect===focus.p:focus.pe?e.dataset.penSelect===focus.pe:e.dataset.field===focus.f&&e.value===focus.v);(el||root.querySelector(c.view==='weight'?'[data-field="weight"]':c.view==='list'?'.inspect-scroll':'.phone > .sheet'))?.focus({preventScroll:true});}if(root.querySelector('.health-catalog'))root.querySelector('.health-catalog').scrollTop=catalogScroll;if(focusKey&&previous===c.view){[...root.querySelectorAll('['+focusKey+']')].find(x=>x.getAttribute(focusKey)===focusValue)?.focus({preventScroll:true});}if(c.logDateFocus){root.querySelector(c.logDateFocus==='dialog'?'.phone > .sheet [data-action="log-date-preset"][aria-pressed="true"]':'.phone > .sheet [data-action="log-date-open"]')?.focus({preventScroll:true});delete c.logDateFocus;}if(c.chooserReturnFocus&&c.view===c.chooserReturnFocus.view&&previous!==c.view){const saved=c.chooserReturnFocus;const back=[...root.querySelectorAll('.phone > .sheet [data-action]')].find(el=>el.dataset.action===saved.action&&(!saved.key||el.dataset.pickerKey===saved.key)&&(!saved.value||el.dataset.value===saved.value));if(back&&Date.now()-lastKeyAt>1000)quietFocus(back);back?.focus({preventScroll:true});delete c.chooserReturnFocus;}const list=root.querySelector('.inspect-list');list.style.paddingBottom=(c.tailSpace||18)+'px';if(c.jump)jumpToPen(c,root);landCue(i,root);rowCheckAfterRender(root,c);if(c.view==='search'&&previous!=='search')root.querySelector('[data-find-input]')?.focus({preventScroll:true});if(c.view==='scan')SentriUI.scanArrive(root,c.scan);const demo=root.querySelector('[data-demo-scan]');if(demo){demo.hidden=c.view!=='scan'||!c.scan?.connected;demo.disabled=!c.scan?.listening;}}
-function backTo(c){if(c.view==='farrowing-record'){finishFarrowingHandoff(c);return;}if(c.view.startsWith('lookup-move')){lookupMoveAction(c,'back');return;}if(c.view==='pen-observe'){c.view='pen-detail';return;}if(c.view==='medicine-picker'){delete c.form.med;c.view='treatment';return;}if(c.view==='brand-picker'){delete c.form.brandPick;c.view='treatment';return;}if(c.view==='pig-doses'){delete c.form.doseSearch;c.view='treatment';return;}if(c.view==='medicine-sheet'){c.view='medicines';return;}if(c.view==='medicines'){const pg=medPage(c);if(pg.category)pg.category='';else c.view='list';return;}if(c.view==='bulk-health-picker'){leaveConditionPicker(c);return;}if(c.view==='record-optional'){c.view=c.form.optionalReturn;delete c.form.optionalDraft;return;}if(c.view==='picker'){c.view=c.form.pickerReturn||'list';delete c.form.pickerKey;delete c.form.pickerReturn;return;}if(c.navTrail?.length){const parent=c.navTrail.pop();Object.assign(c,parent);c.restoreSheetScroll=parent.sheetScroll;return;}if(['health','body','individual-plan','resolve','triage','temperature','backfat','treatment'].includes(c.view)){parkBulkDraft(c);c.form={};c.view='actions';return;}if(['fault-form','fault-record','pen-note'].includes(c.view)){c.view='pen-detail';return;}if(['condition','note','plan','weight'].includes(c.view)){parkBulkDraft(c);c.form={};c.view='actions';}else if(['report','exception'].includes(c.view)){c.form={};c.view='feed';}else if(c.view==='review')c.view=c.reviewBack||'actions';else c.view='list';}
+function render(i,focus){if(states[i].actionEntry&&states[i].view==='list'&&states[i].returnAfterActionSave){states[i].selected=new Set([states[i].actionEntry]);states[i].actionScope='pigs';states[i].view='actions';states[i].restoreSheetScroll=states[i].actionMenuScroll||0;}delete states[i].returnAfterActionSave;settleDetailNavigation(states[i]);if(embeddedSow&&embeddedSowReady&&i===0){sendSowDetail(states[i].view==='list'?'sow-detail-close':'sow-detail-state',states[i]);if(states[i].view==='list')return;}const c=states[i],root=gallery.querySelector(`[data-card="${i}"]`),previous=root.dataset.view;c.moveKey=i;const active=document.activeElement;const focusKey=active&&root.contains(active)?['data-v2','data-condition','data-verdict','data-log-category','data-log-date-field','data-feed-edit'].find(k=>active.hasAttribute(k)):null;const focusValue=focusKey?active.getAttribute(focusKey):null;const catalogScroll=root.querySelector('.health-catalog')?.scrollTop||0;const sheetScroll=previous===c.view?root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0:0;root.dataset.view=c.view;if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(c));if(c.toast){if(c.toastView==null)c.toastView=c.view;else if(c.toastView!==c.view){c.toast='';c.toastView=null;clearTimeout(c.toastTimer);}}root.querySelector('.phone').innerHTML=main(c)+inspectionSurface(c)+(c.toast&&Date.now()<c.toastUntil?(typeof c.toast==='string'?SentriUI.toast(c.toast):SentriUI.toast(c.toast.title,{detail:c.toast.detail,tone:c.toast.tone})):'');localizeFeed(root.querySelector('.phone'));SentriUI.rowFitTags(root);dockBulkDetails(root);if(previous!==c.view)root.querySelector('.phone > .sheet')?.classList.add('drawer-enter');const parentList=root.querySelector('.bulk-pig-list,.feed-pig-rows');if(parentList&&c.form?.parentListScroll!=null)parentList.scrollTop=c.form.parentListScroll;const pigTaskRail=root.querySelector('.pig-current-task-list');if(pigTaskRail)pigTaskRail.scrollLeft=c.pigTaskRailScroll?.[c.pigId]||0;const taskRail=root.querySelector('.sow-task-rail');if(taskRail){taskRail.scrollLeft=c.taskRailScroll||0;}root.querySelector('.inspect-list').style.paddingBottom=(c.tailSpace||18)+'px';root.querySelector('.inspect-scroll').scrollTop=c.scroll;const carousel=root.querySelector('.batch-carousel');if(carousel)carousel.scrollLeft=c.batchScroll||0;root.querySelectorAll('[data-mixed]').forEach(x=>x.indeterminate=x.dataset.mixed==='true');if(root.querySelector('.phone > .sheet > .sheet-body'))root.querySelector('.phone > .sheet > .sheet-body').scrollTop=c.restoreSheetScroll??sheetScroll;delete c.restoreSheetScroll;if(previous!==c.view)root.querySelector(c.view==='list'?'.inspect-scroll':'.phone > .sheet')?.focus({preventScroll:true});if(focus){const el=[...root.querySelectorAll('[data-action],[data-pig-select],[data-pen-select],[data-field]')].find(e=>focus.a?e.dataset.action===focus.a&&e.dataset.value===focus.v:focus.p?e.dataset.pigSelect===focus.p:focus.pe?e.dataset.penSelect===focus.pe:e.dataset.field===focus.f&&e.value===focus.v);(el||root.querySelector(c.view==='weight'?'[data-field="weight"]':c.view==='list'?'.inspect-scroll':'.phone > .sheet'))?.focus({preventScroll:true});}if(root.querySelector('.health-catalog'))root.querySelector('.health-catalog').scrollTop=catalogScroll;if(focusKey&&previous===c.view){[...root.querySelectorAll('['+focusKey+']')].find(x=>x.getAttribute(focusKey)===focusValue)?.focus({preventScroll:true});}if(c.logDateFocus){root.querySelector(c.logDateFocus==='dialog'?'.phone > .sheet [data-action="log-date-preset"][aria-pressed="true"]':'.phone > .sheet [data-action="log-date-open"]')?.focus({preventScroll:true});delete c.logDateFocus;}if(c.chooserReturnFocus&&c.view===c.chooserReturnFocus.view&&previous!==c.view){const saved=c.chooserReturnFocus;const back=[...root.querySelectorAll('.phone > .sheet [data-action]')].find(el=>el.dataset.action===saved.action&&(!saved.key||el.dataset.pickerKey===saved.key)&&(!saved.value||el.dataset.value===saved.value));if(back&&Date.now()-lastKeyAt>1000)quietFocus(back);back?.focus({preventScroll:true});delete c.chooserReturnFocus;}const list=root.querySelector('.inspect-list');list.style.paddingBottom=(c.tailSpace||18)+'px';if(c.jump)jumpToPen(c,root);landCue(i,root);rowCheckAfterRender(root,c);if(c.view==='search'&&previous!=='search')root.querySelector('[data-find-input]')?.focus({preventScroll:true});if(c.view==='scan')SentriUI.scanArrive(root,c.scan,{highlight:id=>!c.selected.has(id)});const demo=root.querySelector('[data-demo-scan]');if(demo){
+ const picking=c.view==='move-pigs'&&c.move?.scanning;
+ demo.hidden=!picking&&(c.view!=='scan'||!c.scan?.connected);demo.disabled=!picking&&!c.scan?.listening;
+ }}
+function backTo(c){if(c.move&&handleInspectionMove(c,null,'back'))return;if(c.view==='farrowing-record'){finishFarrowingHandoff(c);return;}if(c.view.startsWith('lookup-move')){lookupMoveAction(c,'back');return;}if(c.view==='pen-observe'){c.view='pen-detail';return;}if(c.view==='medicine-picker'){delete c.form.med;c.view='treatment';return;}if(c.view==='brand-picker'){delete c.form.brandPick;c.view='treatment';return;}if(c.view==='pig-doses'){delete c.form.doseSearch;c.view='treatment';return;}if(c.view==='medicine-sheet'){c.view='medicines';return;}if(c.view==='medicines'){const pg=medPage(c);if(pg.category)pg.category='';else c.view='list';return;}if(c.view==='bulk-health-picker'){leaveConditionPicker(c);return;}if(c.view==='record-optional'){c.view=c.form.optionalReturn;delete c.form.optionalDraft;return;}if(c.view==='picker'){c.view=c.form.pickerReturn||'list';delete c.form.pickerKey;delete c.form.pickerReturn;return;}if(c.navTrail?.length){const parent=c.navTrail.pop();Object.assign(c,parent);c.restoreSheetScroll=parent.sheetScroll;return;}if(['health','body','individual-plan','resolve','triage','temperature','backfat','treatment'].includes(c.view)){parkBulkDraft(c);c.form={};c.view='actions';return;}if(['fault-form','fault-record','pen-note'].includes(c.view)){c.view='pen-detail';return;}if(['condition','note','plan','weight'].includes(c.view)){parkBulkDraft(c);c.form={};c.view='actions';}else if(['report','exception'].includes(c.view)){c.form={};c.view='feed';}else if(c.view==='review')c.view=c.reviewBack||'actions';else c.view='list';}
 
 // Detail sheets return to the actual entry page; form values are discarded on Back.
 // The record's own Actions has one subject; keep the walk or scan ticks on its parent.
@@ -2410,6 +2755,13 @@ function installDetailNavigation(){
   const i=+root.dataset.card,c=states[i],a=el.dataset.action;
   if(['bulk-pick-health','medicine-open','record-optional-open','feed-optional-open','open-picker'].includes(a)){c.chooserReturnFocus={action:a,value:el.dataset.value,key:e.target.closest('[data-picker-key]')?.dataset.pickerKey,view:c.view};c.form.parentListScroll=root.querySelector('.bulk-pig-list,.feed-pig-rows')?.scrollTop||0;}
   if(a==='log-date-open')c.logDateScroll=root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0;
+  if(a==='move-pig'){e.stopImmediatePropagation();return;}
+  if(handleInspectionMove(c,el,a,el.dataset.value)){
+   e.stopImmediatePropagation();
+   if(c.move)c.move.showSources=!!root.querySelector('.move-sources[open]');
+   render(i);
+   return;
+  }
   if(c.view.startsWith('lookup-move')&&lookupMoveAction(c,a,el.dataset.value)){e.stopImmediatePropagation();render(i);if(a==='lookup-move-clear')root.querySelector('[data-move-pen-search]')?.focus();return;}
   if(c.logDatePicker&&(a==='back'||a==='dismiss')){e.stopImmediatePropagation();handleRecordAction(c,'log-date-cancel');render(i);return;}
   if(c.view==='medicine-picker'&&(a==='back'||a==='dismiss')){e.stopImmediatePropagation();delete c.form.med;c.view='treatment';render(i);return;}
@@ -2442,8 +2794,15 @@ gallery.addEventListener('click',e=>{
   }
  }return;}
  if(a==='sow-current-task'){e.stopImmediatePropagation();const subject=pig(c,c.pigId)||picked(c)[0],task=currentTasksForPig(c,subject).find(t=>t.id===v);if(!task||!subject||c.selectedPens.size)return;c.selected=new Set([subject.id]);c.actionMenuScroll=root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0;if(['farrowing','piglet-processing'].includes(task.id)&&embeddedSow)window.parent.postMessage({type:'sow-action',action:'current-task',taskId:task.id,context:{...c,toastTimer:undefined}},location.origin);else{c.navTrail=c.navTrail||[];c.navTrail.push({...detailLocation(c),sheetScroll:c.actionMenuScroll});if((task.type||'').toLowerCase()==='health'||/vaccin/i.test(task.title||'')){openBulkAction(c,'treatment');c.form.taskId=task.id;}else openProductionTask(c,task,subject);render(i);}return;}
- if(a==='sow-host-action'){e.stopImmediatePropagation();if(picked(c).length!==1||c.selectedPens.size)return;const entry=c.hostActions?.find(x=>x.id===v&&!x.reason);if(!entry||!embeddedSow)return;c.actionMenuScroll=root.querySelector('.phone > .sheet > .sheet-body').scrollTop;if(v==='transfer'){c.navTrail=c.navTrail||[];c.navTrail.push({...detailLocation(c),sheetScroll:c.actionMenuScroll});c.transferDraft={unit:'',pen:''};c.view='sow-transfer';render(i);}else if(v==='miscarriage'){c.navTrail=c.navTrail||[];c.navTrail.push({...detailLocation(c),sheetScroll:c.actionMenuScroll});c.view='miscarriage';c.lossReason='';render(i);}else if(['remove-batch','not-in-pig'].includes(v)){c.navTrail=c.navTrail||[];c.navTrail.push({...detailLocation(c),sheetScroll:c.actionMenuScroll});c.form={dispositionReason:'',dispositionNote:''};c.view=v==='remove-batch'?'batch-removal':'not-in-pig';render(i);}else window.parent.postMessage({type:'sow-action',action:v,context:{...c,toastTimer:undefined}},location.origin);return;}
- if(a==='save-transfer'){e.stopImmediatePropagation();if(picked(c).length===1&&!c.selectedPens.size&&transferReady(c))window.parent.postMessage({type:'sow-action',action:'save-transfer',unit:c.transferDraft.unit,pen:c.transferDraft.pen,context:{...c,toastTimer:undefined}},location.origin);return;}
+ if(a==='sow-host-action'){e.stopImmediatePropagation();if(picked(c).length!==1||c.selectedPens.size)return;const entry=c.hostActions?.find(x=>x.id===v&&!x.reason);if(!entry||!embeddedSow)return;c.actionMenuScroll=root.querySelector('.phone > .sheet > .sheet-body').scrollTop;if(v==='transfer'){openInspectionMove(c,'',true);render(i);}else if(v==='miscarriage'){c.navTrail=c.navTrail||[];c.navTrail.push({...detailLocation(c),sheetScroll:c.actionMenuScroll});c.view='miscarriage';c.lossReason='';render(i);}else if(['remove-batch','not-in-pig'].includes(v)){c.navTrail=c.navTrail||[];c.navTrail.push({...detailLocation(c),sheetScroll:c.actionMenuScroll});c.form={dispositionReason:'',dispositionNote:''};c.view=v==='remove-batch'?'batch-removal':'not-in-pig';render(i);}else window.parent.postMessage({type:'sow-action',action:v,context:{...c,toastTimer:undefined}},location.origin);return;}
+ if(a==='save-transfer'){e.stopImmediatePropagation();
+  const m=c.move,room=m&&moveDestinationRoom(c,m);
+  if(m?.host&&m.to&&room.pens.some(p=>p.id===m.to&&!MovePicker.unavailable(p))&&!(room.id===String(c.transferOrigin?.unit)&&m.to===penOf(c,m.ids[0])?.id)){
+   delete c.move;
+   window.parent.postMessage({type:'sow-action',action:'save-transfer',unit:room.id,pen:m.to,context:{...c,toastTimer:undefined}},location.origin);
+  }
+  return;
+ }
  if(a==='save-miscarriage'){e.stopImmediatePropagation();if(picked(c).length!==1||c.selectedPens.size||!c.lossReason?.trim())return;if(embeddedSow&&c.hostActions?.some(x=>x.id==='miscarriage'&&!x.reason))window.parent.postMessage({type:'sow-action',action:'save-miscarriage',reason:c.lossReason.trim(),context:{...c,toastTimer:undefined}},location.origin);else {saveMiscarriage(c);render(i);}return;}
  if(['save-batch-removal','save-not-in-pig'].includes(a)){e.stopImmediatePropagation();if(picked(c).length===1&&!c.selectedPens.size&&c.form.dispositionReason)window.parent.postMessage({type:'sow-action',action:a,reason:c.form.dispositionReason,note:(c.form.dispositionNote||'').trim(),context:{...c,toastTimer:undefined}},location.origin);return;}
  if(c.actionEntry&&a.startsWith('save-')&&!el.disabled)c.returnAfterActionSave=true;
@@ -2452,13 +2811,36 @@ gallery.addEventListener('click',e=>{
 gallery.addEventListener('scroll',e=>{if(e.target.matches('.pig-current-task-list')){const root=e.target.closest('[data-card]'),c=states[+root.dataset.card];(c.pigTaskRailScroll||={})[c.pigId]=e.target.scrollLeft;}if(e.target.matches('.sow-task-rail')){const root=e.target.closest('[data-card]');states[+root.dataset.card].taskRailScroll=e.target.scrollLeft;}if(e.target.matches('.actions-sheet .sheet-body')){const root=e.target.closest('[data-card]');states[+root.dataset.card].actionMenuScroll=e.target.scrollTop;}},true);
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-loss-reason]'))return;const root=e.target.closest('[data-card]'),c=states[+root.dataset.card];c.lossReason=e.target.value;setCommitWaiting(root.querySelector('[data-action="save-miscarriage"]'),!c.lossReason.trim());});
 installDetailNavigation();
+window.addEventListener('online',()=>{
+ states.forEach((c,i)=>{
+  const queued=c.pendingMoves?.filter(move=>move.result==='queued')||[];
+  if(!queued.length)return;
+  c.pendingMoves=c.pendingMoves.filter(move=>move.result!=='queued');
+  for(const move of queued){
+   if(!completePreviewMove(c,move.sources,move.room,move.code,move.select)){
+    const [title,detail]=moveReply('failed');notify(c,{title,detail,tone:'notice'});
+   }
+  }
+  render(i);
+ });
+});
 installV2();
-document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const card=b.closest('[data-card]'),i=+card.dataset.card,before=SentriUI.scanPlaces(card);if(scanAdd(states[i])){render(i);SentriUI.scanGlide(card,before);}});
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;
+ const card=b.closest('[data-card]'),i=+card.dataset.card,c=states[i],before=SentriUI.scanPlaces(card);
+ if(c.view==='move-pigs'&&c.move.scanning){
+  if(c.scan.connected){
+   const next=pen(c,c.move.sourcePen).pigs.find(p=>transferable(p)&&!p.earNotch&&!c.move.ids.includes(p.id));
+   if(next)c.move.ids.push(next.id);
+  }else c.scan.connected=true;
+  render(i);
+ }else if(scanAdd(c)){render(i);SentriUI.scanGlide(card,before);}
+});
 SentriUI.radioBind(gallery,{onChange:(field,value)=>{if(field!=='choice')return;const i=+document.activeElement.closest('[data-card]').dataset.card;states[i].form.choice=value;render(i);}});
 /* the peek's rows fit their tags to the card's width, as the walk's rows do (+N for what does not fit) */
 gallery.addEventListener('sentri-pen-peek',e=>SentriUI.rowFitTags(e.target.querySelector('.st-pen-peek')));
 gallery.addEventListener('scroll',e=>{if(e.target.matches('.sheet-body,.inspect-scroll'))showMobileScrollIndicator(e.target);if(e.target.matches('.batch-carousel')){const root=e.target.closest('[data-card]'),c=states[+root.dataset.card];c.batchScroll=e.target.scrollLeft;}if(e.target.matches('.inspect-scroll')){const root=e.target.closest('[data-card]'),c=states[+root.dataset.card];c.scroll=e.target.scrollTop;if(c.view==='list'){const edge=e.target.getBoundingClientRect().top+root.querySelector('.inspect-controls').offsetHeight,items=[...e.target.querySelectorAll('[data-pen]')],current=items.find(p=>p.getBoundingClientRect().bottom>edge+12);if(current)c.currentPen=current.dataset.pen;}}},true);
-gallery.addEventListener('click',e=>{const el=e.target.closest('[data-action]');if(!el||el.disabled)return;const i=+el.closest('[data-card]').dataset.card,c=states[i],a=el.dataset.action,v=el.dataset.value,old=c.view;if(a==='jump'&&c.view==='grid'&&settleOnPen(i,v))return;if(a!=='jump'&&atlasStill())c.landUntil=0;
+gallery.addEventListener('click',e=>{if(e.target.closest('.st-pen-whole-toggle,.st-pen-group'))return;const el=e.target.closest('[data-action]');if(!el||el.disabled)return;const i=+el.closest('[data-card]').dataset.card,c=states[i],a=el.dataset.action,v=el.dataset.value,old=c.view;if(a==='jump'&&c.view==='grid'&&settleOnPen(i,v))return;if(a!=='jump'&&atlasStill())c.landUntil=0;
  if(lookupMoveAction(c,a,v)){render(i);return;}
  if(a==='back')backTo(c);else if(a==='dismiss'){c.form={};c.view='list';}
  else if(a==='lens'){c.lens=v;c.reviewOnly=false;c.scroll=0;}
@@ -2482,19 +2864,30 @@ gallery.addEventListener('click',e=>{const el=e.target.closest('[data-action]');
  else if(a==='save-pen'&&valid(c)){const pe=pen(c,c.penId),f=c.form;if(c.view==='report'){pe.issue=f.choice;pe.issueTime='09:41';}pe.last=f.choice+(f.actual!==''&&f.actual!=null?' · '+f.actual+' kg delivered':'')+' · 09:41';addEvent(c,c.view==='report'?'Pen issue':'Feeding exception',[pe.id],pe.last+(f.note?' · '+f.note:''));c.view='feed';c.form={};notify(c,'Saved to pen '+pe.id);}
  else if(a==='jump'){if(!goToPen(c,v))return;}
  else if(a==='find-clear')c.query='';
- else if(a==='transfer')notify(c,'Transfer is not designed yet');   // the entry point only: the Transfer feature (move) is not designed yet
+
  else if(a==='scan-toggle'&&c.scan.connected)c.scan.listening=!c.scan.listening;
  else if(a==='search'){c.query='';c.view='search';}
  else if(['history','home','grid','scan'].includes(a)){c.view=a;}
  render(i,old===c.view?{a,v}:null);
 });
-gallery.addEventListener('change',e=>{const el=e.target,root=el.closest('[data-card]');if(!root)return;const i=+root.dataset.card,c=states[i];if(el.matches('.scenario')){clearTimeout(c.toastTimer);states[i]=makeExample(el.value);render(i);return;}if(el.dataset.pigSelect){c.actionScope='pigs';el.checked?c.selected.add(el.dataset.pigSelect):c.selected.delete(el.dataset.pigSelect);if(!c.selected.size)c.reviewOnly=false;endEmptyReview(c);render(i,{p:el.dataset.pigSelect});}else if(el.dataset.notagsSelect){const nt=(c.selectedNoTags||=new Set()),id=el.dataset.notagsSelect;c.noTagsCount||={};if(el.checked){nt.add(id);c.noTagsCount[id]=pen(c,id).untagged.count;}else{nt.delete(id);delete c.noTagsCount[id];}endEmptyReview(c);render(i);}else if(el.dataset.penSelect){el.checked?c.selectedPens.add(el.dataset.penSelect):c.selectedPens.delete(el.dataset.penSelect);{const pu=pen(c,el.dataset.penSelect),nt=(c.selectedNoTags||=new Set());if(pu?.untagged?.count){c.noTagsCount||={};if(el.checked){nt.add(pu.id);c.noTagsCount[pu.id]=pu.untagged.count;}else{nt.delete(pu.id);delete c.noTagsCount[pu.id];}}}c.actionScope='pigs';displayPigs(c,pen(c,el.dataset.penSelect)).forEach(p=>el.checked?c.selected.add(p.id):c.selected.delete(p.id));if(!c.selected.size)c.reviewOnly=false;endEmptyReview(c);render(i,{pe:el.dataset.penSelect});}else if(el.dataset.field&&el.type!=='textarea'&&el.type!=='number'){c.form[el.dataset.field]=el.value;render(i,{f:el.dataset.field,v:el.value});}});
-gallery.addEventListener('input',e=>{const el=e.target,i=+el.closest('[data-card]').dataset.card,c=states[i];if(el.matches('[data-move-pen-search]')){
-  c.lookupMove.query=el.value;const surface=el.closest('.sheet');
-  surface.querySelector('[data-move-pen-results]').innerHTML=movePenResults(c);
+gallery.addEventListener('change',e=>{const el=e.target,root=el.closest('[data-card]');if(!root)return;const i=+root.dataset.card,c=states[i];if(el.matches('.scenario')){clearTimeout(c.toastTimer);states[i]=makeExample(el.value);render(i);return;}if(el.dataset.action==='move-pig'&&c.view==='move-pigs'){
+ const ids=c.move.ids;
+ c.move.ids=el.checked?[...new Set([...ids,el.value])]:ids.filter(id=>id!==el.value);
+ const next=root.querySelector('[data-action="move-next"]');
+ setCommitWaiting(next,!c.move.ids.length&&!c.move.counts[c.move.sourcePen]);
+ return;
+ }if(el.dataset.pigSelect){c.actionScope='pigs';el.checked?c.selected.add(el.dataset.pigSelect):c.selected.delete(el.dataset.pigSelect);if(!c.selected.size)c.reviewOnly=false;endEmptyReview(c);render(i,{p:el.dataset.pigSelect});}else if(el.dataset.notagsSelect){const nt=(c.selectedNoTags||=new Set()),id=el.dataset.notagsSelect;c.noTagsCount||={};if(el.checked){nt.add(id);c.noTagsCount[id]=pen(c,id).untagged.count;}else{nt.delete(id);delete c.noTagsCount[id];}endEmptyReview(c);render(i);}else if(el.dataset.penSelect){el.checked?c.selectedPens.add(el.dataset.penSelect):c.selectedPens.delete(el.dataset.penSelect);{const pu=pen(c,el.dataset.penSelect),nt=(c.selectedNoTags||=new Set());if(pu?.untagged?.count){c.noTagsCount||={};if(el.checked){nt.add(pu.id);c.noTagsCount[pu.id]=pu.untagged.count;}else{nt.delete(pu.id);delete c.noTagsCount[pu.id];}}}c.actionScope='pigs';displayPigs(c,pen(c,el.dataset.penSelect)).forEach(p=>el.checked?c.selected.add(p.id):c.selected.delete(p.id));if(!c.selected.size)c.reviewOnly=false;endEmptyReview(c);render(i,{pe:el.dataset.penSelect});}else if(el.dataset.field&&el.type!=='textarea'&&el.type!=='number'){c.form[el.dataset.field]=el.value;render(i,{f:el.dataset.field,v:el.value});}});
+gallery.addEventListener('input',e=>{const el=e.target,i=+el.closest('[data-card]').dataset.card,c=states[i];const surface=el.closest('.sheet');
+ if(el.matches('[data-move-pen-search]')){
+  const m=c.lookupMove||c.move;if(!m)return;
+  m.query=el.value;
+  surface.querySelector('[data-move-pen-results]').innerHTML=c.lookupMove?movePenResults(c):inspectionMoveMap(c,m);
   surface.querySelector('.sheet-body').scrollTop=0;
-  surface.querySelector('[data-action="lookup-move-clear"]').hidden=!el.value;return;
- }if(el.matches('[data-find-input]')){c.query=el.value;const page=el.closest('.st-find');page.querySelector('.st-find-results').innerHTML=searchBody(c);page.querySelector('.st-find-clear').hidden=!c.query;localizeFeed(page.querySelector('.st-find-results'));SentriUI.rowFitTags(page.querySelector('.st-find-results'));if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(c));return;}if(el.dataset.field){c.form[el.dataset.field]=el.value;const save=el.closest('.sheet')?.querySelector('[data-action="save-record"],[data-action="save-weight"],[data-action="save-pen"]');if(save)setCommitWaiting(save,!valid(c));}});
+  return;
+ }
+ if(el.matches('[data-move-room-search]')){c.move.roomQuery=el.value;surface.querySelector('[data-move-room-results]').innerHTML=inspectionMoveRoomResults(c,c.move);return;}
+ if(el.matches('[data-move-pig-search]')){c.move.pigQuery=el.value;surface.querySelector('[data-move-pig-results]').innerHTML=movePigRows(c,c.move);return;}
+ if(el.matches('[data-find-input]')){c.query=el.value;const page=el.closest('.st-find');page.querySelector('.st-find-results').innerHTML=searchBody(c);page.querySelector('.st-find-clear').hidden=!c.query;localizeFeed(page.querySelector('.st-find-results'));SentriUI.rowFitTags(page.querySelector('.st-find-results'));if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(c));return;}if(el.dataset.field){c.form[el.dataset.field]=el.value;const save=el.closest('.sheet')?.querySelector('[data-action="save-record"],[data-action="save-weight"],[data-action="save-pen"]');if(save)setCommitWaiting(save,!valid(c));}});
 gallery.addEventListener('keydown',e=>{const root=e.target.closest('[data-card]');if(!root)return;const i=+root.dataset.card,c=states[i];/* A condition's name is one line: the keyboard's Done closes the keyboard, as on a Measure box, so Add is in reach. */if(e.key==='Enter'&&e.target.matches('[data-condition-add-name]')){e.preventDefault();e.target.blur();return;}if(e.key==='Escape'){if(c.logDatePicker){e.preventDefault();handleRecordAction(c,'log-date-cancel');render(i);return;}if(c.view!=='list'){backTo(c);render(i);}else if(c.selected.size||c.selectedPens.size){c.selected.clear();c.selectedPens?.clear();c.reviewOnly=false;render(i);}return;}const sheet=e.target.closest('.sheet');if(e.key==='Tab'&&sheet){const items=[...sheet.querySelectorAll('button:not(:disabled),input,textarea,select,summary')],first=items[0],last=items.at(-1);if(e.shiftKey&&e.target===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&e.target===last){e.preventDefault();first.focus();}}});
 document.addEventListener('pointerdown',()=>document.documentElement.dataset.inputMode='pointer',true);document.addEventListener('keydown',()=>delete document.documentElement.dataset.inputMode,true);
 document.getElementById('reset-all').onclick=()=>{states.forEach((c,i)=>{clearTimeout(c.toastTimer);states[i]=makeExample(examples[i].initial);gallery.querySelector(`[data-card="${i}"] .scenario`).value=examples[i].initial;render(i);});};

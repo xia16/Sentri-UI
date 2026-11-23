@@ -1,18 +1,22 @@
 {
   "id": "move",
   "name": "Move",
-  "zh": "转移",
+  "zh": "转舍",
   "platform": "mobile",
   "section": "measures",
   "newFeature": false,
   "duplicates": "",
   "groups": [
     [
-      "Transfer",
+      "Inspection Move",
       [
+        "move.which-pigs",
+        "move.counts",
         "move.tagged",
-        "move.picker",
         "move.mixed",
+        "move.rooms",
+        "move.whole-room",
+        "move.picker",
         "move.after"
       ]
     ],
@@ -25,157 +29,267 @@
   ],
   "screens": [
     {
-      "id": "move.tagged",
-      "name": "Transfer · tagged pigs",
-      "zh": "转移",
+      "id": "move.which-pigs",
+      "name": "Choose pigs in a pen",
+      "zh": "选择猪只",
       "status": "in-design",
-      "url": "/ux/archive/workflows.html?sec=wf-transfer&slide=1",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+        "[data-action=\"pen-move\"][data-value=\"D4\"]"
+      ],
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Two tagged pigs, one field.",
         "rules": [
-          "The sheet is the confirmation: production's dialog is cut.",
-          "Triage's hospital set is drained here; the mark's execution needs no screen of its own."
+          "Choose by ear tag or ear notch. A scan can tick a pig housed in this pen. Enter the head count for pigs without either identity.",
+          "When all but one pig are absent and there is no untagged group, start at the destination."
         ]
       }
     },
     {
-      "id": "move.picker",
-      "name": "Destination picker",
-      "zh": "选择位置",
+      "id": "move.counts",
+      "name": "Allocate selected head by batch",
+      "zh": "各批次转舍头数",
       "status": "in-design",
-      "url": "/ux/archive/workflows.html?sec=wf-transfer&slide=2",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus&moveFixture=batches",
+      "preset": "walk",
+      "steps": [
+        "[data-pig-select=\"000254\"]",
+        "[data-action=\"notags-count-open\"][data-value=\"D4\"]",
+        "[data-action=\"notags-pad\"][data-key=\"5\"]",
+        "[data-action=\"notags-count-done\"]",
+        "[data-action=\"actions\"]",
+        "[data-action=\"transfer\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "rules": [
+          "A partial selection of a multi-batch group must specify the head count by batch. The sum matches the count selected in Inspection."
+        ]
+      }
+    },
+    {
+      "id": "move.tagged",
+      "name": "Move · one identified pig",
+      "zh": "转舍 · 单猪",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pig\"][data-value=\"000267\"]",
+        "[data-action=\"pig-actions\"]",
+        "[data-action=\"transfer\"]"
+      ],
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Choose the destination pen.",
-        "elements": [
-          {
-            "name": "Pen list",
-            "shows": "Units and pens as labels, not navigation",
-            "logic": "The current unit is pinned first and the source cell dimmed (\"where they are now\"); cross-unit groups wear their full path; search results are flat with the path trailing.",
-            "states": [
-              {
-                "state": "Source pen",
-                "when": "Pen the pigs are in",
-                "shows": "Dimmed"
-              },
-              {
-                "state": "Empty pen",
-                "when": "No pigs",
-                "shows": "Dashed (for a hospital drain it is the answer)"
-              }
-            ],
-            "rule": "Tap commits: the sheet closes and the drawer's Picker is filled."
-          }
+        "rules": [
+          "An identified pig keeps her records. Destination uses the shared PenMap; source pens are disabled. Search can find a registered destination."
         ]
       }
     },
     {
       "id": "move.mixed",
-      "name": "Transfer · tagged and head",
-      "zh": "转移 · 含无ID",
+      "name": "Move · identified pigs and counted head",
+      "zh": "转舍 · 混选",
       "status": "in-design",
-      "url": "/ux/archive/workflows.html?sec=wf-transfer&slide=3",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+        "[data-action=\"pen-move\"][data-value=\"D4\"]",
+        "input[data-action=\"move-pig\"][value=\"000801\"]",
+        "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+        "[data-action=\"move-number\"][data-key=\"5\"]",
+        "[data-action=\"move-number-done\"]",
+        "[data-action=\"move-next\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "rules": [
+          "Review the sources by pen and batch. Moving any unidentified heads clears current diseases and symptoms for the whole unidentified group at each affected source pen.",
+          "Existing conditions of identified pigs and existing groups at the destination are kept."
+        ]
+      }
+    },
+    {
+      "id": "move.rooms",
+      "name": "Choose a room",
+      "zh": "选择房间",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+        "[data-action=\"pen-move\"][data-value=\"D4\"]",
+        "input[data-action=\"move-pig\"][value=\"000801\"]",
+        "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+        "[data-action=\"move-number\"][data-key=\"5\"]",
+        "[data-action=\"move-number-done\"]",
+        "[data-action=\"move-next\"]",
+        "[data-action=\"move-choose-room\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "rules": [
+          "Room list groups by section and pins the source room. It can be searched by room or section."
+        ]
+      }
+    },
+    {
+      "id": "move.whole-room",
+      "name": "Destination · Whole room",
+      "zh": "整栋选栏",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus&penmap=long",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+        "[data-action=\"pen-move\"][data-value=\"D4\"]",
+        "input[data-action=\"move-pig\"][value=\"000801\"]",
+        "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+        "[data-action=\"move-number\"][data-key=\"5\"]",
+        "[data-action=\"move-number-done\"]",
+        "[data-action=\"move-next\"]",
+        ".st-pen-whole-toggle"
+      ],
+      "figma": "",
+      "notes": {
+        "rules": [
+          "Select a range in Whole room to return to individual pens in that part of the room. This does not commit the move."
+        ]
+      }
+    },
+    {
+      "id": "move.picker",
+      "name": "Destination · pen picked",
+      "zh": "已选目标栏",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+        "[data-action=\"pen-move\"][data-value=\"D4\"]",
+        "input[data-action=\"move-pig\"][value=\"000801\"]",
+        "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+        "[data-action=\"move-number\"][data-key=\"5\"]",
+        "[data-action=\"move-number-done\"]",
+        "[data-action=\"move-next\"]",
+        "[data-action=\"move-pen\"][data-value=\"C4\"]"
+      ],
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Three tagged pigs and nine head: both conditionals under one commit.",
-        "elements": [
-          {
-            "name": "Group verdicts",
-            "shows": "Each open group record on the source pen",
-            "states": [
-              {
-                "state": "Stays",
-                "when": "Default",
-                "shows": "Record stays on the source pen"
-              },
-              {
-                "state": "Goes",
-                "when": "Chosen, or when the whole population leaves (n = N)",
-                "shows": "Record moves; the checklist folds to a footnote"
-              },
-              {
-                "state": "Both",
-                "when": "Chosen",
-                "shows": "Record on both pens"
-              }
-            ]
-          },
-          {
-            "name": "Which batches the head leave",
-            "shows": "Per-batch steppers",
-            "logic": "Appears for a multi-batch group only; the steppers must sum to n (4 + 5 = 9). Single-batch groups ride silently. No block prints for an all-tagged selection."
-          }
+        "rules": [
+          "A dark ring marks the chosen pen. The primary button names the unit and pen and commits the move."
         ]
       }
     },
     {
       "id": "move.after",
-      "name": "After · the cards are the receipt",
-      "zh": "转移 · 完成",
+      "name": "Move recorded · back on the pen",
+      "zh": "转舍完成 · 回到来源栏",
       "status": "in-design",
-      "url": "/ux/archive/workflows.html?sec=wf-transfer&slide=4",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+        "[data-action=\"pen-move\"][data-value=\"D4\"]",
+        "input[data-action=\"move-pig\"][value=\"000801\"]",
+        "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+        "[data-action=\"move-number\"][data-key=\"5\"]",
+        "[data-action=\"move-number-done\"]",
+        "[data-action=\"move-next\"]",
+        "[data-action=\"move-pen\"][data-value=\"C4\"]",
+        "[data-action=\"move-save\"]"
+      ],
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "The pen cards after the move.",
         "rules": [
-          "Counts re-derive from placements for tagged pigs and are set by count for head (one-number law).",
-          "A case arrived with the pig; head arrive under their own batches as a group row with a count trail."
+          "The count changes in both pens and each pen log gains a movement record. A concise toast names the destination."
         ]
       }
     },
     {
       "id": "move.transfer-sow",
-      "name": "Transfer sow · from a sow record",
-      "zh": "转移母猪",
+      "name": "Move sow · from a Farrowing record",
+      "zh": "母猪转舍",
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "count",
       "steps": [
-        "Actions",
+        "[data-action=\"sowActions\"]",
         "[data-action=\"sow-host-action\"][data-value=\"transfer\"]"
       ],
       "figma": "",
       "notes": {
-        "purpose": "Moving one sow from her Farrowing record: Actions, then Transfer sow.",
-        "elements": [
-          {
-            "name": "Transfer sow button",
-            "at": "Transfer sow",
-            "shows": "Destination unit and destination pen, with the origin shown above",
-            "rule": "Disabled until a unit and a pen are chosen and the destination differs from her current pen. The pen field stays disabled until a unit is chosen, and the current pen is left out of the list in her own unit. Saving moves her, writes \"Transferred · origin to destination\" to her log and returns to her record.",
-            "source": "inspection-astra-concept.js transferReady / transferPage"
-          }
-        ],
+        "purpose": "Open the shared destination picker for this sow from her own Farrowing Actions.",
         "rules": [
-          "Not offered for a sow that has died."
-        ],
-        "issues": [
-          "Two unit and pen select fields, not the destination picker of the Transfer deck (current unit pinned, search, scan); the two designs differ."
+          "The source crate is disabled. Choose a room or type a pen code. The commit names the unit and pen.",
+          "The sow returns to her record after the move, with her new location."
         ]
       }
     }
   ],
   "flow": [
     [
-      "move.tagged",
-      "move.picker",
-      "tap the destination"
+      "move.which-pigs",
+      "move.mixed",
+      "choose pigs and continue"
     ],
     [
-      "move.picker",
-      "move.tagged",
-      "tap a pen"
+      "move.counts",
+      "move.mixed",
+      "confirm the split"
     ],
     [
       "move.tagged",
-      "move.after",
-      "tap Transfer"
+      "move.rooms",
+      "choose a room"
     ],
     [
       "move.mixed",
+      "move.whole-room",
+      "tap Whole room in a long room"
+    ],
+    [
+      "move.mixed",
+      "move.picker",
+      "choose a pen"
+    ],
+    [
+      "move.picker",
       "move.after",
-      "tap Transfer"
+      "commit from a pen"
     ]
+  ],
+  "entryPoints": [
+    {
+      "section": "Inspection",
+      "label": "From a pen page",
+      "control": "Move",
+      "lands": "move.which-pigs",
+      "from": "inspection.pen"
+    },
+    {
+      "section": "Inspection",
+      "label": "From a selected list",
+      "control": "Move",
+      "lands": "move.mixed",
+      "from": "inspection.actions"
+    },
+    {
+      "section": "Pig profile",
+      "label": "From a pig’s Actions",
+      "control": "Move",
+      "lands": "move.tagged",
+      "from": "pig-profile.actions"
+    },
+    {
+      "section": "Farrowing",
+      "label": "From a sow’s Actions",
+      "control": "Move",
+      "lands": "move.transfer-sow",
+      "from": "farrowing.sow-actions"
+    }
   ]
 }

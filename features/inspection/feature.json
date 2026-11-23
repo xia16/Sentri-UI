@@ -741,6 +741,9 @@
         ],
         "issues": [
           "Count (Set count, pen-ops 2.3) is not a verb Inspection has yet, so it is not a tile."
+        ],
+        "rules": [
+          "Move starts with the pigs in this pen. The pen roster offers identity and counted groups; the destination uses the shared picker."
         ]
       }
     },
@@ -995,6 +998,9 @@
         ],
         "issues": [
           "Same four-column, six-row layout as Farrowing's; the positions are sample positions, not the unit's real layout."
+        ],
+        "rules": [
+          "Long rooms offer Whole room through the shared PenMap. Tap a range to jump to its pens."
         ]
       }
     },
@@ -1299,15 +1305,14 @@
         "issues": [],
         "purpose": "Show the moment after a scan: where the pig just read landed in the list.",
         "states": [
-          "The newest scan, 000306, holds the arrival tint (the still frame of a cue that fades after 1.6 s)"
+          "The newest scan, 000306, is checked and stays on the ordinary row background."
         ],
         "elements": [
           {
-            "name": "Arrival tint",
+            "name": "New scan",
             "at": "000306",
-            "shows": "Her row takes the pale progress wash, for a new pig and a repeat scan alike; not the well tint of a ticked row.",
-            "source": "SentriUI.scanArrive(), scanGlide() (components/Lookup); Row's Just scanned state (data-arrival)",
-            "logic": "Every scan lights its row for 1.6 s and brings it into view; a new row slides in and the rows under it glide down. Reduced motion keeps the tint and drops the slide."
+            "shows": "Green checkbox on the ordinary row background.",
+            "logic": "The reader brings the row into view. A new row slides into the list using the shared Lookup motion."
           }
         ],
         "copy": [
@@ -1344,7 +1349,7 @@
             "name": "Selection bar",
             "at": "Actions",
             "shows": "The plain count \"2 pigs selected\" and the primary Actions.",
-            "rule": "Actions is the walk's own Actions page for the ticked pigs, the one the walk's selection opens. Its everyday verbs include Transfer, the entry point to the Transfer feature (move), which is not designed yet (owner, 2026-10-20): the tile shows the notice \"Transfer is not designed yet\". Back from it returns here.",
+            "rule": "Actions is the walk’s own Actions surface for the selected pigs. Move opens the shared destination picker for those pigs.",
             "source": "SentriUI.scanPage (components/Lookup); inspection-astra-concept.js actionsPage()"
           }
         ],
@@ -2408,15 +2413,15 @@
       "notes": {
         "purpose": "Find a registered destination in the inspected unit.",
         "rules": [
-          "The full-screen list remains searchable when it contains many pens. Selecting a pen does not commit a move."
+          "The full-screen destination picker uses the shared PenMap and pen-code search. Selecting a pen opens the review."
         ],
         "issues": []
       }
     },
     {
       "id": "inspection.lookup-move-confirm",
-      "name": "Move and select · review",
-      "zh": "移入并选中 · 核对",
+      "name": "Review move",
+      "zh": "核对转舍",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "lookup-outside",
@@ -2455,9 +2460,9 @@
         "[data-action=\"lookup-move-confirm\"]"
       ],
       "notes": {
-        "purpose": "Show the prototype receipt and what happened to this selection.",
+        "purpose": "Show the confirmed ear tag and destination.",
         "rules": [
-          "Only a confirmed receipt updates the location and, in the select mode, the selection. Offline, failure, denial and uncertain are simulated alternatives."
+          "Confirmation updates the location and applies the chosen selection mode. An offline submission returns to its source and waits for background confirmation. Rejected and unknown outcomes show the reason."
         ],
         "issues": []
       }

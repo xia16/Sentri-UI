@@ -828,6 +828,12 @@ export interface PenMapProps {
   pens?: Record<string, PenLevel>;
   /** The pen the map opens centred on. */
   current?: string;
+  /** The chosen tile in a destination picker. */
+  selected?: string;
+  /** Pen code to accessible reason for a tile that cannot be chosen. */
+  disabled?: Record<string, string>;
+  /** A destination picker can put the view toggle beside Entrance. */
+  wholeControl?: 'footer' | 'map';
   /** The data-action of every tile that can be opened; its data-value is the pen code. */
   action?: string;
   /** Names this map for the peek registry; give each map on a page its own. */
@@ -902,7 +908,7 @@ export interface SentriUI {
   /** Scanning on a list: the host's search bar becomes this one status while the reader is on. 'waiting' until it connects. */
   scanBar(props?: { state?: 'scanning' | 'waiting'; title?: string; text?: string; device?: string; stop?: { action: string; label?: string } }): string;
   /** Lights the rows in scan.fresh until their time is up and brings scan.last into view. */
-  scanArrive(root: ParentNode, scan: ScanState): void;
+  scanArrive(root: ParentNode, scan: ScanState, options?: { highlight?: (tag: string) => boolean }): void;
   /** Measures the scan list before a render, for scanGlide after it. */
   scanPlaces(root: ParentNode): Map<string, number>;
   scanGlide(root: ParentNode, before: Map<string, number>): void;

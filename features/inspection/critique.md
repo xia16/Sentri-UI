@@ -334,3 +334,7 @@ Unchanged: each screen shows the same information in the same order as on main, 
 ## Applying the 2026-11-20 decisions
 
 The review proposal repeated a move button below every outside pig, making one result look like two rows. The destination sheet put the full catalogue and submit action in the same space. Keep the physical unit/pen grouping; use one tappable row, a short choice of intent and a full-page searchable catalogue. In the 48-pen example, C12 is reachable without scrolling; selecting it opens a separate review. The before/after captures and the exception paths are in [操作链路](decision-round/canvas.html).
+
+## Move and scan feedback · 2026-11-21
+
+The original scan arrival wash made a checked animal look like a second selection state. The checkbox now provides the selection mark, with the same row background. The transfer receipt names the result and location once. The shared PenMap keeps the search visible while the worker looks through long rooms, and the source details show batches before a mixed move is committed. The [walkthrough](decision-round/canvas.html) includes the source and target log captures.

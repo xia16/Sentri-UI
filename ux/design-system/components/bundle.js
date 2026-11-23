@@ -1362,12 +1362,14 @@
     const lo=Math.min(...s),r=Math.max(...s)/lo,p=r>PEN_CAP?Math.log(PEN_CAP)/Math.log(r):1;
     return v=>v>0?Math.round(PEN_TILE*Math.pow(v/lo,p)):PEN_TILE;
   }
-  function penMap({lanes=['A','B','C','D'],depth=6,rows=[],apart=[],aSide='left',entranceAt='middle',backDoor=null,pens={},current='',action='pen',key='pen-map',entrance='Entrance',labels={},peek=null,className=''}={}){
+  function penMap({lanes=['A','B','C','D'],depth=6,rows=[],apart=[],aSide='left',entranceAt='middle',backDoor=null,pens={},current='',selected='',disabled={},action='pen',key='pen-map',entrance='Entrance',labels={},peek=null,className='',wholeControl='footer'}={}){
     const L=penLabels(labels);
     if(typeof peek==='function')penPeeks.set(key,peek);else penPeeks.delete(key);
-    const level=c=>PEN_LEVELS.includes(pens[c])?pens[c]:'empty';
-    const tile=(c,at='')=>{const l=level(c),off=l==='empty'||l==='hidden';
-      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${at}${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc(L.pen(c)+', '+L[l])}">${esc(c)}</button>`;};
+    const available=c=>!Object.hasOwn(disabled,c);
+    const level=c=>available(c)&&PEN_LEVELS.includes(pens[c])?pens[c]:'empty';
+    const tile=(c,at='')=>{const l=level(c),off=l==='empty'||l==='hidden',word=available(c)?L[l]:disabled[c];
+      const picked=selected===c&&!off?' data-selected aria-pressed="true"':'';
+      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${at}${picked}${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc([L.pen(c),word].filter(Boolean).join(', '))}">${esc(c)}</button>`;};;
     const band=(cls,text,at,extra='')=>`<div class="${cls}"${at==='left'||at==='right'?` data-at="${at}"`:''}${extra}>${sGlyph('arrow-down')}<span>${esc(text)}</span></div>`;
     const letterOf=i=>String.fromCharCode(65+i),runsOf=l=>typeof l==='string'?[]:l.runs||[];
     const sizeOf=penSizes([...lanes.flatMap(l=>runsOf(l).map(r=>r.size)),...rows.flatMap(w=>(w.runs||[]).map(r=>r.size))]);
@@ -1379,7 +1381,7 @@
       const rows=Array.from({length:Math.max(1,depth|0)},(_,i)=>i+1);tall=rows.length>99;
       grid=`<div class="st-pen-grid" style="--pm-lanes:${lanes.length}"><span class="st-pen-col st-pen-row" aria-hidden="true"></span>${lanes.map(c=>`<span class="st-pen-col" aria-hidden="true">${esc(c)}</span>`).join('')}${rows.map(n=>`<span class="st-pen-row" data-row="${n}" aria-hidden="true">${n}</span>${lanes.map(c=>tile(c+n)).join('')}`).join('')}</div>`;
     }else({tall,html:grid}=penPlaced({ls,rs,apart,aSide,backDoor,tile,band}));
-    return `<div class="st-pen-map${className?' '+esc(className):''}" data-ds="PenMap" data-key="${esc(key)}"${current?` data-current="${esc(current)}"`:''}${tall?' data-wide':''}>${band('st-pen-entrance',entrance,entranceAt)}<div class="st-pen-field"><div class="st-pen-scroll" role="group" aria-label="${esc(L.map)}">${grid}</div><div class="st-pen-peek" hidden></div></div></div>`;
+    return `<div class="st-pen-map${className?' '+esc(className):''}" data-ds="PenMap" data-key="${esc(key)}"${current?` data-current="${esc(current)}"`:''}${tall?' data-wide':''}>${wholeControl==='map'?`<div class="st-pen-controls">${band('st-pen-entrance',entrance,entranceAt)}</div>`:band('st-pen-entrance',entrance,entranceAt)}<div class="st-pen-field"><div class="st-pen-scroll" role="group" aria-label="${esc(L.map)}">${grid}</div><div class="st-pen-peek" hidden></div></div></div>`;
   }
   const penH=h=>h!==PEN_TILE?`min-height:${h}px`:'';
   const penStyle=(...parts)=>{const s=parts.filter(Boolean).join(';');return s?` style="${s}"`:'';};
@@ -1484,6 +1486,7 @@
      it opens centred on its current pen; a map more than two screens tall adds Whole room to the sheet's footer; a hold
      shows the peek (350ms; a move of more than 12px, a scroll or a release hides it), and the tap after a peek only closes it. */
   const penHead=map=>map.querySelector('.st-pen-col'),penSheet=el=>el.closest('.sheet,.phone')||document.body;
+  const penControls=m=>m.querySelector('.st-pen-controls')||penSheet(m).querySelector('.sheet-footer');
   function penMount(scope){
     const maps=!scope||!scope.querySelectorAll?[]:scope.matches&&scope.matches('.st-pen-map')?[scope]:[...scope.querySelectorAll('.st-pen-map')];
     for(const m of maps){
@@ -1498,7 +1501,7 @@
         map.scrollTop+=snap(at.top-(head.bottom+PEN_GAP),at.height+PEN_GAP);
         if(map.scrollWidth>map.clientWidth+1)map.scrollLeft+=snap(at.left-(side+PEN_GAP),at.width+PEN_GAP);
       }
-      const room=penRooms.get(m.dataset.key),foot=penSheet(m).querySelector('.sheet-footer');
+      const room=penRooms.get(m.dataset.key),foot=penControls(m);
       if(room&&foot&&map.clientHeight>0&&map.scrollHeight>2*map.clientHeight&&!foot.querySelector('.st-pen-whole-toggle'))
         foot.insertAdjacentHTML('beforeend',button({label:room.L.whole,className:'st-pen-whole-toggle',attrs:{'aria-pressed':'false','data-key':m.dataset.key}}));
     }
@@ -1506,7 +1509,7 @@
   /* Whole room on, at the fewest pens to a tile that fit the map's height; off, back to the pens where they were */
   function penWholeSet(m,on,from){
     const map=m.querySelector('.st-pen-scroll'),pens=map.querySelector('.st-pen-grid:not(.st-pen-whole)'),room=penRooms.get(m.dataset.key);
-    const btn=penSheet(m).querySelector(`.st-pen-whole-toggle[data-key="${CSS.escape(m.dataset.key)}"]`);
+    const btn=penControls(m)?.querySelector(`.st-pen-whole-toggle[data-key="${CSS.escape(m.dataset.key)}"]`);
     let whole=map.querySelector('.st-pen-whole');
     if(on){
       m.dataset.pensTop=map.scrollTop;penStop();
@@ -1690,10 +1693,10 @@
   /* An animal just scanned keeps Row's Just scanned state for a moment (data-arrival="on", the progress wash), so the eye finds her row after
      looking up from the pig; "off" then fades it back and the attribute goes. The row just read is brought into view (smoothly); the rest of
      the list keeps its place. scan = { fresh:{ tag: until (ms, or Infinity for the held frame) }, last }. Rows carry data-scan-tag. */
-  function scanArrive(root,sc){
+  function scanArrive(root,sc,{highlight=()=>true}={}){
     if(!root||!sc)return;const now=Date.now();sc.fresh=sc.fresh||{};
     for(const [tag,until] of Object.entries(sc.fresh)){
-      if(until<=now){delete sc.fresh[tag];continue;}
+      if(until<=now||!highlight(tag)){delete sc.fresh[tag];continue;}
       const r=root.querySelector(`[data-scan-tag="${tag}"]`);if(!r)continue;
       r.dataset.arrival='on';
       if(until!==Infinity)setTimeout(()=>{r.dataset.arrival='off';setTimeout(()=>r.removeAttribute('data-arrival'),900);},until-now);

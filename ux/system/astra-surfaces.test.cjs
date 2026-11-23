@@ -40,7 +40,9 @@ test('Record health is a full page like Record treatment (owner, 2026-10-17)', (
 test('treatment and transfer use full pages with completion controls', () => {
   const c = context('pig'); c.selected.add(c.pigId); model.openBulkAction(c, 'treatment');
   checkPage(model.overlay(c)); assert.match(model.overlay(c), /data-action="bulk-save"/);
-  c.view = 'sow-transfer'; c.transferDraft = {}; checkPage(model.overlay(c));
+  c.view = 'actions'; c.transferOrigin={unit:'7',name:'Unit 7'};
+  c.transferDestinations=[{id:'7',name:'Unit 7',pens:['C1','C2','C3']}];
+  assert.equal(model.openInspectionMove(c,'',true),true);checkPage(model.overlay(c));
   assert.match(model.overlay(c), /data-action="save-transfer"/);
 });
 test('medicine picker preserves the treatment page and entered dose behind it', () => {
@@ -121,13 +123,13 @@ test('a sow\'s existing note keeps its row under the grid; only bare verbs becom
   assert.ok(html.indexOf('data-action-group="everyday"')<html.indexOf('data-action-group="content"'));
 });
 
-test('a group of pigs without ear tags alone is offered Condition only: no verb that cannot act on it', () => {
+test('a group without identity can record a condition or move', () => {
   const c=context('actions');c.selected.clear();
   const penWithGroup=c.pens.find(p=>p.untagged?.count);
   if(!penWithGroup)return; // seed without untagged groups
   c.selectedNoTags=new Set([penWithGroup.id]);c.noTagsCount={[penWithGroup.id]:penWithGroup.untagged.count};
   const actions=model.actionCatalogue(c).groups.flatMap(g=>g.items).map(x=>x.a);
-  assert.deepEqual(actions,['health']);
+  assert.deepEqual(actions,['health','transfer']);
 });
 
 test('pen Actions is a menu drawer too', () => {
@@ -135,11 +137,11 @@ test('pen Actions is a menu drawer too', () => {
   checkMenuDrawer(model.overlay(c));
 });
 
-test('the verb words come from the strings registry, and Transfer is not the registered verb Move', () => {
+test('the Move tile comes from the shared strings registry', () => {
   const c=context('actions');c.selected.add(c.pigId);
   c.hostActions=farrowing.sowActionCatalogue(farrowing.seed('count'));
   const labels=[...model.overlay(c).matchAll(/<span class="st-row-tile-label">([^<]+)<\/span>/g)].map(m=>m[1]);
-  assert.ok(labels.includes('Transfer'));assert.ok(!labels.includes('Move'));
+  assert.ok(labels.includes('Move'));
   const registry=require('../laws/strings.json').strings;
   for(const label of labels)assert.ok(Object.entries(registry).some(([id,s])=>id.startsWith('actions.tile.')&&s.en===label&&s.zh),label);
 });
@@ -306,7 +308,7 @@ test('the pen page leads with its verbs, then what needs someone, then how the p
   const html=model.overlay(c);
   const grid=html.match(/<div class="st-panel st-row-grid[^"]*"[^>]*aria-label="Pen actions"[^>]*>([\s\S]*?)<\/div><\/section>/);
   assert.ok(grid,'pen verbs as a tile grid');
-  assert.deepEqual([...grid[1].matchAll(/data-action="([^"]+)"/g)].map(m=>m[1]),['pen-note','feed','pen-observe','new-fault','tick-pen']);
+  assert.deepEqual([...grid[1].matchAll(/data-action="([^"]+)"/g)].map(m=>m[1]),['pen-note','feed','pen-observe','new-fault','pen-move','tick-pen']);
   assert.doesNotMatch(html,/data-action="(?:scan|scan-pen)"/,'the pen page does not open Scan');
   const order=['Pen actions','Needs attention','>Now<','Pen log'].map(k=>html.indexOf(k));
   assert.ok(order.every((x,i)=>x>0&&(i===0||x>order[i-1])),'verbs, needs attention, now, log: '+order);
