@@ -1457,11 +1457,10 @@ const moveRoom=(c,id)=>inspectionMoveRooms(c).find(room=>room.id===id);
 const identifiedLabel=p=>p?.earNotch?moveText('Notch '+p.earNotch,'耳缺 '+p.earNotch):p?.id||'';
 const transferable=p=>canMoveFromLookup(p)&&p.stage!=='Sow died';
 const moveBatches=pe=>pe?.untagged?.batches||[{id:'',count:pe?.untagged?.count||0}];
-const batchLabel=id=>id?moveText('Batch '+id,'批次 '+id):moveText('No batch','无批次');
 function moveSources(c,ids,counts){
  const sources=new Map(),get=(room,code)=>{
   const key=room+'|'+code;
-  if(!sources.has(key))sources.set(key,{room,code,ids:[],count:0,batches:[]});
+  if(!sources.has(key))sources.set(key,{room,code,ids:[],count:0});
   return sources.get(key);
  };
  for(const id of ids){
@@ -1470,21 +1469,20 @@ function moveSources(c,ids,counts){
  }
  for(const [code,count] of Object.entries(counts)){
   if(!count)continue;
-  const source=get('home',code),batches=moveBatches(pen(c,code));
+  const source=get('home',code);
   source.count=count;source.sourceTotal=pen(c,code).untagged.count;
-  source.batches=batches.filter(b=>b.count>0).map(b=>({...b,move:count===pen(c,code).untagged.count||batches.length===1?Math.min(b.count,count):0}));
  }
  return [...sources.values()];
 }
 const moveTotal=sources=>sources.reduce((n,s)=>n+s.count+s.ids.length,0);
-const countSettled=s=>s.batches.reduce((n,b)=>n+b.move,0)===s.count;
 function validateMove(c,sources,roomId,code){
  const room=moveRoom(c,roomId),target=room?.pens.find(p=>p.id===code);
  if(!target||MovePicker.unavailable(target)||!moveTotal(sources))return false;
  return sources.every(s=>{
   const from=moveRoom(c,s.room)?.actual.find(p=>p.id===s.code);
   return from&&!(s.room===roomId&&s.code===code)&&s.ids.every(id=>from.pigs.some(p=>p.id===id&&transferable(p)))&&
-   (!s.count||(countSettled(s)&&from.untagged?.count===s.sourceTotal&&s.sourceTotal>=s.count&&s.batches.every(b=>b.move<=(moveBatches(from).find(x=>x.id===b.id)?.count||0))));
+   (!s.count||(Number.isInteger(s.count)&&s.count>0&&from.untagged?.count===s.sourceTotal&&s.count<=s.sourceTotal&&
+    s.count<=moveBatches(from).reduce((total,batch)=>total+batch.count,0)));
  });
 }
 function recordMove(c,sources,roomId,code){
@@ -1501,11 +1499,17 @@ function recordMove(c,sources,roomId,code){
    target.pigs.push(p);
   }
   if(s.count){
-   const kept=moveBatches(from).map(b=>({...b,count:b.count-(s.batches.find(x=>x.id===b.id)?.move||0)})).filter(b=>b.count>0);
+   // Sample receipt deducts from batch balances in a fixed order. Only the count comes from the worker.
+   let remaining=s.count;
+   const kept=[];
    const destBatches=new Map(moveBatches(target).map(b=>[b.id,b.count]));
-   for(const b of s.batches.filter(b=>b.move)){
+   for(const b of moveBatches(from)){
+    const moved=Math.min(remaining,b.count);
+    remaining-=moved;
+    if(b.count>moved)kept.push({...b,count:b.count-moved});
+    if(!moved)continue;
     const id=(!b.id||b.id===fromRoom.defaultBatchId)&&room.defaultBatchId?room.defaultBatchId:b.id;
-    destBatches.set(id,(destBatches.get(id)||0)+b.move);
+    destBatches.set(id,(destBatches.get(id)||0)+moved);
    }
    // A completed move clears current diseases and symptoms for the source's whole unidentified group.
    from.untagged={...from.untagged,count:from.untagged.count-s.count,batches:kept,cases:[]};
@@ -1561,7 +1565,7 @@ function openInspectionMove(c,sourcePen='',host=false){
   if(!pe)return false;
   const pigs=pe.pigs.filter(transferable),n=pe.untagged?.count||0;
   if(!pigs.length&&!n)return false;
-  if(pigs.length!==1||n){c.move=m;c.view='move-pigs';return true;}
+  if(pigs.length!==1||n){m.choosePigs=true;c.move=m;c.view='move-pigs';return true;}
   m.ids=[pigs[0].id];
  }else{
   m.ids=[...c.selected];
@@ -1571,12 +1575,13 @@ function openInspectionMove(c,sourcePen='',host=false){
  m.sources=moveSources(c,m.ids,m.counts);
  if(!host&&m.sources.length===1)m.room=m.sources[0].room;
  c.move=m;
- c.view=host?'sow-transfer':m.sources.every(countSettled)?'move-to':'move-counts';
+ c.view=host?'sow-transfer':'move-to';
  return true;
 }
 function moveSourceRows(c,m){
  const labels=m.sources.map(s=>{
-  const details=[...s.ids.map(id=>identifiedLabel(pig(c,id))),...s.batches.filter(b=>b.move).map(b=>batchLabel(b.id)+' · '+moveCountLabel(b.move))];
+  const details=s.ids.map(id=>identifiedLabel(pig(c,id)));
+  if(s.count)details.push(moveText(moveCountLabel(s.count)+' without ID','无身份猪 '+s.count+' 头'));
   return SentriUI.row({variant:'plain',title:MovePicker.place(moveRoom(c,s.room),s.code),description:details.join(' · '),wrap:true});
  });
  return SentriUI.rowGroup(labels.join(''));
@@ -1599,19 +1604,13 @@ function inspectionMovePage(c){
   const pe=pen(c,m.sourcePen);
   const identified=pe.pigs.some(transferable)?SentriUI.heading({title:moveText('With ID','可识别猪只'),kind:'section',level:3})+
    '<div data-move-pig-results>'+movePigRows(c,m)+'</div>':'';
-  const counts=pe.untagged?.count?moveCountRows(c,m,pe):'';
+  const counts=pe.untagged?.count?moveCountControl(c,m):'';
   const above=!identified?'':m.scanning?SentriUI.scanBar({state:c.scan.connected?'scanning':'waiting',device:'Reader 1',
    text:c.scan.connected?moveText('Scan pig tags','扫描耳标'):'',stop:{action:'move-read-stop'}}):
    SentriUI.choiceSearch({label:moveText('Search pig ID','搜索耳标或耳缺'),placeholder:moveText('Ear tag or notch','耳标或耳缺'),value:m.pigQuery,
     attrs:{'data-move-pig-search':''},scan:{action:'move-read',label:moveText('Scan pig tags','扫描耳标')}});
   return MovePicker.page({title:moveText('Which pigs?','选择要转舍的猪'),line:{text:unitName(c)+' · '+pe.id},bar,above,
    body:'<div class="move-form">'+identified+counts+'</div>',primary:{label:moveText('Choose pen','选择目标栏'),action:'move-next',waiting:!m.ids.length&&!m.counts[pe.id]}});
- }
- if(c.view==='move-counts'){
-  const rows=m.sources.filter(s=>s.count).map(s=>SentriUI.heading({title:s.code+' · '+moveCountLabel(s.count),kind:'section',level:3})+
-   s.batches.map((b,i)=>moveBatchControl(s.code+'|'+i,b,b.move)).join(''));
-  return MovePicker.page({title:moveText('Pigs per batch','各批次转几头'),bar,body:'<div class="move-form">'+rows.join('')+'</div>',
-   primary:{label:moveText('Choose pen','选择目标栏'),action:'move-next',waiting:!m.sources.every(countSettled)}});
  }
  if(c.view==='move-rooms'){
   return MovePicker.page({title:moveText('Choose room','选择房间'),bar,above:MovePicker.search('room',m.roomQuery),
@@ -1627,7 +1626,7 @@ function inspectionMovePage(c){
   consequence:moveText('Covers all pigs without ID in '+clear.join(', ')+'.','涉及 '+clear.join('、')+' 栏的全部无身份猪。')}):'';
  const changingCount=room.defaultBatchId?m.sources.reduce((n,s)=>{
   const from=moveRoom(c,s.room),changes=id=>id!==room.defaultBatchId&&(!id||id===from.defaultBatchId);
-  return n+s.ids.filter(id=>changes(pig(c,id)?.batchId)).length+s.batches.filter(b=>changes(b.id)).reduce((total,b)=>total+b.move,0);
+  return n+s.ids.filter(id=>changes(pig(c,id)?.batchId)).length;
  },0):0;
  const batch=changingCount?SentriUI.statusLine([moveText(moveCountLabel(changingCount)+' join the destination’s default batch',moveCountLabel(changingCount)+'会加入目标生产线的默认批次')]):'';
  const sources=SentriUI.heading({title:moveText('Moving '+moveCountLabel(moveTotal(m.sources)),'转舍对象 · '+moveCountLabel(moveTotal(m.sources))),kind:'section',level:3})+
@@ -1644,14 +1643,12 @@ function movePigRows(c,m){
   action:'move-pig',value:p.id,checked:m.ids.includes(p.id),inputAttrs:{'aria-label':moveText('Select ','选择 ')+identifiedLabel(p)}})).join('')):
   SentriUI.choiceEmpty(moveText('No matching pigs','没有匹配的猪只'),{icon:'search'});
 }
-function moveBatchControl(key,b,value){
- return SentriUI.stepper({label:batchLabel(b.id),description:moveText(b.count+' available','可移 '+b.count+' 头'),key,value,max:b.count,action:'move-count-step',reserveHint:false})
-  +SentriUI.button({register:'text',label:moveText('Enter count','输入头数'),action:'move-count-open',value:key});
-}
-function moveCountRows(c,m,pe){
- const batches=moveBatches(pe);
- return SentriUI.heading({title:moveText('Without ID','无身份猪只'),kind:'section',level:3})+
-  batches.map((b,i)=>moveBatchControl(pe.id+'|'+i,b,m.penCounts?.[i]||0)).join('');
+const moveCountMax=(c,m)=>pen(c,m.sourcePen)?.untagged?.count||0;
+function moveCountControl(c,m){
+ const max=moveCountMax(c,m);
+ return SentriUI.stepper({label:moveText('Pigs without ID','无身份猪只'),description:moveText(max+' available','可移 '+max+' 头'),
+  key:m.sourcePen,value:m.counts[m.sourcePen]||0,max,action:'move-count-step',reserveHint:false})
+  +SentriUI.button({register:'text',label:moveText('Enter count','输入头数'),action:'move-count-open',value:m.sourcePen});
 }
 function inspectionMoveRoomResults(c,m){
  return MovePicker.roomResults(moveDestinationRooms(c,m),m.host?String(c.transferOrigin?.unit||''):'home',m.room,'move-room',m.roomQuery);
@@ -1667,28 +1664,13 @@ function leaveInspectionMove(c,m,committed){
  }
  delete c.move;
 }
-function moveBatchDraft(c,m,key,view=c.view){
- const [code,index]=key.split('|'),i=Number(index);
- if(view==='move-counts'){
-  const source=m.sources.find(s=>s.code===code),batch=source?.batches[i];
-  if(!batch)return null;
-  return {count:batch.move,max:Math.min(batch.count,source.count-source.batches.reduce((n,b)=>n+b.move,0)+batch.move),apply:n=>batch.move=n};
- }
- const batch=moveBatches(pen(c,m.sourcePen))[i];
- if(!batch)return null;
- m.penCounts||={};
- return {count:m.penCounts[i]||0,max:batch.count,apply:n=>{
-  m.penCounts[i]=n;
-  m.counts[code]=Object.values(m.penCounts).reduce((a,b)=>a+b,0);
- }};
-}
 function moveCountPage(c,m){
- const d=m.number,batch=moveBatchDraft(c,m,d.key,d.back);
+ const d=m.number,max=moveCountMax(c,m);
  const bar=status(),n=Number(d.value);
- const pad=SentriUI.numpad({compact:true,label:moveText('How many?','转几头？'),value:d.value,unit:moveText('of '+batch.max,'最多 '+batch.max+' 头'),
-  suggested:d.suggested,maxLength:4,action:'move-number',actions:[{label:moveText('All '+batch.max,'全部 '+batch.max+' 头'),action:'move-number-all'}]});
+ const pad=SentriUI.numpad({compact:true,label:moveText('How many?','转几头？'),value:d.value,unit:moveText('of '+max,'最多 '+max+' 头'),
+  suggested:d.suggested,maxLength:4,action:'move-number',actions:[{label:moveText('All '+max,'全部 '+max+' 头'),action:'move-number-all'}]});
  return MovePicker.page({title:moveText('Pigs without ID','无身份猪只'),bar,body:pad,
-  primary:{label:moveText('Done','完成'),action:'move-number-done',waiting:d.value===''||n>batch.max}});
+  primary:{label:moveText('Done','完成'),action:'move-number-done',waiting:d.value===''||n>max}});
 }
 function handleInspectionMove(c,el,a,v){
  if(a==='pen-move'&&c.view==='pen-detail')return openInspectionMove(c,v);
@@ -1697,52 +1679,42 @@ function handleInspectionMove(c,el,a,v){
  if(!m)return false;
  const pickerView=m.host?'sow-transfer':'move-to';
  if(a==='back'||a==='dismiss'){
-  if(c.view==='move-number'){c.view=m.number.back;delete m.number;}
+  if(c.view==='move-number'){c.view='move-pigs';delete m.number;}
   else if(m.mapOpen)m.mapOpen=false;
   else if(c.view==='move-rooms')c.view=pickerView;
   else if(c.view==='move-review')c.view=pickerView;
   else if(c.view===pickerView&&m.returnTarget){
    Object.assign(m,m.returnTarget);delete m.returnTarget;c.view='move-review';
   }
-  else if(c.view==='move-counts'&&m.sourcePen)c.view='move-pigs';
-  else if(c.view==='move-to'&&m.backToCounts)c.view='move-counts';
-  else if(c.view==='move-to'&&m.sourcePen&&m.penCounts)c.view='move-pigs';
+  else if(c.view==='move-to'&&m.choosePigs)c.view='move-pigs';
   else leaveInspectionMove(c,m,false);
   return true;
  }
  if(a==='move-read'&&c.view==='move-pigs'){m.scanning=true;m.pigQuery='';return true;}
  if(a==='move-read-stop'&&c.view==='move-pigs'){m.scanning=false;return true;}
- if(a==='move-count-open'){
-  const batch=moveBatchDraft(c,m,v);
-  if(batch){m.number={key:v,value:String(batch.count),suggested:true,back:c.view};c.view='move-number';}
+ if(a==='move-count-open'&&c.view==='move-pigs'){
+  m.number={value:String(m.counts[m.sourcePen]||0),suggested:true};c.view='move-number';
   return true;
  }
- if(a==='move-count-step'){
-  const batch=moveBatchDraft(c,m,v);
-  if(batch)batch.apply(Math.min(batch.max,Math.max(0,batch.count+Number(el.dataset.step))));
+ if(a==='move-count-step'&&c.view==='move-pigs'){
+  const count=(m.counts[m.sourcePen]||0)+Number(el.dataset.step);
+  m.counts[m.sourcePen]=Math.min(moveCountMax(c,m),Math.max(0,count));
   return true;
  }
  if(c.view==='move-number'&&a.startsWith('move-number')){
   const d=m.number;
   if(a==='move-number'){Object.assign(d,SentriUI.numpadInput(d,el.dataset.key,{maxLength:4}));return true;}
-  c.view=d.back;
-  const batch=moveBatchDraft(c,m,d.key);
-  if(a==='move-number-all'){d.value=String(batch.max);d.suggested=true;c.view='move-number';return true;}
-  if(d.value!==''&&Number(d.value)<=batch.max)batch.apply(Number(d.value));
+  const max=moveCountMax(c,m);
+  if(a==='move-number-all'){d.value=String(max);d.suggested=true;return true;}
+  const count=Number(d.value);
+  if(d.value===''||count>max)return true;
+  m.counts[m.sourcePen]=count;
+  c.view='move-pigs';
   delete m.number;
   return true;
  }
- if(a==='move-next'){
-  if(c.view==='move-counts'){
-   if(m.sources.every(countSettled)){c.view='move-to';m.backToCounts=true;}
-  }else if(m.ids.length||m.counts[m.sourcePen]){
-   m.sources=moveSources(c,m.ids,m.counts);
-   if(m.counts[m.sourcePen]){
-    const source=m.sources.find(s=>s.code===m.sourcePen);
-    source.batches.forEach((b,i)=>b.move=m.penCounts[i]||0);
-   }
-   m.penCounts||={};c.view='move-to';
-  }
+ if(a==='move-next'&&c.view==='move-pigs'){
+  if(m.ids.length||m.counts[m.sourcePen]){m.sources=moveSources(c,m.ids,m.counts);c.view='move-to';}
   return true;
  }
  if(a==='move-open-map'&&c.view===pickerView){m.mapOpen=true;return true;}
@@ -2449,7 +2421,7 @@ function lookupSeed(c,type){
   {id:'hospital',name:moveText('Hospital','病猪舍'),section:moveText('Hospital','病猪舍'),layout:{lanes:['H'],depth:4},pens:[]}];
  if(params.get('moveFixture')==='batches'){
   const pe=pen(c,'D4');
-  pe.untagged.batches=[{id:'18',count:8},{id:'19',count:6}];
+  pe.untagged.batches=[{id:'18',count:3},{id:'19',count:11}];
   pe.untagged.cases.push({name:'Diarrhoea',kind:'Disease',day:1,triage:'Monitor',count:2});
   pe.pigs.push({id:'sample-notch',earNotch:'2-5',stage:'Grower',base:0,factor:1,cases:[]});
   c.pens.push({...emptyMovePen('C5'),full:true},{...emptyMovePen('C6'),available:false});
@@ -2474,7 +2446,7 @@ function atlasScreen(c){
  if(c.view==='sow-transfer')return 'move.transfer-sow';
  if(c.view==='move-review')return 'move.picker';
  if(c.view==='move-pigs')return 'move.which-pigs';
- if(c.view==='move-counts')return 'move.counts';
+ if(c.view==='move-number')return 'move.counts';
  if(c.view==='move-rooms')return 'move.rooms';
  if(c.view==='move-to')return c.move.sources.some(source=>source.count)?'move.mixed':'move.tagged';
  if(c.view==='farrowing-record')return 'inspection.farrowing-record';

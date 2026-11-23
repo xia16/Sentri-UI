@@ -30,7 +30,7 @@
 <main>
   <header>
     <h1>巡检转舍 · 选栏方案</h1>
-    <p>同一例用两种方式选 Unit 7 的 C12。样例共转 6 头猪，C1 一头有耳号，D4 五头按所属批次分配。两套方案都用组件库的 PenMap Sheet，长房间在底部点「整栋」。</p>
+    <p>同一例用两种方式选 Unit 7 的 C12。样例共转 6 头猪，C1 一头有耳号，D4 转 5 头无身份猪。D4 只填本次要转的总头数。两套方案都用组件库的 PenMap Sheet，长房间在底部点「整栋」。</p>
     <nav aria-label="查看方案">
       <a href="#a">A · 核对页打开栏位图</a>
       <a href="#b">B · 先按栏号找，再核对</a>
@@ -68,7 +68,7 @@
     <p class="route">扫描或查找 → 点 000430 → 只移入／移入并选中 → 选本单元目标栏 → 核对</p>
     <p>核对里直接点目标栏这一整行修改。目的地限定在当前 Unit 7。接口返回错误时，在核对页短暂显示服务端消息，耳号、目标栏和已有勾选都保留，可改栏再提交。图中的「目标栏已满」是提示样例。</p>
     <div class="screens">
-      <figure><img src="../decision-round/screenshots/06-confirm-select.jpg" alt="当前原型中单独的 Change destination 按钮" width="390" height="844"><figcaption class="old"><strong>当前 · 单独的 Change destination</strong>目标值和修改入口分在两处。</figcaption></figure>
+      <figure><img src="screenshots/outside-before.jpg" alt="旧原型中单独的 Change destination 按钮" width="390" height="844"><figcaption class="old"><strong>旧版 · 单独的 Change destination</strong>目标值和修改入口分在两处。</figcaption></figure>
       <figure><img src="screenshots/outside-review.jpg" alt="目标栏参与核对，右侧箭头可重新选栏" width="390" height="844"><figcaption><strong>新 · 点 Unit 7 · C12 改栏</strong>来源栏 A2 只供核对，目标栏的箭头代表可以修改。</figcaption></figure>
       <figure><img src="screenshots/outside-error.jpg" alt="核对页以底部提示显示接口报错" width="390" height="844"><figcaption><strong>新 · 接口错误用底部提示</strong>沿用扫描「No pig with this tag」的 Toast。删除 Move unavailable、Move failed、Move not confirmed 三个专用状态。</figcaption></figure>
     </div>

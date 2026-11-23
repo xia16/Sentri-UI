@@ -67,7 +67,7 @@ function review() {
   }
   const pigs = section('转舍对象 · 6 头', group(
     ui.row({ title: 'Unit 7 · C1', description: '耳号 000254', variant: 'plain' }),
-    ui.row({ title: 'Unit 7 · D4', description: '批次 18 转 3 头，批次 19 转 2 头', variant: 'plain' })
+    ui.row({ title: 'Unit 7 · D4', description: '无身份猪 5 头', variant: 'plain' })
   ));
   const pick = listFirst ? group(targetRow()) : group(roomRow(), nav({
     title: destination || '选择目标栏',

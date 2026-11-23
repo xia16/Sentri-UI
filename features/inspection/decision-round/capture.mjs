@@ -101,7 +101,6 @@ try{
  });
  await check('From a pen, choose identities or scan and count; a tagged-only move keeps the pen’s group conditions',async()=>{
   await walk('penmap=long');await tap('pen-detail','D4');await tap('pen-move','D4');await view('move-pigs');
-  await shot('61-move-pick');
   await tap('move-read');await read();
   assert.equal(await live('input[data-action="move-pig"][value="000801"]').isChecked(),true);
   await tap('move-read-stop');await tap('move-next');await view('move-to');
@@ -111,21 +110,29 @@ try{
   await tap('move-pen','C4');await tap('move-save');await view('pen-detail');await tap('back');
   assert.match(await live('[data-pen="D4"]').first().innerText(),/Coughing|咳嗽/);
  });
- await check('Move from a walk selection splits batches, clears all source group conditions and records both pen logs',async()=>{
+ await check('From a pen, enter one total for all pigs without ID in the source pen',async()=>{
+  await walk('moveFixture=batches');await tap('pen-detail','D4');await tap('pen-move','D4');
+  assert.equal(await live(action('move-count-open')).count(),1);
+  const count=live('.move-form [role="spinbutton"]');
+  assert.equal(await count.getAttribute('aria-valuemax'),'14');await shot('61-move-pick');
+  await tap('move-count-open','D4');await tap('move-number-all');
+  await live('[data-action="move-number"][data-key="5"]').click();await shot('62-move-count');
+  await tap('move-number-done');assert.equal(await count.getAttribute('aria-valuenow'),'5');
+  await tap('move-next');await view('move-to');await tap('back');
+  assert.equal(await count.getAttribute('aria-valuenow'),'5');
+ });
+ await check('A walk selection goes straight to the destination and moves the correct quantities across any source batches',async()=>{
   await walk('penmap=long&moveFixture=batches');
   await live('[data-pig-select="000254"]').check();
   await tap('notags-count-open','D4');await live('[data-action="notags-pad"][data-key="5"]').click();
-  await tap('notags-count-done');await tap('actions');await tap('transfer');await view('move-counts');
-  await shot('62-move-batches');
-  for(const [batch,count] of [['D4|0','3'],['D4|1','2']]){
-   await tap('move-count-open',batch);await live('[data-action="move-number"][data-key="'+count+'"]').click();
-   await tap('move-number-done');
-  }
-  await tap('move-next');await view('move-to');await tap('move-open-map');
+  await tap('notags-count-done');await tap('actions');await tap('transfer');await view('move-to');
+  await tap('move-open-map');
   for(const pen of ['C1','D4','C5','C6'])assert.equal(await live('.st-pen-tile[data-pen="'+pen+'"]').isDisabled(),true);
   await live('.st-pen-whole-toggle').click();await shot('64-move-whole-room');
   await live('.st-pen-group[data-from="C21"]').click();await tap('move-pen','C30');
-  assert.match(await live('.move-review').innerText(),/000254/);
+  const review=await live('.move-review').innerText();
+  assert.match(review,/000254/);assert.match(review,/5 pigs without ID|无身份猪 5 头/);
+  assert.doesNotMatch(review,/Batch 1[89]|批次 1[89]/);
   assert.match(await live(action('move-change')).innerText(),/C30/);await shot('63-move-review');
   await tap('move-change');await tap('move-choose-room');await tap('move-room','8');
   await tap('back');assert.match(await live(action('move-change')).innerText(),/(?:Unit 7|7\s*单元) · C30/);
@@ -135,6 +142,9 @@ try{
   const list=await live('.inspect-list').innerText();
   assert.doesNotMatch(list,/Coughing|咳嗽/);
   assert.match(list,/Appetite|食欲/);
+  for(const [code,count] of [['D4','9'],['C4','7']]) {
+   assert.equal(await live(`[data-notags-field="${code}"]`).inputValue(),count);
+  }
   await tap('pen-detail','D4');await tap('pen-log','D4');
   assert.match(await live('.sheet').last().innerText(),/Moved out|移出/);await shot('67-move-out-log');
   await tap('back');await tap('back');await tap('pen-detail','C4');await tap('pen-log','C4');

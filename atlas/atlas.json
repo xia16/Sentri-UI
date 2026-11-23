@@ -25947,23 +25947,20 @@
         },
         {
          "id": "move.counts",
-         "name": "Allocate selected head by batch",
-         "zh": "各批次转舍头数",
+         "name": "Enter total head count",
+         "zh": "录入转舍总头数",
          "status": "in-design",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus&moveFixture=batches",
          "preset": "walk",
          "steps": [
-          "[data-pig-select=\"000254\"]",
-          "[data-action=\"notags-count-open\"][data-value=\"D4\"]",
-          "[data-action=\"notags-pad\"][data-key=\"5\"]",
-          "[data-action=\"notags-count-done\"]",
-          "[data-action=\"actions\"]",
-          "[data-action=\"transfer\"]"
+          "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+          "[data-action=\"pen-move\"][data-value=\"D4\"]",
+          "[data-action=\"move-count-open\"][data-value=\"D4\"]"
          ],
          "figma": "",
          "notes": {
           "rules": [
-           "A partial selection of a multi-batch group must specify the head count by batch. The sum matches the count selected in Inspection."
+           "Enter one total head count for the source pen. The maximum is the number of pigs without ID in the pen, across all batches."
           ]
          }
         },
@@ -25997,7 +25994,7 @@
           "[data-action=\"pen-detail\"][data-value=\"D4\"]",
           "[data-action=\"pen-move\"][data-value=\"D4\"]",
           "input[data-action=\"move-pig\"][value=\"000801\"]",
-          "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+          "[data-action=\"move-count-open\"][data-value=\"D4\"]",
           "[data-action=\"move-number\"][data-key=\"5\"]",
           "[data-action=\"move-number-done\"]",
           "[data-action=\"move-next\"]"
@@ -26020,7 +26017,7 @@
           "[data-action=\"pen-detail\"][data-value=\"D4\"]",
           "[data-action=\"pen-move\"][data-value=\"D4\"]",
           "input[data-action=\"move-pig\"][value=\"000801\"]",
-          "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+          "[data-action=\"move-count-open\"][data-value=\"D4\"]",
           "[data-action=\"move-number\"][data-key=\"5\"]",
           "[data-action=\"move-number-done\"]",
           "[data-action=\"move-next\"]",
@@ -26044,7 +26041,7 @@
           "[data-action=\"pen-detail\"][data-value=\"D4\"]",
           "[data-action=\"pen-move\"][data-value=\"D4\"]",
           "input[data-action=\"move-pig\"][value=\"000801\"]",
-          "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+          "[data-action=\"move-count-open\"][data-value=\"D4\"]",
           "[data-action=\"move-number\"][data-key=\"5\"]",
           "[data-action=\"move-number-done\"]",
           "[data-action=\"move-next\"]",
@@ -26069,7 +26066,7 @@
           "[data-action=\"pen-detail\"][data-value=\"D4\"]",
           "[data-action=\"pen-move\"][data-value=\"D4\"]",
           "input[data-action=\"move-pig\"][value=\"000801\"]",
-          "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+          "[data-action=\"move-count-open\"][data-value=\"D4\"]",
           "[data-action=\"move-number\"][data-key=\"5\"]",
           "[data-action=\"move-number-done\"]",
           "[data-action=\"move-next\"]",
@@ -26094,7 +26091,7 @@
           "[data-action=\"pen-detail\"][data-value=\"D4\"]",
           "[data-action=\"pen-move\"][data-value=\"D4\"]",
           "input[data-action=\"move-pig\"][value=\"000801\"]",
-          "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+          "[data-action=\"move-count-open\"][data-value=\"D4\"]",
           "[data-action=\"move-number\"][data-key=\"5\"]",
           "[data-action=\"move-number-done\"]",
           "[data-action=\"move-next\"]",
@@ -26136,9 +26133,14 @@
          "choose pigs and continue"
         ],
         [
+         "move.which-pigs",
          "move.counts",
-         "move.mixed",
-         "confirm the split"
+         "enter total head count"
+        ],
+        [
+         "move.counts",
+         "move.which-pigs",
+         "apply the count"
         ],
         [
          "move.tagged",
@@ -26191,7 +26193,7 @@
          "from": "farrowing.sow-actions"
         }
        ],
-       "prd": "# Move 转舍\n\n## Scope\n\nA worker moves pigs to another pen during a walk. The phone calls this **Move**. Planned Transfer tasks are issued from the console.\n\n| Entrance | Where it opens |\n| --- | --- |\n| Inspection → pen → Move | Choose pigs in that pen. A pen holding one movable identified pig opens the destination directly. |\n| Inspection or Scan → selected pigs → Actions → Move | The selection supplies the pigs and counts. A partial multi-batch group asks for the split by batch before the destination. |\n| Pig record → Actions → Move | This pig opens directly on the destination. |\n| Farrowing record → Actions → Move | This sow opens the same destination picker using Farrowing's rooms. |\n| Finished or ended Farrowing record → Piglets → Actions → Move | The chosen piglets open the same destination picker. The movement goes in their litter and pen logs. |\n| Inspection Scan or Find → pig from another unit | Choose Move only or Move and select. Choose a pen in the inspected unit using the same PenMap and search, then review both locations. |\n\n## Meaning of a selection\n\n- Ear tag and ear notch identify individual pigs. The pen roster supports search and the reader. Without either identity, select a count from the source pen and its batch. Multi-batch allocations match the requested count.\n- Choose a room and find a registered pen by code. Rooms with a multi-pen layout offer the standard PenMap Sheet with Back and, in long rooms, Whole room. The list and map both turn off source pens and known unavailable destinations. Selecting a pen opens Review move.\n- Review identifies the source pens and their pigs or counts, and names the destination room and pen. Tap the destination row to change it. Back from that change restores the previous destination.\n- Tagged or ear-notched animals keep their individual records. Once any unidentified pigs leave a pen, clear that source pen's **current diseases and symptoms for all its unidentified pigs**, even when some remain. The picker lists affected source pens. The destination's existing animals retain their records and the movement history stays available.\n- Formal batch memberships follow the pigs. The sample nursery has a default batch for eligible pigs arriving from no batch or another default batch. The review shows a reassignment when the prototype has that destination fact.\n\n## Record and return\n\n- Confirm move submits the review. A confirmed move adjusts the source and destination and records both sides. The pen entrance returns to its source. The pig record and selection entrances return to the originating record or list. A finished litter returns to Piglets with the move listed in Sent and moved.\n- Inspection's prototype models a success, an API error message or a quiet queue on connection loss. An API error uses the same notice toast as Scan and leaves the review available for editing. Placement, group conditions and selection update on confirmation.\n- Android and the live operation require a service contract for placement, eligibility, capacity, conflicts and a retrievable receipt. A live cross-pen transaction is outside this prototype round.\n\n[巡检转舍图文](../../ux/review/farrowing-inspection/move.html)\n",
+       "prd": "# Move 转舍\n\n## Scope\n\nA worker moves pigs to another pen during a walk. The phone calls this **Move**. Planned Transfer tasks are issued from the console.\n\n| Entrance | Where it opens |\n| --- | --- |\n| Inspection → pen → Move | Choose pigs in that pen. A pen holding one movable identified pig opens the destination directly. |\n| Inspection or Scan → selected pigs → Actions → Move | The selection supplies identified pigs and the total number of unidentified pigs per source pen. Move opens the destination picker. |\n| Pig record → Actions → Move | This pig opens directly on the destination. |\n| Farrowing record → Actions → Move | This sow opens the same destination picker using Farrowing's rooms. |\n| Finished or ended Farrowing record → Piglets → Actions → Move | The chosen piglets open the same destination picker. The movement goes in their litter and pen logs. |\n| Inspection Scan or Find → pig from another unit | Choose Move only or Move and select. Choose a pen in the inspected unit using the same PenMap and search, then review both locations. |\n\n## Meaning of a selection\n\n- Ear tag and ear notch identify individual pigs. The pen roster supports search and the reader. For pigs without either identity, enter one total head count per source pen, up to the number available in that pen. The review shows that count next to the source pen.\n- The client sends the source pen and total head count for its unidentified pigs. The server may randomly draw from the source pen's batch balances when deducting that count. The total deducted equals the submitted count.\n- Choose a room and find a registered pen by code. Rooms with a multi-pen layout offer the standard PenMap Sheet with Back and, in long rooms, Whole room. The list and map both turn off source pens and known unavailable destinations. Selecting a pen opens Review move.\n- Review identifies the source pens and their pigs or counts, and names the destination room and pen. Tap the destination row to change it. Back from that change restores the previous destination.\n- Tagged or ear-notched animals keep their individual records. Once any unidentified pigs leave a pen, clear that source pen's **current diseases and symptoms for all its unidentified pigs**, even when some remain. The picker lists affected source pens. The destination's existing animals retain their records and the movement history stays available.\n- Formal batch membership for unidentified pigs is handled internally. For individually identified pigs, any applicable default batch assignment is shown in the review.\n\n## Record and return\n\n- Confirm move submits the review. A confirmed move adjusts the source and destination and records both sides. The pen entrance returns to its source. The pig record and selection entrances return to the originating record or list. A finished litter returns to Piglets with the move listed in Sent and moved.\n- Inspection's prototype models a success, an API error message or a quiet queue on connection loss. An API error uses the same notice toast as Scan and leaves the review available for editing. Placement, group conditions and selection update on confirmation.\n- Android and the live operation require a service contract for placement, eligibility, capacity, conflicts and a retrievable receipt. A live cross-pen transaction is outside this prototype round.\n\n[巡检转舍图文](../../ux/review/farrowing-inspection/move.html)\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,

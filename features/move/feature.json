@@ -49,23 +49,20 @@
     },
     {
       "id": "move.counts",
-      "name": "Allocate selected head by batch",
-      "zh": "各批次转舍头数",
+      "name": "Enter total head count",
+      "zh": "录入转舍总头数",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus&moveFixture=batches",
       "preset": "walk",
       "steps": [
-        "[data-pig-select=\"000254\"]",
-        "[data-action=\"notags-count-open\"][data-value=\"D4\"]",
-        "[data-action=\"notags-pad\"][data-key=\"5\"]",
-        "[data-action=\"notags-count-done\"]",
-        "[data-action=\"actions\"]",
-        "[data-action=\"transfer\"]"
+        "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+        "[data-action=\"pen-move\"][data-value=\"D4\"]",
+        "[data-action=\"move-count-open\"][data-value=\"D4\"]"
       ],
       "figma": "",
       "notes": {
         "rules": [
-          "A partial selection of a multi-batch group must specify the head count by batch. The sum matches the count selected in Inspection."
+          "Enter one total head count for the source pen. The maximum is the number of pigs without ID in the pen, across all batches."
         ]
       }
     },
@@ -99,7 +96,7 @@
         "[data-action=\"pen-detail\"][data-value=\"D4\"]",
         "[data-action=\"pen-move\"][data-value=\"D4\"]",
         "input[data-action=\"move-pig\"][value=\"000801\"]",
-        "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+        "[data-action=\"move-count-open\"][data-value=\"D4\"]",
         "[data-action=\"move-number\"][data-key=\"5\"]",
         "[data-action=\"move-number-done\"]",
         "[data-action=\"move-next\"]"
@@ -122,7 +119,7 @@
         "[data-action=\"pen-detail\"][data-value=\"D4\"]",
         "[data-action=\"pen-move\"][data-value=\"D4\"]",
         "input[data-action=\"move-pig\"][value=\"000801\"]",
-        "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+        "[data-action=\"move-count-open\"][data-value=\"D4\"]",
         "[data-action=\"move-number\"][data-key=\"5\"]",
         "[data-action=\"move-number-done\"]",
         "[data-action=\"move-next\"]",
@@ -146,7 +143,7 @@
         "[data-action=\"pen-detail\"][data-value=\"D4\"]",
         "[data-action=\"pen-move\"][data-value=\"D4\"]",
         "input[data-action=\"move-pig\"][value=\"000801\"]",
-        "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+        "[data-action=\"move-count-open\"][data-value=\"D4\"]",
         "[data-action=\"move-number\"][data-key=\"5\"]",
         "[data-action=\"move-number-done\"]",
         "[data-action=\"move-next\"]",
@@ -171,7 +168,7 @@
         "[data-action=\"pen-detail\"][data-value=\"D4\"]",
         "[data-action=\"pen-move\"][data-value=\"D4\"]",
         "input[data-action=\"move-pig\"][value=\"000801\"]",
-        "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+        "[data-action=\"move-count-open\"][data-value=\"D4\"]",
         "[data-action=\"move-number\"][data-key=\"5\"]",
         "[data-action=\"move-number-done\"]",
         "[data-action=\"move-next\"]",
@@ -196,7 +193,7 @@
         "[data-action=\"pen-detail\"][data-value=\"D4\"]",
         "[data-action=\"pen-move\"][data-value=\"D4\"]",
         "input[data-action=\"move-pig\"][value=\"000801\"]",
-        "[data-action=\"move-count-open\"][data-value=\"D4|0\"]",
+        "[data-action=\"move-count-open\"][data-value=\"D4\"]",
         "[data-action=\"move-number\"][data-key=\"5\"]",
         "[data-action=\"move-number-done\"]",
         "[data-action=\"move-next\"]",
@@ -238,9 +235,14 @@
       "choose pigs and continue"
     ],
     [
+      "move.which-pigs",
       "move.counts",
-      "move.mixed",
-      "confirm the split"
+      "enter total head count"
+    ],
+    [
+      "move.counts",
+      "move.which-pigs",
+      "apply the count"
     ],
     [
       "move.tagged",

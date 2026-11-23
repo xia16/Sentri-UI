@@ -54,7 +54,7 @@ Scope: the facts a disabled or waiting control displays. The change adds and cut
 
 | Question in walking order | Attention | Place |
 | --- | --- | --- |
-| Which pigs are moving? | Primary | Pen entry selects individual identities and counts. An existing selection shows one total, with origin details on demand. |
+| Which pigs are moving? | Primary | Pen entry selects individual IDs and one total count of unidentified pigs for that pen. Review shows the source pens, IDs and counts. |
 | Where are they going? | Primary | Choose a room, search by pen code or open the shared PenMap Sheet. A long room offers Whole room. The review shows the exact destination as an editable row. |
 | Which records will change? | Secondary, only when relevant | One consequence for the source pens whose untagged group conditions are cleared. A change to the default batch uses the destination's line. |
 | Did it go through? | Primary after commit | Source and target counts, both pen logs and the confirmed result. A locally queued move closes the view. A rejected or uncertain move keeps placement and health facts intact. |
