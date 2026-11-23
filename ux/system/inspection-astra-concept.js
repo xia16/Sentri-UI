@@ -1560,8 +1560,7 @@ function openInspectionMove(c,sourcePen='',host=false){
 }
 function moveSubjectLine(c,m){
  const one=m.sources.length===1?m.sources[0]:null;
- const place=one?MovePicker.place(moveRoom(c,one.room),one.code):moveText(m.sources.length+' source pens','来自 '+m.sources.length+' 个栏');
- return {text:one?moveText('From ','来源 ')+place:place};
+ return one?{text:moveText('From ','来源 ')+MovePicker.place(moveRoom(c,one.room),one.code)}:null;
 }
 function moveSourcesDisclosure(c,m){
  if(m.sources.length===1&&moveTotal(m.sources)===1&&m.sources[0].ids.length===1)return '';
@@ -1570,7 +1569,7 @@ function moveSourcesDisclosure(c,m){
   return SentriUI.row({variant:'plain',title:MovePicker.place(moveRoom(c,s.room),s.code),description:details.join(' · '),wrap:true});
  });
  return '<details class="move-sources"'+(m.showSources?' open':'')+'><summary>'+icon('chevron')+
-  moveText('Review the pigs to move','核对要移动的猪')+'</summary>'+SentriUI.rowGroup(labels.join(''))+'</details>';
+  moveText('Review '+moveCountLabel(moveTotal(m.sources)),'核对转舍 '+moveCountLabel(moveTotal(m.sources)))+'</summary>'+SentriUI.rowGroup(labels.join(''))+'</details>';
 }
 function moveDestinationRooms(c,m){
  if(!m.host)return inspectionMoveRooms(c);
@@ -1610,7 +1609,7 @@ function inspectionMovePage(c){
    body:'<div data-move-room-results>'+inspectionMoveRoomResults(c,m)+'</div>'});
  }
  const room=moveDestinationRoom(c,m),n=moveTotal(m.sources),one=n===1&&m.ids.length===1?pig(c,m.ids[0]):null;
- const title=one?moveText('Move '+identifiedLabel(one),'转舍 · '+identifiedLabel(one)):moveText('Move '+moveCountLabel(n),'转舍 '+moveCountLabel(n));
+ const title=one?moveText('Move '+identifiedLabel(one),'转舍 · '+identifiedLabel(one)):moveText('Move pigs','猪只转舍');
  const clear=m.sources.filter(s=>s.count&&pen(c,s.code)?.untagged?.cases?.length).map(s=>s.code);
  const notice=clear.length?SentriUI.banner({tone:'notice',headline:moveText('Clear group conditions','清空群组病症'),
   consequence:moveText('Covers all pigs without ID in '+clear.join(', ')+'.','涉及 '+clear.join('、')+' 栏的全部无身份猪。')}):'';
@@ -1746,8 +1745,10 @@ function handleInspectionMove(c,el,a,v){
   if(reply==='ok'||reply==='queued'){
    leaveInspectionMove(c,m,true);
    if(reply==='ok'&&m.sourcePen)c.moveReceipt=m.sourcePen;
-   if(reply==='ok')notify(c,{title:moveText('Moved '+moveCountLabel(moveTotal(m.sources)),'已转舍 '+moveCountLabel(moveTotal(m.sources))),
-    detail:MovePicker.place(moveRoom(c,m.room),m.to),tone:'done'});
+   if(reply==='ok'){
+    const count=moveCountLabel(moveTotal(m.sources)),where=moveRoom(c,m.room).name+' · '+m.to;
+    notify(c,{title:moveText('Moved '+count+' to '+where,'已将 '+count+' 转到 '+where),tone:'done'});
+   }
   }else m.result=reply;
   return true;
  }

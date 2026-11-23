@@ -1015,8 +1015,8 @@ function allocMoveMap(s){
 }
 function allocPenPage(s){
  const f=s.fosterDraft,n=litterPicked(s),room=allocRoom(s),t=SentriMovePicker.t;
- return SentriMovePicker.page({title:t('Move '+pigletWord(n),'转舍 '+n+' 头仔猪'),line:{text:t('From ','来源 ')+sowPlace(s)},bar:status(),back:'featureBack',
-  above:SentriMovePicker.roomRow(room,'allocRooms')+SentriMovePicker.search('pen',f.penQ),
+ return SentriMovePicker.page({title:t('Move piglets','仔猪转舍'),line:{text:t('From ','来源 ')+sowPlace(s)},bar:status(),back:'featureBack',
+  above:SentriUI.statusLine([t(pigletWord(n)+' selected','已选 '+n+' 头仔猪')])+SentriMovePicker.roomRow(room,'allocRooms')+SentriMovePicker.search('pen',f.penQ),
   body:'<div data-move-pen-results>'+allocMoveMap(s)+'</div>',primary:{action:'allocPenSave',waiting:!f.toPen,
    label:f.toPen?t('Move to '+room.name+' · '+f.toPen,'移到 '+room.name+' · '+f.toPen):t('Choose a pen','选择一个栏位')}});
 }

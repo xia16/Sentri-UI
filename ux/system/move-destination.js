@@ -62,7 +62,8 @@ function roomResults(rooms,home,selected,action,query=''){
    description:[room.id===home?t('This room','本房间'):'',penCount(room.pens.length)].filter(Boolean).join(' · '),action,value:room.id,
    attrs:room.id===selected?{'aria-current':'true'}:{},wrap:true}));
  }
- return groups.size?[...groups].map(([name,rows])=>(name?SentriUI.heading({title:name,kind:'section',level:3}):'')+SentriUI.rowGroup(rows.join(''))).join(''):
+ return groups.size?[...groups].map(([name,rows])=>'<section>'+
+  (name?SentriUI.heading({title:name,kind:'section',level:3}):'')+SentriUI.rowGroup(rows.join(''))+'</section>').join(''):
   SentriUI.choiceEmpty(t('Try another room name.','试试其他房间名称。'),{title:t('No matching rooms','没有匹配的房间'),icon:'search'});
 }
 function page({title,line,bar,back='back',above='',body,primary=null}){
