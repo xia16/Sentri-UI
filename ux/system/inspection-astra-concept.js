@@ -1764,8 +1764,10 @@ function lookupMoveLayer(c){
  const line={text:[{text:m.id,mono:true},{sep:true},{text:place}]};
  const titleForMode=moveText('Review move','核对转舍');
  if(c.view==='lookup-move-pens'){
-  return MovePicker.picker({room:moveRoom(c,'home'),bar:status(),selected:destination,
-   action:'lookup-move-pen',reviewAction:'lookup-move-review',key:'lookup-move-'+c.moveKey});
+  const room=moveRoom(c,'home');
+  const body=MovePicker.destinationMap({room,selected:destination,action:'lookup-move-pen',key:'lookup-move-'+c.moveKey});
+  return SentriUI.sheet({surface:'menu',size:'long',sizing:'full',title:moveText('Choose a pen','选择目标栏'),
+   line:{text:room.name},body,footer:SentriUI.penMapFooter({back:{action:'back',label:moveText('Back','返回')}})});
  }
  if(c.view==='lookup-move'){
   const rows=[{title:moveText('View pig record','查看猪只档案'),icon:icon('profile'),action:'lookup-exception-record'}];
@@ -1794,12 +1796,7 @@ function lookupMoveAction(c,a,v){
  const m=c.lookupMove;
  if(!m||!c.view.startsWith('lookup-move'))return false;
  if(a==='back'||a==='dismiss'){
-  if(c.view==='lookup-move-pens'){
-   c.view=m.pickerBack||'lookup-move';
-   if(c.view==='lookup-move-confirm')m.destination=m.previousDestination;
-   delete m.previousDestination;
-   return true;
-  }
+  if(c.view==='lookup-move-pens'){c.view=m.pickerBack||'lookup-move';return true;}
   if(c.view==='lookup-move-confirm'){m.pickerBack='lookup-move';c.view='lookup-move-pens';return true;}
   c.view=m.from;c.scan.listening=m.listening;delete c.lookupMove;return true;
  }
@@ -1810,15 +1807,9 @@ function lookupMoveAction(c,a,v){
  if(a==='lookup-move-mode'&&['move','select'].includes(v)&&canMoveFromLookup(pig(c,m.id))){
   m.mode=v;m.pickerBack='lookup-move';c.view='lookup-move-pens';return true;
  }
- if(a==='lookup-move-change'&&c.view==='lookup-move-confirm'){m.pickerBack='lookup-move-confirm';m.previousDestination=m.destination;c.view='lookup-move-pens';return true;}
+ if(a==='lookup-move-change'&&c.view==='lookup-move-confirm'){m.pickerBack='lookup-move-confirm';c.view='lookup-move-pens';return true;}
  if(a==='lookup-move-pen'&&c.view==='lookup-move-pens'){
-  if(moveRoom(c,'home').pens.some(pe=>pe.id===v&&!MovePicker.unavailable(pe)))m.destination=v;
-  return true;
- }
- if(a==='lookup-move-review'&&c.view==='lookup-move-pens'){
-  if(moveRoom(c,'home').pens.some(pe=>pe.id===m.destination&&!MovePicker.unavailable(pe))){
-   delete m.previousDestination;c.view='lookup-move-confirm';
-  }
+  if(moveRoom(c,'home').pens.some(pe=>pe.id===v&&!MovePicker.unavailable(pe))){m.destination=v;c.view='lookup-move-confirm';}
   return true;
  }
  if(a==='lookup-move-confirm'&&c.view==='lookup-move-confirm'){
@@ -1886,10 +1877,8 @@ function overlay(c){
  if(c.view==='sow-transfer'||c.view.startsWith('move-'))return inspectionMovePage(c);
  if(c.view==='farrowing-record')return farrowingRecordFrame(c);
  if(c.view.startsWith('lookup-move')){
-  const layer=lookupMoveLayer(c);
-  if(c.view==='lookup-move-pens')return layer;
   const under=c.lookupMove.from==='search'?findPage(c):scanPage(c);
-  return '<div class="page-background" inert aria-hidden="true">'+under+'</div>'+layer;
+  return '<div class="page-background" inert aria-hidden="true">'+under+'</div>'+lookupMoveLayer(c);
  }
  if(c.view==='medicines')return medicinesPage(c);if(c.view==='medicine-sheet'&&!c.isDrawerBackground)return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+medicinesPage(c).replace(/ aria-modal="true"/g,'')+'</div>'+medicineSheet(c);if(c.view==='medicine-sheet')return medicineSheet(c);if(c.logDatePicker)return '<div class="drawer-background" inert aria-hidden="true">'+overlay({...c,logDatePicker:false})+'</div>'+logDatePicker(c);if(['record-optional','feed-date','feed-note','medicine-picker','brand-picker','bulk-health-picker','picker'].includes(c.view)&&!c.isDrawerBackground){const parent={...c,view:c.view==='picker'?c.form.pickerReturn:c.view==='record-optional'?c.form.optionalReturn:['medicine-picker','brand-picker'].includes(c.view)?'treatment':c.view==='bulk-health-picker'?'health':'feed-editor',isDrawerBackground:true};if(!AstraSurfaces.isPage('inspection',parent.view,parent))return overlay({...c,isDrawerBackground:true});return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+overlay(parent).replace(/ aria-modal="true"/g,'')+'</div>'+overlay({...c,isDrawerBackground:true});}if(c.view==='medicine-picker')return medicinePicker(c);if(c.view==='brand-picker')return brandPicker(c);if(c.view==='pig-doses')return customDosesPage(c);if(c.view==='picker')return pickerPage(c);if(c.view==='record-optional')return recordOptionalEditor(c);if(c.form?.recordEditor&&bulkActionKinds.includes(c.view))return bulkActionPage(c);if(c.view==='bulk-health-picker')return bulkHealthPicker(c);if(c.view==='measurements-menu')return measurementsMenu(c);if(c.view==='miscarriage')return miscarriagePage(c);if(c.view==='production-task')return productionTaskPage(c);if(c.view==='batch-membership')return batchMembershipPage(c);if(['batch-removal','not-in-pig'].includes(c.view))return productionDispositionPage(c);if(c.view==='feed-date'||c.view==='feed-note')return feedOptionalEditor(c);if(c.view==='feed-breakdown')return feedBreakdown(c);if(c.view==='pig-production-batch')return productionBatchPage(c);if(c.view==='feed-editor')return feedEditor(c);const recordView=recordFlowOverlay(c);if(recordView!==null)return recordView;const revised=round3Overlay(c);if(revised!==null)return revised;const f=c.form;
  if(c.view==='actions')return actionsPage(c);
@@ -2694,7 +2683,7 @@ function rowCheckAfterRender(root,c){
 function notify(c,text){c.toast=text;c.toastView=null;if(typeof document==='undefined'){c.toastUntil=Infinity;return;}if(document.documentElement.classList.contains('atlas-still')){c.toastUntil=Infinity;clearTimeout(c.toastTimer);return;}c.toastUntil=Date.now()+3200;clearTimeout(c.toastTimer);c.toastTimer=setTimeout(()=>{c.toast='';const i=states.indexOf(c);document.querySelector(`[data-card="${i}"] .st-toast`)?.remove();},3200);}
 function inspectionSurface(c){
  const content=overlay(c);
- if(AstraSurfaces.isPage('inspection',c.view,c)||c.isDrawerBackground||['record-optional','feed-date','feed-note','medicine-picker','brand-picker','medicine-sheet','bulk-health-picker','picker'].includes(c.view))return content;
+ if(AstraSurfaces.isPage('inspection',c.view,c)||c.isDrawerBackground||c.view.startsWith('lookup-move')||['record-optional','feed-date','feed-note','medicine-picker','brand-picker','medicine-sheet','bulk-health-picker','picker'].includes(c.view))return content;
  const parent=[...(c.navTrail||[])].reverse().find(p=>AstraSurfaces.isPage('inspection',p.view,{...c,...p}));
  if(!parent)return content;
  return '<div class="page-background" inert aria-hidden="true">'+overlay({...c,...parent,isDrawerBackground:true})+'</div>'+content;

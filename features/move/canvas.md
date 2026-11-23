@@ -7,3 +7,5 @@
 - [无身份猪按总头数转舍](../../ux/review/farrowing-inspection/move.html#move)（2026-11-23）。负责人确认按每个来源栏的总头数录入。批次扣减由服务端处理。
 
 - [数字键盘与页面内选栏图](../../ux/review/farrowing-inspection/move.html#move)（2026-11-23）。按负责人提供的两张参考图，点击数字打开底部键盘，目标栏位图直接显示在选栏页。这轮替代上面的 B 方案。
+
+- [异单元猪移入用底部栏位图](../../ux/review/farrowing-inspection/move.html#scan)（2026-11-23）。负责人确认 Scan 和 Find 的移入在结果上打开 PenMap Sheet，点栏后直接核对。

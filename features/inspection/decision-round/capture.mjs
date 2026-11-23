@@ -34,7 +34,7 @@ const walk=(q='',s='walk')=>open('inspection-astra-concept','screen=inspection.'
 const shot=async (id)=>{if(checkOnly)return;await phone().screenshot({path:new URL('screenshots/'+id+'.jpg',here).pathname,type:'jpeg',quality:82,animations:'disabled'});};
 const check=async (name,go)=>{await go();checks.push(name);console.log('PASS',name);};
 async function outsideRead(){await tap('scan');await read();await read();await read();assert.deepEqual(await ticks(),['000267','000306']);}
-async function choose(mode,destination='C1'){await tap('lookup-exception','000430');await tap('lookup-move-mode',mode);await tap('lookup-move-pen',destination);await tap('lookup-move-review');}
+async function choose(mode,destination='C1'){await tap('lookup-exception','000430');await tap('lookup-move-mode',mode);await tap('lookup-move-pen',destination);}
 const chooseMovePen=async code=>{await tap('move-pen',code);await tap('move-review-target');};
 async function note(txt){await tap('note');await live('[data-bulk-key="note"]').last().fill(txt);await tap('bulk-save');}
 try{
@@ -45,15 +45,29 @@ try{
   await read();assert.equal(await live('[data-scan-tag="000306"]').count(),1);assert.deepEqual(await ticks(),['000267','000306']);
   await tap('lookup-exception','000430');await shot('04-outside-choices');await tap('lookup-move-mode','select');
   assert.equal(await live(action('lookup-move-pen')).count(),48);await shot('05-choose-destination');
-  assert.ok(await live('.sheet[data-presentation="page"] > .sheet-body > .st-pen-map').isVisible());
-  assert.equal(await live(action('lookup-move-review')).getAttribute('aria-disabled'),'true');
-  await tap('lookup-move-pen','C12');await view('lookup-move-pens');
-  assert.equal(await live(action('lookup-move-pen','C12')).getAttribute('aria-pressed'),'true');await shot('05b-selected-C12');
-  await tap('lookup-move-review');await view('lookup-move-confirm');await shot('06-confirm-C12');await tap('lookup-move-change');
+  assert.ok(await live('.sheet[role="dialog"] > .sheet-body > .st-pen-map').isVisible());
+  assert.ok(await phone().locator('.page-background[inert] .st-scan-body').isVisible());
+  assert.equal(await live('.sheet[role="dialog"]').count(),1);
+  await tap('lookup-move-pen','C12');await view('lookup-move-confirm');await shot('06-confirm-C12');await tap('lookup-move-change');
   assert.equal(await live(action('lookup-move-pen','C12')).getAttribute('aria-pressed'),'true');
-  await tap('lookup-move-pen','C11');await tap('back');await view('lookup-move-confirm');
+  await shot('05b-selected-C12');
+  await tap('back');await view('lookup-move-confirm');
   assert.match(await live(action('lookup-move-change')).innerText(),/C12/);
+  await tap('lookup-move-change');await tap('lookup-move-pen','C11');await view('lookup-move-confirm');
+  assert.match(await live(action('lookup-move-change')).innerText(),/C11/);
   await tap('back');await tap('back');await tap('back');assert.deepEqual(await ticks(),['000267','000306']);
+ });
+ await check('The outside-unit PenMap Sheet offers Whole room and returns to the move choices',async()=>{
+  await walk('penmap=long');await outsideRead();await tap('lookup-exception','000430');await tap('lookup-move-mode','move');
+  await live('.st-pen-whole-toggle').click();await shot('05a-outside-whole-room');
+  await live('.st-pen-group[data-from="C21"]').click();
+  assert.ok(await live(action('lookup-move-pen','C21')).evaluate(tile=>{
+   const tileBox=tile.getBoundingClientRect(),mapBox=tile.closest('.st-pen-scroll').getBoundingClientRect();
+   return tileBox.bottom>mapBox.top&&tileBox.top<mapBox.bottom;
+  }));
+  await tap('back');await view('lookup-move');
+  await tap('lookup-move-mode','select');await tap('lookup-move-pen','C21');await view('lookup-move-confirm');
+  assert.match(await live(action('lookup-move-change')).innerText(),/C21/);
  });
  await check('Move-only and move-and-select change the location; only the second adds a tick',async()=>{
   for(const mode of ['move','select']){
@@ -65,7 +79,11 @@ try{
   }
  });
  await check('Search offers the same transfer choices and preserves the original text on return',async()=>{
-  await walk();await tap('search');await live('[data-find-input]').fill('000430');await shot('09-find-outside');await choose('select');
+  await walk();await tap('search');await live('[data-find-input]').fill('000430');await shot('09-find-outside');
+  await tap('lookup-exception','000430');await tap('lookup-move-mode','select');
+  assert.ok(await live('.sheet[role="dialog"] .st-pen-map').isVisible());
+  assert.equal(await phone().locator('.page-background[inert] [data-find-input]').inputValue(),'000430');
+  await shot('09a-find-pen-map');await tap('lookup-move-pen','C1');
   await tap('lookup-move-confirm');await tap('back');assert.equal(await live('[data-find-input]').inputValue(),'000430');await shot('10-find-return');
   await tap('back');assert.deepEqual(await ticks(),['000430']);
  });

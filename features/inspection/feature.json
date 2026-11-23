@@ -2491,7 +2491,7 @@
       "notes": {
         "purpose": "Find a registered destination in the inspected unit.",
         "rules": [
-          "Choose a registered pen on the current unit’s embedded map, then tap Review move."
+          "The PenMap Sheet opens over Scan or Find. Tap a registered pen in the current unit to open Review move. Long rooms offer Whole room."
         ],
         "issues": []
       }
@@ -2506,13 +2506,12 @@
       "steps": [
         "[data-action=\"lookup-exception\"][data-value=\"000430\"]",
         "[data-action=\"lookup-move-mode\"][data-value=\"select\"]",
-        "[data-action=\"lookup-move-pen\"][data-value=\"C12\"]",
-        "[data-action=\"lookup-move-review\"]"
+        "[data-action=\"lookup-move-pen\"][data-value=\"C12\"]"
       ],
       "notes": {
         "purpose": "Review the pig and the source and destination before submitting.",
         "rules": [
-          "The destination row opens the picker and preserves the current choice on Back. A server error is a notice toast on this review."
+          "The destination row reopens the PenMap Sheet with the current pen outlined. Back keeps that destination. A server error is a notice toast on this review."
         ],
         "issues": []
       }
@@ -2528,7 +2527,6 @@
         "[data-action=\"lookup-exception\"][data-value=\"000430\"]",
         "[data-action=\"lookup-move-mode\"][data-value=\"select\"]",
         "[data-action=\"lookup-move-pen\"][data-value=\"C12\"]",
-        "[data-action=\"lookup-move-review\"]",
         "[data-action=\"lookup-move-confirm\"]"
       ],
       "notes": {

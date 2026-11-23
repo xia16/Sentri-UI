@@ -3,6 +3,7 @@
   "transfer": "simulated receipts",
   "checks": [
     "Unit scan groups local pigs in their own pens; outside tag has no tick; unknown and repeated reads do not add pigs",
+    "The outside-unit PenMap Sheet offers Whole room and returns to the move choices",
     "Move-only and move-and-select change the location; only the second adds a tick",
     "Search offers the same transfer choices and preserves the original text on return",
     "Pen page has no scan entry; the walk dock still scans the whole unit",

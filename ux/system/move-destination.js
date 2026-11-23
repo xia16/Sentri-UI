@@ -35,19 +35,24 @@ function layoutFor(room,pens){
  return {lanes:[...lanes].sort(([a],[b])=>sortCodes(a,b)).map(([letter,n])=>({letter,n})),apart};
 }
 
-function picker({room,selected='',current='',blocked={},bar,back='back',key,roomAction='',action,reviewAction}){
+function destinationMap({room,selected='',current='',blocked={},action,key}){
  const pens=room.pens.filter(p=>p.registered!==false);
  const disabled=Object.fromEntries(pens.map(p=>[p.id,blocked[p.id]||unavailable(p)]).filter(([,reason])=>reason));
- const body=pens.length?SentriUI.penMap({lanes:[],...layoutFor(room,pens),pens:Object.fromEntries(pens.map(p=>[p.id,'plain'])),
+ return pens.length?SentriUI.penMap({lanes:[],...layoutFor(room,pens),pens:Object.fromEntries(pens.map(p=>[p.id,'plain'])),
   disabled,selected,current:selected||current,action,key,entrance:t('Entrance','入口'),
   labels:{pen:code=>code,plain:'',map:t('Pens','栏位'),whole:t('Whole room','整栋'),byPen:t('Pen by pen','逐栏'),pens:range=>t('Pens '+range,range+' 栏')}}):
   SentriUI.choiceEmpty(t('No registered pens','没有登记的栏位'),{icon:'grid'});
+}
+
+function picker({room,selected='',current='',blocked={},bar,back='back',key,roomAction='',action,reviewAction}){
+ const body=destinationMap({room,selected,current,blocked,action,key});
  const roomRow=roomAction?SentriUI.row({variant:'navigation',title:room.name,
   description:[room.zone,room.section!==room.name?room.section:null].filter(Boolean).join(' · '),
   icon:SentriIcons.icon('grid'),action:roomAction,wrap:true}):'';
+ const ready=room.pens.some(p=>p.id===selected&&!unavailable(p)&&!blocked[p.id]);
  return page({title:t('Choose a pen','选择目标栏'),line:roomAction?null:{text:room.name},bar,back,
   above:roomRow?SentriUI.rowGroup(roomRow):'',body,
-  primary:{label:t('Review move','核对转舍'),action:reviewAction,waiting:!selected||!pens.some(p=>p.id===selected)||!!disabled[selected]}});
+  primary:{label:t('Review move','核对转舍'),action:reviewAction,waiting:!ready}});
 }
 
 function targetRow(room,code,action){
@@ -76,5 +81,5 @@ function page({title,line,bar,back='back',above='',body,primary=null}){
  return SentriUI.sheet({variant:'page',className:'move-page',title,line,back:{action:back},bar,
   above:above?'<div class="move-picker-tools">'+above+'</div>':'',body,footer:primary?SentriUI.sheetFooter({back:false,primary}):false});
 }
-root.SentriMovePicker={t,esc,sortCodes,place,codesFor,unavailable,picker,targetRow,roomSearch,roomResults,page};
+root.SentriMovePicker={t,esc,sortCodes,place,codesFor,unavailable,destinationMap,picker,targetRow,roomSearch,roomResults,page};
 })(globalThis);
