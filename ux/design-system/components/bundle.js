@@ -233,7 +233,10 @@
     /* Group (an Animal row for animals without an ID, owner 2026-10-18): a lead glyph before the name, the tags on the line under it,
        and a count field after the door, always there, so the row keeps the Animal row's height ticked or not. */
     if(an&&lead)an.html=an.html.replace('<strong class="st-animal-id">','<strong class="st-animal-id">'+(root.SentriIcons?root.SentriIcons.icon(lead):''));
-    const countHtml=count?`<label class="st-row-count"${count.idle?' data-idle=""':''}><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" value="${esc(String(count.value??''))}"${safeAttr(count.attrs||{})}></label>`:'';
+    const countValue=count?esc(String(count.value??'')):'';
+    const countHtml=count?`<span class="st-row-count"${count.idle?' data-idle=""':''}>${count.openAction
+      ?`<button type="button" data-action="${esc(count.openAction)}" data-value="${esc(openValue)}"${safeAttr(count.attrs||{})}>${countValue}</button>`
+      :`<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" value="${countValue}"${safeAttr(count.attrs||{})}>`}</span>`:'';
     const copy=contentHtml||(an?an.html:'')||`${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>`;
     return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door"${an?` data-animal="${an.kind}"`:''}${count?' data-group=""':''} data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><label class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${selectDisabled?' disabled':''}${safeAttr(inputAttrs)}></label><button type="button" class="st-row-door ${esc(doorClass)}" data-action="${esc(openAction)}" data-value="${esc(openValue)}"${label?` aria-label="${esc(label)}"`:''}>${copy}<span class="st-row-chevron">${arrow}</span></button>${countHtml}</div>`;
   }
@@ -520,7 +523,7 @@
   /* Stepper: `− n +`, the one counting shape. variant 'row' (a 60px sheet row) or 'hero' (the count sheet's one number).
      A key emits a requested delta; the host posts it (immediate host) or adds it to a draft (staged host).
      pointers: text actions shown in the status region at the floor. */
-  function stepper({label='',prefix='',description='',value=0,min=0,max=null,step=1,action='step',key='',variant='row',changed=false,draft=false,tone='',hint='',pointers=[],reserveHint,id='',className='',disabled=false,reason='',error='',loading=false,pressed=false,status='',hintHtml='',strs,args}={}){
+  function stepper({label='',prefix='',description='',value=0,min=0,max=null,step=1,action='step',key='',variant='row',changed=false,draft=false,tone='',hint='',pointers=[],reserveHint,id='',className='',disabled=false,reason='',error='',loading=false,pressed=false,status='',hintHtml='',valueAction=null,strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{};
     const n=Number(value)||0,hero=variant!=='row',lid=id||fieldId('st-stepper'),hid=lid+'-hint',d=Math.abs(Number(step)||1);
     variant=variant==='hero'?'count':variant;
@@ -532,7 +535,10 @@
     const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}" aria-describedby="${esc(hid)}${inline?' '+esc(nid):''}"${pressed&&dir>0?' data-preview="pressed"':''}${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
     const copy=`<span class="st-stepper-copy"><span class="st-stepper-label" id="${esc(lid)}">${tx(label,o,'label')}</span>${inline?`<span class="st-stepper-note" id="${esc(nid)}" role="status" aria-live="polite">${stateWord}</span>`:''}${description||has(o,'description')?`<small class="st-stepper-description">${tx(description,o,'description')}</small>`:''}</span>`;
     const vargs=a.value||(s.value?{n:String(n)}:null);
-    const val=`<span class="st-stepper-value" role="spinbutton" tabindex="0" data-st-spin${disabled||loading?' aria-disabled="true"':''}${error?' aria-invalid="true"':''} aria-labelledby="${esc(lid)}" aria-describedby="${esc(hid)}${inline?' '+esc(nid):''}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${esc(prefix)}${esc(n)}</span>`;
+    const valueText=esc(prefix)+esc(n);
+    const val=valueAction
+      ?`<button type="button" class="st-stepper-value" data-st-spin data-action="${esc(valueAction.action)}" data-value="${esc(key)}" aria-haspopup="dialog" aria-label="${esc(valueAction.label||label)}: ${valueText}"${disabled||loading?' disabled':''}>${valueText}</button>`
+      :`<span class="st-stepper-value" role="spinbutton" tabindex="0" data-st-spin${disabled||loading?' aria-disabled="true"':''}${error?' aria-invalid="true"':''} aria-labelledby="${esc(lid)}" aria-describedby="${esc(hid)}${inline?' '+esc(nid):''}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${valueText}</span>`;
     const canPoint=pointers.length>0;
     const reserve=reserveHint!=null?(reserveHint?(canPoint?'action':'text'):''):'';
     const messages=[hint||has(o,'hint')?tx(hint,o,'hint'):'',error?esc(error):'',disabled?esc(reason||'This record cannot be edited.'):'',loading?tx('Saving…',{strs:{status:'ds.stepper.saving'}},'status'):'',''].filter(Boolean);
@@ -1502,8 +1508,10 @@
         if(map.scrollWidth>map.clientWidth+1)map.scrollLeft+=snap(at.left-(side+PEN_GAP),at.width+PEN_GAP);
       }
       const room=penRooms.get(m.dataset.key),foot=penControls(m);
-      if(room&&foot&&map.clientHeight>0&&map.scrollHeight>2*map.clientHeight&&!foot.querySelector('.st-pen-whole-toggle'))
-        foot.insertAdjacentHTML('beforeend',button({label:room.L.whole,className:'st-pen-whole-toggle',attrs:{'aria-pressed':'false','data-key':m.dataset.key}}));
+      if(room&&foot&&map.clientHeight>0&&map.scrollHeight>2*map.clientHeight&&!foot.querySelector('.st-pen-whole-toggle')){
+        const toggle=button({label:room.L.whole,className:'st-pen-whole-toggle',attrs:{'aria-pressed':'false','data-key':m.dataset.key}});
+        foot.insertAdjacentHTML(penSheet(m).dataset.presentation==='page'?'afterbegin':'beforeend',toggle);
+      }
     }
   }
   /* Whole room on, at the fewest pens to a tile that fit the map's height; off, back to the pens where they were */

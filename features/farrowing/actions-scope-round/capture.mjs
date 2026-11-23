@@ -134,9 +134,9 @@ try {
   await tap(page, 'litterActions');
   await tap(page, 'allocToPen');
   await shot(page, 'd01-finished-move-pen-picker');
-  await tap(page, 'allocPenMap');
+  await tap(page, 'allocPenPick', 'B2');
   await shot(page, 'd01a-finished-move-pen-map');
-  await page.locator('.sheet[role="dialog"] ' + action('allocPenPick', 'B2')).click();
+  await tap(page, 'allocPenNext');
   await shot(page, 'd01b-finished-move-review');
   await tap(page, 'allocPenSave');
   assert.equal((await state(page)).alive, 6);

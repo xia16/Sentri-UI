@@ -11,9 +11,9 @@
 | Sentri-UI `codex/inspection-cross-unit-scan@baa057e5` · `features/inspection/PRD.md` 与原型 | 保留真实归属、看档案、只移入／移入并选择。旧稿禁用真正提交。 |
 | Sentri-Android-App · `docs/home-inspection-health-delivery.md`、`docs/status.md` | 盘点现有预览及转舍写入边界。原型回执采用模拟结果；实际发布需确认服务端操作身份、权限和回执查询。 |
 
-扫码或查找时照实际位置显示异单元猪。选择移入方式后，按栏号搜索当前单元或打开 PenMap Sheet，再核对来源和目标。用 `?moveResult=error` 查看接口短提示的样例，用 `?moveResult=offline` 查看离线返回和联网后的样例更新。
+扫码或查找时照实际位置显示异单元猪。选择移入方式后，在当前单元的栏位图上点栏，再点「核对转舍」。用 `?moveResult=error` 查看接口短提示的样例，用 `?moveResult=offline` 查看离线返回和联网后的样例更新。
 
-通用 Move 从栏位、已选名单、单猪档案进入。用 `?penmap=long` 查看 200 栏 Whole room 样例，用 `?moveFixture=batches` 验证耳缺、混批无身份猪按总头数选择、以及不可用栏。每个来源栏只录一次总头数。服务端处理批次扣减，原型回执用固定顺序模拟。来源栏只要成功转出无身份猪，该栏无身份猪的当前疾病和症状全部清空。分娩母猪和已选仔猪共用目标栏选择页。详见 [Move 规则](../../move/PRD.md)。
+通用 Move 从栏位、已选名单、单猪档案进入。用 `?penmap=long` 查看 200 栏 Whole room 样例，用 `?moveFixture=batches` 验证耳缺、混批无身份猪按总头数选择、以及不可用栏。每个来源栏只录一次总头数。转舍的加减按钮中央数字和巡检名单行尾数字都打开底部数字键盘。服务端处理批次扣减，原型回执用固定顺序模拟。来源栏只要成功转出无身份猪，该栏无身份猪的当前疾病和症状全部清空。分娩母猪和已选仔猪共用目标栏选择页。详见 [Move 规则](../../move/PRD.md)。
 
 回执、队列和位置更新均为原型样例。
 

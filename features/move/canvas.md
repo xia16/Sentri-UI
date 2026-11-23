@@ -5,3 +5,5 @@
 - [选栏方案](../inspection/move-picker-round/canvas.html)（2026-11-23）。负责人确认 B · 先按栏号找，再核对，复用 PenMap Sheet。
 
 - [无身份猪按总头数转舍](../../ux/review/farrowing-inspection/move.html#move)（2026-11-23）。负责人确认按每个来源栏的总头数录入。批次扣减由服务端处理。
+
+- [数字键盘与页面内选栏图](../../ux/review/farrowing-inspection/move.html#move)（2026-11-23）。按负责人提供的两张参考图，点击数字打开底部键盘，目标栏位图直接显示在选栏页。这轮替代上面的 B 方案。

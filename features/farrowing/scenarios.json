@@ -3054,6 +3054,7 @@
           "[data-action='litterActions']",
           "[data-action='allocToPen']",
           "[data-action='allocPenPick'][data-value='B1']",
+          "[data-action='allocPenNext']",
           "[data-action='allocPenSave']"
          ],
          "children": [
@@ -3430,6 +3431,7 @@
         "[data-action='litterActions']",
         "[data-action='allocToPen']",
         "[data-action='allocPenPick'][data-value='B1']",
+        "[data-action='allocPenNext']",
         "[data-action='allocPenSave']"
        ],
        "children": [

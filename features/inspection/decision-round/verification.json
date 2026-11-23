@@ -12,6 +12,8 @@
     "From a pen, enter one total for all pigs without ID in the source pen",
     "A walk selection goes straight to the destination and moves the correct quantities across any source batches",
     "From one pig’s record, Move takes that pig only and returns to its record with the new location",
+    "A single movable pig in a pen opens the map directly",
+    "Scan selection and Selected review open the same embedded destination map",
     "Ear notch stays individually selectable and cancel leaves the source untouched",
     "Farrowing sow and piglet Move reuse the pen picker",
     "No connected reader offers no scan actions",

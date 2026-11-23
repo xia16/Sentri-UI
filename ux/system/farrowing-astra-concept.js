@@ -140,20 +140,22 @@ function act(s,a,v){
  if(a==='litterActions'&&litterPicked(s))s.view='litterActions';
  if(a==='allocToSow'&&litterPicked(s)){s.featureReturn='pigletList';Object.assign(s.fosterDraft,{q:'',scanning:false,direction:'out',target:''});s.view='foster';}
  if(a==='allocToPen'&&litterPicked(s)){
-  Object.assign(s.fosterDraft,{toRoom:homeUnit(s).id,toPen:'',penQ:'',roomQ:''});s.view='allocPen';
+  Object.assign(s.fosterDraft,{toRoom:homeUnit(s).id,toPen:'',roomQ:''});s.view='allocPen';
  }
  if(a==='allocRooms'&&s.view==='allocPen'){s.fosterDraft.roomQ='';s.view='allocRooms';}
  if(a==='allocRoom'&&s.view==='allocRooms'){
-  const f=s.fosterDraft;if(v!==f.toRoom){f.toRoom=v;f.toPen='';f.penQ='';}s.view='allocPen';
+  const f=s.fosterDraft;if(v!==f.toRoom){f.toRoom=v;f.toPen='';}s.view='allocPen';
  }
- if(a==='allocPenMap'&&s.view==='allocPen')s.fosterDraft.mapOpen=true;
  if(a==='allocPenChange'&&s.view==='allocPenReview'){
   const f=s.fosterDraft;
-  f.returnTarget={toRoom:f.toRoom,toPen:f.toPen,penQ:f.penQ};s.view='allocPen';
+  f.returnTarget={toRoom:f.toRoom,toPen:f.toPen};s.view='allocPen';
  }
  if(a==='allocPenPick'&&s.view==='allocPen'&&allocPenAvailable(s,allocRoom(s),v)){
+  s.fosterDraft.toPen=v;
+ }
+ if(a==='allocPenNext'&&s.view==='allocPen'&&allocPenAvailable(s,allocRoom(s),s.fosterDraft.toPen)){
   const f=s.fosterDraft;
-  f.toPen=v;f.mapOpen=false;delete f.returnTarget;s.view='allocPenReview';
+  delete f.returnTarget;s.view='allocPenReview';
  }
  if(a==='allocPenSave'&&s.view==='allocPenReview'){
   const f=s.fosterDraft,c=roomContext(s),home=homeUnit(s),room=allocRoom(s),ids=f.ids.slice(),n=ids.length+f.count;
@@ -199,7 +201,6 @@ function act(s,a,v){
  if(a==='featureBack'&&s.view==='allocPenReview'){s.view='allocPen';return;}
  if(a==='featureBack'&&s.view==='allocPen'){
   const f=s.fosterDraft;
-  if(f.mapOpen){f.mapOpen=false;return;}
   if(f.returnTarget){Object.assign(f,f.returnTarget);delete f.returnTarget;s.view='allocPenReview';return;}
   s.view='litterActions';return;
  }
@@ -1029,12 +1030,12 @@ function allocPenAvailable(s,room,code){
 }
 function allocPenOptions(s){
  const f=s.fosterDraft,room=allocRoom(s),home=room.id===homeUnit(s).id;
- return {room,query:f.penQ,selected:f.toPen,current:home?s.pen:'',action:'allocPenPick',
+ return {room,selected:f.toPen,current:home?s.pen:'',action:'allocPenPick',
   key:'piglet-move-'+states.indexOf(s),blocked:home?{[s.pen]:SentriMovePicker.t('Source pen','来源栏')}:{}};
 }
 function allocPenPage(s){
  return SentriMovePicker.picker({...allocPenOptions(s),bar:status(),back:'featureBack',
-  roomAction:'allocRooms',mapAction:'allocPenMap',mapOpen:s.fosterDraft.mapOpen});
+  roomAction:'allocRooms',reviewAction:'allocPenNext'});
 }
 function allocPenReview(s){
  const f=s.fosterDraft,room=allocRoom(s),n=litterPicked(s),t=SentriMovePicker.t;
@@ -1053,7 +1054,7 @@ function allocRoomResults(s){
 }
 function allocRoomsPage(s){
  return SentriMovePicker.page({title:SentriMovePicker.t('Choose room','选择房间'),bar:status(),back:'featureBack',
-  above:SentriMovePicker.search('room',s.fosterDraft.roomQ),body:'<div data-move-room-results>'+allocRoomResults(s)+'</div>'});
+  above:SentriMovePicker.roomSearch(s.fosterDraft.roomQ),body:'<div data-move-room-results>'+allocRoomResults(s)+'</div>'});
 }
 // The finished sow (owner, 2026-11-02): her drawer says only what happened this time, one ring of where the litter went in a card that
 // opens Details (a tappable card in a white drawer: white body, tinted head band); her actions sit in the bar, nothing stacked in the body.
@@ -1381,9 +1382,8 @@ gallery.addEventListener('input',e=>{if(!e.target.matches('[data-litter-search]'
 gallery.addEventListener('change',e=>{if(!e.target.matches('[data-litter-count]'))return;const i=+e.target.closest('[data-card]').dataset.card,s=states[i];s.fosterDraft.count=Math.max(0,Math.min(fosterNoId(s),Number(e.target.value)||0));render(i);});   // typed into the row
 gallery.addEventListener('input',e=>{
  const el=e.target;
- if(!el.matches('[data-move-pen-search],[data-move-room-search]'))return;
+ if(!el.matches('[data-move-room-search]'))return;
  const s=states[+el.closest('[data-card]').dataset.card],surface=el.closest('.sheet');
- if(s.view==='allocPen'){s.fosterDraft.penQ=el.value;surface.querySelector('[data-move-pen-results]').innerHTML=SentriMovePicker.results(allocPenOptions(s));}
  if(s.view==='allocRooms'){s.fosterDraft.roomQ=el.value;surface.querySelector('[data-move-room-results]').innerHTML=allocRoomResults(s);}
  surface.querySelector('.sheet-body').scrollTop=0;
 });

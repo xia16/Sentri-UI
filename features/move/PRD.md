@@ -11,13 +11,13 @@ A worker moves pigs to another pen during a walk. The phone calls this **Move**.
 | Pig record → Actions → Move | This pig opens directly on the destination. |
 | Farrowing record → Actions → Move | This sow opens the same destination picker using Farrowing's rooms. |
 | Finished or ended Farrowing record → Piglets → Actions → Move | The chosen piglets open the same destination picker. The movement goes in their litter and pen logs. |
-| Inspection Scan or Find → pig from another unit | Choose Move only or Move and select. Choose a pen in the inspected unit using the same PenMap and search, then review both locations. |
+| Inspection Scan or Find → pig from another unit | Choose Move only or Move and select. Choose a pen on the inspected unit's map, then review both locations. |
 
 ## Meaning of a selection
 
-- Ear tag and ear notch identify individual pigs. The pen roster supports search and the reader. For pigs without either identity, enter one total head count per source pen, up to the number available in that pen. The review shows that count next to the source pen.
+- Ear tag and ear notch identify individual pigs. The pen roster supports search and the reader. For pigs without either identity, enter one total head count per source pen, up to the number available. In Move, minus and plus surround the count. Tap the number to edit it in the keypad drawer. In the Inspection list, tap the group row's number for the same keypad. Done applies the count. In the Inspection list, submitting zero clears that group's selection.
 - The client sends the source pen and total head count for its unidentified pigs. The server may randomly draw from the source pen's batch balances when deducting that count. The total deducted equals the submitted count.
-- Choose a room and find a registered pen by code. Rooms with a multi-pen layout offer the standard PenMap Sheet with Back and, in long rooms, Whole room. The list and map both turn off source pens and known unavailable destinations. Selecting a pen opens Review move.
+- Choose a room, then tap a registered pen on the embedded PenMap. Source pens and known unavailable destinations are disabled. Long rooms offer Whole room and tapping a range returns to that part of the detailed map. The chosen pen is outlined. Tap Review move to check the selection before submitting.
 - Review identifies the source pens and their pigs or counts, and names the destination room and pen. Tap the destination row to change it. Back from that change restores the previous destination.
 - Tagged or ear-notched animals keep their individual records. Once any unidentified pigs leave a pen, clear that source pen's **current diseases and symptoms for all its unidentified pigs**, even when some remain. The picker lists affected source pens. The destination's existing animals retain their records and the movement history stays available.
 - Formal batch membership for unidentified pigs is handled internally. For individually identified pigs, any applicable default batch assignment is shown in the review.

@@ -11,6 +11,7 @@
       "The walk",
       [
         "inspection.walk",
+        "inspection.untagged-count",
         "inspection.stage-times",
         "inspection.animal-types",
         "inspection.filters",
@@ -518,7 +519,7 @@
                 "shows": "Strip \"Feeder low · 06:40\" under the header"
               }
             ],
-            "logic": "Pig count is ALL pigs in the pen, its pigs without ear tags included. Ticking the pen ticks every pig it shows under the current filters and its group row; the header keeps its colour, only its checkbox ticks (owner, 2026-10-18). The checkbox is indeterminate when only some are ticked. Tagged pigs are listed by ID number; the group row (struck-tag icon, \"14 pigs\", its conditions on one line, a count field) is always last.",
+            "logic": "Pig count is ALL pigs in the pen, its pigs without ear tags included. Ticking the pen ticks every pig it shows under the current filters and its group row; the header keeps its colour, only its checkbox ticks (owner, 2026-10-18). The checkbox is indeterminate when only some are ticked. Tagged pigs are listed by ID number; the group row (struck-tag icon, \"14 pigs\", its conditions on one line, a count button opening a keypad drawer) is always last.",
             "source": "penFeedEntry() · allocation(pe) · pe.switchDue · c.selectedPens",
             "at": "7.6 kg"
           },
@@ -2461,6 +2462,22 @@
       }
     },
     {
+      "id": "inspection.untagged-count",
+      "name": "Pigs without ID · selection count",
+      "zh": "无身份猪只 · 选择头数",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-notags-field=\"D4\"]"
+      ],
+      "notes": {
+        "rules": [
+          "Tap the count on the untagged group row to open the numeric keypad drawer. Done selects the entered head count for the current Inspection actions."
+        ]
+      }
+    },
+    {
       "id": "inspection.lookup-move-pens",
       "name": "Destination pen",
       "zh": "选择目标栏",
@@ -2474,7 +2491,7 @@
       "notes": {
         "purpose": "Find a registered destination in the inspected unit.",
         "rules": [
-          "Search a registered pen in the current unit or open the shared PenMap Sheet. Selecting a pen opens the review."
+          "Choose a registered pen on the current unit’s embedded map, then tap Review move."
         ],
         "issues": []
       }
@@ -2489,11 +2506,8 @@
       "steps": [
         "[data-action=\"lookup-exception\"][data-value=\"000430\"]",
         "[data-action=\"lookup-move-mode\"][data-value=\"select\"]",
-        {
-          "fill": "[data-move-pen-search]",
-          "text": "C12"
-        },
-        "[data-action=\"lookup-move-pen\"][data-value=\"C12\"]"
+        "[data-action=\"lookup-move-pen\"][data-value=\"C12\"]",
+        "[data-action=\"lookup-move-review\"]"
       ],
       "notes": {
         "purpose": "Review the pig and the source and destination before submitting.",
@@ -2513,11 +2527,8 @@
       "steps": [
         "[data-action=\"lookup-exception\"][data-value=\"000430\"]",
         "[data-action=\"lookup-move-mode\"][data-value=\"select\"]",
-        {
-          "fill": "[data-move-pen-search]",
-          "text": "C12"
-        },
         "[data-action=\"lookup-move-pen\"][data-value=\"C12\"]",
+        "[data-action=\"lookup-move-review\"]",
         "[data-action=\"lookup-move-confirm\"]"
       ],
       "notes": {

@@ -125,14 +125,14 @@
       "screenshots": [
         {
           "file": "screenshots/d01-finished-move-pen-picker.jpg",
-          "title": "先搜索或打开栏位图",
-          "caption": "选择房间和目标栏。",
+          "title": "直接显示栏位图",
+          "caption": "需要换房间时点顶上的房间卡片。",
           "version": "corrected"
         },
         {
           "file": "screenshots/d01a-finished-move-pen-map.jpg",
-          "title": "打开 PenMap Sheet",
-          "caption": "从地图点 B2。",
+          "title": "点选 B2",
+          "caption": "选中的目标栏有描边。点底部「核对转舍」继续。",
           "version": "corrected"
         },
         {

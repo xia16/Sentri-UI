@@ -101,7 +101,7 @@ Choose pigs 只选择当前单元的在场活猪。筛选可以区分“在分�
 
 **寄养送出：**已结束母猪记录 → **Piglets** → 勾选已有编号的仔猪 / 搜索或扫描选中 / 填无编号只数 → **Actions · N → Foster** → 选接收母猪 → 确认接收母猪和仔猪 → **Send N piglets** → 回 Piglets；剩余仔猪继续留着，送出的进入 Sent and moved。
 
-**移栏：**同样先选仔猪 → **Actions · N → Move** → 搜栏号或打开 PenMap Sheet → 选目标栏 → 核对并确认 → 回 Piglets 查看移栏记录。来源栏置灰。
+**移栏：**同样先选仔猪 → **Actions · N → Move** → 搜栏号或点选 B2 → 选目标栏 → 核对并确认 → 回 Piglets 查看移栏记录。来源栏置灰。
 
 这条 Foster 没有 Send / Receive 切换，因为待送出的仔猪已选好。其 Actions 只有 Foster / Move，不增加 Care、给予身份、编辑性别体重、数量核对或新的死亡入口。
 

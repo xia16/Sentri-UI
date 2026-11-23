@@ -2385,14 +2385,14 @@
           {
             "name": "Choose a destination",
             "at": "Choose a pen",
-            "shows": "Room, searchable pen list and an entrance to the standard PenMap Sheet. The source crate is disabled.",
-            "logic": "Tap a pen to open Review move.",
+            "shows": "Room selector and embedded PenMap. The source crate is disabled.",
+            "logic": "Tap a pen to select it, then use the footer to open Review move.",
             "source": "farrowing-astra-concept.js allocPenPage()"
           }
         ],
         "controls": [
           {
-            "control": "Tap a pen",
+            "control": "Review move",
             "does": "Opens the review for the ticked piglets",
             "goesTo": "farrowing.piglets-move-review"
           },
@@ -2409,7 +2409,7 @@
         ],
         "copy": [
           "Choose a pen",
-          "Open pen map",
+          "Review move",
           "Source pen"
         ],
         "edge": [],
@@ -2430,7 +2430,7 @@
       "notes": {
         "purpose": "Switch the destination room without losing the litter selection.",
         "rules": [
-          "The sow’s room comes first. Selecting a room returns to its searchable pens and keeps the selected piglets."
+          "The sow’s room comes first. Selecting a room returns to its map and keeps the selected piglets."
         ]
       },
       "steps": [
@@ -2445,7 +2445,8 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "piglets-pen",
       "steps": [
-        "[data-action=\"allocPenPick\"][data-value=\"B2\"]"
+        "[data-action=\"allocPenPick\"][data-value=\"B2\"]",
+        "[data-action=\"allocPenNext\"]"
       ],
       "figma": "",
       "notes": {

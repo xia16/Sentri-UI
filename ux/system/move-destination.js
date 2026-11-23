@@ -18,51 +18,45 @@ function codesFor({lanes=[],depth=6,rows=[],apart=[]}){
 const unavailable=pen=>pen.registered===false||pen.available===false?t('Pen unavailable','栏位不可用'):
  pen.full?t('Pen full','栏位已满'):pen.allowed===false?t('No permission','无权限'):'';
 
-const registered=room=>room.pens.filter(p=>p.registered!==false);
-const reasonFor=(p,blocked)=>blocked[p.id]||unavailable(p);
-function results({room,query='',selected='',action,blocked={}}){
- const q=normalize(query),pens=registered(room);
- if(!pens.length)return SentriUI.choiceEmpty(t('No registered pens','没有登记的栏位'),{icon:'search'});
- const found=pens.filter(p=>normalize(p.id).includes(q)).sort((a,b)=>sortCodes(a.id,b.id));
- return found.length?SentriUI.rowGroup(found.map(p=>{
-  const reason=reasonFor(p,blocked);
-  return SentriUI.row({variant:'navigation',title:p.id,description:reason,action,value:p.id,
-   disabled:!!reason,reason,attrs:p.id===selected?{'aria-current':'true'}:{},wrap:true});
- }).join('')):SentriUI.choiceEmpty(t('Try another pen code.','试试其他栏号。'),{title:t('No matching pens','没有匹配的栏位'),icon:'search'});
+function layoutFor(room,pens){
+ if(room.layout){
+  const known=new Set(codesFor(room.layout));
+  const extra=pens.filter(p=>!known.has(p.id)).map(p=>({code:p.id}));
+  return extra.length?{...room.layout,apart:[...(room.layout.apart||[]),...extra]}:room.layout;
+ }
+ // Sample rooms without a saved layout supply their existing pen codes.
+ const lanes=new Map(),apart=[];
+ for(const {id} of pens){
+  const match=/^([A-Z]+)([1-9]\d*)$/.exec(id);
+  if(!match){apart.push({code:id});continue;}
+  const [,letter,n]=match;
+  lanes.set(letter,Math.max(lanes.get(letter)||0,Number(n)));
+ }
+ return {lanes:[...lanes].sort(([a],[b])=>sortCodes(a,b)).map(([letter,n])=>({letter,n})),apart};
 }
 
-function mapSheet({room,selected,current,action,back,key,blocked}){
- const pens=registered(room),disabled=Object.fromEntries(pens.map(p=>[p.id,reasonFor(p,blocked)]).filter(([,reason])=>reason));
- const body=SentriUI.penMap({...room.layout,pens:Object.fromEntries(pens.map(p=>[p.id,'plain'])),
-  disabled,selected,current: selected||current,action,key,entrance:t('Entrance','入口'),
-  labels:{pen:code=>code,plain:'',map:t('Pens','栏位'),whole:t('Whole room','整栋'),byPen:t('Pen by pen','逐栏'),pens:range=>t('Pens '+range,range+' 栏')}});
- return SentriUI.sheet({surface:'menu',size:'long',sizing:'full',title:t('Choose a pen','选择目标栏'),
-  line:{text:room.name},body,scrim:{action:back,label:t('Back','返回')},
-  footer:SentriUI.penMapFooter({back:{action:back,label:t('Back','返回')}})});
-}
-
-function picker({room,query='',selected='',current='',blocked={},bar,back='back',key,roomAction='',mapAction,action,mapOpen}){
- const hasMap=!!room.layout&&codesFor(room.layout).length>1&&registered(room).length>1;
- const mapRow=hasMap?SentriUI.row({variant:'navigation',title:t('Open pen map','打开栏位图'),
-  icon:SentriIcons.icon('grid'),action:mapAction}):'';
+function picker({room,selected='',current='',blocked={},bar,back='back',key,roomAction='',action,reviewAction}){
+ const pens=room.pens.filter(p=>p.registered!==false);
+ const disabled=Object.fromEntries(pens.map(p=>[p.id,blocked[p.id]||unavailable(p)]).filter(([,reason])=>reason));
+ const body=pens.length?SentriUI.penMap({...layoutFor(room,pens),pens:Object.fromEntries(pens.map(p=>[p.id,'plain'])),
+  disabled,selected,current:selected||current,action,key,entrance:t('Entrance','入口'),
+  labels:{pen:code=>code,plain:'',map:t('Pens','栏位'),whole:t('Whole room','整栋'),byPen:t('Pen by pen','逐栏'),pens:range=>t('Pens '+range,range+' 栏')}}):
+  SentriUI.choiceEmpty(t('No registered pens','没有登记的栏位'),{icon:'grid'});
  const roomRow=roomAction?SentriUI.row({variant:'navigation',title:room.name,
   description:[room.zone,room.section!==room.name?room.section:null].filter(Boolean).join(' · '),
-  icon:SentriIcons.icon('barn'),action:roomAction,wrap:true}):'';
- const list=page({title:t('Choose a pen','选择目标栏'),line:roomAction?null:{text:room.name},bar,back,
-  above:(roomRow||mapRow?SentriUI.rowGroup(roomRow+mapRow):'')+search('pen',query),
-  body:'<div data-move-pen-results>'+results({room,query,selected,action,blocked})+'</div>'});
- if(!mapOpen||!hasMap)return list;
- return '<div class="page-background" inert aria-hidden="true">'+list+'</div>'+
-  mapSheet({room,selected,current,action,back,key,blocked});
+  icon:SentriIcons.icon('grid'),action:roomAction,wrap:true}):'';
+ return page({title:t('Choose a pen','选择目标栏'),line:roomAction?null:{text:room.name},bar,back,
+  above:roomRow?SentriUI.rowGroup(roomRow):'',body,
+  primary:{label:t('Review move','核对转舍'),action:reviewAction,waiting:!selected||!pens.some(p=>p.id===selected)||!!disabled[selected]}});
 }
 
 function targetRow(room,code,action){
  return SentriUI.row({variant:'navigation',title:room.name+' · '+code,description:t('Destination pen','目标栏'),action,wrap:true});
 }
 
-function search(kind,value=''){
- const pen=kind==='pen',label=pen?t('Search pen code','搜索栏号'):t('Find a room','搜索房间');
- return SentriUI.choiceSearch({label,placeholder:pen?t('e.g. C12','例如 C12'):label,value,attrs:{[pen?'data-move-pen-search':'data-move-room-search']:''}});
+function roomSearch(value=''){
+ const label=t('Find a room','搜索房间');
+ return SentriUI.choiceSearch({label,placeholder:label,value,attrs:{'data-move-room-search':''}});
 }
 function roomResults(rooms,home,selected,action,query=''){
  const q=normalize(query),groups=new Map();
@@ -82,5 +76,5 @@ function page({title,line,bar,back='back',above='',body,primary=null}){
  return SentriUI.sheet({variant:'page',className:'move-page',title,line,back:{action:back},bar,
   above:above?'<div class="move-picker-tools">'+above+'</div>':'',body,footer:primary?SentriUI.sheetFooter({back:false,primary}):false});
 }
-root.SentriMovePicker={t,esc,sortCodes,place,codesFor,unavailable,results,picker,targetRow,search,roomResults,page};
+root.SentriMovePicker={t,esc,sortCodes,place,codesFor,unavailable,picker,targetRow,roomSearch,roomResults,page};
 })(globalThis);
