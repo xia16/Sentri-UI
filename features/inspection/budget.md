@@ -155,3 +155,9 @@ Decision: a pen the walk has been through and one it has not take the same face.
 ## Cut list
 
 The fact line in every cell and its second vocabulary (`N health`, which also counted ongoing conditions); `Not in unit` and `No matches` (the quiet tile says both); the intro and layout notes; the unit name under the title (the walk's header has it); the current-pen ring and the pen number on the dock button; the peek's feed, formula, manual-feed, note and fault lines (the pen page has them, one tap away); a checked mark.
+
+## Recount · 2026-11-27
+
+- Inventory and questions: where am I (unit, pen); have I entered the physical total (Stepper); which tagged pigs are confirmed (search or reader, identity row, last known pen when different); which pens are staged (map tiles with observed or recorded number); what will change (observed vs on record, identity differences, unconfirmed tags, unresolved untagged delta); where is the record (pen log).
+- Levels: act now = count and search, Done/Finish/Save at their stage; watch = an unexpected placement or missing tag; settled = staged pen tiles and matching counts; audit = origin, destination and log evidence.
+- Cut: transfer task details, arrival progress, cause selection, and any inferred disposition for animals not observed. Show just the unresolved count when the rule for an unobserved pen is blocked.

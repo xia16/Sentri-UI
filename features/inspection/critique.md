@@ -324,3 +324,19 @@ Scope: the words only. At `?lang=zh` these screens read in English where the Ins
 ## Attention budget
 
 Unchanged: each screen shows the same information in the same order as on main, in Chinese. Cut list: nothing is cut.
+
+## Inspection recount · 2026-11-27
+
+### Keep
+
+The Inspection pen door, existing five pen tools and pen log stay in their current hierarchy. The normal Inspection search, scan, pen map and Farrowing entry stay distinct.
+
+### Problems
+
+- Major: `inspection.pen` on `df82ba5d` has no live Count action. The older `inspection.set-count` screens point to the archived quantity-calibration deck.
+- Major: the retired deck does not show a live staged count for each pen or a unit review when the net number stays the same but the tag identities differ. Boards 5–12 show the replacement.
+- Major: disposition and allocation at the save boundary are incomplete in the source. Show what was observed, and keep unresolved writes as open decisions.
+
+### Parts
+
+Use RowGrid for the Count door, Page/Sheet and its footer for each surface, PenMap for the map geometry, Stepper for whole-pen count, ChoiceSearch and selectable rows for ear tags, and navigation rows and Log for the review and audit. Keep count-specific map content in Inspection until its PenMap variant is agreed across features.

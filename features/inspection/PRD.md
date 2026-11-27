@@ -48,3 +48,16 @@ Open (recorded on the screens as issues):
 - "Health" and "Feed" lens counts do not say what they count.
 - The care level shows on a row only by the tag's look (red wash with "!", outlined, plain); the care word and the day are on the record.
 - Fixed author "G. Hansen" and times 06:40 and 09:41 stand in for the signed-in worker and real times.
+
+## Inspection recount
+
+[Claude Design, boards 1, 5–13 and 25](canvas.md) is the source for this prototype round. Count opens from a pen; the unit recount map also opens from the inspection Pen map. Choose an empty or occupied pen. Record its whole physical count, then scan or search for each tagged animal. The tag list starts empty; a repeated read counts once and a stray read can be unticked. Done stages the pen and goes to the recount map. Open the same pen again to correct it.
+
+Finish recount saves a round with no differences. Changed headcounts and found or unconfirmed identities go to a review before Save. A tag actually seen in another unit shows the recorded origin and its observed destination. A recorded tag not confirmed appears by ear tag and original pen as a batch discrepancy; it does not create a Missing or Death report. Each saved sample count is visible in the pen log. The prototype stores only sample data for the active session.
+
+## Not supported
+
+- Planned transfer and receiving. These use separate task flows.
+- Automatic death or missing reports from a count. Those are separate, deliberate operations.
+
+Open product decisions for incomplete counts, tag status after save and interaction with open moves are in [the scenario tree](scenario-tree.md#2--open-decisions).
