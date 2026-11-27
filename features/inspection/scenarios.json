@@ -402,6 +402,64 @@
             },
             {
               "type": "action",
+              "id": "action-unit-progress",
+              "label": "unit-progress",
+              "taps": [
+                "[data-action=\"count-unit\"]",
+                "[data-action=\"count-open-pen\"][data-value=\"C3\"]",
+                "[data-action=\"count-done\"]",
+                "[data-action=\"count-open-pen\"][data-value=\"D4\"]",
+                "[data-action=\"count-done\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "inspect-count-unit-progress",
+                  "label": "Both pens are staged and only the occupied one advances progress.",
+                  "tree": "C-13",
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Inspection recount",
+                      "says": "The map shows occupied-pen progress, staged counts and remaining recorded stock."
+                    }
+                  ],
+                  "gwt": {
+                    "given": "C3 is empty and D4 has pigs.",
+                    "when": "The worker stages both pens.",
+                    "then": "C3 shows a verified zero, one occupied pen is counted and the footer describes the remaining stock."
+                  },
+                  "visible": [
+                    {
+                      "el": "[data-action=\"count-open-pen\"][data-value=\"C3\"][data-level=\"done\"]"
+                    },
+                    {
+                      "el": "[data-action=\"count-open-pen\"][data-value=\"D4\"][data-level=\"done\"]"
+                    },
+                    {
+                      "el": "[data-action=\"count-open-pen\"][data-value=\"C2\"][data-level=\"plain\"]"
+                    },
+                    {
+                      "text": {
+                        "en": "1 of 3 pens with pigs counted",
+                        "zh": "1 / 3 个有猪栏位已盘点"
+                      },
+                      "in": "sheet"
+                    },
+                    {
+                      "text": {
+                        "en": "5 on record",
+                        "zh": "账面 5 头"
+                      },
+                      "in": "sheet"
+                    }
+                  ],
+                  "record": []
+                }
+              ]
+            },
+            {
+              "type": "action",
               "id": "action-too-few",
               "label": "too-few",
               "taps": [

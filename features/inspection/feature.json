@@ -2399,7 +2399,7 @@
       ],
       "figma": "",
       "notes": {
-        "purpose": "Choose another pen or finish the unit recount. Counted pens can be reopened and empty pens accept a count."
+        "purpose": "Choose another pen or finish the unit recount. Progress counts occupied pens, green tiles show staged observations, and the footer shows pending recorded stock or the sum of the actual counts."
       }
     },
     {

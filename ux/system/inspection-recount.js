@@ -174,19 +174,41 @@ function page(title, unit, body, primary, bar, footerSummary = '') {
     back:{action:'count-back',label:t('Back','返回')},footer});
 }
 
+function countFooter(ui, title, description) {
+  return '<div class="recount-summary" role="status">'+
+    ui.heading({kind:'panel',level:3,title,description})+'</div>';
+}
+
 function mapPage(c, unit, bar, {lanes,depth}) {
   const ui = globalThis.SentriUI;
   const observations = c.recount.observations;
+  const recordedStock = c.pens.filter(pen => headcount(pen) > 0);
+  // A pen recorded as occupied still counts toward progress when it is verified empty.
+  const occupied = new Set(recordedStock.map(pen => pen.id));
   const counts = Object.fromEntries(c.pens.map(pen => [pen.id,{count:headcount(pen)}]));
-  for (const [id, observation] of Object.entries(observations)) counts[id] = {count:observation.total,counted:true};
-  const map = ui.penMap({lanes,depth,counts,action:'count-open-pen',key:'inspection-count-map',
+  for (const [id, observation] of Object.entries(observations)) {
+    counts[id] = {count:observation.total,counted:true};
+    if (observation.total > 0) occupied.add(id);
+  }
+  const staged = Object.values(observations);
+  const done = [...occupied].filter(id => counts[id].counted).length;
+  const pending = recordedStock.filter(pen => !observations[pen.id]);
+  const pendingPigs = pending.reduce((sum, pen) => sum + headcount(pen), 0);
+  const countedPigs = staged.reduce((sum, observation) => sum + observation.total, 0);
+  const title = pending.length === 1 ? t(pending[0].id+' not counted',pending[0].id+' 栏未盘') :
+    pending.length ? t(pending.length+' pens not counted',pending.length+' 栏未盘') :
+    occupied.size ? t('Ready to finish','有猪栏位已盘完') : t('No occupied pens','暂无有猪栏位');
+  const detail = pending.length ? t(pendingPigs+' on record','账面 '+pendingPigs+' 头') :
+    t(countedPigs+(countedPigs === 1 ? ' pig counted' : ' pigs counted'),'实盘 '+countedPigs+' 头');
+  const overview = {done,total:occupied.size,
+    label:t('of '+occupied.size+' '+(occupied.size === 1 ? 'pen' : 'pens')+' with pigs counted','/ '+occupied.size+' 个有猪栏位已盘点'),
+    detail:t('Started 09:41 · G. Hansen','09:41 开始 · G. Hansen')};
+  const map = ui.penMap({lanes,depth,counts,overview,action:'count-open-pen',key:'inspection-count-map',
     entrance:t('Entrance','入口'), labels:{map:t('Pens','栏位'),pen:penLabel,counted:t('Counted','已盘'),
-      onRecord:t('On record','账面'),emptyValue:t('Empty','空栏')}});
-  const done = Object.keys(observations).length;
-  return page(t('Recount','盘点'), unit, '<div class="recount-flow">'+
-    ui.heading({kind:'section',level:2,title:t(done+(done===1?' pen counted':' pens counted'),'已盘 '+done+' 栏')})+map+'</div>', {
-    label:t('Finish recount','结束盘点'), action:'count-finish', waiting:!done
-  },bar);
+      notCounted:t('Not counted','未盘'),onRecord:t('On record','账面'),emptyValue:t('Empty','空栏')}});
+  return page(t('Recount','盘点'), unit, map, {
+    label:t('Finish recount','结束盘点'), action:'count-finish', waiting:!staged.length
+  },bar,countFooter(ui,title,detail));
 }
 
 function tagList(c, unit) {
@@ -265,8 +287,7 @@ function penPage(c, unit, bar) {
     missing.length ? t(missing.length+' tags not confirmed',missing.length+' 个耳标待确认') :
     draft.total === headcount(pen) && tagged === (pen?.pigs.length ?? 0) ?
       t('Matches the record','与账面吻合') : t('Differs from the record','与账面有差异');
-  const footerSummary = '<div class="recount-summary" role="status">'+
-    ui.heading({kind:'panel',level:3,title:summaryTitle,description:summaryDetail})+'</div>';
+  const footerSummary = countFooter(ui,summaryTitle,summaryDetail);
   const quantity = ui.stepper({variant:'well',label:t('How many pigs are in '+r.pen+'?',r.pen+' 栏一共有几头猪？'),
     value:draft.total,min:0,action:'count-step',key:r.pen,error:under ? error : ''});
   const search = r.listening ?

@@ -18,6 +18,7 @@ The scope for this round is the Inspection recount. Sources are [canvas.md](canv
 | C-10 | Review | Save an unconfirmed tag | ? Q2 for its downstream placement and lifecycle; show the original pen and a discrepancy in the preview | S — board 11 and conflicting Count PRD sections | |
 | C-11 | Pen count | Confirm tag on an active move into the unit | ? Q3 | S — 17 Nov canvas note and open task reconciliation | |
 | C-12 | Draft on a phone | Reload, go offline, or another worker saves | ? Q4 for native durability and conflicts | I — required for a real inventory write | |
+| C-13 | Unit recount map | Stage an empty pen at zero, then stage an occupied pen | → mark both counted, advance occupied-pen progress once, and show the remaining recorded stock | S — board 5 |
 
 ## 2 · Open decisions
 

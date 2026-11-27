@@ -163,3 +163,5 @@ The fact line in every cell and its second vocabulary (`N health`, which also co
 - Cut: transfer task details, arrival progress, cause selection, and any inferred disposition for animals not observed. Show just the unresolved count when the rule for an unobserved pen is blocked.
 
 - Pen entry fits the reference's four reads in this order: current headcount, confirmed ear tags, recent stock history, and the live untagged tally by Done. The untouched ear-tag panel prompts the worker to scan and shows the number of expected tagged pigs. The history uses a sample record in the preview.
+
+- Read the unit map in order: occupied-pen progress, the counted colour key, physical pen positions and observed or recorded numbers, then the remaining recorded stock beside Finish. Once the occupied pens are counted, the same footer position shows the observed total.

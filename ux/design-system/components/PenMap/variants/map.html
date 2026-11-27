@@ -68,7 +68,8 @@ const open=(name,lang,o)=>{
 };
 const R={
  recount:()=>UI.sheet({variant:'page',title:'Recount',line:{text:'Unit 7'},back:{action:'back'},
-  body:UI.penMap({lanes:['C','D'],depth:5,counts:{C1:{count:3,counted:true},D4:{count:18,counted:true},D5:{count:38}},key:'pm-recount'}),
+  body:UI.penMap({lanes:['C','D'],depth:5,counts:{C1:{count:3,counted:true},C2:{count:2,counted:true},D4:{count:18,counted:true},D5:{count:38}},
+    overview:{done:3,total:4,label:'of 4 pens with pigs counted',detail:'Started 09:05 · L.M'},key:'pm-recount'}),
   footer:UI.sheetFooter({back:false,primary:{label:'Finish recount',action:'finish'}})}),
  unit7:()=>open('unit7','en'),
  pressed:()=>open('unit7','en'),

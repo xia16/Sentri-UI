@@ -805,7 +805,7 @@ export interface SentriUI { rangeSlider(props?:RangeSliderProps):string; filterS
 /** A pen's status on the map. act: needs the worker. live: farrowing. plain: has sows the list shows. hidden: has sows the current tab or filter hides. A pen missing from pens is empty. */
 export type PenLevel = 'act' | 'live' | 'plain' | 'hidden';
 /** whole / byPen: the footer button's two words (Whole room, Pen by pen); pens: a shared tile's name ('Pens A11–20'). */
-export interface PenMapLabels { map?: string; act?: string; live?: string; plain?: string; empty?: string; hidden?: string; counted?: string; onRecord?: string; emptyValue?: string; pen?: (code: string) => string; pens?: (range: string) => string; whole?: string; byPen?: string }
+export interface PenMapLabels { map?: string; act?: string; live?: string; plain?: string; empty?: string; hidden?: string; counted?: string; notCounted?: string; onRecord?: string; emptyValue?: string; pen?: (code: string) => string; pens?: (range: string) => string; whole?: string; byPen?: string }
 /** A lane of the room as the farm layout describes it: runs of one pen type each, in order from the main door. */
 /** size: the pen type's length along the lane in cm (the layout type's w); tiles are as tall as their pens are long against the room's other pens. */
 export interface PenMapRun { n: number; type?: string; size?: number }
@@ -828,6 +828,8 @@ export interface PenMapProps {
   pens?: Record<string, PenLevel>;
   /** Recount tiles: all physical pens open, with an observed or recorded number. Missing entries are empty. */
   counts?: Record<string, { count: number; counted?: boolean }>;
+  /** An optional progress card and key before the map. done is the occupied pens counted so far and total is the occupied pens in scope. */
+  overview?: { done: number; total: number; label: string; detail?: string };
   /** The pen the map opens centred on. */
   current?: string;
   /** The data-action of every tile that can be opened; its data-value is the pen code. */

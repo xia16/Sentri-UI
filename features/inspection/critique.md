@@ -348,3 +348,7 @@ At 390 px the Count tile sits next to the existing pen tools, so the worker can 
 #### Pen input follow-up · 2026-11-27
 
 The previous count hero put the label inside its card, reduced the untouched ear-tag state to one line, and omitted the history and bottom-left tally. The [layout comparison](count-layout/canvas.html) matches the reference's hierarchy with Stepper Well, a Panel with ChoiceList's empty state, and evidence Rows. The footer keeps the sample-derived untagged number and tag confirmation beside Done. The compact Stepper uses the current white page surface. D4 uses the prototype's recorded two tagged pigs so the displayed counts and sample behave consistently.
+
+#### Unit map follow-up · 2026-11-27
+
+The previous map had one count, green figures on white tiles and an action-only footer. The [layout comparison](count-layout/canvas.html#unit) shows the progress card with one segment per occupied pen, the full done face and its key, and the pending pens and recorded stock beside Finish. A green zero distinguishes a verified empty pen from the quiet Empty state. The fixture retains the physical Inspection map and shows original recorded stock where the reference illustrates a disputed adjustment.
