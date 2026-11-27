@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>巡检盘点 · 栏位页对照</title>
+<style>
+  body { margin: 0; background: #f4f5ef; color: #202a1e; font: 16px/1.6 system-ui, sans-serif; }
+  main { max-width: 1240px; padding: 28px 18px; margin: auto; }
+  h1 { line-height: 1.25; }
+  .boards { display: flex; flex-wrap: wrap; gap: 18px; }
+  figure { width: min(100%, 390px); margin: 0; }
+  img { display: block; width: 100%; height: auto; border-radius: 16px; }
+  figcaption { padding: 8px 0 20px; }
+  aside { margin: 22px 0; padding: 14px 18px; background: white; border-radius: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>巡检盘点 · 栏位页对照</h1>
+  <p>对照《盘点｜逐栏核对》第 2 页。画面使用当前巡检的 D4 样例，账面 16 头，其中 2 头带耳标。</p>
+  <section class="boards" aria-label="英文改前改后">
+    <figure><img src="old-390-en.png" width="390" height="844" alt="改前的英文栏位盘点"><figcaption>改前 · 大号计数器、单行空态、单个完成按钮</figcaption></figure>
+    <figure><img src="blank-390-en.png" width="390" height="844" alt="改后的英文耳标空态"><figcaption>改后 · 横排计数、耳标空态、上次盘点记录和底栏统计</figcaption></figure>
+    <figure><img src="matched-390-en.png" width="390" height="844" alt="两个耳标都确认后的英文界面"><figcaption>改后 · 两个耳标均确认，底栏显示 14 头无耳标及账面吻合</figcaption></figure>
+  </section>
+  <section class="boards" aria-label="中文界面">
+    <figure><img src="blank-390-zh.png" width="390" height="844" alt="改后的中文耳标空态"><figcaption>改后 · 中文空态，历史区使用模拟数据</figcaption></figure>
+  </section>
+  <aside>单元入口待定。原参考展示了进入后的盘点地图，未画单元列表上触发这个页面的位置。当前草稿从巡检的「栏位图」底部进入单元盘点。</aside>
+</main>
+</body>
+</html>

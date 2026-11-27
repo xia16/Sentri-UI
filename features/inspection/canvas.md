@@ -4,3 +4,5 @@
 - [Colour in the health and treatment pickers](https://claude.ai/artifact/CaAFZ7wmNkGcNDUkdfTYTH) (2026-11-03): the owner found Conditions, Treatment and Medicines grey and dull. Four levers on the live pages: A white rows (a picker as a menu drawer), B the selection in green, C the withdrawal as the consequence, D a hue per body area and drug class. Sources: `features/inspection/picker-colour-round/` (mock.mjs). On hold: the owner first wants one surface convention (2026-11-03).
 
 - [Count · 巡检盘点](https://claude.ai/artifact/2SXtYQML5GGP7W33176wvn#page-dcb81aee8d83)（接入范围：画板 1、5–13、25）。从巡检栏位进入、逐栏录数与确认耳标、单元差异明细和栏位日志。2026-11-27 用户要求接入此画布的巡检盘点部分。转出和接猪画板不在本轮；下列计数未决项见 [scenario-tree.md](scenario-tree.md#2--open-decisions)。
+
+- [巡检盘点 · 栏位页对照](count-layout/canvas.html)（2026-11-27）。按《盘点｜逐栏核对》第 2 页复原计数器、耳标空态、盘点历史及底部统计。第 1 页展示打开后的单元盘点地图。上一轮原型在巡检「栏位图」底部放了一个入口，单元列表上的触发位置仍待产品确认。
