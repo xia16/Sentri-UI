@@ -166,11 +166,12 @@ function save(c, unit, record, result) {
   c.recount = null;
 }
 
-function page(title, unit, body, primary, bar) {
+function page(title, unit, body, primary, bar, footerSummary = '') {
   const ui = globalThis.SentriUI;
+  const footer = footerSummary ? ui.sheetFooter({back:false,className:'recount-footer',
+    content:footerSummary+ui.button({...primary,register:'primary'})}) : primary && ui.sheetFooter({back:false,primary});
   return ui.sheet({variant:'page',className:'inspection-recount',title,line:{text:unit},body,bar,
-    back:{action:'count-back',label:t('Back','返回')},
-    footer:primary ? ui.sheetFooter({back:false,primary}) : false});
+    back:{action:'count-back',label:t('Back','返回')},footer});
 }
 
 function mapPage(c, unit, bar, {lanes,depth}) {
@@ -200,20 +201,24 @@ function tagList(c, unit) {
       inputAttrs:{'aria-label':t('Remove ','移除 ')+pig.id}}) :
       ui.row({variant:'navigation',title:pig.id,description:location,action:'count-pick',value:pig.id});
   };
+  const recordedTags = c.pens.find(pen => pen.id === r.pen)?.pigs ?? [];
   const entryFor = id => known.find(x => x.pig.id === id);
   const chosen = draft.tags.map(entryFor).filter(Boolean);
   const term = r.query.trim();
   const hits = term ? known.filter(x => !draft.tags.includes(x.pig.id) && x.pig.id.includes(term)).slice(0,12) : [];
   const group = rows => '<div class="st-panel st-row-group">'+rows+'</div>';
-  const missing = chosen.length ? known.filter(x => x.local && x.pen.id === r.pen && !draft.tags.includes(x.pig.id)).map(x => x.pig.id) : [];
+  const missing = chosen.length ? recordedTags.filter(pig => !draft.tags.includes(pig.id)).map(pig => pig.id) : [];
   const origin = r.read ? entryFor(r.read) : null;
   const notice = r.read === '000999' ? t('Ear tag not found: ','未找到耳标：')+r.read :
     origin && (!origin.local || origin.pen.id !== r.pen) ? r.read+' · '+origin.unit+' · '+penLabel(origin.pen.id) : '';
   return (notice ? '<p class="st-find-hint" role="status">'+esc(notice)+'</p>' : '') +
     (hits.length ? group(hits.map(x => row(x, false)).join('')) :
       term && !chosen.some(x => x.pig.id.includes(term)) ? '<p class="st-find-hint" role="status">'+t('No matching ear tag','没有匹配的耳标')+'</p>' : '') +
-    (chosen.length ? group(chosen.map(x => row(x, true)).join('')) :
-      '<p class="st-find-hint">'+t('Scan every tagged pig','扫描每头带耳标的猪')+' · '+t(known.filter(x => x.local && x.pen.id === r.pen).length+' on record','账面 '+known.filter(x => x.local && x.pen.id === r.pen).length+' 头')+'</p>') +
+    (chosen.length ? group(chosen.map(x => row(x, true)).join('')) : !term ?
+      ui.panel(ui.choiceEmpty(t(
+        recordedTags.length+' on record in '+r.pen,
+        r.pen+' 栏账面有 '+recordedTags.length+' 头带耳标'
+      ), {title:t('Scan every tagged pig','扫描每头带耳标的猪')})) : '') +
     (missing.length ? '<p class="st-find-hint">'+t('On record, not yet confirmed: ','账面有、尚未确认：')+esc(missing.join(', '))+'</p>' : '');
 }
 
@@ -224,27 +229,61 @@ export function recountInput(c, el, unit) {
   return true;
 }
 
+function countHistory(c, unit, id, pen) {
+  const ui = globalThis.SentriUI;
+  const last = c.recountHistory?.findLast(round => round.unit === unit && round.pens[id])?.pens[id];
+  const title = ui.heading({title:t('Since the last count','上次盘点以来'),icon:globalThis.SentriIcons.icon('record'),level:2});
+  const line = (title, description, number) => ui.row({variant:'read',title,description,trailing:String(number)});
+  const counted = t('Counted','已盘点');
+  // The D4 example mirrors the reference ledger. A saved sample count becomes
+  // the latest count in the active prototype session.
+  const rows = last ? line(counted,t('Saved this session','本次会话已保存'),last.total) : id === 'D4' && pen ?
+    line(counted,t('Oct 28 · 08:10 · G.H','10月28日 · 08:10 · G.H'),20) +
+    line(t('Moved to D6','转至 D6 栏'),t('Oct 30 · 14:20 · M.L','10月30日 · 14:20 · M.L'),'−3') +
+    line(t('Died','死亡'),t('Oct 31 · 07:05 · G.H','10月31日 · 07:05 · G.H'),'−1') : '';
+  const onRecord = rows ? line(t('Should be here now','当前账面'),t(
+    (pen?.pigs.length ?? 0)+' with ear tags · '+(pen?.untagged?.count ?? 0)+' without',
+    '有耳标 '+(pen?.pigs.length ?? 0)+' 头 · 无耳标 '+(pen?.untagged?.count ?? 0)+' 头'
+  ),headcount(pen)) : '';
+  return '<section class="recount-section">'+title+
+    (rows ? ui.rowGroup(rows+onRecord) : ui.panel(ui.choiceEmpty(t('No count records yet','暂无盘点记录'))))+'</section>';
+}
+
 function penPage(c, unit, bar) {
   const ui = globalThis.SentriUI;
   const r = c.recount;
   const draft = r.drafts[r.pen];
-  const under = draft.total < draft.tags.length;
-  const prompt = t('How many pigs are here?', '这里一共有几头猪？');
-  const canEstimateUntagged = draft.tags.length > 0 || !c.pens.find(p => p.id === r.pen)?.pigs.length;
-  const quantity = ui.stepper({variant:'count',label:prompt,value:draft.total,min:0,action:'count-step',key:r.pen,
-    error:under ? t('Total is below confirmed ear tags.','总数少于已确认的耳标数。') : ''});
+  const pen = c.pens.find(pen => pen.id === r.pen);
+  const tagged = draft.tags.length;
+  const missing = (pen?.pigs ?? []).filter(pig => !draft.tags.includes(pig.id));
+  const under = draft.total < tagged;
+  const error = t('Total is below confirmed ear tags.','总数少于已确认的耳标数。');
+  const summaryTitle = under ? t('Check the total','请核对总数') :
+    t((draft.total-tagged)+' without ear tags','无耳标 '+(draft.total-tagged)+' 头');
+  const summaryDetail = under ? '' : !tagged && missing.length ? t('None scanned yet','尚未确认耳标') :
+    missing.length === 1 ? t(missing[0].id+' not confirmed',missing[0].id+' 待确认') :
+    missing.length ? t(missing.length+' tags not confirmed',missing.length+' 个耳标待确认') :
+    draft.total === headcount(pen) && tagged === (pen?.pigs.length ?? 0) ?
+      t('Matches the record','与账面吻合') : t('Differs from the record','与账面有差异');
+  const footerSummary = '<div class="recount-summary" role="status">'+
+    ui.heading({kind:'panel',level:3,title:summaryTitle,description:summaryDetail})+'</div>';
+  const quantity = ui.stepper({variant:'well',label:t('How many pigs are in '+r.pen+'?',r.pen+' 栏一共有几头猪？'),
+    value:draft.total,min:0,action:'count-step',key:r.pen,error:under ? error : ''});
   const search = r.listening ?
     ui.scanBar({state:c.scan?.connected ? 'scanning' : 'waiting',device:'Reader 1',stop:{action:'count-stop',label:t('Stop scanning','停止扫码')}}) :
     ui.choiceSearch({label:t('Ear tag','耳标'),placeholder:t('Ear tag','耳标'),value:r.query,attrs:{'data-recount-query':''},
       scan:{action:'count-scan',label:t('Scan ear tag','扫描耳标')}});
   const conflict = r.conflict && draft.tags.includes(r.conflict) ?
     '<p class="st-find-hint" role="alert">'+esc(r.conflict)+' · '+t('Already confirmed in another counted pen. Check both pens.','同一耳标已在另一栏确认，请核对两栏。')+'</p>' : '';
-  return page(penLabel(r.pen), unit, '<div class="recount-flow">'+quantity+
-    ui.heading({kind:'section',level:2,title:t('Which tagged pigs are here?','哪些带耳标的猪在这里？')})+search+
-    '<div class="recount-tags" data-recount-tags>'+tagList(c,unit)+'</div>'+conflict+
-    (canEstimateUntagged && !under ? '<p class="st-find-hint">'+t(draft.total-draft.tags.length+' without ear tags','无耳标 '+(draft.total-draft.tags.length)+' 头')+'</p>' : '')+'</div>',{
+  const tagsTitle = ui.heading({kind:'section',level:2,title:t('Which tagged pigs are here?','哪些带耳标的猪在这里？'),
+    icon:globalThis.SentriIcons.icon('tag'),meta:tagged ? t(tagged+' found','已确认 '+tagged+' 头') : ''});
+  const title = t('Count '+r.pen,r.pen+' 栏盘点');
+  return page(title, unit, '<div class="recount-pen-flow">'+quantity+
+    '<section class="recount-section">'+tagsTitle+search+
+    '<div class="recount-tags" data-recount-tags>'+tagList(c,unit)+'</div>'+conflict+'</section>'+
+    countHistory(c,unit,r.pen,pen)+'</div>',{
       label:t('Done','完成'),action:'count-done',waiting:under
-    },bar);
+    },bar,footerSummary);
 }
 
 const reviewTitles = {

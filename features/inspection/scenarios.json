@@ -60,8 +60,29 @@
                   "visible": [
                     {
                       "text": {
-                        "en": "How many pigs are here?",
-                        "zh": "这里一共有几头猪？"
+                        "en": "How many pigs are in D4?",
+                        "zh": "D4 栏一共有几头猪？"
+                      },
+                      "in": "sheet"
+                    },
+                    {
+                      "text": {
+                        "en": "Scan every tagged pig",
+                        "zh": "扫描每头带耳标的猪"
+                      },
+                      "in": "sheet"
+                    },
+                    {
+                      "text": {
+                        "en": "Since the last count",
+                        "zh": "上次盘点以来"
+                      },
+                      "in": "sheet"
+                    },
+                    {
+                      "text": {
+                        "en": "None scanned yet",
+                        "zh": "尚未确认耳标"
                       },
                       "in": "sheet"
                     },
@@ -111,6 +132,13 @@
                   "visible": [
                     {
                       "el": "[data-action=\"count-untick\"][value=\"000801\"]"
+                    },
+                    {
+                      "text": {
+                        "en": "000802 not confirmed",
+                        "zh": "000802 待确认"
+                      },
+                      "in": "sheet"
                     },
                     {
                       "el": "[data-action=\"count-pick\"][data-value=\"000801\"]",

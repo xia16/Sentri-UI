@@ -51,7 +51,9 @@ Open (recorded on the screens as issues):
 
 ## Inspection recount
 
-[Claude Design, boards 1, 5–13 and 25](canvas.md) is the source for this prototype round. Count opens from a pen; the unit recount map also opens from the inspection Pen map. Choose an empty or occupied pen. Record its whole physical count, then scan or search for each tagged animal. The tag list starts empty; a repeated read counts once and a stray read can be unticked. Done stages the pen and goes to the recount map. Open the same pen again to correct it.
+[Claude Design, boards 1, 5–13 and 25](canvas.md) is the source for this prototype round. Count opens from a pen. Board 5 specifies the unit recount map once the round has opened. The control that opens it from a unit is unresolved. The preview puts a Recount shortcut in the existing Inspection Pen map footer for walk-throughs. Choose an empty or occupied pen. Record its whole physical count, then scan or search for each tagged animal. The tag list starts empty; a repeated read counts once and a stray read can be unticked. Done stages the pen and goes to the recount map. Open the same pen again to correct it.
+
+The pen's compact count control puts the question above the minus, number and plus. While no ear tags have been confirmed, the empty panel prompts the worker to scan and shows how many the record expects for that pen. The footer computes total minus confirmed tags and shows scan or match status beside Done. Its figure is provisional until the tags have been checked. Since the last count shows a sample D4 history, or the latest count saved in the active session. See the [layout comparison](count-layout/canvas.html).
 
 Finish recount saves a round with no differences. Changed headcounts and found or unconfirmed identities go to a review before Save. A tag actually seen in another unit shows the recorded origin and its observed destination. A recorded tag not confirmed appears by ear tag and original pen as a batch discrepancy; it does not create a Missing or Death report. Each saved sample count is visible in the pen log. The prototype stores only sample data for the active session.
 

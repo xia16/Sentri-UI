@@ -7,7 +7,7 @@ The scope for this round is the Inspection recount. Sources are [canvas.md](canv
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
 | C-1 | Inspection pen page | Count | → open that pen with no tag selected | S — boards 1, 6 | |
-| C-2 | Unit map | Recount, choose an empty pen | → enter zero or a positive observed count | S — board 5 | |
+| C-2 | Unit map | Recount, choose an empty pen | → enter zero or a positive observed count | S — board 5 after entry; I — prototype footer shortcut | |
 | C-3 | Pen count | Search, confirm known tag; repeat scan or untick | → one entry per ear tag and removable misread | S — boards 6–8 | |
 | C-4 | Pen count | Total below confirmed tags | → keep the draft, wait for a consistent count | S — Count PRD counting order | |
 | C-5 | Pen count | Done, re-open the same pen | → stage, then edit the same observation | S — boards 5, 7 | |

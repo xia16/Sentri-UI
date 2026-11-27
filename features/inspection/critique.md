@@ -344,3 +344,7 @@ Use RowGrid for the Count door, Page/Sheet and its footer for each surface, PenM
 ### Self-crit
 
 At 390 px the Count tile sits next to the existing pen tools, so the worker can reach it from the pen they are looking at. The existing map's Back stays in place and Recount opens a dedicated map that can distinguish a staged observation from its original number. The pen's dominant number, search-and-scan, then Done match the canvas order. The review keeps the original and observed totals on either side of the differences, so a net-zero identity change still has two explicit rows.
+
+#### Pen input follow-up · 2026-11-27
+
+The previous count hero put the label inside its card, reduced the untouched ear-tag state to one line, and omitted the history and bottom-left tally. The [layout comparison](count-layout/canvas.html) matches the reference's hierarchy with Stepper Well, a Panel with ChoiceList's empty state, and evidence Rows. The footer keeps the sample-derived untagged number and tag confirmation beside Done. The compact Stepper uses the current white page surface. D4 uses the prototype's recorded two tagged pigs so the displayed counts and sample behave consistently.
