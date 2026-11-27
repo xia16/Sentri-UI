@@ -2,13 +2,13 @@
 
 A pen map shows a room as a map of pens, each pen a tile that goes to that pen and is coloured by its status, so a worker finds the pen in front of her by where it is and sees at once which ones need her. It is Farrowing's and Inspection's Pen map. It sits in a menu drawer ([Sheet](../Sheet/README.md), `surface: 'menu'`) and does not record a farm fact.
 
-`SentriUI.penMap({ lanes, depth, rows, apart, aSide, entranceAt, backDoor, pens, current, action, key, entrance, labels, peek })` draws the body: the Entrance band and the map. `SentriUI.penMapKey({ pens, words })` gives the items of the sheet's key line (the legend; see below). `SentriUI.penMapFooter({ back })` draws the footer (Back; the map adds [Whole room](#whole-room) beside it when it needs it). `SentriUI.penPeek({ title, meta, rows, more })` draws the hold-to-peek card's content. Types are in `index.d.ts`.
+`SentriUI.penMap({ lanes, depth, rows, apart, aSide, entranceAt, backDoor, pens, counts, current, action, key, entrance, labels, peek })` draws the body: the Entrance band and the map. `SentriUI.penMapKey({ pens, words })` gives the items of the sheet's key line (the legend; see below). `SentriUI.penMapFooter({ back })` draws the footer (Back; the map adds [Whole room](#whole-room) beside it when it needs it). `SentriUI.penPeek({ title, meta, rows, more })` draws the hold-to-peek card's content. Types are in `index.d.ts`.
 
 Classification: **component** (a new job; no existing component draws a map of places). Two variants: the map, and the map's [Whole room](#whole-room) view.
 
 ## Recount tiles
 
-Inspection can pass `counts` to show a second line with a physical pen’s recorded or observed headcount. Each value is `{ count, counted? }`. The tile is green only after a count is staged. A pen with no entry is empty, but can still be opened. The pen layout, tap action and dimensions are the same as the standard map. The host owns the observation and the save decision. No value or count status is drawn for callers that omit `counts`.
+Inspection can pass `counts` to show a second line with a physical pen’s recorded or observed headcount. Each value is `{ count, counted? }`. The count gets a green status label after the observation is staged. A pen with no entry is empty, but can still be opened. The pen layout, tap action and dimensions are the same as the standard map. The host owns the observation and the save decision. No value or count status is drawn for callers that omit `counts`.
 
 ## When to use / when not
 

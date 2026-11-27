@@ -278,7 +278,8 @@ function detailPage(c, unit, bar) {
   const detail = summary[key].map(x => ui.row({variant:'read',title:x.pig.id,
     description:x.unit+' · '+penLabel(x.pen.id)+(x.to ? ' → '+penLabel(x.to) : ''),wrap:true})).join('');
   const note = key === 'notFound' ? '<p class="st-find-hint">'+t('Recorded as a discrepancy for follow-up.','记入差异，待后续核实。')+'</p>' : '';
-  return page(t(...reviewTitles[key]),unit,'<div class="recount-flow"><div class="st-panel st-row-group">'+detail+'</div>'+note+'</div>',null,bar);
+  const title = key === 'found' ? t('From other units','从其他单元找到') : t(...reviewTitles[key]);
+  return page(title,unit,'<div class="recount-flow"><div class="st-panel st-row-group">'+detail+'</div>'+note+'</div>',null,bar);
 }
 
 export function renderRecount(c, unit, bar, layout) {
