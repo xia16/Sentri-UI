@@ -15617,6 +15617,16 @@
          ]
         ],
         [
+         "Inspection recount",
+         [
+          "inspection.recount-pen",
+          "inspection.recount-map",
+          "inspection.recount-review",
+          "inspection.recount-found",
+          "inspection.recount-not-found"
+         ]
+        ],
+        [
          "Pen head count",
          [
           "inspection.set-count",
@@ -15879,6 +15889,46 @@
          "inspection.farrowing-pen-fault",
          "inspection.farrowing-pen",
          "Report fault or Back"
+        ],
+        [
+         "inspection.pen",
+         "inspection.recount-pen",
+         "tap Count"
+        ],
+        [
+         "inspection.go-to-pen",
+         "inspection.recount-map",
+         "tap Recount"
+        ],
+        [
+         "inspection.recount-pen",
+         "inspection.recount-map",
+         "tap Done"
+        ],
+        [
+         "inspection.recount-map",
+         "inspection.recount-pen",
+         "tap a pen"
+        ],
+        [
+         "inspection.recount-map",
+         "inspection.recount-review",
+         "tap Finish recount when an identity or quantity differs"
+        ],
+        [
+         "inspection.recount-review",
+         "inspection.recount-found",
+         "open Found from other units"
+        ],
+        [
+         "inspection.recount-review",
+         "inspection.recount-not-found",
+         "open Not found"
+        ],
+        [
+         "inspection.recount-review",
+         "inspection.pen",
+         "save when you entered from a pen"
         ]
        ],
        "screens": [
@@ -16220,7 +16270,13 @@
             "logic": "Feed today is the pen's allowance (or Ad-lib / Station-fed) over its formula; Pigs counts tagged and untagged pigs, with the untagged count or All tagged beneath; Looked is the pen's last observation and is left out when none is recorded."
            }
           ],
-          "controls": [],
+          "controls": [
+           {
+            "control": "Count",
+            "does": "opens unit recount directly in this pen",
+            "goesTo": "inspection.recount-pen"
+           }
+          ],
           "copy": [
            "Pen actions (raw)",
            "Needs attention (raw)",
@@ -16230,9 +16286,7 @@
            "Looked (raw)",
            "Pen log (raw)"
           ],
-          "issues": [
-           "Count (Set count, pen-ops 2.3) is not a verb Inspection has yet, so it is not a tile."
-          ]
+          "issues": []
          }
         },
         {
@@ -17476,7 +17530,7 @@
          "id": "inspection.set-count",
          "name": "Set count",
          "zh": "设置头数",
-         "status": "in-design",
+         "status": "earlier",
          "url": "/ux/archive/workflows.html?sec=wf-count&slide=1",
          "figma": "",
          "notes": {
@@ -17498,7 +17552,7 @@
          "id": "inspection.set-count-batches",
          "name": "Set count · several batches",
          "zh": "设置头数 · 多个批次",
-         "status": "in-design",
+         "status": "earlier",
          "url": "/ux/archive/workflows.html?sec=wf-count&slide=2",
          "figma": "",
          "notes": {
@@ -17517,7 +17571,7 @@
          "id": "inspection.set-count-fewer",
          "name": "Set count · why fewer",
          "zh": "设置头数 · 减少原因",
-         "status": "in-design",
+         "status": "earlier",
          "url": "/ux/archive/workflows.html?sec=wf-count&slide=3",
          "figma": "",
          "notes": {
@@ -17536,7 +17590,7 @@
          "id": "inspection.set-count-more",
          "name": "Set count · why more",
          "zh": "设置头数 · 增加原因",
-         "status": "in-design",
+         "status": "earlier",
          "url": "/ux/archive/workflows.html?sec=wf-count&slide=4",
          "figma": "",
          "notes": {
@@ -17556,7 +17610,7 @@
          "id": "inspection.count-recorded",
          "name": "Pen record · count set",
          "zh": "栏位记录 · 头数已设",
-         "status": "in-design",
+         "status": "earlier",
          "url": "/ux/archive/workflows.html?sec=wf-count&slide=5",
          "figma": "",
          "notes": {
@@ -17871,14 +17925,145 @@
           ],
           "issues": []
          }
+        },
+        {
+         "id": "inspection.recount-pen",
+         "name": "Count a pen",
+         "zh": "栏位盘点",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "walk",
+         "steps": [
+          "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+          "[data-action=\"count-start\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Enter the observed whole-pen count, then confirm tagged pigs by search or scan."
+         }
+        },
+        {
+         "id": "inspection.recount-map",
+         "name": "Unit recount",
+         "zh": "单元盘点",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "walk",
+         "steps": [
+          "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+          "[data-action=\"count-start\"]",
+          "[data-action=\"count-done\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Choose another pen or finish the unit recount. Counted pens can be reopened and empty pens accept a count."
+         }
+        },
+        {
+         "id": "inspection.recount-review",
+         "name": "Recount differences",
+         "zh": "盘点差异",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "walk",
+         "steps": [
+          "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+          "[data-action=\"count-start\"]",
+          {
+           "fill": "[data-recount-query]",
+           "text": "000801"
+          },
+          "[data-action=\"count-pick\"][data-value=\"000801\"]",
+          {
+           "fill": "[data-recount-query]",
+           "text": "000430"
+          },
+          "[data-action=\"count-pick\"][data-value=\"000430\"]",
+          "[data-action=\"count-done\"]",
+          "[data-action=\"count-finish\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Review counted and recorded totals and every changed identity before saving."
+         }
+        },
+        {
+         "id": "inspection.recount-found",
+         "name": "Found from other units",
+         "zh": "从其他单元找到",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "walk",
+         "steps": [
+          "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+          "[data-action=\"count-start\"]",
+          {
+           "fill": "[data-recount-query]",
+           "text": "000801"
+          },
+          "[data-action=\"count-pick\"][data-value=\"000801\"]",
+          {
+           "fill": "[data-recount-query]",
+           "text": "000430"
+          },
+          "[data-action=\"count-pick\"][data-value=\"000430\"]",
+          "[data-action=\"count-done\"]",
+          "[data-action=\"count-finish\"]",
+          "[data-action=\"count-show\"][data-value=\"found\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "See the original location and the counted pen for each confirmed external tag."
+         }
+        },
+        {
+         "id": "inspection.recount-not-found",
+         "name": "Not found",
+         "zh": "未找到",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "walk",
+         "steps": [
+          "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+          "[data-action=\"count-start\"]",
+          {
+           "fill": "[data-recount-query]",
+           "text": "000801"
+          },
+          "[data-action=\"count-pick\"][data-value=\"000801\"]",
+          {
+           "fill": "[data-recount-query]",
+           "text": "000430"
+          },
+          "[data-action=\"count-pick\"][data-value=\"000430\"]",
+          "[data-action=\"count-done\"]",
+          "[data-action=\"count-finish\"]",
+          "[data-action=\"count-show\"][data-value=\"notFound\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "See recorded ear tags that still need to be reconciled."
+         }
         }
        ],
-       "prd": "# Inspection 巡检\n\n## Problem\n\nA worker walks one unit and has to see every pig, spot the ones that need care or feed attention, and record what they find without leaving the place they are standing. Today's old UI spreads this over many screens in the Inspection Figma file. The built prototype (`ux/system/inspection-astra-concept.html`) puts it in one list with a dock, but several parts of it are built and never reachable (unit summary, sensors, batch tracker, equipment faults), and the list repeats facts that the pig record also shows.\n\n## Who\n\nThe barn worker doing the morning or evening walk, often wearing gloves, one hand free. The supervisor reads the same list to see what was recorded (\"Log\", \"Check in\"). The unit is the scope: there is no cohort.\n\n## Anchor\n\nNo anchor. The walk has no lifecycle that changes what work is available: it can be checked in again at any time (\"Check in again\"), and nothing is blocked before or after. The screens are therefore grouped by what the worker is doing: walk the list, open a pen, select and act, unit batches, unit environment and equipment (built, not reachable), finish.\n\n## Rules\n\n- Selection is not an inspection result. A pig checkbox never selects its pen; a pen checkbox selects the pen and the pigs shown (ROUND-3).\n- Notes belong to the pen, not to its pigs. A pen has one note; closing it moves it into the pen log.\n- Feed is guidance, not a completion checklist: nothing on the walk can be \"done\" for feed.\n- The stage on a row is days in the stage, never lifetime age; the walk date is fixed in the sample (12 Sep 2026).\n- Care is the only editable condition state; attention is derived from it (ASTRA-BULK-ACTIONS).\n- One Actions sheet for one pig or many; Production actions exist only for one pig.\n- Finishing a walk records that the unit was walked; it does not mark pigs healthy or tasks done.\n\n## Scope\n\nIn: the unit walk list (lens All / Health / Feed, filter, pen map, find and scan), the pen page and its tools (note, feed, fault, log) wherever a task opens it, Farrowing's room included (owner, 2026-10-22: the screens Farrowing's prototype draws are mapped here, \"Pen in Farrowing\"), the selection and Actions sheet, the walk log and check-in, the unit batches that change the stage text, and the built-but-unreachable unit summary, sensors, batch sheet and equipment fault flow.\n\nOut (owned by other features): the pig record and its actions (pig-profile), feed reading and editing (feed-plan), conditions, care and treatment (health-record). The Farrowing task is opened from here but belongs to Tasks.\n\n## Decisions\n\n- Owner, 2026-10-22: the pen page and its tools are Inspection's. Farrowing's pen header `›` opens the pen page; Farrowing's own drawing of it (Note, Feed, Fault, Needs attention, Now, Pen log) is listed under \"Pen in Farrowing\" until the two prototypes share one page.\n\nTaken from the research notes and the code:\n\n- The roster shows every pig (the earlier \"quiet pigs collapsed\" idea was dropped). Owner-approved 2026-10-12: a pig is a two-line row. Left, a fixed 112px column: the pig ID over the stage line (\"Gestation · 42d\"; \"d\" is the one allowed abbreviation; no stage date, the stage alone; the stage ends in an ellipsis rather than widening the column). Right, one line of compact condition tags that fills the space up to the chevron: the name only (no day, no care word; Poor appetite is the trend-down icon and \"Appetite\", Diarrhoea is \"Scours\"), ordered by urgency then day (Treat in place and Hospital pen, then Monitor, then ongoing). Act now is a red wash with the \"!\" icon and bold red text; monitor is white with a thin border; ongoing is muted text with no box.\n- The tag line is one line only. Tags are added in priority order until the line is full, then \"+N\" says how many are left; the urgent tag is never the hidden one.\n- There is no feed tag on a pig row. A trough pen can't feed one pig, so feed is read and changed at the pen (the pen header keeps its feed summary).\n- The row is the design system's Row · animal (select + door), with the compact ConditionTag.\n- Home opens this page through the \"Inspect unit\" card with the unit kept in the link; Back returns to Home with the unit.\n- Pen map is the design system's PenMap, as Farrowing's (2026-10-22): the framed Pen map button in the dock, tiles coloured by the walk's row levels (amber for a pig at act now, never blue), the peek with the walk's rows, and the colour-carries-over landing. A pen the walk has been through and one it has not look the same: there is no per-pen check (budget.md, Pen map).\n\nOpen (recorded on the screens as issues):\n\n- The unit summary card (pig and pen counts, faults, sensors, batch tracker) is in the code and not placed on the walk. Draw it or remove it.\n- Equipment faults have a full report-and-resolve flow in the prototype's code but no control reaches it; the pen workflow deck draws the same flow (and Set count) as screens, listed under Equipment faults and Pen head count.\n- \"Health\" and \"Feed\" lens counts do not say what they count.\n- The care level shows on a row only by the tag's look (red wash with \"!\", outlined, plain); the care word and the day are on the record.\n- Fixed author \"G. Hansen\" and times 06:40 and 09:41 stand in for the signed-in worker and real times.\n",
+       "prd": "# Inspection 巡检\n\n## Problem\n\nA worker walks one unit and has to see every pig, spot the ones that need care or feed attention, and record what they find without leaving the place they are standing. Today's old UI spreads this over many screens in the Inspection Figma file. The built prototype (`ux/system/inspection-astra-concept.html`) puts it in one list with a dock, but several parts of it are built and never reachable (unit summary, sensors, batch tracker, equipment faults), and the list repeats facts that the pig record also shows.\n\n## Who\n\nThe barn worker doing the morning or evening walk, often wearing gloves, one hand free. The supervisor reads the same list to see what was recorded (\"Log\", \"Check in\"). The unit is the scope: there is no cohort.\n\n## Anchor\n\nNo anchor. The walk has no lifecycle that changes what work is available: it can be checked in again at any time (\"Check in again\"), and nothing is blocked before or after. The screens are therefore grouped by what the worker is doing: walk the list, open a pen, select and act, unit batches, unit environment and equipment (built, not reachable), finish.\n\n## Rules\n\n- Selection is not an inspection result. A pig checkbox never selects its pen; a pen checkbox selects the pen and the pigs shown (ROUND-3).\n- Notes belong to the pen, not to its pigs. A pen has one note; closing it moves it into the pen log.\n- Feed is guidance, not a completion checklist: nothing on the walk can be \"done\" for feed.\n- The stage on a row is days in the stage, never lifetime age; the walk date is fixed in the sample (12 Sep 2026).\n- Care is the only editable condition state; attention is derived from it (ASTRA-BULK-ACTIONS).\n- One Actions sheet for one pig or many; Production actions exist only for one pig.\n- Finishing a walk records that the unit was walked; it does not mark pigs healthy or tasks done.\n\n## Scope\n\nIn: the unit walk list (lens All / Health / Feed, filter, pen map, find and scan), the pen page and its tools (note, feed, fault, log) wherever a task opens it, Farrowing's room included (owner, 2026-10-22: the screens Farrowing's prototype draws are mapped here, \"Pen in Farrowing\"), the selection and Actions sheet, the walk log and check-in, the unit batches that change the stage text, and the built-but-unreachable unit summary, sensors, batch sheet and equipment fault flow.\n\nOut (owned by other features): the pig record and its actions (pig-profile), feed reading and editing (feed-plan), conditions, care and treatment (health-record). The Farrowing task is opened from here but belongs to Tasks.\n\n## Decisions\n\n- Owner, 2026-10-22: the pen page and its tools are Inspection's. Farrowing's pen header `›` opens the pen page; Farrowing's own drawing of it (Note, Feed, Fault, Needs attention, Now, Pen log) is listed under \"Pen in Farrowing\" until the two prototypes share one page.\n\nTaken from the research notes and the code:\n\n- The roster shows every pig (the earlier \"quiet pigs collapsed\" idea was dropped). Owner-approved 2026-10-12: a pig is a two-line row. Left, a fixed 112px column: the pig ID over the stage line (\"Gestation · 42d\"; \"d\" is the one allowed abbreviation; no stage date, the stage alone; the stage ends in an ellipsis rather than widening the column). Right, one line of compact condition tags that fills the space up to the chevron: the name only (no day, no care word; Poor appetite is the trend-down icon and \"Appetite\", Diarrhoea is \"Scours\"), ordered by urgency then day (Treat in place and Hospital pen, then Monitor, then ongoing). Act now is a red wash with the \"!\" icon and bold red text; monitor is white with a thin border; ongoing is muted text with no box.\n- The tag line is one line only. Tags are added in priority order until the line is full, then \"+N\" says how many are left; the urgent tag is never the hidden one.\n- There is no feed tag on a pig row. A trough pen can't feed one pig, so feed is read and changed at the pen (the pen header keeps its feed summary).\n- The row is the design system's Row · animal (select + door), with the compact ConditionTag.\n- Home opens this page through the \"Inspect unit\" card with the unit kept in the link; Back returns to Home with the unit.\n- Pen map is the design system's PenMap, as Farrowing's (2026-10-22): the framed Pen map button in the dock, tiles coloured by the walk's row levels (amber for a pig at act now, never blue), the peek with the walk's rows, and the colour-carries-over landing. A pen the walk has been through and one it has not look the same: there is no per-pen check (budget.md, Pen map).\n\nOpen (recorded on the screens as issues):\n\n- The unit summary card (pig and pen counts, faults, sensors, batch tracker) is in the code and not placed on the walk. Draw it or remove it.\n- Equipment faults have a full report-and-resolve flow in the prototype's code but no control reaches it; the pen workflow deck draws the same flow (and Set count) as screens, listed under Equipment faults and Pen head count.\n- \"Health\" and \"Feed\" lens counts do not say what they count.\n- The care level shows on a row only by the tag's look (red wash with \"!\", outlined, plain); the care word and the day are on the record.\n- Fixed author \"G. Hansen\" and times 06:40 and 09:41 stand in for the signed-in worker and real times.\n\n## Inspection recount\n\n[Claude Design, boards 1, 5–13 and 25](canvas.md) is the source for this prototype round. Count opens from a pen; the unit recount map also opens from the inspection Pen map. Choose an empty or occupied pen. Record its whole physical count, then scan or search for each tagged animal. The tag list starts empty; a repeated read counts once and a stray read can be unticked. Done stages the pen and goes to the recount map. Open the same pen again to correct it.\n\nFinish recount saves a round with no differences. Changed headcounts and found or unconfirmed identities go to a review before Save. A tag actually seen in another unit shows the recorded origin and its observed destination. A recorded tag not confirmed appears by ear tag and original pen as a batch discrepancy; it does not create a Missing or Death report. Each saved sample count is visible in the pen log. The prototype stores only sample data for the active session.\n\n## Not supported\n\n- Planned transfer and receiving. These use separate task flows.\n- Automatic death or missing reports from a count. Those are separate, deliberate operations.\n\nOpen product decisions for incomplete counts, tag status after save and interaction with open moves are in [the scenario tree](scenario-tree.md#2--open-decisions).\n",
        "scenarios": {
-        "treeDoc": false,
+        "treeDoc": true,
         "tree": null,
         "run": null,
-        "notSupported": null
+        "notSupported": {
+         "source": "features/inspection/PRD.md",
+         "items": [
+          {
+           "what": "Planned transfer and receiving. These use separate task flows.",
+           "why": ""
+          },
+          {
+           "what": "Automatic death or missing reports from a count. Those are separate, deliberate operations.",
+           "why": ""
+          }
+         ]
+        }
        },
        "status": "in-design"
       }

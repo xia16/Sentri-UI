@@ -340,3 +340,7 @@ The Inspection pen door, existing five pen tools and pen log stay in their curre
 ### Parts
 
 Use RowGrid for the Count door, Page/Sheet and its footer for each surface, PenMap for the map geometry, Stepper for whole-pen count, ChoiceSearch and selectable rows for ear tags, and navigation rows and Log for the review and audit. Keep count-specific map content in Inspection until its PenMap variant is agreed across features.
+
+### Self-crit
+
+At 390 px the Count tile sits next to the existing pen tools, so the worker can reach it from the pen they are looking at. The existing map's Back stays in place and Recount opens a dedicated map that can distinguish a staged observation from its original number. The pen's dominant number, search-and-scan, then Done match the canvas order. The review keeps the original and observed totals on either side of the differences, so a net-zero identity change still has two explicit rows.

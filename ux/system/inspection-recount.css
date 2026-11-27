@@ -1,0 +1,27 @@
+.inspection-recount .recount-flow,
+.inspection-recount .recount-tags {
+  display: grid;
+  gap: var(--space-12);
+}
+.inspection-recount .recount-flow .st-pen-tile {
+  align-content: center;
+  gap: var(--space-4);
+}
+.inspection-recount .st-pen-tile strong {
+  font-size: var(--type-identifier-size);
+}
+.inspection-recount .recount-tags p,
+.inspection-recount .recount-flow > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--type-identifier-size);
+}
+
+.inspection-recount .st-pen-tile.recount-tile-counted {
+  background: var(--done-fill);
+  color: var(--done-fill-ink);
+}
+.inspection-recount .st-pen-tile.recount-tile-empty {
+  background: var(--well);
+  color: var(--muted);
+}

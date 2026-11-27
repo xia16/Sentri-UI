@@ -1,0 +1,479 @@
+{
+  "feature": "inspection",
+  "defaults": {
+    "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+    "langs": [
+      "en",
+      "zh"
+    ],
+    "widths": [
+      360,
+      390
+    ],
+    "height": 844,
+    "clipCheck": true
+  },
+  "tree": [
+    {
+      "type": "entry",
+      "id": "inspection-count",
+      "label": "Inspection recount",
+      "children": [
+        {
+          "type": "state",
+          "id": "from-pen",
+          "label": "D4 pen",
+          "tree": "C",
+          "reset": {
+            "screen": "inspection.pen",
+            "taps": [
+              "[data-action=\"back\"]",
+              "[data-action=\"pen-detail\"][data-value=\"D4\"]"
+            ]
+          },
+          "children": [
+            {
+              "type": "action",
+              "id": "action-entry",
+              "label": "entry",
+              "taps": [
+                "[data-action=\"count-start\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "inspect-count-pen-entry",
+                  "label": "The D4 count opens with no tag confirmed.",
+                  "tree": "C-1",
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Inspection recount",
+                      "says": "Inspection recount follows boards 1 and 5–13."
+                    }
+                  ],
+                  "gwt": {
+                    "given": "D4 is open in Inspection.",
+                    "when": "The worker taps Count.",
+                    "then": "The D4 count opens with no tag confirmed."
+                  },
+                  "visible": [
+                    {
+                      "text": {
+                        "en": "How many pigs are here?",
+                        "zh": "这里一共有几头猪？"
+                      },
+                      "in": "sheet"
+                    },
+                    {
+                      "el": "[data-action=\"count-untick\"]",
+                      "is": "absent"
+                    }
+                  ],
+                  "record": []
+                }
+              ]
+            },
+            {
+              "type": "action",
+              "id": "action-repeat-tag",
+              "label": "repeat-tag",
+              "taps": [
+                "[data-action=\"count-start\"]",
+                {
+                  "fill": "[data-recount-query]",
+                  "value": "000801"
+                },
+                "[data-action=\"count-pick\"][data-value=\"000801\"]",
+                {
+                  "fill": "[data-recount-query]",
+                  "value": "000801"
+                }
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "inspect-count-unique-tag",
+                  "label": "The confirmed tag stays selected once.",
+                  "tree": "C-3",
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Inspection recount",
+                      "says": "Inspection recount follows boards 1 and 5–13."
+                    }
+                  ],
+                  "gwt": {
+                    "given": "The worker is counting D4.",
+                    "when": "They search for an ear tag they already confirmed.",
+                    "then": "The confirmed tag stays selected once."
+                  },
+                  "visible": [
+                    {
+                      "el": "[data-action=\"count-untick\"][value=\"000801\"]"
+                    },
+                    {
+                      "el": "[data-action=\"count-pick\"][data-value=\"000801\"]",
+                      "is": "absent"
+                    }
+                  ],
+                  "record": []
+                }
+              ]
+            },
+            {
+              "type": "action",
+              "id": "action-reopen",
+              "label": "reopen",
+              "taps": [
+                "[data-action=\"count-start\"]",
+                {
+                  "fill": "[data-recount-query]",
+                  "value": "000801"
+                },
+                "[data-action=\"count-pick\"][data-value=\"000801\"]",
+                "[data-action=\"count-done\"]",
+                "[data-action=\"count-open-pen\"][data-value=\"D4\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "inspect-count-reopens",
+                  "label": "They see the same staged ear tag.",
+                  "tree": "C-5",
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Inspection recount",
+                      "says": "Inspection recount follows boards 1 and 5–13."
+                    }
+                  ],
+                  "gwt": {
+                    "given": "One ear tag has been confirmed in D4.",
+                    "when": "The worker finishes that pen and opens it again.",
+                    "then": "They see the same staged ear tag."
+                  },
+                  "visible": [
+                    {
+                      "el": "[data-action=\"count-untick\"][value=\"000801\"]"
+                    }
+                  ],
+                  "record": []
+                }
+              ]
+            },
+            {
+              "type": "action",
+              "id": "action-match-save",
+              "label": "match-save",
+              "taps": [
+                "[data-action=\"count-start\"]",
+                {
+                  "fill": "[data-recount-query]",
+                  "value": "000801"
+                },
+                "[data-action=\"count-pick\"][data-value=\"000801\"]",
+                {
+                  "fill": "[data-recount-query]",
+                  "value": "000802"
+                },
+                "[data-action=\"count-pick\"][data-value=\"000802\"]",
+                "[data-action=\"count-done\"]",
+                "[data-action=\"count-finish\"]",
+                "[data-action=\"pen-log\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "inspect-count-match-log",
+                  "label": "The count is saved directly and appears in the log.",
+                  "tree": "C-6",
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Inspection recount",
+                      "says": "Inspection recount follows boards 1 and 5–13."
+                    }
+                  ],
+                  "gwt": {
+                    "given": "Both D4 tags and its count match the record.",
+                    "when": "The worker finishes the unit and opens the pen log.",
+                    "then": "The count is saved directly and appears in the log."
+                  },
+                  "visible": [
+                    {
+                      "text": {
+                        "en": "Count recorded",
+                        "zh": "已记录盘点"
+                      },
+                      "in": "sheet"
+                    }
+                  ],
+                  "record": []
+                }
+              ]
+            },
+            {
+              "type": "action",
+              "id": "action-review-swap",
+              "label": "review-swap",
+              "taps": [
+                "[data-action=\"count-start\"]",
+                {
+                  "fill": "[data-recount-query]",
+                  "value": "000801"
+                },
+                "[data-action=\"count-pick\"][data-value=\"000801\"]",
+                {
+                  "fill": "[data-recount-query]",
+                  "value": "000430"
+                },
+                "[data-action=\"count-pick\"][data-value=\"000430\"]",
+                "[data-action=\"count-done\"]",
+                "[data-action=\"count-finish\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "inspect-count-same-total-swap",
+                  "label": "The review shows both the outside tag and the unconfirmed local tag.",
+                  "tree": "C-7",
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Inspection recount",
+                      "says": "Inspection recount follows boards 1 and 5–13."
+                    }
+                  ],
+                  "gwt": {
+                    "given": "One D4 tag and one outside tag are confirmed.",
+                    "when": "The worker finishes the unit recount.",
+                    "then": "The review shows both the outside tag and the unconfirmed local tag."
+                  },
+                  "visible": [
+                    {
+                      "text": {
+                        "en": "Found from other units",
+                        "zh": "从其他单元找到"
+                      },
+                      "in": "sheet"
+                    },
+                    {
+                      "text": {
+                        "en": "Not found",
+                        "zh": "未找到"
+                      },
+                      "in": "sheet"
+                    }
+                  ],
+                  "record": []
+                }
+              ]
+            },
+            {
+              "type": "action",
+              "id": "action-return-to-review",
+              "label": "return-to-review",
+              "taps": [
+                "[data-action=\"count-start\"]",
+                {
+                  "fill": "[data-recount-query]",
+                  "value": "000801"
+                },
+                "[data-action=\"count-pick\"][data-value=\"000801\"]",
+                {
+                  "fill": "[data-recount-query]",
+                  "value": "000430"
+                },
+                "[data-action=\"count-pick\"][data-value=\"000430\"]",
+                "[data-action=\"count-done\"]",
+                "[data-action=\"count-finish\"]",
+                "[data-action=\"count-back\"]",
+                "[data-action=\"count-open-pen\"][data-value=\"D4\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "inspect-count-correct",
+                  "label": "The staged tags are still there for correction.",
+                  "tree": "C-8",
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Inspection recount",
+                      "says": "Inspection recount follows boards 1 and 5–13."
+                    }
+                  ],
+                  "gwt": {
+                    "given": "A worker is reviewing an external tag and a tag they did not find.",
+                    "when": "They go back and reopen D4.",
+                    "then": "The staged tags are still there for correction."
+                  },
+                  "visible": [
+                    {
+                      "el": "[data-action=\"count-untick\"][value=\"000430\"]"
+                    }
+                  ],
+                  "record": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "state",
+          "id": "from-map",
+          "label": "Unit pen map",
+          "tree": "C",
+          "reset": {
+            "screen": "inspection.go-to-pen"
+          },
+          "children": [
+            {
+              "type": "action",
+              "id": "action-empty-pen",
+              "label": "empty-pen",
+              "taps": [
+                "[data-action=\"count-unit\"]",
+                "[data-action=\"count-open-pen\"][data-value=\"C3\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "inspect-count-empty-pen",
+                  "label": "The empty pen can be opened and staged.",
+                  "tree": "C-2",
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Inspection recount",
+                      "says": "Inspection recount follows boards 1 and 5–13."
+                    }
+                  ],
+                  "gwt": {
+                    "given": "The inspection unit map is open.",
+                    "when": "The worker opens Recount and taps an empty pen.",
+                    "then": "The empty pen can be opened and staged."
+                  },
+                  "visible": [
+                    {
+                      "el": "[data-action=\"count-done\"]",
+                      "is": "enabled"
+                    },
+                    {
+                      "text": {
+                        "en": "0 without ear tags",
+                        "zh": "无耳标 0 头"
+                      },
+                      "in": "sheet"
+                    }
+                  ],
+                  "record": []
+                }
+              ]
+            },
+            {
+              "type": "action",
+              "id": "action-too-few",
+              "label": "too-few",
+              "taps": [
+                "[data-action=\"count-unit\"]",
+                "[data-action=\"count-open-pen\"][data-value=\"C3\"]",
+                {
+                  "fill": "[data-recount-query]",
+                  "value": "000801"
+                },
+                "[data-action=\"count-pick\"][data-value=\"000801\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "inspect-count-below-confirmed",
+                  "label": "Done waits until the total covers the confirmed tags.",
+                  "tree": "C-4",
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Inspection recount",
+                      "says": "Inspection recount follows boards 1 and 5–13."
+                    }
+                  ],
+                  "gwt": {
+                    "given": "An empty-record pen has a total of zero.",
+                    "when": "The worker confirms one ear tag.",
+                    "then": "Done waits until the total covers the confirmed tags."
+                  },
+                  "visible": [
+                    {
+                      "el": "[data-action=\"count-done\"]",
+                      "is": "disabled"
+                    },
+                    {
+                      "text": {
+                        "en": "Total is below confirmed ear tags.",
+                        "zh": "总数少于已确认的耳标数。"
+                      },
+                      "in": "sheet"
+                    }
+                  ],
+                  "record": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "state",
+          "id": "open-decisions",
+          "label": "Open decisions",
+          "tree": "C",
+          "reset": {
+            "screen": "inspection.recount-pen"
+          },
+          "children": [
+            {
+              "type": "decision-blocker",
+              "id": "inspect-count-partial-discrepancy",
+              "tree": "C-9",
+              "label": "partial-discrepancy",
+              "question": "Q1",
+              "sources": [
+                "Inspection scenario tree, open decisions"
+              ]
+            },
+            {
+              "type": "decision-blocker",
+              "id": "inspect-count-unconfirmed-placement",
+              "tree": "C-10",
+              "label": "unconfirmed-placement",
+              "question": "Q2",
+              "sources": [
+                "Inspection scenario tree, open decisions"
+              ]
+            },
+            {
+              "type": "decision-blocker",
+              "id": "inspect-count-open-transfer",
+              "tree": "C-11",
+              "label": "open-transfer",
+              "question": "Q3",
+              "sources": [
+                "Inspection scenario tree, open decisions"
+              ]
+            },
+            {
+              "type": "decision-blocker",
+              "id": "inspect-count-interruption-and-conflict",
+              "tree": "C-12",
+              "label": "interruption-and-conflict",
+              "question": "Q4",
+              "sources": [
+                "Inspection scenario tree, open decisions"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
