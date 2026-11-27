@@ -2125,9 +2125,9 @@ function penPeek(c,id){
 }
 function penMapSheet(c){
  const pens=penLevels(c),act=Object.values(pens).filter(l=>l==='act').length;
- const body=SentriUI.penMap({lanes:PEN_LANES,depth:PEN_DEPTH,pens,current:c.currentPen,action:'jump',key:'inspection-pens-'+states.indexOf(c),labels:{plain:'has pigs',hidden:'no pigs match'},peek:id=>penPeek(c,id)});
+ const body=SentriUI.penMap({lanes:PEN_LANES,depth:PEN_DEPTH,pens,current:c.currentPen,action:'jump',key:'inspection-pens-'+states.indexOf(c),entrance:recountText('Entrance','入口'),labels:{plain:'has pigs',hidden:'no pigs match'},peek:id=>penPeek(c,id)});
  const foot=SentriUI.sheetFooter({back:{action:'back'},primary:{label:recountText('Recount','盘点'),action:'count-unit',register:'secondary'}});
- return sheet(c,'Pen map','',body,foot,'menu',{key:SentriUI.penMapKey({pens,words:{act:act===1?'needs you':'need you'}})});
+ return sheet(c,recountText('Pen map','栏位图'),'',body,foot,'menu',{key:SentriUI.penMapKey({pens,words:{act:recountText(act===1?'needs you':'need you','需关注')}})});
 }
 function legacyValid(c){const f=c.form;if(c.view==='condition'||c.view==='report')return !!f.choice&&(f.choice!=='Other'||!!f.note?.trim());if(c.view==='note')return !!f.note?.trim();if(c.view==='weight')return !!f.weight&&Number.isFinite(+f.weight)&&+f.weight>0;if(c.view==='plan')return !!f.preset;if(c.view==='exception')return !!f.choice&&(pen(c,c.penId).mode==='station'||f.actual!==''&&f.actual!=null&&Number.isFinite(+f.actual)&&+f.actual>=0);return true;}
 /* Which saves confirm with a toast (owner, 2026-10-18): one pig only when the walk list's row doesn't show the result (its ear tag,
@@ -2169,7 +2169,7 @@ function rowCheckAfterRender(root,c){
 }
 function notify(c,text){c.toast=text;c.toastView=null;if(typeof document==='undefined'){c.toastUntil=Infinity;return;}if(document.documentElement.classList.contains('atlas-still')){c.toastUntil=Infinity;clearTimeout(c.toastTimer);return;}c.toastUntil=Date.now()+3200;clearTimeout(c.toastTimer);c.toastTimer=setTimeout(()=>{c.toast='';const i=states.indexOf(c);document.querySelector(`[data-card="${i}"] .st-toast`)?.remove();},3200);}
 function inspectionSurface(c){
- if(isRecountPage(c.view))return renderRecount(c,unitName(c),status());
+ if(isRecountPage(c.view))return renderRecount(c,unitName(c),status(),{lanes:PEN_LANES,depth:PEN_DEPTH});
  const content=overlay(c);
  if(AstraSurfaces.isPage('inspection',c.view,c)||c.isDrawerBackground||['record-optional','feed-date','feed-note','medicine-picker','brand-picker','medicine-sheet','bulk-health-picker','picker'].includes(c.view))return content;
  const parent=[...(c.navTrail||[])].reverse().find(p=>AstraSurfaces.isPage('inspection',p.view,{...c,...p}));

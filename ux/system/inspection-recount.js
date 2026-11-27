@@ -17,23 +17,6 @@ function locations(c, unit) {
   ].flatMap(place => place.pen.pigs.map(pig => ({...place, pig})));
 }
 
-function codesForMap(c) {
-  const coordinate = /^([A-Z])(\d+)$/;
-  const columns = new Map();
-  for (const {id} of c.pens) {
-    const m = coordinate.exec(id);
-    if (m) columns.set(m[1], Math.max(+m[2], columns.get(m[1]) || 1));
-  }
-  // The sample walk initially lists only occupied C1, C2 and D4; the
-  // physical map from the canvas also shows the empty C/D pens up to 5.
-  const canvasRoom = [...columns.keys()].every(letter => letter === 'C' || letter === 'D');
-  const lanes = canvasRoom
-    ? ['C','D'].map(letter => ({letter,n:Math.max(5,columns.get(letter) || 0)}))
-    : [...columns].sort().map(([letter, n]) => ({letter, n}));
-  const codes = lanes.flatMap(({letter,n}) => Array.from({length:n}, (_, i) => letter + (i + 1)));
-  return {lanes,codes};
-}
-
 function openPen(c, id) {
   const r = c.recount;
   r.pen = id;
@@ -190,13 +173,13 @@ function page(title, unit, body, primary, bar) {
     footer:primary ? ui.sheetFooter({back:false,primary}) : false});
 }
 
-function mapPage(c, unit, bar) {
+function mapPage(c, unit, bar, {lanes,depth}) {
   const ui = globalThis.SentriUI;
-  const {lanes,codes} = codesForMap(c);
+  const codes = lanes.flatMap(lane => Array.from({length:depth}, (_, i) => lane + (i + 1)));
   const counts = c.recount.observations;
   const levels = Object.fromEntries(codes.map(id => [id, counts[id] ? 'live' : 'plain']));
   const map = document.createElement('template');
-  map.innerHTML = ui.penMap({lanes,pens:levels,action:'count-open-pen',key:'inspection-count-map',
+  map.innerHTML = ui.penMap({lanes,depth,pens:levels,action:'count-open-pen',key:'inspection-count-map',
     entrance:t('Entrance','入口'), labels:{map:t('Pens','栏位'), pen:penLabel, live:t('counted','已盘'), plain:t('not counted','未盘')}});
   for (const tile of map.content.querySelectorAll('[data-pen]')) {
     const id = tile.dataset.pen;
@@ -259,6 +242,7 @@ function penPage(c, unit, bar) {
   const draft = r.drafts[r.pen];
   const under = draft.total < draft.tags.length;
   const prompt = t('How many pigs are here?', '这里一共有几头猪？');
+  const canEstimateUntagged = draft.tags.length > 0 || !c.pens.find(p => p.id === r.pen)?.pigs.length;
   const quantity = ui.stepper({variant:'count',label:prompt,value:draft.total,min:0,action:'count-step',key:r.pen,
     error:under ? t('Total is below confirmed ear tags.','总数少于已确认的耳标数。') : ''});
   const search = r.listening ?
@@ -270,7 +254,7 @@ function penPage(c, unit, bar) {
   return page(penLabel(r.pen), unit, '<div class="recount-flow">'+quantity+
     ui.heading({kind:'section',level:2,title:t('Which tagged pigs are here?','哪些带耳标的猪在这里？')})+search+
     '<div class="recount-tags" data-recount-tags>'+tagList(c,unit)+'</div>'+conflict+
-    '<p class="recount-total">'+t(Math.max(0,draft.total-draft.tags.length)+' without ear tags','无耳标 '+Math.max(0,draft.total-draft.tags.length)+' 头')+'</p></div>',{
+    (canEstimateUntagged && !under ? '<p>'+t(draft.total-draft.tags.length+' without ear tags','无耳标 '+(draft.total-draft.tags.length)+' 头')+'</p>' : '')+'</div>',{
       label:t('Done','完成'),action:'count-done',waiting:under
     },bar);
 }
@@ -309,8 +293,8 @@ function detailPage(c, unit, bar) {
   return page(t(...reviewTitles[key]),unit,'<div class="recount-flow"><div class="st-panel st-row-group">'+detail+'</div>'+note+'</div>',null,bar);
 }
 
-export function renderRecount(c, unit, bar) {
-  if (c.view === 'recount-map') return mapPage(c,unit,bar);
+export function renderRecount(c, unit, bar, layout) {
+  if (c.view === 'recount-map') return mapPage(c,unit,bar,layout);
   if (c.view === 'recount-pen') return penPage(c,unit,bar);
   if (c.view === 'recount-review') return reviewPage(c,unit,bar);
   return detailPage(c,unit,bar);
