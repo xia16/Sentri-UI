@@ -18275,7 +18275,7 @@
                   "says": "The map shows occupied-pen progress, staged counts and remaining recorded stock."
                  }
                 ],
-                "result": "not-run"
+                "result": "pass"
                }
               ]
              },
@@ -18364,9 +18364,9 @@
          }
         ],
         "run": {
-         "commit": "76a03f2",
+         "commit": "6be3e8b",
          "dirty": false,
-         "ran": "2026-11-27T08:59:49.033Z",
+         "ran": "2026-11-27T09:36:52.723Z",
          "langs": [
           "en",
           "zh"

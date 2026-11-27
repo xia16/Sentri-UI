@@ -1,8 +1,8 @@
 {
  "feature": "inspection",
- "commit": "76a03f27dd4f16031fe7c7662874eef212f28dfe",
+ "commit": "6be3e8b2dbd034e575a9c4801d26c43e89eeac6f",
  "dirty": false,
- "ran": "2026-11-27T08:59:49.033Z",
+ "ran": "2026-11-27T09:36:52.723Z",
  "base": "http://127.0.0.1:4318",
  "langs": [
   "en",
@@ -15,12 +15,12 @@
  "nodes": {
   "entry": 1,
   "state": 3,
-  "action": 8,
-  "outcome": 8,
+  "action": 9,
+  "outcome": 9,
   "decision-blocker": 4
  },
  "summary": {
-  "pass": 8,
+  "pass": 9,
   "fail": 0,
   "blocked": 4,
   "pending": 0,
@@ -28,19 +28,19 @@
  },
  "byLang": {
   "en": {
-   "pass": 8,
+   "pass": 9,
    "fail": 0,
    "blocked": 0
   },
   "zh": {
-   "pass": 8,
+   "pass": 9,
    "fail": 0,
    "blocked": 0
   }
  },
  "byBranch": {
   "inspection-count": {
-   "pass": 8,
+   "pass": 9,
    "fail": 0,
    "blocked": 4,
    "pending": 0
@@ -719,6 +719,102 @@
       "review/scenarios/inspection/inspect-count-empty-pen/zh-390/00-start.png",
       "review/scenarios/inspection/inspect-count-empty-pen/zh-390/01-data-action-count-unit.png",
       "review/scenarios/inspection/inspect-count-empty-pen/zh-390/02-data-action-count-open-pen-data-.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "inspect-count-unit-progress",
+   "tree": "C-13",
+   "branch": "inspection-count",
+   "label": "Both pens are staged and only the occupied one advances progress.",
+   "gwt": {
+    "given": "C3 is empty and D4 has pigs.",
+    "when": "The worker stages both pens.",
+    "then": "C3 shows a verified zero, one occupied pen is counted and the footer describes the remaining stock."
+   },
+   "path": [
+    "inspection-count",
+    "from-map",
+    "action-unit-progress",
+    "inspect-count-unit-progress"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Inspection recount",
+     "says": "The map shows occupied-pen progress, staged counts and remaining recorded stock."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-unit-progress/en-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-360/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-360/02-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-360/03-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-360/04-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-360/05-data-action-count-done.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-unit-progress/en-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-390/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-390/02-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-390/03-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-390/04-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-390/05-data-action-count-done.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-360/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-360/02-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-360/03-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-360/04-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-360/05-data-action-count-done.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-390/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-390/02-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-390/03-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-390/04-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-390/05-data-action-count-done.png"
      ],
      "loadFailures": []
     }
