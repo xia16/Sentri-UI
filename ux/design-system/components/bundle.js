@@ -1352,7 +1352,7 @@
      current pen is in view; a map more than two screens tall adds Whole room beside Back (see penWhole). */
   const PEN_LEVELS=['act','live','plain','hidden'],PEN_HOLD_MS=350,PEN_SLOP=12,PEN_GAP=8,PEN_TILE=56,PEN_CAP=1.68,PEN_STEPS=[2,5,10,25,50],penPeeks=new Map(),penRooms=new Map();
   let penHold=null,penSwallow=false;
-  const penLabels=o=>Object.assign({map:'Pens',act:'needs you',live:'farrowing',plain:'has sows',empty:'empty',hidden:'no sows match',pen:c=>'Pen '+c,pens:r=>'Pens '+r,whole:'Whole room',byPen:'Pen by pen'},o);
+  const penLabels=o=>Object.assign({map:'Pens',act:'needs you',live:'farrowing',plain:'has sows',empty:'empty',hidden:'no sows match',counted:'Counted',onRecord:'On record',emptyValue:'Empty',pen:c=>'Pen '+c,pens:r=>'Pens '+r,whole:'Whole room',byPen:'Pen by pen'},o);
   /* A pen's size says what it is: a tile is as tall as its pen is long along the lane, against the room's other pens. The
      room's shortest pen is 56px and nothing is smaller; the longest is at most PEN_CAP times that (94px: on a 390 × 844 phone,
      four of the biggest pens fit in a lane under the letters). Within that the ratios are true;
@@ -1362,12 +1362,20 @@
     const lo=Math.min(...s),r=Math.max(...s)/lo,p=r>PEN_CAP?Math.log(PEN_CAP)/Math.log(r):1;
     return v=>v>0?Math.round(PEN_TILE*Math.pow(v/lo,p)):PEN_TILE;
   }
-  function penMap({lanes=['A','B','C','D'],depth=6,rows=[],apart=[],aSide='left',entranceAt='middle',backDoor=null,pens={},current='',action='pen',key='pen-map',entrance='Entrance',labels={},peek=null,className=''}={}){
+  function penMap({lanes=['A','B','C','D'],depth=6,rows=[],apart=[],aSide='left',entranceAt='middle',backDoor=null,pens={},counts,current='',action='pen',key='pen-map',entrance='Entrance',labels={},peek=null,className=''}={}){
     const L=penLabels(labels);
     if(typeof peek==='function')penPeeks.set(key,peek);else penPeeks.delete(key);
     const level=c=>PEN_LEVELS.includes(pens[c])?pens[c]:'empty';
-    const tile=(c,at='')=>{const l=level(c),off=l==='empty'||l==='hidden';
-      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${at}${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc(L.pen(c)+', '+L[l])}">${esc(c)}</button>`;};
+    const tile=(c,at='')=>{
+      if(counts){
+        const {count=0,counted=false}=counts[c]||{};
+        const level=counted?'done':count?'plain':'empty';
+        const value=counted||count?String(count):L.emptyValue;
+        return `<button type="button" class="st-pen-tile" data-level="${level}" data-pen-count data-pen="${esc(c)}"${at} data-action="${esc(action)}" data-value="${esc(c)}" aria-label="${esc([L.pen(c),counted?L.counted:L.onRecord,value].join(' · '))}"><span>${esc(c)}</span><strong>${esc(value)}</strong></button>`;
+      }
+      const l=level(c),off=l==='empty'||l==='hidden';
+      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${at}${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc(L.pen(c)+', '+L[l])}">${esc(c)}</button>`;
+    };
     const band=(cls,text,at,extra='')=>`<div class="${cls}"${at==='left'||at==='right'?` data-at="${at}"`:''}${extra}>${sGlyph('arrow-down')}<span>${esc(text)}</span></div>`;
     const letterOf=i=>String.fromCharCode(65+i),runsOf=l=>typeof l==='string'?[]:l.runs||[];
     const sizeOf=penSizes([...lanes.flatMap(l=>runsOf(l).map(r=>r.size)),...rows.flatMap(w=>(w.runs||[]).map(r=>r.size))]);

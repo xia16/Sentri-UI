@@ -175,27 +175,15 @@ function page(title, unit, body, primary, bar) {
 
 function mapPage(c, unit, bar, {lanes,depth}) {
   const ui = globalThis.SentriUI;
-  const codes = lanes.flatMap(lane => Array.from({length:depth}, (_, i) => lane + (i + 1)));
-  const counts = c.recount.observations;
-  const levels = Object.fromEntries(codes.map(id => [id, counts[id] ? 'live' : 'plain']));
-  const map = document.createElement('template');
-  map.innerHTML = ui.penMap({lanes,depth,pens:levels,action:'count-open-pen',key:'inspection-count-map',
-    entrance:t('Entrance','入口'), labels:{map:t('Pens','栏位'), pen:penLabel, live:t('counted','已盘'), plain:t('not counted','未盘')}});
-  for (const tile of map.content.querySelectorAll('[data-pen]')) {
-    const id = tile.dataset.pen;
-    const total = counts[id]?.total ?? headcount(c.pens.find(p => p.id === id));
-    const code = document.createElement('span');
-    const amount = document.createElement('strong');
-    code.textContent = id;
-    amount.textContent = total || counts[id] ? String(total) : t('Empty','空栏');
-    tile.replaceChildren(code,amount);
-    tile.classList.toggle('recount-tile-counted', Boolean(counts[id]));
-    tile.classList.toggle('recount-tile-empty', !counts[id] && total === 0);
-    tile.setAttribute('aria-label', [penLabel(id),counts[id] ? t('Counted','已盘') : t('On record','账面'),amount.textContent].join(' · '));
-  }
-  const done = Object.keys(counts).length;
+  const observations = c.recount.observations;
+  const counts = Object.fromEntries(c.pens.map(pen => [pen.id,{count:headcount(pen)}]));
+  for (const [id, observation] of Object.entries(observations)) counts[id] = {count:observation.total,counted:true};
+  const map = ui.penMap({lanes,depth,counts,action:'count-open-pen',key:'inspection-count-map',
+    entrance:t('Entrance','入口'), labels:{map:t('Pens','栏位'),pen:penLabel,counted:t('Counted','已盘'),
+      onRecord:t('On record','账面'),emptyValue:t('Empty','空栏')}});
+  const done = Object.keys(observations).length;
   return page(t('Recount','盘点'), unit, '<div class="recount-flow">'+
-    ui.heading({kind:'section',level:2,title:t(done+(done===1?' pen counted':' pens counted'),'已盘 '+done+' 栏')})+map.innerHTML+'</div>', {
+    ui.heading({kind:'section',level:2,title:t(done+(done===1?' pen counted':' pens counted'),'已盘 '+done+' 栏')})+map+'</div>', {
     label:t('Finish recount','结束盘点'), action:'count-finish', waiting:!done
   },bar);
 }
@@ -221,12 +209,12 @@ function tagList(c, unit) {
   const origin = r.read ? entryFor(r.read) : null;
   const notice = r.read === '000999' ? t('Ear tag not found: ','未找到耳标：')+r.read :
     origin && (!origin.local || origin.pen.id !== r.pen) ? r.read+' · '+origin.unit+' · '+penLabel(origin.pen.id) : '';
-  return (notice ? '<p role="status">'+esc(notice)+'</p>' : '') +
+  return (notice ? '<p class="st-find-hint" role="status">'+esc(notice)+'</p>' : '') +
     (hits.length ? group(hits.map(x => row(x, false)).join('')) :
-      term && !chosen.some(x => x.pig.id.includes(term)) ? '<p role="status">'+t('No matching ear tag','没有匹配的耳标')+'</p>' : '') +
+      term && !chosen.some(x => x.pig.id.includes(term)) ? '<p class="st-find-hint" role="status">'+t('No matching ear tag','没有匹配的耳标')+'</p>' : '') +
     (chosen.length ? group(chosen.map(x => row(x, true)).join('')) :
-      '<p>'+t('Scan every tagged pig','扫描每头带耳标的猪')+' · '+t(known.filter(x => x.local && x.pen.id === r.pen).length+' on record','账面 '+known.filter(x => x.local && x.pen.id === r.pen).length+' 头')+'</p>') +
-    (missing.length ? '<p>'+t('On record, not yet confirmed: ','账面有、尚未确认：')+esc(missing.join(', '))+'</p>' : '');
+      '<p class="st-find-hint">'+t('Scan every tagged pig','扫描每头带耳标的猪')+' · '+t(known.filter(x => x.local && x.pen.id === r.pen).length+' on record','账面 '+known.filter(x => x.local && x.pen.id === r.pen).length+' 头')+'</p>') +
+    (missing.length ? '<p class="st-find-hint">'+t('On record, not yet confirmed: ','账面有、尚未确认：')+esc(missing.join(', '))+'</p>' : '');
 }
 
 export function recountInput(c, el, unit) {
@@ -250,11 +238,11 @@ function penPage(c, unit, bar) {
     ui.choiceSearch({label:t('Ear tag','耳标'),placeholder:t('Ear tag','耳标'),value:r.query,attrs:{'data-recount-query':''},
       scan:{action:'count-scan',label:t('Scan ear tag','扫描耳标')}});
   const conflict = r.conflict && draft.tags.includes(r.conflict) ?
-    '<p role="alert">'+esc(r.conflict)+' · '+t('Already confirmed in another counted pen. Check both pens.','同一耳标已在另一栏确认，请核对两栏。')+'</p>' : '';
+    '<p class="st-find-hint" role="alert">'+esc(r.conflict)+' · '+t('Already confirmed in another counted pen. Check both pens.','同一耳标已在另一栏确认，请核对两栏。')+'</p>' : '';
   return page(penLabel(r.pen), unit, '<div class="recount-flow">'+quantity+
     ui.heading({kind:'section',level:2,title:t('Which tagged pigs are here?','哪些带耳标的猪在这里？')})+search+
     '<div class="recount-tags" data-recount-tags>'+tagList(c,unit)+'</div>'+conflict+
-    (canEstimateUntagged && !under ? '<p>'+t(draft.total-draft.tags.length+' without ear tags','无耳标 '+(draft.total-draft.tags.length)+' 头')+'</p>' : '')+'</div>',{
+    (canEstimateUntagged && !under ? '<p class="st-find-hint">'+t(draft.total-draft.tags.length+' without ear tags','无耳标 '+(draft.total-draft.tags.length)+' 头')+'</p>' : '')+'</div>',{
       label:t('Done','完成'),action:'count-done',waiting:under
     },bar);
 }
@@ -273,7 +261,7 @@ function reviewPage(c, unit, bar) {
   if (summary.withoutTagsDelta) rows.push(ui.row({variant:'navigation',title:t('Without ear tags','无耳标差异'),trailing:signed(summary.withoutTagsDelta),action:'count-show',value:'withoutTags',wrap:true}));
   const counted = ui.row({title:t('Counted','实盘'),trailing:String(summary.counted)});
   const onRecord = ui.row({title:t('On record','账面'),trailing:String(summary.onRecord)});
-  const notice = summary.blocked ? '<p role="status">'+t('Count the remaining pens with untagged pigs to resolve this difference.','请继续盘点还有无耳标猪的栏位，核实这笔差异。')+'</p>' : '';
+  const notice = summary.blocked ? '<p class="st-find-hint" role="status">'+t('Count the remaining pens with untagged pigs to resolve this difference.','请继续盘点还有无耳标猪的栏位，核实这笔差异。')+'</p>' : '';
   return page(t('Recount review','盘点差异'),unit,'<div class="recount-flow"><div class="st-panel st-row-group">'+
     counted+rows.join('')+onRecord+'</div>'+notice+'</div>',{
     label:t('Save recount','保存盘点'),action:'count-save',waiting:summary.blocked
@@ -286,10 +274,10 @@ function detailPage(c, unit, bar) {
   const key = c.recount.detail;
   if (key === 'withoutTags') return page(t('Without ear tags','无耳标差异'),unit,
     '<div class="recount-flow">'+ui.facts([{label:t('Difference','差异'),value:signed(summary.withoutTagsDelta)}],{columns:1})+
-    '<p>'+t('Unresolved differences are recorded with this observation.','未核实的差异随本次盘点记录。')+'</p></div>',null,bar);
+    '<p class="st-find-hint">'+t('Unresolved differences are recorded with this observation.','未核实的差异随本次盘点记录。')+'</p></div>',null,bar);
   const detail = summary[key].map(x => ui.row({variant:'read',title:x.pig.id,
     description:x.unit+' · '+penLabel(x.pen.id)+(x.to ? ' → '+penLabel(x.to) : ''),wrap:true})).join('');
-  const note = key === 'notFound' ? '<p>'+t('Recorded as a discrepancy for follow-up.','记入差异，待后续核实。')+'</p>' : '';
+  const note = key === 'notFound' ? '<p class="st-find-hint">'+t('Recorded as a discrepancy for follow-up.','记入差异，待后续核实。')+'</p>' : '';
   return page(t(...reviewTitles[key]),unit,'<div class="recount-flow"><div class="st-panel st-row-group">'+detail+'</div>'+note+'</div>',null,bar);
 }
 

@@ -6,6 +6,10 @@ A pen map shows a room as a map of pens, each pen a tile that goes to that pen a
 
 Classification: **component** (a new job; no existing component draws a map of places). Two variants: the map, and the map's [Whole room](#whole-room) view.
 
+## Recount tiles
+
+Inspection can pass `counts` to show a second line with a physical pen’s recorded or observed headcount. Each value is `{ count, counted? }`. The tile is green only after a count is staged. A pen with no entry is empty, but can still be opened. The pen layout, tap action and dimensions are the same as the standard map. The host owns the observation and the save decision. No value or count status is drawn for callers that omit `counts`.
+
 ## When to use / when not
 
 **Use it when**

@@ -28,6 +28,7 @@
 <div class="ph" data-state="Long lane · 2 × 50 stalls" data-demo="stalls50"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Chinese · Unit 7" data-demo="zh7"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Chinese · 2 × 100" data-demo="zh100"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Recount · counted, on record and empty" data-demo="recount"><div class="bg"></div><div class="over"></div></div>
 <script>
 const UI=window.SentriUI;
 const L=n=>[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].slice(0,n);
@@ -66,6 +67,9 @@ const open=(name,lang,o)=>{
  return UI.sheet({surface:'menu',size:'long',title:lang==='zh'?'栏位图':'Pen map',label:'Pen map',line:{key:UI.penMapKey({pens:b.pens,words:lang==='zh'?t.legend:b.words||t.legend})},body,footer:UI.penMapFooter({back:{action:'back',label:lang==='zh'?'返回':'Back'},depth:b.depth,label:lang==='zh'?'跳转栏位':'Jump to pens'})});
 };
 const R={
+ recount:()=>UI.sheet({variant:'page',title:'Recount',line:{text:'Unit 7'},back:{action:'back'},
+  body:UI.penMap({lanes:['C','D'],depth:5,counts:{C1:{count:3,counted:true},D4:{count:18,counted:true},D5:{count:38}},key:'pm-recount'}),
+  footer:UI.sheetFooter({back:false,primary:{label:'Finish recount',action:'finish'}})}),
  unit7:()=>open('unit7','en'),
  pressed:()=>open('unit7','en'),
  peek:()=>open('unit7','en'),

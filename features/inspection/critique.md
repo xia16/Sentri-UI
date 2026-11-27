@@ -339,7 +339,7 @@ The Inspection pen door, existing five pen tools and pen log stay in their curre
 
 ### Parts
 
-Use RowGrid for the Count door, Page/Sheet and its footer for each surface, PenMap for the map geometry, Stepper for whole-pen count, ChoiceSearch and selectable rows for ear tags, and navigation rows and Log for the review and audit. Keep count-specific map content in Inspection until its PenMap variant is agreed across features.
+Use RowGrid for the Count door, Page/Sheet and its footer for each surface, PenMap for the map geometry, Stepper for whole-pen count, ChoiceSearch and selectable rows for ear tags, and navigation rows and Log for the review and audit. Pass count-specific content through the optional PenMap count tiles. This use is scoped to Inspection.
 
 ### Self-crit
 

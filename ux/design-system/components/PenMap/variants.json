@@ -28,11 +28,13 @@
       "Lane A on the right as you walk in · the row counts from A",
       "Long lane · 2 × 50 stalls",
       "Chinese · Unit 7",
-      "Chinese · 2 × 100"
+      "Chinese · 2 × 100",
+      "Recount · counted, on record and empty"
     ],
     "usedBy": [
       "farrowing.pen-map",
-      "inspection.go-to-pen"
+      "inspection.go-to-pen",
+      "inspection.recount-map"
     ]
   },
   {
