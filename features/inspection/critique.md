@@ -324,3 +324,31 @@ Scope: the words only. At `?lang=zh` these screens read in English where the Ins
 ## Attention budget
 
 Unchanged: each screen shows the same information in the same order as on main, in Chinese. Cut list: nothing is cut.
+
+## Inspection recount · 2026-11-27
+
+### Keep
+
+The Inspection pen door, existing five pen tools and pen log stay in their current hierarchy. The normal Inspection search, scan, pen map and Farrowing entry stay distinct.
+
+### Problems
+
+- Major: `inspection.pen` on `df82ba5d` has no live Count action. The older `inspection.set-count` screens point to the archived quantity-calibration deck.
+- Major: the retired deck does not show a live staged count for each pen or a unit review when the net number stays the same but the tag identities differ. Boards 5–12 show the replacement.
+- Major: disposition and allocation at the save boundary are incomplete in the source. Show what was observed, and keep unresolved writes as open decisions.
+
+### Parts
+
+Use RowGrid for the Count door, Page/Sheet and its footer for each surface, PenMap for the map geometry, Stepper for whole-pen count, ChoiceSearch and selectable rows for ear tags, and navigation rows and Log for the review and audit. Pass count-specific content through the optional PenMap count tiles. This use is scoped to Inspection.
+
+### Self-crit
+
+At 390 px the Count tile sits next to the existing pen tools, so the worker can reach it from the pen they are looking at. The existing map's Back stays in place and Recount opens a dedicated map that can distinguish a staged observation from its original number. The pen's dominant number, search-and-scan, then Done match the canvas order. The review keeps the original and observed totals on either side of the differences, so a net-zero identity change still has two explicit rows.
+
+#### Pen input follow-up · 2026-11-27
+
+The previous count hero put the label inside its card, reduced the untouched ear-tag state to one line, and omitted the history and bottom-left tally. The [layout comparison](count-layout/canvas.html) matches the reference's hierarchy with Stepper Well, a Panel with ChoiceList's empty state, and evidence Rows. The footer keeps the sample-derived untagged number and tag confirmation beside Done. The compact Stepper uses the current white page surface. D4 uses the prototype's recorded two tagged pigs so the displayed counts and sample behave consistently.
+
+#### Unit map follow-up · 2026-11-27
+
+The previous map had one count, green figures on white tiles and an action-only footer. The [layout comparison](count-layout/canvas.html#unit) shows the progress card with one segment per occupied pen, the full done face and its key, and the pending pens and recorded stock beside Finish. A green zero distinguishes a verified empty pen from the quiet Empty state. The fixture retains the physical Inspection map and shows original recorded stock where the reference illustrates a disputed adjustment.

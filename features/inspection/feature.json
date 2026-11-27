@@ -82,6 +82,16 @@
       ]
     ],
     [
+      "Inspection recount",
+      [
+        "inspection.recount-pen",
+        "inspection.recount-map",
+        "inspection.recount-review",
+        "inspection.recount-found",
+        "inspection.recount-not-found"
+      ]
+    ],
+    [
       "Pen head count",
       [
         "inspection.set-count",
@@ -344,6 +354,46 @@
       "inspection.farrowing-pen-fault",
       "inspection.farrowing-pen",
       "Report fault or Back"
+    ],
+    [
+      "inspection.pen",
+      "inspection.recount-pen",
+      "tap Count"
+    ],
+    [
+      "inspection.go-to-pen",
+      "inspection.recount-map",
+      "tap Recount"
+    ],
+    [
+      "inspection.recount-pen",
+      "inspection.recount-map",
+      "tap Done"
+    ],
+    [
+      "inspection.recount-map",
+      "inspection.recount-pen",
+      "tap a pen"
+    ],
+    [
+      "inspection.recount-map",
+      "inspection.recount-review",
+      "tap Finish recount when an identity or quantity differs"
+    ],
+    [
+      "inspection.recount-review",
+      "inspection.recount-found",
+      "open Found from other units"
+    ],
+    [
+      "inspection.recount-review",
+      "inspection.recount-not-found",
+      "open Not found"
+    ],
+    [
+      "inspection.recount-review",
+      "inspection.pen",
+      "save when you entered from a pen"
     ]
   ],
   "screens": [
@@ -674,7 +724,13 @@
             "logic": "Feed today is the pen's allowance (or Ad-lib / Station-fed) over its formula; Pigs counts tagged and untagged pigs, with the untagged count or All tagged beneath; Looked is the pen's last observation and is left out when none is recorded."
           }
         ],
-        "controls": [],
+        "controls": [
+          {
+            "control": "Count",
+            "does": "opens unit recount directly in this pen",
+            "goesTo": "inspection.recount-pen"
+          }
+        ],
         "copy": [
           "Pen actions (raw)",
           "Needs attention (raw)",
@@ -684,9 +740,7 @@
           "Looked (raw)",
           "Pen log (raw)"
         ],
-        "issues": [
-          "Count (Set count, pen-ops 2.3) is not a verb Inspection has yet, so it is not a tile."
-        ]
+        "issues": []
       }
     },
     {
@@ -1919,7 +1973,7 @@
       "id": "inspection.set-count",
       "name": "Set count",
       "zh": "设置头数",
-      "status": "in-design",
+      "status": "earlier",
       "url": "/ux/archive/workflows.html?sec=wf-count&slide=1",
       "figma": "",
       "notes": {
@@ -1941,7 +1995,7 @@
       "id": "inspection.set-count-batches",
       "name": "Set count · several batches",
       "zh": "设置头数 · 多个批次",
-      "status": "in-design",
+      "status": "earlier",
       "url": "/ux/archive/workflows.html?sec=wf-count&slide=2",
       "figma": "",
       "notes": {
@@ -1960,7 +2014,7 @@
       "id": "inspection.set-count-fewer",
       "name": "Set count · why fewer",
       "zh": "设置头数 · 减少原因",
-      "status": "in-design",
+      "status": "earlier",
       "url": "/ux/archive/workflows.html?sec=wf-count&slide=3",
       "figma": "",
       "notes": {
@@ -1979,7 +2033,7 @@
       "id": "inspection.set-count-more",
       "name": "Set count · why more",
       "zh": "设置头数 · 增加原因",
-      "status": "in-design",
+      "status": "earlier",
       "url": "/ux/archive/workflows.html?sec=wf-count&slide=4",
       "figma": "",
       "notes": {
@@ -1999,7 +2053,7 @@
       "id": "inspection.count-recorded",
       "name": "Pen record · count set",
       "zh": "栏位记录 · 头数已设",
-      "status": "in-design",
+      "status": "earlier",
       "url": "/ux/archive/workflows.html?sec=wf-count&slide=5",
       "figma": "",
       "notes": {
@@ -2313,6 +2367,125 @@
           "A typed resolution note is kept for that fault through Back, until Resolve fault."
         ],
         "issues": []
+      }
+    },
+    {
+      "id": "inspection.recount-pen",
+      "name": "Count a pen",
+      "zh": "栏位盘点",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+        "[data-action=\"count-start\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Enter the observed whole-pen count, then confirm tagged pigs by search or scan."
+      }
+    },
+    {
+      "id": "inspection.recount-map",
+      "name": "Unit recount",
+      "zh": "单元盘点",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+        "[data-action=\"count-start\"]",
+        "[data-action=\"count-done\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Choose another pen or finish the unit recount. Progress counts occupied pens, green tiles show staged observations, and the footer shows pending recorded stock or the sum of the actual counts."
+      }
+    },
+    {
+      "id": "inspection.recount-review",
+      "name": "Recount differences",
+      "zh": "盘点差异",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+        "[data-action=\"count-start\"]",
+        {
+          "fill": "[data-recount-query]",
+          "text": "000801"
+        },
+        "[data-action=\"count-pick\"][data-value=\"000801\"]",
+        {
+          "fill": "[data-recount-query]",
+          "text": "000430"
+        },
+        "[data-action=\"count-pick\"][data-value=\"000430\"]",
+        "[data-action=\"count-done\"]",
+        "[data-action=\"count-finish\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Review counted and recorded totals and every changed identity before saving."
+      }
+    },
+    {
+      "id": "inspection.recount-found",
+      "name": "Found from other units",
+      "zh": "从其他单元找到",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+        "[data-action=\"count-start\"]",
+        {
+          "fill": "[data-recount-query]",
+          "text": "000801"
+        },
+        "[data-action=\"count-pick\"][data-value=\"000801\"]",
+        {
+          "fill": "[data-recount-query]",
+          "text": "000430"
+        },
+        "[data-action=\"count-pick\"][data-value=\"000430\"]",
+        "[data-action=\"count-done\"]",
+        "[data-action=\"count-finish\"]",
+        "[data-action=\"count-show\"][data-value=\"found\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "See the original location and the counted pen for each confirmed external tag."
+      }
+    },
+    {
+      "id": "inspection.recount-not-found",
+      "name": "Not found",
+      "zh": "未找到",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        "[data-action=\"pen-detail\"][data-value=\"D4\"]",
+        "[data-action=\"count-start\"]",
+        {
+          "fill": "[data-recount-query]",
+          "text": "000801"
+        },
+        "[data-action=\"count-pick\"][data-value=\"000801\"]",
+        {
+          "fill": "[data-recount-query]",
+          "text": "000430"
+        },
+        "[data-action=\"count-pick\"][data-value=\"000430\"]",
+        "[data-action=\"count-done\"]",
+        "[data-action=\"count-finish\"]",
+        "[data-action=\"count-show\"][data-value=\"notFound\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "See recorded ear tags that still need to be reconciled."
       }
     }
   ]

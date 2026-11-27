@@ -1,0 +1,996 @@
+{
+ "feature": "inspection",
+ "commit": "6be3e8b2dbd034e575a9c4801d26c43e89eeac6f",
+ "dirty": false,
+ "ran": "2026-11-27T09:36:52.723Z",
+ "base": "http://127.0.0.1:4318",
+ "langs": [
+  "en",
+  "zh"
+ ],
+ "widths": [
+  360,
+  390
+ ],
+ "nodes": {
+  "entry": 1,
+  "state": 3,
+  "action": 9,
+  "outcome": 9,
+  "decision-blocker": 4
+ },
+ "summary": {
+  "pass": 9,
+  "fail": 0,
+  "blocked": 4,
+  "pending": 0,
+  "slow": 0
+ },
+ "byLang": {
+  "en": {
+   "pass": 9,
+   "fail": 0,
+   "blocked": 0
+  },
+  "zh": {
+   "pass": 9,
+   "fail": 0,
+   "blocked": 0
+  }
+ },
+ "byBranch": {
+  "inspection-count": {
+   "pass": 9,
+   "fail": 0,
+   "blocked": 4,
+   "pending": 0
+  }
+ },
+ "hardFailures": [],
+ "leaves": [
+  {
+   "id": "inspect-count-pen-entry",
+   "tree": "C-1",
+   "branch": "inspection-count",
+   "label": "The D4 count opens with no tag confirmed.",
+   "gwt": {
+    "given": "D4 is open in Inspection.",
+    "when": "The worker taps Count.",
+    "then": "The D4 count opens with no tag confirmed."
+   },
+   "path": [
+    "inspection-count",
+    "from-pen",
+    "action-entry",
+    "inspect-count-pen-entry"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Inspection recount",
+     "says": "Inspection recount follows boards 1 and 5–13."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-pen-entry/en-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-pen-entry/en-360/01-data-action-count-start.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-pen-entry/en-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-pen-entry/en-390/01-data-action-count-start.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-pen-entry/zh-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-pen-entry/zh-360/01-data-action-count-start.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-pen-entry/zh-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-pen-entry/zh-390/01-data-action-count-start.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "inspect-count-unique-tag",
+   "tree": "C-3",
+   "branch": "inspection-count",
+   "label": "The confirmed tag stays selected once.",
+   "gwt": {
+    "given": "The worker is counting D4.",
+    "when": "They search for an ear tag they already confirmed.",
+    "then": "The confirmed tag stays selected once."
+   },
+   "path": [
+    "inspection-count",
+    "from-pen",
+    "action-repeat-tag",
+    "inspect-count-unique-tag"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Inspection recount",
+     "says": "Inspection recount follows boards 1 and 5–13."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-unique-tag/en-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/en-360/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/en-360/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/en-360/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/en-360/04-fill-data-recount-query.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-unique-tag/en-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/en-390/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/en-390/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/en-390/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/en-390/04-fill-data-recount-query.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-unique-tag/zh-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/zh-360/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/zh-360/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/zh-360/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/zh-360/04-fill-data-recount-query.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-unique-tag/zh-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/zh-390/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/zh-390/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/zh-390/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-unique-tag/zh-390/04-fill-data-recount-query.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "inspect-count-reopens",
+   "tree": "C-5",
+   "branch": "inspection-count",
+   "label": "They see the same staged ear tag.",
+   "gwt": {
+    "given": "One ear tag has been confirmed in D4.",
+    "when": "The worker finishes that pen and opens it again.",
+    "then": "They see the same staged ear tag."
+   },
+   "path": [
+    "inspection-count",
+    "from-pen",
+    "action-reopen",
+    "inspect-count-reopens"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Inspection recount",
+     "says": "Inspection recount follows boards 1 and 5–13."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-reopens/en-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-reopens/en-360/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-reopens/en-360/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-reopens/en-360/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-reopens/en-360/04-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-reopens/en-360/05-data-action-count-open-pen-data-.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-reopens/en-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-reopens/en-390/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-reopens/en-390/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-reopens/en-390/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-reopens/en-390/04-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-reopens/en-390/05-data-action-count-open-pen-data-.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-reopens/zh-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-reopens/zh-360/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-reopens/zh-360/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-reopens/zh-360/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-reopens/zh-360/04-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-reopens/zh-360/05-data-action-count-open-pen-data-.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-reopens/zh-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-reopens/zh-390/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-reopens/zh-390/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-reopens/zh-390/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-reopens/zh-390/04-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-reopens/zh-390/05-data-action-count-open-pen-data-.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "inspect-count-match-log",
+   "tree": "C-6",
+   "branch": "inspection-count",
+   "label": "The count is saved directly and appears in the log.",
+   "gwt": {
+    "given": "Both D4 tags and its count match the record.",
+    "when": "The worker finishes the unit and opens the pen log.",
+    "then": "The count is saved directly and appears in the log."
+   },
+   "path": [
+    "inspection-count",
+    "from-pen",
+    "action-match-save",
+    "inspect-count-match-log"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Inspection recount",
+     "says": "Inspection recount follows boards 1 and 5–13."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-match-log/en-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-360/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-360/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-360/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-360/04-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-360/05-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-360/06-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-360/07-data-action-count-finish.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-360/08-data-action-pen-log.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-match-log/en-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-390/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-390/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-390/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-390/04-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-390/05-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-390/06-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-390/07-data-action-count-finish.png",
+      "review/scenarios/inspection/inspect-count-match-log/en-390/08-data-action-pen-log.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-match-log/zh-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-360/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-360/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-360/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-360/04-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-360/05-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-360/06-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-360/07-data-action-count-finish.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-360/08-data-action-pen-log.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-match-log/zh-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-390/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-390/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-390/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-390/04-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-390/05-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-390/06-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-390/07-data-action-count-finish.png",
+      "review/scenarios/inspection/inspect-count-match-log/zh-390/08-data-action-pen-log.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "inspect-count-same-total-swap",
+   "tree": "C-7",
+   "branch": "inspection-count",
+   "label": "The review shows both the outside tag and the unconfirmed local tag.",
+   "gwt": {
+    "given": "One D4 tag and one outside tag are confirmed.",
+    "when": "The worker finishes the unit recount.",
+    "then": "The review shows both the outside tag and the unconfirmed local tag."
+   },
+   "path": [
+    "inspection-count",
+    "from-pen",
+    "action-review-swap",
+    "inspect-count-same-total-swap"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Inspection recount",
+     "says": "Inspection recount follows boards 1 and 5–13."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-360/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-360/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-360/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-360/04-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-360/05-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-360/06-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-360/07-data-action-count-finish.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-390/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-390/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-390/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-390/04-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-390/05-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-390/06-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/en-390/07-data-action-count-finish.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-360/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-360/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-360/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-360/04-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-360/05-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-360/06-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-360/07-data-action-count-finish.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-390/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-390/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-390/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-390/04-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-390/05-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-390/06-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-same-total-swap/zh-390/07-data-action-count-finish.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "inspect-count-correct",
+   "tree": "C-8",
+   "branch": "inspection-count",
+   "label": "The staged tags are still there for correction.",
+   "gwt": {
+    "given": "A worker is reviewing an external tag and a tag they did not find.",
+    "when": "They go back and reopen D4.",
+    "then": "The staged tags are still there for correction."
+   },
+   "path": [
+    "inspection-count",
+    "from-pen",
+    "action-return-to-review",
+    "inspect-count-correct"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Inspection recount",
+     "says": "Inspection recount follows boards 1 and 5–13."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-correct/en-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-correct/en-360/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-correct/en-360/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-correct/en-360/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-correct/en-360/04-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-correct/en-360/05-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-correct/en-360/06-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-correct/en-360/07-data-action-count-finish.png",
+      "review/scenarios/inspection/inspect-count-correct/en-360/08-data-action-count-back.png",
+      "review/scenarios/inspection/inspect-count-correct/en-360/09-data-action-count-open-pen-data-.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-correct/en-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-correct/en-390/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-correct/en-390/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-correct/en-390/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-correct/en-390/04-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-correct/en-390/05-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-correct/en-390/06-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-correct/en-390/07-data-action-count-finish.png",
+      "review/scenarios/inspection/inspect-count-correct/en-390/08-data-action-count-back.png",
+      "review/scenarios/inspection/inspect-count-correct/en-390/09-data-action-count-open-pen-data-.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-correct/zh-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-360/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-360/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-360/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-360/04-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-360/05-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-360/06-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-360/07-data-action-count-finish.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-360/08-data-action-count-back.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-360/09-data-action-count-open-pen-data-.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-correct/zh-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-390/01-data-action-count-start.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-390/02-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-390/03-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-390/04-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-390/05-data-action-count-pick-data-valu.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-390/06-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-390/07-data-action-count-finish.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-390/08-data-action-count-back.png",
+      "review/scenarios/inspection/inspect-count-correct/zh-390/09-data-action-count-open-pen-data-.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "inspect-count-empty-pen",
+   "tree": "C-2",
+   "branch": "inspection-count",
+   "label": "The empty pen can be opened and staged.",
+   "gwt": {
+    "given": "The inspection unit map is open.",
+    "when": "The worker opens Recount and taps an empty pen.",
+    "then": "The empty pen can be opened and staged."
+   },
+   "path": [
+    "inspection-count",
+    "from-map",
+    "action-empty-pen",
+    "inspect-count-empty-pen"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Inspection recount",
+     "says": "Inspection recount follows boards 1 and 5–13."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-empty-pen/en-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-empty-pen/en-360/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-empty-pen/en-360/02-data-action-count-open-pen-data-.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-empty-pen/en-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-empty-pen/en-390/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-empty-pen/en-390/02-data-action-count-open-pen-data-.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-empty-pen/zh-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-empty-pen/zh-360/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-empty-pen/zh-360/02-data-action-count-open-pen-data-.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-empty-pen/zh-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-empty-pen/zh-390/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-empty-pen/zh-390/02-data-action-count-open-pen-data-.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "inspect-count-unit-progress",
+   "tree": "C-13",
+   "branch": "inspection-count",
+   "label": "Both pens are staged and only the occupied one advances progress.",
+   "gwt": {
+    "given": "C3 is empty and D4 has pigs.",
+    "when": "The worker stages both pens.",
+    "then": "C3 shows a verified zero, one occupied pen is counted and the footer describes the remaining stock."
+   },
+   "path": [
+    "inspection-count",
+    "from-map",
+    "action-unit-progress",
+    "inspect-count-unit-progress"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Inspection recount",
+     "says": "The map shows occupied-pen progress, staged counts and remaining recorded stock."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-unit-progress/en-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-360/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-360/02-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-360/03-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-360/04-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-360/05-data-action-count-done.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-unit-progress/en-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-390/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-390/02-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-390/03-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-390/04-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/en-390/05-data-action-count-done.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-360/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-360/02-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-360/03-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-360/04-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-360/05-data-action-count-done.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-390/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-390/02-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-390/03-data-action-count-done.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-390/04-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-unit-progress/zh-390/05-data-action-count-done.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "inspect-count-below-confirmed",
+   "tree": "C-4",
+   "branch": "inspection-count",
+   "label": "Done waits until the total covers the confirmed tags.",
+   "gwt": {
+    "given": "An empty-record pen has a total of zero.",
+    "when": "The worker confirms one ear tag.",
+    "then": "Done waits until the total covers the confirmed tags."
+   },
+   "path": [
+    "inspection-count",
+    "from-map",
+    "action-too-few",
+    "inspect-count-below-confirmed"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Inspection recount",
+     "says": "Inspection recount follows boards 1 and 5–13."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-below-confirmed/en-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/en-360/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/en-360/02-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/en-360/03-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/en-360/04-data-action-count-pick-data-valu.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-below-confirmed/en-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/en-390/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/en-390/02-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/en-390/03-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/en-390/04-data-action-count-pick-data-valu.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-below-confirmed/zh-360/00-start.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/zh-360/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/zh-360/02-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/zh-360/03-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/zh-360/04-data-action-count-pick-data-valu.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/inspect-count-below-confirmed/zh-390/00-start.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/zh-390/01-data-action-count-unit.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/zh-390/02-data-action-count-open-pen-data-.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/zh-390/03-fill-data-recount-query.png",
+      "review/scenarios/inspection/inspect-count-below-confirmed/zh-390/04-data-action-count-pick-data-valu.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "inspect-count-partial-discrepancy",
+   "tree": "C-9",
+   "branch": "inspection-count",
+   "label": "partial-discrepancy",
+   "gwt": null,
+   "path": [
+    "inspection-count",
+    "open-decisions",
+    "inspect-count-partial-discrepancy"
+   ],
+   "authority": [],
+   "result": "blocked",
+   "hard": [],
+   "runs": [],
+   "question": "Q1",
+   "sources": [
+    "Inspection scenario tree, open decisions"
+   ]
+  },
+  {
+   "id": "inspect-count-unconfirmed-placement",
+   "tree": "C-10",
+   "branch": "inspection-count",
+   "label": "unconfirmed-placement",
+   "gwt": null,
+   "path": [
+    "inspection-count",
+    "open-decisions",
+    "inspect-count-unconfirmed-placement"
+   ],
+   "authority": [],
+   "result": "blocked",
+   "hard": [],
+   "runs": [],
+   "question": "Q2",
+   "sources": [
+    "Inspection scenario tree, open decisions"
+   ]
+  },
+  {
+   "id": "inspect-count-open-transfer",
+   "tree": "C-11",
+   "branch": "inspection-count",
+   "label": "open-transfer",
+   "gwt": null,
+   "path": [
+    "inspection-count",
+    "open-decisions",
+    "inspect-count-open-transfer"
+   ],
+   "authority": [],
+   "result": "blocked",
+   "hard": [],
+   "runs": [],
+   "question": "Q3",
+   "sources": [
+    "Inspection scenario tree, open decisions"
+   ]
+  },
+  {
+   "id": "inspect-count-interruption-and-conflict",
+   "tree": "C-12",
+   "branch": "inspection-count",
+   "label": "interruption-and-conflict",
+   "gwt": null,
+   "path": [
+    "inspection-count",
+    "open-decisions",
+    "inspect-count-interruption-and-conflict"
+   ],
+   "authority": [],
+   "result": "blocked",
+   "hard": [],
+   "runs": [],
+   "question": "Q4",
+   "sources": [
+    "Inspection scenario tree, open decisions"
+   ]
+  }
+ ]
+}

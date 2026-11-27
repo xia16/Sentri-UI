@@ -1,0 +1,21 @@
+.inspection-recount .recount-flow,
+.inspection-recount .recount-tags {
+  display: grid;
+  gap: var(--space-12);
+}
+
+.inspection-recount .recount-pen-flow,
+.inspection-recount .recount-section {
+  display: grid;
+  gap: var(--space-section);
+}
+
+.inspection-recount .recount-section {
+  gap: var(--space-12);
+}
+
+.inspection-recount .recount-summary {
+  align-self: center;
+  flex: 0 1 42%;
+  min-width: 0;
+}

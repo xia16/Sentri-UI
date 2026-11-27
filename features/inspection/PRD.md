@@ -48,3 +48,20 @@ Open (recorded on the screens as issues):
 - "Health" and "Feed" lens counts do not say what they count.
 - The care level shows on a row only by the tag's look (red wash with "!", outlined, plain); the care word and the day are on the record.
 - Fixed author "G. Hansen" and times 06:40 and 09:41 stand in for the signed-in worker and real times.
+
+## Inspection recount
+
+[Claude Design, boards 1, 5–13 and 25](canvas.md) is the source for this prototype round. Count opens from a pen. Board 5 specifies the unit recount map once the round has opened. The control that opens it from a unit is unresolved. The preview puts a Recount shortcut in the existing Inspection Pen map footer for walk-throughs. Choose an empty or occupied pen. Record its whole physical count, then scan or search for each tagged animal. The tag list starts empty; a repeated read counts once and a stray read can be unticked. Done stages the pen and goes to the recount map. Open the same pen again to correct it.
+
+The pen's compact count control puts the question above the minus, number and plus. While no ear tags have been confirmed, the empty panel prompts the worker to scan and shows how many the record expects for that pen. The footer computes total minus confirmed tags and shows scan or match status beside Done. Its figure is provisional until the tags have been checked. Since the last count shows a sample D4 history, or the latest count saved in the active session. See the [layout comparison](count-layout/canvas.html).
+
+The unit progress card tracks occupied pens counted, including any formerly occupied pen counted at zero and any newly discovered occupied pen. A verified empty pen is selectable and stages as a green zero; it does not advance occupied-pen progress. The footer names the one remaining occupied pen or shows how many remain, with their recorded headcount. After those pens are counted, it shows the sum of actual counts. The prototype does not infer new counts for skipped pens.
+
+Finish recount saves a round with no differences. Changed headcounts and found or unconfirmed identities go to a review before Save. A tag actually seen in another unit shows the recorded origin and its observed destination. A recorded tag not confirmed appears by ear tag and original pen as a batch discrepancy; it does not create a Missing or Death report. Each saved sample count is visible in the pen log. The prototype stores only sample data for the active session.
+
+## Not supported
+
+- Planned transfer and receiving. These use separate task flows.
+- Automatic death or missing reports from a count. Those are separate, deliberate operations.
+
+Open product decisions for incomplete counts, tag status after save and interaction with open moves are in [the scenario tree](scenario-tree.md#2--open-decisions).
